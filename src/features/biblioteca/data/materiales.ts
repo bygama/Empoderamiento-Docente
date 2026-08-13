@@ -8,7 +8,7 @@
 
 export const TIPOS = [
   "Producción académica",
-  "Recursos pedagógicos",
+  "Recurso didáctico",
   "Proyectos",
   "Guías y cuadernos",
   "Evaluación",
@@ -62,7 +62,7 @@ export const MATERIALES: Material[] = [
     titulo: "Secuencias didácticas abiertas: fracciones y reparto",
     descripcion:
       "Colección editable de secuencias sobre fracciones a partir de situaciones de reparto, listas para adaptar a cada grupo.",
-    tipo: "Recursos pedagógicos",
+    tipo: "Recurso didáctico",
     tema: "Pensamiento matemático",
     publico: "Docentes",
     anio: 2025,
