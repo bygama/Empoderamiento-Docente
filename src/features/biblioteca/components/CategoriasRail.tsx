@@ -22,7 +22,7 @@ import {
 const CATEGORIAS: { label: string; Icon: (p: IconProps) => React.JSX.Element }[] = [
   { label: "Todo el catálogo", Icon: Compass },
   { label: "Producción académica", Icon: BookOpen },
-  { label: "Recursos pedagógicos", Icon: Lightbulb },
+  { label: "Recurso didáctico", Icon: Lightbulb },
   { label: "Proyectos", Icon: Target },
   { label: "Guías y cuadernos", Icon: School },
   { label: "Evaluación", Icon: TrendingUp },
