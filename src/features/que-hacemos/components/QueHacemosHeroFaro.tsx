@@ -1,0 +1,455 @@
+"use client";
+
+import { useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { Highlight } from "@/components/ui/Highlight";
+import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { FaroEscena, CAPAS_Z, FOCO_X, FOCO_Y } from "./FaroEscena";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+/**
+ * Hero de «Qué hacemos» v2 — scroll-story del faro con CÁMARA.
+ *
+ * La escena (FaroEscena) son seis capas con profundidad Z. Acá vive la
+ * cámara: un proxy {z,x,y} animado por la timeline scrubbed; cada frame se
+ * proyecta a cada capa con la fórmula de una cámara pinhole:
+ *
+ *   escala(Z)  = (P + Z) / (P + Z − camZ)      P = distancia focal
+ *   despl.(Z)  = −camX · P / (P + Z − camZ)    (cerca se mueve más)
+ *
+ * Todo se expande desde el punto de fuga (transform-origin de las capas):
+ * avanzar la cámara ES caminar el muelle hacia el faro. Paralaje correcto
+ * sin preserve-3d (los filters/overflow no pueden aplanar nada).
+ *
+ * Recorrido (una sola escena que evoluciona, sin pantallas):
+ *   S0 0.00–0.10  SILENCIO   plano general lejano, mundo apenas insinuado,
+ *                            una chispa tenue en la linterna, una frase.
+ *   S1 0.10–0.40  APROXIMACIÓN + ENCENDIDO  la cámara avanza, el muelle y
+ *                            el primer plano ENTRAN por los bordes; a mitad
+ *                            de camino la linterna prende (chispa → núcleo →
+ *                            halo → haz) y la luz revela el mensaje central.
+ *   S2 0.40–0.74  MÉTODO     cinco golpes, UN verbo por momento; el haz
+ *                            dirige la lectura (izq lejos → izq alto → der →
+ *                            der cerca → centro), la cámara se desplaza
+ *                            lateralmente y sigue avanzando hasta el
+ *                            contrapicado (faro ~55% del alto en Evaluamos).
+ *                            Cada verbo tocado deja un rastro verde en el
+ *                            agua. Vacío breve como conector.
+ *   S3 0.74–0.86  ESCALAS    el plano SE ABRE (pull-back): «Del sistema al
+ *                            aula» pide plano general; cinco estaciones a lo
+ *                            largo del muelle, encendidas por el barrido.
+ *   S4 0.86–1.00  AMANECER   la noche cede en dos velos (alba → día), las
+ *                            estrellas se apagan, el haz ya no hace falta
+ *                            (la lámpara queda en mínima), y el cielo
+ *                            termina EXACTAMENTE en gris-fondo: la sección
+ *                            siguiente es la continuación literal del cielo.
+ *
+ * Copy: 100% validado (data.ts / arquitectura de la rama de contenido
+ * maestro), salvo el titular del cierre, pedido explícitamente por Gastón y
+ * marcado VALIDAR con ED. Desktop-first: la coreografía corre en ≥1024px
+ * sin reduced-motion (gsap.matchMedia rearma al cruzar el breakpoint); si
+ * no, queda la escena estática encendida con el mensaje central (default
+ * del JSX) y el runway colapsa a una pantalla (h-svh).
+ */
+
+const P = 1100; // distancia focal de la cámara imaginaria
+const ORIGEN_FOCO = `${FOCO_X} ${FOCO_Y}`;
+
+/** Copy validado del método (data.ts de contenido maestro). */
+const VERBOS = [
+  { verbo: "Dialogamos", pregunta: "¿Qué se quiere transformar y por qué?" },
+  { verbo: "Investigamos", pregunta: "¿Qué sabemos de este problema y qué necesitamos comprender mejor?" },
+  { verbo: "Diseñamos", pregunta: "¿Qué experiencia puede producir un cambio significativo en este contexto?" },
+  { verbo: "Implementamos", pregunta: "¿Qué está ocurriendo en la experiencia real y qué necesitan quienes la sostienen?" },
+  { verbo: "Evaluamos", pregunta: "¿Qué aprendimos, qué debe cambiar y qué puede sostener el equipo hacia adelante?" },
+] as const;
+
+/** Posición del bloque de texto de cada verbo (viewport, desktop). */
+const VERBO_POS: ReadonlyArray<React.CSSProperties> = [
+  { left: "8%", top: "38%" },
+  { left: "11%", top: "18%" },
+  { right: "6%", top: "15%", textAlign: "right" },
+  { right: "9%", top: "55%", textAlign: "right" },
+  { left: "50%", bottom: "18%", transform: "translateX(-50%)", textAlign: "center" },
+];
+
+/** Ángulo del haz por verbo (izq = óptica izquierda, der = derecha). */
+const HAZ_VERBO: ReadonlyArray<{ lado: "izq" | "der"; rot: number }> = [
+  { lado: "izq", rot: -21 },
+  { lado: "izq", rot: -13 },
+  { lado: "der", rot: 42 },
+  { lado: "der", rot: 59 },
+  { lado: "izq", rot: -58 },
+];
+
+/**
+ * Escalas sobre el muelle: versiones ABREVIADAS de los nombres validados
+ * de data.ts («Sistemas, políticas y programas», «Instituciones y
+ * proyectos», «Equipos técnicos, directivos y liderazgos», «Docentes y
+ * comunidades profesionales», «Aula y experiencia estudiantil») para que la
+ * perspectiva tipográfica respire — VALIDAR abreviaturas con ED.
+ */
+const ESCALAS = [
+  { nombre: "Sistemas y políticas", left: "58%", top: "54%", fs: "0.95rem", op: 0.72 },
+  { nombre: "Instituciones", left: "55.5%", top: "62%", fs: "1.12rem", op: 0.8 },
+  { nombre: "Equipos y liderazgos", left: "51%", top: "70.5%", fs: "1.32rem", op: 0.88 },
+  { nombre: "Docentes", left: "45%", top: "79.5%", fs: "1.55rem", op: 0.94 },
+  { nombre: "Aula", left: "37.5%", top: "89%", fs: "1.85rem", op: 1 },
+] as const;
+
+export function QueHacemosHeroFaro() {
+  const rootRef = useRef<HTMLElement | null>(null);
+  const altoRef = useRef<HTMLDivElement | null>(null);
+  const reduced = useReducedMotion();
+
+  useIsomorphicLayoutEffect(() => {
+    const root = rootRef.current;
+    const alto = altoRef.current;
+    if (!root || !alto || reduced) return;
+
+    // gsap.matchMedia rearma/desarma la coreografía al cruzar el breakpoint
+    // (el gate evaluado una sola vez dejaba el estado congelado al resize).
+    const mm = gsap.matchMedia(root);
+
+    mm.add("(min-width: 1024px)", () => {
+      let rafQa = 0;
+
+      /* ── La cámara ──────────────────────────────────────────────────── */
+      const cam = { z: -340, x: 0, y: 0 };
+      // Entradas del mundo (S0→S1): offset vertical extra por capa, se suma
+      // a la proyección para que el foreground ENTRE por el borde inferior.
+      // El muelle NO desliza: está unido al faro y aparece con el mundo
+      // (solo fade) — un muelle que viaja solo rompe la lectura espacial.
+      const entrada = { foreground: 150, marMedio: 50 };
+
+      // quickSetters cacheados: cero allocs por frame en el scrub.
+      const capas = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-capa]"),
+      ).map((el) => ({
+        el,
+        nombre: el.dataset.capa as keyof typeof CAPAS_Z,
+        Z: CAPAS_Z[el.dataset.capa as keyof typeof CAPAS_Z],
+        setX: gsap.quickSetter(el, "x", "px"),
+        setY: gsap.quickSetter(el, "y", "px"),
+        setS: gsap.quickSetter(el, "scale"),
+        setSkX: gsap.quickSetter(el, "skewX", "deg"),
+        setSY: gsap.quickSetter(el, "scaleY"),
+      }));
+
+      // El muelle atraviesa profundidades (su punta toca el islote, su borde
+      // cercano casi pisa la cámara), pero la capa tiene UN solo Z: si se
+      // traslada en bloque, la punta se despega de la torre con cada lateral
+      // (paralaje de capa plana). Solución: la capa recibe el translate del
+      // FARO (punta soldada a la base, siempre) y el paralaje extra del
+      // tramo cercano lo pone una DEFORMACIÓN anclada en el punto de fuga
+      // (skewX para laterales, scaleY para verticales): el borde cercano
+      // barre, la punta no se mueve ni un píxel respecto del faro.
+      const MEZCLA_PARALAJE = 0.65; // cuánto del paralaje propio conserva el tramo cercano
+      const NEAR_Y = ((940 - 522) / 900) * 1.28; // borde cercano→fuga, en alturas de viewport
+
+      const aplicarCamara = () => {
+        const fFaro = P / (P + CAPAS_Z.faro - cam.z);
+        const nearPx = NEAR_Y * window.innerHeight;
+        for (const { nombre, Z, setX, setY, setS, setSkX, setSY } of capas) {
+          const d = P + Z - cam.z;
+          const f = P / d;
+          setS((P + Z) / d);
+          if (nombre === "muelle") {
+            const dif = (f - fFaro) * MEZCLA_PARALAJE;
+            setX(-cam.x * fFaro);
+            setSkX((Math.atan2(-cam.x * dif, nearPx) * 180) / Math.PI);
+            setY(-cam.y * fFaro);
+            setSY(1 - (cam.y * dif) / nearPx);
+          } else {
+            setX(-cam.x * f);
+            setY(-cam.y * f + ((entrada as Record<string, number>)[nombre] ?? 0) * f);
+          }
+        }
+      };
+
+      // Promoción a GPU solo mientras la coreografía existe (el fallback
+      // estático no paga las texturas de 6 capas full-viewport).
+      gsap.set(capas.map((c) => c.el), { willChange: "transform" });
+
+      // El CTA del cierre es alcanzable solo cuando la coreografía corre
+      // (en el fallback el bloque está invisible: inert lo saca del foco).
+      const cierreEl = root.querySelector("[data-esc='cierre']");
+      cierreEl?.removeAttribute("inert");
+
+      /* ── Estados iniciales = S0 (el JSX por defecto es el fallback S1
+            encendido; acá se apaga y se aleja todo) ─────────────────────── */
+      gsap.set("[data-haz='izq'], [data-haz='der']", { autoAlpha: 0 });
+      gsap.set("[data-halo]", { autoAlpha: 0, scale: 0.3, svgOrigin: ORIGEN_FOCO });
+      gsap.set("[data-nucleo]", { autoAlpha: 0.16, scale: 0.5, svgOrigin: ORIGEN_FOCO });
+      gsap.set("[data-linterna]", { opacity: 0.2 });
+      gsap.set("[data-espejo]", { autoAlpha: 0 });
+      gsap.set("[data-capa='muelle'], [data-capa='foreground']", { autoAlpha: 0 });
+      gsap.set("[data-capa='marMedio']", { autoAlpha: 0.35 });
+      gsap.set("[data-mensaje]", {
+        autoAlpha: 0,
+        clipPath: "inset(-8% 100% -8% 0)",
+      });
+      aplicarCamara();
+
+      const tl = gsap.timeline({
+        defaults: { ease: "power2.out" },
+        onUpdate: aplicarCamara,
+        scrollTrigger: {
+          trigger: alto,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0.85,
+        },
+      });
+
+      /* ── S0 · Silencio ──────────────────────────────────────────────── */
+      tl.fromTo("[data-esc='0']", { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.022 }, 0.012)
+        .to("[data-esc='0']", { autoAlpha: 0, y: -16, duration: 0.02, ease: "power2.in" }, 0.078);
+
+      /* ── S1 · Aproximación + encendido ──────────────────────────────── */
+      tl.to(cam, { z: 80, duration: 0.2, ease: "power1.inOut" }, 0.1);
+      // El mundo entra por los bordes mientras avanzamos.
+      tl.to("[data-capa='marMedio']", { autoAlpha: 1, duration: 0.08, ease: "none" }, 0.1)
+        .to(entrada, { marMedio: 0, duration: 0.1, ease: "power2.out" }, 0.1)
+        .to("[data-capa='muelle']", { autoAlpha: 1, duration: 0.07, ease: "none" }, 0.12)
+        .to("[data-capa='foreground']", { autoAlpha: 1, duration: 0.06, ease: "none" }, 0.16)
+        .to(entrada, { foreground: 0, duration: 0.12, ease: "power2.out" }, 0.16);
+      // Encendido con peso: chispa → núcleo → halo → haz → espejo.
+      tl.to("[data-nucleo]", { autoAlpha: 1, scale: 1.6, duration: 0.008, ease: "power3.in" }, 0.21)
+        .to("[data-nucleo]", { scale: 1, duration: 0.015 }, 0.218)
+        .to("[data-linterna]", { opacity: 1, duration: 0.012 }, 0.212)
+        .to("[data-halo]", { autoAlpha: 1, scale: 1, duration: 0.028 }, 0.216)
+        .fromTo("[data-haz='izq']", { autoAlpha: 0, rotation: -8, svgOrigin: ORIGEN_FOCO }, { autoAlpha: 1, rotation: -2, duration: 0.035, ease: "power1.out" }, 0.226)
+        .to("[data-espejo]", { autoAlpha: 1, duration: 0.04 }, 0.235);
+      // La luz atraviesa la zona del titular y el mensaje emerge con ella.
+      tl.to("[data-mensaje]", { autoAlpha: 1, duration: 0.012, ease: "none" }, 0.262)
+        .to("[data-mensaje]", { clipPath: "inset(-8% 0% -8% 0)", duration: 0.05, ease: "power1.inOut" }, 0.262)
+        // …y deja el concepto encendido: el subrayado verde de «procesos».
+        .fromTo("[data-mensaje] mark", { backgroundSize: "0% 0.14em" }, { backgroundSize: "100% 0.14em", duration: 0.022, ease: "power1.inOut" }, 0.318)
+        .to("[data-mensaje]", { autoAlpha: 0, y: -26, duration: 0.028, ease: "power2.in" }, 0.372);
+
+      /* ── S2 · Método: un verbo por momento ──────────────────────────── */
+      const beats = [0.4, 0.462, 0.524, 0.598, 0.667] as const;
+      // Desplazamientos laterales de cámara: el encuadre respira y el faro
+      // cambia de lado del cuadro.
+      tl.to(cam, { x: -70, duration: 0.06, ease: "power1.inOut" }, 0.395)
+        .to(cam, { x: 120, duration: 0.08, ease: "power1.inOut" }, 0.5)
+        .to(cam, { x: 60, duration: 0.06, ease: "power1.inOut" }, 0.6)
+        .to(cam, { x: 0, duration: 0.06, ease: "power1.inOut" }, 0.672)
+        // …y sigue avanzando hasta el contrapicado de «Evaluamos».
+        .to(cam, { z: 380, duration: 0.14, ease: "power1.inOut" }, 0.44)
+        .to(cam, { z: 600, duration: 0.1, ease: "power1.inOut" }, 0.6);
+
+      beats.forEach((t, i) => {
+        const { lado, rot } = HAZ_VERBO[i];
+        const otro = lado === "izq" ? "der" : "izq";
+        const prev = i > 0 ? HAZ_VERBO[i - 1] : null;
+        // La óptica gira hacia el punto (crossfade si cambia de lado). El
+        // wind-up se planta con un set HIJO del timeline: al scrubbear en
+        // reversa el playhead lo cruza y restaura la rotación previa (un
+        // fromTo dejaría el wind-up pegado hacia atrás).
+        if (prev && prev.lado !== lado) {
+          tl.set(`[data-haz='${lado}']`, { rotation: rot + (lado === "der" ? -14 : 14), svgOrigin: ORIGEN_FOCO }, t - 0.007)
+            .to(`[data-haz='${otro}']`, { autoAlpha: 0, duration: 0.018, ease: "none" }, t - 0.006)
+            .to(`[data-haz='${lado}']`, { autoAlpha: 1, rotation: rot, duration: 0.03, ease: "power1.inOut" }, t);
+        } else {
+          tl.to(`[data-haz='${lado}']`, { rotation: rot, svgOrigin: ORIGEN_FOCO, duration: 0.028, ease: "power1.inOut" }, t - 0.004);
+        }
+        // Consecuencia: el agua se enciende donde el haz llega…
+        tl.to(`[data-verbo-punto='${i}']`, { autoAlpha: 1, duration: 0.014 }, t + 0.018)
+          // …el verbo toma la escena…
+          .fromTo(`[data-verbo-txt='${i}'] [data-v]`, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.016 }, t + 0.02)
+          .fromTo(`[data-verbo-txt='${i}'] [data-q]`, { autoAlpha: 0, y: 16 }, { autoAlpha: 0.9, y: 0, duration: 0.014 }, t + 0.024);
+        // …y al ceder deja una idea encendida (rastro verde) en el agua.
+        const fin = i < 4 ? beats[i + 1] - 0.016 : 0.73;
+        tl.to(`[data-verbo-txt='${i}'] [data-v], [data-verbo-txt='${i}'] [data-q]`, { autoAlpha: 0, y: -16, duration: 0.016, ease: "power2.in" }, fin)
+          .to(`[data-verbo-punto='${i}']`, { autoAlpha: 0.22, duration: 0.02 }, fin)
+          .to(`[data-rastro='${i}']`, { autoAlpha: 0.6, duration: 0.014 }, fin + 0.004);
+      });
+      tl.fromTo("[data-esc='cap2']", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.02 }, 0.398)
+        .to("[data-esc='cap2']", { autoAlpha: 0, duration: 0.018, ease: "power2.in" }, 0.73);
+
+      /* ── S3 · Escalas: el plano se abre ─────────────────────────────── */
+      tl.to(cam, { z: 20, duration: 0.06, ease: "power1.inOut" }, 0.742)
+        .to(cam, { y: 55, duration: 0.06, ease: "power1.inOut" }, 0.746)
+        .to("[data-haz='izq']", { rotation: -26, duration: 0.016, ease: "power1.inOut" }, 0.744);
+      tl.fromTo("[data-esc='cap3']", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.02 }, 0.756);
+      // El haz LEE el camino: barre del horizonte hacia el primer plano y
+      // las estaciones se encienden a su paso, del sistema al aula.
+      tl.to("[data-haz='izq']", { rotation: -60, duration: 0.085, ease: "none" }, 0.762);
+      ESCALAS.forEach((_, i) => {
+        tl.fromTo(`[data-escala='${i}']`, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.014 }, 0.764 + i * 0.017);
+      });
+      tl.to("[data-esc='cap3'], [data-escala]", { autoAlpha: 0, y: -12, duration: 0.02, ease: "power2.in" }, 0.852);
+
+      /* ── S4 · Amanecer ──────────────────────────────────────────────── */
+      tl.to(cam, { z: -260, duration: 0.1, ease: "power1.inOut" }, 0.862)
+        .to(cam, { y: 0, duration: 0.08, ease: "power1.inOut" }, 0.862);
+      tl.to("[data-alba='1']", { opacity: 1, duration: 0.06, ease: "none" }, 0.858)
+        .to("[data-alba='2']", { opacity: 1, duration: 0.06, ease: "none" }, 0.9)
+        .to("[data-estrellas]", { autoAlpha: 0, duration: 0.05, ease: "none" }, 0.862)
+        .to("[data-bruma]", { opacity: 1, duration: 0.06, ease: "none" }, 0.868)
+        .to("[data-haz='izq'], [data-haz='der']", { autoAlpha: 0, duration: 0.04, ease: "none" }, 0.862)
+        .to("[data-espejo]", { autoAlpha: 0, duration: 0.04, ease: "none" }, 0.864)
+        .to("[data-rastro]", { autoAlpha: 0, duration: 0.04, ease: "none" }, 0.868)
+        .to("[data-verbo-punto]", { autoAlpha: 0, duration: 0.03, ease: "none" }, 0.866)
+        // La lámpara no se apaga: queda en mínima. La luz ya está en otros.
+        .to("[data-halo]", { autoAlpha: 0.3, duration: 0.05 }, 0.895)
+        .to("[data-nucleo]", { autoAlpha: 0.55, duration: 0.05 }, 0.895)
+        // El primer plano pierde su sombra dura: el día no proyecta drama.
+        .to("[data-fg-sombra]", { autoAlpha: 0.3, duration: 0.05, ease: "none" }, 0.88);
+      tl.fromTo("[data-esc='cierre']", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.03 }, 0.918)
+        .fromTo("[data-esc='cierre'] [data-cta]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.022 }, 0.944)
+        .set({}, {}, 1);
+
+      // Solo dev: `#qa=0.42` clava el timeline en ese progreso (sin scroll:
+      // el screenshot headless no respeta scrollTo). QA determinista.
+      if (process.env.NODE_ENV === "development") {
+        const m = window.location.hash.match(/qa=([\d.]+)/);
+        if (m) {
+          const p = Math.min(1, Math.max(0, parseFloat(m[1])));
+          rafQa = requestAnimationFrame(() => {
+            tl.scrollTrigger?.disable(false);
+            tl.progress(p);
+          });
+        }
+      }
+
+      return () => {
+        if (rafQa) cancelAnimationFrame(rafQa);
+        cierreEl?.setAttribute("inert", "");
+      };
+    });
+
+    return () => mm.revert();
+  }, [reduced]);
+
+  return (
+    <section ref={rootRef} aria-label="Qué hace Empoderamiento Docente">
+      {/* El runway solo existe donde corre la coreografía: en mobile o con
+          reduced-motion colapsa a una pantalla (nada de scroll muerto). */}
+      <div ref={altoRef} className="relative h-svh lg:h-[640vh] lg:motion-reduce:h-svh">
+        <div className="bg-azul-principal sticky top-0 isolate h-svh overflow-hidden">
+          <FaroEscena />
+
+          {/* El titular real de la página, siempre perceptible para AT: la
+              versión visual de abajo entra y sale con la coreografía. */}
+          <h1 className="sr-only">
+            Diseñamos y acompañamos procesos que transforman la matemática
+            escolar.
+          </h1>
+
+          {/* ══ Overlays de texto — una idea por momento ══ */}
+
+          {/* S0 · La pregunta en la noche (principio «Singularidad», data.ts) */}
+          <div data-esc="0" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center" style={{ opacity: 0 }}>
+            <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
+              <p className="text-azul-claro/90 font-display max-w-[30ch] text-[1.65rem] font-medium leading-snug md:text-[2rem]">
+                Cada contexto educativo presenta actores, objetivos, tensiones
+                y posibilidades diferentes.
+              </p>
+            </div>
+          </div>
+
+          {/* S1 · Mensaje central — el momento tipográfico principal. También
+              es el fallback estático (sin JS / reduced-motion / <lg). El
+              subrayado de «procesos» se pinta con la luz (background-size).
+              aria-hidden: para AT el titular es el h1 sr-only de arriba. */}
+          <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center">
+            <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
+              <div data-mensaje>
+                <Eyebrow variant="light">Qué hacemos</Eyebrow>
+                <p
+                  className="font-display mt-7 max-w-[19ch] font-extrabold tracking-[-0.03em] text-white [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
+                  style={{ fontSize: "clamp(2.6rem, 1.2rem + 3.9vw, 4.6rem)", lineHeight: 1.06 }}
+                >
+                  Diseñamos y acompañamos <Highlight>procesos</Highlight> que
+                  transforman la matemática escolar.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* S2 · Caption del método (eyebrow real de MetodoPasos) */}
+          <div data-esc="cap2" aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 pt-32" style={{ opacity: 0 }}>
+            <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
+              <Eyebrow variant="light">Cómo trabajamos</Eyebrow>
+            </div>
+          </div>
+
+          {/* S2 · Los cinco verbos: un golpe narrativo por momento */}
+          {VERBOS.map(({ verbo, pregunta }, i) => (
+            <div
+              key={verbo}
+              data-verbo-txt={i}
+              aria-hidden="true"
+              className="pointer-events-none absolute max-w-[24rem]"
+              style={VERBO_POS[i]}
+            >
+              <p data-v className="font-display font-extrabold tracking-[-0.02em] text-white" style={{ fontSize: "clamp(2.4rem, 1.4rem + 2.4vw, 3.5rem)", opacity: 0 }}>
+                {verbo}
+              </p>
+              <p data-q className="text-azul-claro/80 mt-3 font-sans text-[1rem] leading-relaxed" style={{ opacity: 0 }}>
+                {pregunta}
+              </p>
+            </div>
+          ))}
+
+          {/* S3 · Escalas: caption (eyebrow + título reales de la sección) */}
+          <div data-esc="cap3" aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 pt-32" style={{ opacity: 0 }}>
+            <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
+              <Eyebrow variant="light">Niveles en los que intervenimos</Eyebrow>
+              <p className="font-display mt-4 text-[2rem] font-bold tracking-[-0.02em] text-white">
+                Del sistema al aula.
+              </p>
+            </div>
+          </div>
+
+          {/* S3 · Estaciones sobre el muelle, del horizonte al primer plano */}
+          {ESCALAS.map(({ nombre, left, top, fs, op }, i) => (
+            <div
+              key={nombre}
+              data-escala={i}
+              aria-hidden="true"
+              className="pointer-events-none absolute flex items-center gap-3"
+              style={{ left, top, opacity: 0 }}
+            >
+              <span aria-hidden="true" className="bg-azul-claro block h-1.5 w-1.5 rounded-full" style={{ opacity: 0.85 }} />
+              <span className="font-display font-semibold text-white" style={{ fontSize: fs, opacity: op }}>
+                {nombre}
+              </span>
+            </div>
+          ))}
+
+          {/* S4 · Cierre sobre el amanecer. Titular pedido por Gastón
+              (VALIDAR con ED); CTA real del proyecto hacia #lineas — en el
+              copy validado es la acción secundaria del hero (la primaria es
+              «Conversemos»), acá va naranja como única acción del plano
+              final: VALIDAR jerarquía con ED. `inert` por defecto: en el
+              fallback está invisible y no debe recibir foco; la coreografía
+              lo quita al montar. */}
+          <div data-esc="cierre" inert className="pointer-events-none absolute inset-0 flex items-center" style={{ opacity: 0 }}>
+            <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
+              <p
+                className="text-azul-principal font-display max-w-[19ch] font-extrabold tracking-[-0.025em]"
+                style={{ fontSize: "clamp(2.4rem, 1.2rem + 3.2vw, 4rem)", lineHeight: 1.08 }}
+              >
+                La transformación queda encendida en cada equipo.
+              </p>
+              <div data-cta className="pointer-events-auto mt-9" style={{ opacity: 0 }}>
+                <ButtonPrimary href="#lineas">Ver líneas de acción</ButtonPrimary>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
