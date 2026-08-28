@@ -119,7 +119,10 @@ export function PuenteInvestigacion() {
   // no tienen offset y el paso mediría 0.
   useIsomorphicLayoutEffect(() => {
     if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 768px)").matches) return;
+    // 1024, no 768: cada lomo mide 52px mínimo, así que los 4 se comen 208px.
+    // En tablet el panel abierto quedaba con ~180px por columna y el texto se
+    // amontonaba contra la foto. Abajo de eso va la pila estática.
+    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) return;
     setLive(true);
   }, [reduced]);
 

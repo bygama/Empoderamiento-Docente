@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -34,6 +34,13 @@ if (typeof window !== "undefined") {
  * decorativa (aria-hidden) y se oculta sin motion; el contenido real vive
  * en bloques en orden lógico del DOM que quedan apilados en flow. Las
  * fichas son <li> sin semántica de botón ni cursor pointer.
+ *
+ * Gate por viewport (`live`): la escena usa geometría proporcional al ancho
+ * (zona de lectura en 32vw, carril de fichas en ~32vw, cámara con tx en
+ * fracciones de W) pensada para desktop — en móvil/tablet los textos se
+ * pisaban y recortaban contra el borde. Bajo 1024px o sin hover se sirve el
+ * MISMO layout estático del fallback de reduced-motion, ahora por clases
+ * condicionales además de las variantes motion-reduce.
  *
  * El CTA «Mirá cómo lo hacemos» sigue retirado de esta transición (ruta
  * /que-hacemos viva en el nav).
@@ -174,11 +181,21 @@ export function MiradaEd() {
   const rootRef = useRef<HTMLElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
+  const [live, setLive] = useState(false);
+
+  // La escena solo con puntero fino y ancho desktop real: a 768 los labels
+  // de los nodos ya se montaban sobre la zona de lectura.
+  useIsomorphicLayoutEffect(() => {
+    if (reduced) return;
+    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) return;
+    setLive(true);
+  }, [reduced]);
 
   useIsomorphicLayoutEffect(() => {
+    if (!live) return;
     const root = rootRef.current;
     const zone = zoneRef.current;
-    if (!root || !zone || reduced) return;
+    if (!root || !zone) return;
 
     // Los tweens del indicador nacen en onUpdate (async): quedan fuera del
     // registro de gsap.context, así que se matan a mano en el cleanup.
@@ -583,7 +600,7 @@ export function MiradaEd() {
       gsap.killTweensOf(dotEls);
       ctx.revert();
     };
-  }, [reduced]);
+  }, [live]);
 
   return (
     <section
@@ -592,15 +609,26 @@ export function MiradaEd() {
       className="bg-grain-light to-gris-fondo/60 relative z-30 -mt-[4svh] overflow-clip rounded-t-[2.5rem] bg-gradient-to-b from-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.35)]"
       aria-label="Nuestra mirada"
     >
-      <div ref={zoneRef} className="relative h-[910svh] motion-reduce:h-auto">
-        <div className="sticky top-0 h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto">
+      <div
+        ref={zoneRef}
+        className={"relative motion-reduce:h-auto " + (live ? "h-[910svh]" : "h-auto")}
+      >
+        <div
+          className={
+            "w-full motion-reduce:static motion-reduce:h-auto " +
+            (live ? "sticky top-0 h-[100svh] overflow-hidden" : "")
+          }
+        >
           {/* ── Escenario decorativo: constelación (líneas + nodos) ─────────
               Es la capa que la "cámara" recorre. Decorativa: el contenido
               real vive en los bloques de texto de abajo. ── */}
           <div
             data-stage
             aria-hidden="true"
-            className="absolute inset-0 will-change-transform motion-reduce:hidden"
+            className={
+              "absolute inset-0 will-change-transform motion-reduce:hidden" +
+              (live ? "" : " hidden")
+            }
           >
             <svg
               className="absolute inset-0 h-full w-full"
@@ -705,7 +733,10 @@ export function MiradaEd() {
           {/* ── Núcleo: apertura del mapa ─────────────────────────────────── */}
           <div
             data-centro
-            className="flex h-full flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24"
+            className={
+              "flex flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24 " +
+              (live ? "h-full" : "h-auto py-24")
+            }
           >
             <span
               data-centro-bit
@@ -728,11 +759,13 @@ export function MiradaEd() {
             <div key={p.id} className="contents">
               <div
                 data-detalle={i}
-                className="motion-reduce:py-14"
+                className={"motion-reduce:py-14" + (live ? "" : " py-14")}
               >
                 <div
                   data-detalle-inner
-                  className="mx-auto max-w-xl px-6 text-center motion-safe:px-0"
+                  className={
+                    "mx-auto max-w-xl text-center " + (live ? "px-0" : "px-6")
+                  }
                 >
                   {/* Barra de acento decorativa: el color identifica al
                       principio sin comprometer el contraste del texto. Queda
@@ -741,7 +774,10 @@ export function MiradaEd() {
                       está apuntando mientras se lee este bloque. */}
                   <span
                     aria-hidden="true"
-                    className="mx-auto mb-5 block h-[3px] w-8 rounded-full motion-safe:mx-0"
+                    className={
+                      "mb-5 block h-[3px] w-8 rounded-full " +
+                      (live ? "mx-0" : "mx-auto")
+                    }
                     style={{ backgroundColor: p.accent }}
                   />
                   <h3
@@ -791,7 +827,10 @@ export function MiradaEd() {
                   (con /90 se transparentaba). */}
               <ul
                 data-fichas={i}
-                className="m-0 flex list-none flex-wrap items-center justify-center gap-3 px-6 pb-10 motion-reduce:mx-auto motion-reduce:max-w-xl"
+                className={
+                  "m-0 flex list-none flex-wrap items-center justify-center gap-3 px-6 pb-10 motion-reduce:mx-auto motion-reduce:max-w-xl" +
+                  (live ? "" : " mx-auto max-w-xl")
+                }
               >
                 {p.fichas.map((f, k) => (
                   <li
@@ -814,14 +853,20 @@ export function MiradaEd() {
           {/* ── Síntesis + puente hacia la red ────────────────────────────── */}
           <div
             data-sintesis
-            className="flex h-full flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24"
+            className={
+              "flex flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24 " +
+              (live ? "h-full" : "h-auto py-24")
+            }
           >
             {/* Niebla marfil del MOMENTO B: campo de foco detrás del texto
                 (el sistema y las ramas quedan alrededor, no encima). */}
             <span
               data-sintesis-fog
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 motion-reduce:hidden"
+              className={
+                "pointer-events-none absolute inset-0 motion-reduce:hidden" +
+                (live ? "" : " hidden")
+              }
               style={{
                 background:
                   "radial-gradient(ellipse 58% 52% at 50% 48%, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.78) 46%, rgba(255,255,255,0) 74%)",
@@ -846,7 +891,10 @@ export function MiradaEd() {
 
           {/* Indicador de progreso: mapa · 01 · 02 · 03 · síntesis */}
           <div
-            className="absolute bottom-7 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2.5 motion-reduce:hidden"
+            className={
+              "absolute bottom-7 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2.5 motion-reduce:hidden" +
+              (live ? "" : " hidden")
+            }
             aria-hidden="true"
           >
             {Array.from({ length: 5 }, (_, i) => (

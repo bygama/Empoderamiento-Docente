@@ -315,8 +315,12 @@ export function DestacadosBiblioteca() {
                       />
                     </div>
 
+                    {/* hyphens + break-words: títulos con palabras largas
+                        ("proporcionalidad") desbordaban la columna en anchos
+                        intermedios (~1024) y estiraban la página 7px. */}
                     <h3
-                      className="font-display font-extrabold tracking-[-0.02em] text-white"
+                      className="font-display font-extrabold tracking-[-0.02em] break-words hyphens-auto text-white"
+                      lang="es"
                       style={{ fontSize: "clamp(1.8rem, 1.1rem + 2.4vw, 2.7rem)", lineHeight: 1.08 }}
                     >
                       {titulo}
