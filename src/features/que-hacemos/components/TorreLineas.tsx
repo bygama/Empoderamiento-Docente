@@ -90,7 +90,10 @@ export function TorreLineas() {
 
   useIsomorphicLayoutEffect(() => {
     if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 768px)").matches) return;
+    // 1024, no 768: el tambor necesita ancho para que el título envuelto se
+    // lea. En tablet salía cortado contra los bordes, el rótulo se montaba
+    // sobre la foto y la escena quedaba ilegible. Abajo de eso va la lista.
+    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) return;
     setLive(true);
   }, [reduced]);
 
