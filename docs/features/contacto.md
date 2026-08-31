@@ -3,7 +3,8 @@
 Registro de trabajo del formulario de `/contacto`: qué hay hecho, qué se
 decidió y por qué, y qué falta. Se actualiza a medida que avanzamos.
 
-- **Estado:** en progreso — endpoint escrito, falta cargar credenciales
+- **Estado:** bloqueado — código listo y en la rama `feat/contacto-backend-smtp`,
+  esperando las credenciales de la casilla para abrir el PR
 - **Código:** `src/features/contacto/`, `src/app/api/contacto/`,
   `src/lib/mail.ts`
 - **Última actualización:** 2026-08-31
@@ -168,6 +169,14 @@ una persona distinta de la casilla que las manda, sin tocar código.
 - Se escribió el [ADR-0003](../architecture/adrs/0003-correo-del-formulario-por-smtp-de-hostinger.md),
   que además deja asentado el reparto Hostinger / Vercel: era la razón de
   fondo por la que nadie recordaba qué servicios estaban pagados.
+- Rama `feat/contacto-backend-smtp` empujada al remoto, rebasada sobre
+  `main`.
+
+**El PR queda a propósito sin abrir.** Mergear esto antes de que las
+credenciales estén cargadas en Vercel dejaría el formulario en vivo
+mostrando "No pudimos enviar tu consulta" donde hoy al menos intenta
+abrir el cliente de correo: sería un cambio visible para peor. El orden
+es casilla, variables en Vercel, y recién ahí PR y merge.
 
 ---
 
