@@ -48,19 +48,62 @@ const SVH_POR_TAMBOR = 130; // cuánto scroll dura cada estación de la torre
 // Ángulos de los chips de frase sobre la banda (3 por tambor, repartidos).
 const CHIP_ANGS = [40, 160, 280];
 
-type GeoTambor = { f: number; paso: number; slices: string[] };
+/** `angs[j]` = ángulo de la rebanada j (no hay paso uniforme, ver abajo). */
+type GeoTambor = { f: number; angs: number[]; slices: string[] };
 type Geo = { r: number; sp: number; alto: number; drums: GeoTambor[] };
+
+/**
+ * Ancho real de cada carácter, medido con la tipografía de verdad.
+ *
+ * Antes el ángulo entre letras era UNIFORME (360/n) y el tamaño de fuente
+ * salía de un ancho promedio. Pero las mayúsculas de Manrope no miden lo
+ * mismo: en palabras con muchas letras anchas —"SISTEMAS EDUCATIVOS" es casi
+ * toda S, M, E, D, U, C, A, O— cada glifo pide más arco del que le tocaba y
+ * se solapan; en las angostas, al revés, quedan huecos.
+ *
+ * Se mide una vez por sesión y se cachea. Si la fuente todavía no cargó, el
+ * fallback promedio deja el comportamiento anterior y `document.fonts.ready`
+ * dispara un recálculo.
+ */
+const anchoCache = new Map<string, number>();
+function medirChar(ch: string): number {
+  const hit = anchoCache.get(ch);
+  if (hit !== undefined) return hit;
+  let ancho = ANCHO_CHAR;
+  if (typeof document !== "undefined") {
+    const cv = (medirChar as { _cv?: HTMLCanvasElement })._cv ??
+      ((medirChar as { _cv?: HTMLCanvasElement })._cv = document.createElement("canvas"));
+    const cx = cv.getContext("2d");
+    if (cx) {
+      cx.font = '800 100px Manrope, system-ui, sans-serif';
+      ancho = cx.measureText(ch).width / 100;
+    }
+  }
+  anchoCache.set(ch, ancho);
+  return ancho;
+}
 
 function calcularGeo(w: number, h: number): Geo {
   const r = Math.min(w * 0.36, 540);
   const circ = 2 * Math.PI * r;
   const drums = TAMBORES.map((t) => {
     const base = (t.tambor + SEP).toUpperCase();
+    const anchoBase = Array.from(base).reduce((acc, ch) => acc + medirChar(ch), 0);
     // Repeticiones para que la letra no pase de F_MAX al cerrar la vuelta.
-    const k = Math.max(1, Math.ceil(circ / (ANCHO_CHAR * F_MAX) / base.length));
+    const k = Math.max(1, Math.ceil(circ / (F_MAX * anchoBase)));
     const slices = Array.from(base.repeat(k));
-    const f = Math.min(F_MAX, circ / (ANCHO_CHAR * slices.length));
-    return { f, paso: 360 / slices.length, slices };
+    const anchos = slices.map(medirChar);
+    const total = anchos.reduce((a2, b2) => a2 + b2, 0);
+    const f = Math.min(F_MAX, circ / total);
+    // Cada rebanada se lleva el arco que su glifo necesita: se le asigna el
+    // ángulo del CENTRO de su tramo, así ninguna pisa a la vecina.
+    let acum = 0;
+    const angs = anchos.map((an) => {
+      const centro = acum + an / 2;
+      acum += an;
+      return (centro / total) * 360;
+    });
+    return { f, angs, slices };
   });
   // Separación entre tambores: lo justo para que el siguiente asome desde
   // abajo mientras el activo está al frente — a mitad de viaje los dos se
@@ -101,8 +144,20 @@ export function TorreLineas() {
     if (!live) return;
     const medir = () => setGeo(calcularGeo(window.innerWidth, window.innerHeight));
     medir();
+    // Los anchos se miden con canvas: si Manrope todavía no cargó, la primera
+    // pasada usa la fuente de fallback y los ángulos quedan mal repartidos.
+    // Al resolverse fonts.ready se limpia el cache y se recalcula.
+    let vivo = true;
+    document.fonts?.ready.then(() => {
+      if (!vivo) return;
+      anchoCache.clear();
+      medir();
+    });
     window.addEventListener("resize", medir);
-    return () => window.removeEventListener("resize", medir);
+    return () => {
+      vivo = false;
+      window.removeEventListener("resize", medir);
+    };
   }, [live]);
 
   useIsomorphicLayoutEffect(() => {
@@ -226,23 +281,29 @@ export function TorreLineas() {
         for (let j = 0; j < spans.length; j++) {
           const s = spans[j];
           if (!s) continue;
-          const a = (((j * g.paso + rot) % 360) + 360) % 360;
+          const a = (((g.angs[j] + rot) % 360) + 360) % 360;
           const c = Math.cos((a * Math.PI) / 180);
           if (c > 0) {
             s.style.opacity = String((0.2 + 0.8 * c) * armEase);
-            s.style.color = "";
+            // El acento se REPONE, no se limpia: `color = ""` borraba el
+            // color que pone React desde data y las letras volvían al navy
+            // heredado en el frame siguiente.
+            s.style.color = TAMBORES[i].acento;
             s.style.textShadow = "none";
           } else {
+            // Cara de atrás: se ve a través del "vidrio", tenue y difusa. La
+            // sombra toma el color de la estación (antes navy fijo), así el
+            // tambor tiene su tinte también por detrás.
             s.style.opacity = String((0.1 + 0.12 * -c) * armEase);
             s.style.color = "transparent";
-            s.style.textShadow = "0 0 14px rgba(31, 45, 77, 0.5)";
+            s.style.textShadow = `0 0 14px color-mix(in srgb, ${TAMBORES[i].acento} 55%, transparent)`;
           }
           // Durante el armado el radio crece desde el eje: las letras nacen
           // amontonadas en el centro y se abren hasta formar el cilindro.
           if (arm < 1) {
-            s.style.transform = `translate(-50%, -50%) rotateY(${j * g.paso}deg) translateZ(${geo.r * armEase}px)`;
+            s.style.transform = `translate(-50%, -50%) rotateY(${g.angs[j]}deg) translateZ(${geo.r * armEase}px)`;
           } else if (s.dataset.armado !== "1") {
-            s.style.transform = `translate(-50%, -50%) rotateY(${j * g.paso}deg) translateZ(${geo.r}px)`;
+            s.style.transform = `translate(-50%, -50%) rotateY(${g.angs[j]}deg) translateZ(${geo.r}px)`;
             s.dataset.armado = "1";
           }
         }
@@ -270,13 +331,11 @@ export function TorreLineas() {
         }
       }
 
-      // Los apoyos respiran con la torre: plenos en cada estación, se apagan
-      // durante el viaje (así el tambor que llega nunca los pisa).
+      // El apoyo YA NO se apaga durante el viaje: tiene contenedor propio, así
+      // que el tambor que llega le pasa por detrás sin ensuciarlo. Antes se
+      // desvanecía para no pisarse con la foto y quedaba ilegible justo en el
+      // tramo en que uno lee.
       const pos = pv * (n - 1);
-      const dist = Math.abs(pos - Math.round(pos)); // 0 en estación, 0.5 a mitad de viaje
-      if (apoyoRef.current) {
-        apoyoRef.current.style.opacity = String(Math.max(0, 1 - dist * 2.6));
-      }
 
       // Riel derecho: barra y porcentaje del recorrido.
       if (fillRef.current) fillRef.current.style.transform = `scaleY(${pv})`;
@@ -572,7 +631,19 @@ export function TorreLineas() {
                           transform: `translate(-50%, -50%) translateY(${i * geo.sp}px)`,
                         }}
                       >
-                        <div className="relative h-[30vmin] w-[30vmin] overflow-hidden rounded-full opacity-95 shadow-[0_30px_80px_-30px_rgb(15_23_42/0.5)]">
+                        {/* Resplandor del acento detrás de la foto: da aire
+                            de color al centro del tambor. */}
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute top-1/2 left-1/2 h-[44vmin] w-[44vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                          style={{
+                            background: `radial-gradient(circle, color-mix(in srgb, ${t.acento} 22%, transparent) 0%, transparent 68%)`,
+                          }}
+                        />
+                        <div
+                          className="relative h-[30vmin] w-[30vmin] overflow-hidden rounded-full opacity-95 shadow-[0_30px_80px_-30px_rgb(15_23_42/0.5)]"
+                          style={{ outline: `2px solid color-mix(in srgb, ${t.acento} 35%, transparent)`, outlineOffset: "6px" }}
+                        >
                           <Image
                             src={t.foto}
                             alt=""
@@ -604,8 +675,10 @@ export function TorreLineas() {
                             <div
                               key={lado}
                               aria-hidden="true"
-                              className="border-azul-principal/15 absolute rounded-full border"
+                              className="absolute rounded-full border"
+                              // Aro del color de la estación (antes navy fijo).
                               style={{
+                                borderColor: `color-mix(in srgb, ${t.acento} 22%, transparent)`,
                                 width: geo.r * 2.06,
                                 height: geo.r * 2.06,
                                 left: -geo.r * 1.03,
@@ -640,11 +713,14 @@ export function TorreLineas() {
                               ref={(el) => {
                                 spanRefs.current[i][j] = el;
                               }}
-                              className="font-display text-azul-principal absolute select-none font-extrabold"
+                              className="font-display absolute select-none font-extrabold"
                               style={{
+                                // Color de la estación, no navy fijo: el
+                                // viaje deja de ser monocromo.
+                                color: t.acento,
                                 fontSize: g.f,
                                 lineHeight: 1,
-                                transform: `translate(-50%, -50%) rotateY(${j * g.paso}deg) translateZ(${geo.r}px)`,
+                                transform: `translate(-50%, -50%) rotateY(${g.angs[j]}deg) translateZ(${geo.r}px)`,
                               }}
                             >
                               {ch === " " ? " " : ch}
@@ -659,10 +735,15 @@ export function TorreLineas() {
               </div>
 
               {/* ── Apoyos fijos al pie: se cruzan al cambiar de tambor ── */}
-              <div
-                ref={apoyoRef}
-                className="relative z-20 mx-auto grid w-full max-w-screen-xl gap-5 px-5 pb-12 md:grid-cols-2 md:gap-10 md:px-10"
-              >
+              <div className="relative z-20 mx-auto w-full max-w-screen-xl px-5 pb-10 md:px-10">
+                <div
+                  ref={apoyoRef}
+                  // Contenedor PROPIO: el tambor y su foto pasan por detrás y
+                  // antes lavaban este texto hasta volverlo ilegible. Con
+                  // superficie opaca y un borde tenue, el apoyo se lee siempre,
+                  // esté donde esté la torre.
+                  className="bg-gris-fondo/92 ring-azul-principal/10 grid gap-5 rounded-2xl px-6 py-6 shadow-[0_18px_50px_-30px_rgb(15_23_42/0.4)] ring-1 backdrop-blur-[2px] md:grid-cols-2 md:gap-10 md:px-8 md:py-7"
+                >
                 <div>
                   <p
                     ref={tituloRef}
@@ -686,6 +767,7 @@ export function TorreLineas() {
                 >
                   {TAMBORES[0].detalle}
                 </p>
+                </div>
               </div>
             </>
           ) : (
