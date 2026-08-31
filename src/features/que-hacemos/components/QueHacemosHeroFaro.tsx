@@ -35,7 +35,7 @@ if (typeof window !== "undefined") {
  *                            el primer plano ENTRAN por los bordes; a mitad
  *                            de camino la linterna prende (chispa → núcleo →
  *                            halo → haz) y la luz revela el mensaje central.
- *   S2 0.40–0.74  MÉTODO     cinco golpes, UN verbo por momento; el haz
+ *   S2 0.40–0.73  PREGUNTAS  cinco golpes, UNA pregunta por momento; el haz
  *                            dirige la lectura (izq lejos → izq alto → der →
  *                            der cerca → centro), la cámara se desplaza
  *                            lateralmente y sigue avanzando hasta el
@@ -62,13 +62,25 @@ if (typeof window !== "undefined") {
 const P = 1100; // distancia focal de la cámara imaginaria
 const ORIGEN_FOCO = `${FOCO_X} ${FOCO_Y}`;
 
-/** Copy validado del método (data.ts de contenido maestro). */
-const VERBOS = [
-  { verbo: "Dialogamos", pregunta: "¿Qué se quiere transformar y por qué?" },
-  { verbo: "Investigamos", pregunta: "¿Qué sabemos de este problema y qué necesitamos comprender mejor?" },
-  { verbo: "Diseñamos", pregunta: "¿Qué experiencia puede producir un cambio significativo en este contexto?" },
-  { verbo: "Implementamos", pregunta: "¿Qué está ocurriendo en la experiencia real y qué necesitan quienes la sostienen?" },
-  { verbo: "Evaluamos", pregunta: "¿Qué aprendimos, qué debe cambiar y qué puede sostener el equipo hacia adelante?" },
+/**
+ * Las preguntas con las que empieza cada proyecto.
+ *
+ * ANTES esta escena mostraba los cinco VERBOS del método (Dialogamos,
+ * Investigamos, Diseñamos, Implementamos, Evaluamos) bajo el rótulo «Cómo
+ * trabajamos» — que es, textual, el título de una sección que viene más
+ * abajo en esta misma página y cuenta lo mismo. La escena resumía el
+ * contenido que la seguía.
+ *
+ * Ahora se queda solo con las preguntas: la escena PREGUNTA y las secciones
+ * de abajo RESPONDEN. Es lo que el faro hace de verdad —alumbrar para ver
+ * qué hay— y no le pisa el texto a nadie.
+ */
+const PREGUNTAS = [
+  "¿Qué se quiere transformar y por qué?",
+  "¿Qué sabemos de este problema y qué necesitamos comprender mejor?",
+  "¿Qué puede producir un cambio real en este contexto?",
+  "¿Qué está ocurriendo y qué necesitan quienes lo sostienen?",
+  "¿Qué aprendimos y qué puede sostener el equipo hacia adelante?",
 ] as const;
 
 /** Posición del bloque de texto de cada verbo (viewport, desktop). */
@@ -88,21 +100,6 @@ const HAZ_VERBO: ReadonlyArray<{ lado: "izq" | "der"; rot: number }> = [
   { lado: "der", rot: 59 },
   { lado: "izq", rot: -58 },
 ];
-
-/**
- * Escalas sobre el muelle: versiones ABREVIADAS de los nombres validados
- * de data.ts («Sistemas, políticas y programas», «Instituciones y
- * proyectos», «Equipos técnicos, directivos y liderazgos», «Docentes y
- * comunidades profesionales», «Aula y experiencia estudiantil») para que la
- * perspectiva tipográfica respire — VALIDAR abreviaturas con ED.
- */
-const ESCALAS = [
-  { nombre: "Sistemas y políticas", left: "58%", top: "54%", fs: "0.95rem", op: 0.72 },
-  { nombre: "Instituciones", left: "55.5%", top: "62%", fs: "1.12rem", op: 0.8 },
-  { nombre: "Equipos y liderazgos", left: "51%", top: "70.5%", fs: "1.32rem", op: 0.88 },
-  { nombre: "Docentes", left: "45%", top: "79.5%", fs: "1.55rem", op: 0.94 },
-  { nombre: "Aula", left: "37.5%", top: "89%", fs: "1.85rem", op: 1 },
-] as const;
 
 export function QueHacemosHeroFaro() {
   const rootRef = useRef<HTMLElement | null>(null);
@@ -174,6 +171,48 @@ export function QueHacemosHeroFaro() {
         }
       };
 
+      /**
+       * APUNTADO EN VIVO del haz al texto activo.
+       *
+       * Los bloques de texto son HTML por fuera del SVG, y la cámara
+       * transforma el SVG en cada frame: la relación entre "dónde está el
+       * texto en pantalla" y "qué ángulo es eso dentro del SVG" CAMBIA
+       * constantemente. Calcular el ángulo una sola vez (como hacían los
+       * valores fijos de HAZ_VERBO) daba errores de 50° a 116° medidos.
+       *
+       * Por eso se resuelve por frame, corriendo DESPUÉS de los tweens: se
+       * busca el bloque visible, se pasa su centro a coordenadas del SVG con
+       * getScreenCTM y se orienta el haz a ese ángulo. Si no hay ninguno
+       * visible no se toca nada y manda la coreografía (el remate del final
+       * apunta al centro por su cuenta).
+       */
+      const REPOSO_HAZ = { izq: 176.42, der: 3.41 } as const;
+      const svgFaro = root.querySelector("svg");
+      const apuntarAlTextoActivo = () => {
+        if (!svgFaro) return;
+        const bloques = root.querySelectorAll<HTMLElement>("[data-verbo-txt]");
+        let activo: HTMLElement | null = null;
+        let mejor = 0.15;
+        for (const b of bloques) {
+          const v = b.querySelector<HTMLElement>("[data-v]");
+          const op = v ? parseFloat(getComputedStyle(v).opacity) : 0;
+          if (op > mejor) { mejor = op; activo = b; }
+        }
+        if (!activo) return;
+        const ctm = (svgFaro as SVGSVGElement).getScreenCTM();
+        if (!ctm) return;
+        const r = activo.getBoundingClientRect();
+        const pt = new DOMPoint(r.left + r.width / 2, r.top + r.height / 2)
+          .matrixTransform(ctm.inverse());
+        const ang = (Math.atan2(pt.y - FOCO_Y, pt.x - FOCO_X) * 180) / Math.PI;
+        const lado: "izq" | "der" = pt.x < FOCO_X ? "izq" : "der";
+        let delta = ang - REPOSO_HAZ[lado];
+        while (delta > 180) delta -= 360;
+        while (delta < -180) delta += 360;
+        gsap.set(`[data-haz='${lado}']`, { rotation: delta, svgOrigin: ORIGEN_FOCO });
+      };
+
+
       // Promoción a GPU solo mientras la coreografía existe (el fallback
       // estático no paga las texturas de 6 capas full-viewport).
       gsap.set(capas.map((c) => c.el), { willChange: "transform" });
@@ -199,7 +238,10 @@ export function QueHacemosHeroFaro() {
 
       const tl = gsap.timeline({
         defaults: { ease: "power2.out" },
-        onUpdate: aplicarCamara,
+        onUpdate: () => {
+          aplicarCamara();
+          apuntarAlTextoActivo();
+        },
         scrollTrigger: {
           trigger: alto,
           // +100svh: el runway ahora empieza una pantalla antes (detrás del
@@ -209,6 +251,10 @@ export function QueHacemosHeroFaro() {
           start: () => `top+=${window.innerHeight} top`,
           end: "bottom bottom",
           scrub: 0.85,
+          // Los ángulos del haz se calculan midiendo dónde quedó cada bloque
+          // de texto: sin esto GSAP los evaluaría una sola vez y volverían a
+          // desfasarse en cuanto cambie el layout (resize, fuente, copy).
+          invalidateOnRefresh: true,
         },
       });
 
@@ -272,8 +318,41 @@ export function QueHacemosHeroFaro() {
         .to(cam, { z: 380, duration: 0.14, ease: "power1.inOut" }, 0.44)
         .to(cam, { z: 600, duration: 0.1, ease: "power1.inOut" }, 0.6);
 
+      /**
+       * Rotación que hace que el haz APUNTE al bloque de texto i.
+       *
+       * Antes los ángulos estaban a mano (HAZ_VERBO), calibrados para el copy
+       * anterior: al cambiar las frases por preguntas los bloques cambiaron de
+       * alto y de posición, y el haz quedó señalando "por ahí cerca" en vez de
+       * al texto. Ahora se mide de verdad: se toma el centro del bloque en
+       * pantalla, se lo pasa a coordenadas del SVG (getScreenCTM) y se calcula
+       * el ángulo desde el foco de la linterna. Function-based, así se
+       * recalcula en cada refresh y no se desfasa nunca más.
+       *
+       * Eje del haz en reposo: el izquierdo apunta a 176.4° desde el foco y el
+       * derecho a 3.4° (medido de los polígonos de FaroEscena).
+       */
+      const REPOSO = { izq: 176.42, der: 3.41 } as const;
+      const anguloHacia = (i: number, lado: "izq" | "der") => {
+        const el = root.querySelector<HTMLElement>(`[data-verbo-txt='${i}']`);
+        const svg = root.querySelector("svg");
+        if (!el || !svg) return HAZ_VERBO[i].rot;
+        const ctm = (svg as SVGSVGElement).getScreenCTM();
+        if (!ctm) return HAZ_VERBO[i].rot;
+        const r = el.getBoundingClientRect();
+        const pt = new DOMPoint(r.left + r.width / 2, r.top + r.height / 2)
+          .matrixTransform(ctm.inverse());
+        const ang = (Math.atan2(pt.y - FOCO_Y, pt.x - FOCO_X) * 180) / Math.PI;
+        // Normaliza a (-180, 180] para que no pegue vueltas de más.
+        let delta = ang - REPOSO[lado];
+        while (delta > 180) delta -= 360;
+        while (delta < -180) delta += 360;
+        return delta;
+      };
+
       beats.forEach((t, i) => {
-        const { lado, rot } = HAZ_VERBO[i];
+        const { lado } = HAZ_VERBO[i];
+        const rot = () => anguloHacia(i, lado);
         const otro = lado === "izq" ? "der" : "izq";
         const prev = i > 0 ? HAZ_VERBO[i - 1] : null;
         // La óptica gira hacia el punto (crossfade si cambia de lado). El
@@ -281,7 +360,7 @@ export function QueHacemosHeroFaro() {
         // reversa el playhead lo cruza y restaura la rotación previa (un
         // fromTo dejaría el wind-up pegado hacia atrás).
         if (prev && prev.lado !== lado) {
-          tl.set(`[data-haz='${lado}']`, { rotation: rot + (lado === "der" ? -14 : 14), svgOrigin: ORIGEN_FOCO }, t - 0.007)
+          tl.set(`[data-haz='${lado}']`, { rotation: () => rot() + (lado === "der" ? -14 : 14), svgOrigin: ORIGEN_FOCO }, t - 0.007)
             .to(`[data-haz='${otro}']`, { autoAlpha: 0, duration: 0.018, ease: "none" }, t - 0.006)
             .to(`[data-haz='${lado}']`, { autoAlpha: 1, rotation: rot, duration: 0.03, ease: "power1.inOut" }, t);
         } else {
@@ -301,19 +380,6 @@ export function QueHacemosHeroFaro() {
       tl.fromTo("[data-esc='cap2']", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.02 }, 0.398)
         .to("[data-esc='cap2']", { autoAlpha: 0, duration: 0.018, ease: "power2.in" }, 0.73);
 
-      /* ── S3 · Escalas: el plano se abre ─────────────────────────────── */
-      tl.to(cam, { z: 20, duration: 0.06, ease: "power1.inOut" }, 0.742)
-        .to(cam, { y: 55, duration: 0.06, ease: "power1.inOut" }, 0.746)
-        .to("[data-haz='izq']", { rotation: -26, duration: 0.016, ease: "power1.inOut" }, 0.744);
-      tl.fromTo("[data-esc='cap3']", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.02 }, 0.756);
-      // El haz LEE el camino: barre del horizonte hacia el primer plano y
-      // las estaciones se encienden a su paso, del sistema al aula.
-      tl.to("[data-haz='izq']", { rotation: -60, duration: 0.085, ease: "none" }, 0.762);
-      ESCALAS.forEach((_, i) => {
-        tl.fromTo(`[data-escala='${i}']`, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.014 }, 0.764 + i * 0.017);
-      });
-      tl.to("[data-esc='cap3'], [data-escala]", { autoAlpha: 0, y: -12, duration: 0.02, ease: "power2.in" }, 0.852);
-
       /* ── S4 · Cierre EN LA NOCHE ────────────────────────────────────────
          Antes acá amanecía (dos velos de alba, estrellas apagándose y el haz
          retirándose) y el plano final quedaba sobre fondo marfil. Ahora la
@@ -330,8 +396,11 @@ export function QueHacemosHeroFaro() {
         // La linterna queda a plena: es la única fuente de luz del plano.
         .to("[data-halo]", { autoAlpha: 1, duration: 0.05 }, 0.88)
         .to("[data-nucleo]", { autoAlpha: 1, duration: 0.05 }, 0.88);
-      tl.fromTo("[data-esc='cierre']", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.03 }, 0.872)
-        .fromTo("[data-esc='cierre'] [data-cta]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.022 }, 0.896);
+      // Entra apenas se va la ultima pregunta (0.73). Al retirar el bloque
+      // de niveles quedaba un hueco de ~0.14 sin nada — casi una pantalla de
+      // scroll muerto antes del remate.
+      tl.fromTo("[data-esc='cierre']", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.03 }, 0.762)
+        .fromTo("[data-esc='cierre'] [data-cta]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.022 }, 0.79);
 
       /* ── S5 · Deslumbre → puente con la torre ────────────────────────────
          El faro gira hacia la cámara: el haz se abre y viene de frente, la
@@ -419,7 +488,7 @@ export function QueHacemosHeroFaro() {
     >
       {/* El runway solo existe donde corre la coreografía: en mobile o con
           reduced-motion colapsa a una pantalla (nada de scroll muerto). */}
-      <div ref={altoRef} className="relative h-svh lg:h-[920vh] lg:motion-reduce:h-svh">
+      <div ref={altoRef} className="relative h-svh lg:h-[820vh] lg:motion-reduce:h-svh">
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
@@ -470,53 +539,34 @@ export function QueHacemosHeroFaro() {
           {/* S2 · Caption del método (eyebrow real de MetodoPasos) */}
           <div data-esc="cap2" aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 pt-32" style={{ opacity: 0 }}>
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
-              <Eyebrow variant="light">Cómo trabajamos</Eyebrow>
+              <Eyebrow variant="light">Antes de proponer nada</Eyebrow>
             </div>
           </div>
 
           {/* S2 · Los cinco verbos: un golpe narrativo por momento */}
-          {VERBOS.map(({ verbo, pregunta }, i) => (
+          {PREGUNTAS.map((pregunta, i) => (
             <div
-              key={verbo}
+              key={pregunta}
               data-verbo-txt={i}
               aria-hidden="true"
-              className="pointer-events-none absolute max-w-[24rem]"
+              className="pointer-events-none absolute max-w-[26rem]"
               style={VERBO_POS[i]}
             >
-              <p data-v className="font-display font-extrabold tracking-[-0.02em] text-white" style={{ fontSize: "clamp(2.4rem, 1.4rem + 2.4vw, 3.5rem)", opacity: 0 }}>
-                {verbo}
-              </p>
-              <p data-q className="text-azul-claro/80 mt-3 font-sans text-[1rem] leading-relaxed" style={{ opacity: 0 }}>
+              <p
+                data-v
+                className="font-display font-bold tracking-[-0.02em] text-white"
+                style={{ fontSize: "clamp(1.6rem, 1rem + 1.6vw, 2.4rem)", lineHeight: 1.18, opacity: 0 }}
+              >
                 {pregunta}
               </p>
             </div>
           ))}
 
-          {/* S3 · Escalas: caption (eyebrow + título reales de la sección) */}
-          <div data-esc="cap3" aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 pt-32" style={{ opacity: 0 }}>
-            <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
-              <Eyebrow variant="light">Niveles en los que intervenimos</Eyebrow>
-              <p className="font-display mt-4 text-[2rem] font-bold tracking-[-0.02em] text-white">
-                Del sistema al aula.
-              </p>
-            </div>
-          </div>
-
-          {/* S3 · Estaciones sobre el muelle, del horizonte al primer plano */}
-          {ESCALAS.map(({ nombre, left, top, fs, op }, i) => (
-            <div
-              key={nombre}
-              data-escala={i}
-              aria-hidden="true"
-              className="pointer-events-none absolute flex items-center gap-3"
-              style={{ left, top, opacity: 0 }}
-            >
-              <span aria-hidden="true" className="bg-azul-claro block h-1.5 w-1.5 rounded-full" style={{ opacity: 0.85 }} />
-              <span className="font-display font-semibold text-white" style={{ fontSize: fs, opacity: op }}>
-                {nombre}
-              </span>
-            </div>
-          ))}
+          {/* S3 RETIRADO. Mostraba «Niveles en los que intervenimos» + «Del
+              sistema al aula» con cinco estaciones — es, textual, el título y
+              el contenido de una sección que viene más abajo. Además las
+              estaciones se posicionaban a lo largo del muelle, que ya no
+              existe, así que quedaban flotando sobre el agua. */}
 
           {/* S4 · Cierre sobre el amanecer. Titular pedido por Gastón
               (VALIDAR con ED); CTA real del proyecto hacia #lineas — en el
