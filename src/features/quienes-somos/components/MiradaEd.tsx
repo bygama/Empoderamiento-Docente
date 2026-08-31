@@ -128,8 +128,7 @@ const PERSPECTIVAS: readonly Perspectiva[] = [
   },
 ] as const;
 
-/** Posiciones (en % del escenario) del núcleo y los tres nodos. */
-const CENTRO = { x: 50, y: 46 } as const;
+/** Posiciones (en % del escenario) de los tres nodos. */
 const NODOS = [
   { x: 24, y: 30 },
   { x: 76, y: 36 },
