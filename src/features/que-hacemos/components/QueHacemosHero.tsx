@@ -498,9 +498,9 @@ export function QueHacemosHero() {
           data-qh-rise
           className="mt-6 max-w-[56ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
         >
-          Generamos escenarios de aprendizaje pensados para cada contexto —
-          nunca enlatados — que transforman la relación con la matemática
-          escolar.
+          Generamos escenarios de aprendizaje pensados para cada contexto y
+          sostenidos en investigación, que transforman la relación con la
+          matemática escolar.
         </p>
 
         {/* Portal al recorrido: CÁPSULA DE LUZ VERDE — vidrio con halo que
