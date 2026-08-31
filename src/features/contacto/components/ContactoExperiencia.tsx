@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+
+import { contactoSchema } from "@/features/contacto/schema";
 import Image from "next/image";
 import gsap from "gsap";
 import { MathField } from "@/components/ui/MathField";
@@ -128,6 +130,11 @@ export function ContactoExperiencia() {
   const [vista, setVista] = useState<Vista>("hero");
   const [tema, setTema] = useState<TemaKey | null>(null);
   const [introListo, setIntroListo] = useState(false);
+  // Estado del envio del formulario. "error" deja el formulario en
+  // pantalla con el mensaje puesto, en vez de mandar a la persona a la
+  // pantalla de cierre a festejar algo que no pasó.
+  const [envio, setEnvio] = useState<"quieto" | "enviando" | "error">("quieto");
+  const [errorEnvio, setErrorEnvio] = useState("");
   const animando = useRef(false);
   const introVivo = useRef(true);
   const introTl = useRef<gsap.core.Timeline | null>(null);
@@ -548,34 +555,69 @@ export function ContactoExperiencia() {
       );
   };
 
-  // ── FORMULARIO → CIERRE (mailto + confirmación) ─────────────────────────
-  const enviar = (e: FormEvent<HTMLFormElement>) => {
+  // ── FORMULARIO → CIERRE ─────────────────────────────────────────────────
+  //
+  // Manda la consulta al endpoint y recién si sale bien pasa a la pantalla
+  // de cierre. Antes esto abría un `mailto:` y daba por enviada la consulta
+  // sin saber nada: si la persona no tenía cliente de correo configurado
+  // —el caso normal en celular— el mensaje no llegaba nunca y ella se iba
+  // convencida de que sí. Ahora la confirmación significa que llegó.
+  const enviar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (envio === "enviando") return;
+
     const data = new FormData(e.currentTarget);
-    const nombre = String(data.get("nombre") ?? "").trim();
-    const email = String(data.get("email") ?? "").trim();
-    const institucion = String(data.get("institucion") ?? "").trim();
-    const pais = String(data.get("pais") ?? "").trim();
-    const mensaje = String(data.get("mensaje") ?? "").trim();
+    const consulta = {
+      nombre: String(data.get("nombre") ?? "").trim(),
+      email: String(data.get("email") ?? "").trim(),
+      institucion: String(data.get("institucion") ?? "").trim(),
+      pais: String(data.get("pais") ?? "").trim(),
+      mensaje: String(data.get("mensaje") ?? "").trim(),
+      tema: temaActivo?.titulo ?? "",
+      website: String(data.get("website") ?? ""),
+    };
 
-    const asunto = `[Web] ${temaActivo?.titulo ?? "Consulta"} — ${nombre}`;
-    const cuerpo = [
-      mensaje,
-      "",
-      "—",
-      `Nombre: ${nombre}`,
-      `Email: ${email}`,
-      institucion ? `Institución: ${institucion}` : null,
-      pais ? `País: ${pais}` : null,
-    ]
-      .filter((l) => l !== null)
-      .join("\n");
+    // Chequeo de este lado con el mismo schema que usa el endpoint: evita
+    // el viaje de ida y vuelta cuando el error se ve a simple vista.
+    const revisado = contactoSchema.safeParse(consulta);
+    if (!revisado.success) {
+      setErrorEnvio(revisado.error.issues[0]?.message ?? "Revisá los datos del formulario.");
+      setEnvio("error");
+      return;
+    }
 
-    // mientras no haya backend, abre el correo con todo precargado
-    window.location.href = `mailto:${siteConfig.contacto.email}?subject=${encodeURIComponent(
-      asunto,
-    )}&body=${encodeURIComponent(cuerpo)}`;
+    setEnvio("enviando");
+    setErrorEnvio("");
 
+    try {
+      const res = await fetch("/api/contacto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(revisado.data),
+      });
+
+      if (!res.ok) {
+        const cuerpo = await res.json().catch(() => null);
+        setErrorEnvio(
+          cuerpo?.error ?? "No pudimos enviar tu consulta. Probá de nuevo en un momento.",
+        );
+        setEnvio("error");
+        return;
+      }
+    } catch {
+      // Se cayó la conexión o el endpoint no respondió.
+      setErrorEnvio("No pudimos enviar tu consulta. Revisá tu conexión y probá de nuevo.");
+      setEnvio("error");
+      return;
+    }
+
+    setEnvio("quieto");
+    irAlCierre();
+  };
+
+  // La animación de salida del formulario, separada del envío para que el
+  // camino de error pueda dejar todo como está.
+  const irAlCierre = () => {
     setVista("cierre");
     if (reduced) {
       gsap.set(panel("formulario"), { autoAlpha: 0 });
@@ -1006,20 +1048,52 @@ export function ContactoExperiencia() {
                 />
               </div>
 
+              {/* Trampa para bots: fuera de pantalla y sin foco de teclado, así
+                  que ninguna persona lo ve ni lo pisa tabulando. Un bot que
+                  completa todos los campos que encuentra cae acá y el endpoint
+                  descarta el envío en silencio. */}
+              <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+                <label htmlFor="ct-website">No completar este campo</label>
+                <input id="ct-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+              </div>
+
               {/* CTA primaria, centrada al pie del panel. */}
-              <div data-campo className="mt-1 flex justify-center pt-1 md:col-span-2">
+              <div data-campo className="mt-1 flex flex-col items-center gap-3 pt-1 md:col-span-2">
                 {/* Espejo de ButtonPrimary como <button> de submit (el componente
                     solo acepta href). Único naranja en pantalla. */}
                 <button
                   type="submit"
-                  className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
+                  disabled={envio === "enviando"}
+                  className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-none"
                 >
-                  <span>Enviar consulta</span>
-                  <ArrowUpRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
+                  <span>{envio === "enviando" ? "Enviando…" : "Enviar consulta"}</span>
+                  {envio !== "enviando" && (
+                    <ArrowUpRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  )}
                 </button>
+
+                {/* Si el envío falla, el formulario se queda donde está con los
+                    datos puestos y ofrece la salida por correo: que algo se
+                    rompa de nuestro lado no puede dejar a la persona sin manera
+                    de escribirnos. */}
+                {envio === "error" && (
+                  <p
+                    role="alert"
+                    className="max-w-[46ch] text-center font-sans text-[0.85rem] leading-relaxed text-red-700"
+                  >
+                    {errorEnvio}{" "}
+                    <a
+                      href={`mailto:${siteConfig.contacto.email}`}
+                      className="text-azul-principal hover:text-verde-concepto font-medium underline underline-offset-2 transition-colors"
+                    >
+                      O escribinos directo a {siteConfig.contacto.email}
+                    </a>
+                    .
+                  </p>
+                )}
               </div>
             </div>
             </form>
