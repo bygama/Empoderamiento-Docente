@@ -116,8 +116,73 @@ export function TorreLineas() {
     let enCuadro = false;
     const avance = { p: 0 };
 
+    // ARMADO (0→1): el primer tambor se CONSTRUYE apenas el velo del faro
+    // despeja. Arranca colapsado en el eje (radio 0) y con las letras
+    // apagadas; salen del centro hasta el radio real y se encienden.
+    //
+    // La sección se mete SOLAPE_SVH por debajo del faro (ver el -mt del
+    // <section>), así que ese primer tramo del recorrido transcurre TAPADO
+    // por el velo — sin el solape quedaba una pantalla entera de gris muerto
+    // mientras el velo salía de cuadro. Ese tramo pasa con el tambor en cero.
+    const SOLAPE_SVH = 100;
+    const TOTAL_SVH = 100 + TAMBORES.length * SVH_POR_TAMBOR;
+    const OCULTO = SOLAPE_SVH / TOTAL_SVH;
+    // Progreso VISIBLE: el tramo tapado por el velo no cuenta. Si la torre
+    // avanzara ahí, al despejar el velo ya estarías a mitad de camino del
+    // tambor 02 y te perderías el 01 entero.
+    // (ojo: adentro del loop de pintar() hay otra `visible` booleana para
+    // el culling; por eso esta va con nombre propio.)
+    const progresoVisible = () =>
+      Math.min(1, Math.max(0, (avance.p - OCULTO) / (1 - OCULTO)));
+
+    // El armado NO va scrubbeado: corre SOLO, por tiempo, en cuanto el velo
+    // despeja. Atado al scroll obligaba a ir empujando la rueda para verlo
+    // construirse; así el remate del flash se reproduce como animación y el
+    // scroll queda libre para viajar la torre. Si el usuario vuelve arriba
+    // (el velo tapa de nuevo), se rearma para la próxima pasada.
+    const build = { v: 0 };
+    let buildTween: gsap.core.Tween | null = null;
+    // El armado y su rebobinado se disparan desde un ScrollTrigger PROPIO
+    // (más abajo), no desde pintar(): pintar() solo corre mientras la zona
+    // está activa, así que una vez armado nada lo devolvía a cero y la torre
+    // quedaba visible y montada desde antes del flash — los tambores
+    // aparecían subiendo desde abajo en vez de nacer de la luz.
+    const armar = () => {
+      buildTween?.kill();
+      buildTween = gsap.to(build, {
+        v: 1,
+        duration: 1.6,
+        ease: "power3.out",
+        onUpdate: pintar,
+        onComplete: () => { buildTween = null; },
+      });
+    };
+    // Al cruzar hacia arriba el corte es INMEDIATO, no un fundido: pasado
+    // ese borde el escenario deja de estar pineado y se DESLIZA hacia abajo
+    // con la página — desvanecerlo en medio segundo hacía que se lo viera
+    // resbalar, que es lo que quedaba mal. Justo ahí atrás está el flash del
+    // faro a pleno, de brillo parecido al gris del escenario, así que el
+    // relevo instantáneo no se percibe como corte.
+    const rebobinar = () => {
+      buildTween?.kill();
+      buildTween = null;
+      build.v = 0;
+      stage.style.opacity = "0";
+    };
+    const armado = () => build.v;
+    // Nace APAGADO. La torre pinta por encima del faro (z-20), así que con la
+    // opacidad por defecto (1) se veía montada sobre la escena nocturna y
+    // tapaba el flash: pintar() solo corre cuando el ScrollTrigger de la zona
+    // está activo, o sea que antes de eso nadie la apagaba.
+    stage.style.opacity = "0";
+
     const pintar = () => {
-      const y = -avance.p * (n - 1) * geo.sp;
+      const pv = progresoVisible();
+
+      // El escenario COMPLETO (su superficie gris, los tambores y la UI)
+      // aparece con el armado: se funde encima de la luz del deslumbre.
+      stage.style.opacity = String(build.v);
+      const y = -pv * (n - 1) * geo.sp;
       tower.style.transform = `translateY(${y}px)`;
       for (let i = 0; i < n; i++) {
         const drum = drumRefs.current[i];
@@ -140,7 +205,7 @@ export function TorreLineas() {
         }
         // Giro: avanza con el scroll + desfase por tambor + deriva constante.
         // El latido (pulsos) es el "beat" elástico cuando el tambor llega.
-        const rot = 26 + avance.p * 560 + i * 47 + deriva;
+        const rot = 26 + pv * 560 + i * 47 + deriva;
         const lat = 1 + (pulsos.current[i] || 0);
         drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) rotateY(${rot}deg) scale(${lat})`;
         // La foto viaja con la torre pero un toque más lenta (parallax).
@@ -150,44 +215,69 @@ export function TorreLineas() {
 
         const g = geo.drums[i];
         const spans = spanRefs.current[i] ?? [];
+        // Solo el PRIMER tambor se arma: es el que recibe el deslumbre. Los
+        // demás ya llegan montados desde arriba, como siempre.
+        const arm = i === 0 ? armado() : 1;
+        // Ease out: las letras salen rápido del eje y frenan al llegar al aro.
+        const armEase = 1 - (1 - arm) * (1 - arm);
         for (let j = 0; j < spans.length; j++) {
           const s = spans[j];
           if (!s) continue;
           const a = (((j * g.paso + rot) % 360) + 360) % 360;
           const c = Math.cos((a * Math.PI) / 180);
           if (c > 0) {
-            s.style.opacity = String(0.2 + 0.8 * c);
+            s.style.opacity = String((0.2 + 0.8 * c) * armEase);
             s.style.color = "";
             s.style.textShadow = "none";
           } else {
-            s.style.opacity = String(0.1 + 0.12 * -c);
+            s.style.opacity = String((0.1 + 0.12 * -c) * armEase);
             s.style.color = "transparent";
             s.style.textShadow = "0 0 14px rgba(31, 45, 77, 0.5)";
           }
+          // Durante el armado el radio crece desde el eje: las letras nacen
+          // amontonadas en el centro y se abren hasta formar el cilindro.
+          if (arm < 1) {
+            s.style.transform = `translate(-50%, -50%) rotateY(${j * g.paso}deg) translateZ(${geo.r * armEase}px)`;
+          } else if (s.dataset.armado !== "1") {
+            s.style.transform = `translate(-50%, -50%) rotateY(${j * g.paso}deg) translateZ(${geo.r}px)`;
+            s.dataset.armado = "1";
+          }
         }
 
-        // Chips de frase: legibles solo del lado de adelante.
+        // Chips de frase: legibles solo del lado de adelante. Entran recién
+        // sobre el final del armado (si aparecen con las letras, el momento
+        // se ensucia: son dos lecturas compitiendo).
+        const chipArm = arm < 1 ? Math.max(0, (arm - 0.55) / 0.45) : 1;
         const chips = chipRefs.current[i] ?? [];
         for (let k = 0; k < chips.length; k++) {
           const chip = chips[k];
           if (!chip) continue;
           const a = (((CHIP_ANGS[k] + rot) % 360) + 360) % 360;
           const c = Math.cos((a * Math.PI) / 180);
-          chip.style.opacity = c > 0.12 ? String(0.2 + 0.8 * c) : "0";
+          chip.style.opacity = c > 0.12 ? String((0.2 + 0.8 * c) * chipArm) : "0";
+        }
+
+        // La foto central del primer tambor crece con el armado: el disco
+        // nace chico en el eje junto con las letras.
+        if (foto && i === 0 && arm < 1) {
+          foto.style.transform += ` scale(${0.4 + 0.6 * armEase})`;
+          foto.style.opacity = String(armEase);
+        } else if (foto && i === 0 && foto.style.opacity !== "") {
+          foto.style.opacity = "";
         }
       }
 
       // Los apoyos respiran con la torre: plenos en cada estación, se apagan
       // durante el viaje (así el tambor que llega nunca los pisa).
-      const pos = avance.p * (n - 1);
+      const pos = pv * (n - 1);
       const dist = Math.abs(pos - Math.round(pos)); // 0 en estación, 0.5 a mitad de viaje
       if (apoyoRef.current) {
         apoyoRef.current.style.opacity = String(Math.max(0, 1 - dist * 2.6));
       }
 
       // Riel derecho: barra y porcentaje del recorrido.
-      if (fillRef.current) fillRef.current.style.transform = `scaleY(${avance.p})`;
-      const pct = `${Math.round(avance.p * 100)}%`;
+      if (fillRef.current) fillRef.current.style.transform = `scaleY(${pv})`;
+      const pct = `${Math.round(pv * 100)}%`;
       if (pctRef.current && pctRef.current.textContent !== pct) {
         pctRef.current.textContent = pct;
       }
@@ -245,8 +335,32 @@ export function TorreLineas() {
           onToggle: (self) => {
             enCuadro = self.isActive;
           },
+          // Fuera de la zona pintar() no corre, así que el rebobinado del
+          // armado se hace acá: si volvés arriba, la torre se apaga y el
+          // flash del faro vuelve a quedar despejado.
+
         },
         onUpdate: pintar,
+      });
+
+      // Armado / rebobinado: trigger PROPIO sin scrub, en el mismo punto
+      // donde el faro termina su flash (la zona arranca ahí por el solape).
+      // onRefresh cubre el caso de cargar la página ya scrolleada.
+      ScrollTrigger.create({
+        trigger: zone,
+        start: "top top",
+        end: "bottom bottom",
+        onEnter: armar,
+        onEnterBack: armar,
+        onLeaveBack: rebobinar,
+        onRefresh: (self) => {
+          if (!self.isActive) {
+            buildTween?.kill();
+            buildTween = null;
+            build.v = 0;
+            stage.style.opacity = "0";
+          }
+        },
       });
 
       // (La aparición del bloque de apoyo la maneja pintar(): opacidad por
@@ -257,6 +371,9 @@ export function TorreLineas() {
 
     return () => {
       gsap.ticker.remove(tick);
+      // El tween del armado nace fuera del gsap.context (lo crea pintar en
+      // caliente), así que ctx.revert() no lo alcanza: se mata a mano.
+      buildTween?.kill();
       ctx.revert();
     };
   }, [live, geo]);
@@ -283,14 +400,33 @@ export function TorreLineas() {
   return (
     <section
       id="recorrido"
-      className="bg-gris-fondo relative"
+      // Se mete una pantalla POR DEBAJO del faro (que pinta encima con z-10
+      // y cierra en este mismo gris). Sin el solape quedaba un viewport de
+      // gris muerto mientras el velo del faro salía de cuadro. Ese tramo
+      // tapado transcurre con el tambor todavía sin armar (ARMADO_DESDE):
+      // el armado arranca justo cuando el velo despeja.
+      // Solo en lg + con motion, que es donde existe el runway del faro.
+      className={
+        "relative " +
+        (live
+          ? // Va POR ENCIMA del faro (z-20 contra su z-10) y sin fondo propio:
+            // así el escenario se funde ENCIMA de la luz del deslumbre en vez
+            // de que la luz se corra como una cortina. El gris de base lo pone
+            // el body; la superficie real la trae el escenario (data-fondo).
+            "z-20 lg:-mt-[100svh] lg:motion-reduce:mt-0"
+          : "bg-gris-fondo")
+      }
       aria-label="Líneas de acción"
     >
-      {/* Grilla de puntos §6 sobre gris, como la referencia. */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,color-mix(in_srgb,var(--color-azul-principal)_22%,transparent)_1.1px,transparent_1.6px)] [background-size:22px_22px]"
-      />
+      {/* Grilla de puntos §6 — solo en el fallback plano: cuando la torre
+          anima, la trama viaja dentro del escenario (data-fondo) para que
+          aparezca junto con él sobre la luz del faro. */}
+      {!live && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,color-mix(in_srgb,var(--color-azul-principal)_22%,transparent)_1.1px,transparent_1.6px)] [background-size:22px_22px]"
+        />
+      )}
 
       {/* Contenido real para lectores de pantalla: la torre es decorativa. */}
       <ul className="sr-only">
@@ -315,6 +451,18 @@ export function TorreLineas() {
           }
           aria-hidden={live || undefined}
         >
+          {/* Superficie del escenario: el gris de la página con su trama de
+              puntos. Vive DENTRO del escenario para que entre junto con los
+              tambores — el conjunto se funde ENCIMA de la luz del faro en vez
+              de que la luz se corra. */}
+          {live && (
+            <span
+              aria-hidden="true"
+              className="bg-gris-fondo pointer-events-none absolute inset-0"
+            >
+              <span className="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,color-mix(in_srgb,var(--color-azul-principal)_22%,transparent)_1.1px,transparent_1.6px)] [background-size:22px_22px]" />
+            </span>
+          )}
           {/* Niebla arriba y abajo del escenario: los tambores que entran o
               salen se desvanecen antes de pisar el encabezado o los apoyos.
               (z-10: sobre la escena, debajo de header/rieles/apoyos en z-20.) */}
