@@ -25,6 +25,7 @@
 | Estilo de código  | [`conventions/CODE-STYLE.md`](conventions/CODE-STYLE.md) | Decisiones de estilo que las tools no enforce-an + índice de configs |
 | Código IA-friendly| [`AI_GUIDELINES.md`](AI_GUIDELINES.md)          | Reglas detalladas: naming, archivos chicos, TS, Tailwind v4, GSAP            |
 | ADRs              | [`architecture/adrs/`](architecture/adrs/README.md) | Decisiones arquitectónicas (stack base, backend con Supabase, etc.)   |
+| Features          | [`features/`](features/)                        | Registro de trabajo por feature: qué hay hecho, qué se decidió y qué falta |
 
 ---
 
@@ -40,6 +41,7 @@
 | Instalar y correr local                           | [`../README.md`](../README.md) (getting started) → `package.json` scripts (`pnpm dev` / `build` / `start` / `lint` / `typecheck`) |
 | Entender el backend / persistencia (Supabase)     | `../AGENTS.md` §12 → [`architecture/adrs/0002-adoptar-supabase-persistencia.md`](architecture/adrs/0002-adoptar-supabase-persistencia.md) → [`AI_GUIDELINES.md`](AI_GUIDELINES.md) §12 |
 | Ponerte al día con el estado del proyecto         | `../AGENTS.md` §13 (Estado del proyecto)                                             |
+| Tocar el formulario de contacto o su backend      | [`features/contacto.md`](features/contacto.md) (infra, decisiones, variables de entorno y pendientes) |
 
 ---
 
@@ -58,6 +60,7 @@ el código en una sesión futura, va a un `.md`.**
 | Cambio en el formato de commits                    | `COMMITS.md`                       |
 | Quirk específico de Claude Code                    | `../CLAUDE.md`                     |
 | Datos institucionales, contacto, redes             | `src/config/site.ts` (fuente canónica)                       |
+| Avance, decisión o pendiente de un feature         | `features/<feature>.md`            |
 
 Si una decisión arquitectónica grande aparece (ej: sumar un backend o
 persistencia, agregar i18n, cambiar de hosting), planteala en conversación
