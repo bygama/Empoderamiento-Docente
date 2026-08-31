@@ -20,6 +20,12 @@ export type Tambor = {
   detalle: string;
   /** Foto que flota dentro del tambor (placeholder del pool de marca). */
   foto: string;
+  /**
+   * Acento de la estación. Las 7 estaban en el mismo navy y el viaje se
+   * sentía monocromo; con color propio se nota que avanzás. Solo paleta de
+   * marca y NUNCA naranja: está reservado a los CTA.
+   */
+  acento: string;
 };
 
 // La torre = exactamente las 7 líneas de acción del sitemap.
@@ -32,6 +38,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Impulsamos procesos de desarrollo profesional con sustento vivencial y acompañamiento que fortalecen la práctica, promueven la reflexión y resignifican las matemáticas.",
     foto: "/metodo/acompanamos.webp",
+    acento: "var(--color-azul-principal)",
   },
   {
     id: "materiales",
@@ -41,6 +48,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Diseñamos materiales que median la relación entre docentes, matemáticas y aprendizaje, generando rupturas productivas que invitan a explorar, argumentar y resignificar.",
     foto: "/metodo/disenamos.webp",
+    acento: "var(--color-verde-concepto-texto)",
   },
   {
     id: "curriculo",
@@ -50,6 +58,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido para orientar trayectorias de aprendizaje.",
     foto: "/quienes-somos/origen-03-pregunta.webp",
+    acento: "var(--color-azul-medio)",
   },
   {
     id: "evaluacion",
@@ -59,6 +68,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Desarrollamos sistemas de evaluación que generan evidencia situada para comprender los aprendizajes y orientar decisiones educativas.",
     foto: "/metodo/evaluamos.webp",
+    acento: "var(--color-azul-principal)",
   },
   {
     id: "investigacion",
@@ -68,6 +78,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Investigamos las prácticas educativas para producir conocimiento, compartirlo con la comunidad científica y seguir enriqueciendo el campo de la Matemática Educativa.",
     foto: "/hero/hero-2.webp",
+    acento: "var(--color-verde-concepto-texto)",
   },
   {
     id: "fortalecimiento",
@@ -77,6 +88,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Fortalecemos capacidades institucionales mediante el diseño de políticas, estrategias y procesos que favorecen transformaciones coherentes, sostenibles y perdurables.",
     foto: "/hero/hero-6.webp",
+    acento: "var(--color-azul-medio)",
   },
   {
     id: "sistemas",
@@ -86,6 +98,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Integramos todas las dimensiones del cambio educativo para construir soluciones coherentes, sostenibles y pertinentes para cada realidad.",
     foto: "/hero/hero-9.webp",
+    acento: "var(--color-azul-principal)",
   },
 ];
 
@@ -124,7 +137,7 @@ export const PASOS_TRABAJO = [
     n: "02",
     verbo: "Diseñamos",
     texto:
-      "Armamos una propuesta a medida, con sustento en investigación. Nada enlatado.",
+      "Armamos una propuesta a medida para ese contexto, con sustento en investigación.",
     foto: "/metodo/disenamos.webp",
   },
   {
