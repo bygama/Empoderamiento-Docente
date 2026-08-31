@@ -34,22 +34,6 @@ const CARRILES = [
 const VIAJE = 14; // segundos que tarda una imagen de nacer a irse
 const CADENCIA = 3.5; // cada cuánto nace una imagen nueva
 
-// ── Cielo estrellado ───────────────────────────────────────────────────────
-// Estrellas dispersas con LCG determinista: misma constelación en server y
-// client (Math.random rompería la hidratación). Algunas titilan.
-const ESTRELLAS = (() => {
-  let s = 20260821;
-  const rnd = () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296);
-  return Array.from({ length: 90 }, () => ({
-    x: rnd() * 100,
-    y: rnd() * 100,
-    r: 0.9 + rnd() * 1.6,
-    o: 0.12 + rnd() * 0.5,
-    titila: rnd() < 0.13,
-    delay: rnd() * 6,
-  }));
-})();
-
 /**
  * Hero de Qué hacemos — pantalla completa (100svh) a sangre, sin bordes
  * redondeados, todo centrado en el medio: titular, bajada y el botón portal
@@ -119,12 +103,10 @@ export function QueHacemosHero() {
       // El celeste entra desde la DERECHA (cruzado con el subrayado, que se
       // dibuja desde la izquierda).
       gsap.set("[data-qh-pintura]", { clipPath: "inset(0% 0% 0% 100%)" });
-      gsap.set("[data-qh-glow]", { autoAlpha: 0 });
       gsap.set("[data-qh-rise]", { autoAlpha: 0, y: 24 });
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
       tl.to("[data-qh-word]", { yPercent: 0, duration: 1, stagger: 0.12 }, 0.75)
-        .to("[data-qh-glow]", { autoAlpha: 1, duration: 1.4, ease: "power2.out" }, 1.0)
         // El subrayado se dibuja de izquierda a derecha cuando el titular
         // ya está arriba — el gesto del marcador — y la palabra se tiñe de
         // celeste con un barrido cruzado, desde la derecha.
@@ -411,36 +393,27 @@ export function QueHacemosHero() {
   return (
     <section
       ref={rootRef}
-      className="relative isolate flex min-h-svh flex-col justify-center overflow-hidden pt-24 pb-12 text-white"
+      className="relative z-20 isolate flex min-h-svh flex-col justify-center overflow-hidden pt-24 pb-12 text-white"
       aria-label="Qué hacemos"
       style={
         {
           "--qhx": "0",
           "--qhy": "0",
-          // Navy que oscurece hacia arriba: profundidad de cielo nocturno
-          // sin salir de la paleta (azul-principal mezclado con negro).
-          background:
-            "linear-gradient(180deg, color-mix(in srgb, var(--color-azul-principal) 52%, #04060c) 0%, color-mix(in srgb, var(--color-azul-principal) 78%, #04060c) 55%, var(--color-azul-principal) 100%)",
+          // Sin fondo propio: lo pone el envoltorio compartido con la
+          // escena del faro (ver app/que-hacemos/page.tsx), para que no haya
+          // costura entre los dos cielos.
         } as CSSProperties
       }
     >
+      {/* SIN FONDO PROPIO. Antes esta sección tenía sus propias capas —
+          resplandor de horizonte, cielo estrellado y un haz girando— que la
+          hacían distinta de la escena del faro que viene abajo y marcaban
+          una línea horizontal en la junta. Ahora el cielo lo pone
+          únicamente el envoltorio compartido (app/que-hacemos/page.tsx) y
+          las dos secciones se leen como una sola.
+          Se conserva el glow verde del botón: es respuesta a la interacción,
+          no decorado de fondo. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        {/* Horizonte de luz: el faro debajo del horizonte. GSAP solo anima
-            autoAlpha (entrada); el transform queda libre para el parallax
-            por CSS var — sin pelea de transforms. */}
-        {/* -inset-8 (32px) > desplazamiento máximo del parallax (18px):
-            los bordes de la capa nunca entran al viewport — sin costuras
-            de gradiente en las esquinas. */}
-        <span
-          data-qh-glow
-          className="absolute -inset-8 will-change-transform"
-          style={{
-            background:
-              "radial-gradient(90% 62% at 50% 110%, color-mix(in srgb, var(--color-azul-medio) 52%, transparent) 0%, color-mix(in srgb, var(--color-azul-claro) 16%, transparent) 42%, transparent 72%)",
-            transform:
-              "translate3d(calc(var(--qhx, 0) * -18px), calc(var(--qhy, 0) * -10px), 0)",
-          }}
-        />
         {/* Luz que se "carga" con el click: sube desde el botón, abajo. */}
         <span
           data-qh-holdglow
@@ -448,41 +421,6 @@ export function QueHacemosHero() {
           style={{
             background:
               "radial-gradient(60% 55% at 50% 100%, color-mix(in srgb, var(--color-verde-concepto) 26%, transparent), transparent 72%)",
-          }}
-        />
-        {/* Cielo estrellado — en lugar de la grilla de puntos que comparten
-            Biblioteca/Novedades: constelación dispersa, algunas titilan. */}
-        <span className="absolute inset-0 overflow-hidden">
-          {ESTRELLAS.map((e, i) => (
-            <span
-              key={i}
-              className={
-                "absolute rounded-full bg-white" +
-                (e.titila
-                  ? " motion-safe:animate-[qh-estrella_5s_ease-in-out_infinite]"
-                  : "")
-              }
-              style={{
-                left: `${e.x}%`,
-                top: `${e.y}%`,
-                width: e.r,
-                height: e.r,
-                opacity: e.o,
-                animationDelay: e.titila ? `${e.delay}s` : undefined,
-              }}
-            />
-          ))}
-        </span>
-        {/* El haz del faro girando — versión amplia y tenue: cono de ~48°
-            con bordes bien difusos y pico al 6%, vuelta completa en 18s.
-            No se "ve pasar" un rayo: la zona del cielo que toca respira un
-            poco más de luz. Sin motion no se monta. */}
-        <span
-          className="absolute top-[105%] left-1/2 hidden h-[190vmax] w-[190vmax] motion-safe:block motion-safe:animate-[qh-faro-gira_18s_linear_infinite]"
-          style={{
-            transform: "translate(-50%, -50%)",
-            background:
-              "conic-gradient(from 0deg at 50% 50%, transparent 0deg, color-mix(in srgb, var(--color-azul-claro) 2%, transparent) 10deg, color-mix(in srgb, var(--color-azul-claro) 4%, transparent) 18deg, color-mix(in srgb, var(--color-azul-claro) 6%, transparent) 24deg, color-mix(in srgb, var(--color-azul-claro) 4%, transparent) 30deg, color-mix(in srgb, var(--color-azul-claro) 2%, transparent) 38deg, transparent 48deg)",
           }}
         />
       </div>
