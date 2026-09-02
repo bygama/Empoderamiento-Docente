@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
+import { getLenis } from "@/lib/lenis";
 import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -143,6 +144,23 @@ export function QueHacemosHeroFaro() {
   const rootRef = useRef<HTMLElement | null>(null);
   const altoRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
+
+  // «Ver líneas de acción» viaja con Lenis hasta el ARRANQUE de la torre.
+  // El salto nativo a #lineas "no llevaba a ningún lado": caía 112px antes
+  // del arranque (scroll-mt del ancla, pensado para el listado plano) sobre
+  // el faro casi blanco, y Lenis, si todavía estaba deslizando, lo pisaba
+  // en el frame siguiente. +4px para que ScrollTrigger dé la zona por
+  // activa y arranque el armado (en el borde exacto, progreso 0, no lo
+  // hace). El href queda como semántica y como fallback sin JS.
+  const irALineas = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const destino = document.getElementById("lineas");
+    if (!destino) return;
+    e.preventDefault();
+    const top = destino.getBoundingClientRect().top + window.scrollY + 4;
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(top, { duration: 1.6 });
+    else window.scrollTo({ top, behavior: "smooth" });
+  };
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -800,7 +818,7 @@ export function QueHacemosHeroFaro() {
                   naranja: sobre la noche el primario era un bloque que
                   competía con el titular. Sigue siendo la única acción. */}
               <div data-cta className="pointer-events-auto mt-9" style={{ opacity: 0 }}>
-                <ButtonSecondary href="#lineas" variant="dark">
+                <ButtonSecondary href="#lineas" variant="dark" withArrow onClick={irALineas}>
                   Ver líneas de acción
                 </ButtonSecondary>
               </div>
