@@ -74,17 +74,24 @@ const P = 1100; // distancia focal de la cámara imaginaria
  * de abajo RESPONDEN. Es lo que el faro hace de verdad —alumbrar para ver
  * qué hay— y no le pisa el texto a nadie.
  */
-const PREGUNTAS = [
-  "¿Qué se quiere transformar y por qué?",
-  "¿Qué sabemos de este problema y qué necesitamos comprender mejor?",
-  "¿Qué puede producir un cambio real en este contexto?",
-  "¿Qué está ocurriendo y qué necesitan quienes lo sostienen?",
-  "¿Qué aprendimos y qué puede sostener el equipo hacia adelante?",
-] as const;
+const PREGUNTAS: ReadonlyArray<{ antes: string; clave: string; resto: string }> = [
+  // La primera es la TESIS —las otras cuatro se desprenden de ella— y por
+  // eso es la líder: más grande y más ancha (ver el JSX). Cada pregunta
+  // lleva UNA palabra clave con el marcador de concepto del sitio (celeste
+  // + subrayado verde, pintado por la luz cuando el haz la alcanza): antes
+  // eran cinco bloques blancos idénticos y se leían planos.
+  { antes: "¿Qué se quiere ", clave: "transformar", resto: " y por qué?" },
+  { antes: "¿Qué sabemos de este problema y qué necesitamos ", clave: "comprender", resto: " mejor?" },
+  { antes: "¿Qué puede producir un ", clave: "cambio real", resto: " en este contexto?" },
+  { antes: "¿Qué está ocurriendo y qué necesitan ", clave: "quienes lo sostienen", resto: "?" },
+  { antes: "¿Qué ", clave: "aprendimos", resto: " y qué puede sostener el equipo hacia adelante?" },
+];
 
 /** Posición del bloque de texto de cada verbo (viewport, desktop). */
 const VERBO_POS: ReadonlyArray<React.CSSProperties> = [
-  { left: "8%", top: "38%" },
+  // La líder es más alta (dos líneas grandes): arranca más arriba para que
+  // su pie quede lejos del horizonte.
+  { left: "8%", top: "33%" },
   { left: "11%", top: "18%" },
   { right: "6%", top: "15%", textAlign: "right" },
   { right: "9%", top: "55%", textAlign: "right" },
@@ -216,6 +223,11 @@ export function QueHacemosHeroFaro() {
        */
       const REPOSO_HAZ = { izq: 176.42, der: 3.41 } as const;
       const svgFaro = root.querySelector("svg");
+      // Tramos de la línea de tiempo en los que una óptica está GIRANDO por
+      // coreografía (los llena el loop de preguntas). Mientras dura uno, el
+      // apuntado por frame no toca esa óptica: si la clavara al ángulo final
+      // en cuanto el texto asoma, el barrido se cortaría de golpe.
+      const giros: Array<{ lado: "izq" | "der"; desde: number; hasta: number }> = [];
       const apuntarAlTextoActivo = () => {
         if (!svgFaro) return;
         const bloques = root.querySelectorAll<HTMLElement>("[data-verbo-txt]");
@@ -237,6 +249,8 @@ export function QueHacemosHeroFaro() {
         let delta = ang - REPOSO_HAZ[lado];
         while (delta > 180) delta -= 360;
         while (delta < -180) delta += 360;
+        const ahora = tl.time();
+        if (giros.some((g) => g.lado === lado && ahora >= g.desde && ahora <= g.hasta)) return;
         gsap.set(`[data-haz='${lado}']`, { rotation: delta });
       };
 
@@ -411,25 +425,38 @@ export function QueHacemosHeroFaro() {
         const rot = () => anguloHacia(i, lado);
         const otro = lado === "izq" ? "der" : "izq";
         const prev = i > 0 ? HAZ_VERBO[i - 1] : null;
-        // La óptica gira hacia el punto (crossfade si cambia de lado). El
-        // wind-up se planta con un set HIJO del timeline: al scrubbear en
+        // La óptica gira hacia el punto. Si cambia de lado, la luz BARRE en
+        // vez de cortarse: antes era un crossfade entre los dos conos (uno
+        // se apagaba a la izquierda y el otro aparecía a la derecha, sin
+        // recorrido). Ahora el cono que se va sigue girando en el sentido
+        // del viaje mientras se apaga, y el que llega arranca BARRIDO_DEG
+        // más atrás en ese mismo sentido y entra girando, con solape largo:
+        // se lee como una sola luz que pasa por arriba del cielo. Sentido:
+        // saliendo de la izquierda, horario (+); de la derecha, antihorario.
+        // El wind-up se planta con un set HIJO del timeline: al scrubbear en
         // reversa el playhead lo cruza y restaura la rotación previa (un
         // fromTo dejaría el wind-up pegado hacia atrás).
+        const BARRIDO_DEG = 36;
         if (prev && prev.lado !== lado) {
-          tl.set(`[data-haz='${lado}']`, { rotation: () => rot() + (lado === "der" ? -14 : 14) }, t - 0.007)
-            .to(`[data-haz='${otro}']`, { autoAlpha: 0, duration: 0.018, ease: "none" }, t - 0.006)
-            .to(`[data-haz='${lado}']`, { autoAlpha: 1, rotation: rot, duration: 0.03, ease: "power1.inOut" }, t);
+          const sentido = lado === "der" ? 1 : -1;
+          tl.set(`[data-haz='${lado}']`, { rotation: () => rot() - sentido * BARRIDO_DEG }, t - 0.036)
+            .to(`[data-haz='${otro}']`, { rotation: `+=${sentido * BARRIDO_DEG}`, autoAlpha: 0, duration: 0.05, ease: "sine.in" }, t - 0.035)
+            .to(`[data-haz='${lado}']`, { autoAlpha: 1, rotation: rot, duration: 0.07, ease: "sine.inOut" }, t - 0.03);
+          giros.push({ lado: otro, desde: t - 0.035, hasta: t + 0.015 }, { lado, desde: t - 0.03, hasta: t + 0.04 });
         } else {
-          tl.to(`[data-haz='${lado}']`, { rotation: rot, duration: 0.028, ease: "power1.inOut" }, t - 0.004);
+          tl.to(`[data-haz='${lado}']`, { rotation: rot, duration: 0.06, ease: "sine.inOut" }, t - 0.025);
+          giros.push({ lado, desde: t - 0.025, hasta: t + 0.035 });
         }
         // Consecuencia: el agua se enciende donde el haz llega…
         tl.to(`[data-verbo-punto='${i}']`, { autoAlpha: 1, duration: 0.014 }, t + 0.018)
-          // …el verbo toma la escena…
+          // …la pregunta toma la escena…
           .fromTo(`[data-verbo-txt='${i}'] [data-v]`, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.016 }, t + 0.02)
-          .fromTo(`[data-verbo-txt='${i}'] [data-q]`, { autoAlpha: 0, y: 16 }, { autoAlpha: 0.9, y: 0, duration: 0.014 }, t + 0.024);
+          // …y la luz pinta el concepto: el subrayado verde de la palabra
+          // clave se dibuja cuando el haz ya está sobre ella.
+          .fromTo(`[data-verbo-txt='${i}'] mark`, { backgroundSize: "0% 0.12em" }, { backgroundSize: "100% 0.12em", duration: 0.03, ease: "power1.inOut" }, t + 0.036);
         // …y al ceder deja una idea encendida (rastro verde) en el agua.
         const fin = i < 4 ? beats[i + 1] - 0.016 : FIN_PREGUNTAS;
-        tl.to(`[data-verbo-txt='${i}'] [data-v], [data-verbo-txt='${i}'] [data-q]`, { autoAlpha: 0, y: -16, duration: 0.016, ease: "power2.in" }, fin)
+        tl.to(`[data-verbo-txt='${i}'] [data-v]`, { autoAlpha: 0, y: -16, duration: 0.016, ease: "power2.in" }, fin)
           .to(`[data-verbo-punto='${i}']`, { autoAlpha: 0.22, duration: 0.02 }, fin)
           .to(`[data-rastro='${i}']`, { autoAlpha: 0.6, duration: 0.014 }, fin + 0.004);
       });
@@ -627,23 +654,43 @@ export function QueHacemosHeroFaro() {
               cada momento tenga UNA sola lectura. */}
 
           {/* S2 · Los cinco verbos: un golpe narrativo por momento */}
-          {PREGUNTAS.map((pregunta, i) => (
-            <div
-              key={pregunta}
-              data-verbo-txt={i}
-              aria-hidden="true"
-              className="pointer-events-none absolute max-w-[26rem]"
-              style={VERBO_POS[i]}
-            >
-              <p
-                data-v
-                className="font-display font-bold tracking-[-0.02em] text-white"
-                style={{ fontSize: "clamp(1.6rem, 1rem + 1.6vw, 2.4rem)", lineHeight: 1.18, opacity: 0 }}
+          {PREGUNTAS.map(({ antes, clave, resto }, i) => {
+            // La primera pregunta es la tesis: un escalón más grande y más
+            // ancha que las cuatro que se desprenden de ella.
+            const lider = i === 0;
+            return (
+              <div
+                key={clave}
+                data-verbo-txt={i}
+                aria-hidden="true"
+                // La líder cierra en dos líneas («…transformar y por qué?»
+                // entera en la segunda): 44rem, pero nunca más de 54vw para
+                // que en desktops angostos no se meta bajo la torre.
+                className={`pointer-events-none absolute ${lider ? "max-w-[min(44rem,54vw)]" : "max-w-[26rem]"}`}
+                style={VERBO_POS[i]}
               >
-                {pregunta}
-              </p>
-            </div>
-          ))}
+                {/* La palabra clave: celeste (la luz la toca) + subrayado
+                    verde pintado por la coreografía (background-size 0→100%,
+                    mismo mecanismo que el mensaje central). Sombra suave
+                    para despegar el texto del cielo. */}
+                <p
+                  data-v
+                  className="font-display font-bold tracking-[-0.02em] text-white [text-shadow:0_2px_28px_rgb(6_11_25/0.6)] [&_mark]:text-azul-claro [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:0%_0.12em] [&_mark]:no-underline"
+                  style={{
+                    fontSize: lider
+                      ? "clamp(2.2rem, 1.2rem + 2.4vw, 3.4rem)"
+                      : "clamp(1.6rem, 1rem + 1.6vw, 2.4rem)",
+                    lineHeight: lider ? 1.1 : 1.18,
+                    opacity: 0,
+                  }}
+                >
+                  {antes}
+                  <Highlight>{clave}</Highlight>
+                  {resto}
+                </p>
+              </div>
+            );
+          })}
 
           {/* S3 RETIRADO. Mostraba «Niveles en los que intervenimos» + «Del
               sistema al aula» con cinco estaciones — es, textual, el título y
