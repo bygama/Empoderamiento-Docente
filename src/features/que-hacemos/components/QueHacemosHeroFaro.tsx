@@ -208,53 +208,11 @@ export function QueHacemosHeroFaro() {
         }
       };
 
-      /**
-       * APUNTADO EN VIVO del haz al texto activo.
-       *
-       * Los bloques de texto son HTML por fuera del SVG, y la cámara
-       * transforma el SVG en cada frame: la relación entre "dónde está el
-       * texto en pantalla" y "qué ángulo es eso dentro del SVG" CAMBIA
-       * constantemente. Calcular el ángulo una sola vez (como hacían los
-       * valores fijos de HAZ_VERBO) daba errores de 50° a 116° medidos.
-       *
-       * Por eso se resuelve por frame, corriendo DESPUÉS de los tweens: se
-       * busca el bloque visible, se pasa su centro a coordenadas del SVG con
-       * getScreenCTM y se orienta el haz a ese ángulo. Si no hay ninguno
-       * visible no se toca nada y manda la coreografía (el remate del final
-       * apunta al centro por su cuenta).
-       */
-      const REPOSO_HAZ = { izq: 176.42, der: 3.41 } as const;
-      const svgFaro = root.querySelector("svg");
-      // Tramos de la línea de tiempo en los que una óptica está GIRANDO por
-      // coreografía (los llena el loop de preguntas). Mientras dura uno, el
-      // apuntado por frame no toca esa óptica: si la clavara al ángulo final
-      // en cuanto el texto asoma, el barrido se cortaría de golpe.
-      const giros: Array<{ lado: "izq" | "der"; desde: number; hasta: number }> = [];
-      const apuntarAlTextoActivo = () => {
-        if (!svgFaro) return;
-        const bloques = root.querySelectorAll<HTMLElement>("[data-verbo-txt]");
-        let activo: HTMLElement | null = null;
-        let mejor = 0.15;
-        for (const b of bloques) {
-          const v = b.querySelector<HTMLElement>("[data-v]");
-          const op = v ? parseFloat(getComputedStyle(v).opacity) : 0;
-          if (op > mejor) { mejor = op; activo = b; }
-        }
-        if (!activo) return;
-        const ctm = (svgFaro as SVGSVGElement).getScreenCTM();
-        if (!ctm) return;
-        const r = activo.getBoundingClientRect();
-        const pt = new DOMPoint(r.left + r.width / 2, r.top + r.height / 2)
-          .matrixTransform(ctm.inverse());
-        const ang = (Math.atan2(pt.y - FOCO_Y, pt.x - FOCO_X) * 180) / Math.PI;
-        const lado: "izq" | "der" = pt.x < FOCO_X ? "izq" : "der";
-        let delta = ang - REPOSO_HAZ[lado];
-        while (delta > 180) delta -= 360;
-        while (delta < -180) delta += 360;
-        const ahora = tl.time();
-        if (giros.some((g) => g.lado === lado && ahora >= g.desde && ahora <= g.hasta)) return;
-        gsap.set(`[data-haz='${lado}']`, { rotation: delta });
-      };
+      // El apuntado del haz a las preguntas se resuelve POR FRAME en
+      // `girarHaces` (más abajo, junto a `anguloHacia`), después de los
+      // tweens de cada tick: los bloques de texto son HTML por fuera del SVG
+      // y la cámara transforma el SVG en cada frame, así que el ángulo
+      // correcto cambia constantemente.
 
 
       // Promoción a GPU solo mientras la coreografía existe (el fallback
@@ -291,11 +249,140 @@ export function QueHacemosHeroFaro() {
       });
       aplicarCamara();
 
+      /**
+       * Rotación que hace que el haz APUNTE al bloque de texto i.
+       *
+       * Antes los ángulos estaban a mano (HAZ_VERBO), calibrados para el copy
+       * anterior: al cambiar las frases por preguntas los bloques cambiaron de
+       * alto y de posición, y el haz quedó señalando "por ahí cerca" en vez de
+       * al texto. Ahora se mide de verdad: se toma el centro del bloque en
+       * pantalla, se lo pasa a coordenadas del SVG (getScreenCTM) y se calcula
+       * el ángulo desde el foco de la linterna. La evalúa `girarHaces` en
+       * cada frame, así sigue a la cámara mientras se mueve.
+       *
+       * Eje del haz en reposo: el izquierdo apunta a 176.4° desde el foco y el
+       * derecho a 3.4° (medido de los polígonos de FaroEscena).
+       */
+      const REPOSO = { izq: 176.42, der: 3.41 } as const;
+      const anguloHacia = (i: number, lado: "izq" | "der") => {
+        const el = root.querySelector<HTMLElement>(`[data-verbo-txt='${i}']`);
+        const svg = root.querySelector("svg");
+        if (!el || !svg) return HAZ_VERBO[i].rot;
+        const ctm = (svg as SVGSVGElement).getScreenCTM();
+        if (!ctm) return HAZ_VERBO[i].rot;
+        const r = el.getBoundingClientRect();
+        const pt = new DOMPoint(r.left + r.width / 2, r.top + r.height / 2)
+          .matrixTransform(ctm.inverse());
+        const ang = (Math.atan2(pt.y - FOCO_Y, pt.x - FOCO_X) * 180) / Math.PI;
+        // Normaliza a (-180, 180] para que no pegue vueltas de más.
+        let delta = ang - REPOSO[lado];
+        while (delta > 180) delta -= 360;
+        while (delta < -180) delta += 360;
+        return delta;
+      };
+
+      /**
+       * GIRO DEL HAZ, por frame.
+       *
+       * La rotación de las ópticas durante las preguntas NO va en tweens: el
+       * ángulo hacia cada texto depende de la cámara, que se mueve mientras
+       * el haz gira (los paneos laterales caen justo en los cambios de lado).
+       * Un tween congela el destino al arrancar, y cuando el apuntado en vivo
+       * retomaba lo corregía de golpe: el haz "se iba a otro lado y volvía"
+       * (14° medidos). Acá todo es en vivo: se interpola entre el ángulo REAL
+       * del texto anterior y el del actual según el avance del giro, así el
+       * final del giro coincide exacto con el apuntado. No guarda estado
+       * (solo lee el tiempo de la línea y la geometría), por eso no hay salto
+       * en ningún sentido del scroll.
+       *
+       * Cambio de lado: la luz BARRE en vez de cortarse. El cono que se va
+       * sigue girando en el sentido del viaje mientras se apaga, y el que
+       * llega arranca `barrido` grados más atrás en ese mismo sentido y
+       * entra girando, con solape largo: se lee como una sola luz que pasa
+       * por arriba del cielo. Sentido: saliendo de la izquierda, horario (+);
+       * de la derecha, antihorario. Las opacidades sí son tweens (loop de
+       * S2), con estos mismos tiempos.
+       *
+       * UN SOLO DUEÑO. Ningún tween de la línea de tiempo toca `rotation` de
+       * las ópticas: ni el encendido (−8 → −2) ni el cierre (→ −46) — los
+       * dos viven acá como tramos por tiempo. Cuando compartían dueño pasaba
+       * esto: ScrollTrigger.refresh() re-renderiza la línea con los eventos
+       * suprimidos, el tween del encendido volvía a escribir su −2 sobre el
+       * haz y `girarHaces` no corría (onUpdate suprimido): el haz "se iba a
+       * otro lado" hasta el próximo tick de scroll, que lo devolvía. Por lo
+       * mismo se escribe con quickSetter (sin crear un tween por frame que
+       * después GSAP pueda re-renderizar por su cuenta).
+       *
+       * Va declarado ANTES de la línea de tiempo: ScrollTrigger dispara
+       * onUpdate en plena construcción, y una const declarada después
+       * explota (zona muerta temporal) y tira abajo la escena entera.
+       */
+      const GIRO = {
+        antesEntrada: 0.03,
+        entrada: 0.07,
+        antesSalida: 0.035,
+        salida: 0.05,
+        antesMismo: 0.025,
+        mismo: 0.06,
+        barrido: 36,
+      } as const;
+      // Encendido (S1): la óptica izquierda se asienta de −8 a −2 mientras
+      // prende. Cierre (S4): desde la última pregunta al ángulo que baña el
+      // titular. Mismos tiempos que sus tweens de opacidad.
+      const ENCENDIDO = { desde: 0.226, dur: 0.035, rotDesde: -8 } as const;
+      const REPOSO_S1 = -2; // el haz izq al final del encendido (S1)
+      const CIERRE = { desde: despues(0.862), dur: 0.06, rot: -46 } as const;
+      const easeInOut = (p: number) => 0.5 - 0.5 * Math.cos(Math.PI * p);
+      const easeIn = (p: number) => 1 - Math.cos((p * Math.PI) / 2);
+      const easeOut = (p: number) => 1 - (1 - p) * (1 - p);
+      const clamp01 = (p: number) => Math.min(1, Math.max(0, p));
+      const setters = {
+        izq: gsap.quickSetter("[data-haz='izq']", "rotation", "deg"),
+        der: gsap.quickSetter("[data-haz='der']", "rotation", "deg"),
+      };
+      const setRot = (lado: "izq" | "der", rotation: number) => setters[lado](rotation);
+      // Se asigna recién creada la línea de tiempo (ver abajo): mientras no
+      // exista, el giro no hace nada.
+      let tlActual: gsap.core.Timeline | null = null;
+      const girarHaces = () => {
+        if (!tlActual) return;
+        const ahora = tlActual.time();
+        if (ahora < BEATS[0] - GIRO.antesSalida) {
+          const p = clamp01((ahora - ENCENDIDO.desde) / ENCENDIDO.dur);
+          setRot("izq", ENCENDIDO.rotDesde + (REPOSO_S1 - ENCENDIDO.rotDesde) * easeOut(p));
+          return;
+        }
+        if (ahora > FIN_PREGUNTAS) {
+          const ultimo = HAZ_VERBO.length - 1;
+          const desde = anguloHacia(ultimo, "izq");
+          const p = clamp01((ahora - CIERRE.desde) / CIERRE.dur);
+          setRot("izq", desde + (CIERRE.rot - desde) * easeInOut(p));
+          return;
+        }
+        let i = 0;
+        while (i + 1 < BEATS.length && ahora >= BEATS[i + 1] - GIRO.antesSalida) i++;
+        const t = BEATS[i];
+        const { lado } = HAZ_VERBO[i];
+        const prev = i > 0 ? HAZ_VERBO[i - 1] : null;
+        const objetivo = anguloHacia(i, lado);
+        if (prev && prev.lado !== lado) {
+          const sentido = lado === "der" ? 1 : -1;
+          const pIn = clamp01((ahora - (t - GIRO.antesEntrada)) / GIRO.entrada);
+          setRot(lado, objetivo - sentido * GIRO.barrido * (1 - easeInOut(pIn)));
+          const pOut = clamp01((ahora - (t - GIRO.antesSalida)) / GIRO.salida);
+          setRot(prev.lado, anguloHacia(i - 1, prev.lado) + sentido * GIRO.barrido * easeIn(pOut));
+        } else {
+          const p = clamp01((ahora - (t - GIRO.antesMismo)) / GIRO.mismo);
+          const desde = prev ? anguloHacia(i - 1, lado) : REPOSO_S1;
+          setRot(lado, desde + (objetivo - desde) * easeInOut(p));
+        }
+      };
+
       const tl = gsap.timeline({
         defaults: { ease: "power2.out" },
         onUpdate: () => {
           aplicarCamara();
-          apuntarAlTextoActivo();
+          girarHaces();
         },
         scrollTrigger: {
           trigger: alto,
@@ -310,8 +397,18 @@ export function QueHacemosHeroFaro() {
           // de texto: sin esto GSAP los evaluaría una sola vez y volverían a
           // desfasarse en cuanto cambie el layout (resize, fuente, copy).
           invalidateOnRefresh: true,
+          // Un refresh de ScrollTrigger re-renderiza la línea pasando por el
+          // progreso 0 CON eventos y vuelve al progreso actual SIN eventos:
+          // cámara y haz quedaban en su estado inicial hasta el próximo tick
+          // de scroll ("el haz se va a otro lado y vuelve"; medido: −8° tras
+          // un resize a mitad de las preguntas). Se re-aplican al terminar.
+          onRefresh: () => {
+            aplicarCamara();
+            girarHaces();
+          },
         },
       });
+      tlActual = tl;
 
       /* ── Detrás del hero: solo cielo ────────────────────────────────
          En el tramo que corre bajo el hero el faro queda HUNDIDO bajo el
@@ -366,7 +463,9 @@ export function QueHacemosHeroFaro() {
         .to("[data-nucleo]", { scale: 1, duration: 0.015 }, 0.218)
         .to("[data-linterna]", { opacity: 1, duration: 0.012 }, 0.212)
         .to("[data-halo]", { autoAlpha: 1, scale: 1, duration: 0.028 }, 0.216)
-        .fromTo("[data-haz='izq']", { autoAlpha: 0, rotation: -8 }, { autoAlpha: 1, rotation: -2, duration: 0.035, ease: "power1.out" }, 0.226)
+        // (Solo la opacidad: la rotación del haz, también su asentado de −8
+        // a −2 al prender, la pone `girarHaces`. Ver ahí por qué.)
+        .fromTo("[data-haz='izq']", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.035, ease: "power1.out" }, 0.226)
         .to("[data-espejo]", { autoAlpha: 1, duration: 0.04 }, 0.235);
       // La luz atraviesa la zona del titular y el mensaje emerge con ella.
       tl.to("[data-mensaje]", { autoAlpha: 1, duration: 0.012, ease: "none" }, 0.262)
@@ -390,64 +489,17 @@ export function QueHacemosHeroFaro() {
         .to(cam, { z: 380, duration: beats[3] - beats[0] - 0.06, ease: "power1.inOut" }, beats[0] + 0.04)
         .to(cam, { z: 600, duration: PASO_PREGUNTA + 0.03, ease: "power1.inOut" }, beats[3] + 0.002);
 
-      /**
-       * Rotación que hace que el haz APUNTE al bloque de texto i.
-       *
-       * Antes los ángulos estaban a mano (HAZ_VERBO), calibrados para el copy
-       * anterior: al cambiar las frases por preguntas los bloques cambiaron de
-       * alto y de posición, y el haz quedó señalando "por ahí cerca" en vez de
-       * al texto. Ahora se mide de verdad: se toma el centro del bloque en
-       * pantalla, se lo pasa a coordenadas del SVG (getScreenCTM) y se calcula
-       * el ángulo desde el foco de la linterna. Function-based, así se
-       * recalcula en cada refresh y no se desfasa nunca más.
-       *
-       * Eje del haz en reposo: el izquierdo apunta a 176.4° desde el foco y el
-       * derecho a 3.4° (medido de los polígonos de FaroEscena).
-       */
-      const REPOSO = { izq: 176.42, der: 3.41 } as const;
-      const anguloHacia = (i: number, lado: "izq" | "der") => {
-        const el = root.querySelector<HTMLElement>(`[data-verbo-txt='${i}']`);
-        const svg = root.querySelector("svg");
-        if (!el || !svg) return HAZ_VERBO[i].rot;
-        const ctm = (svg as SVGSVGElement).getScreenCTM();
-        if (!ctm) return HAZ_VERBO[i].rot;
-        const r = el.getBoundingClientRect();
-        const pt = new DOMPoint(r.left + r.width / 2, r.top + r.height / 2)
-          .matrixTransform(ctm.inverse());
-        const ang = (Math.atan2(pt.y - FOCO_Y, pt.x - FOCO_X) * 180) / Math.PI;
-        // Normaliza a (-180, 180] para que no pegue vueltas de más.
-        let delta = ang - REPOSO[lado];
-        while (delta > 180) delta -= 360;
-        while (delta < -180) delta += 360;
-        return delta;
-      };
-
+      // `anguloHacia` y `girarHaces` (la rotación del haz hacia cada
+      // pregunta) viven arriba, antes de crear la línea de tiempo.
       beats.forEach((t, i) => {
         const { lado } = HAZ_VERBO[i];
-        const rot = () => anguloHacia(i, lado);
         const otro = lado === "izq" ? "der" : "izq";
         const prev = i > 0 ? HAZ_VERBO[i - 1] : null;
-        // La óptica gira hacia el punto. Si cambia de lado, la luz BARRE en
-        // vez de cortarse: antes era un crossfade entre los dos conos (uno
-        // se apagaba a la izquierda y el otro aparecía a la derecha, sin
-        // recorrido). Ahora el cono que se va sigue girando en el sentido
-        // del viaje mientras se apaga, y el que llega arranca BARRIDO_DEG
-        // más atrás en ese mismo sentido y entra girando, con solape largo:
-        // se lee como una sola luz que pasa por arriba del cielo. Sentido:
-        // saliendo de la izquierda, horario (+); de la derecha, antihorario.
-        // El wind-up se planta con un set HIJO del timeline: al scrubbear en
-        // reversa el playhead lo cruza y restaura la rotación previa (un
-        // fromTo dejaría el wind-up pegado hacia atrás).
-        const BARRIDO_DEG = 36;
+        // La rotación la pone `girarHaces` por frame; acá solo el crossfade
+        // de opacidad cuando la luz cambia de óptica, con los tiempos de GIRO.
         if (prev && prev.lado !== lado) {
-          const sentido = lado === "der" ? 1 : -1;
-          tl.set(`[data-haz='${lado}']`, { rotation: () => rot() - sentido * BARRIDO_DEG }, t - 0.036)
-            .to(`[data-haz='${otro}']`, { rotation: `+=${sentido * BARRIDO_DEG}`, autoAlpha: 0, duration: 0.05, ease: "sine.in" }, t - 0.035)
-            .to(`[data-haz='${lado}']`, { autoAlpha: 1, rotation: rot, duration: 0.07, ease: "sine.inOut" }, t - 0.03);
-          giros.push({ lado: otro, desde: t - 0.035, hasta: t + 0.015 }, { lado, desde: t - 0.03, hasta: t + 0.04 });
-        } else {
-          tl.to(`[data-haz='${lado}']`, { rotation: rot, duration: 0.06, ease: "sine.inOut" }, t - 0.025);
-          giros.push({ lado, desde: t - 0.025, hasta: t + 0.035 });
+          tl.to(`[data-haz='${otro}']`, { autoAlpha: 0, duration: GIRO.salida, ease: "sine.in" }, t - GIRO.antesSalida)
+            .to(`[data-haz='${lado}']`, { autoAlpha: 1, duration: GIRO.entrada, ease: "sine.inOut" }, t - GIRO.antesEntrada);
         }
         // Consecuencia: el agua se enciende donde el haz llega…
         tl.to(`[data-verbo-punto='${i}']`, { autoAlpha: 1, duration: 0.02 }, t + 0.018)
@@ -455,8 +507,9 @@ export function QueHacemosHeroFaro() {
           // 0.016 un scroll rápido las hacía parpadear)…
           .fromTo(`[data-verbo-txt='${i}'] [data-v]`, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.03, ease: "sine.out" }, t + 0.02)
           // …y la luz pinta el concepto: el subrayado verde de la palabra
-          // clave se dibuja cuando el haz ya está sobre ella.
-          .fromTo(`[data-verbo-txt='${i}'] mark`, { backgroundSize: "0% 0.12em" }, { backgroundSize: "100% 0.12em", duration: 0.04, ease: "power1.inOut" }, t + 0.05);
+          // clave se dibuja cuando el haz ya está sobre ella. Largo (0.12 ≈
+          // 74vh de scroll): con 0.04 se pintaba en un parpadeo.
+          .fromTo(`[data-verbo-txt='${i}'] mark`, { backgroundSize: "0% 0.12em" }, { backgroundSize: "100% 0.12em", duration: 0.12, ease: "sine.inOut" }, t + 0.05);
         // …y al ceder deja una idea encendida (rastro verde) en el agua.
         const fin = i < 4 ? beats[i + 1] - 0.03 : FIN_PREGUNTAS;
         tl.to(`[data-verbo-txt='${i}'] [data-v]`, { autoAlpha: 0, y: -16, duration: 0.03, ease: "sine.in" }, fin)
@@ -475,8 +528,8 @@ export function QueHacemosHeroFaro() {
       tl.to(cam, { z: -260, duration: 0.1, ease: "power1.inOut" }, despues(0.862))
         .to(cam, { y: 0, duration: 0.08, ease: "power1.inOut" }, despues(0.862));
       tl.to("[data-verbo-punto]", { autoAlpha: 0, duration: 0.03, ease: "none" }, despues(0.866))
-        // El haz sigue vivo: abre un poco y baña la zona del titular.
-        .to("[data-haz='izq']", { rotation: -46, duration: 0.06, ease: "power1.inOut" }, despues(0.862))
+        // El haz sigue vivo: abre un poco y baña la zona del titular (el
+        // giro a −46° lo hace `girarHaces`; acá solo la opacidad).
         .to("[data-haz='izq']", { autoAlpha: 1, duration: 0.04, ease: "none" }, despues(0.862))
         // La linterna queda a plena: es la única fuente de luz del plano.
         .to("[data-halo]", { autoAlpha: 1, duration: 0.05 }, despues(0.88))
