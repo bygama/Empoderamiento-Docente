@@ -48,6 +48,17 @@ const SEP = "  •  ";
 const ANCHO_CHAR = 0.62; // ancho promedio (em) de Manrope extrabold mayúsculas
 const F_MAX = 148;
 const SVH_POR_TAMBOR = 130; // cuánto scroll dura cada estación de la torre
+// ARRANQUE del viaje: los primeros ARRANQUE_SVH de scroll de la zona no
+// mueven la torre. Es el respiro entre que el tambor cierra y empieza a
+// viajar: quien viene empujando la rueda durante el armado no se lo lleva
+// girando en el mismo frame en que se suelta el bloqueo. Corto a propósito
+// (dos o tres muescas): con 100svh se sentía como si el scroll siguiera
+// trabado ("tarda en dejarme scrollear"); sin nada, el tambor se iba a la
+// izquierda antes de verse quieto (Mateo, 2026-09-02).
+const ARRANQUE_SVH = 40;
+const ZONA_SVH = TAMBORES.length * SVH_POR_TAMBOR + ARRANQUE_SVH;
+/** Fracción del recorrido de la zona (alto − 100svh) que ocupa el arranque. */
+const ARRANQUE = ARRANQUE_SVH / (ZONA_SVH - 100);
 // Ángulos de los chips de frase sobre la banda (3 por tambor, repartidos).
 const CHIP_ANGS = [40, 160, 280];
 // Giro total de la torre a lo largo del recorrido. Antes 560°: un scroll
@@ -220,14 +231,10 @@ export function TorreLineas() {
     // tambor (ver `armar`): el usuario que frena en el blanco ve nacer la
     // sección sin tener que empujar la rueda. (Se probó disolver el velo
     // por scroll y quedaba peor: quien se detiene en el blanco no ve nada.)
-    // El viaje de la torre arranca CON la zona. Antes se descontaba el
-    // solape (los primeros 100svh no movían la torre, para que quien
-    // scrolleaba durante el velo no se perdiera el tambor 01). Con el
-    // scroll frenado mientras se arma eso ya no puede pasar, y el descuento
-    // dejaba ~90svh de scroll muerto justo después de soltar: "tarda en
-    // dejarme scrollear" (Mateo, 2026-09-02). Mientras el faro se desliza
-    // tapado, la torre ya responde. De paso el riel (saltarA) cae exacto en
-    // cada estación: antes ignoraba el descuento y llegaba corto.
+    // El viaje de la torre arranca ARRANQUE_SVH después del inicio de la
+    // zona (ver la constante). Antes descontaba el solape entero (100svh)
+    // para que quien scrolleaba durante el velo no se perdiera el tambor
+    // 01; con el scroll frenado mientras se arma eso ya no puede pasar.
 
     // El armado NO va scrubbeado: corre SOLO, por tiempo, en cuanto la zona
     // arranca (= el faro terminó en blanco). Atado al scroll obligaba a ir
@@ -373,7 +380,9 @@ export function TorreLineas() {
     const wrap180 = (a: number) => ((((a + 180) % 360) + 360) % 360) - 180;
 
     const pintar = () => {
-      const pv = avance.p; // progreso de la zona = viaje de la torre
+      // Viaje de la torre: el avance de la zona menos el arranque (ver
+      // ARRANQUE_SVH).
+      const pv = Math.min(1, Math.max(0, (avance.p - ARRANQUE) / (1 - ARRANQUE)));
 
       // El velo blanco lo disuelve el armado (por tiempo): la superficie
       // gris y su trama EMERGEN del blanco en que terminó el faro.
@@ -623,13 +632,15 @@ export function TorreLineas() {
   chipRefs.current = TAMBORES.map(() => []);
 
   // Riel izquierdo: saltar a la estación i (misma cuenta que hace pintar
-  // al revés: posición de scroll donde el avance p = i/(n-1)).
+  // al revés: posición de scroll donde el viaje pv = i/(n-1), contando el
+  // arranque).
   const saltarA = (i: number) => {
     const zone = zoneRef.current;
     if (!zone) return;
     const top = zone.getBoundingClientRect().top + window.scrollY;
+    const pv = i / (TAMBORES.length - 1);
     const destino =
-      top + (zone.offsetHeight - window.innerHeight) * (i / (TAMBORES.length - 1));
+      top + (zone.offsetHeight - window.innerHeight) * (ARRANQUE + (1 - ARRANQUE) * pv);
     const lenis = getLenis();
     if (lenis) lenis.scrollTo(destino, { duration: 1.4 });
     else window.scrollTo({ top: destino, behavior: "smooth" });
@@ -680,9 +691,9 @@ export function TorreLineas() {
       <div
         ref={zoneRef}
         className="relative"
-        // Sin los 100svh extra del solape: el viaje arranca con la zona
-        // (ver el effect), así cada estación conserva sus SVH_POR_TAMBOR.
-        style={live ? { height: `${TAMBORES.length * SVH_POR_TAMBOR}svh` } : undefined}
+        // Estaciones + arranque (ver ARRANQUE_SVH): cada estación conserva
+        // sus SVH_POR_TAMBOR de scroll.
+        style={live ? { height: `${ZONA_SVH}svh` } : undefined}
       >
         <div
           ref={stageRef}
