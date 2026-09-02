@@ -32,9 +32,10 @@ if (typeof window !== "undefined") {
  * Los textos de apoyo (título oficial + frase verde + detalle) NO viajan con
  * los tambores: viven en ranuras fijas al pie y se cruzan (crossfade +
  * textContent, sin re-render de React) cuando cambia el tambor activo. La
- * FOTO tampoco viaja: queda en el ojo del tubo y cada una se enciende por
- * scroll según la distancia de su tambor al centro — los tambores pasan
- * alrededor de un punto casi quieto.
+ * FOTO sí viaja: cuelga del centro de su tambor y sube con la torre, con un
+ * parallax leve que la deja un toque atrás. Probamos apilarlas quietas en el
+ * eje de cámara y encenderlas por distancia, pero sin recorrido el cambio de
+ * imagen se lee como un parpadeo.
  *
  * Performance: solo se pintan los tambores en cuadro (los demás quedan
  * visibility:hidden); por frame se escriben ~2 transforms + las opacidades
@@ -280,7 +281,7 @@ export function TorreLineas() {
       resetBuild();
       stage.style.opacity = "0";
       // (Las fotos no necesitan reset: build.foto=0 apaga la 01 y las demás
-      // salen de la distancia al centro en el próximo pintar.)
+      // vuelven a su sitio con el transform del próximo pintar.)
     };
     // Nace APAGADO. La torre pinta por encima del faro (z-20), así que con la
     // opacidad por defecto (1) se veía montada sobre la escena nocturna y
@@ -310,18 +311,21 @@ export function TorreLineas() {
       tower.style.transform = `translateY(${y}px)`;
       for (let i = 0; i < n; i++) {
         const drum = drumRefs.current[i];
+        const foto = fotoRefs.current[i];
         if (!drum) continue;
         const wy = i * geo.sp + y; // 0 = centro de cámara
         const visible = Math.abs(wy) < geo.alto * 1.05;
         if (!visible) {
           if (!ocultos[i]) {
             drum.style.visibility = "hidden";
+            if (foto) foto.style.visibility = "hidden";
             ocultos[i] = true;
           }
           continue;
         }
         if (ocultos[i]) {
           drum.style.visibility = "";
+          if (foto) foto.style.visibility = "";
           ocultos[i] = false;
         }
         // Giro: fase del tambor + scroll (en sentido de lectura) + deriva +
@@ -340,6 +344,17 @@ export function TorreLineas() {
           drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) scale(${esc * lat})`;
         } else {
           drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) rotateY(${rot}deg) scale(${lat})`;
+        }
+        // La foto viaja CON la torre, un toque más lenta (parallax): sube
+        // pegada a su tambor en vez de encenderse quieta en el centro. Las
+        // fotos apiladas en el eje de cámara se leían como un parpadeo — un
+        // cambio de imagen sin recorrido, justo lo contrario del viaje que
+        // cuenta la sección. La 01 sí nace con el armado: crece desde el eje
+        // cuando el tubo ya cerró y hay un "adentro" donde ponerla.
+        if (foto) {
+          const nac = i === 0 ? build.foto : 1;
+          foto.style.opacity = String(nac);
+          foto.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp - wy * 0.1}px) scale(${0.4 + 0.6 * nac})`;
         }
         const g = geo.drums[i];
         const spans = spanRefs.current[i] ?? [];
@@ -418,35 +433,6 @@ export function TorreLineas() {
           chip.style.opacity = c > 0.12 ? String((0.2 + 0.8 * c) * chipArm) : "0";
         }
 
-      }
-
-      // LA FOTO DEL OJO va por SCROLL, como el giro y la traslación: nada
-      // de crossfade por evento (se disparaba a mitad de camino, con el
-      // tubo todavía entrando, y la foto brotaba sola en el vacío: "pum").
-      // Cada foto sale de la distancia de su tambor al centro: plena
-      // cuando se asienta (±0.15 estación), cero a ±0.5, y se desplaza unos
-      // px en la dirección desde donde viene el tambor, así aparece
-      // "subiendo con" el tubo y sale por arriba con él. Continuo y
-      // reversible, no puede saltar. La 01 además nace con el armado.
-      const posFoto = pv * (n - 1);
-      for (let i = 0; i < n; i++) {
-        const foto = fotoRefs.current[i];
-        if (!foto) continue;
-        const d = i - posFoto; // >0: el tambor todavía viene de abajo
-        const v = Math.min(1, Math.max(0, 1 - (Math.abs(d) - 0.15) / 0.35));
-        const nac = i === 0 ? build.foto : 1;
-        const op = v * nac;
-        if (op <= 0) {
-          if (foto.style.visibility !== "hidden") {
-            foto.style.visibility = "hidden";
-            foto.style.opacity = "0";
-          }
-          continue;
-        }
-        const esc = (0.85 + 0.15 * v) * (0.4 + 0.6 * nac);
-        foto.style.visibility = "";
-        foto.style.opacity = String(op);
-        foto.style.transform = `translate(-50%, -50%) translateY(${d * 40}px) scale(${esc})`;
       }
 
       // El apoyo YA NO se apaga durante el viaje: tiene contenedor propio, así
@@ -746,24 +732,27 @@ export function TorreLineas() {
                     transformStyle: "preserve-3d",
                   }}
                 >
-                  {/* LA FOTO DEL OJO: no viaja con la torre. Las fotos de
-                      todas las estaciones viven apiladas en el centro de la
-                      cámara (fuera del div que se traslada); pintar() las
-                      enciende por scroll según la distancia de su tambor al
-                      centro. Los tambores suben y bajan alrededor de un
-                      punto casi quieto. En 3D quedan entre el texto
-                      esmerilado de atrás y el nítido de adelante. Nacen
-                      apagadas: la 01 la trae el armado. */}
-                  {TAMBORES.map((t, i) => (
-                    <div
-                      key={"foto-" + t.id}
-                      ref={(el) => {
-                        fotoRefs.current[i] = el;
-                      }}
-                      aria-hidden="true"
-                      className="absolute will-change-transform"
-                      style={{ transform: "translate(-50%, -50%) scale(0.4)", opacity: 0 }}
-                    >
+                  <div
+                    ref={towerRef}
+                    className="will-change-transform"
+                    style={{ transformStyle: "preserve-3d" }}
+                  >
+                    {/* Fotos flotando DENTRO de cada tambor (la "medusa" de la
+                        referencia): no rotan — viajan con la torre con leve
+                        parallax. En 3D quedan entre el texto esmerilado de
+                        atrás y el texto nítido de adelante. */}
+                    {TAMBORES.map((t, i) => (
+                      <div
+                        key={"foto-" + t.id}
+                        ref={(el) => {
+                          fotoRefs.current[i] = el;
+                        }}
+                        aria-hidden="true"
+                        className="absolute will-change-transform"
+                        style={{
+                          transform: `translate(-50%, -50%) translateY(${i * geo.sp}px)`,
+                        }}
+                      >
                         {/* Resplandor del acento detrás de la foto: da aire
                             de color al centro del tambor. */}
                         <span
@@ -788,12 +777,6 @@ export function TorreLineas() {
                         </div>
                       </div>
                     ))}
-
-                  <div
-                    ref={towerRef}
-                    className="will-change-transform"
-                    style={{ transformStyle: "preserve-3d" }}
-                  >
                     {TAMBORES.map((t, i) => {
                       const g = geo.drums[i];
                       return (
