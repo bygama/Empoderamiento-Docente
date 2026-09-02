@@ -220,17 +220,14 @@ export function TorreLineas() {
     // tambor (ver `armar`): el usuario que frena en el blanco ve nacer la
     // sección sin tener que empujar la rueda. (Se probó disolver el velo
     // por scroll y quedaba peor: quien se detiene en el blanco no ve nada.)
-    // El viaje de la torre empieza recién al terminar el solape (OCULTO).
-    const SOLAPE_SVH = 100;
-    const TOTAL_SVH = SOLAPE_SVH + TAMBORES.length * SVH_POR_TAMBOR;
-    const OCULTO = SOLAPE_SVH / TOTAL_SVH;
-    // Progreso VISIBLE: el tramo tapado por el velo no cuenta. Si la torre
-    // avanzara ahí, al despejar el velo ya estarías a mitad de camino del
-    // tambor 02 y te perderías el 01 entero.
-    // (ojo: adentro del loop de pintar() hay otra `visible` booleana para
-    // el culling; por eso esta va con nombre propio.)
-    const progresoVisible = () =>
-      Math.min(1, Math.max(0, (avance.p - OCULTO) / (1 - OCULTO)));
+    // El viaje de la torre arranca CON la zona. Antes se descontaba el
+    // solape (los primeros 100svh no movían la torre, para que quien
+    // scrolleaba durante el velo no se perdiera el tambor 01). Con el
+    // scroll frenado mientras se arma eso ya no puede pasar, y el descuento
+    // dejaba ~90svh de scroll muerto justo después de soltar: "tarda en
+    // dejarme scrollear" (Mateo, 2026-09-02). Mientras el faro se desliza
+    // tapado, la torre ya responde. De paso el riel (saltarA) cae exacto en
+    // cada estación: antes ignoraba el descuento y llegaba corto.
 
     // El armado NO va scrubbeado: corre SOLO, por tiempo, en cuanto la zona
     // arranca (= el faro terminó en blanco). Atado al scroll obligaba a ir
@@ -373,7 +370,7 @@ export function TorreLineas() {
     const wrap180 = (a: number) => ((((a + 180) % 360) + 360) % 360) - 180;
 
     const pintar = () => {
-      const pv = progresoVisible();
+      const pv = avance.p; // progreso de la zona = viaje de la torre
 
       // El velo blanco lo disuelve el armado (por tiempo): la superficie
       // gris y su trama EMERGEN del blanco en que terminó el faro.
@@ -680,7 +677,9 @@ export function TorreLineas() {
       <div
         ref={zoneRef}
         className="relative"
-        style={live ? { height: `${100 + TAMBORES.length * SVH_POR_TAMBOR}svh` } : undefined}
+        // Sin los 100svh extra del solape: el viaje arranca con la zona
+        // (ver el effect), así cada estación conserva sus SVH_POR_TAMBOR.
+        style={live ? { height: `${TAMBORES.length * SVH_POR_TAMBOR}svh` } : undefined}
       >
         <div
           ref={stageRef}
