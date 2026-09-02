@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
+import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -773,26 +773,36 @@ export function QueHacemosHeroFaro() {
           {/* S4 · Cierre sobre el amanecer. Titular pedido por Gastón
               (VALIDAR con ED); CTA real del proyecto hacia #lineas — en el
               copy validado es la acción secundaria del hero (la primaria es
-              «Conversemos»), acá va naranja como única acción del plano
-              final: VALIDAR jerarquía con ED. `inert` por defecto: en el
+              «Conversemos»), acá va como secundario (transparente + borde) y
+              única acción del plano final: VALIDAR jerarquía con ED. `inert`
+              por defecto: en el
               fallback está invisible y no debe recibir foco; la coreografía
               lo quita al montar. */}
           <div data-esc="cierre" inert className="pointer-events-none absolute inset-0 flex items-center" style={{ opacity: 0 }}>
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
               {/* Blanco, no navy: el cierre ya no ocurre sobre el amanecer
                   sino sobre la noche iluminada por el faro. */}
+              {/* Angosto y en tres líneas parejas (text-balance): a 19ch y
+                  4rem el titular cruzaba el cuadro entero y, con el naranja
+                  abajo, el cierre pesaba de más (pedido de Mateo,
+                  2026-09-02). */}
               <p
-                className="font-display max-w-[19ch] font-extrabold tracking-[-0.025em] text-white"
+                className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em] text-balance text-white"
                 style={{
-                  fontSize: "clamp(2.4rem, 1.2rem + 3.2vw, 4rem)",
+                  fontSize: "clamp(2.2rem, 1rem + 2.8vw, 3.5rem)",
                   lineHeight: 1.08,
                   textShadow: "0 2px 40px rgb(6 11 25 / 0.75)",
                 }}
               >
                 La transformación queda encendida en cada equipo.
               </p>
+              {/* Secundario sobre navy (transparente + borde) en vez del
+                  naranja: sobre la noche el primario era un bloque que
+                  competía con el titular. Sigue siendo la única acción. */}
               <div data-cta className="pointer-events-auto mt-9" style={{ opacity: 0 }}>
-                <ButtonPrimary href="#lineas">Ver líneas de acción</ButtonPrimary>
+                <ButtonSecondary href="#lineas" variant="dark">
+                  Ver líneas de acción
+                </ButtonSecondary>
               </div>
             </div>
           </div>
