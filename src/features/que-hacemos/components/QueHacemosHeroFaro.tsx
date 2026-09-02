@@ -318,13 +318,19 @@ export function QueHacemosHeroFaro() {
        * onUpdate en plena construcción, y una const declarada después
        * explota (zona muerta temporal) y tira abajo la escena entera.
        */
+      // Giros LARGOS (0.12–0.13 ≈ 75vh de scroll, el doble que antes) con
+      // arranque y frenada en quíntica (ver «suave»): a 0.06 y en coseno el
+      // haz salía y llegaba con un tirón. Los tres «antes» valen lo mismo
+      // porque el tramo activo cambia en t − antesSalida (ver el while de
+      // girarHaces): si un giro arrancara antes de ese cambio, el primer
+      // frame del tramo nuevo lo encontraría a mitad de camino y saltaría.
       const GIRO = {
-        antesEntrada: 0.03,
-        entrada: 0.07,
-        antesSalida: 0.035,
-        salida: 0.05,
-        antesMismo: 0.025,
-        mismo: 0.06,
+        antesEntrada: 0.06,
+        entrada: 0.13,
+        antesSalida: 0.06,
+        salida: 0.1,
+        antesMismo: 0.06,
+        mismo: 0.12,
         barrido: 36,
       } as const;
       // Encendido (S1): la óptica izquierda se asienta de −8 a −2 mientras
@@ -332,9 +338,14 @@ export function QueHacemosHeroFaro() {
       // titular. Mismos tiempos que sus tweens de opacidad.
       const ENCENDIDO = { desde: 0.226, dur: 0.035, rotDesde: -8 } as const;
       const REPOSO_S1 = -2; // el haz izq al final del encendido (S1)
-      const CIERRE = { desde: despues(0.862), dur: 0.06, rot: -46 } as const;
-      const easeInOut = (p: number) => 0.5 - 0.5 * Math.cos(Math.PI * p);
-      const easeIn = (p: number) => 1 - Math.cos((p * Math.PI) / 2);
+      const CIERRE = { desde: despues(0.862), dur: 0.1, rot: -46 } as const;
+      // Quíntica (smootherstep): velocidad Y aceleración nulas en las dos
+      // puntas, así el haz ni arranca ni frena de golpe. El coseno de antes
+      // tenía aceleración máxima justo en las puntas: ese era el tirón.
+      const suave = (p: number) => p * p * p * (p * (6 * p - 15) + 10);
+      // Cúbica para el cono que se va: parte quieto (velocidad y aceleración
+      // cero) y acelera mientras se apaga.
+      const easeIn = (p: number) => p * p * p;
       const easeOut = (p: number) => 1 - (1 - p) * (1 - p);
       const clamp01 = (p: number) => Math.min(1, Math.max(0, p));
       const setters = {
@@ -357,7 +368,7 @@ export function QueHacemosHeroFaro() {
           const ultimo = HAZ_VERBO.length - 1;
           const desde = anguloHacia(ultimo, "izq");
           const p = clamp01((ahora - CIERRE.desde) / CIERRE.dur);
-          setRot("izq", desde + (CIERRE.rot - desde) * easeInOut(p));
+          setRot("izq", desde + (CIERRE.rot - desde) * suave(p));
           return;
         }
         let i = 0;
@@ -369,13 +380,13 @@ export function QueHacemosHeroFaro() {
         if (prev && prev.lado !== lado) {
           const sentido = lado === "der" ? 1 : -1;
           const pIn = clamp01((ahora - (t - GIRO.antesEntrada)) / GIRO.entrada);
-          setRot(lado, objetivo - sentido * GIRO.barrido * (1 - easeInOut(pIn)));
+          setRot(lado, objetivo - sentido * GIRO.barrido * (1 - suave(pIn)));
           const pOut = clamp01((ahora - (t - GIRO.antesSalida)) / GIRO.salida);
           setRot(prev.lado, anguloHacia(i - 1, prev.lado) + sentido * GIRO.barrido * easeIn(pOut));
         } else {
           const p = clamp01((ahora - (t - GIRO.antesMismo)) / GIRO.mismo);
           const desde = prev ? anguloHacia(i - 1, lado) : REPOSO_S1;
-          setRot(lado, desde + (objetivo - desde) * easeInOut(p));
+          setRot(lado, desde + (objetivo - desde) * suave(p));
         }
       };
 
