@@ -265,14 +265,68 @@ export function TorreLineas() {
     // está activa, así que una vez armado nada lo devolvía a cero y la torre
     // quedaba visible y montada desde antes del flash — los tambores
     // aparecían subiendo desde abajo en vez de nacer de la luz.
-    const armar = () => {
+    // SCROLL HACIA ABAJO BLOQUEADO mientras se arma. El armado corre por
+    // tiempo, y hasta acá quien seguía empujando la rueda se llevaba la
+    // torre de viaje con el tambor a medio enrollar, o se pasaba de largo.
+    // Ahora, al entrar desde arriba: se clava el scroll al comienzo de la
+    // zona (eso también corta la inercia de Lenis) y se tragan la rueda y
+    // las teclas que BAJAN; recién cuando el tambor cerró y empezó a girar
+    // (onComplete) el scroll vuelve. Hacia ARRIBA queda libre (pedido de
+    // Mateo, 2026-09-02): quien se arrepiente vuelve al faro, y al cruzar
+    // el borde onLeaveBack rebobina y suelta. Entrando desde abajo no se
+    // bloquea: ahí el tambor 01 ni siquiera está en cuadro.
+    // Los listeners van en CAPTURA sobre window y cortan la propagación:
+    // así el evento no llega a Lenis (que escucha en burbuja) ni al scroll
+    // nativo. Clavar va diferido un frame: onEnter corre adentro de
+    // ScrollTrigger.update, y Lenis emite scroll al mover.
+    const TECLAS_ABAJO = new Set([" ", "PageDown", "ArrowDown", "End"]);
+    const tragar = (e: Event) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    const frenarTecla = (e: KeyboardEvent) => {
+      // Shift+Espacio sube: se deja pasar.
+      if (TECLAS_ABAJO.has(e.key) && !(e.key === " " && e.shiftKey)) tragar(e);
+    };
+    const frenarRueda = (e: WheelEvent) => {
+      if (e.deltaY > 0) tragar(e);
+    };
+    let bloqueado = false;
+    let rafBloqueo = 0;
+    const bloquear = () => {
+      rafBloqueo = 0;
+      if (bloqueado) return;
+      bloqueado = true;
+      window.addEventListener("keydown", frenarTecla, { capture: true });
+      window.addEventListener("wheel", frenarRueda, { capture: true, passive: false });
+      // +2px: en el borde exacto (progreso 0) ScrollTrigger da la zona por
+      // inactiva y apagaría el escenario. El faro ya terminó en blanco y
+      // este escenario lo tapa opaco, así que el salto no se ve.
+      const top = zone.getBoundingClientRect().top + window.scrollY + 2;
+      const lenis = getLenis();
+      if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
+      else window.scrollTo(0, top);
+    };
+    const liberar = () => {
+      if (rafBloqueo) cancelAnimationFrame(rafBloqueo);
+      rafBloqueo = 0;
+      if (!bloqueado) return;
+      bloqueado = false;
+      window.removeEventListener("keydown", frenarTecla, { capture: true });
+      window.removeEventListener("wheel", frenarRueda, { capture: true });
+    };
+    const armar = (bloquearScroll: boolean) => {
       buildAnim?.kill();
       resetBuild();
+      if (bloquearScroll && !bloqueado && !rafBloqueo) {
+        rafBloqueo = requestAnimationFrame(bloquear);
+      }
       buildAnim = gsap
         .timeline({
           onUpdate: pintar,
           onComplete: () => {
             buildAnim = null;
+            liberar();
           },
         })
         .to(build, { velo: 0, duration: 1.6, ease: "sine.inOut" }, 0)
@@ -289,6 +343,7 @@ export function TorreLineas() {
     const rebobinar = () => {
       buildAnim?.kill();
       buildAnim = null;
+      liberar();
       resetBuild();
       pintar();
       // (Las fotos no necesitan reset: build.foto=0 apaga la 01 y las demás
@@ -547,8 +602,8 @@ export function TorreLineas() {
         trigger: zone,
         start: "top top",
         end: "bottom bottom",
-        onEnter: armar,
-        onEnterBack: armar,
+        onEnter: () => armar(true),
+        onEnterBack: () => armar(false),
         onLeaveBack: rebobinar,
         onRefresh: (self) => {
           if (!self.isActive) rebobinar();
@@ -566,6 +621,7 @@ export function TorreLineas() {
       // La línea de tiempo del armado nace fuera del gsap.context (la crea
       // el ScrollTrigger en caliente), así que ctx.revert() no la alcanza.
       buildAnim?.kill();
+      liberar();
       ctx.revert();
     };
   }, [live, geo]);
