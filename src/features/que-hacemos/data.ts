@@ -9,8 +9,8 @@
 // caracteres y cada detalle en ≤85, sin agregar ideas; el copy íntegro sigue
 // en el home. VALIDAR con ED las versiones cortas. Si el cliente actualiza el
 // copy, revisar los dos lados.
-// Enfoque (diferenciales de Dani jun 2026), pasos de trabajo, niveles y
-// proyectos → armados desde el brief y el modelo conceptual, PENDIENTES de
+// Enfoque (diferenciales de Dani jun 2026) y niveles → armados desde el
+// brief y el modelo conceptual, PENDIENTES de
 // validación fina con cliente.
 
 export type Tambor = {
@@ -127,40 +127,6 @@ export const DIFERENCIALES = [
   },
 ] as const;
 
-// ── Cómo trabajamos — el camino de un proyecto (4 pasos, viaje horizontal) ───
-// Versión corta orientada a quien contrata; el método completo (5 pasos con
-// copy oficial) vive en el home. PENDIENTE validar con cliente.
-export const PASOS_TRABAJO = [
-  {
-    n: "01",
-    verbo: "Dialogamos",
-    texto:
-      "Escuchamos tu contexto: qué pasa en tus aulas, qué buscás, desde dónde partimos.",
-    foto: "/metodo/escuchamos.webp",
-  },
-  {
-    n: "02",
-    verbo: "Diseñamos",
-    texto:
-      "Armamos una propuesta a medida para ese contexto, con sustento en investigación.",
-    foto: "/metodo/disenamos.webp",
-  },
-  {
-    n: "03",
-    verbo: "Acompañamos",
-    texto:
-      "Trabajamos junto a docentes y equipos, en el aula y en el territorio.",
-    foto: "/metodo/acompanamos.webp",
-  },
-  {
-    n: "04",
-    verbo: "Evaluamos",
-    texto:
-      "Generamos evidencia del proceso; los hallazgos orientan el paso siguiente.",
-    foto: "/metodo/evaluamos.webp",
-  },
-] as const;
-
 // ── Niveles en los que intervenimos — ondas expansivas (5) ───────────────────
 // Los 4 niveles de impacto del modelo conceptual + la red regional. El orden
 // va de lo micro a lo macro: es el guion de la animación de anillos.
@@ -173,45 +139,4 @@ export const NIVELES = [
     k: "Redes en cinco países",
     d: "Comunidades e instituciones de América Latina.",
   },
-] as const;
-
-// ── Proyectos y aplicaciones — 5 áreas del modelo conceptual ─────────────────
-// PENDIENTE: reemplazar por proyectos reales con nombre cuando el cliente
-// pase el material. No inventar casos concretos.
-export const PROYECTO_AREAS = [
-  {
-    titulo: "Desarrollo profesional docente",
-    d: "Workshops, diplomados, acompañamiento y comunidades de práctica.",
-    etiqueta: "Workshops · Diplomados",
-  },
-  {
-    titulo: "Diseño curricular y pedagógico",
-    d: "Currícula, materiales, guías didácticas y situaciones de aprendizaje.",
-    etiqueta: "Guías didácticas",
-  },
-  {
-    titulo: "Evaluación e investigación aplicada",
-    d: "Instrumentos, análisis y evaluación de impacto.",
-    etiqueta: "Evaluación de impacto",
-  },
-  {
-    titulo: "Fortalecimiento de sistemas",
-    d: "Acompañamiento a ministerios, redes escolares y escuelas técnicas.",
-    etiqueta: "Ministerios · Redes",
-  },
-  {
-    titulo: "Recursos y plataformas",
-    d: "Baterías de pensamiento matemático y repositorios de prácticas.",
-    etiqueta: "Baterías de pensamiento",
-  },
-] as const;
-
-// Cinta continua con producción real de ED (dato concreto, no inventado).
-export const CINTA = [
-  "Artículo · RELIME 2025",
-  "Capítulo · Bolema 2025",
-  "Libro · Empoderamiento docente y Socioepistemología",
-  "Cinco países de América Latina",
-  "Congresos internacionales",
-  "Redes de investigación",
 ] as const;

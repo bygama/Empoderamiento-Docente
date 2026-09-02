@@ -54,11 +54,20 @@ problematizar, interpretar, resignificar, producir evidencia, sistematizar).
 | 1 | Hero | — | Investigar para transformar |
 | 2 | Por qué investigamos | `#sentido` | Origen, sentido y los cuatro fundamentos |
 | 3 | Líneas de investigación | `#lineas` | Los seis grandes temas que estudia ED |
-| 4 | Ciclo de investigación aplicada | `#ciclo` | De la investigación a la acción (ciclo pedagógico) |
-| 5 | Volvemos a investigar | `#evidencia` | Evidencia, análisis y producción de conocimiento |
-| 6 | Investigación en acción | `#en-accion` | Preguntas aplicadas en proyectos reales |
-| 7 | Conexión con Biblioteca | `#biblioteca` | Dónde vive la producción académica |
-| 8 | Cierre | — | Acción clara hacia Contacto |
+| 4 | Cómo trabajamos | `#metodo` | El método en 4 pasos, con la investigación como hilo (venía de Qué hacemos) |
+| 5 | Ciclo de investigación aplicada | `#ciclo` | De la investigación a la acción (ciclo pedagógico) |
+| 6 | Proyectos y aplicaciones | `#proyectos` | Lo que investigamos, puesto a trabajar: cinco áreas (venía de Qué hacemos) |
+| 7 | Volvemos a investigar | `#evidencia` | Evidencia, análisis y producción de conocimiento |
+| 8 | Investigación en acción | `#en-accion` | Preguntas aplicadas en proyectos reales |
+| 9 | Conexión con Biblioteca | `#biblioteca` | Dónde vive la producción académica |
+| 10 | Cierre | — | Acción clara hacia Contacto |
+
+> **Decisión tomada (usuario, 02-09-2026):** «Cómo trabajamos» (antes
+> sección 3 de Qué hacemos) y «Proyectos y aplicaciones» (antes sección 6)
+> pasan a esta página: el método antes del ciclo de investigación aplicada,
+> y los proyectos después. Su contenido y pendientes (4 pasos a validar;
+> proyectos reales con nombre, sin inventar casos) siguen descritos en
+> `arquitectura-que-hacemos.md` §5 y §8.
 
 ---
 
