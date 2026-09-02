@@ -4,7 +4,6 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -401,9 +400,6 @@ export function QueHacemosHeroFaro() {
           .to(`[data-verbo-punto='${i}']`, { autoAlpha: 0.22, duration: 0.02 }, fin)
           .to(`[data-rastro='${i}']`, { autoAlpha: 0.6, duration: 0.014 }, fin + 0.004);
       });
-      tl.fromTo("[data-esc='cap2']", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.02 }, 0.398)
-        .to("[data-esc='cap2']", { autoAlpha: 0, duration: 0.018, ease: "power2.in" }, 0.73);
-
       /* ── S4 · Cierre EN LA NOCHE ────────────────────────────────────────
          Antes acá amanecía (dos velos de alba, estrellas apagándose y el haz
          retirándose) y el plano final quedaba sobre fondo marfil. Ahora la
@@ -549,10 +545,12 @@ export function QueHacemosHeroFaro() {
               aria-hidden: para AT el titular es el h1 sr-only de arriba. */}
           <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center">
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
+              {/* Sin eyebrow: «Qué hacemos» ya es el título de la página y
+                  el hero lo acaba de decir; repetirlo acá le quitaba peso al
+                  momento tipográfico (pedido de Mateo, 2026-09-02). */}
               <div data-mensaje>
-                <Eyebrow variant="light">Qué hacemos</Eyebrow>
                 <p
-                  className="font-display mt-7 max-w-[19ch] font-extrabold tracking-[-0.03em] text-white [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
+                  className="font-display max-w-[19ch] font-extrabold tracking-[-0.03em] text-white [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
                   style={{ fontSize: "clamp(2.6rem, 1.2rem + 3.9vw, 4.6rem)", lineHeight: 1.06 }}
                 >
                   Diseñamos y acompañamos <Highlight>procesos</Highlight> que
@@ -562,12 +560,9 @@ export function QueHacemosHeroFaro() {
             </div>
           </div>
 
-          {/* S2 · Caption del método (eyebrow real de MetodoPasos) */}
-          <div data-esc="cap2" aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 pt-32" style={{ opacity: 0 }}>
-            <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
-              <Eyebrow variant="light">Antes de proponer nada</Eyebrow>
-            </div>
-          </div>
+          {/* S2 sin caption: llevaba el eyebrow «Antes de proponer nada»
+              arriba de las preguntas; se quitó junto con el de S1 para que
+              cada momento tenga UNA sola lectura. */}
 
           {/* S2 · Los cinco verbos: un golpe narrativo por momento */}
           {PREGUNTAS.map((pregunta, i) => (
