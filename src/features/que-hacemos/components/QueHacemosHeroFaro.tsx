@@ -270,22 +270,36 @@ export function QueHacemosHeroFaro() {
 
       /* ── Detrás del hero: solo cielo ────────────────────────────────
          En el tramo que corre bajo el hero el faro queda HUNDIDO bajo el
-         borde inferior y sube a su lugar justo cuando arranca la
-         coreografía. Así el titular se lee sobre el cielo estrellado sin que
-         la torre se le cruce, y la aparición del faro sigue siendo la
-         llegada de la cámara (la narrativa original de la escena).
+         borde inferior y sube a su lugar mientras el hero se va. Así el
+         titular se lee sobre el cielo estrellado sin que la torre se le
+         cruce, y la aparición del faro sigue siendo la llegada de la cámara
+         (la narrativa original de la escena).
          Se anima el wrapper interno, no [data-capa]: esa la escribe la
-         cámara en cada frame y pisaría cualquier cosa que pongamos acá. */
+         cámara en cada frame y pisaría cualquier cosa que pongamos acá.
+
+         LA LLEGADA FRENA, NO SE CLAVA. Antes la subida era lineal y
+         terminaba justo en una pantalla: el mundo entero (torre, horizonte,
+         estrellas) venía pegado al scroll y a 1vh se detenía en seco
+         mientras la página seguía — y encima quedaba quieto casi una
+         pantalla hasta que la cámara arrancaba (p=0.1). Ese cambio de
+         velocidad era la "junta" que se sentía entre el hero y la escena,
+         aunque el cielo fuera el mismo. Ahora la subida se reparte en
+         LLEGADA_VH pantallas con freno en coseno: arranca al MISMO ritmo
+         que antes (con sine.out la velocidad inicial es π/2 · 0.86 /
+         LLEGADA_VH = 0.86× el scroll, así el tramo del hero no cambia) y
+         desacelera hasta detenerse cuando se va la primera frase, un pelo
+         antes de que la cámara empiece a avanzar. */
+      const LLEGADA_VH = Math.PI / 2;
       gsap.fromTo(
         "[data-faro-shift]",
         { y: () => window.innerHeight * 0.86 },
         {
           y: 0,
-          ease: "none",
+          ease: "sine.out",
           scrollTrigger: {
             trigger: alto,
             start: "top top",
-            end: () => `top+=${window.innerHeight} top`,
+            end: () => `top+=${window.innerHeight * LLEGADA_VH} top`,
             scrub: 0.85,
             invalidateOnRefresh: true,
           },
