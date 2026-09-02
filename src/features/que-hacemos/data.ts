@@ -1,9 +1,14 @@
 // Contenido de Qué hacemos (sitemap pág. 02: Hero → Nuestro enfoque → Cómo
 // trabajamos → Líneas de acción → Niveles → Proyectos y aplicaciones → Cierre).
 //
-// Las 7 líneas de acción usan el COPY OFICIAL del cliente — misma fuente que
-// LineasAccion del home (frase = línea destacada en verde, detalle = la
-// descripción). Si el cliente actualiza ese copy, cambiarlo en los dos lados.
+// Las 7 líneas de acción salen del COPY OFICIAL del cliente — la misma fuente
+// que LineasAccion del home (frase = línea destacada en verde, detalle = la
+// descripción). En la TORRE van en VERSIÓN CORTA (pedido de Mateo,
+// 2026-09-02): la tarjeta de apoyo exige la frase en UNA línea y el detalle
+// en DOS, a dos columnas de ~548px. Cada frase resume la oficial en ≤35
+// caracteres y cada detalle en ≤85, sin agregar ideas; el copy íntegro sigue
+// en el home. VALIDAR con ED las versiones cortas. Si el cliente actualiza el
+// copy, revisar los dos lados.
 // Enfoque (diferenciales de Dani jun 2026), pasos de trabajo, niveles y
 // proyectos → armados desde el brief y el modelo conceptual, PENDIENTES de
 // validación fina con cliente.
@@ -14,9 +19,9 @@ export type Tambor = {
   tambor: string;
   /** Título completo oficial — se muestra en el bloque de apoyo. */
   titulo: string;
-  /** Frase destacada (verde-concepto). */
+  /** Frase destacada (verde-concepto). Versión corta: ≤35 caracteres. */
   frase: string;
-  /** Descripción. */
+  /** Descripción. Versión corta: ≤85 caracteres. */
   detalle: string;
   /** Foto que flota dentro del tambor (placeholder del pool de marca). */
   foto: string;
@@ -34,9 +39,9 @@ export const TAMBORES: Tambor[] = [
     id: "desarrollo-profesional",
     tambor: "Desarrollo profesional",
     titulo: "Desarrollo profesional docente",
-    frase: "La experiencia como fuente de reflexión",
+    frase: "Reflexionar desde la experiencia",
     detalle:
-      "Impulsamos procesos de desarrollo profesional con sustento vivencial y acompañamiento que fortalecen la práctica, promueven la reflexión y resignifican las matemáticas.",
+      "Acompañamos procesos que fortalecen la práctica y resignifican las matemáticas.",
     foto: "/metodo/acompanamos.webp",
     acento: "var(--color-azul-principal)",
   },
@@ -44,9 +49,9 @@ export const TAMBORES: Tambor[] = [
     id: "materiales",
     tambor: "Materiales",
     titulo: "Materiales para la resignificación de las matemáticas",
-    frase: "Cada tarea puede transformar la relación con las matemáticas",
+    frase: "Cada tarea transforma la relación",
     detalle:
-      "Diseñamos materiales que median la relación entre docentes, matemáticas y aprendizaje, generando rupturas productivas que invitan a explorar, argumentar y resignificar.",
+      "Materiales que invitan a explorar, argumentar y resignificar las matemáticas.",
     foto: "/metodo/disenamos.webp",
     acento: "var(--color-verde-concepto-texto)",
   },
@@ -54,9 +59,9 @@ export const TAMBORES: Tambor[] = [
     id: "curriculo",
     tambor: "Currículo",
     titulo: "Currículo y arquitectura pedagógica",
-    frase: "La coherencia hace posible el aprendizaje",
+    frase: "La coherencia hace posible aprender",
     detalle:
-      "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido para orientar trayectorias de aprendizaje.",
+      "Arquitecturas curriculares que articulan conocimiento, progresión y sentido.",
     foto: "/quienes-somos/origen-03-pregunta.webp",
     acento: "var(--color-azul-medio)",
   },
@@ -66,7 +71,7 @@ export const TAMBORES: Tambor[] = [
     titulo: "Evaluación para la mejora educativa",
     frase: "Comprender permite decidir",
     detalle:
-      "Desarrollamos sistemas de evaluación que generan evidencia situada para comprender los aprendizajes y orientar decisiones educativas.",
+      "Evaluaciones que generan evidencia situada para orientar decisiones educativas.",
     foto: "/metodo/evaluamos.webp",
     acento: "var(--color-azul-principal)",
   },
@@ -76,7 +81,7 @@ export const TAMBORES: Tambor[] = [
     titulo: "Investigación en Matemática Educativa",
     frase: "La práctica produce conocimiento",
     detalle:
-      "Investigamos las prácticas educativas para producir conocimiento, compartirlo con la comunidad científica y seguir enriqueciendo el campo de la Matemática Educativa.",
+      "Investigamos la práctica y compartimos lo aprendido con la comunidad científica.",
     foto: "/hero/hero-2.webp",
     acento: "var(--color-verde-concepto-texto)",
   },
@@ -84,9 +89,9 @@ export const TAMBORES: Tambor[] = [
     id: "fortalecimiento",
     tambor: "Fortalecimiento",
     titulo: "Fortalecimiento institucional",
-    frase: "La continuidad hace posible las transformaciones",
+    frase: "La continuidad sostiene el cambio",
     detalle:
-      "Fortalecemos capacidades institucionales mediante el diseño de políticas, estrategias y procesos que favorecen transformaciones coherentes, sostenibles y perdurables.",
+      "Políticas, estrategias y procesos para transformaciones coherentes y sostenibles.",
     foto: "/hero/hero-6.webp",
     acento: "var(--color-azul-medio)",
   },
@@ -94,9 +99,9 @@ export const TAMBORES: Tambor[] = [
     id: "sistemas",
     tambor: "Sistemas educativos",
     titulo: "Transformación de sistemas educativos",
-    frase: "La articulación hace posible las transformaciones sistémicas",
+    frase: "La articulación transforma sistemas",
     detalle:
-      "Integramos todas las dimensiones del cambio educativo para construir soluciones coherentes, sostenibles y pertinentes para cada realidad.",
+      "Integramos las dimensiones del cambio educativo en soluciones para cada realidad.",
     foto: "/hero/hero-9.webp",
     acento: "var(--color-azul-principal)",
   },
