@@ -42,17 +42,17 @@ conocimiento que sostiene todo esto vive en «Investigación».
 |---|---------|-------|----------------------|
 | 1 | Hero | — | Qué hace ED, en una frase |
 | 2 | Líneas de acción | `#lineas` | Siete especialidades dentro de una misma forma de intervenir |
-| 3 | Del sistema al aula | `#escalas` | Cinco escalas de intervención |
-| 4 | Nuestro enfoque | `#enfoque` | Por qué no es una capacitación tradicional |
-| 5 | Cierre | — | Invitación a conversar |
+| 3 | Cómo trabajamos | `#metodo` | El método en 4 pasos, con la investigación como hilo |
+| 4 | Del sistema al aula | `#escalas` | Cinco escalas de intervención |
+| 5 | Nuestro enfoque | `#enfoque` | Por qué no es una capacitación tradicional |
+| 6 | Cierre | — | Invitación a conversar |
 
 > **Decisión tomada (usuario, 02-09-2026):** el orden publicado cambia
 > respecto del sitemap original: las líneas de acción van inmediatamente
 > después del hero, «Nuestro enfoque» pasa al final (justo antes del
-> cierre) y «Cómo trabajamos» y «Proyectos y aplicaciones» se mudan a la
-> página de Investigación (ver `arquitectura-investigacion.md`, secciones
-> 4 y 6). Las secciones §5 y §8 de este doc quedan como referencia del
-> contenido que se movió.
+> cierre) y «Proyectos y aplicaciones» se muda a la página de
+> Investigación (ver `arquitectura-investigacion.md`, sección 5). La
+> sección §8 de este doc queda como referencia del contenido que se movió.
 
 ---
 

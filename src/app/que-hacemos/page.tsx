@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { QueHacemosHero } from "@/features/que-hacemos/components/QueHacemosHero";
 import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemosHeroFaro";
 import { EnfoqueTransformacion } from "@/features/que-hacemos/components/EnfoqueTransformacion";
+import { CaminoDeTrabajo } from "@/features/que-hacemos/components/CaminoDeTrabajo";
 import { TorreLineas } from "@/features/que-hacemos/components/TorreLineas";
 import { NivelesEscala } from "@/features/que-hacemos/components/NivelesEscala";
 import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHacemos";
@@ -9,15 +10,15 @@ import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHac
 export const metadata: Metadata = {
   title: "Qué hacemos",
   description:
-    "Cómo trabaja Empoderamiento Docente: líneas de acción, niveles de intervención y un enfoque que transforma la matemática escolar.",
+    "Cómo trabaja Empoderamiento Docente: líneas de acción, camino de trabajo, niveles de intervención y un enfoque que transforma la matemática escolar.",
 };
 
 // Sitemap pág. 02 con desvíos pedidos por el cliente: el recorrido (la torre
 // de líneas) va INMEDIATAMENTE después del hero — el botón "Entrar" y el
 // scroll natural caen ahí — y «Nuestro enfoque» (capacitación →
-// transformación) cierra la página, justo antes del CTA. «Cómo trabajamos»
-// y «Proyectos y aplicaciones» pasaron a /investigacion (pedido de Mateo,
-// 2026-09-02). Orden: Hero → Líneas → Niveles → Enfoque → Cierre.
+// transformación) cierra la página, justo antes del CTA. «Proyectos y
+// aplicaciones» pasó a /investigacion (pedido de Mateo, 2026-09-02). Orden:
+// Hero → Líneas → Cómo trabajamos → Niveles → Enfoque → Cierre.
 export default function QueHacemosPage() {
   return (
     <main>
@@ -51,6 +52,7 @@ export default function QueHacemosPage() {
       <div id="lineas" className="scroll-mt-28">
         <TorreLineas />
       </div>
+      <CaminoDeTrabajo />
       <NivelesEscala />
       {/* El enfoque (CAPACITACIÓN tachada → TRANSFORMACIÓN) remata la página
           antes del cierre: es la idea con la que hay que irse. */}

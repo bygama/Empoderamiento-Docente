@@ -1,8 +1,7 @@
 // Contenido de Investigación que no vive en los componentes.
 //
-// «Cómo trabajamos» y «Proyectos y aplicaciones» venían de Qué hacemos
-// (sitemap pág. 02, secciones 3 y 6) y pasan a esta página por pedido de
-// Mateo (2026-09-02): el método con la investigación como hilo, y lo que
+// «Proyectos y aplicaciones» venía de Qué hacemos (sitemap pág. 02, sección 6)
+// y pasa a esta página por pedido de Mateo (2026-09-02): es lo que
 // investigamos, puesto a trabajar. Las 5 áreas salen del modelo conceptual
 // (PENDIENTE reemplazar por proyectos reales con nombre cuando el cliente
 // pase el material; no inventar casos) y la CINTA lleva producción real.
@@ -46,38 +45,4 @@ export const CINTA = [
   "Cinco países de América Latina",
   "Congresos internacionales",
   "Redes de investigación",
-] as const;
-
-// ── Cómo trabajamos — el camino de un proyecto (4 pasos, viaje horizontal) ───
-// Versión corta orientada a quien contrata; el método completo (5 pasos con
-// copy oficial) vive en el home. PENDIENTE validar con cliente.
-export const PASOS_TRABAJO = [
-  {
-    n: "01",
-    verbo: "Dialogamos",
-    texto:
-      "Escuchamos tu contexto: qué pasa en tus aulas, qué buscás, desde dónde partimos.",
-    foto: "/metodo/escuchamos.webp",
-  },
-  {
-    n: "02",
-    verbo: "Diseñamos",
-    texto:
-      "Armamos una propuesta a medida para ese contexto, con sustento en investigación.",
-    foto: "/metodo/disenamos.webp",
-  },
-  {
-    n: "03",
-    verbo: "Acompañamos",
-    texto:
-      "Trabajamos junto a docentes y equipos, en el aula y en el territorio.",
-    foto: "/metodo/acompanamos.webp",
-  },
-  {
-    n: "04",
-    verbo: "Evaluamos",
-    texto:
-      "Generamos evidencia del proceso; los hallazgos orientan el paso siguiente.",
-    foto: "/metodo/evaluamos.webp",
-  },
 ] as const;
