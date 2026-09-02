@@ -34,21 +34,22 @@ if (typeof window !== "undefined") {
  *                            el primer plano ENTRAN por los bordes; a mitad
  *                            de camino la linterna prende (chispa → núcleo →
  *                            halo → haz) y la luz revela el mensaje central.
- *   S2 0.40–0.73  PREGUNTAS  cinco golpes, UNA pregunta por momento; el haz
+ *   S2 0.40–1.06  PREGUNTAS  cinco golpes, UNA pregunta por momento; el haz
  *                            dirige la lectura (izq lejos → izq alto → der →
  *                            der cerca → centro), la cámara se desplaza
  *                            lateralmente y sigue avanzando hasta el
- *                            contrapicado (faro ~55% del alto en Evaluamos).
- *                            Cada verbo tocado deja un rastro verde en el
- *                            agua. Vacío breve como conector.
- *   S3 0.74–0.86  ESCALAS    el plano SE ABRE (pull-back): «Del sistema al
- *                            aula» pide plano general; cinco estaciones a lo
- *                            largo del muelle, encendidas por el barrido.
- *   S4 0.86–1.00  AMANECER   la noche cede en dos velos (alba → día), las
- *                            estrellas se apagan, el haz ya no hace falta
- *                            (la lámpara queda en mínima), y el cielo
- *                            termina EXACTAMENTE en gris-fondo: la sección
- *                            siguiente es la continuación literal del cielo.
+ *                            contrapicado (faro ~55% del alto en la última).
+ *                            Cada pregunta tocada deja un rastro verde en el
+ *                            agua. Un beat por pregunta (PASO_PREGUNTA).
+ *   S4 1.09–1.29  CIERRE     la noche no cede: el faro alumbra el titular
+ *                            final y su CTA; el haz se abre y baña el plano.
+ *   S5 1.24–1.33  DESLUMBRE  la linterna crece hasta dejar la pantalla en
+ *                            blanco; la torre de líneas nace de ese blanco.
+ *
+ * Las posiciones son UNIDADES DE LA LÍNEA DE TIEMPO, no progreso 0–1: la
+ * línea dura DURACION_RECORRIDO (>1) y ScrollTrigger reparte el runway
+ * entero entre 0 y ese valor. Con el runway actual 1 unidad ≈ 620vh de
+ * scroll. Ver el bloque de constantes de tiempo más abajo.
  *
  * Copy: 100% validado (data.ts / arquitectura de la rama de contenido
  * maestro), salvo el titular del cierre, pedido explícitamente por Gastón y
@@ -98,6 +99,35 @@ const HAZ_VERBO: ReadonlyArray<{ lado: "izq" | "der"; rot: number }> = [
   { lado: "der", rot: 59 },
   { lado: "izq", rot: -58 },
 ];
+
+/* ── Escala de tiempo de la coreografía ────────────────────────────────────
+ *
+ * Las preguntas (S2) se ESTIRARON. Con beats de ~0.062 cada pregunta quedaba
+ * plenamente legible apenas 0.01 (≈6vh, dos muescas de rueda) y el tramo
+ * pasaba entero en un envión: era imposible scrollear sin que se fuera todo.
+ * Ahora cada beat dura PASO_PREGUNTA y lo que viene después (cierre y
+ * deslumbre) corre CORRIMIENTO en bloque, sin cambiar de velocidad.
+ *
+ * Para que S0 y S1 no se hagan más lentos, el runway (h-[…vh] del <section>)
+ * crece en la misma proporción: alto = DURACION_RECORRIDO · 620vh + 200vh
+ * (los 200 son la pantalla que corre detrás del hero y la del viewport).
+ * Si se toca una cosa, se toca la otra. */
+const INICIO_PREGUNTAS = 0.4;
+const PASO_PREGUNTA = 0.15;
+/** Un beat por pregunta. */
+const BEATS = PREGUNTAS.map((_, i) => INICIO_PREGUNTAS + i * PASO_PREGUNTA);
+/** La última pregunta se va poco después de su beat, como en el original. */
+const FIN_PREGUNTAS = BEATS[BEATS.length - 1] + 0.06;
+/** En la coreografía original S2 terminaba en 0.73; de ahí el corrimiento. */
+const CORRIMIENTO = FIN_PREGUNTAS - 0.73;
+/** Posición original (post-S2) → posición actual. */
+const despues = (t: number) => t + CORRIMIENTO;
+/**
+ * Duración total de la línea de tiempo. Quien convierta una posición a
+ * progreso del runway (por ejemplo el viaje del botón del hero) divide por
+ * esto.
+ */
+export const DURACION_RECORRIDO = despues(1);
 
 export function QueHacemosHeroFaro() {
   const rootRef = useRef<HTMLElement | null>(null);
@@ -330,16 +360,19 @@ export function QueHacemosHeroFaro() {
         .to("[data-mensaje]", { autoAlpha: 0, y: -26, duration: 0.028, ease: "power2.in" }, 0.372);
 
       /* ── S2 · Método: un verbo por momento ──────────────────────────── */
-      const beats = [0.4, 0.462, 0.524, 0.598, 0.667] as const;
+      const beats = BEATS;
       // Desplazamientos laterales de cámara: el encuadre respira y el faro
-      // cambia de lado del cuadro.
-      tl.to(cam, { x: -70, duration: 0.06, ease: "power1.inOut" }, 0.395)
-        .to(cam, { x: 120, duration: 0.08, ease: "power1.inOut" }, 0.5)
-        .to(cam, { x: 60, duration: 0.06, ease: "power1.inOut" }, 0.6)
-        .to(cam, { x: 0, duration: 0.06, ease: "power1.inOut" }, 0.672)
-        // …y sigue avanzando hasta el contrapicado de «Evaluamos».
-        .to(cam, { z: 380, duration: 0.14, ease: "power1.inOut" }, 0.44)
-        .to(cam, { z: 600, duration: 0.1, ease: "power1.inOut" }, 0.6);
+      // cambia de lado del cuadro. Van atados a los beats (se mueve justo
+      // antes de la pregunta que cambia de lado) con la misma duración de
+      // siempre: al estirar S2 se alargan las lecturas, no los paneos.
+      tl.to(cam, { x: -70, duration: 0.06, ease: "power1.inOut" }, beats[0] - 0.005)
+        .to(cam, { x: 120, duration: 0.08, ease: "power1.inOut" }, beats[2] - 0.024)
+        .to(cam, { x: 60, duration: 0.06, ease: "power1.inOut" }, beats[3] + 0.002)
+        .to(cam, { x: 0, duration: 0.06, ease: "power1.inOut" }, beats[4] + 0.005)
+        // …y sigue avanzando, repartido a lo largo del tramo, hasta el
+        // contrapicado que llega con la última pregunta.
+        .to(cam, { z: 380, duration: beats[3] - beats[0] - 0.06, ease: "power1.inOut" }, beats[0] + 0.04)
+        .to(cam, { z: 600, duration: PASO_PREGUNTA + 0.03, ease: "power1.inOut" }, beats[3] + 0.002);
 
       /**
        * Rotación que hace que el haz APUNTE al bloque de texto i.
@@ -395,7 +428,7 @@ export function QueHacemosHeroFaro() {
           .fromTo(`[data-verbo-txt='${i}'] [data-v]`, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.016 }, t + 0.02)
           .fromTo(`[data-verbo-txt='${i}'] [data-q]`, { autoAlpha: 0, y: 16 }, { autoAlpha: 0.9, y: 0, duration: 0.014 }, t + 0.024);
         // …y al ceder deja una idea encendida (rastro verde) en el agua.
-        const fin = i < 4 ? beats[i + 1] - 0.016 : 0.73;
+        const fin = i < 4 ? beats[i + 1] - 0.016 : FIN_PREGUNTAS;
         tl.to(`[data-verbo-txt='${i}'] [data-v], [data-verbo-txt='${i}'] [data-q]`, { autoAlpha: 0, y: -16, duration: 0.016, ease: "power2.in" }, fin)
           .to(`[data-verbo-punto='${i}']`, { autoAlpha: 0.22, duration: 0.02 }, fin)
           .to(`[data-rastro='${i}']`, { autoAlpha: 0.6, duration: 0.014 }, fin + 0.004);
@@ -407,20 +440,22 @@ export function QueHacemosHeroFaro() {
          resto de las ilustraciones del sitio. Los velos y la bruma quedan en
          el DOM pero no se animan; el haz se queda encendido barriendo el
          primer plano y la lámpara sube a plena en vez de bajar a mínima. */
-      tl.to(cam, { z: -260, duration: 0.1, ease: "power1.inOut" }, 0.862)
-        .to(cam, { y: 0, duration: 0.08, ease: "power1.inOut" }, 0.862);
-      tl.to("[data-verbo-punto]", { autoAlpha: 0, duration: 0.03, ease: "none" }, 0.866)
+      // Posiciones de acá en adelante: las originales, corridas por
+      // `despues` (ver CORRIMIENTO).
+      tl.to(cam, { z: -260, duration: 0.1, ease: "power1.inOut" }, despues(0.862))
+        .to(cam, { y: 0, duration: 0.08, ease: "power1.inOut" }, despues(0.862));
+      tl.to("[data-verbo-punto]", { autoAlpha: 0, duration: 0.03, ease: "none" }, despues(0.866))
         // El haz sigue vivo: abre un poco y baña la zona del titular.
-        .to("[data-haz='izq']", { rotation: -46, duration: 0.06, ease: "power1.inOut" }, 0.862)
-        .to("[data-haz='izq']", { autoAlpha: 1, duration: 0.04, ease: "none" }, 0.862)
+        .to("[data-haz='izq']", { rotation: -46, duration: 0.06, ease: "power1.inOut" }, despues(0.862))
+        .to("[data-haz='izq']", { autoAlpha: 1, duration: 0.04, ease: "none" }, despues(0.862))
         // La linterna queda a plena: es la única fuente de luz del plano.
-        .to("[data-halo]", { autoAlpha: 1, duration: 0.05 }, 0.88)
-        .to("[data-nucleo]", { autoAlpha: 1, duration: 0.05 }, 0.88);
+        .to("[data-halo]", { autoAlpha: 1, duration: 0.05 }, despues(0.88))
+        .to("[data-nucleo]", { autoAlpha: 1, duration: 0.05 }, despues(0.88));
       // Entra apenas se va la ultima pregunta (0.73). Al retirar el bloque
       // de niveles quedaba un hueco de ~0.14 sin nada — casi una pantalla de
       // scroll muerto antes del remate.
-      tl.fromTo("[data-esc='cierre']", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.03 }, 0.762)
-        .fromTo("[data-esc='cierre'] [data-cta]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.022 }, 0.79);
+      tl.fromTo("[data-esc='cierre']", { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.03 }, despues(0.762))
+        .fromTo("[data-esc='cierre'] [data-cta]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.022 }, despues(0.79));
 
       /* ── S5 · Deslumbre → puente con la torre ────────────────────────────
          El faro gira hacia la cámara: el haz se abre y viene de frente, la
@@ -432,9 +467,9 @@ export function QueHacemosHeroFaro() {
       // El RAYO se apaga en cuanto el titular terminó de aparecer: ya cumplió
       // su función de guiar la lectura. La luz no desaparece — se concentra
       // en la linterna, y de ahí sale el flash.
-      tl.to("[data-haz='izq'], [data-haz='der']", { autoAlpha: 0, duration: 0.05, ease: "power2.in" }, 0.906)
+      tl.to("[data-haz='izq'], [data-haz='der']", { autoAlpha: 0, duration: 0.05, ease: "power2.in" }, despues(0.906))
         // El titular sale antes de que el blanco lo alcance.
-        .to("[data-esc='cierre']", { autoAlpha: 0, duration: 0.035, ease: "none" }, 0.958)
+        .to("[data-esc='cierre']", { autoAlpha: 0, duration: 0.035, ease: "none" }, despues(0.958))
         // ── La luz que CRECE es la del propio faro ──────────────────────
         // No se agregan luces nuevas: se escala el halo y el núcleo que la
         // linterna ya tiene. Están dibujados en el SVG, en la punta exacta,
@@ -445,12 +480,12 @@ export function QueHacemosHeroFaro() {
         .to(
           "[data-halo]",
           { scale: 46, duration: 0.088, ease: "power2.in" },
-          0.912,
+          despues(0.912),
         )
         .to(
           "[data-nucleo]",
           { scale: 30, duration: 0.084, ease: "power2.in" },
-          0.916,
+          despues(0.916),
         )
         // El mar del frente SE QUEMA con la luz: está DELANTE del faro
         // (Z 300 contra 620), así que el halo crece por detrás y quedaría
@@ -460,7 +495,7 @@ export function QueHacemosHeroFaro() {
         .to(
           "[data-capa='marMedio']",
           { autoAlpha: 0, duration: 0.072, ease: "power2.in" },
-          0.924,
+          despues(0.924),
         );
 
       // Sin círculo de flash aparte: ESE era la "segunda esfera" que
@@ -469,7 +504,9 @@ export function QueHacemosHeroFaro() {
       // moviendo la escena, así que se despegaba de la linterna. El halo y
       // el núcleo, al vivir dentro del SVG, viajan con la cámara y no
       // pueden despegarse: encandilan solos.
-      tl.set({}, {}, 1);
+      // Cierra la línea en su duración total: es lo que ScrollTrigger reparte
+      // sobre el runway.
+      tl.set({}, {}, DURACION_RECORRIDO);
 
       // Solo dev: `#qa=0.42` clava el timeline en ese progreso (sin scroll:
       // el screenshot headless no respeta scrollTo). QA determinista.
@@ -508,8 +545,10 @@ export function QueHacemosHeroFaro() {
       aria-label="Qué hace Empoderamiento Docente"
     >
       {/* El runway solo existe donde corre la coreografía: en mobile o con
-          reduced-motion colapsa a una pantalla (nada de scroll muerto). */}
-      <div ref={altoRef} className="relative h-svh lg:h-[820vh] lg:motion-reduce:h-svh">
+          reduced-motion colapsa a una pantalla (nada de scroll muerto).
+          Alto = DURACION_RECORRIDO · 620vh + 200vh (1.33 · 620 + 200 ≈ 1025):
+          si cambia la duración de la línea de tiempo, cambia este número. */}
+      <div ref={altoRef} className="relative h-svh lg:h-[1025vh] lg:motion-reduce:h-svh">
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
