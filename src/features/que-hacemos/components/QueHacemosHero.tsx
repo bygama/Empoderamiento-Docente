@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { DURACION_RECORRIDO } from "./QueHacemosHeroFaro";
 
 // ── Polvo de estrellas del primer viewport ─────────────────────────────────
 // El cielo real lo pinta el fondo compartido + la escena del faro (detrás);
@@ -251,7 +252,9 @@ export function QueHacemosHero() {
       // de progreso descuenta esa pantalla en ambos extremos.
       const top = faro.getBoundingClientRect().top + window.scrollY;
       const vh = window.innerHeight;
-      const destino = top + vh + (faro.offsetHeight - vh * 2) * 0.048;
+      // 0.048 está en unidades de la línea de tiempo del faro, que dura
+      // DURACION_RECORRIDO: dividir lo pasa a progreso del runway.
+      const destino = top + vh + (faro.offsetHeight - vh * 2) * (0.048 / DURACION_RECORRIDO);
       const lenis = getLenis();
       if (lenis) {
         lenis.scrollTo(destino, {
