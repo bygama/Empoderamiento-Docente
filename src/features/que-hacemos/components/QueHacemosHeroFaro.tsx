@@ -505,7 +505,7 @@ export function QueHacemosHeroFaro() {
       // encima de eso. El velo es uniforme y va sobre la escena: remata la
       // sobreexposición para que al final del runway la pantalla SEA blanca.
       // De ese blanco nace la torre (TorreLineas arranca con su propio velo
-      // blanco y lo disuelve por scroll). Como es un plano uniforme, no
+      // blanco y lo disuelve por tiempo). Como es un plano uniforme, no
       // puede despegarse de la linterna: no vuelve la "segunda esfera".
       tl.to("[data-velo-blanco]", { opacity: 1, duration: 0.04, ease: "power1.in" }, despues(0.96));
 
