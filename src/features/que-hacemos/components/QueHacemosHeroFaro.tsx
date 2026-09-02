@@ -28,8 +28,9 @@ if (typeof window !== "undefined") {
  * sin preserve-3d (los filters/overflow no pueden aplanar nada).
  *
  * Recorrido (una sola escena que evoluciona, sin pantallas):
- *   S0 0.00–0.10  SILENCIO   plano general lejano, mundo apenas insinuado,
- *                            una chispa tenue en la linterna, una frase.
+ *   S0 0.00–0.19  SILENCIO   plano general lejano, mundo apenas insinuado,
+ *                            una chispa tenue en la linterna, una frase que
+ *                            se queda hasta que el mundo empieza a entrar.
  *   S1 0.10–0.40  APROXIMACIÓN + ENCENDIDO  la cámara avanza, el muelle y
  *                            el primer plano ENTRAN por los bordes; a mitad
  *                            de camino la linterna prende (chispa → núcleo →
@@ -429,8 +430,8 @@ export function QueHacemosHeroFaro() {
          LLEGADA_VH pantallas con freno en coseno: arranca al MISMO ritmo
          que antes (con sine.out la velocidad inicial es π/2 · 0.86 /
          LLEGADA_VH = 0.86× el scroll, así el tramo del hero no cambia) y
-         desacelera hasta detenerse cuando se va la primera frase, un pelo
-         antes de que la cámara empiece a avanzar. */
+         desacelera hasta detenerse con la primera frase todavía en
+         pantalla, un pelo antes de que la cámara empiece a avanzar. */
       const LLEGADA_VH = Math.PI / 2;
       gsap.fromTo(
         "[data-faro-shift]",
@@ -449,8 +450,12 @@ export function QueHacemosHeroFaro() {
       );
 
       /* ── S0 · Silencio ──────────────────────────────────────────────── */
-      tl.fromTo("[data-esc='0']", { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.022 }, 0.012)
-        .to("[data-esc='0']", { autoAlpha: 0, y: -16, duration: 0.02, ease: "power2.in" }, 0.078);
+      // La frase SE QUEDA. Entraba en 0.012 y ya se iba en 0.078: plena
+      // apenas 0.044 (≈27vh, un envión de rueda) y casi nadie la leía.
+      // Ahora vive hasta 0.15 —el mundo empieza a entrar (S1, 0.1) con la
+      // frase todavía en pantalla— y se va antes del encendido (0.21).
+      tl.fromTo("[data-esc='0']", { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.03, ease: "sine.out" }, 0.012)
+        .to("[data-esc='0']", { autoAlpha: 0, y: -16, duration: 0.035, ease: "sine.in" }, 0.15);
 
       /* ── S1 · Aproximación + encendido ──────────────────────────────── */
       tl.to(cam, { z: 80, duration: 0.2, ease: "power1.inOut" }, 0.1);
