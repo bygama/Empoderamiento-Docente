@@ -951,14 +951,17 @@ export function TorreLineas() {
                   // antes lavaban este texto hasta volverlo ilegible. Con
                   // superficie opaca y un borde tenue, el apoyo se lee siempre,
                   // esté donde esté la torre.
-                  // APILADO (rótulo, frase, detalle), sin columnas: ningún texto
-                  // pasa de DOS líneas (pedido de Mateo, 2026-09-02). A dos
-                  // columnas el detalle llegaba a cuatro, y es copy oficial: no
-                  // se recorta. A lo ancho de la tarjeta la frase más larga
-                  // (29.9 veces el tamaño de fuente, Manrope 700) entra en una
-                  // línea a 1.5rem desde 1024 (718px en 880px de ancho), y el
-                  // detalle más largo (229 caracteres) en dos.
-                  className="bg-gris-fondo/92 ring-azul-principal/10 grid gap-3 rounded-2xl px-6 py-5 shadow-[0_18px_50px_-30px_rgb(15_23_42/0.4)] ring-1 backdrop-blur-[2px] md:px-8 md:py-6"
+                  // Rótulo y frase a la izquierda, detalle a la derecha, con
+                  // dos límites (pedido de Mateo, 2026-09-02): la frase en UNA
+                  // línea y el detalle en DOS como máximo. Se resuelve por el
+                  // lado del texto, no del layout: la torre usa la versión
+                  // corta de cada línea (ver data.ts: frase ≤35 caracteres,
+                  // detalle ≤85). Con eso, dos columnas iguales de la tarjeta
+                  // de 1280px (548px desde 1280 de viewport, 420px a 1024)
+                  // alcanzan: la frase más larga mide ~420px a 1.5rem y el
+                  // detalle más largo ~600px a 0.9rem, dos líneas aun con el
+                  // peor corte de palabra.
+                  className="bg-gris-fondo/92 ring-azul-principal/10 grid gap-3 rounded-2xl px-6 py-5 shadow-[0_18px_50px_-30px_rgb(15_23_42/0.4)] ring-1 backdrop-blur-[2px] md:grid-cols-2 md:items-end md:gap-10 md:px-8 md:py-6"
                 >
                 <div>
                   <p
@@ -979,7 +982,7 @@ export function TorreLineas() {
                 <p
                   ref={detalleRef}
                   data-torre-slot
-                  className="text-gris-texto max-w-[120ch] font-sans text-[0.9rem] leading-relaxed"
+                  className="text-gris-texto max-w-[52ch] font-sans text-[0.9rem] leading-relaxed md:justify-self-end"
                 >
                   {TAMBORES[0].detalle}
                 </p>
