@@ -141,6 +141,7 @@ export function TorreLineas() {
   const railRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const fillRef = useRef<HTMLSpanElement | null>(null);
   const pctRef = useRef<HTMLSpanElement | null>(null);
+  const veloRef = useRef<HTMLSpanElement | null>(null);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
   const [geo, setGeo] = useState<Geo | null>(null);
@@ -204,17 +205,28 @@ export function TorreLineas() {
     const rotDe = (i: number, pv: number) =>
       fase[i] - pv * GIRO_TOTAL + deriva + ajuste[i];
 
-    // ARMADO: el primer tambor se CONSTRUYE apenas el velo del faro despeja.
-    // Nace como una LÍNEA recta legible (el nombre entero, quieto, a escala
-    // reducida) y después se ENROLLA hasta cerrar el cilindro. Así el
-    // usuario lee qué es antes de que se vuelva objeto. Ver `armar`.
+    // ARMADO: el primer tambor se CONSTRUYE sobre la superficie que emerge
+    // del blanco. Nace como una LÍNEA recta legible (el nombre entero,
+    // quieto, a escala reducida) y después se ENROLLA hasta cerrar el
+    // cilindro. Así el usuario lee qué es antes de que se vuelva objeto.
     //
-    // La sección se mete SOLAPE_SVH por debajo del faro (ver el -mt del
-    // <section>), así que ese primer tramo del recorrido transcurre TAPADO
-    // por el velo — sin el solape quedaba una pantalla entera de gris muerto
-    // mientras el velo salía de cuadro. Ese tramo pasa con el tambor en cero.
+    // RELEVO CON EL FARO. La sección se mete SOLAPE_SVH por debajo del faro
+    // (ver el -mt del <section>) y pinta POR ENCIMA (z-20 contra z-10). La
+    // zona arranca justo donde el faro termina su línea de tiempo con la
+    // pantalla en blanco; desde ahí y durante una pantalla el escenario del
+    // faro se desliza fuera de cuadro tapado por este escenario. Antes ese
+    // tramo era tiempo muerto: la torre se fundía en 0.4s por tiempo, ya
+    // armada, con superficie y trama — la sección "aparecía de la nada" con
+    // el cambio de pantalla. Ahora el escenario entra opaco pero cubierto por
+    // un VELO BLANCO propio (mismo blanco en que termina el faro, relevo
+    // invisible) que se disuelve POR SCROLL en los primeros VELO_SVH,
+    // dejando ver la superficie gris con su trama; el armado del tambor
+    // arranca a los ARMADO_SVH, cuando ya hay superficie donde nacer. El
+    // viaje de la torre empieza recién al terminar el solape (OCULTO).
     const SOLAPE_SVH = 100;
-    const TOTAL_SVH = 100 + TAMBORES.length * SVH_POR_TAMBOR;
+    const VELO_SVH = 60;
+    const ARMADO_SVH = 24;
+    const TOTAL_SVH = SOLAPE_SVH + TAMBORES.length * SVH_POR_TAMBOR;
     const OCULTO = SOLAPE_SVH / TOTAL_SVH;
     // Progreso VISIBLE: el tramo tapado por el velo no cuenta. Si la torre
     // avanzara ahí, al despejar el velo ya estarías a mitad de camino del
@@ -224,27 +236,27 @@ export function TorreLineas() {
     const progresoVisible = () =>
       Math.min(1, Math.max(0, (avance.p - OCULTO) / (1 - OCULTO)));
 
-    // El armado NO va scrubbeado: corre SOLO, por tiempo, en cuanto el velo
-    // despeja. Atado al scroll obligaba a ir empujando la rueda para verlo
-    // construirse; así el remate del flash se reproduce como animación y el
-    // scroll queda libre para viajar la torre. Si el usuario vuelve arriba
-    // (el velo tapa de nuevo), se rearma para la próxima pasada.
-    // Secuencia (por tiempo, en segundos desde que despeja el velo):
-    //   surf  0.0→0.4  la superficie gris, vacía (el ojo descansa)
-    //   linea 0.5→0.9  el nombre en UNA línea, quieto, legible
-    //   apoyo 0.8→1.2  la tarjeta de apoyo abajo (nombre arriba, explicación
+    // El armado NO va scrubbeado: corre SOLO, por tiempo, desde que el scroll
+    // pasa ARMADO_SVH. Atado al scroll obligaba a ir empujando la rueda para
+    // verlo construirse; así se reproduce como animación y el scroll queda
+    // libre para disolver el velo y viajar la torre. Si el usuario vuelve
+    // arriba de ese punto, se rearma para la próxima pasada.
+    // Secuencia (por tiempo, en segundos desde ARMADO_SVH; la superficie
+    // vacía ya la puso la disolución del velo, por eso no hay paso "surf"):
+    //   linea 0.2→0.6  el nombre en UNA línea, quieto, legible
+    //   apoyo 0.5→0.9  la tarjeta de apoyo abajo (nombre arriba, explicación
     //                  abajo, antes de que nada gire)
-    //   rollo 1.9→3.3  la línea se enrolla hasta el tubo y crece a escala 1
-    //   foto  2.6→3.3  el disco nace en el centro cuando ya hay "adentro"
-    //   chips 3.3→3.8  las frases sobre la banda, con el tubo ya cerrado
+    //   rollo 1.6→3.0  la línea se enrolla hasta el tubo y crece a escala 1
+    //   foto  2.3→3.0  el disco nace en el centro cuando ya hay "adentro"
+    //   chips 3.0→3.5  las frases sobre la banda, con el tubo ya cerrado
     // Recién con el rollo cerrado arranca la deriva (ver `tick`).
-    const build = { surf: 0, linea: 0, apoyo: 0, rollo: 0, foto: 0, chips: 0 };
+    const build = { linea: 0, apoyo: 0, rollo: 0, foto: 0, chips: 0 };
     let buildAnim: gsap.core.Timeline | null = null;
     // Transform final de cada tambor escrito UNA vez (i>0: al primer frame;
     // i=0: al cerrar el rollo). Se limpia al rearmar.
     const fijado: boolean[] = TAMBORES.map(() => false);
     const resetBuild = () => {
-      build.surf = build.linea = build.apoyo = build.rollo = build.foto = build.chips = 0;
+      build.linea = build.apoyo = build.rollo = build.foto = build.chips = 0;
       fijado[0] = false;
     };
     // El armado y su rebobinado se disparan desde un ScrollTrigger PROPIO
@@ -262,31 +274,29 @@ export function TorreLineas() {
             buildAnim = null;
           },
         })
-        .to(build, { surf: 1, duration: 0.4, ease: "power2.out" }, 0)
-        .to(build, { linea: 1, duration: 0.4, ease: "power2.out" }, 0.5)
-        .to(build, { apoyo: 1, duration: 0.4, ease: "power2.out" }, 0.8)
-        .to(build, { rollo: 1, duration: 1.4, ease: "power2.inOut" }, 1.9)
-        .to(build, { foto: 1, duration: 0.7, ease: "power2.out" }, 2.6)
-        .to(build, { chips: 1, duration: 0.5, ease: "power2.out" }, 3.3);
+        .to(build, { linea: 1, duration: 0.4, ease: "power2.out" }, 0.2)
+        .to(build, { apoyo: 1, duration: 0.4, ease: "power2.out" }, 0.5)
+        .to(build, { rollo: 1, duration: 1.4, ease: "power2.inOut" }, 1.6)
+        .to(build, { foto: 1, duration: 0.7, ease: "power2.out" }, 2.3)
+        .to(build, { chips: 1, duration: 0.5, ease: "power2.out" }, 3.0);
     };
-    // Al cruzar hacia arriba el corte es INMEDIATO, no un fundido: pasado
-    // ese borde el escenario deja de estar pineado y se DESLIZA hacia abajo
-    // con la página — desvanecerlo en medio segundo hacía que se lo viera
-    // resbalar, que es lo que quedaba mal. Justo ahí atrás está el flash del
-    // faro a pleno, de brillo parecido al gris del escenario, así que el
-    // relevo instantáneo no se percibe como corte.
+    // Rebobinar deshace SOLO el armado: la visibilidad del escenario la
+    // maneja el trigger de la zona (ver onToggle), porque el velo tiene que
+    // seguir tapando aunque el tambor vuelva a cero.
     const rebobinar = () => {
       buildAnim?.kill();
       buildAnim = null;
       resetBuild();
-      stage.style.opacity = "0";
       // (Las fotos no necesitan reset: build.foto=0 apaga la 01 y las demás
       // vuelven a su sitio con el transform del próximo pintar.)
     };
     // Nace APAGADO. La torre pinta por encima del faro (z-20), así que con la
-    // opacidad por defecto (1) se veía montada sobre la escena nocturna y
-    // tapaba el flash: pintar() solo corre cuando el ScrollTrigger de la zona
-    // está activo, o sea que antes de eso nadie la apagaba.
+    // opacidad por defecto (1) se vería montada sobre la escena nocturna y
+    // taparía el flash. Se prende y apaga de golpe con la zona (onToggle):
+    // al cruzar hacia arriba el corte es INMEDIATO, no un fundido — pasado
+    // ese borde el escenario deja de estar pineado y se DESLIZA con la
+    // página; desvanecerlo hacía que se lo viera resbalar. Y en ese borde el
+    // faro está en blanco pleno, igual que el velo: el relevo no se ve.
     stage.style.opacity = "0";
 
     // Geometría del ENROLLADO del primer tambor. En la línea, el nombre
@@ -303,9 +313,13 @@ export function TorreLineas() {
     const pintar = () => {
       const pv = progresoVisible();
 
-      // El escenario COMPLETO (su superficie gris, los tambores y la UI)
-      // aparece con el armado: se funde encima de la luz del deslumbre.
-      stage.style.opacity = String(build.surf);
+      // El velo blanco se disuelve con el scroll de los primeros VELO_SVH del
+      // solape: la superficie gris y su trama EMERGEN del blanco en que
+      // terminó el faro, al ritmo de la rueda, en vez de aparecer de golpe.
+      if (veloRef.current) {
+        const velo = 1 - Math.min(1, Math.max(0, (avance.p * TOTAL_SVH) / VELO_SVH));
+        veloRef.current.style.opacity = String(velo);
+      }
       if (apoyoRef.current) apoyoRef.current.style.opacity = String(build.apoyo);
       const y = -pv * (n - 1) * geo.sp;
       tower.style.transform = `translateY(${y}px)`;
@@ -514,24 +528,27 @@ export function TorreLineas() {
           end: "bottom bottom",
           scrub: 0.5,
           invalidateOnRefresh: true,
+          // Fuera de la zona pintar() no corre, así que el escenario se
+          // prende y apaga acá: entra opaco (cubierto por su velo blanco) en
+          // cuanto la zona arranca, y si volvés arriba se apaga y el flash
+          // del faro vuelve a quedar despejado.
           onToggle: (self) => {
             enCuadro = self.isActive;
+            stage.style.opacity = self.isActive ? "1" : "0";
           },
-          // Fuera de la zona pintar() no corre, así que el rebobinado del
-          // armado se hace acá: si volvés arriba, la torre se apaga y el
-          // flash del faro vuelve a quedar despejado.
-
         },
         onUpdate: pintar,
       });
 
-      // Armado / rebobinado: trigger PROPIO sin scrub, en el mismo punto
-      // donde el faro termina su flash (la zona arranca ahí por el solape).
+      // Armado / rebobinado: trigger PROPIO sin scrub, ARMADO_SVH después de
+      // que arranca la zona — cuando el velo ya dejó ver buena parte de la
+      // superficie, así el tambor nace sobre algo y no sobre el blanco.
       // onRefresh cubre el caso de cargar la página ya scrolleada.
       ScrollTrigger.create({
         trigger: zone,
-        start: "top top",
+        start: () => `top+=${(window.innerHeight * ARMADO_SVH) / 100} top`,
         end: "bottom bottom",
+        invalidateOnRefresh: true,
         onEnter: armar,
         onEnterBack: armar,
         onLeaveBack: rebobinar,
@@ -577,11 +594,11 @@ export function TorreLineas() {
   return (
     <section
       id="recorrido"
-      // Se mete una pantalla POR DEBAJO del faro (que pinta encima con z-10
-      // y cierra en este mismo gris). Sin el solape quedaba un viewport de
-      // gris muerto mientras el velo del faro salía de cuadro. Ese tramo
-      // tapado transcurre con el tambor todavía sin armar (ARMADO_DESDE):
-      // el armado arranca justo cuando el velo despeja.
+      // Se mete una pantalla debajo del final del faro y pinta POR ENCIMA
+      // (z-20 contra su z-10): la zona arranca justo donde el faro termina
+      // en blanco, y durante ese solape el escenario del faro sale de cuadro
+      // tapado por este. El relevo, la disolución del velo blanco y el
+      // armado del tambor están explicados en el effect (SOLAPE_SVH).
       // Solo en lg + con motion, que es donde existe el runway del faro.
       className={
         "relative " +
@@ -639,6 +656,17 @@ export function TorreLineas() {
             >
               <span className="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,color-mix(in_srgb,var(--color-azul-principal)_22%,transparent)_1.1px,transparent_1.6px)] [background-size:22px_22px]" />
             </span>
+          )}
+          {/* Velo blanco del relevo: el mismo blanco en que termina el faro,
+              por encima de TODO el escenario (z-30, sobre header, rieles y
+              apoyos). pintar() lo disuelve con el scroll de los primeros
+              VELO_SVH; de ahí emergen la superficie, la trama y el tambor. */}
+          {live && (
+            <span
+              ref={veloRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-30 bg-white"
+            />
           )}
           {/* Niebla arriba y abajo del escenario: los tambores que entran o
               salen se desvanecen antes de pisar el encabezado o los apoyos.

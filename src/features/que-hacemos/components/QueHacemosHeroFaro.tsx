@@ -498,6 +498,17 @@ export function QueHacemosHeroFaro() {
           despues(0.924),
         );
 
+      // VELO BLANCO. El halo y el núcleo crecen desde la lámpara, pero su
+      // gradiente radial nunca llega a blanco en los bordes: a p=1 el cuadro
+      // quedaba en una bruma gris azulada con la torre, el horizonte y un
+      // punto brillante todavía visibles, y la torre de líneas se fundía
+      // encima de eso. El velo es uniforme y va sobre la escena: remata la
+      // sobreexposición para que al final del runway la pantalla SEA blanca.
+      // De ese blanco nace la torre (TorreLineas arranca con su propio velo
+      // blanco y lo disuelve por scroll). Como es un plano uniforme, no
+      // puede despegarse de la linterna: no vuelve la "segunda esfera".
+      tl.to("[data-velo-blanco]", { opacity: 1, duration: 0.04, ease: "power1.in" }, despues(0.96));
+
       // Sin círculo de flash aparte: ESE era la "segunda esfera" que
       // aparecía corrida a la izquierda del faro. Estaba anclado a una
       // posición medida una sola vez (onStart) mientras la cámara seguía
@@ -557,6 +568,16 @@ export function QueHacemosHeroFaro() {
           className="sticky top-0 isolate h-svh overflow-hidden"
         >
           <FaroEscena />
+
+          {/* Velo blanco del deslumbre: encima de la escena, debajo de los
+              textos (el titular ya salió cuando este sube). Solo la
+              coreografía lo enciende; en el fallback queda en 0. */}
+          <div
+            data-velo-blanco
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-white"
+            style={{ opacity: 0 }}
+          />
 
           {/* Titular de la sección, siempre perceptible para AT (h2: el h1
               de la página vive en QueHacemosHero, que va primero): la
