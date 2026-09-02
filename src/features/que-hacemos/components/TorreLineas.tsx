@@ -238,15 +238,17 @@ export function TorreLineas() {
     // empujando la rueda para verlo construirse; así el remate del flash se
     // reproduce como animación y el scroll queda libre para viajar la
     // torre. Si el usuario vuelve arriba, se rearma para la próxima pasada.
-    // Secuencia (por tiempo, en segundos desde el blanco):
-    //   velo  0.0→0.9  el velo blanco se disuelve: la superficie gris y su
+    // Secuencia (por tiempo, en segundos desde el blanco). Los pasos se
+    // SOLAPAN y van en seno: cada cosa empieza a aparecer mientras la
+    // anterior todavía termina, así no hay escalones.
+    //   velo  0.0→1.6  el velo blanco se disuelve: la superficie gris y su
     //                  trama de puntos EMERGEN del blanco (el ojo descansa)
-    //   linea 1.0→1.4  el nombre en UNA línea, quieto, legible
-    //   apoyo 1.3→1.7  la tarjeta de apoyo abajo (nombre arriba, explicación
+    //   linea 1.1→1.8  el nombre en UNA línea, quieto, legible
+    //   apoyo 1.5→2.2  la tarjeta de apoyo abajo (nombre arriba, explicación
     //                  abajo, antes de que nada gire)
-    //   rollo 2.4→3.8  la línea se enrolla hasta el tubo y crece a escala 1
-    //   foto  3.1→3.8  el disco nace en el centro cuando ya hay "adentro"
-    //   chips 3.8→4.3  las frases sobre la banda, con el tubo ya cerrado
+    //   rollo 2.7→4.3  la línea se enrolla hasta el tubo y crece a escala 1
+    //   foto  3.5→4.3  el disco nace en el centro cuando ya hay "adentro"
+    //   chips 4.3→4.9  las frases sobre la banda, con el tubo ya cerrado
     // Recién con el rollo cerrado arranca la deriva (ver `tick`).
     const build = { velo: 1, linea: 0, apoyo: 0, rollo: 0, foto: 0, chips: 0 };
     let buildAnim: gsap.core.Timeline | null = null;
@@ -273,12 +275,12 @@ export function TorreLineas() {
             buildAnim = null;
           },
         })
-        .to(build, { velo: 0, duration: 0.9, ease: "power2.inOut" }, 0)
-        .to(build, { linea: 1, duration: 0.4, ease: "power2.out" }, 1.0)
-        .to(build, { apoyo: 1, duration: 0.4, ease: "power2.out" }, 1.3)
-        .to(build, { rollo: 1, duration: 1.4, ease: "power2.inOut" }, 2.4)
-        .to(build, { foto: 1, duration: 0.7, ease: "power2.out" }, 3.1)
-        .to(build, { chips: 1, duration: 0.5, ease: "power2.out" }, 3.8);
+        .to(build, { velo: 0, duration: 1.6, ease: "sine.inOut" }, 0)
+        .to(build, { linea: 1, duration: 0.7, ease: "sine.out" }, 1.1)
+        .to(build, { apoyo: 1, duration: 0.7, ease: "sine.out" }, 1.5)
+        .to(build, { rollo: 1, duration: 1.6, ease: "power2.inOut" }, 2.7)
+        .to(build, { foto: 1, duration: 0.8, ease: "power2.out" }, 3.5)
+        .to(build, { chips: 1, duration: 0.6, ease: "power2.out" }, 4.3);
     };
     // Rebobinar deshace SOLO el armado (velo de vuelta a blanco, tambor a
     // cero): la visibilidad del escenario la maneja el trigger de la zona
