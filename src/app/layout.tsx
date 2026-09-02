@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, JetBrains_Mono } from "next/font/google";
+import { Caveat, Courier_Prime, Inter, Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -25,6 +25,24 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
   variable: "--font-jetbrains-mono",
   weight: ["400", "500"],
+});
+
+// Manuscrita — SOLO para anotaciones "a mano" dentro de los expedientes de
+// Investigación (notas al margen, marcas humanas). No es tipografía de UI.
+const caveat = Caveat({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-caveat",
+  weight: ["500", "600"],
+});
+
+// Maquina de escribir — SOLO para el texto documental de los expedientes de
+// Investigacion (informes mecanografiados del archivo). No es tipografia de UI.
+const courierPrime = Courier_Prime({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-courier-prime",
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -62,7 +80,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} ${caveat.variable} ${courierPrime.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <LenisProvider>

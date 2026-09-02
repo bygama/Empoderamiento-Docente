@@ -30,6 +30,12 @@ type Props = {
   start?: string;
   /** delay extra antes de animar. */
   delay?: number;
+  /**
+   * false = texto plano sin reveal. Para remontajes donde el reveal ya se
+   * vio (p. ej. un índice que se desmonta y vuelve): sin esto, cada
+   * remontaje re-dispararía el SplitText completo.
+   */
+  enabled?: boolean;
 };
 
 /**
@@ -47,13 +53,14 @@ export function RevealLines({
   style,
   start = "top 85%",
   delay = 0,
+  enabled = true,
 }: Props) {
   const ref = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduced) return;
+    if (!el || reduced || !enabled) return;
 
     let split: SplitText | null = null;
     let trigger: ScrollTrigger | null = null;
@@ -91,7 +98,7 @@ export function RevealLines({
       trigger?.kill();
       split?.revert();
     };
-  }, [reduced, start, delay]);
+  }, [reduced, start, delay, enabled]);
 
   const Tag = as;
   return (
