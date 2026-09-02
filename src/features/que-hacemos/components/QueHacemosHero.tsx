@@ -1,38 +1,26 @@
 "use client";
 
-import { useRef, useState, type CSSProperties } from "react";
-import Image from "next/image";
+import { useRef, type CSSProperties } from "react";
 import gsap from "gsap";
 import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
-// ── Escena ambiente: imágenes que nacen de la luz del horizonte ────────────
-// Misma idea que el hero de Investigación (imágenes evocativas que se acercan
-// y pasan de largo) pero manejada por TIEMPO, no por scroll: loop continuo y
-// lento detrás del titular. Es atmósfera — sin etiquetas, el titular manda.
-const ESCENA = [
-  "/hero/hero-2.webp",
-  "/metodo/acompanamos.webp",
-  "/hero/hero-9.webp",
-  "/metodo/evaluamos.webp",
-  "/hero/hero-11.webp",
-  "/hero/hero-3.webp",
-];
-
-// Carriles: lado (izq/der) y banda vertical de destino — esquivan el centro,
-// donde vive el titular.
-const CARRILES = [
-  { side: -1, y: -0.2 },
-  { side: 1, y: 0.14 },
-  { side: -1, y: 0.18 },
-  { side: 1, y: -0.16 },
-  { side: -1, y: 0.02 },
-  { side: 1, y: 0.2 },
-];
-
-const VIAJE = 14; // segundos que tarda una imagen de nacer a irse
-const CADENCIA = 3.5; // cada cuánto nace una imagen nueva
+// ── Polvo de estrellas del primer viewport ─────────────────────────────────
+// El cielo real lo pinta el fondo compartido + la escena del faro (detrás);
+// esta capa fina y tenue vive solo en el hero: densifica el arranque ahora
+// que las fotos flotantes no están. LCG determinista (misma constelación en
+// server y client — Math.random rompería la hidratación).
+const POLVO = (() => {
+  let s = 20260828;
+  const rnd = () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296);
+  return Array.from({ length: 46 }, () => ({
+    x: rnd() * 100,
+    y: rnd() * 100,
+    r: 0.6 + rnd() * 1.1,
+    o: 0.08 + rnd() * 0.22,
+  }));
+})();
 
 /**
  * Hero de Qué hacemos — pantalla completa (100svh) a sangre, sin bordes
@@ -44,15 +32,15 @@ const CADENCIA = 3.5; // cada cuánto nace una imagen nueva
  * en verde encima), CIELO ESTRELLADO disperso (constelación determinista,
  * algunas titilan) y EL HAZ DEL FARO GIRANDO: un cono ancho (~48°)
  * y muy tenue (pico 6%) da la vuelta cada 18s — no se ve un rayo, la
- * zona del cielo que toca respira un poco más de luz. Titular con el mensaje diferencial de ED: "No formamos. /
- * Transformamos." (palabras de la clienta: "en ED no formamos, se trata
- * de una transformación educativa"). PENDIENTE validar titular exacto.
+ * zona del cielo que toca respira un poco más de luz. Titular: "Generamos y /
+ * transformamos." (antes "No formamos. / Transformamos."; se cambió a
+ * pedido de Gastón el 2026-09-01). PENDIENTE validar titular exacto con ED.
  *
- * ESCENA AMBIENTE (idea del hero de Investigación, adaptada): imágenes
- * evocativas nacen chiquitas en la luz del horizonte, se acercan de a poco
- * derivando hacia los costados y pasan de largo — loop continuo por TIEMPO
- * (acá no hay scroll-scrub: el hero es una pantalla). Solo desktop con
- * puntero fino y motion; en mobile/reduced ni se montan.
+ * SIN escena de fotos: las imágenes flotantes competían con el titular y
+ * adelantaban lo que la torre muestra mejor. En su lugar el primer viewport
+ * gana un POLVO de estrellas finas y una ESTRELLA FUGAZ ocasional (una
+ * sola, cada ~9-13s, sutil) — vida sin protagonismo. El cielo de fondo es
+ * el compartido con la escena del faro (page.tsx): un solo cielo.
  *
  * Entrada: el haz barre encendiendo los puntos y las dos líneas suben desde
  * su máscara cuando la luz cruza el centro (~0.95s, constantes de PuntosFaro).
@@ -65,7 +53,7 @@ const CADENCIA = 3.5; // cada cuánto nace una imagen nueva
  * profundidad. Amplitudes chicas (≤18px) — acompaña, no marea. Solo con
  * puntero fino (hover:hover); sin motion no hay parallax.
  *
- * ESTRUCTURA (referencia Ink): titular blanco con "Transformamos." teñido
+ * ESTRUCTURA (referencia Ink): titular blanco con "transformamos." teñido
  * de celeste y subrayado verde (el marcador de concepto en versión
  * subrayado) → bajada → CÁPSULA DE LUZ VERDE (el portal).
  *
@@ -76,12 +64,14 @@ const CADENCIA = 3.5; // cada cuánto nace una imagen nueva
  * olita de letras y flecha en hover. Click Y hold encienden: apretar
  * hincha el cuerpo (squash gomoso) mientras la luz interna crece con la
  * carga (~1.1s); soltar antes = click, la carga restante se acelera
- * (~0.4s). Al completar: pop elástico, la luz verde del faro inunda desde
- * abajo y viaja suave hasta la torre (#recorrido). El hover aviva la
- * brasita (carga al 15%) como affordance. NO es una puerta: scrollear de
- * largo sigue funcionando siempre. Teclado (click sintético) carga rápido;
- * con prefers-reduced-motion la cápsula queda quieta y el click salta
- * directo.
+ * (~0.4s). Al completar: pop elástico, la luz verde inunda desde abajo y
+ * arranca el VIAJE NOCTURNO: un scroll automático largo (~4s, easing
+ * cinematográfico) que atraviesa la noche y entra al scroll-story del faro
+ * hasta dejarlo ENCENDIDO (p≈0.30 de su timeline). Como es scroll real, el
+ * usuario puede frenarlo o seguirlo a su ritmo. El hover aviva la brasita
+ * (carga al 15%) como affordance. NO es una puerta: scrollear de largo
+ * sigue funcionando siempre. Teclado (click sintético) carga rápido; con
+ * prefers-reduced-motion la cápsula queda quieta y el click salta directo.
  */
 export function QueHacemosHero() {
   const rootRef = useRef<HTMLElement | null>(null);
@@ -89,9 +79,6 @@ export function QueHacemosHero() {
   const campoRef = useRef<HTMLDivElement | null>(null);
   const innerRef = useRef<HTMLSpanElement | null>(null);
   const reduced = useReducedMotion();
-  // La escena de imágenes solo corre en desktop con puntero fino y motion:
-  // en mobile/reduced el hero queda limpio (y ni se cargan las fotos).
-  const [escenaViva, setEscenaViva] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -158,51 +145,41 @@ export function QueHacemosHero() {
     };
   }, [reduced]);
 
-  // ── Escena ambiente: encender solo donde corresponde ───────────────────
-  useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 768px)").matches) return;
-    setEscenaViva(true);
-  }, [reduced]);
-
-  // ── Escena ambiente: el loop (corre recién cuando las figuras montaron) ──
+  // ── Estrella fugaz ocasional ───────────────────────────────────────────
+  // UNA sola, cada ~9-13s, arriba del cielo (nunca sobre el titular), rápida
+  // y tenue: vida, no espectáculo. Solo client y solo con motion — la
+  // aleatoriedad vive en el effect, así que no toca la hidratación.
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root || !escenaViva) return;
+    if (!root || reduced) return;
 
-    const ctx = gsap.context(() => {
-      const cards = gsap.utils.toArray<HTMLElement>("[data-qh-img]");
+    const fugaz = root.querySelector<HTMLElement>("[data-qh-fugaz]");
+    if (!fugaz) return;
+
+    let tl: gsap.core.Timeline | null = null;
+    let primera = true;
+    const lanzar = () => {
       const W = window.innerWidth;
-      const H = window.innerHeight;
-      // Ciclo total por tarjeta = CADENCIA * n; el resto del viaje es espera.
-      const espera = Math.max(0, CADENCIA * cards.length - VIAJE);
+      const x0 = W * (0.12 + Math.random() * 0.6);
+      const y0 = window.innerHeight * (0.06 + Math.random() * 0.2);
+      const largo = 180 + Math.random() * 140;
+      // La primera sale pronto (~4s, con la entrada ya asentada); las
+      // siguientes respetan la cadencia lenta.
+      tl = gsap
+        .timeline({ delay: primera ? 4 : 9 + Math.random() * 4, onComplete: lanzar })
+        .set(fugaz, { x: x0, y: y0, rotation: 24, autoAlpha: 0 })
+        .to(fugaz, { autoAlpha: 0.55, duration: 0.18, ease: "power1.in" })
+        .to(fugaz, { x: x0 + largo, y: y0 + largo * 0.45, duration: 0.75, ease: "power2.out" }, 0)
+        .to(fugaz, { autoAlpha: 0, duration: 0.3, ease: "power1.out" }, 0.5);
+      primera = false;
+    };
+    lanzar();
 
-      cards.forEach((card, i) => {
-        const { side, y } = CARRILES[i % CARRILES.length];
-        gsap.set(card, { xPercent: -50, yPercent: -50, autoAlpha: 0 });
-
-        const tl = gsap.timeline({
-          repeat: -1,
-          repeatDelay: espera,
-          delay: 2.2 + i * CADENCIA, // arranca cuando la entrada ya pasó
-        });
-        // Nace chiquita en la luz del horizonte…
-        tl.set(card, { x: 0, y: H * 0.3, scale: 0.08, autoAlpha: 0 })
-          // …aparece de a poco…
-          .to(card, { autoAlpha: 0.85, duration: 2.4, ease: "power1.in" }, 0)
-          // …se acerca derivando hacia su carril…
-          .to(card, { x: side * W * 0.36, y: y * H, scale: 0.95, duration: VIAJE - 4, ease: "power1.out" }, 0)
-          // …y pasa de largo, agrandándose mientras se va.
-          .to(
-            card,
-            { x: side * W * 0.56, y: y * H - H * 0.14, scale: 1.5, autoAlpha: 0, duration: 4, ease: "power1.in" },
-            VIAJE - 4,
-          );
-      });
-    }, root);
-
-    return () => ctx.revert();
-  }, [escenaViva]);
+    return () => {
+      tl?.kill();
+      gsap.set(fugaz, { autoAlpha: 0 });
+    };
+  }, [reduced]);
 
   // ── Cápsula: magnetismo fuerte + olita de letras ───────────────────────
   // El wrapper (campo) tiene padding invisible: ese padding ES el radio
@@ -253,12 +230,38 @@ export function QueHacemosHero() {
     const root = rootRef.current;
     if (!btn || !root) return;
 
+    // EL VIAJE NOCTURNO: scroll automático largo hasta ADENTRO del
+    // scroll-story del faro — no hasta su borde. Destino: el PRIMER
+    // PÁRRAFO de la escena ("Cada contexto educativo presenta…"), en el
+    // centro de su ventana de lectura (p≈0.048: entra en 0.012–0.034,
+    // quieto hasta 0.078). Antes aterrizaba en el encendido (p≈0.30) y
+    // pasaba por encima del párrafo a toda velocidad. Así el faro se
+    // enciende con el primer scroll PROPIO del usuario: el botón lleva al
+    // principio de la historia, no al medio. Scroll real: el usuario puede
+    // frenar con la rueda cuando quiera.
     const viajar = () => {
-      const destino = document.getElementById("recorrido");
-      if (!destino) return;
+      const faro = document.getElementById("faro");
+      if (!faro) return;
+      if (reduced) {
+        faro.scrollIntoView({ behavior: "auto" });
+        return;
+      }
+      // El ScrollTrigger del faro arranca en `top+=100svh` (su runway
+      // empieza una pantalla antes, oculto detrás de este hero): el mapeo
+      // de progreso descuenta esa pantalla en ambos extremos.
+      const top = faro.getBoundingClientRect().top + window.scrollY;
+      const vh = window.innerHeight;
+      const destino = top + vh + (faro.offsetHeight - vh * 2) * 0.048;
       const lenis = getLenis();
-      if (lenis) lenis.scrollTo(destino, { duration: 1.6 });
-      else destino.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+      if (lenis) {
+        lenis.scrollTo(destino, {
+          duration: 3,
+          easing: (t: number) =>
+            t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+        });
+      } else {
+        window.scrollTo({ top: destino, behavior: "smooth" });
+      }
     };
 
     // Sin motion: botón común, salta directo.
@@ -423,34 +426,28 @@ export function QueHacemosHero() {
               "radial-gradient(60% 55% at 50% 100%, color-mix(in srgb, var(--color-verde-concepto) 26%, transparent), transparent 72%)",
           }}
         />
-      </div>
-
-      {/* Escena ambiente: imágenes que nacen de la luz del horizonte, se
-          acercan de a poco y pasan de largo. Detrás del contenido (z-0 vs
-          z-10); parallax leve EN CONTRA del mouse (son "lejos"). */}
-      {escenaViva && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 will-change-transform"
-          style={{
-            transform:
-              "translate3d(calc(var(--qhx, 0) * -12px), calc(var(--qhy, 0) * -8px), 0)",
-          }}
-        >
-          {ESCENA.map((src) => (
-            <figure
-              key={src}
-              data-qh-img
-              className="absolute top-1/2 left-1/2 w-[clamp(170px,17vw,280px)] opacity-0 will-change-transform"
-            >
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-[0_30px_60px_-30px_rgb(0_0_0/0.7)] ring-1 ring-white/10">
-                <Image src={src} alt="" fill sizes="280px" className="object-cover" />
-                <span className="bg-azul-principal/25 absolute inset-0" />
-              </div>
-            </figure>
+        {/* Polvo de estrellas del primer viewport + estrella fugaz: detalle
+            fino que densifica el arranque (las fotos ya no están). El cielo
+            base sigue siendo el compartido con la escena del faro. */}
+        <span className="absolute inset-0 overflow-hidden">
+          {POLVO.map((e, i) => (
+            <span
+              key={`p-${i}`}
+              className="absolute rounded-full bg-white"
+              style={{ left: `${e.x}%`, top: `${e.y}%`, width: e.r, height: e.r, opacity: e.o }}
+            />
           ))}
-        </div>
-      )}
+          {/* Trazo de la fugaz: posición/alpha los maneja GSAP. */}
+          <span
+            data-qh-fugaz
+            className="absolute top-0 left-0 h-[1.5px] w-[110px] rounded-full opacity-0"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 55%, rgba(255,255,255,0.2))",
+            }}
+          />
+        </span>
+      </div>
 
       <div
         className="relative z-10 mx-auto flex w-full max-w-screen-xl flex-col items-center px-5 text-center will-change-transform md:px-10"
@@ -466,10 +463,10 @@ export function QueHacemosHero() {
           className="font-display font-extrabold tracking-[-0.03em] text-white [text-shadow:0_2px_30px_rgb(15_21_40/0.55)]"
           style={{ fontSize: "clamp(2.75rem, 1.1rem + 7vw, 6.25rem)", lineHeight: 1.04 }}
         >
-          <span className="sr-only">No formamos. Transformamos.</span>
+          <span className="sr-only">Generamos y transformamos.</span>
           <span aria-hidden="true" className="block overflow-hidden pb-[0.08em]">
             <span data-qh-word className="block">
-              No formamos.
+              Generamos y
             </span>
           </span>
           <span aria-hidden="true" className="block overflow-hidden pb-[0.14em]">
@@ -481,9 +478,9 @@ export function QueHacemosHero() {
                   el subrayado va y el color viene. Sin motion: celeste
                   directo (el clip solo lo setea GSAP). */}
               <span className="relative inline-block">
-                Transformamos.
+                transformamos.
                 <span aria-hidden="true" data-qh-pintura className="text-azul-claro absolute inset-0">
-                  Transformamos.
+                  transformamos.
                 </span>
                 <span
                   data-qh-underline

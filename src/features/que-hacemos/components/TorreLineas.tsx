@@ -31,8 +31,10 @@ if (typeof window !== "undefined") {
  *
  * Los textos de apoyo (título oficial + frase verde + detalle) NO viajan con
  * los tambores: viven en ranuras fijas al pie y se cruzan (crossfade +
- * textContent, sin re-render de React) cuando cambia el tambor activo. El
- * medallón central marca la posición en la torre.
+ * textContent, sin re-render de React) cuando cambia el tambor activo. La
+ * FOTO tampoco viaja: queda en el ojo del tubo y cada una se enciende por
+ * scroll según la distancia de su tambor al centro — los tambores pasan
+ * alrededor de un punto casi quieto.
  *
  * Performance: solo se pintan los tambores en cuadro (los demás quedan
  * visibility:hidden); por frame se escriben ~2 transforms + las opacidades
@@ -47,6 +49,16 @@ const F_MAX = 148;
 const SVH_POR_TAMBOR = 130; // cuánto scroll dura cada estación de la torre
 // Ángulos de los chips de frase sobre la banda (3 por tambor, repartidos).
 const CHIP_ANGS = [40, 160, 280];
+// Giro total de la torre a lo largo del recorrido. Antes 560°: un scroll
+// rápido volvía molinete el texto. Con 300° cada estación gira ~50°.
+const GIRO_TOTAL = 300;
+// Deriva en reposo (grados por ms). Corre en SENTIDO DE LECTURA: las letras
+// del frente van hacia la izquierda, como un letrero luminoso.
+const DERIVA = 0.0025;
+// Ángulo donde se planta la PRIMERA letra del nombre cuando llegás a una
+// estación: al borde izquierdo del arco legible, para leer desde el
+// principio. Al girar, el resto del nombre entra por la derecha.
+const ALINEA = -46;
 
 /** `angs[j]` = ángulo de la rebanada j (no hay paso uniforme, ver abajo). */
 type GeoTambor = { f: number; angs: number[]; slices: string[] };
@@ -119,6 +131,7 @@ export function TorreLineas() {
   const spanRefs = useRef<(HTMLSpanElement | null)[][]>([]);
   const fotoRefs = useRef<(HTMLDivElement | null)[]>([]);
   const chipRefs = useRef<(HTMLDivElement | null)[][]>([]);
+  const aroRefs = useRef<(HTMLDivElement | null)[][]>([]);
   const pulsos = useRef<number[]>([]); // latido elástico por tambor (escala extra)
   const tituloRef = useRef<HTMLParagraphElement | null>(null);
   const fraseRef = useRef<HTMLParagraphElement | null>(null);
@@ -174,9 +187,26 @@ export function TorreLineas() {
     let enCuadro = false;
     const avance = { p: 0 };
 
-    // ARMADO (0→1): el primer tambor se CONSTRUYE apenas el velo del faro
-    // despeja. Arranca colapsado en el eje (radio 0) y con las letras
-    // apagadas; salen del centro hasta el radio real y se encienden.
+    // FASE por tambor: al llegar a la estación i (p = i/(n-1)), sin deriva,
+    // la primera letra del nombre cae en ALINEA. Reemplaza al desfase
+    // arbitrario de antes (i·47), que te dejaba leyendo desde la mitad.
+    // El giro por scroll va con signo NEGATIVO: bajando, las letras del
+    // frente corren hacia la izquierda, que es el sentido en que se lee.
+    // Antes iba al revés y el nombre te escapaba; se leía mejor subiendo.
+    const fase = TAMBORES.map(
+      (_, i) => ALINEA - geo.drums[i].angs[0] + (i / (n - 1)) * GIRO_TOTAL,
+    );
+    // Asentado: la deriva acumulada corre la fase, así que al cambiar de
+    // estación el tambor que llega se acomoda (tween) hasta mostrar su
+    // nombre desde la primera letra. Un ajuste por tambor.
+    const ajuste: number[] = TAMBORES.map(() => 0);
+    const rotDe = (i: number, pv: number) =>
+      fase[i] - pv * GIRO_TOTAL + deriva + ajuste[i];
+
+    // ARMADO: el primer tambor se CONSTRUYE apenas el velo del faro despeja.
+    // Nace como una LÍNEA recta legible (el nombre entero, quieto, a escala
+    // reducida) y después se ENROLLA hasta cerrar el cilindro. Así el
+    // usuario lee qué es antes de que se vuelva objeto. Ver `armar`.
     //
     // La sección se mete SOLAPE_SVH por debajo del faro (ver el -mt del
     // <section>), así que ese primer tramo del recorrido transcurre TAPADO
@@ -198,22 +228,45 @@ export function TorreLineas() {
     // construirse; así el remate del flash se reproduce como animación y el
     // scroll queda libre para viajar la torre. Si el usuario vuelve arriba
     // (el velo tapa de nuevo), se rearma para la próxima pasada.
-    const build = { v: 0 };
-    let buildTween: gsap.core.Tween | null = null;
+    // Secuencia (por tiempo, en segundos desde que despeja el velo):
+    //   surf  0.0→0.4  la superficie gris, vacía (el ojo descansa)
+    //   linea 0.5→0.9  el nombre en UNA línea, quieto, legible
+    //   apoyo 0.8→1.2  la tarjeta de apoyo abajo (nombre arriba, explicación
+    //                  abajo, antes de que nada gire)
+    //   rollo 1.9→3.3  la línea se enrolla hasta el tubo y crece a escala 1
+    //   foto  2.6→3.3  el disco nace en el centro cuando ya hay "adentro"
+    //   chips 3.3→3.8  las frases sobre la banda, con el tubo ya cerrado
+    // Recién con el rollo cerrado arranca la deriva (ver `tick`).
+    const build = { surf: 0, linea: 0, apoyo: 0, rollo: 0, foto: 0, chips: 0 };
+    let buildAnim: gsap.core.Timeline | null = null;
+    // Transform final de cada tambor escrito UNA vez (i>0: al primer frame;
+    // i=0: al cerrar el rollo). Se limpia al rearmar.
+    const fijado: boolean[] = TAMBORES.map(() => false);
+    const resetBuild = () => {
+      build.surf = build.linea = build.apoyo = build.rollo = build.foto = build.chips = 0;
+      fijado[0] = false;
+    };
     // El armado y su rebobinado se disparan desde un ScrollTrigger PROPIO
     // (más abajo), no desde pintar(): pintar() solo corre mientras la zona
     // está activa, así que una vez armado nada lo devolvía a cero y la torre
     // quedaba visible y montada desde antes del flash — los tambores
     // aparecían subiendo desde abajo en vez de nacer de la luz.
     const armar = () => {
-      buildTween?.kill();
-      buildTween = gsap.to(build, {
-        v: 1,
-        duration: 1.6,
-        ease: "power3.out",
-        onUpdate: pintar,
-        onComplete: () => { buildTween = null; },
-      });
+      buildAnim?.kill();
+      resetBuild();
+      buildAnim = gsap
+        .timeline({
+          onUpdate: pintar,
+          onComplete: () => {
+            buildAnim = null;
+          },
+        })
+        .to(build, { surf: 1, duration: 0.4, ease: "power2.out" }, 0)
+        .to(build, { linea: 1, duration: 0.4, ease: "power2.out" }, 0.5)
+        .to(build, { apoyo: 1, duration: 0.4, ease: "power2.out" }, 0.8)
+        .to(build, { rollo: 1, duration: 1.4, ease: "power2.inOut" }, 1.9)
+        .to(build, { foto: 1, duration: 0.7, ease: "power2.out" }, 2.6)
+        .to(build, { chips: 1, duration: 0.5, ease: "power2.out" }, 3.3);
     };
     // Al cruzar hacia arriba el corte es INMEDIATO, no un fundido: pasado
     // ese borde el escenario deja de estar pineado y se DESLIZA hacia abajo
@@ -222,69 +275,110 @@ export function TorreLineas() {
     // faro a pleno, de brillo parecido al gris del escenario, así que el
     // relevo instantáneo no se percibe como corte.
     const rebobinar = () => {
-      buildTween?.kill();
-      buildTween = null;
-      build.v = 0;
+      buildAnim?.kill();
+      buildAnim = null;
+      resetBuild();
       stage.style.opacity = "0";
+      // (Las fotos no necesitan reset: build.foto=0 apaga la 01 y las demás
+      // salen de la distancia al centro en el próximo pintar.)
     };
-    const armado = () => build.v;
     // Nace APAGADO. La torre pinta por encima del faro (z-20), así que con la
     // opacidad por defecto (1) se veía montada sobre la escena nocturna y
     // tapaba el flash: pintar() solo corre cuando el ScrollTrigger de la zona
     // está activo, o sea que antes de eso nadie la apagaba.
     stage.style.opacity = "0";
 
+    // Geometría del ENROLLADO del primer tambor. En la línea, el nombre
+    // (primera copia, sin separador) queda centrado al frente; las demás
+    // copias y los "•" se encienden recién cuando el arco cierra.
+    const g0 = geo.drums[0];
+    const nombreLen = Array.from(TAMBORES[0].tambor).length;
+    const rotLinea = -(g0.angs[0] + g0.angs[nombreLen - 1]) / 2;
+    // Escala de la línea: a tamaño final no entra en pantalla (~2000px).
+    const ESCALA_LINEA = 0.55;
+    const DEG = Math.PI / 180;
+    const wrap180 = (a: number) => ((((a + 180) % 360) + 360) % 360) - 180;
+
     const pintar = () => {
       const pv = progresoVisible();
 
       // El escenario COMPLETO (su superficie gris, los tambores y la UI)
       // aparece con el armado: se funde encima de la luz del deslumbre.
-      stage.style.opacity = String(build.v);
+      stage.style.opacity = String(build.surf);
+      if (apoyoRef.current) apoyoRef.current.style.opacity = String(build.apoyo);
       const y = -pv * (n - 1) * geo.sp;
       tower.style.transform = `translateY(${y}px)`;
       for (let i = 0; i < n; i++) {
         const drum = drumRefs.current[i];
-        const foto = fotoRefs.current[i];
         if (!drum) continue;
         const wy = i * geo.sp + y; // 0 = centro de cámara
         const visible = Math.abs(wy) < geo.alto * 1.05;
         if (!visible) {
           if (!ocultos[i]) {
             drum.style.visibility = "hidden";
-            if (foto) foto.style.visibility = "hidden";
             ocultos[i] = true;
           }
           continue;
         }
         if (ocultos[i]) {
           drum.style.visibility = "";
-          if (foto) foto.style.visibility = "";
           ocultos[i] = false;
         }
-        // Giro: avanza con el scroll + desfase por tambor + deriva constante.
-        // El latido (pulsos) es el "beat" elástico cuando el tambor llega.
-        const rot = 26 + pv * 560 + i * 47 + deriva;
+        // Giro: fase del tambor + scroll (en sentido de lectura) + deriva +
+        // asentado. El latido (pulsos) es el "beat" elástico cuando llega.
+        const rot = rotDe(i, pv);
         const lat = 1 + (pulsos.current[i] || 0);
-        drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) rotateY(${rot}deg) scale(${lat})`;
-        // La foto viaja con la torre pero un toque más lenta (parallax).
-        if (foto) {
-          foto.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp - wy * 0.1}px)`;
-        }
-
-        const g = geo.drums[i];
-        const spans = spanRefs.current[i] ?? [];
         // Solo el PRIMER tambor se arma: es el que recibe el deslumbre. Los
         // demás ya llegan montados desde arriba, como siempre.
-        const arm = i === 0 ? armado() : 1;
-        // Ease out: las letras salen rápido del eje y frenan al llegar al aro.
-        const armEase = 1 - (1 - arm) * (1 - arm);
+        const rollo = i === 0 ? build.rollo : 1;
+        const enRollo = rollo < 1;
+        // Durante el rollo el tambor NO gira como div: cada letra lleva su
+        // ángulo efectivo (ver abajo), porque la línea tiene que mirar a
+        // cámara sea cual sea la fase. Crece de ESCALA_LINEA a 1.
+        if (enRollo) {
+          const esc = ESCALA_LINEA + (1 - ESCALA_LINEA) * rollo;
+          drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) scale(${esc * lat})`;
+        } else {
+          drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) rotateY(${rot}deg) scale(${lat})`;
+        }
+        const g = geo.drums[i];
+        const spans = spanRefs.current[i] ?? [];
+        // ENROLLADO: una línea es un arco de radio infinito. Se parte de un
+        // radio enorme (R / rollo) tangente al frente y se lo cierra hasta R:
+        // cada letra conserva su arco real, así la línea se dobla sola sin
+        // que nada se amontone. Mientras tanto la fase se desliza desde la
+        // del nombre centrado hasta la de la estación.
+        const e = Math.max(rollo, 1e-4);
+        const rho = geo.r / e;
+        const rotNow = enRollo ? rotLinea + (rot - rotLinea) * rollo : rot;
+        // Copias repetidas y separadores: apagados en la línea, entran con
+        // el arco (si no, la línea muestra "…ONAL • DESARROLLO PROF…").
+        const copiaFade = Math.min(1, Math.max(0, (rollo - 0.35) / 0.5));
+        const fijar = !fijado[i];
         for (let j = 0; j < spans.length; j++) {
           const s = spans[j];
           if (!s) continue;
-          const a = (((g.angs[j] + rot) % 360) + 360) % 360;
-          const c = Math.cos((a * Math.PI) / 180);
+          let c: number;
+          let vis = 1;
+          if (enRollo) {
+            const aw = wrap180(g.angs[j] + rotNow);
+            const phi = aw * e; // grados: s/ρ = (aw·R)/(R/e)
+            c = Math.cos(phi * DEG);
+            const x = rho * Math.sin(phi * DEG);
+            const z = geo.r - rho + rho * Math.cos(phi * DEG);
+            s.style.transform = `translate(-50%, -50%) translate3d(${x}px, 0px, ${z}px) rotateY(${phi}deg)`;
+            vis = build.linea * (j < nombreLen ? 1 : copiaFade);
+          } else {
+            const a = (((g.angs[j] + rot) % 360) + 360) % 360;
+            c = Math.cos(a * DEG);
+            if (fijar) {
+              s.style.transform = `translate(-50%, -50%) rotateY(${g.angs[j]}deg) translateZ(${geo.r}px)`;
+            }
+          }
           if (c > 0) {
-            s.style.opacity = String((0.2 + 0.8 * c) * armEase);
+            // Zona legible bien marcada: plena de frente, cae rápido hacia
+            // los costados (antes 0.2 + 0.8·c, casi lineal).
+            s.style.opacity = String((0.08 + 0.92 * Math.pow(c, 1.5)) * vis);
             // El acento se REPONE, no se limpia: `color = ""` borraba el
             // color que pone React desde data y las letras volvían al navy
             // heredado en el frame siguiente.
@@ -293,42 +387,66 @@ export function TorreLineas() {
           } else {
             // Cara de atrás: se ve a través del "vidrio", tenue y difusa. La
             // sombra toma el color de la estación (antes navy fijo), así el
-            // tambor tiene su tinte también por detrás.
-            s.style.opacity = String((0.1 + 0.12 * -c) * armEase);
+            // tambor tiene su tinte también por detrás. A la mitad de lo que
+            // estaba: las letras espejadas ensuciaban el frente que se lee.
+            s.style.opacity = String((0.05 + 0.06 * -c) * vis);
             s.style.color = "transparent";
             s.style.textShadow = `0 0 14px color-mix(in srgb, ${TAMBORES[i].acento} 55%, transparent)`;
           }
-          // Durante el armado el radio crece desde el eje: las letras nacen
-          // amontonadas en el centro y se abren hasta formar el cilindro.
-          if (arm < 1) {
-            s.style.transform = `translate(-50%, -50%) rotateY(${g.angs[j]}deg) translateZ(${geo.r * armEase}px)`;
-          } else if (s.dataset.armado !== "1") {
-            s.style.transform = `translate(-50%, -50%) rotateY(${g.angs[j]}deg) translateZ(${geo.r}px)`;
-            s.dataset.armado = "1";
-          }
+        }
+        if (!enRollo) fijado[i] = true;
+
+        // Aros del cilindro: alrededor de una línea recta no tienen sentido;
+        // entran con el arco.
+        const aros = aroRefs.current[i] ?? [];
+        for (let k = 0; k < aros.length; k++) {
+          const aro = aros[k];
+          if (aro) aro.style.opacity = String(copiaFade);
         }
 
         // Chips de frase: legibles solo del lado de adelante. Entran recién
-        // sobre el final del armado (si aparecen con las letras, el momento
-        // se ensucia: son dos lecturas compitiendo).
-        const chipArm = arm < 1 ? Math.max(0, (arm - 0.55) / 0.45) : 1;
+        // con el rollo CERRADO (si aparecen con las letras, el momento se
+        // ensucia: son dos lecturas compitiendo; y durante el rollo el div
+        // no gira, así que quedarían desfasados de las letras).
+        const chipArm = i === 0 ? build.chips : 1;
         const chips = chipRefs.current[i] ?? [];
         for (let k = 0; k < chips.length; k++) {
           const chip = chips[k];
           if (!chip) continue;
           const a = (((CHIP_ANGS[k] + rot) % 360) + 360) % 360;
-          const c = Math.cos((a * Math.PI) / 180);
+          const c = Math.cos(a * DEG);
           chip.style.opacity = c > 0.12 ? String((0.2 + 0.8 * c) * chipArm) : "0";
         }
 
-        // La foto central del primer tambor crece con el armado: el disco
-        // nace chico en el eje junto con las letras.
-        if (foto && i === 0 && arm < 1) {
-          foto.style.transform += ` scale(${0.4 + 0.6 * armEase})`;
-          foto.style.opacity = String(armEase);
-        } else if (foto && i === 0 && foto.style.opacity !== "") {
-          foto.style.opacity = "";
+      }
+
+      // LA FOTO DEL OJO va por SCROLL, como el giro y la traslación: nada
+      // de crossfade por evento (se disparaba a mitad de camino, con el
+      // tubo todavía entrando, y la foto brotaba sola en el vacío: "pum").
+      // Cada foto sale de la distancia de su tambor al centro: plena
+      // cuando se asienta (±0.15 estación), cero a ±0.5, y se desplaza unos
+      // px en la dirección desde donde viene el tambor, así aparece
+      // "subiendo con" el tubo y sale por arriba con él. Continuo y
+      // reversible, no puede saltar. La 01 además nace con el armado.
+      const posFoto = pv * (n - 1);
+      for (let i = 0; i < n; i++) {
+        const foto = fotoRefs.current[i];
+        if (!foto) continue;
+        const d = i - posFoto; // >0: el tambor todavía viene de abajo
+        const v = Math.min(1, Math.max(0, 1 - (Math.abs(d) - 0.15) / 0.35));
+        const nac = i === 0 ? build.foto : 1;
+        const op = v * nac;
+        if (op <= 0) {
+          if (foto.style.visibility !== "hidden") {
+            foto.style.visibility = "hidden";
+            foto.style.opacity = "0";
+          }
+          continue;
         }
+        const esc = (0.85 + 0.15 * v) * (0.4 + 0.6 * nac);
+        foto.style.visibility = "";
+        foto.style.opacity = String(op);
+        foto.style.transform = `translate(-50%, -50%) translateY(${d * 40}px) scale(${esc})`;
       }
 
       // El apoyo YA NO se apaga durante el viaje: tiene contenedor propio, así
@@ -357,10 +475,24 @@ export function TorreLineas() {
         pulsos.current[act] = beat.v;
         gsap.to(beat, {
           v: 0,
-          duration: 0.9,
+          duration: 0.7,
           ease: "elastic.out(1.2, 0.5)",
           onUpdate: () => {
             pulsos.current[act] = beat.v;
+          },
+        });
+        // Asentado: la fase ya deja el nombre alineado en la estación, pero
+        // la deriva lo fue corriendo. Se compensa con el giro más corto
+        // (módulo 360) para que, al frenar en este tambor, se lea desde la
+        // primera letra. Se tweenea, nunca se salta.
+        const delta = ((((-deriva - ajuste[act]) % 360) + 540) % 360) - 180;
+        const aj = { v: ajuste[act] };
+        gsap.to(aj, {
+          v: ajuste[act] + delta,
+          duration: 1.2,
+          ease: "power3.out",
+          onUpdate: () => {
+            ajuste[act] = aj.v;
           },
         });
         const t = TAMBORES[act];
@@ -376,10 +508,12 @@ export function TorreLineas() {
       }
     };
 
-    // Deriva constante mientras la torre está en viewport.
+    // Deriva constante mientras la torre está en viewport. Durante el armado
+    // no corre: la línea tiene que quedarse QUIETA para leerse, y pintar()
+    // ya lo llama la línea de tiempo del armado.
     const tick = (_t: number, dt: number) => {
-      if (!enCuadro) return;
-      deriva -= dt * 0.0035;
+      if (!enCuadro || buildAnim) return;
+      deriva -= dt * DERIVA;
       pintar();
     };
     gsap.ticker.add(tick);
@@ -416,12 +550,7 @@ export function TorreLineas() {
         onEnterBack: armar,
         onLeaveBack: rebobinar,
         onRefresh: (self) => {
-          if (!self.isActive) {
-            buildTween?.kill();
-            buildTween = null;
-            build.v = 0;
-            stage.style.opacity = "0";
-          }
+          if (!self.isActive) rebobinar();
         },
       });
 
@@ -433,9 +562,9 @@ export function TorreLineas() {
 
     return () => {
       gsap.ticker.remove(tick);
-      // El tween del armado nace fuera del gsap.context (lo crea pintar en
-      // caliente), así que ctx.revert() no lo alcanza: se mata a mano.
-      buildTween?.kill();
+      // La línea de tiempo del armado nace fuera del gsap.context (la crea
+      // el ScrollTrigger en caliente), así que ctx.revert() no la alcanza.
+      buildAnim?.kill();
       ctx.revert();
     };
   }, [live, geo]);
@@ -566,9 +695,16 @@ export function TorreLineas() {
                     tabIndex={-1}
                     data-active={i === 0}
                     onClick={() => saltarA(i)}
-                    className="group text-gris-texto/55 hover:text-azul-principal data-[active=true]:text-azul-principal flex cursor-pointer items-center gap-2 py-0.5 text-left font-mono text-[0.62rem] tracking-[0.12em] uppercase transition-colors"
+                    // La activa se nota por tres restas y sumas chicas: sube un
+                    // escalón de tamaño, se corre 4px a la derecha (rompe la
+                    // columna) y las demás retroceden al 40%. Sin bold ni
+                    // fondo: en mono chica el bold se empasta y el fondo
+                    // vuelve botonera al riel.
+                    className="group text-gris-texto/40 hover:text-azul-principal data-[active=true]:text-azul-principal flex cursor-pointer items-center gap-2 py-0.5 text-left font-mono text-[0.62rem] tracking-[0.12em] uppercase transition-[color,font-size,transform] duration-300 ease-out data-[active=true]:translate-x-1 data-[active=true]:text-[0.72rem]"
                   >
-                    <span className="group-data-[active=true]:bg-verde-concepto inline-block h-1 w-1 rounded-full bg-current opacity-40 transition-all group-data-[active=true]:scale-150 group-data-[active=true]:opacity-100" />
+                    {/* El punto se estira a un guion verde en la activa: el
+                        gesto de "estás acá" lee mejor que un punto más grande. */}
+                    <span className="group-data-[active=true]:bg-verde-concepto inline-block h-1 w-1 rounded-full bg-current opacity-40 transition-all duration-300 ease-out group-data-[active=true]:w-3 group-data-[active=true]:opacity-100" />
                     {String(i + 1).padStart(2, "0")} {t.tambor}
                   </button>
                 ))}
@@ -610,27 +746,24 @@ export function TorreLineas() {
                     transformStyle: "preserve-3d",
                   }}
                 >
-                  <div
-                    ref={towerRef}
-                    className="will-change-transform"
-                    style={{ transformStyle: "preserve-3d" }}
-                  >
-                    {/* Fotos flotando DENTRO de cada tambor (la "medusa" de la
-                        referencia): no rotan — viajan con la torre con leve
-                        parallax. En 3D quedan entre el texto esmerilado de
-                        atrás y el texto nítido de adelante. */}
-                    {TAMBORES.map((t, i) => (
-                      <div
-                        key={"foto-" + t.id}
-                        ref={(el) => {
-                          fotoRefs.current[i] = el;
-                        }}
-                        aria-hidden="true"
-                        className="absolute will-change-transform"
-                        style={{
-                          transform: `translate(-50%, -50%) translateY(${i * geo.sp}px)`,
-                        }}
-                      >
+                  {/* LA FOTO DEL OJO: no viaja con la torre. Las fotos de
+                      todas las estaciones viven apiladas en el centro de la
+                      cámara (fuera del div que se traslada); pintar() las
+                      enciende por scroll según la distancia de su tambor al
+                      centro. Los tambores suben y bajan alrededor de un
+                      punto casi quieto. En 3D quedan entre el texto
+                      esmerilado de atrás y el nítido de adelante. Nacen
+                      apagadas: la 01 la trae el armado. */}
+                  {TAMBORES.map((t, i) => (
+                    <div
+                      key={"foto-" + t.id}
+                      ref={(el) => {
+                        fotoRefs.current[i] = el;
+                      }}
+                      aria-hidden="true"
+                      className="absolute will-change-transform"
+                      style={{ transform: "translate(-50%, -50%) scale(0.4)", opacity: 0 }}
+                    >
                         {/* Resplandor del acento detrás de la foto: da aire
                             de color al centro del tambor. */}
                         <span
@@ -656,6 +789,11 @@ export function TorreLineas() {
                       </div>
                     ))}
 
+                  <div
+                    ref={towerRef}
+                    className="will-change-transform"
+                    style={{ transformStyle: "preserve-3d" }}
+                  >
                     {TAMBORES.map((t, i) => {
                       const g = geo.drums[i];
                       return (
@@ -671,9 +809,12 @@ export function TorreLineas() {
                           }}
                         >
                           {/* Aros del cilindro */}
-                          {[-1, 1].map((lado) => (
+                          {[-1, 1].map((lado, k) => (
                             <div
                               key={lado}
+                              ref={(el) => {
+                                (aroRefs.current[i] ??= [])[k] = el;
+                              }}
                               aria-hidden="true"
                               className="absolute rounded-full border"
                               // Aro del color de la estación (antes navy fijo).

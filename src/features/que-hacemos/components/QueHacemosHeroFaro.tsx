@@ -60,7 +60,6 @@ if (typeof window !== "undefined") {
  */
 
 const P = 1100; // distancia focal de la cámara imaginaria
-const ORIGEN_FOCO = `${FOCO_X} ${FOCO_Y}`;
 
 /**
  * Las preguntas con las que empieza cada proyecto.
@@ -209,7 +208,7 @@ export function QueHacemosHeroFaro() {
         let delta = ang - REPOSO_HAZ[lado];
         while (delta > 180) delta -= 360;
         while (delta < -180) delta += 360;
-        gsap.set(`[data-haz='${lado}']`, { rotation: delta, svgOrigin: ORIGEN_FOCO });
+        gsap.set(`[data-haz='${lado}']`, { rotation: delta });
       };
 
 
@@ -224,9 +223,20 @@ export function QueHacemosHeroFaro() {
 
       /* ── Estados iniciales = S0 (el JSX por defecto es el fallback S1
             encendido; acá se apaga y se aleja todo) ─────────────────────── */
-      gsap.set("[data-haz='izq'], [data-haz='der']", { autoAlpha: 0 });
-      gsap.set("[data-halo]", { autoAlpha: 0, scale: 0.3, svgOrigin: ORIGEN_FOCO });
-      gsap.set("[data-nucleo]", { autoAlpha: 0.16, scale: 0.5, svgOrigin: ORIGEN_FOCO });
+      // PIVOTES DE LA LUZ — nunca svgOrigin: su parse salía corrupto
+      // (medido: xOrigin −2003 en vez de 950, derivando con los refreshes)
+      // y todo transform pivotaba desde cualquier lado. En su lugar,
+      // transformOrigin en el espacio del BBOX de cada elemento, declarado
+      // UNA vez (los tweens usan el caché y ningún refresh lo recalcula):
+      // - halo/núcleo: círculos centrados EXACTO en el foco → "50% 50%".
+      // - haces: el foco (950,388) relativo al bbox de sus conos. Cono izq:
+      //   x −360..946, y 288..644 → (950−(−360), 388−288) = 1310px, 100px.
+      //   Cono der: x 954..2260 → (950−954, 388−288) = −4px, 100px.
+      //   (Si cambia la geometría de los conos en FaroEscena, recalcular.)
+      gsap.set("[data-haz='izq']", { autoAlpha: 0, transformOrigin: "1310px 100px" });
+      gsap.set("[data-haz='der']", { autoAlpha: 0, transformOrigin: "-4px 100px" });
+      gsap.set("[data-halo]", { autoAlpha: 0, scale: 0.3, transformOrigin: "50% 50%" });
+      gsap.set("[data-nucleo]", { autoAlpha: 0.16, scale: 0.5, transformOrigin: "50% 50%" });
       gsap.set("[data-linterna]", { opacity: 0.2 });
       gsap.set("[data-espejo]", { autoAlpha: 0 });
       gsap.set("[data-capa='marMedio']", { autoAlpha: 0.35 });
@@ -297,7 +307,7 @@ export function QueHacemosHeroFaro() {
         .to("[data-nucleo]", { scale: 1, duration: 0.015 }, 0.218)
         .to("[data-linterna]", { opacity: 1, duration: 0.012 }, 0.212)
         .to("[data-halo]", { autoAlpha: 1, scale: 1, duration: 0.028 }, 0.216)
-        .fromTo("[data-haz='izq']", { autoAlpha: 0, rotation: -8, svgOrigin: ORIGEN_FOCO }, { autoAlpha: 1, rotation: -2, duration: 0.035, ease: "power1.out" }, 0.226)
+        .fromTo("[data-haz='izq']", { autoAlpha: 0, rotation: -8 }, { autoAlpha: 1, rotation: -2, duration: 0.035, ease: "power1.out" }, 0.226)
         .to("[data-espejo]", { autoAlpha: 1, duration: 0.04 }, 0.235);
       // La luz atraviesa la zona del titular y el mensaje emerge con ella.
       tl.to("[data-mensaje]", { autoAlpha: 1, duration: 0.012, ease: "none" }, 0.262)
@@ -360,11 +370,11 @@ export function QueHacemosHeroFaro() {
         // reversa el playhead lo cruza y restaura la rotación previa (un
         // fromTo dejaría el wind-up pegado hacia atrás).
         if (prev && prev.lado !== lado) {
-          tl.set(`[data-haz='${lado}']`, { rotation: () => rot() + (lado === "der" ? -14 : 14), svgOrigin: ORIGEN_FOCO }, t - 0.007)
+          tl.set(`[data-haz='${lado}']`, { rotation: () => rot() + (lado === "der" ? -14 : 14) }, t - 0.007)
             .to(`[data-haz='${otro}']`, { autoAlpha: 0, duration: 0.018, ease: "none" }, t - 0.006)
             .to(`[data-haz='${lado}']`, { autoAlpha: 1, rotation: rot, duration: 0.03, ease: "power1.inOut" }, t);
         } else {
-          tl.to(`[data-haz='${lado}']`, { rotation: rot, svgOrigin: ORIGEN_FOCO, duration: 0.028, ease: "power1.inOut" }, t - 0.004);
+          tl.to(`[data-haz='${lado}']`, { rotation: rot, duration: 0.028, ease: "power1.inOut" }, t - 0.004);
         }
         // Consecuencia: el agua se enciende donde el haz llega…
         tl.to(`[data-verbo-punto='${i}']`, { autoAlpha: 1, duration: 0.014 }, t + 0.018)
@@ -391,7 +401,7 @@ export function QueHacemosHeroFaro() {
         .to(cam, { y: 0, duration: 0.08, ease: "power1.inOut" }, 0.862);
       tl.to("[data-verbo-punto]", { autoAlpha: 0, duration: 0.03, ease: "none" }, 0.866)
         // El haz sigue vivo: abre un poco y baña la zona del titular.
-        .to("[data-haz='izq']", { rotation: -46, duration: 0.06, ease: "power1.inOut", svgOrigin: ORIGEN_FOCO }, 0.862)
+        .to("[data-haz='izq']", { rotation: -46, duration: 0.06, ease: "power1.inOut" }, 0.862)
         .to("[data-haz='izq']", { autoAlpha: 1, duration: 0.04, ease: "none" }, 0.862)
         // La linterna queda a plena: es la única fuente de luz del plano.
         .to("[data-halo]", { autoAlpha: 1, duration: 0.05 }, 0.88)
@@ -424,12 +434,12 @@ export function QueHacemosHeroFaro() {
         // svgOrigin en el foco: crecen desde la lámpara, no desde su centro.
         .to(
           "[data-halo]",
-          { scale: 46, duration: 0.088, ease: "power2.in", svgOrigin: ORIGEN_FOCO },
+          { scale: 46, duration: 0.088, ease: "power2.in" },
           0.912,
         )
         .to(
           "[data-nucleo]",
-          { scale: 30, duration: 0.084, ease: "power2.in", svgOrigin: ORIGEN_FOCO },
+          { scale: 30, duration: 0.084, ease: "power2.in" },
           0.916,
         )
         // El mar del frente SE QUEMA con la luz: está DELANTE del faro
@@ -482,6 +492,7 @@ export function QueHacemosHeroFaro() {
     // secciones (antes solo compartían el color de fondo). El hero va encima
     // con z mayor y sin fondo propio, así que se lee como una sola escena.
     <section
+      id="faro"
       ref={rootRef}
       className="relative z-10 lg:-mt-[100svh] lg:motion-reduce:mt-0"
       aria-label="Qué hace Empoderamiento Docente"
@@ -498,12 +509,13 @@ export function QueHacemosHeroFaro() {
         >
           <FaroEscena />
 
-          {/* El titular real de la página, siempre perceptible para AT: la
+          {/* Titular de la sección, siempre perceptible para AT (h2: el h1
+              de la página vive en QueHacemosHero, que va primero): la
               versión visual de abajo entra y sale con la coreografía. */}
-          <h1 className="sr-only">
+          <h2 className="sr-only">
             Diseñamos y acompañamos procesos que transforman la matemática
             escolar.
-          </h1>
+          </h2>
 
           {/* ══ Overlays de texto — una idea por momento ══ */}
 

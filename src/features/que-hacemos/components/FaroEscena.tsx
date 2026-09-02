@@ -130,10 +130,17 @@ function CapaCielo() {
             y volvía a marcar la junta — y como la cámara lo escala, el tono
             que asomaba arriba ni siquiera era constante. */}
         <linearGradient id="qh2-fondo" x1="0" y1="0" x2="0" y2="1">
+          {/* El fade transparente→opaco es LARGO y con paso intermedio: un
+              tramo corto (34→48%) se leía como una banda con borde recto
+              flotando bajo el hero. La opacidad plena recién llega cerca
+              del horizonte, donde el tono ya coincide con el fondo
+              compartido y la junta no existe. */}
           <stop offset="0" style={{ stopColor: NOCHE }} stopOpacity="0" />
-          <stop offset="0.34" style={{ stopColor: NOCHE }} stopOpacity="0" />
-          <stop offset="0.48" style={{ stopColor: NOCHE }} />
-          <stop offset="0.55" style={{ stopColor: AZUL }} />
+          <stop offset="0.26" style={{ stopColor: NOCHE }} stopOpacity="0" />
+          <stop offset="0.38" style={{ stopColor: NOCHE }} stopOpacity="0.28" />
+          <stop offset="0.47" style={{ stopColor: NOCHE }} stopOpacity="0.68" />
+          <stop offset="0.54" style={{ stopColor: NOCHE }} />
+          <stop offset="0.57" style={{ stopColor: AZUL }} />
           <stop offset="0.63" style={{ stopColor: mezcla(AZUL_MEDIO, 40, "black") }} />
           <stop offset="0.78" style={{ stopColor: mezcla(AZUL, 82, "black") }} />
           <stop offset="1" style={{ stopColor: mezcla(AZUL, 58, "black") }} />
@@ -412,13 +419,17 @@ function CapaFaro() {
         {/* Cornisa de la linterna. */}
         <rect x="932.8" y="368.4" width="34.4" height="3.1" rx="1.3" style={{ fill: AZUL }} />
         <rect x="932.8" y="368.4" width="34.4" height="1.1" rx="0.55" style={{ fill: AZUL_CLARO }} opacity="0.35" />
-        {/* Cúpula de campana (perfil curvo, no un triángulo) + nervio. */}
-        <path d="M932.5,368.4 C934,357.5 941.5,350.5 950,349.5 C958.5,350.5 966,357.5 967.5,368.4 Z" fill="url(#qh2-cupula)" />
-        <path d="M950,350 L950,368" stroke="white" strokeOpacity="0.16" strokeWidth="0.9" />
-        <path d="M935.2,368 C936.6,359.4 942.6,353.2 950,351.8" fill="none" style={{ stroke: AZUL_CLARO }} strokeOpacity="0.3" strokeWidth="1" />
-        {/* Rim-light derecho: la cúpula no se funde en silueta contra el
-            halo — el perfil completo del domo sigue leyéndose de noche. */}
-        <path d="M950,351.6 C957.6,352.8 963.6,358.8 965.2,367.6" fill="none" style={{ stroke: AZUL_CLARO }} strokeOpacity="0.2" strokeWidth="1" />
+        {/* Techo a DOS AGUAS RECTAS con alero, como el isotipo del logo:
+            dos líneas al pico, base apenas más ancha que la linterna. El
+            gradiente lateral pone el volumen y la arista central + el
+            rim-light derecho mantienen el perfil legible de noche. */}
+        <polygon points="930.5,368.4 950,348.8 969.5,368.4" fill="url(#qh2-cupula)" />
+        <path d="M950,349.6 L950,368" stroke="white" strokeOpacity="0.16" strokeWidth="0.9" />
+        <path d="M933.2,367.2 L950,350.4" fill="none" style={{ stroke: AZUL_CLARO }} strokeOpacity="0.32" strokeWidth="1" />
+        <path d="M950,350.4 L966.8,367.2" fill="none" style={{ stroke: AZUL_CLARO }} strokeOpacity="0.18" strokeWidth="1" />
+        {/* Alero: la moldura de la base sobresale como en el logo. */}
+        <rect x="929.6" y="367.4" width="40.8" height="2" rx="1" style={{ fill: AZUL }} />
+        <rect x="929.6" y="367.4" width="40.8" height="0.9" rx="0.45" style={{ fill: AZUL_CLARO }} opacity="0.3" />
         {/* Remate: tambor, mástil, esfera con brillo y aguja fina. */}
         <circle cx="950" cy="348.6" r="2.3" style={{ fill: AZUL }} />
         <rect x="949.1" y="335.5" width="1.8" height="13.5" rx="0.9" style={{ fill: AZUL }} />

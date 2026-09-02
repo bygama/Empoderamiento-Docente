@@ -46,7 +46,11 @@ export default function QueHacemosPage() {
             justo antes del recorrido, como antesala de la torre. */}
         <QueHacemosHeroFaro />
       </div>
-      <TorreLineas />
+      {/* Ancla del CTA final del faro («Ver líneas de acción» → #lineas):
+          el wrapper no altera el layout de la torre. */}
+      <div id="lineas" className="scroll-mt-28">
+        <TorreLineas />
+      </div>
       <EnfoqueTransformacion />
       <CaminoDeTrabajo />
       <NivelesEscala />
