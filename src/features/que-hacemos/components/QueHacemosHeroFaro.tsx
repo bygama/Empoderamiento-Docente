@@ -36,16 +36,16 @@ if (typeof window !== "undefined") {
  *                            el primer plano ENTRAN por los bordes; a mitad
  *                            de camino la linterna prende (chispa → núcleo →
  *                            halo → haz) y la luz revela el mensaje central.
- *   S2 0.40–1.66  PREGUNTAS  cinco golpes, UNA pregunta por momento; el haz
+ *   S2 0.40–1.87  PREGUNTAS  cinco golpes, UNA pregunta por momento; el haz
  *                            dirige la lectura (izq lejos → izq alto → der →
  *                            der cerca → centro), la cámara se desplaza
  *                            lateralmente y sigue avanzando hasta el
  *                            contrapicado (faro ~55% del alto en la última).
  *                            Cada pregunta tocada deja un rastro verde en el
  *                            agua. Un beat por pregunta (PASO_PREGUNTA).
- *   S4 1.69–1.89  CIERRE     la noche no cede: el faro alumbra el titular
+ *   S4 1.90–2.10  CIERRE     la noche no cede: el faro alumbra el titular
  *                            final y su CTA; el haz se abre y baña el plano.
- *   S5 1.84–1.93  DESLUMBRE  la linterna crece hasta dejar la pantalla en
+ *   S5 2.05–2.14  DESLUMBRE  la linterna crece hasta dejar la pantalla en
  *                            blanco; la torre de líneas nace de ese blanco.
  *
  * Las posiciones son UNIDADES DE LA LÍNEA DE TIEMPO, no progreso 0–1: la
@@ -127,8 +127,13 @@ const INICIO_PREGUNTAS = 0.4;
 const PASO_PREGUNTA = 0.3;
 /** Un beat por pregunta. */
 const BEATS = PREGUNTAS.map((_, i) => INICIO_PREGUNTAS + i * PASO_PREGUNTA);
-/** La última pregunta se va poco después de su beat, como en el original. */
-const FIN_PREGUNTAS = BEATS[BEATS.length - 1] + 0.06;
+/**
+ * La última pregunta dura lo mismo que las otras: se va 0.03 antes de donde
+ * caería un beat siguiente. Con +0.06 (herencia de cuando los beats medían
+ * 0.062) quedaba plena 0.01 (≈6vh): aparecía, se iba al toque y el
+ * subrayado no llegaba a pintarse.
+ */
+const FIN_PREGUNTAS = BEATS[BEATS.length - 1] + PASO_PREGUNTA - 0.03;
 /** En la coreografía original S2 terminaba en 0.73; de ahí el corrimiento. */
 const CORRIMIENTO = FIN_PREGUNTAS - 0.73;
 /** Posición original (post-S2) → posición actual. */
@@ -676,9 +681,9 @@ export function QueHacemosHeroFaro() {
     >
       {/* El runway solo existe donde corre la coreografía: en mobile o con
           reduced-motion colapsa a una pantalla (nada de scroll muerto).
-          Alto = DURACION_RECORRIDO · 620vh + 200vh (1.93 · 620 + 200 ≈ 1397):
+          Alto = DURACION_RECORRIDO · 620vh + 200vh (2.14 · 620 + 200 ≈ 1527):
           si cambia la duración de la línea de tiempo, cambia este número. */}
-      <div ref={altoRef} className="relative h-svh lg:h-[1397vh] lg:motion-reduce:h-svh">
+      <div ref={altoRef} className="relative h-svh lg:h-[1527vh] lg:motion-reduce:h-svh">
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
