@@ -62,8 +62,9 @@ const ARRANQUE = ARRANQUE_SVH / (ZONA_SVH - 100);
 // Ángulos de los chips de frase sobre la banda (3 por tambor, repartidos).
 const CHIP_ANGS = [40, 160, 280];
 // Giro total de la torre a lo largo del recorrido. Antes 560°: un scroll
-// rápido volvía molinete el texto. Con 300° cada estación gira ~50°.
-const GIRO_TOTAL = 300;
+// rápido volvía molinete el texto. Calibrado a ~50° por estación: con 7
+// estaciones eran 300°; con 5 (cuatro tramos), 200°.
+const GIRO_TOTAL = 200;
 // SIN deriva en reposo. Había un giro continuo en sentido de lectura
 // (2.5°/s, "letrero luminoso"); con el scroll frenado durante el armado uno
 // se queda mirando el tambor y la deriva se llevaba el principio del nombre

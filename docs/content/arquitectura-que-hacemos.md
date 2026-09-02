@@ -316,6 +316,15 @@ bajo interacción (tap/click expande; sin depender de hover). Patrón
 > esta taxonomía (mapeo en §10). Los nombres definitivos siguen en VALIDAR
 > con ED antes del lanzamiento.
 
+> **Decisión tomada (usuario, 02-09-2026):** la torre de `/que-hacemos`
+> publica **cinco** líneas, fusionando de a pares las 7 del copy oficial
+> donde el propio contenido ya las juntaba: Materiales + Currículo (como en
+> «Proyectos y aplicaciones») y Fortalecimiento institucional +
+> Transformación de sistemas educativos (como la línea 7 de este doc).
+> Títulos y frases se conservan literales; los dos párrafos de detalle
+> fusionados son síntesis de las oraciones oficiales → **VALIDAR** con ED.
+> El home sigue con 7 hasta la unificación pendiente (§12, ítem 1).
+
 ---
 
 ## 7. Sección 5 — Del sistema al aula (`#escalas`)
@@ -504,7 +513,9 @@ nunca solo hover; jerarquía que funcione apilada).
 
 ## 12. Pendientes de validación (consolidado)
 
-1. Nombres definitivos de las 7 líneas de acción (y unificación con el home).
+1. Nombres definitivos de las líneas de acción (y unificación con el home:
+   la torre de Qué hacemos publica 5, el home 7; ver decisión del
+   02-09-2026 en §6). Incluye los dos párrafos fusionados de la torre.
 2. «Arquitectura pedagógica»: ¿vocabulario oficial?
 3. «Soluciones Institucionales Integrales»: ¿línea o modalidad?
 4. Casos: Techint (programas, sedes, fechas, logo), CABA (fecha de inicio,
