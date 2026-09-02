@@ -952,12 +952,14 @@ export function TorreLineas() {
                   // antes lavaban este texto hasta volverlo ilegible. Con
                   // superficie opaca y un borde tenue, el apoyo se lee siempre,
                   // esté donde esté la torre.
-                  // 3fr/2fr y frase con tamaño fluido: la frase (el título
-                  // visual) entra en UNA línea en todo lg, como el rótulo de
-                  // arriba. A dos columnas iguales y 1.5rem las más largas
-                  // (60 caracteres) se partían en dos; el detalle de la derecha
-                  // baja un escalón (pedido de Mateo, 2026-09-02).
-                  className="bg-gris-fondo/92 ring-azul-principal/10 grid gap-5 rounded-2xl px-6 py-6 shadow-[0_18px_50px_-30px_rgb(15_23_42/0.4)] ring-1 backdrop-blur-[2px] md:grid-cols-[3fr_2fr] md:gap-10 md:px-8 md:py-7"
+                  // APILADO (rótulo, frase, detalle), sin columnas: ningún texto
+                  // pasa de DOS líneas (pedido de Mateo, 2026-09-02). A dos
+                  // columnas el detalle llegaba a cuatro, y es copy oficial: no
+                  // se recorta. A lo ancho de la tarjeta la frase más larga
+                  // (29.9 veces el tamaño de fuente, Manrope 700) entra en una
+                  // línea a 1.5rem desde 1024 (718px en 880px de ancho), y el
+                  // detalle más largo (229 caracteres) en dos.
+                  className="bg-gris-fondo/92 ring-azul-principal/10 grid gap-3 rounded-2xl px-6 py-5 shadow-[0_18px_50px_-30px_rgb(15_23_42/0.4)] ring-1 backdrop-blur-[2px] md:px-8 md:py-6"
                 >
                 <div>
                   <p
@@ -970,11 +972,7 @@ export function TorreLineas() {
                   <p
                     ref={fraseRef}
                     data-torre-slot
-                    className="text-verde-concepto-texto font-display mt-2 leading-snug font-bold"
-                    // Medido con Manrope 700: la frase más larga mide 29.9 veces
-                    // el tamaño de fuente, y la columna va de 504px (1024) a
-                    // 658px (≥1280): 16px…20.8px deja 5% de aire.
-                    style={{ fontSize: "clamp(1rem, 0.1rem + 1.2vw, 1.3rem)" }}
+                    className="text-verde-concepto-texto font-display mt-1 text-[1.5rem] leading-snug font-bold"
                   >
                     {TAMBORES[0].frase}
                   </p>
@@ -982,7 +980,7 @@ export function TorreLineas() {
                 <p
                   ref={detalleRef}
                   data-torre-slot
-                  className="text-gris-texto max-w-[52ch] font-sans text-[0.9rem] leading-relaxed md:self-end md:justify-self-end"
+                  className="text-gris-texto max-w-[120ch] font-sans text-[0.9rem] leading-relaxed"
                 >
                   {TAMBORES[0].detalle}
                 </p>
