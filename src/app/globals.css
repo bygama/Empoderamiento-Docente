@@ -20,6 +20,10 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  /* Manuscrita: SOLO anotaciones "a mano" en los expedientes (no UI). */
+  --font-hand: var(--font-caveat), "Segoe Script", cursive;
+  /* Máquina de escribir: SOLO texto documental de expedientes (no UI). */
+  --font-typewriter: var(--font-courier-prime), "Courier New", monospace;
 
   /* === Escala tipográfica fluida (mobile → desktop) === */
   --text-display: clamp(2.5rem, 1rem + 5vw, 4.5rem);
@@ -77,6 +81,20 @@ html.has-custom-cursor * {
     transparent 2.5px
   );
   background-size: 22px 22px;
+}
+
+/* Renglones de hoja de expediente (Investigación): rayado horizontal muy
+   tenue derivado del token azul. Mismas reglas que bg-grain-*: no fuerza
+   position ni background-color, solo pinta el rayado. */
+.renglones-papel {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(2.2rem - 1px),
+    color-mix(in srgb, var(--color-azul-principal) 5%, transparent) calc(2.2rem - 1px),
+    color-mix(in srgb, var(--color-azul-principal) 5%, transparent) 2.2rem
+  );
+  background-size: 100% 2.2rem;
 }
 
 /* Riel horizontal sin scrollbar visible (se navega con flecha / drag). */
