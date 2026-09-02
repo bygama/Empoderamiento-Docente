@@ -951,7 +951,12 @@ export function TorreLineas() {
                   // antes lavaban este texto hasta volverlo ilegible. Con
                   // superficie opaca y un borde tenue, el apoyo se lee siempre,
                   // esté donde esté la torre.
-                  className="bg-gris-fondo/92 ring-azul-principal/10 grid gap-5 rounded-2xl px-6 py-6 shadow-[0_18px_50px_-30px_rgb(15_23_42/0.4)] ring-1 backdrop-blur-[2px] md:grid-cols-2 md:gap-10 md:px-8 md:py-7"
+                  // 3fr/2fr y frase con tamaño fluido: la frase (el título
+                  // visual) entra en UNA línea en todo lg, como el rótulo de
+                  // arriba. A dos columnas iguales y 1.5rem las más largas
+                  // (60 caracteres) se partían en dos; el detalle de la derecha
+                  // baja un escalón (pedido de Mateo, 2026-09-02).
+                  className="bg-gris-fondo/92 ring-azul-principal/10 grid gap-5 rounded-2xl px-6 py-6 shadow-[0_18px_50px_-30px_rgb(15_23_42/0.4)] ring-1 backdrop-blur-[2px] md:grid-cols-[3fr_2fr] md:gap-10 md:px-8 md:py-7"
                 >
                 <div>
                   <p
@@ -964,7 +969,11 @@ export function TorreLineas() {
                   <p
                     ref={fraseRef}
                     data-torre-slot
-                    className="text-verde-concepto-texto font-display mt-2 max-w-[26ch] text-[1.3rem] leading-snug font-bold md:text-[1.5rem]"
+                    className="text-verde-concepto-texto font-display mt-2 leading-snug font-bold"
+                    // Medido con Manrope 700: la frase más larga mide 29.9 veces
+                    // el tamaño de fuente, y la columna va de 504px (1024) a
+                    // 658px (≥1280): 16px…20.8px deja 5% de aire.
+                    style={{ fontSize: "clamp(1rem, 0.1rem + 1.2vw, 1.3rem)" }}
                   >
                     {TAMBORES[0].frase}
                   </p>
@@ -972,7 +981,7 @@ export function TorreLineas() {
                 <p
                   ref={detalleRef}
                   data-torre-slot
-                  className="text-gris-texto max-w-[52ch] font-sans text-[0.95rem] leading-relaxed md:self-end md:justify-self-end md:text-[1.02rem]"
+                  className="text-gris-texto max-w-[52ch] font-sans text-[0.9rem] leading-relaxed md:self-end md:justify-self-end"
                 >
                   {TAMBORES[0].detalle}
                 </p>
