@@ -140,11 +140,10 @@ export function EnfoqueTransformacion() {
               : "flex min-h-[80svh] flex-col"
           }
         >
-          <div className="mx-auto w-full max-w-screen-xl px-5 pt-24 md:px-10 md:pt-28">
-            <p className="text-gris-texto font-mono text-[0.7rem] tracking-[0.14em] uppercase">
-              Nuestro enfoque · Por qué no es una capacitación tradicional
-            </p>
-          </div>
+          {/* Sin rótulo («Nuestro enfoque · Por qué no es una capacitación
+              tradicional»): la escena se explica sola y el rótulo le quitaba
+              aire a la palabra (pedido de Mateo, 2026-09-02). El sr-only de
+              arriba sigue diciendo la idea para AT. */}
 
           {live ? (
             <>
@@ -152,10 +151,12 @@ export function EnfoqueTransformacion() {
               <div aria-hidden="true" className="relative min-h-0 flex-1">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                   <span className="relative block whitespace-nowrap">
-                    {/* La tacha: cruza la palabra antes del estallido. */}
+                    {/* La tacha: cruza la palabra antes del estallido. Más
+                        fina (0.06em, como en el fallback): a 0.09em sobre
+                        una palabra de ~90px era una barra de 8px. */}
                     <span
                       data-enf-tacha
-                      className="bg-azul-medio absolute top-1/2 left-[-2%] h-[0.09em] w-[104%] origin-left rounded-full"
+                      className="bg-azul-medio absolute top-1/2 left-[-2%] h-[0.06em] w-[104%] origin-left rounded-full"
                       style={{ fontSize: "clamp(2.4rem, 0.6rem + 6.4vw, 5.6rem)" }}
                     />
                     {Array.from(PALABRA_VIEJA).map((ch, i) => (
