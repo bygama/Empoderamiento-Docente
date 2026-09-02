@@ -53,12 +53,15 @@ const CHIP_ANGS = [40, 160, 280];
 // Giro total de la torre a lo largo del recorrido. Antes 560°: un scroll
 // rápido volvía molinete el texto. Con 300° cada estación gira ~50°.
 const GIRO_TOTAL = 300;
-// Deriva en reposo (grados por ms). Corre en SENTIDO DE LECTURA: las letras
-// del frente van hacia la izquierda, como un letrero luminoso.
-const DERIVA = 0.0025;
+// SIN deriva en reposo. Había un giro continuo en sentido de lectura
+// (2.5°/s, "letrero luminoso"); con el scroll frenado durante el armado uno
+// se queda mirando el tambor y la deriva se llevaba el principio del nombre
+// hacia la izquierda: a los pocos segundos se leía «…OLLO PROFESIONAL».
+// Ahora el tambor gira SOLO con el scroll y se queda donde lo dejás, con el
+// nombre alineado (pedido de Mateo, 2026-09-02).
 // Ángulo donde se planta la PRIMERA letra del nombre cuando llegás a una
 // estación: al borde izquierdo del arco legible, para leer desde el
-// principio. Al girar, el resto del nombre entra por la derecha.
+// principio. Al scrollear, el resto del nombre entra por la derecha.
 const ALINEA = -46;
 
 /** `angs[j]` = ángulo de la rebanada j (no hay paso uniforme, ver abajo). */
@@ -184,26 +187,22 @@ export function TorreLineas() {
 
     const n = TAMBORES.length;
     const ocultos: boolean[] = TAMBORES.map(() => false);
-    let deriva = 0;
     let activo = 0;
     let enCuadro = false;
     const avance = { p: 0 };
 
-    // FASE por tambor: al llegar a la estación i (p = i/(n-1)), sin deriva,
-    // la primera letra del nombre cae en ALINEA. Reemplaza al desfase
-    // arbitrario de antes (i·47), que te dejaba leyendo desde la mitad.
+    // FASE por tambor: al llegar a la estación i (p = i/(n-1)) la primera
+    // letra del nombre cae en ALINEA. Reemplaza al desfase arbitrario de
+    // antes (i·47), que te dejaba leyendo desde la mitad.
     // El giro por scroll va con signo NEGATIVO: bajando, las letras del
     // frente corren hacia la izquierda, que es el sentido en que se lee.
     // Antes iba al revés y el nombre te escapaba; se leía mejor subiendo.
     const fase = TAMBORES.map(
       (_, i) => ALINEA - geo.drums[i].angs[0] + (i / (n - 1)) * GIRO_TOTAL,
     );
-    // Asentado: la deriva acumulada corre la fase, así que al cambiar de
-    // estación el tambor que llega se acomoda (tween) hasta mostrar su
-    // nombre desde la primera letra. Un ajuste por tambor.
-    const ajuste: number[] = TAMBORES.map(() => 0);
-    const rotDe = (i: number, pv: number) =>
-      fase[i] - pv * GIRO_TOTAL + deriva + ajuste[i];
+    // Sin deriva no hace falta asentado: en cada estación el nombre queda
+    // alineado por construcción.
+    const rotDe = (i: number, pv: number) => fase[i] - pv * GIRO_TOTAL;
 
     // ARMADO: el primer tambor se CONSTRUYE sobre la superficie que emerge
     // del blanco. Nace como una LÍNEA recta legible (el nombre entero,
@@ -254,7 +253,6 @@ export function TorreLineas() {
     // 2.65 s en total (antes 4.9), y el rollo arranca apenas la línea terminó
     // de aparecer: con el scroll frenado mientras se arma, la espera entre
     // «aparece» y «se enrolla» era lo que más se sentía.
-    // Recién con el rollo cerrado arranca la deriva (ver `tick`).
     const build = { velo: 1, linea: 0, apoyo: 0, rollo: 0, foto: 0, chips: 0 };
     let buildAnim: gsap.core.Timeline | null = null;
     // Transform final de cada tambor escrito UNA vez (i>0: al primer frame;
@@ -402,8 +400,8 @@ export function TorreLineas() {
           if (foto) foto.style.visibility = "";
           ocultos[i] = false;
         }
-        // Giro: fase del tambor + scroll (en sentido de lectura) + deriva +
-        // asentado. El latido (pulsos) es el "beat" elástico cuando llega.
+        // Giro: fase del tambor + scroll (en sentido de lectura). El latido
+        // (pulsos) es el "beat" elástico cuando llega.
         const rot = rotDe(i, pv);
         const lat = 1 + (pulsos.current[i] || 0);
         // Solo el PRIMER tambor se arma: es el que recibe el deslumbre. Los
@@ -541,20 +539,6 @@ export function TorreLineas() {
             pulsos.current[act] = beat.v;
           },
         });
-        // Asentado: la fase ya deja el nombre alineado en la estación, pero
-        // la deriva lo fue corriendo. Se compensa con el giro más corto
-        // (módulo 360) para que, al frenar en este tambor, se lea desde la
-        // primera letra. Se tweenea, nunca se salta.
-        const delta = ((((-deriva - ajuste[act]) % 360) + 540) % 360) - 180;
-        const aj = { v: ajuste[act] };
-        gsap.to(aj, {
-          v: ajuste[act] + delta,
-          duration: 1.2,
-          ease: "power3.out",
-          onUpdate: () => {
-            ajuste[act] = aj.v;
-          },
-        });
         const t = TAMBORES[act];
         gsap
           .timeline()
@@ -568,12 +552,13 @@ export function TorreLineas() {
       }
     };
 
-    // Deriva constante mientras la torre está en viewport. Durante el armado
-    // no corre: la línea tiene que quedarse QUIETA para leerse, y pintar()
-    // ya lo llama la línea de tiempo del armado.
-    const tick = (_t: number, dt: number) => {
+    // Repintado por frame mientras la torre está en cuadro: el latido
+    // (pulsos) se anima por su cuenta y tiene que verse aunque el scroll
+    // esté quieto. Durante el armado no corre: pintar() ya lo llama la
+    // línea de tiempo del armado. (La deriva en reposo que corría acá se
+    // quitó; ver el comentario sobre ALINEA.)
+    const tick = () => {
       if (!enCuadro || buildAnim) return;
-      deriva -= dt * DERIVA;
       pintar();
     };
     gsap.ticker.add(tick);
