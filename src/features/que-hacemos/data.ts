@@ -1,9 +1,10 @@
 // Contenido de Qué hacemos (sitemap pág. 02: Hero → Nuestro enfoque → Cómo
 // trabajamos → Líneas de acción → Niveles → Proyectos y aplicaciones → Cierre).
 //
-// Las 7 líneas de acción usan el COPY OFICIAL del cliente — misma fuente que
+// Las líneas de acción usan el COPY OFICIAL del cliente — misma fuente que
 // LineasAccion del home (frase = línea destacada en verde, detalle = la
 // descripción). Si el cliente actualiza ese copy, cambiarlo en los dos lados.
+// La torre las publica fusionadas en cinco (ver TAMBORES).
 // Enfoque (diferenciales de Dani jun 2026), pasos de trabajo, niveles y
 // proyectos → armados desde el brief y el modelo conceptual, PENDIENTES de
 // validación fina con cliente.
@@ -21,14 +22,22 @@ export type Tambor = {
   /** Foto que flota dentro del tambor (placeholder del pool de marca). */
   foto: string;
   /**
-   * Acento de la estación. Las 7 estaban en el mismo navy y el viaje se
+   * Acento de la estación. Todas estaban en el mismo navy y el viaje se
    * sentía monocromo; con color propio se nota que avanzás. Solo paleta de
    * marca y NUNCA naranja: está reservado a los CTA.
    */
   acento: string;
 };
 
-// La torre = exactamente las 7 líneas de acción del sitemap.
+// La torre publica CINCO líneas: las 7 del copy oficial fusionadas de a
+// pares donde el propio contenido ya las juntaba (decisión de Mateo,
+// 2026-09-02; ver docs/content/arquitectura-que-hacemos.md §6):
+//   02 = Materiales + Currículo  (como en «Proyectos y aplicaciones»)
+//   05 = Fortalecimiento + Sistemas educativos (como en el doc maestro: sus
+//        frases eran casi la misma)
+// Los DOS párrafos de detalle fusionados son una síntesis de las oraciones
+// oficiales, no copy nuevo: VALIDAR con ED. Títulos y frases se conservan
+// literales. El home sigue con las 7 áreas hasta que ED valide la taxonomía.
 export const TAMBORES: Tambor[] = [
   {
     id: "desarrollo-profesional",
@@ -41,24 +50,18 @@ export const TAMBORES: Tambor[] = [
     acento: "var(--color-azul-principal)",
   },
   {
-    id: "materiales",
-    tambor: "Materiales",
-    titulo: "Materiales para la resignificación de las matemáticas",
-    frase: "Cada tarea puede transformar la relación con las matemáticas",
+    // Fusión Materiales + Currículo. Se conserva la frase de currículo; la
+    // de materiales («Cada tarea puede transformar la relación con las
+    // matemáticas») queda fuera de la torre.
+    id: "curriculo-materiales",
+    tambor: "Currículo y materiales",
+    titulo: "Currículo y materiales para la resignificación de las matemáticas",
+    frase: "La coherencia hace posible el aprendizaje",
+    // VALIDAR con ED: síntesis de los dos párrafos oficiales.
     detalle:
-      "Diseñamos materiales que median la relación entre docentes, matemáticas y aprendizaje, generando rupturas productivas que invitan a explorar, argumentar y resignificar.",
+      "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido, y materiales que median la relación entre docentes, matemáticas y aprendizaje e invitan a explorar, argumentar y resignificar.",
     foto: "/metodo/disenamos.webp",
     acento: "var(--color-verde-concepto-texto)",
-  },
-  {
-    id: "curriculo",
-    tambor: "Currículo",
-    titulo: "Currículo y arquitectura pedagógica",
-    frase: "La coherencia hace posible el aprendizaje",
-    detalle:
-      "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido para orientar trayectorias de aprendizaje.",
-    foto: "/quienes-somos/origen-03-pregunta.webp",
-    acento: "var(--color-azul-medio)",
   },
   {
     id: "evaluacion",
@@ -68,7 +71,7 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Desarrollamos sistemas de evaluación que generan evidencia situada para comprender los aprendizajes y orientar decisiones educativas.",
     foto: "/metodo/evaluamos.webp",
-    acento: "var(--color-azul-principal)",
+    acento: "var(--color-azul-medio)",
   },
   {
     id: "investigacion",
@@ -78,27 +81,21 @@ export const TAMBORES: Tambor[] = [
     detalle:
       "Investigamos las prácticas educativas para producir conocimiento, compartirlo con la comunidad científica y seguir enriqueciendo el campo de la Matemática Educativa.",
     foto: "/hero/hero-2.webp",
-    acento: "var(--color-verde-concepto-texto)",
+    acento: "var(--color-azul-principal)",
   },
   {
+    // Fusión Fortalecimiento institucional + Transformación de sistemas
+    // educativos. «Fortalecimiento» en el tambor: «Sistemas educativos» ya
+    // forzaba la letra más chica al cerrar la vuelta.
     id: "fortalecimiento",
     tambor: "Fortalecimiento",
-    titulo: "Fortalecimiento institucional",
+    titulo: "Fortalecimiento de sistemas educativos",
     frase: "La continuidad hace posible las transformaciones",
+    // VALIDAR con ED: síntesis de los dos párrafos oficiales.
     detalle:
-      "Fortalecemos capacidades institucionales mediante el diseño de políticas, estrategias y procesos que favorecen transformaciones coherentes, sostenibles y perdurables.",
+      "Fortalecemos capacidades institucionales con políticas, estrategias y procesos que favorecen transformaciones coherentes y sostenibles, integrando las dimensiones del cambio educativo en soluciones pertinentes para cada realidad.",
     foto: "/hero/hero-6.webp",
-    acento: "var(--color-azul-medio)",
-  },
-  {
-    id: "sistemas",
-    tambor: "Sistemas educativos",
-    titulo: "Transformación de sistemas educativos",
-    frase: "La articulación hace posible las transformaciones sistémicas",
-    detalle:
-      "Integramos todas las dimensiones del cambio educativo para construir soluciones coherentes, sostenibles y pertinentes para cada realidad.",
-    foto: "/hero/hero-9.webp",
-    acento: "var(--color-azul-principal)",
+    acento: "var(--color-verde-concepto-texto)",
   },
 ];
 
