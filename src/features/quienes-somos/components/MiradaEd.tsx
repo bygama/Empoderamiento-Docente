@@ -19,8 +19,8 @@ if (typeof window !== "undefined") {
  * matemático · 02 Empoderamiento desde el saber · 03 Transformación
  * educativa). El scroll conduce una cámara sobria (translate + scale del
  * escenario) que se acerca a cada nodo; su texto se revela en la zona
- * derecha de lectura y desde el nodo emergen FICHAS conceptuales que suben
- * con deriva lateral, sincronizadas con el scrub (reversibles). Al final la
+ * derecha de lectura y bajo el nodo se apilan FICHAS conceptuales que entran
+ * de a una con el scroll (reversibles) y se quedan quietas. Al final la
  * cámara regresa al mapa completo, el núcleo se convierte en la SÍNTESIS y
  * las líneas se ramifican en una red incipiente (puntos nuevos) que hace de
  * puente hacia «La red tiene nombres» (ImpulsanEd, intacta).
@@ -36,7 +36,7 @@ if (typeof window !== "undefined") {
  * fichas son <li> sin semántica de botón ni cursor pointer.
  *
  * Gate por viewport (`live`): la escena usa geometría proporcional al ancho
- * (zona de lectura en 32vw, carril de fichas en ~32vw, cámara con tx en
+ * (zona de lectura en 32vw, pila de fichas bajo el nodo, cámara con tx en
  * fracciones de W) pensada para desktop — en móvil/tablet los textos se
  * pisaban y recortaban contra el borde. Bajo 1024px o sin hover se sirve el
  * MISMO layout estático del fallback de reduced-motion, ahora por clases
@@ -207,6 +207,7 @@ export function MiradaEd() {
       const qa = (sel: string) => gsap.utils.toArray<HTMLElement>(sel, root);
 
       const stage = q("[data-stage]");
+      const stageLineas = q("[data-stage-lineas]");
       const centro = q("[data-centro]");
       const sintesis = q("[data-sintesis]");
       const puentes = qa("[data-puente]");
@@ -223,7 +224,9 @@ export function MiradaEd() {
       const arcos = gsap.utils.toArray<SVGPathElement>("[data-arco]", root);
       const ramas = gsap.utils.toArray<SVGPathElement>("[data-rama]", root);
       const ramdots = gsap.utils.toArray<SVGCircleElement>("[data-ramdot]", root);
-      if (!stage || !centro || !sintesis || detalles.length !== 3) return;
+      if (!stage || !stageLineas || !centro || !sintesis || detalles.length !== 3) return;
+      // Las dos capas del escenario reciben la MISMA cámara (ver el JSX).
+      const capasCamara = [stageLineas, stage];
 
       // clientWidth (sin scrollbar): la cámara aterriza donde el usuario ve.
       const W = () => document.documentElement.clientWidth;
@@ -247,7 +250,7 @@ export function MiradaEd() {
       );
 
       // ── Estados iniciales (solo con motion) ──────────────────────────────
-      gsap.set(stage, { transformOrigin: "0 0" });
+      gsap.set(capasCamara, { transformOrigin: "0 0" });
       gsap.set([centro, sintesis], { position: "absolute", inset: 0 });
       gsap.set(sintesis, { autoAlpha: 0 });
       const fogInit = q("[data-sintesis-fog]");
@@ -276,47 +279,59 @@ export function MiradaEd() {
       gsap.set(strikes, { scaleX: 0, transformOrigin: "left center" });
       gsap.set(qa("[data-afirma-underline]"), { scaleX: 0, transformOrigin: "left center" });
 
-      // Capas: el sistema (stage) por encima de las fichas —las fichas
-      // pasan POR DETRÁS del label del nodo, nunca lo tapan— y las zonas
-      // de contenido siempre arriba de todo.
+      // Capas: líneas (3) < fichas (5) < nodos (10) < contenido (20). Las
+      // fichas tapan limpias cualquier línea que cruce por detrás y siguen
+      // pasando POR DETRÁS del rótulo del nodo. Antes el escenario era UNA
+      // capa por encima de las fichas y las líneas se dibujaban sobre ellas
+      // (se veía como bug; Mateo, 2026-09-02).
+      gsap.set(stageLineas, { zIndex: 3 });
       gsap.set(stage, { zIndex: 10 });
       gsap.set(fichaGrupos, { zIndex: 5 });
       gsap.set([...detalles, centro, sintesis], { zIndex: 20 });
 
-      // Fichas: capas absolutas en el CARRIL central-izquierdo (zona B),
-      // entre el nodo activo y la zona de lectura derecha. Un solo carril
-      // con desfasajes fijos por índice (nada aleatorio): las variaciones
-      // son chicas para que la corriente no se vea rígida, pero nunca tan
-      // grandes como para que dos fichas se choquen de costado.
-      const LANE_VW = [31, 33.6, 32.2, 34.4, 31.6];
-      fichaGrupos.forEach((g) => {
-        gsap.set(g, { position: "absolute", inset: 0, pointerEvents: "none" });
-        const items = gsap.utils.toArray<HTMLElement>("[data-ficha]", g);
-        items.forEach((f, k) => {
-          gsap.set(f, {
-            position: "absolute",
-            left: `${LANE_VW[k] ?? 32}vw`,
-            top: 0,
-            maxWidth: "11.5rem",
-            rotation: k % 2 === 0 ? -0.8 : 1,
-            y: H() * 0.86,
-            scale: 0.94,
-            autoAlpha: 0,
-          });
+      // Fichas: PILA FIJA bajo el nodo activo (02-sep). Antes eran una
+      // "corriente" que nacía abajo, subía por un carril y salía por arriba,
+      // atada al scroll: a ritmo de lectura quedaban congeladas a medias, la
+      // huella al 10% parecía una ficha rota y el carril cruzaba la altura
+      // del rótulo del nodo (una ficha se montaba sobre «Transformación
+      // educativa»). Ahora cada grupo es una columna estática que arranca
+      // debajo del rótulo (la cámara deja el nodo en CAMARA[i]); las fichas
+      // entran de a una, con el scroll, y se QUEDAN hasta que la fase
+      // cierra. Nada se mueve mientras se lee y nada cruza nada: a la
+      // derecha de la pila queda la zona de lectura (desde ~0.62W) y el
+      // único nodo en pantalla durante una fase es el activo.
+      fichaGrupos.forEach((g, i) => {
+        const cam = CAMARA[i];
+        gsap.set(g, {
+          position: "absolute",
+          // right/bottom explícitos, no el shorthand inset: GSAP aplica
+          // `inset: auto` después de left/top y los pisa (medido: la pila
+          // quedaba en la esquina 0,0).
+          right: "auto",
+          bottom: "auto",
+          left: cam.tx * W() + 28,
+          top: cam.ty * H() + 54,
+          width: "auto",
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          flexWrap: "nowrap",
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
+          gap: "0.55rem",
+          pointerEvents: "none",
+        });
+        gsap.set(gsap.utils.toArray<HTMLElement>("[data-ficha]", g), {
+          position: "static",
+          maxWidth: "12.5rem",
+          autoAlpha: 0,
+          y: 12,
         });
       });
-      // RESPIRACIÓN: deriva vertical sutil e infinita de cada capa de fichas,
-      // independiente del scrub. Al ritmo real de lectura (una muesca de
-      // rueda + pausa) las fichas pasan buena parte del tiempo detenidas;
-      // sin esto se sienten "muertas". Anima al grupo padre (no al `y` de
-      // cada ficha), así no pelea con la corriente scrubbed.
-      fichaGrupos.forEach((g, i) => {
-        gsap.fromTo(
-          g,
-          { y: -5 },
-          { y: 5, duration: 3.2 + i * 0.5, ease: "sine.inOut", yoyo: true, repeat: -1 },
-        );
-      });
+      // (Sin "respiración": el vaivén infinito de ±5px del grupo, pensado
+      // para que las fichas detenidas no se sintieran muertas, sobre una
+      // ficha translúcida reforzaba la sensación de glitch. Con fichas
+      // opacas y salidas cortas, quietas están bien.)
 
       // Nodos: nacen apagados y chicos; líneas sin dibujar; ramas ocultas.
       // El origin va en el centro del PUNTO (7px): al escalar, el punto
@@ -411,7 +426,7 @@ export function MiradaEd() {
 
         // Cámara: el nodo activo aterriza en la zona izquierda de lectura.
         tl.to(
-          stage,
+          capasCamara,
           {
             scale: cam.scale,
             x: () => cam.tx * W() - cam.scale * (nodo.x / 100) * W(),
@@ -455,41 +470,13 @@ export function MiradaEd() {
         const under = detalles[i].querySelector<HTMLElement>("[data-afirma-underline]");
         if (under) tl.to(under, { scaleX: 1, duration: 0.45, ease: "power2.out" }, S + 0.9);
 
-        // Fichas — CORRIENTE ASCENDENTE GUIADA. Una sola trayectoria
-        // continua en tres tramos CONTIGUOS de la misma propiedad (nunca
-        // solapados → posición continua, reversible y determinista):
-        //   1. nace cerca del nodo (0.86H) y sube desacelerando (power1.out
-        //      termina con pendiente 0: empalma suave con el tramo lento);
-        //   2. carril de lectura (0.58H→0.44H): avance casi horizontal, es
-        //      la meseta legible — se frena solo si el scroll se frena;
-        //   3. sale acelerando hacia arriba-izquierda (power1.in arranca
-        //      con pendiente 0) mientras decae la opacidad.
-        // El paso entre fichas mantiene 1 legible + 1 entrando + 1 en
-        // disolución, nunca dos con alpha 1 (meseta = STEP, se tocan justo
-        // en el borde).
-        //
-        // CORREDOR ANCHO (24-jul): la meseta recorría 0.55H→0.50H, apenas 45px
-        // — menos que el alto de una ficha. Cuando la siguiente aterrizaba en
-        // 0.55H, la anterior seguía a 0.50H y se PISABAN (se veía como bug).
-        // Ahora el tramo de lectura baja hasta 0.44H: en el peor cruce quedan
-        // ~0.17H de separación y ninguna se monta sobre otra.
-        //
-        // La HUELLA de cada principio no sale: estaciona tenue (0.10) junto al
-        // nodo y se apaga antes del cambio de cámara. Estacionaba en 0.56H —
-        // es decir, JUSTO donde aterriza cada ficha nueva—, así que quedaba
-        // debajo de todas las que venían después. Ahora baja a 0.66H y se
-        // corre más a la izquierda (-0.13W): queda fuera del carril, abajo del
-        // nodo. Todo termina antes de S+2.15.
-        // Calibrado para RITMO DE LECTURA (una muesca de rueda + pausa), no
-        // solo scroll continuo: vidas largas (0.68 u ≈ 3 muescas) y salida
-        // como disolución lenta (D3 0.33) en vez de látigo. La meseta de
-        // alpha plena (0.24) sigue siendo ≤ STEP: solo una legible a la vez.
+        // Fichas: entran de a una en la pila, con el scroll, y se quedan.
+        // Entrada corta (0.12 u ≈ 65px, menos de una muesca de rueda): como
+        // mucho una a medias en cualquier parada, y nunca translúcida por
+        // mucho scroll. Se apagan juntas cuando se repliega la lectura
+        // (S+1.88), antes del cambio de cámara (S+2.15).
         const E0 = 0.4;
         const STEP = 0.24;
-        const D1 = 0.14;
-        const D2 = 0.21;
-        const D3 = 0.33; // VIDA = D1+D2+D3 = 0.68
-        const HUELLA_K = [0, 3, 2]; // Construir estrategias · Convicción para transformar · Justicia social
         const items = gsap.utils.toArray<HTMLElement>("[data-ficha]", fichaGrupos[i]);
         // CLAMP de pre-nacimiento: al abrirse la fase se re-asegura el estado
         // oculto de TODAS sus fichas. El set inicial del mount puede ser
@@ -497,49 +484,11 @@ export function MiradaEd() {
         // sin este clamp, las fichas que esperan turno quedaban VISIBLES,
         // clavadas en su punto de nacimiento (el síntoma "trabado" del
         // 23-jul). Dentro del timeline es reversible y se auto-cura.
-        tl.set(items, { autoAlpha: 0, x: 0, scale: 0.94, y: () => H() * 0.86 }, S + 0.02);
+        tl.set(items, { autoAlpha: 0, y: 12 }, S + 0.02);
         items.forEach((f, k) => {
-          const e = S + E0 + k * STEP;
-          const esHuella = k === HUELLA_K[i];
-          // Tramo 1 — nacimiento: sube desacelerando hacia el carril.
-          tl.fromTo(
-            f,
-            { y: () => H() * 0.86 },
-            { y: () => H() * 0.58, duration: D1, ease: "power1.out" },
-            e,
-          );
-          // Tramo 2 — lectura: casi una pausa, sin detenerse de golpe.
-          tl.to(f, { y: () => H() * 0.44, duration: D2, ease: "none" }, e + D1);
-          // Tramo 3 — salida (la huella estaciona ABAJO del nodo, fuera del
-          // carril: si estaciona en el carril, todas las que siguen le caen
-          // encima).
-          tl.to(
-            f,
-            {
-              y: () => H() * (esHuella ? 0.66 : 0.1),
-              duration: D3,
-              ease: esHuella ? "power1.out" : "power1.in",
-            },
-            e + D1 + D2,
-          );
-          // Deriva lateral: entra hacia la derecha, sale hacia la izquierda.
-          tl.to(f, { x: () => W() * 0.02, duration: D1 + D2, ease: "power1.out" }, e);
-          tl.to(
-            f,
-            { x: () => W() * (esHuella ? -0.13 : -0.025), duration: D3, ease: "power1.in" },
-            e + D1 + D2,
-          );
-          // Presencia: escala y opacidad en rampas disjuntas (sin saltos).
-          tl.fromTo(f, { scale: 0.94 }, { scale: 1, duration: D1, ease: "power1.out" }, e);
-          tl.to(f, { autoAlpha: 1, duration: 0.11, ease: "none" }, e);
-          if (esHuella) {
-            tl.to(f, { autoAlpha: 0.1, duration: D3, ease: "none" }, e + D1 + D2);
-            tl.to(f, { autoAlpha: 0, duration: 0.1, ease: "none" }, S + 2.02);
-          } else {
-            tl.to(f, { scale: 0.97, duration: D3, ease: "power1.in" }, e + D1 + D2);
-            tl.to(f, { autoAlpha: 0, duration: D3, ease: "none" }, e + D1 + D2);
-          }
+          tl.to(f, { autoAlpha: 1, y: 0, duration: 0.12, ease: "power2.out" }, S + E0 + k * STEP);
         });
+        tl.to(items, { autoAlpha: 0, y: -8, duration: 0.18, ease: "power1.in" }, S + 1.88);
 
         // Salida: lectura se repliega; el halo del activo se apaga y el nodo
         // queda como memoria (recorrido).
@@ -553,7 +502,7 @@ export function MiradaEd() {
       // absoluto. El sistema queda como huella: puntos con su acento,
       // labels casi apagados, líneas finísimas (la naranja no cruza más el
       // texto a plena intensidad).
-      tl.to(stage, { x: 0, y: 0, scale: 1, duration: 0.6 }, 7.75 + AIRE_TITULO);
+      tl.to(capasCamara, { x: 0, y: 0, scale: 1, duration: 0.6 }, 7.75 + AIRE_TITULO);
       tl.to(nodoCores, { autoAlpha: 0.8, duration: 0.35 }, 8.05 + AIRE_TITULO);
       tl.to(nodoLabels, { autoAlpha: 0.18, duration: 0.35 }, 8.05 + AIRE_TITULO);
       tl.to(nodoNums, { autoAlpha: 0.35, duration: 0.35 }, 8.05 + AIRE_TITULO);
@@ -619,11 +568,13 @@ export function MiradaEd() {
             (live ? "sticky top-0 h-[100svh] overflow-hidden" : "")
           }
         >
-          {/* ── Escenario decorativo: constelación (líneas + nodos) ─────────
-              Es la capa que la "cámara" recorre. Decorativa: el contenido
-              real vive en los bloques de texto de abajo. ── */}
+          {/* ── Escenario decorativo: constelación en DOS capas con la misma
+              cámara. Las líneas van DEBAJO de las fichas y los nodos ENCIMA:
+              una ficha tapa limpia cualquier línea que cruce por detrás y
+              sigue pasando por detrás del rótulo del nodo. Decorativa: el
+              contenido real vive en los bloques de texto de abajo. ── */}
           <div
-            data-stage
+            data-stage-lineas
             aria-hidden="true"
             className={
               "absolute inset-0 will-change-transform motion-reduce:hidden" +
@@ -679,7 +630,15 @@ export function MiradaEd() {
                 />
               ))}
             </svg>
-
+          </div>
+          <div
+            data-stage
+            aria-hidden="true"
+            className={
+              "absolute inset-0 will-change-transform motion-reduce:hidden" +
+              (live ? "" : " hidden")
+            }
+          >
             {/* Nodos (wrapper posiciona; el core anima — GSAP no pisa el
                 translate de centrado) */}
             {/* Anclaje IZQUIERDO: el punto queda sobre la coordenada del nodo
@@ -821,10 +780,10 @@ export function MiradaEd() {
                 </div>
               </div>
 
-              {/* Fichas conceptuales: capas de pensamiento que nacen del nodo
-                  activo y suben. Sin semántica interactiva. Fondo sólido: si
-                  una línea del mapa cruza por detrás, la ficha la tapa limpia
-                  (con /90 se transparentaba). */}
+              {/* Fichas conceptuales: se apilan bajo el nodo activo y entran
+                  de a una con el scroll. Sin semántica interactiva. Fondo
+                  sólido: si una línea del mapa cruza por detrás, la ficha la
+                  tapa limpia (con /90 se transparentaba). */}
               <ul
                 data-fichas={i}
                 className={
