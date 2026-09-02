@@ -393,10 +393,15 @@ export function QueHacemosHero() {
     };
   }, [reduced]);
 
+  // overflow-x-clip y NO overflow-hidden: el recorte horizontal sigue haciendo
+  // falta (el titular a 2.75rem se pasa del ancho en pantallas angostas y
+  // generaría scroll lateral), pero el vertical tiene que quedar abierto
+  // para que la luz del portal pueda cruzar el borde inferior y caer sobre
+  // la escena del faro. El polvo de estrellas se recorta solo, en su span.
   return (
     <section
       ref={rootRef}
-      className="relative z-20 isolate flex min-h-svh flex-col justify-center overflow-hidden pt-24 pb-12 text-white"
+      className="relative z-20 isolate flex min-h-svh flex-col justify-center overflow-x-clip pt-24 pb-12 text-white"
       aria-label="Qué hacemos"
       style={
         {
@@ -417,13 +422,21 @@ export function QueHacemosHero() {
           Se conserva el glow verde del botón: es respuesta a la interacción,
           no decorado de fondo. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        {/* Luz que se "carga" con el click: sube desde el botón, abajo. */}
+        {/* Luz que se "carga" con el click: sube desde el botón, abajo.
+            La elipse está centrada en el BORDE INFERIOR del hero y el span
+            sigue una altura entera hacia abajo, sobre la escena del faro.
+            Antes terminaba justo en el borde y la section lo recortaba con
+            overflow-hidden: durante el viaje automático, cuando el borde
+            cruzaba la pantalla, se veía una línea recta —verde arriba,
+            noche abajo— partiendo las dos secciones. Mismo tamaño de
+            elipse que antes (27.5% de un span del doble de alto = 55% del
+            hero), así lo que se ve dentro del hero no cambia. */}
         <span
           data-qh-holdglow
-          className="absolute inset-0 opacity-0"
+          className="absolute inset-x-0 top-0 -bottom-full opacity-0"
           style={{
             background:
-              "radial-gradient(60% 55% at 50% 100%, color-mix(in srgb, var(--color-verde-concepto) 26%, transparent), transparent 72%)",
+              "radial-gradient(60% 27.5% at 50% 50%, color-mix(in srgb, var(--color-verde-concepto) 26%, transparent), transparent 72%)",
           }}
         />
         {/* Polvo de estrellas del primer viewport + estrella fugaz: detalle
