@@ -507,7 +507,9 @@ export function QueHacemosHeroFaro() {
       // De ese blanco nace la torre (TorreLineas arranca con su propio velo
       // blanco y lo disuelve por tiempo). Como es un plano uniforme, no
       // puede despegarse de la linterna: no vuelve la "segunda esfera".
-      tl.to("[data-velo-blanco]", { opacity: 1, duration: 0.04, ease: "power1.in" }, despues(0.96));
+      // Sube largo y en seno (no acelerando hasta el final): el blanco llega
+      // como una sobreexposición que crece, no como un golpe.
+      tl.to("[data-velo-blanco]", { opacity: 1, duration: 0.07, ease: "sine.inOut" }, despues(0.93));
 
       // Sin círculo de flash aparte: ESE era la "segunda esfera" que
       // aparecía corrida a la izquierda del faro. Estaba anclado a una
