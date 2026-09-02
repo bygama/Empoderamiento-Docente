@@ -237,19 +237,22 @@ export function TorreLineas() {
     // Secuencia (por tiempo, en segundos desde el blanco). Los pasos se
     // SOLAPAN y van en seno: cada cosa empieza a aparecer mientras la
     // anterior todavía termina, así no hay escalones.
-    //   velo  0.0→1.0  el velo blanco se disuelve: la superficie gris y su
+    //   velo  0.0→1.2  el velo blanco se disuelve: la superficie gris y su
     //                  trama de puntos EMERGEN del blanco (el ojo descansa)
-    //   linea 0.6→1.0  el nombre en UNA línea, quieto, legible
-    //   apoyo 0.9→1.4  la tarjeta de apoyo abajo (nombre arriba, explicación
+    //   linea 0.7→1.2  el nombre en UNA línea, quieto, legible
+    //   apoyo 1.0→1.5  la tarjeta de apoyo abajo (nombre arriba, explicación
     //                  abajo, antes de que nada gire)
-    //   rollo 1.2→2.2  la línea se enrolla hasta el tubo y crece a escala 1
-    //   foto  1.7→2.3  el disco nace en el centro cuando ya hay "adentro"
-    //   chips 2.25→2.65 las frases sobre la banda, con el tubo YA cerrado:
+    //   rollo 1.4→3.0  la línea se enrolla hasta el tubo y crece a escala 1,
+    //                  al ritmo ORIGINAL (1.6 s): en 1.0 s se leía como un
+    //                  barrido hacia la izquierda, no como una transformación
+    //   foto  2.2→3.0  el disco nace en el centro cuando ya hay "adentro"
+    //   chips 3.05→3.65 las frases sobre la banda, con el tubo YA cerrado:
     //                  mientras se enrolla el div no gira, y un chip que
     //                  asome antes aparece en otro ángulo y salta al cerrar
-    // 2.65 s en total (antes 4.9), y el rollo arranca apenas la línea terminó
-    // de aparecer: con el scroll frenado mientras se arma, la espera entre
-    // «aparece» y «se enrolla» era lo que más se sentía.
+    // 3.65 s en total (antes 4.9): se acortaron las esperas (velo, línea),
+    // no la transformación. El scroll hacia abajo queda frenado hasta el
+    // final (onComplete): se probó soltarlo al cerrar el tubo y no gustó,
+    // la animación tiene que terminar antes de que el scroll vuelva.
     const build = { velo: 1, linea: 0, apoyo: 0, rollo: 0, foto: 0, chips: 0 };
     let buildAnim: gsap.core.Timeline | null = null;
     // Transform final de cada tambor escrito UNA vez (i>0: al primer frame;
@@ -270,7 +273,7 @@ export function TorreLineas() {
     // torre de viaje con el tambor a medio enrollar, o se pasaba de largo.
     // Ahora, al entrar desde arriba: se clava el scroll al comienzo de la
     // zona (eso también corta la inercia de Lenis) y se tragan la rueda y
-    // las teclas que BAJAN; recién cuando el tambor cerró y empezó a girar
+    // las teclas que BAJAN; recién cuando terminó el armado entero
     // (onComplete) el scroll vuelve. Hacia ARRIBA queda libre (pedido de
     // Mateo, 2026-09-02): quien se arrepiente vuelve al faro, y al cruzar
     // el borde onLeaveBack rebobina y suelta. Entrando desde abajo no se
@@ -329,12 +332,12 @@ export function TorreLineas() {
             liberar();
           },
         })
-        .to(build, { velo: 0, duration: 1.0, ease: "sine.inOut" }, 0)
-        .to(build, { linea: 1, duration: 0.4, ease: "sine.out" }, 0.6)
-        .to(build, { apoyo: 1, duration: 0.5, ease: "sine.out" }, 0.9)
-        .to(build, { rollo: 1, duration: 1.0, ease: "power2.inOut" }, 1.2)
-        .to(build, { foto: 1, duration: 0.6, ease: "power2.out" }, 1.7)
-        .to(build, { chips: 1, duration: 0.4, ease: "power2.out" }, 2.25);
+        .to(build, { velo: 0, duration: 1.2, ease: "sine.inOut" }, 0)
+        .to(build, { linea: 1, duration: 0.5, ease: "sine.out" }, 0.7)
+        .to(build, { apoyo: 1, duration: 0.5, ease: "sine.out" }, 1.0)
+        .to(build, { rollo: 1, duration: 1.6, ease: "power2.inOut" }, 1.4)
+        .to(build, { foto: 1, duration: 0.8, ease: "power2.out" }, 2.2)
+        .to(build, { chips: 1, duration: 0.6, ease: "power2.out" }, 3.05);
     };
     // Rebobinar deshace SOLO el armado (velo de vuelta a blanco, tambor a
     // cero): la visibilidad del escenario la maneja el trigger de la zona
