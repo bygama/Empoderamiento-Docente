@@ -110,10 +110,21 @@ export function CaminoDeTrabajo() {
               : "flex flex-col"
           }
         >
-          <div className="mx-auto flex w-full max-w-screen-xl items-baseline justify-between px-5 pt-24 md:px-10 md:pt-28">
-            <p className="text-gris-texto font-mono text-[0.7rem] tracking-[0.14em] uppercase">
-              Cómo trabajamos · El camino de un proyecto
-            </p>
+          {/* Título en display, como Niveles: antes la sección solo tenía
+              una etiqueta mono de 11px y los verbos de los pasos (80px) se
+              leían como titulares sueltos, sin saber que eran un método. */}
+          <div className="mx-auto flex w-full max-w-screen-xl items-end justify-between px-5 pt-24 md:px-10 md:pt-28">
+            <div>
+              <h2
+                className="font-display text-azul-principal font-extrabold tracking-[-0.02em]"
+                style={{ fontSize: "clamp(1.6rem, 1rem + 1.6vw, 2.15rem)", lineHeight: 1.1 }}
+              >
+                Cómo trabajamos
+              </h2>
+              <p className="text-gris-texto mt-2 font-sans text-[1rem] leading-relaxed">
+                El camino de un proyecto, en cuatro pasos.
+              </p>
+            </div>
             {live && (
               <p className="text-gris-texto/70 font-mono text-[0.7rem] tracking-[0.14em] uppercase">
                 <span ref={contadorRef} className="text-azul-principal">
@@ -131,7 +142,10 @@ export function CaminoDeTrabajo() {
                 {PASOS_TRABAJO.map((paso) => (
                   <article
                     key={paso.n}
-                    className="flex h-full w-screen items-center"
+                    // Anclado ARRIBA, no centrado: al entrar la sección desde
+                    // abajo, título y primer paso llegan juntos en vez de
+                    // media pantalla hueca antes del contenido.
+                    className="flex h-full w-screen items-start pt-8 md:pt-10"
                   >
                     <div className="mx-auto grid w-full max-w-screen-xl items-center gap-10 px-5 md:grid-cols-[1.05fr_1fr] md:px-10">
                       <div className="relative">

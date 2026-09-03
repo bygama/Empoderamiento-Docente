@@ -62,7 +62,11 @@ const ARRANQUE_SVH = 40;
 // subiendo y girando (por scroll, nunca por tiempo: Mateo sacó la deriva en
 // reposo para que el nombre no se escape) y tarjeta y rieles se apagan; el
 // sticky se suelta con el tubo ya en movimiento y saliendo por arriba.
-const SALIDA_SVH = 60;
+// Durante la cola la SUPERFICIE gris (y las nieblas) se vuelven
+// transparentes: la sección siguiente se mete media pantalla por debajo
+// (62svh, ver el -mt en page.tsx) y sube por detrás del tubo que se va. Sin esto
+// quedaban casi dos pantallas de gris vacío entre la torre y lo siguiente.
+const SALIDA_SVH = 40;
 const ZONA_SVH = TAMBORES.length * SVH_POR_TAMBOR + ARRANQUE_SVH + SALIDA_SVH;
 /** Fracción del recorrido de la zona (alto − 100svh) que ocupa el arranque. */
 const ARRANQUE = ARRANQUE_SVH / (ZONA_SVH - 100);
@@ -70,7 +74,7 @@ const ARRANQUE = ARRANQUE_SVH / (ZONA_SVH - 100);
 const SALIDA = SALIDA_SVH / (ZONA_SVH - 100);
 // Cuánto sube (en estaciones) y cuánto gira (grados) la torre durante la
 // cola: el 07 sale de cuadro por arriba a ritmo de página, sin acelerón.
-const SUBIDA_SALIDA = 1.1;
+const SUBIDA_SALIDA = 1.3;
 const GIRO_SALIDA = 40;
 // Ángulos de los chips de frase sobre la banda (3 por tambor, repartidos).
 const CHIP_ANGS = [40, 160, 280];
@@ -175,6 +179,8 @@ export function TorreLineas() {
   const rotuloRef = useRef<HTMLParagraphElement | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
   const rielDerRef = useRef<HTMLDivElement | null>(null);
+  const superficieRef = useRef<HTMLSpanElement | null>(null);
+  const nieblaRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
   const [geo, setGeo] = useState<Geo | null>(null);
@@ -430,6 +436,10 @@ export function TorreLineas() {
       if (apoyoRef.current) apoyoRef.current.style.opacity = String(build.apoyo * uiSalida);
       if (navRef.current) navRef.current.style.opacity = String(uiSalida);
       if (rielDerRef.current) rielDerRef.current.style.opacity = String(uiSalida);
+      // La superficie y las nieblas se van con la cola: la sección siguiente
+      // sube por detrás del tubo.
+      if (superficieRef.current) superficieRef.current.style.opacity = String(1 - salida);
+      for (const nb of nieblaRefs.current) if (nb) nb.style.opacity = String(1 - salida);
       // El RÓTULO ("Siete líneas de acción") presenta la lista una sola vez:
       // se enciende con la línea legible, quieto, y se va en cuanto la línea
       // empieza a enrollarse. Después el marco queda en el encabezado del
@@ -764,6 +774,7 @@ export function TorreLineas() {
               de que la luz se corra. */}
           {live && (
             <span
+              ref={superficieRef}
               aria-hidden="true"
               className="bg-gris-fondo pointer-events-none absolute inset-0"
             >
@@ -787,6 +798,9 @@ export function TorreLineas() {
           {live && (
             <>
               <span
+                ref={(el) => {
+                  nieblaRefs.current[0] = el;
+                }}
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-0 z-10 h-40"
                 style={{
@@ -795,6 +809,9 @@ export function TorreLineas() {
                 }}
               />
               <span
+                ref={(el) => {
+                  nieblaRefs.current[1] = el;
+                }}
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-60"
                 style={{
