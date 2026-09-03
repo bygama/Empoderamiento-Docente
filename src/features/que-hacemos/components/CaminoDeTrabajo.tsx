@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PASOS_TRABAJO } from "../data";
+import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -31,7 +32,8 @@ export function CaminoDeTrabajo() {
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const contadorRef = useRef<HTMLSpanElement | null>(null);
+  const numeroRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const rellenoRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
 
@@ -62,15 +64,31 @@ export function CaminoDeTrabajo() {
         },
       });
 
-      // Contador de paso, directo al DOM (sin re-render por tick). En el
-      // onUpdate del TIMELINE (no del trigger): el scrub sigue moviéndose
-      // después de que el scroll paró y el del trigger leería viejo.
+      // RIEL 01–04 (el mismo de Investigación): el camino dibujado. El
+      // segmento entre dos pasos se RELLENA con el viaje del tren (mismo
+      // scroll, mismo ritmo) y el número siguiente se enciende cuando el
+      // panel terminó de llegar. Antes había un contador "01 / 04" que
+      // saltaba en un frame mientras el tren se deslizaba continuo.
+      // Directo al DOM (sin re-render por tick), en el onUpdate del
+      // TIMELINE: el scrub sigue moviéndose después de que el scroll paró y
+      // el del trigger leería viejo.
+      gsap.set(rellenoRefs.current.filter(Boolean), { scaleX: 0 });
+      let activo = -1;
       tl.eventCallback("onUpdate", () => {
-        const el = contadorRef.current;
-        if (!el) return;
-        const i = Math.min(n - 1, Math.max(0, Math.round(tl.progress() * (n - 1))));
-        const label = String(i + 1).padStart(2, "0");
-        if (el.textContent !== label) el.textContent = label;
+        const p = tl.progress() * (n - 1);
+        rellenoRefs.current.forEach((r, k) => {
+          if (r) r.style.transform = `scaleX(${Math.min(1, Math.max(0, p - k))})`;
+        });
+        // El número siguiente se enciende cuando su panel TERMINÓ de llegar
+        // (85% del tramo), no a mitad de camino: primero se llena la línea,
+        // después se prende el número.
+        const i = Math.min(n - 1, Math.max(0, Math.floor(p + 0.15)));
+        if (i !== activo) {
+          activo = i;
+          numeroRefs.current.forEach((el, k) => {
+            if (el) el.dataset.active = String(k === i);
+          });
+        }
       });
 
       // El travelling: todo el tren de paneles hacia la izquierda.
@@ -99,6 +117,19 @@ export function CaminoDeTrabajo() {
     return () => ctx.revert();
   }, [live]);
 
+  // Click en un número del riel → viajar a ese paso (misma cuenta que el
+  // scrub: el panel i está al frente en progress = i/(n-1)).
+  const saltarA = (i: number) => {
+    const zone = zoneRef.current;
+    if (!zone) return;
+    const top = zone.getBoundingClientRect().top + window.scrollY;
+    const destino =
+      top + (zone.offsetHeight - window.innerHeight) * (i / (PASOS_TRABAJO.length - 1));
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(destino, { duration: 1.2 });
+    else window.scrollTo({ top: destino, behavior: "smooth" });
+  };
+
   return (
     <section className="bg-gris-fondo relative" aria-label="Cómo trabajamos">
       <div ref={zoneRef} className={"relative " + (live ? "h-[380svh]" : "")}>
@@ -110,17 +141,57 @@ export function CaminoDeTrabajo() {
               : "flex flex-col"
           }
         >
-          <div className="mx-auto flex w-full max-w-screen-xl items-baseline justify-between px-5 pt-24 md:px-10 md:pt-28">
-            <p className="text-gris-texto font-mono text-[0.7rem] tracking-[0.14em] uppercase">
-              Cómo trabajamos · El camino de un proyecto
-            </p>
-            {live && (
-              <p className="text-gris-texto/70 font-mono text-[0.7rem] tracking-[0.14em] uppercase">
-                <span ref={contadorRef} className="text-azul-principal">
-                  01
-                </span>{" "}
-                / {String(PASOS_TRABAJO.length).padStart(2, "0")} →
+          {/* Título en display, como Niveles: antes la sección solo tenía
+              una etiqueta mono de 11px y los verbos de los pasos (80px) se
+              leían como titulares sueltos, sin saber que eran un método. */}
+          <div className="mx-auto flex w-full max-w-screen-xl items-end justify-between px-5 pt-24 md:px-10 md:pt-28">
+            <div>
+              <h2
+                className="font-display text-azul-principal font-extrabold tracking-[-0.02em]"
+                style={{ fontSize: "clamp(1.6rem, 1rem + 1.6vw, 2.15rem)", lineHeight: 1.1 }}
+              >
+                Cómo trabajamos
+              </h2>
+              <p className="text-gris-texto mt-2 font-sans text-[1rem] leading-relaxed">
+                El camino de un proyecto, en cuatro pasos.
               </p>
+            </div>
+            {live && (
+              /* Riel 01–04: el camino dibujado (misma pieza que el hero de
+                 Investigación). Números clicables; el relleno verde avanza
+                 con el tren. Sin flecha: el camino ya dice que avanza. */
+              <nav
+                aria-label="Pasos del camino"
+                className="flex items-center gap-3 pb-1 font-mono text-[0.7rem] tracking-[0.22em] uppercase"
+              >
+                {PASOS_TRABAJO.map((paso, i) => (
+                  <Fragment key={paso.n}>
+                    <button
+                      ref={(el) => {
+                        numeroRefs.current[i] = el;
+                      }}
+                      type="button"
+                      data-active={i === 0}
+                      onClick={() => saltarA(i)}
+                      aria-label={`Ir al paso ${i + 1}: ${paso.verbo}`}
+                      className="text-gris-texto/50 hover:text-azul-principal data-[active=true]:text-azul-principal cursor-pointer tabular-nums transition-colors duration-300"
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </button>
+                    {i < PASOS_TRABAJO.length - 1 && (
+                      <span className="bg-azul-principal/15 relative h-px w-12 overflow-hidden">
+                        <span
+                          ref={(el) => {
+                            rellenoRefs.current[i] = el;
+                          }}
+                          className="bg-verde-concepto absolute inset-0 origin-left"
+                          style={{ transform: "scaleX(0)" }}
+                        />
+                      </span>
+                    )}
+                  </Fragment>
+                ))}
+              </nav>
             )}
           </div>
 
@@ -131,7 +202,10 @@ export function CaminoDeTrabajo() {
                 {PASOS_TRABAJO.map((paso) => (
                   <article
                     key={paso.n}
-                    className="flex h-full w-screen items-center"
+                    // Anclado ARRIBA, no centrado: al entrar la sección desde
+                    // abajo, título y primer paso llegan juntos en vez de
+                    // media pantalla hueca antes del contenido.
+                    className="flex h-full w-screen items-start pt-8 md:pt-10"
                   >
                     <div className="mx-auto grid w-full max-w-screen-xl items-center gap-10 px-5 md:grid-cols-[1.05fr_1fr] md:px-10">
                       <div className="relative">
