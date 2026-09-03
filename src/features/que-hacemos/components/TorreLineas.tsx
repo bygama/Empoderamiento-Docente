@@ -74,6 +74,10 @@ const GIRO_TOTAL = 300;
 // estación: al borde izquierdo del arco legible, para leer desde el
 // principio. Al scrollear, el resto del nombre entra por la derecha.
 const ALINEA = -46;
+// Cantidad de líneas en letras para el rótulo de presentación ("Siete
+// líneas de acción"): sale del dato, así si vuelven a cambiar la cantidad
+// se actualiza solo. Fuera de rango cae al número.
+const NUMEROS = ["", "Una", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"];
 
 /** `angs[j]` = ángulo de la rebanada j (no hay paso uniforme, ver abajo). */
 type GeoTambor = { f: number; angs: number[]; slices: string[] };
@@ -155,6 +159,7 @@ export function TorreLineas() {
   const fillRef = useRef<HTMLSpanElement | null>(null);
   const pctRef = useRef<HTMLSpanElement | null>(null);
   const veloRef = useRef<HTMLSpanElement | null>(null);
+  const rotuloRef = useRef<HTMLParagraphElement | null>(null);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
   const [geo, setGeo] = useState<Geo | null>(null);
@@ -399,6 +404,16 @@ export function TorreLineas() {
       // gris y su trama EMERGEN del blanco en que terminó el faro.
       if (veloRef.current) veloRef.current.style.opacity = String(build.velo);
       if (apoyoRef.current) apoyoRef.current.style.opacity = String(build.apoyo);
+      // El RÓTULO ("Siete líneas de acción") presenta la lista una sola vez:
+      // se enciende con la línea legible, quieto, y se va en cuanto la línea
+      // empieza a enrollarse. Después el marco queda en el encabezado del
+      // riel. Sin esto el usuario salía del faro a "DESARROLLO PROFESIONAL"
+      // en letras de 150px sin saber de qué era la lista.
+      if (rotuloRef.current) {
+        const seVa = Math.min(1, build.rollo / 0.35);
+        rotuloRef.current.style.opacity = String(build.linea * (1 - seVa));
+        rotuloRef.current.style.transform = `translate(-50%, ${-14 * seVa}px)`;
+      }
       const y = -pv * (n - 1) * geo.sp;
       tower.style.transform = `translateY(${y}px)`;
       for (let i = 0; i < n; i++) {
@@ -764,11 +779,28 @@ export function TorreLineas() {
 
           {live && geo ? (
             <>
+              {/* ── Rótulo de presentación sobre la línea (solo en el armado) ── */}
+              <p
+                ref={rotuloRef}
+                aria-hidden="true"
+                className="text-azul-principal/70 pointer-events-none absolute top-[12%] left-1/2 z-20 flex items-center gap-3 font-mono text-[0.7rem] tracking-[0.18em] whitespace-nowrap uppercase"
+                style={{ opacity: 0, transform: "translate(-50%, 0px)" }}
+              >
+                <span aria-hidden="true" className="bg-verde-concepto inline-block h-px w-8" />
+                {NUMEROS[TAMBORES.length] ?? TAMBORES.length} líneas de acción
+                <span aria-hidden="true" className="bg-verde-concepto inline-block h-px w-8" />
+              </p>
+
               {/* ── Riel izquierdo: las estaciones, clickeables ──────────── */}
               <nav
                 aria-hidden="true"
                 className="absolute top-1/2 left-4 z-20 hidden -translate-y-1/2 flex-col gap-1 lg:flex xl:left-8"
               >
+                {/* Encabezado del riel: el riel es la tabla de contenidos de
+                    la sección; esto es el nombre de la tabla. Permanente. */}
+                <p className="text-azul-principal/80 mb-2 font-mono text-[0.62rem] font-semibold tracking-[0.16em] uppercase">
+                  Líneas de acción
+                </p>
                 {TAMBORES.map((t, i) => (
                   <button
                     key={t.id}
