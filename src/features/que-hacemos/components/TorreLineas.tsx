@@ -147,7 +147,6 @@ export function TorreLineas() {
   const fotoRefs = useRef<(HTMLDivElement | null)[]>([]);
   const chipRefs = useRef<(HTMLDivElement | null)[][]>([]);
   const aroRefs = useRef<(HTMLDivElement | null)[][]>([]);
-  const pulsos = useRef<number[]>([]); // latido elástico por tambor (escala extra)
   const tituloRef = useRef<HTMLParagraphElement | null>(null);
   const fraseRef = useRef<HTMLParagraphElement | null>(null);
   const detalleRef = useRef<HTMLParagraphElement | null>(null);
@@ -199,7 +198,6 @@ export function TorreLineas() {
     const n = TAMBORES.length;
     const ocultos: boolean[] = TAMBORES.map(() => false);
     let activo = 0;
-    let enCuadro = false;
     const avance = { p: 0 };
 
     // FASE por tambor: al llegar a la estación i (p = i/(n-1)) la primera
@@ -284,7 +282,8 @@ export function TorreLineas() {
     // (onComplete) el scroll vuelve. Hacia ARRIBA queda libre (pedido de
     // Mateo, 2026-09-02): quien se arrepiente vuelve al faro, y al cruzar
     // el borde onLeaveBack rebobina y suelta. Entrando desde abajo no se
-    // bloquea: ahí el tambor 01 ni siquiera está en cuadro.
+    // arma ni se bloquea (ver `completar`): ahí el tambor 01 ni siquiera
+    // está en cuadro.
     // Los listeners van en CAPTURA sobre window y cortan la propagación:
     // así el evento no llega a Lenis (que escucha en burbuja) ni al scroll
     // nativo. Clavar va diferido un frame: onEnter corre adentro de
@@ -359,13 +358,25 @@ export function TorreLineas() {
       // (Las fotos no necesitan reset: build.foto=0 apaga la 01 y las demás
       // vuelven a su sitio con el transform del próximo pintar.)
     };
+    // Completar = el armado ya hecho, sin animarlo: para entrar desde ABAJO
+    // (el tambor 01 ni está en cuadro) y para cargar la página pasada la
+    // zona. Deja el velo en cero y todo lo del tambor 01 en su estado final.
+    const completar = () => {
+      buildAnim?.kill();
+      buildAnim = null;
+      liberar();
+      build.velo = 0;
+      build.linea = build.apoyo = build.rollo = build.foto = build.chips = 1;
+      pintar();
+    };
     // Nace APAGADO. La torre pinta por encima del faro (z-20), así que con la
     // opacidad por defecto (1) se vería montada sobre la escena nocturna y
-    // taparía el flash. Se prende y apaga de golpe con la zona (onToggle):
-    // al cruzar hacia arriba el corte es INMEDIATO, no un fundido — pasado
-    // ese borde el escenario deja de estar pineado y se DESLIZA con la
-    // página; desvanecerlo hacía que se lo viera resbalar. Y en ese borde el
-    // faro está en blanco pleno, igual que el velo: el relevo no se ve.
+    // taparía el flash. Se prende de golpe con la zona y se apaga solo al
+    // salir por ARRIBA (ver `mostrar`, más abajo): en ese borde el corte es
+    // INMEDIATO, no un fundido — pasado el borde el escenario deja de estar
+    // pineado y se DESLIZA con la página; desvanecerlo hacía que se lo viera
+    // resbalar. Y ahí el faro está en blanco pleno, igual que el velo: el
+    // relevo no se ve.
     stage.style.opacity = "0";
 
     // Geometría del ENROLLADO del primer tambor. En la línea, el nombre
@@ -409,10 +420,8 @@ export function TorreLineas() {
           if (foto) foto.style.visibility = "";
           ocultos[i] = false;
         }
-        // Giro: fase del tambor + scroll (en sentido de lectura). El latido
-        // (pulsos) es el "beat" elástico cuando llega.
+        // Giro: fase del tambor + scroll (en sentido de lectura).
         const rot = rotDe(i, pv);
-        const lat = 1 + (pulsos.current[i] || 0);
         // Solo el PRIMER tambor se arma: es el que recibe el deslumbre. Los
         // demás ya llegan montados desde arriba, como siempre.
         const rollo = i === 0 ? build.rollo : 1;
@@ -422,9 +431,9 @@ export function TorreLineas() {
         // cámara sea cual sea la fase. Crece de ESCALA_LINEA a 1.
         if (enRollo) {
           const esc = ESCALA_LINEA + (1 - ESCALA_LINEA) * rollo;
-          drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) scale(${esc * lat})`;
+          drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) scale(${esc})`;
         } else {
-          drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) rotateY(${rot}deg) scale(${lat})`;
+          drum.style.transform = `translate(-50%, -50%) translateY(${i * geo.sp}px) rotateY(${rot}deg)`;
         }
         // La foto viaja CON la torre, un toque más lenta (parallax): sube
         // pegada a su tambor en vez de encenderse quieta en el centro. Las
@@ -536,18 +545,11 @@ export function TorreLineas() {
         railRefs.current.forEach((el, i) => {
           if (el) el.dataset.active = String(i === act);
         });
-        // Latido: el tambor que llega hace un pulso elástico (la escala extra
-        // la lee pintar en cada frame, así compone con el giro).
-        const beat = { v: 0.05 };
-        pulsos.current[act] = beat.v;
-        gsap.to(beat, {
-          v: 0,
-          duration: 0.7,
-          ease: "elastic.out(1.2, 0.5)",
-          onUpdate: () => {
-            pulsos.current[act] = beat.v;
-          },
-        });
+        // (Acá había un "latido": el tambor que llegaba se agrandaba 5% y
+        // volvía con un elástico, que pasa por debajo de 1 y oscila
+        // — medido: escala 1,05 → 0,983 → 1 en medio segundo. A la vista era
+        // un rebote/vibración en cada estación, no un acento, así que fuera.
+        // La llegada la marcan el riel y el cruce del apoyo.)
         const t = TAMBORES[act];
         gsap
           .timeline()
@@ -561,18 +563,27 @@ export function TorreLineas() {
       }
     };
 
-    // Repintado por frame mientras la torre está en cuadro: el latido
-    // (pulsos) se anima por su cuenta y tiene que verse aunque el scroll
-    // esté quieto. Durante el armado no corre: pintar() ya lo llama la
-    // línea de tiempo del armado. (La deriva en reposo que corría acá se
-    // quitó; ver el comentario sobre ALINEA.)
-    const tick = () => {
-      if (!enCuadro || buildAnim) return;
-      pintar();
-    };
-    gsap.ticker.add(tick);
-
+    // Sin repintado por frame: nada se mueve solo. La torre la pinta el
+    // scrub (onUpdate) y el armado su propia línea de tiempo. Acá corría un
+    // ticker para el latido y la deriva en reposo, que ya no existen — y
+    // repintar siete tambores a 60 fps con el scroll quieto era CPU tirada.
     const ctx = gsap.context(() => {
+      // El escenario se prende con la zona y se apaga SOLO al salir por
+      // ARRIBA (progreso 0), donde el flash del faro tiene que quedar
+      // despejado. Por ABAJO se queda prendido: al terminar la zona el
+      // sticky se suelta y el escenario sube con la página, con el último
+      // tambor y su apoyo a la vista. Antes se apagaba en los dos bordes y
+      // al final del recorrido quedaba una pantalla gris vacía (el fondo del
+      // body) que había que scrollear a ciegas hasta que entraba «Cómo
+      // trabajamos». onRefresh cubre cargar la página ya scrolleada.
+      // Va en los CUATRO callbacks de borde y no en onToggle: si el scroll
+      // salta la zona entera en un solo update (tecla Inicio desde «Cómo
+      // trabajamos», por ejemplo) ScrollTrigger pasa de "afuera por abajo" a
+      // "afuera por arriba" sin toggle, pero sí dispara onEnterBack y
+      // onLeaveBack — y el escenario tiene que apagarse igual.
+      const mostrar = (self: ScrollTrigger) => {
+        stage.style.opacity = self.isActive || self.progress >= 1 ? "1" : "0";
+      };
       gsap.to(avance, {
         p: 1,
         ease: "none",
@@ -582,30 +593,33 @@ export function TorreLineas() {
           end: "bottom bottom",
           scrub: 0.5,
           invalidateOnRefresh: true,
-          // Fuera de la zona pintar() no corre, así que el escenario se
-          // prende y apaga acá: entra opaco (cubierto por su velo blanco) en
-          // cuanto la zona arranca, y si volvés arriba se apaga y el flash
-          // del faro vuelve a quedar despejado.
-          onToggle: (self) => {
-            enCuadro = self.isActive;
-            stage.style.opacity = self.isActive ? "1" : "0";
-          },
+          onEnter: mostrar,
+          onEnterBack: mostrar,
+          onLeave: mostrar,
+          onLeaveBack: mostrar,
+          onRefresh: mostrar,
         },
         onUpdate: pintar,
       });
 
       // Armado / rebobinado: trigger PROPIO sin scrub, en el mismo punto
       // donde arranca la zona (= el faro terminó en blanco, por el solape).
-      // onRefresh cubre el caso de cargar la página ya scrolleada.
+      // Desde ABAJO no se rearma: se completa de golpe. Rearmar volvía a
+      // poner el velo en 1 y el escenario, ya a la vista, se iba a blanco y
+      // volvía en 1,2 s — un flash cada vez que subías desde «Cómo
+      // trabajamos». onRefresh cubre cargar la página ya scrolleada: arriba
+      // de la zona rebobina, abajo completa.
       ScrollTrigger.create({
         trigger: zone,
         start: "top top",
         end: "bottom bottom",
         onEnter: () => armar(true),
-        onEnterBack: () => armar(false),
+        onEnterBack: completar,
         onLeaveBack: rebobinar,
         onRefresh: (self) => {
-          if (!self.isActive) rebobinar();
+          if (self.isActive) return;
+          if (self.progress >= 1) completar();
+          else rebobinar();
         },
       });
 
@@ -616,7 +630,6 @@ export function TorreLineas() {
     pintar();
 
     return () => {
-      gsap.ticker.remove(tick);
       // La línea de tiempo del armado nace fuera del gsap.context (la crea
       // el ScrollTrigger en caliente), así que ctx.revert() no la alcanza.
       buildAnim?.kill();
