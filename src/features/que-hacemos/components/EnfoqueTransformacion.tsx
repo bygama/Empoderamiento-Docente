@@ -13,21 +13,30 @@ if (typeof window !== "undefined") {
 
 /**
  * "Nuestro enfoque" (sitemap: por qué NO es una capacitación tradicional) —
- * el diferencial de Dani hecho escena: la palabra CAPACITACIÓN aparece en el
- * centro, una línea la tacha, y con el scroll ESTALLA — cada letra sale
- * despedida con su propia trayectoria y giro. De ese vacío se arma
- * TRANSFORMACIÓN (verde): las letras vuelven volando a su lugar. Rematan los
- * cuatro diferenciales, que aterrizan como afirmaciones.
+ * el diferencial de Dani hecho escena: TRANSFORMACIÓN (verde) se ARMA en
+ * pantalla, las letras llegan volando cada una con su trayectoria y giro y
+ * caen en su lugar. Rematan los cuatro diferenciales, que aterrizan como
+ * afirmaciones.
  *
- * Las trayectorias del estallido son pseudo-aleatorias DETERMINÍSTICAS
- * (seno hasheado por índice): mismo resultado en cada render, nada de
- * Math.random que ensucie la hidratación.
+ * Antes había un primer tiempo con CAPACITACIÓN quieta en el centro, una
+ * línea que la tachaba y un estallido letra por letra; de ese vacío se
+ * armaba la palabra nueva. Se sacó (Facundo, 2026-09-03): era una pantalla
+ * entera con la palabra vieja parada antes de que pasara algo. Queda solo la
+ * aparición de la palabra que importa.
  *
- * Mobile / prefers-reduced-motion: versión quieta ("No hacemos capacitación /
- * Hacemos transformación") con los diferenciales visibles.
+ * El armado arranca mientras la sección todavía ENTRA (trigger desde "top
+ * bottom", no desde el pin): con la palabra invisible en el progreso 0, si
+ * la escena esperara al pin se vería subir una pantalla blanca vacía hasta
+ * que uno empezara a scrollear adentro.
+ *
+ * Las trayectorias de llegada son pseudo-aleatorias DETERMINÍSTICAS (seno
+ * hasheado por índice): mismo resultado en cada render, nada de Math.random
+ * que ensucie la hidratación.
+ *
+ * Mobile / prefers-reduced-motion: versión quieta ("Capacitación." tachada /
+ * "Transformación.") con los diferenciales visibles.
  */
 
-const PALABRA_VIEJA = "CAPACITACIÓN";
 const PALABRA_NUEVA = "TRANSFORMACIÓN";
 
 // Pseudo-random determinístico en [-1, 1] a partir del índice y una sal.
@@ -55,11 +64,10 @@ export function EnfoqueTransformacion() {
     if (!zone || !stage) return;
 
     const ctx = gsap.context(() => {
-      const viejas = gsap.utils.toArray<HTMLElement>("[data-enf-vieja]");
       const nuevas = gsap.utils.toArray<HTMLElement>("[data-enf-nueva]");
 
-      // Estado inicial: la nueva palabra ya está "estallada" (invisible,
-      // desparramada); vuelve a armarse cuando le toca.
+      // Estado inicial: la palabra está desparramada e invisible; se arma
+      // cuando le toca.
       nuevas.forEach((ch, i) => {
         gsap.set(ch, {
           x: rnd(i, 1) * 420,
@@ -68,70 +76,63 @@ export function EnfoqueTransformacion() {
           autoAlpha: 0,
         });
       });
-      gsap.set("[data-enf-tacha]", { scaleX: 0 });
       gsap.set("[data-enf-dif]", { autoAlpha: 0, y: 34 });
 
+      // Una unidad = 50svh de scroll: la zona mide 200svh y el trigger la
+      // recorre entera, de "top bottom" a "bottom bottom". El primer tramo
+      // (0→2) es la sección ENTRANDO; desde 2 está clavada.
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: zone,
-          start: "top top",
+          start: "top bottom",
           end: "bottom bottom",
           scrub: 0.5,
           invalidateOnRefresh: true,
         },
       });
 
-      // 1) La tacha cruza la palabra vieja.
-      tl.to("[data-enf-tacha]", { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, 0.1)
-        // 2) Estallido: cada letra sale despedida con su trayectoria y giro.
-        .to(
-          viejas,
-          {
-            x: (i) => rnd(i, 4) * 520,
-            y: (i) => 160 + Math.abs(rnd(i, 5)) * 420,
-            rotate: (i) => rnd(i, 6) * 200,
-            autoAlpha: 0,
-            duration: 0.9,
-            ease: "power2.in",
-            stagger: { each: 0.03, from: "center" },
-          },
-          0.55,
-        )
-        .to("[data-enf-tacha]", { autoAlpha: 0, duration: 0.3 }, 0.75)
-        // 3) La nueva palabra se arma: las letras vuelven a su lugar.
-        .to(
-          nuevas,
-          {
-            x: 0,
-            y: 0,
-            rotate: 0,
-            autoAlpha: 1,
-            duration: 1,
-            ease: "power3.out",
-            stagger: { each: 0.045, from: "random" },
-          },
-          1.35,
-        )
-        // 4) Aterrizan los diferenciales.
+      // 1) La palabra se arma: las letras llegan volando a su lugar. Arranca
+      //    cuando el centro del escenario asoma por abajo (~0.75) y termina
+      //    ya clavada.
+      tl.to(
+        nuevas,
+        {
+          x: 0,
+          y: 0,
+          rotate: 0,
+          autoAlpha: 1,
+          duration: 1,
+          ease: "power3.out",
+          stagger: { each: 0.045, from: "random" },
+        },
+        0.9,
+      )
+        // 2) Aterrizan los diferenciales.
         .to(
           "[data-enf-dif]",
           { autoAlpha: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.14 },
           2.4,
         )
-        .to({}, { duration: 0.4 });
+        // Respiro y la zona se acaba (total 4 unidades = 200svh).
+        .to({}, { duration: 0.5 }, 3.5);
     }, stage);
 
     return () => ctx.revert();
   }, [live]);
 
+  // Gris de la página, no blanco: el cierre que sigue flota sobre gris y el
+  // corte blanco → gris justo debajo de los diferenciales quedaba muy marcado
+  // (Facundo, 2026-09-03).
   return (
-    <section className="relative bg-white" aria-label="Nuestro enfoque">
+    <section className="bg-gris-fondo relative" aria-label="Nuestro enfoque">
       {/* Contenido real para lectores de pantalla; la escena es decorativa. */}
       <p className="sr-only">
         No hacemos capacitación: hacemos transformación educativa.
       </p>
 
-      <div ref={zoneRef} className={"relative " + (live ? "h-[300svh]" : "")}>
+      {/* 200svh: la mitad que antes (300), sin el primer tiempo de la
+          palabra vieja hay menos coreografía que repartir. */}
+      <div ref={zoneRef} className={"relative " + (live ? "h-[200svh]" : "")}>
         <div
           ref={stageRef}
           className={
@@ -147,33 +148,8 @@ export function EnfoqueTransformacion() {
 
           {live ? (
             <>
-              {/* ── Escenario de las dos palabras ─────────────────────── */}
+              {/* ── Escenario de la palabra ───────────────────────────── */}
               <div aria-hidden="true" className="relative min-h-0 flex-1">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <span className="relative block whitespace-nowrap">
-                    {/* La tacha: cruza la palabra antes del estallido. Más
-                        fina (0.06em, como en el fallback): a 0.09em sobre
-                        una palabra de ~90px era una barra de 8px. */}
-                    <span
-                      data-enf-tacha
-                      className="bg-azul-medio absolute top-1/2 left-[-2%] h-[0.06em] w-[104%] origin-left rounded-full"
-                      style={{ fontSize: "clamp(2.4rem, 0.6rem + 6.4vw, 5.6rem)" }}
-                    />
-                    {Array.from(PALABRA_VIEJA).map((ch, i) => (
-                      <span
-                        key={i}
-                        data-enf-vieja
-                        className="font-display text-azul-principal/70 inline-block font-extrabold tracking-[-0.02em] will-change-transform"
-                        style={{
-                          fontSize: "clamp(2.4rem, 0.6rem + 6.4vw, 5.6rem)",
-                          lineHeight: 1,
-                        }}
-                      >
-                        {ch}
-                      </span>
-                    ))}
-                  </span>
-                </div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                   <span className="block whitespace-nowrap">
                     {Array.from(PALABRA_NUEVA).map((ch, i) => (
