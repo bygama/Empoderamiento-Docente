@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 
 // Sitemap pág. 02 con desvíos pedidos por el cliente: el recorrido (la torre
 // de líneas) va INMEDIATAMENTE después del hero — el botón "Entrar" y el
-// scroll natural caen ahí — y «Nuestro enfoque» (capacitación →
-// transformación) cierra la página, justo antes del CTA. «Proyectos y
+// scroll natural caen ahí — y «Nuestro enfoque» (TRANSFORMACIÓN armándose)
+// cierra la página, justo antes del CTA. «Proyectos y
 // aplicaciones» pasó a /investigacion (pedido de Mateo, 2026-09-02). Orden:
 // Hero → Líneas → Cómo trabajamos → Niveles → Enfoque → Cierre.
 export default function QueHacemosPage() {
@@ -54,7 +54,7 @@ export default function QueHacemosPage() {
       </div>
       <CaminoDeTrabajo />
       <NivelesEscala />
-      {/* El enfoque (CAPACITACIÓN tachada → TRANSFORMACIÓN) remata la página
+      {/* El enfoque (TRANSFORMACIÓN armándose en pantalla) remata la página
           antes del cierre: es la idea con la que hay que irse. */}
       <EnfoqueTransformacion />
       <CierreQueHacemos />

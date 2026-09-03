@@ -21,10 +21,14 @@ if (typeof window !== "undefined") {
  * cuartos de la subida y la descripción nunca estaba quieta para leerse.
  * Siempre hay UNA card abierta y quieta.
  *
- * El titular grande va en DOS TIEMPOS (paréntesis): "Del aula," abre la
- * sección con la coma en suspenso y se va antes de la primera card; cuando
- * las cards ceden vuelve en el mismo lugar y se completa con "al sistema
- * educativo." — la frase que quedó abierta se cierra al final.
+ * El titular "Del aula," abre la sección con la coma en suspenso y se va
+ * antes de la primera card. Lo que sigue son las cards: la última llegada
+ * (con el cierre de la anterior) es lo último que se ve antes de que el
+ * sticky se suelte. Había un remate en que las cards cedían y volvía el
+ * titular completo ("Del aula, / al sistema educativo.") en una pantalla
+ * propia; se sacó (Facundo, 2026-09-03): era una pantalla más que
+ * scrollear después de la coreografía, y la animación tiene que ser lo
+ * último.
  *
  * Sin motion / touch / pantalla chica: no clava; grilla legible + titular.
  * `live` arranca en false (coincide con SSR).
@@ -44,8 +48,13 @@ const POS = [
 const PASO = 2.0; // separación entre llegadas
 const SUBIDA = 1.4; // lo que tarda una card en aterrizar
 const CIERRE_TRAS = 1.0; // la card i se cierra este rato después de que aterriza la i+1
-const CEDEN = 10.4; // las cards ceden y entra el titular
-const ALTO_SVH = 640;
+// Fin de la coreografía: la última card ya aterrizó y la anterior terminó
+// de cerrarse ((n-1)·PASO + SUBIDA·0.7 + CIERRE_TRAS + 0.8). De ahí al final
+// de la zona queda un respiro corto y el sticky se suelta.
+const FIN = 10.8;
+// Antes 640 con el remate del titular (13,3 unidades de timeline); mismo
+// ritmo de scroll por unidad (~40svh) para las 11,3 que quedan.
+const ALTO_SVH = 560;
 
 // Recorrido del lazo viajero (viewBox 1600x900): entra por arriba, serpentea
 // entre las cards y sale por abajo. No se dibuja y queda — VIAJA: la cabeza
@@ -80,21 +89,17 @@ export function NivelesEscala() {
         const cards = gsap.utils.toArray<HTMLElement>("[data-nivel-card]");
         const headline = stage.querySelector<HTMLElement>("[data-nivel-headline]");
         const l1 = stage.querySelector<HTMLElement>("[data-nivel-l1]");
-        const l2 = stage.querySelector<HTMLElement>("[data-nivel-l2]");
-        const intro = stage.querySelector<HTMLElement>("[data-nivel-intro]");
         if (cards.length !== NIVELES.length) return;
 
         // Medir las zonas colapsables y fijarles alto para poder animarlo a 0.
         const colapsables = gsap.utils.toArray<HTMLElement>("[data-collapse]");
         colapsables.forEach((c) => gsap.set(c, { height: c.scrollHeight }));
         gsap.set(cards, { y: 760, autoAlpha: 0 });
-        // EL PARÉNTESIS: "Del aula," (con la coma: algo viene) está VISIBLE
-        // desde que la sección entra, se va antes de que aterrice la primera
-        // card, y vuelve al final en el mismo lugar para completarse con "al
-        // sistema educativo.". Estado inicial EXPLÍCITO en cada arranque.
+        // "Del aula," (con la coma: algo viene) está VISIBLE desde que la
+        // sección entra y se va antes de que aterrice la primera card.
+        // Estado inicial EXPLÍCITO en cada arranque.
         if (headline) gsap.set(headline, { autoAlpha: 1 });
         if (l1) gsap.set(l1, { autoAlpha: 1, y: 0 });
-        if (l2) gsap.set(l2, { autoAlpha: 0, y: 24 });
 
         const tl = gsap.timeline({
           scrollTrigger: { trigger: zone, start: "top top", end: "bottom bottom", scrub: 0.6 },
@@ -119,10 +124,10 @@ export function NivelesEscala() {
             strokeDashoffset: seg + corrimiento,
           });
           // Viaja hasta que la cápsula también salió del todo — y termina
-          // ANTES de que las cards cedan y entre el titular (CEDEN): que el
-          // remate no conviva con restos del lazo en escena.
+          // ANTES del fin de la coreografía (FIN): que la última card no
+          // conviva con restos del lazo en escena.
           const final = -(L + corrimiento + L * 0.02);
-          const viaje = CEDEN - 0.2;
+          const viaje = FIN - 0.2;
           tl.to(lazo, { strokeDashoffset: final, ease: "none", duration: viaje }, 0).to(
             punto,
             { strokeDashoffset: final + corrimiento, ease: "none", duration: viaje },
@@ -130,9 +135,9 @@ export function NivelesEscala() {
           );
           // Seguro definitivo: el tramo de salida por el borde de abajo es
           // largo y la cápsula ronda ahí un rato — el SVG entero se desvanece
-          // antes del remate, así después de este punto no queda tinta en
+          // antes del final, así después de este punto no queda tinta en
           // escena pase lo que pase con la geometría.
-          if (cinta) tl.to(cinta, { autoAlpha: 0, ease: "none", duration: 0.6 }, CEDEN - 0.9);
+          if (cinta) tl.to(cinta, { autoAlpha: 0, ease: "none", duration: 0.6 }, FIN - 0.9);
         }
 
         // "Del aula," se va (hacia arriba) antes de que "Docentes" aterrice:
@@ -199,20 +204,10 @@ export function NivelesEscala() {
           });
         });
 
-        // Las cards ceden; vuelve "Del aula," en el mismo lugar (fundido
-        // invertido al de la salida) y medio tiempo después se completa.
-        tl.to(cards, { autoAlpha: 0, y: -70, ease: "power1.in", duration: 1.2 }, CEDEN);
-        if (intro) tl.to(intro, { autoAlpha: 0, ease: "none", duration: 0.6 }, CEDEN);
-        if (l1)
-          tl.fromTo(
-            l1,
-            { autoAlpha: 0, y: 24 },
-            { autoAlpha: 1, y: 0, ease: "power2.out", duration: 1.0, immediateRender: false },
-            CEDEN + 0.7,
-          );
-        if (l2)
-          tl.to(l2, { autoAlpha: 1, y: 0, ease: "power2.out", duration: 1.2 }, CEDEN + 1.2);
-        tl.to({}, { duration: 0.5 });
+        // Respiro corto después de la última card (el scrub termina de
+        // asentarse) y la zona se acaba: el sticky se suelta con las cinco
+        // cards en escena.
+        tl.to({}, { duration: 0.5 }, FIN);
       }, stage);
 
       return () => {
@@ -231,7 +226,11 @@ export function NivelesEscala() {
   return (
     <div
       ref={zoneRef}
-      className={live ? "relative bg-white" : "bg-white"}
+      // Mismo gris que trae la página desde la torre: con fondo blanco, la
+      // cola de Qué hacemos alternaba gris / blanco / blanco / gris y cada
+      // cambio era un corte seco (Facundo, 2026-09-03). Las cards son
+      // blancas y sobre el gris se leen mejor como piezas.
+      className={live ? "bg-gris-fondo relative" : "bg-gris-fondo"}
       style={live ? { height: `${ALTO_SVH}svh` } : undefined}
       aria-label="Niveles en los que intervenimos"
     >
@@ -282,9 +281,8 @@ export function NivelesEscala() {
           </svg>
         )}
 
-        {/* Encabezado */}
+        {/* Encabezado (se queda a la vista toda la sección). */}
         <div
-          data-nivel-intro
           className={
             live
               ? "absolute inset-x-0 top-0 z-20 mx-auto w-full max-w-screen-xl px-5 pt-24 md:px-10 md:pt-28"
@@ -306,10 +304,15 @@ export function NivelesEscala() {
           </p>
         </div>
 
-        {/* Titular en dos tiempos: "Del aula," abre la sección y se va; al
-            final vuelve y se completa. Cada línea se anima por separado. */}
+        {/* Titular de apertura: "Del aula," abre la sección y se va antes de
+            la primera card. Decorativo (aria-hidden): sin el remate que lo
+            completaba es media frase, y la idea entera sigue en el título y
+            la bajada de arriba. */}
         {live && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-10 flex items-center"
+          >
             {/* <p>, no <h2>: el h2 de la sección es el título de arriba.
                 Mismo contenedor y padding que el encabezado: "Del aula,"
                 convive con el título al principio y tienen que alinear. */}
@@ -320,9 +323,6 @@ export function NivelesEscala() {
             >
               <span data-nivel-l1 className="block">
                 Del aula,
-              </span>
-              <span data-nivel-l2 className="text-verde-concepto-texto block">
-                al sistema educativo.
               </span>
             </p>
           </div>
