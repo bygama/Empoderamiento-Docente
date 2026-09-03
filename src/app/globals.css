@@ -468,12 +468,20 @@ html {
 
 /* El footer trae esquinas superiores redondeadas; su muesca se pinta con el
    color del contenedor [data-footer-dock] (blanco por defecto, ver layout).
-   Cuando la página no termina en blanco sino en gris-fondo —el cierre de
-   Novedades, cuya tarjeta flota sobre ese gris—, esa sección se marca con
-   [data-footer-dock-tint="gris"]: el :has() a nivel de página tiñe la muesca del
-   mismo gris y evita los triángulos blancos del encuentro. */
+   Cuando la página no termina en blanco, la última sección se marca con
+   [data-footer-dock-tint="<color>"] y el :has() a nivel de página tiñe la
+   muesca de ese mismo color: sin eso, en el encuentro aparecen dos triángulos
+   blancos en las esquinas.
+     gris → cierres que flotan sobre gris-fondo (Novedades, Qué hacemos).
+     azul → páginas que terminan sobre la lámina navy (Quiénes somos): ahí el
+            footer también es navy, así que la muesca desaparece y el color
+            corre continuo hasta el pie. */
 body:has([data-footer-dock-tint="gris"]) [data-footer-dock] {
   background-color: var(--color-gris-fondo);
+}
+
+body:has([data-footer-dock-tint="azul"]) [data-footer-dock] {
+  background-color: var(--color-azul-principal);
 }
 
 /* === Qué hacemos — noche de faro ========================================== */

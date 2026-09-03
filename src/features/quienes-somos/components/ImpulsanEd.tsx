@@ -20,8 +20,9 @@ if (typeof window !== "undefined") {
  * 232 px de ancho con el container en su tope de 1280:
  *
  *   N1 Dirección General      → Daniela: card ancha, masthead arriba-izquierda.
- *   N2 Dirección Académica    → Karla: card menor, escalonada abajo-derecha.
- *   N3 Líderes de área/proy.  → grilla ESTABLE 2×2 de cards medianas.
+ *   N2 Dirección              → Karla y Raquel: cards menores, escalonadas
+ *                               abajo-derecha, una debajo de la otra.
+ *   N3 Líderes de área/proy.  → grilla ESTABLE de cards medianas (2 columnas).
  *   N4 Facilitación y diseño  → grilla ESTABLE 3×2 de cards compactas.
  *
  * N3 y N4 comparten estructura: un RAÍL IZQUIERDO con el encabezado del nivel
@@ -132,7 +133,8 @@ export function ImpulsanEd() {
 
   const lideres = porTier(3);
   const facilitacion = porTier(4);
-  const karla = porTier(2)[0];
+  // Dirección (nivel 2): académica + institucional. Antes era una sola card.
+  const direccion = porTier(2);
 
   const openProfile = (persona: Persona, el: HTMLButtonElement) => {
     setSelected({ persona, el });
@@ -236,12 +238,35 @@ export function ImpulsanEd() {
   return (
     <section
       aria-label="Quiénes sostienen ED — el equipo"
+      // La página termina sobre esta lámina navy y el footer también es navy:
+      // sin teñir la muesca del footer, su esquina redondeada deja dos
+      // triángulos blancos justo en el encuentro (ver globals.css).
+      data-footer-dock-tint="azul"
       className="bg-azul-principal relative z-[45] -mt-[4svh] overflow-clip rounded-t-[2.5rem] text-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.45)]"
     >
       {/* Textura de puntos de marca */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:radial-gradient(circle,#fff_1.1px,transparent_1.6px)] [background-size:24px_24px]"
+      />
+
+      {/* Degradé de salida hacia el pie: una sombra ancha que sube desde el
+          final de la lámina, toma cuerpo a media altura y VUELVE a cero justo
+          en el borde. Al llegar al encuentro con el footer la sombra ya no
+          pinta nada, así que ahí queda el navy exacto del footer y el paso no
+          dibuja ninguna línea.
+          Va con alfa sobre el fondo (no como color sólido) por dos razones: la
+          caída es continua de punta a punta —con paradas de color intermedias
+          el propio degradé marcaba un escalón a media altura— y el color base
+          lo sigue poniendo la lámina, así que no hay dos navies que mantener
+          sincronizados. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[26rem]"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgb(4 6 12 / 0) 0%, rgb(4 6 12 / 0.34) 55%, rgb(4 6 12 / 0) 100%)",
+        }}
       />
 
       <div ref={rootRef} className="relative z-10 mx-auto max-w-screen-xl px-5 py-24 md:px-10 md:py-28">
@@ -279,12 +304,19 @@ export function ImpulsanEd() {
             </div>
           </div>
 
-          {/* N2 — Dirección Académica (retrato menor, abajo-derecha, escalonado) */}
+          {/* N2 — Dirección (retratos menores, abajo-derecha, escalonados). La
+              columna sostiene las dos direcciones —académica e institucional—
+              una debajo de la otra: siguen la diagonal que abre Daniela sin
+              achicarse para entrar en la misma fila. */}
           <div className="lg:col-span-4 lg:col-start-9 lg:mt-[9rem] lg:self-start">
-            <KickerRotulo>Dirección académica</KickerRotulo>
-            <div data-reveal className="mt-4">
-              {karla && <PersonCard persona={karla} onOpen={openProfile} />}
-            </div>
+            <KickerRotulo>Dirección</KickerRotulo>
+            <ul className="mt-4 grid gap-8">
+              {direccion.map((persona) => (
+                <li key={persona.key} data-reveal>
+                  <PersonCard persona={persona} onOpen={openProfile} />
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Conector verde discreto entre las dos direcciones (solo desktop) */}
@@ -304,7 +336,8 @@ export function ImpulsanEd() {
           revealStagger="0.09"
         >
           {/* Alineada al borde derecho del masthead: el bloque cierra donde
-              cierra Karla, y el aire queda entre el título y la gente. */}
+              cierra la columna de dirección, y el aire queda entre el título y
+              la gente. Dos columnas, tantas filas como personas haya. */}
           <ul className="grid w-full max-w-[40rem] grid-cols-2 gap-6 justify-self-end lg:gap-8">
             {lideres.map((persona) => (
               <li key={persona.key} data-reveal>
@@ -333,10 +366,6 @@ export function ImpulsanEd() {
             ))}
           </ul>
         </Nivel>
-
-        {/* Pendientes de foto del cliente: Andrea Vergara (Pensamiento
-            Estadístico, Chile) y Luis López (Pensamiento Aritmético y
-            Algebraico, Costa Rica) — sumar cuando lleguen. */}
 
         {/* ── Cierre: respiración final + nodo (la red se resuelve en un
             punto), sin CTA inventado. Deja continuidad con la sección
