@@ -45,6 +45,8 @@ type Cfg = {
   labelAtRest: boolean;
   /** Mostrar el label en hover (en las compactas de N4 va solo la flecha). */
   labelOnHover: boolean;
+  /** Cuerpo de las iniciales en la card sin foto (ver `SinFoto`). */
+  iniciales: string;
 };
 
 /**
@@ -60,11 +62,41 @@ type Cfg = {
  * Académica también en el estado base.
  */
 const CFG: Record<Tier, Cfg> = {
-  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", plate: "bg-white", pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true },
-  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", plate: "bg-white", pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true },
-  3: { aspect: "aspect-[4/5]", radius: "rounded-[1.35rem]", plate: "bg-white/82 backdrop-blur-[3px]", pad: "p-[1.15rem]", nombre: "text-[1.18rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true },
-  4: { aspect: "aspect-[4/5]", radius: "rounded-[1.15rem]", plate: "bg-white/82 backdrop-blur-[3px]", pad: "p-[0.95rem]", nombre: "text-[1.02rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true },
+  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", plate: "bg-white", pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, iniciales: "text-[7rem]" },
+  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", plate: "bg-white", pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[5.5rem]" },
+  3: { aspect: "aspect-[4/5]", radius: "rounded-[1.35rem]", plate: "bg-white/82 backdrop-blur-[3px]", pad: "p-[1.15rem]", nombre: "text-[1.18rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[4.4rem]" },
+  4: { aspect: "aspect-[4/5]", radius: "rounded-[1.15rem]", plate: "bg-white/82 backdrop-blur-[3px]", pad: "p-[0.95rem]", nombre: "text-[1.02rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, iniciales: "text-[3.1rem]" },
 };
+
+/**
+ * Superficie de la card cuando la persona pidió NO publicar foto.
+ *
+ * No es un placeholder ni un "falta la imagen": es la card resuelta con los
+ * materiales de la marca — la superficie gris de la página, su trama de puntos
+ * y las iniciales en tinta muy baja, del mismo tamaño y forma que las demás.
+ * Vista en la grilla se lee como una pieza más del pliego, no como un hueco.
+ */
+function SinFoto({ persona, cfg }: { persona: Persona; cfg: Cfg }) {
+  const iniciales = persona.nombre
+    .split(" ")
+    .map((p) => p[0])
+    .join("");
+  return (
+    <span aria-hidden="true" className="bg-gris-fondo absolute inset-0 block">
+      <span className="absolute inset-0 opacity-[0.5] [background-image:radial-gradient(circle,color-mix(in_srgb,var(--color-azul-principal)_22%,transparent)_1.1px,transparent_1.6px)] [background-size:22px_22px]" />
+      {/* Las iniciales suben respecto del centro: abajo vive el caption y, si
+          quedaran centradas de verdad, se leerían pegadas al nombre. */}
+      <span
+        className={cx(
+          "font-display text-azul-principal/12 absolute inset-0 flex items-center justify-center pb-[26%] font-extrabold tracking-[-0.04em] transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] select-none group-hover:scale-[1.045] group-focus-visible:scale-[1.045]",
+          cfg.iniciales,
+        )}
+      >
+        {iniciales}
+      </span>
+    </span>
+  );
+}
 
 /** Un caption (reposo o hover). Los dos son estructuralmente idénticos para
  *  que el texto quede exactamente en la misma posición y el cross-fade no salte. */
@@ -152,22 +184,27 @@ export function PersonCard({
         cfg.radius,
       )}
     >
-      {/* Foto — cubre toda la card, color pleno, encuadre por persona */}
-      <Image
-        src={fotoDe(persona.key)}
-        alt={persona.nombre}
-        fill
-        sizes={persona.tier <= 2 ? "(max-width: 1024px) 90vw, 640px" : persona.tier === 3 ? "(max-width: 1024px) 45vw, 320px" : "(max-width: 1024px) 30vw, 240px"}
-        style={
-          {
-            objectPosition: persona.imagePosition,
-            "--foto-zoom": persona.imageZoom ?? 1,
-          } as React.CSSProperties
-        }
-        /* El acercamiento de hover se multiplica por el zoom propio de la foto,
-           así el gesto es el mismo para todos sin importar de qué encuadre parta. */
-        className="scale-[var(--foto-zoom)] object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[calc(var(--foto-zoom)*1.045)] group-hover:will-change-transform group-focus-visible:scale-[calc(var(--foto-zoom)*1.045)] group-focus-visible:will-change-transform"
-      />
+      {/* Foto — cubre toda la card, color pleno, encuadre por persona. Quien
+          pidió no publicar retrato lleva la superficie tipográfica. */}
+      {persona.sinFoto ? (
+        <SinFoto persona={persona} cfg={cfg} />
+      ) : (
+        <Image
+          src={fotoDe(persona.key)}
+          alt={persona.nombre}
+          fill
+          sizes={persona.tier <= 2 ? "(max-width: 1024px) 90vw, 640px" : persona.tier === 3 ? "(max-width: 1024px) 45vw, 320px" : "(max-width: 1024px) 30vw, 240px"}
+          style={
+            {
+              objectPosition: persona.imagePosition,
+              "--foto-zoom": persona.imageZoom ?? 1,
+            } as React.CSSProperties
+          }
+          /* El acercamiento de hover se multiplica por el zoom propio de la foto,
+             así el gesto es el mismo para todos sin importar de qué encuadre parta. */
+          className="scale-[var(--foto-zoom)] object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[calc(var(--foto-zoom)*1.045)] group-hover:will-change-transform group-focus-visible:scale-[calc(var(--foto-zoom)*1.045)] group-focus-visible:will-change-transform"
+        />
+      )}
       {/* Captions pre-apilados: reposo (plate claro) ↔ hover (scrim navy) */}
       <Caption persona={persona} cfg={cfg} variant="rest" />
       <Caption persona={persona} cfg={cfg} variant="hover" />

@@ -72,8 +72,13 @@ const CONTENT_W: Record<StageVariant | "default", string> = {
   default: "max-w-[36rem]",
 };
 
-/* Pose final (sidebar) del bloque de identidad, en px (se anima font-size). */
-const ID_FINAL = { line1: 15, line2: 21, role: 10.5, roleGap: 8 };
+/* Pose final (sidebar) del bloque de identidad, en px (se anima font-size).
+ * `roleMaxW` = ancho de la columna del índice (w-[14.5rem]): el cargo tiene que
+ * PLEGARSE ahí. Sin ese límite, un cargo largo —«Líder de Pensamiento
+ * Aritmético y Algebraico»— sigue en una sola línea y se mete por encima del
+ * contenido de las etapas. En el hero no aplica: ahí el cargo tiene ancho de
+ * sobra y va en una línea. */
+const ID_FINAL = { line1: 15, line2: 21, role: 10.5, roleGap: 8, roleMaxW: 232 };
 
 export function ImmersiveProfile({
   profile,
@@ -118,6 +123,8 @@ export function ImmersiveProfile({
   const passedIds = new Set(
     profile.stages.filter((s) => s.n <= activeStage).map((s) => s.categoryId),
   );
+  /** Tratamiento de la fotografía (ver `Profile.figura`). */
+  const figura = profile.figura ?? "recorte";
   // Titular en dos tiempos (frase real, partida en oraciones para jerarquía).
   const headlineParts = profile.headline
     .split(". ")
@@ -186,22 +193,37 @@ export function ImmersiveProfile({
           0,
         );
 
+      // El cargo se PLIEGA al ancho de la columna sobre el final del viaje. Va
+      // escrito a mano sobre el DOM y no como propiedad del tween: acá no
+      // interesa interpolar un ancho, sino el punto exacto en que el cargo deja
+      // de ser una línea del hero y pasa a ser el subtítulo de la columna.
+      // Antes de este pliegue, un cargo largo seguía de largo por encima del
+      // contenido de las etapas.
+      idTl.eventCallback("onUpdate", () => {
+        const el = idRoleRef.current;
+        if (el) el.style.maxWidth = idTl.progress() > 0.9 ? `${ID_FINAL.roleMaxW}px` : "";
+      });
+
       // ── FIGURA: protagonista del hero → se retira al empezar el camino ──
       // (aria-hidden decorativa → autoAlpha ok; el nombre real vive en el h2.)
-      gsap.to(portraitOuterRef.current, {
-        x: 90,
-        scale: 0.95,
-        autoAlpha: 0,
-        transformOrigin: "bottom right",
-        ease: "power1.in",
-        scrollTrigger: st({
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom 68%",
-          scrub: 0.5,
-          invalidateOnRefresh: true,
-        }),
-      });
+      // Sin figura (`figura: "sin"`) los refs son null y este tramo se saltea:
+      // el recorrido se sostiene con el nombre, el camino y las etapas.
+      if (portraitOuterRef.current) {
+        gsap.to(portraitOuterRef.current, {
+          x: 90,
+          scale: 0.95,
+          autoAlpha: 0,
+          transformOrigin: "bottom right",
+          ease: "power1.in",
+          scrollTrigger: st({
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom 68%",
+            scrub: 0.5,
+            invalidateOnRefresh: true,
+          }),
+        });
+      }
 
       // ── Cuerpo del hero (frase, intro, pista) se disuelve hacia arriba ──
       // Rápido: debe estar resuelto ANTES de que el nombre aterrice y la
@@ -352,7 +374,7 @@ export function ImmersiveProfile({
       const heroEls = gsap.utils.toArray<HTMLElement>("[data-hero-el]");
       gsap.set(heroEls, { opacity: 0, y: 26 });
       gsap.set(identity, { opacity: 0 });
-      gsap.set(portraitOuterRef.current, { autoAlpha: 0 });
+      if (portraitOuterRef.current) gsap.set(portraitOuterRef.current, { autoAlpha: 0 });
 
       const intro = gsap.timeline({ delay: 0.18, defaults: { ease: "power3.inOut" } });
       const cardImg = originEl?.querySelector("img");
@@ -377,7 +399,8 @@ export function ImmersiveProfile({
           );
         }
       }
-      intro.to(portraitOuterRef.current, { autoAlpha: 1, duration: 0.45, ease: "power2.out" }, 0);
+      if (portraitOuterRef.current)
+        intro.to(portraitOuterRef.current, { autoAlpha: 1, duration: 0.45, ease: "power2.out" }, 0);
       if (identity && cardName) {
         const nr = cardName.getBoundingClientRect();
         const line2H = idLine2Ref.current?.getBoundingClientRect().height || 64;
@@ -448,13 +471,26 @@ export function ImmersiveProfile({
             </p>
             <p className="text-gris-texto mt-4 max-w-[52ch] font-sans text-[1rem] leading-relaxed">{profile.intro}</p>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={profile.cutout}
-            alt={profile.fullName}
-            className="mx-auto max-h-[52vh] w-auto object-contain"
-            style={{ objectPosition: profile.cutoutPosition }}
-          />
+          {figura === "recorte" && profile.cutout && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={profile.cutout}
+              alt={profile.fullName}
+              className="mx-auto max-h-[52vh] w-auto object-contain"
+              style={{ objectPosition: profile.cutoutPosition }}
+            />
+          )}
+          {figura === "marco" && profile.cutout && (
+            <div className="ring-azul-principal/10 mx-auto aspect-[4/5] w-full max-w-[20rem] overflow-hidden rounded-[1.5rem] shadow-[0_30px_70px_-36px_rgb(31_45_77/0.45)] ring-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={profile.cutout}
+                alt={profile.fullName}
+                className="h-full w-full object-cover"
+                style={{ objectPosition: profile.cutoutPosition }}
+              />
+            </div>
+          )}
         </header>
 
         <div className="border-azul-principal/10 mt-10 border-t pt-8">
@@ -550,28 +586,51 @@ export function ImmersiveProfile({
       </aside>
 
       {/* ── FIGURA (capa fija): protagonista de la apertura, se retira al
-          empezar el recorrido. Parada sobre el borde inferior, sin rectángulo. ── */}
-      <div
-        ref={portraitOuterRef}
-        aria-hidden="true"
-        className="pointer-events-none fixed bottom-0 z-[5] hidden h-[min(74vh,700px)] w-[30rem] items-end justify-end lg:flex"
-        style={{ right: "max(1.25rem, calc((100vw - 1440px)/2 + 2rem))" }}
-      >
-        <div ref={portraitMoverRef} className="relative flex h-full w-full items-end justify-end">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            ref={portraitImgRef}
-            src={profile.cutout}
-            alt=""
-            className="h-full w-auto object-contain object-bottom drop-shadow-[0_18px_44px_rgb(31_45_77/0.12)]"
-            style={{
-              objectPosition: profile.cutoutPosition,
-              maskImage: "linear-gradient(to bottom, #000 86%, rgb(0 0 0 / 0.4) 97%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, #000 86%, rgb(0 0 0 / 0.4) 97%, transparent 100%)",
-            }}
-          />
+          empezar el recorrido. Con recorte va parada sobre el borde inferior y
+          sin rectángulo; con foto normal va enmarcada y flotando (una foto
+          rectangular "apoyada en el piso" se lee como un error de recorte). ── */}
+      {figura !== "sin" && profile.cutout && (
+        <div
+          ref={portraitOuterRef}
+          aria-hidden="true"
+          className="pointer-events-none fixed bottom-0 z-[5] hidden h-[min(74vh,700px)] w-[30rem] items-end justify-end lg:flex"
+          style={{ right: "max(1.25rem, calc((100vw - 1440px)/2 + 2rem))" }}
+        >
+          <div
+            ref={portraitMoverRef}
+            className={cx(
+              "relative flex h-full w-full items-end justify-end",
+              figura === "marco" && "pb-[9vh]",
+            )}
+          >
+            {figura === "marco" ? (
+              <div className="ring-azul-principal/10 relative h-[min(58vh,520px)] w-[clamp(14rem,21vw,19rem)] overflow-hidden rounded-[1.75rem] shadow-[0_44px_90px_-44px_rgb(31_45_77/0.5)] ring-1">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  ref={portraitImgRef}
+                  src={profile.cutout}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: profile.cutoutPosition }}
+                />
+              </div>
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                ref={portraitImgRef}
+                src={profile.cutout}
+                alt=""
+                className="h-full w-auto object-contain object-bottom drop-shadow-[0_18px_44px_rgb(31_45_77/0.12)]"
+                style={{
+                  objectPosition: profile.cutoutPosition,
+                  maskImage: "linear-gradient(to bottom, #000 86%, rgb(0 0 0 / 0.4) 97%, transparent 100%)",
+                  WebkitMaskImage: "linear-gradient(to bottom, #000 86%, rgb(0 0 0 / 0.4) 97%, transparent 100%)",
+                }}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Contenido scrolleable (banda compartida con las capas fijas) ── */}
       <div className="relative z-[4] mx-auto w-full max-w-[1440px] px-[clamp(1.25rem,4vw,3rem)]">
@@ -714,22 +773,39 @@ export function ImmersiveProfile({
             }}
           />
           {/* La figura reaparece, integrada a la convergencia */}
-          <div
-            ref={closingFigRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute right-[3%] bottom-0 hidden h-[min(48vh,440px)] lg:block"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={profile.cutout}
-              alt=""
-              className="h-full w-auto object-contain object-bottom opacity-90"
-              style={{
-                maskImage: "linear-gradient(to bottom, #000 84%, transparent 100%)",
-                WebkitMaskImage: "linear-gradient(to bottom, #000 84%, transparent 100%)",
-              }}
-            />
-          </div>
+          {figura !== "sin" && profile.cutout && (
+            <div
+              ref={closingFigRef}
+              aria-hidden="true"
+              className={cx(
+                "pointer-events-none absolute right-[3%] hidden lg:block",
+                figura === "marco" ? "bottom-[9%] h-[min(36vh,320px)]" : "bottom-0 h-[min(48vh,440px)]",
+              )}
+            >
+              {figura === "marco" ? (
+                <div className="ring-azul-principal/10 h-full w-[calc(min(36vh,320px)*0.8)] overflow-hidden rounded-[1.4rem] opacity-95 shadow-[0_34px_70px_-40px_rgb(31_45_77/0.45)] ring-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={profile.cutout}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: profile.cutoutPosition }}
+                  />
+                </div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={profile.cutout}
+                  alt=""
+                  className="h-full w-auto object-contain object-bottom opacity-90"
+                  style={{
+                    maskImage: "linear-gradient(to bottom, #000 84%, transparent 100%)",
+                    WebkitMaskImage: "linear-gradient(to bottom, #000 84%, transparent 100%)",
+                  }}
+                />
+              )}
+            </div>
+          )}
 
           <div className="relative max-w-[48rem]">
             <span
