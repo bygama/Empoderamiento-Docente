@@ -187,14 +187,14 @@ export function CierreInvestigacion() {
         </div>
 
         {/* ── Los dos mensajes que la luz lee de costado: invitaciones. */}
-        <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(220px,20vw)_1fr]">
+        <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(200px,17vw)_1fr] lg:gap-x-6">
           {/* Primera parada del haz: dónde vive lo que investigamos. */}
-          <div id="biblioteca" data-cierre-bloque className="max-w-[30ch] lg:justify-self-end">
+          <div id="biblioteca" data-cierre-bloque className="max-w-[30rem] lg:max-w-none lg:justify-self-end">
             <Eyebrow variant="light">Producción académica</Eyebrow>
             <h2
               data-cierre-titulo
-              className="font-display text-azul-claro mt-5 font-extrabold tracking-[-0.02em]"
-              style={{ fontSize: "clamp(1.7rem, 0.9rem + 1.7vw, 2.5rem)", lineHeight: 1.08 }}
+              className="font-display text-azul-claro mt-5 font-extrabold tracking-[-0.02em] text-balance"
+              style={{ fontSize: "clamp(1.6rem, 0.8rem + 1.5vw, 2.1rem)", lineHeight: 1.08 }}
             >
               La investigación también se comparte.
             </h2>
@@ -209,14 +209,14 @@ export function CierreInvestigacion() {
           <div aria-hidden="true" className="hidden lg:block" />
 
           {/* Última parada del haz: el camino. */}
-          <div data-cierre-bloque className="max-w-[30ch]">
+          <div data-cierre-bloque className="max-w-[30rem] lg:max-w-none">
             <p className="text-azul-claro/70 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
               Investigar para transformar
             </p>
             <h2
               data-cierre-titulo
-              className="font-display mt-5 font-extrabold tracking-[-0.025em]"
-              style={{ fontSize: "clamp(2rem, 1rem + 2.3vw, 3rem)", lineHeight: 1.04 }}
+              className="font-display mt-5 font-extrabold tracking-[-0.025em] text-balance"
+              style={{ fontSize: "clamp(1.6rem, 0.8rem + 1.5vw, 2.1rem)", lineHeight: 1.08 }}
             >
               Investigar permite hacer mejores preguntas.
             </h2>
