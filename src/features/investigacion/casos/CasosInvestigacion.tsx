@@ -459,6 +459,8 @@ export function CasosInvestigacion() {
           {indiceVisible && (
             <div className="relative">
               <div ref={introRef} data-casos-intro>
+                {/* Invitación, no lectura: eyebrow + título y las carpetas
+                    hablan solas. El único apoyo es el rótulo de archivo. */}
                 <div className="flex flex-wrap items-end justify-between gap-6">
                   <div className="max-w-3xl">
                     <Eyebrow>Investigación en acción</Eyebrow>
@@ -468,18 +470,6 @@ export function CasosInvestigacion() {
                       className="font-display text-azul-principal mt-4 text-h2 font-extrabold tracking-[-0.02em]"
                     >
                       Casos de investigación
-                    </RevealLines>
-                    <RevealLines
-                      as="p"
-                      delay={0.12}
-                      enabled={!introRevelado}
-                      className="text-azul-principal/80 mt-5 font-sans text-body leading-relaxed"
-                    >
-                      La investigación toma forma cuando las preguntas se
-                      encuentran con contextos, evidencias y decisiones reales.
-                      Abrimos algunos procesos para mostrar cómo Empoderamiento
-                      Docente investiga, aprende y transforma junto con las
-                      comunidades educativas.
                     </RevealLines>
                   </div>
                   <p
