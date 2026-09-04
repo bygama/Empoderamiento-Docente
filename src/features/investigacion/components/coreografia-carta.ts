@@ -65,16 +65,18 @@ const T = {
   fichasEntran: { desde: 0.6, cada: 0.08 },
   cartaSube: { desde: 1.0, hasta: 2.1 },
   tituloSeVa: { desde: 1.5, hasta: 1.85 },
-  cartaSale: { desde: 2.6, hasta: 3.4 },
-  sobreSale: { desde: 2.8, hasta: 3.3 },
-  fichasViajan: { desde: 2.9, dura: 0.8, cada: 0.1 },
-  fichasAbren: { desde: 3.6, dura: 0.35, cada: 0.06 },
-  figurasForman: { desde: 3.65, dura: 0.5, cada: 0.06 },
-  fin: 4.4,
+  // La carta sale LINEAL y despacio (se termina de leer mientras sube) y
+  // se va del todo ANTES de que las fichas viajen: nunca se pisan.
+  cartaSale: { desde: 2.5, hasta: 3.7 },
+  sobreSale: { desde: 2.7, hasta: 3.3 },
+  fichasViajan: { desde: 3.7, dura: 0.8, cada: 0.1 },
+  fichasAbren: { desde: 4.45, dura: 0.35, cada: 0.06 },
+  figurasForman: { desde: 4.5, dura: 0.5, cada: 0.06 },
+  fin: 5.3,
 } as const;
 
 /** Alto del recorrido pinneado en px de scroll. */
-export const RECORRIDO_CARTA = 4400;
+export const RECORRIDO_CARTA = 5300;
 
 /** Largo de la arista j de una figura (para el trazado con dash). */
 function largoArista(figura: (typeof FIGURAS)[number], j: number) {
@@ -104,7 +106,11 @@ export function crearCarta({ zona, hoja }: Escena) {
   // ── Geometría de la carta, sin transforms (offsets de layout): el sobre
   //    es hijo posicionado de la hoja y la carta, hija posicionada del sobre.
   const topCarta = () => sobre.offsetTop + carta.offsetTop;
-  const yLectura = () => (alto() - carta.offsetHeight) / 2 - topCarta();
+  /** Posición de lectura: centrada, pero nunca con el encabezado de la
+   *  carta fuera de pantalla (en viewports bajos la hoja es más alta que
+   *  el escenario: se lee el arranque acá y el resto mientras sube). */
+  const yLectura = () =>
+    Math.max((alto() - carta.offsetHeight) / 2, alto() * 0.07) - topCarta();
   /** El sobre se hunde bajo el piso con solapa y todo (la solapa asoma
    *  9rem por arriba de su caja). */
   const hundidoSobre = () => sobre.offsetHeight + 200;
@@ -193,6 +199,13 @@ export function crearCarta({ zona, hoja }: Escena) {
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
+      // Este trigger nace DESPUÉS que los de las secciones de abajo (live se
+      // decide en un layout effect). ScrollTrigger procesa los pins en orden
+      // de creación salvo que algún trigger declare refreshPriority: con eso
+      // ordena por posición en la página y el spacer de la carta se suma bien
+      // al inicio de los pins siguientes (si no, el cierre pinneaba 4400px
+      // antes de tiempo).
+      refreshPriority: 0,
       onUpdate: (self) => {
         // Progreso expuesto para QA (scripts de scroll leen data-progreso).
         zona.dataset.progreso = self.progress.toFixed(3);
@@ -268,7 +281,7 @@ export function crearCarta({ zona, hoja }: Escena) {
   tl.fromTo(
     carta,
     { y: yLectura },
-    { y: ySalida, duration: T.cartaSale.hasta - T.cartaSale.desde, ease: "power1.in", ...sinRender },
+    { y: ySalida, duration: T.cartaSale.hasta - T.cartaSale.desde, ...sinRender },
     T.cartaSale.desde,
   );
   tl.fromTo(
