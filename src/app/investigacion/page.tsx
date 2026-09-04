@@ -6,7 +6,6 @@ import { CicloInvestigacionAplicada } from "@/features/investigacion/components/
 import { ProyectosAplicaciones } from "@/features/investigacion/components/ProyectosAplicaciones";
 import { VolvemosInvestigar } from "@/features/investigacion/components/VolvemosInvestigar";
 import { InvestigacionEnAccion } from "@/features/investigacion/components/InvestigacionEnAccion";
-import { ConexionBiblioteca } from "@/features/investigacion/components/ConexionBiblioteca";
 import { CierreInvestigacion } from "@/features/investigacion/components/CierreInvestigacion";
 
 export const metadata: Metadata = {
@@ -34,7 +33,6 @@ export default function InvestigacionPage() {
       <ProyectosAplicaciones />
       <VolvemosInvestigar />
       <InvestigacionEnAccion />
-      <ConexionBiblioteca />
       <CierreInvestigacion />
     </main>
   );
