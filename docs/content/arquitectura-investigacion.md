@@ -55,18 +55,18 @@ problematizar, interpretar, resignificar, producir evidencia, sistematizar).
 | 2 | Por qué investigamos | `#sentido` | Origen, sentido y los cuatro fundamentos |
 | 3 | Líneas de investigación | `#lineas` | Los seis grandes temas que estudia ED |
 | 4 | Ciclo de investigación aplicada | `#ciclo` | De la investigación a la acción (ciclo pedagógico) |
-| 5 | Proyectos y aplicaciones | `#proyectos` | Lo que investigamos, puesto a trabajar: cinco áreas (venía de Qué hacemos) |
-| 6 | Volvemos a investigar | `#evidencia` | Evidencia, análisis y producción de conocimiento |
-| 7 | Investigación en acción | `#en-accion` | Preguntas aplicadas en proyectos reales |
-| 8 | Conexión con Biblioteca | `#biblioteca` | Dónde vive la producción académica |
-| 9 | Cierre | — | Acción clara hacia Contacto |
+| 5 | Volvemos a investigar | `#evidencia` | Evidencia, análisis y producción de conocimiento |
+| 6 | Investigación en acción | `#en-accion` | Preguntas aplicadas en proyectos reales |
+| 7 | Conexión con Biblioteca | `#biblioteca` | Dónde vive la producción académica |
+| 8 | Cierre | — | Acción clara hacia Contacto |
 
-> **Decisión tomada (usuario, 02-09-2026):** «Proyectos y aplicaciones»
-> (antes sección 6 de Qué hacemos) pasa a esta página, después del ciclo
-> de investigación aplicada. Su contenido y pendientes (proyectos reales
-> con nombre, sin inventar casos) siguen descritos en
+> **Decisión tomada (usuario, 04-09-2026):** «Proyectos y aplicaciones»
+> (traída de Qué hacemos el 02-09-2026) **se quita de esta página**: eran
+> cinco áreas del modelo conceptual sin proyectos reales, y su función la
+> cumple «Investigación en acción». Sus pendientes (proyectos reales con
+> nombre, sin inventar casos) siguen descritos en
 > `arquitectura-que-hacemos.md` §8. («Cómo trabajamos» se probó acá el
-> mismo día y volvió a Qué hacemos.)
+> 02-09 y volvió a Qué hacemos.)
 
 ---
 
