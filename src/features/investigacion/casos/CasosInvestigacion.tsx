@@ -433,12 +433,20 @@ export function CasosInvestigacion() {
   const casoActivo = activo !== null ? CASOS[activo] : null;
   const indiceVisible = activo === null || estado === "opening" || estado === "closing";
 
+  // z-40 mientras el expediente está montado: la capa fija del lugar vive
+  // DENTRO de esta sección (isolate). Al desmontarse el índice el documento
+  // se acorta, ScrollTrigger se refresca y una sección pinneada más abajo
+  // (el cierre con el faro) pasa a position:fixed; sin z-index propio
+  // ganaría por orden del DOM y taparía el expediente. Queda por debajo del
+  // navbar (z-50): el expediente sigue siendo una página del sitio.
   return (
     <section
       ref={sectionRef}
       id="en-accion"
       aria-label="Investigación en acción"
-      className="bg-gris-fondo relative isolate overflow-hidden"
+      className={`bg-gris-fondo relative isolate overflow-hidden ${
+        activo !== null ? "z-40" : ""
+      }`}
     >
       <div className="mx-auto w-full max-w-screen-xl px-5 py-20 md:px-10 md:py-28">
         <p aria-live="polite" className="sr-only">
