@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { InvestigacionHero } from "@/features/investigacion/components/InvestigacionHero";
-import { PorQueInvestigamos } from "@/features/investigacion/components/PorQueInvestigamos";
+import { CartaAbierta } from "@/features/investigacion/components/CartaAbierta";
 import { LineasInvestigacion } from "@/features/investigacion/components/LineasInvestigacion";
 import { CicloInvestigacionAplicada } from "@/features/investigacion/components/CicloInvestigacionAplicada";
 import { VolvemosInvestigar } from "@/features/investigacion/components/VolvemosInvestigar";
@@ -26,7 +26,7 @@ export default function InvestigacionPage() {
   return (
     <main>
       <InvestigacionHero />
-      <PorQueInvestigamos />
+      <CartaAbierta />
       <LineasInvestigacion />
       <CicloInvestigacionAplicada />
       <VolvemosInvestigar />
