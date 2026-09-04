@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -161,6 +162,10 @@ export function CartaAbierta() {
     const ctx = gsap.context(() => {
       crearCarta({ zona, hoja });
     }, zona);
+    // El pin de la carta entra un render después que los triggers de las
+    // secciones siguientes (live se decide en un layout effect): su spacer
+    // corre todo lo de abajo, así que hay que recalcular los demás.
+    ScrollTrigger.refresh();
     return () => ctx.revert();
   }, [live]);
 
