@@ -1,4 +1,4 @@
-import { FIGURAS, PUNTOS, VIEWBOX, type Figura } from "./constelacion";
+import { FIGURAS, PERSONAJE, PUNTOS, VIEWBOX, type Figura } from "./constelacion";
 
 /**
  * Factor sobre el radio de cada punto del hero: la figura se ve chica (una
@@ -17,13 +17,19 @@ export const RADIO_ESTAMPA = 2.3;
  * El SSR la dibuja formada. Los data-attributes (`data-figura-punto`,
  * `data-figura-arista`) dejan que una coreografía la desarme y la vuelva a
  * formar (puntos que caen en su lugar, aristas que se trazan).
+ *
+ * `personajeVisible=false` esconde el punto naranja (el personaje) con una
+ * transición: la figura queda "sin su personaje" mientras este está en otro
+ * lado de la sección (Líneas lo manda a marcar la fila abierta).
  */
 export function FiguraConstelacion({
   id,
   className = "",
+  personajeVisible = true,
 }: {
   id: Figura["id"];
   className?: string;
+  personajeVisible?: boolean;
 }) {
   const figura = FIGURAS.find((f) => f.id === id) ?? FIGURAS[0];
 
@@ -59,6 +65,16 @@ export function FiguraConstelacion({
           cy={figura.puntos[i][1]}
           r={p.r * RADIO_ESTAMPA}
           fill={p.color}
+          style={
+            i === PERSONAJE
+              ? {
+                  transformBox: "fill-box",
+                  transformOrigin: "center",
+                  transform: personajeVisible ? "scale(1)" : "scale(0)",
+                  transition: "transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+                }
+              : undefined
+          }
         />
       ))}
     </svg>
