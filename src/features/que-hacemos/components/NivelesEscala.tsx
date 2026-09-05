@@ -19,16 +19,25 @@ if (typeof window !== "undefined") {
  * repartidas en zig-zag por todo el ancho — de lo micro a lo macro. Llegar y
  * cerrar van separados a propósito: antes la card empezaba a cerrarse a tres
  * cuartos de la subida y la descripción nunca estaba quieta para leerse.
- * Siempre hay UNA card abierta y quieta.
+ * Siempre hay UNA card abierta y quieta. Y cada cierre pasa SOLO, en el
+ * hueco entre dos llegadas: si se superpone con la card que entra, el ojo
+ * se va con la que entra y el cierre no se ve (ver CIERRE_INICIO).
  *
- * El titular "Del aula," abre la sección con la coma en suspenso y se va
- * antes de la primera card. Lo que sigue son las cards: la última llegada
- * (con el cierre de la anterior) es lo último que se ve antes de que el
- * sticky se suelte. Había un remate en que las cards cedían y volvía el
- * titular completo ("Del aula, / al sistema educativo.") en una pantalla
- * propia; se sacó (Facundo, 2026-09-03): era una pantalla más que
+ * En vivo la sección es encabezado + cards y nada más: el cierre de la
+ * quinta es lo último que se ve, y el sticky se suelta con los cinco
+ * títulos en escena. Hubo dos piezas de titular que ya no están. El remate
+ * ("Del aula, / al sistema educativo." en pantalla propia, con las cards
+ * cediendo) se sacó (Facundo, 2026-09-03): era una pantalla más que
  * scrollear después de la coreografía, y la animación tiene que ser lo
- * último.
+ * último. La apertura ("Del aula," solo, con la coma en suspenso) se sacó
+ * (Mateo, 2026-09-05): sin el remate que la completaba quedaba media frase
+ * colgada. La frase entera sigue viva en el fallback sin motion.
+ *
+ * La timeline arranca ENTRADA_SVH de scroll ANTES de que el escenario se
+ * clave, así el lazo ya viene entrando cuando la sección se traba (Mateo,
+ * 2026-09-05). Las cards NO se corrieron: siguen arrancando con el
+ * escenario ya clavado — por eso todo lo que no es el lazo va desplazado
+ * ENTRADA unidades.
  *
  * Sin motion / touch / pantalla chica: no clava; grilla legible + titular.
  * `live` arranca en false (coincide con SSR).
@@ -47,14 +56,40 @@ const POS = [
 // Ritmo de la escalada (unidades de la timeline; la zona mide ALTO_SVH).
 const PASO = 2.0; // separación entre llegadas
 const SUBIDA = 1.4; // lo que tarda una card en aterrizar
-const CIERRE_TRAS = 1.0; // la card i se cierra este rato después de que aterriza la i+1
-// Fin de la coreografía: la última card ya aterrizó y la anterior terminó
-// de cerrarse ((n-1)·PASO + SUBIDA·0.7 + CIERRE_TRAS + 0.8). De ahí al final
-// de la zona queda un respiro corto y el sticky se suelta.
-const FIN = 10.8;
-// Antes 640 con el remate del titular (13,3 unidades de timeline); mismo
-// ritmo de scroll por unidad (~40svh) para las 11,3 que quedan.
-const ALTO_SVH = 560;
+const CIERRE_TRAS = 0.45; // la card i se cierra este rato después de que aterriza la i+1
+const CIERRE = 0.45; // lo que tarda el cierre (el ícono va un toque más rápido)
+// CADA CIERRE TIENE QUE PASAR SOLO, ENTRE DOS LLEGADAS. Medido con
+// CIERRE_TRAS 1.0 y cierres de 0.8, la card i se cerraba en
+// (i+1)·PASO + 1.98 → +2.78 y la i+2 arrancaba a subir en (i+1)·PASO + 2.0:
+// el cierre transcurría casi entero por debajo de la llegada siguiente y no
+// se veía cuál card se había cerrado (Mateo, 2026-09-05: «el 3 no se cierra
+// en orden» — el orden estaba bien, lo que faltaba era poder verlo). Ahora
+// el cierre va de +1.43 a +1.88, o sea después de que la i+1 aterriza
+// (+SUBIDA = 1.4) y antes de que la i+2 arranque (+PASO = 2.0).
+// Al tocar PASO, SUBIDA, CIERRE_TRAS o CIERRE hay que rehacer esta cuenta.
+const CIERRE_INICIO = SUBIDA * 0.7 + CIERRE_TRAS;
+// Fin de la coreografía: se cerró la última card, que es la quinta y no
+// tiene ninguna atrás esperando (n·PASO + CIERRE_INICIO + CIERRE = 11,88).
+// De ahí al final de la zona queda un respiro corto y el sticky se suelta.
+const FIN = 11.9;
+// Antes 640 con el remate del titular (13,3 unidades de timeline), 560 con
+// cierres largos (11,3) y 520 sin el cierre de la quinta (10,4). Se sostiene
+// el mismo ritmo de scroll por unidad (~40svh) para las 12,4 que quedan.
+const ALTO_SVH = 600;
+
+// Cuánto scroll corre la timeline ANTES de que el escenario se clave. El
+// sticky se traba cuando el tope de la zona toca el tope del viewport, así
+// que basta con arrancar el ScrollTrigger a `top ENTRADA_SVH%`.
+// Apenas un anticipo: con 30 el lazo entraba de más y se comía el arranque
+// (Mateo, 2026-09-05).
+const ENTRADA_SVH = 10;
+// Unidades de timeline que se consumen con el escenario ya clavado: la zona
+// clava durante (ALTO_SVH - 100)svh, que es exactamente el tramo del
+// ScrollTrigger sin la entrada.
+const CUERPO = FIN + 0.5;
+// La entrada vale lo mismo por unidad de scroll que el resto: así el ritmo
+// no cambia al cruzar el momento en que se clava.
+const ENTRADA = (CUERPO * ENTRADA_SVH) / (ALTO_SVH - 100);
 
 // Recorrido del lazo viajero (viewBox 1600x900): entra por arriba, serpentea
 // entre las cards y sale por abajo. No se dibuja y queda — VIAJA: la cabeza
@@ -87,22 +122,21 @@ export function NivelesEscala() {
       const limpiadores: Array<() => void> = [];
       const ctx = gsap.context(() => {
         const cards = gsap.utils.toArray<HTMLElement>("[data-nivel-card]");
-        const headline = stage.querySelector<HTMLElement>("[data-nivel-headline]");
-        const l1 = stage.querySelector<HTMLElement>("[data-nivel-l1]");
         if (cards.length !== NIVELES.length) return;
 
         // Medir las zonas colapsables y fijarles alto para poder animarlo a 0.
         const colapsables = gsap.utils.toArray<HTMLElement>("[data-collapse]");
         colapsables.forEach((c) => gsap.set(c, { height: c.scrollHeight }));
         gsap.set(cards, { y: 760, autoAlpha: 0 });
-        // "Del aula," (con la coma: algo viene) está VISIBLE desde que la
-        // sección entra y se va antes de que aterrice la primera card.
-        // Estado inicial EXPLÍCITO en cada arranque.
-        if (headline) gsap.set(headline, { autoAlpha: 1 });
-        if (l1) gsap.set(l1, { autoAlpha: 1, y: 0 });
 
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: zone, start: "top top", end: "bottom bottom", scrub: 0.6 },
+          scrollTrigger: {
+            trigger: zone,
+            // Empieza ENTRADA_SVH antes de que el sticky se trabe.
+            start: `top ${ENTRADA_SVH}%`,
+            end: "bottom bottom",
+            scrub: 0.6,
+          },
         });
 
         // El lazo viajero + su cápsula: ventana visible que se desliza a lo
@@ -125,9 +159,11 @@ export function NivelesEscala() {
           });
           // Viaja hasta que la cápsula también salió del todo — y termina
           // ANTES del fin de la coreografía (FIN): que la última card no
-          // conviva con restos del lazo en escena.
+          // conviva con restos del lazo en escena. Arranca en 0, o sea
+          // ANTES de que el escenario se clave: es lo único que se mueve
+          // durante la entrada.
           const final = -(L + corrimiento + L * 0.02);
-          const viaje = FIN - 0.2;
+          const viaje = ENTRADA + FIN - 0.2;
           tl.to(lazo, { strokeDashoffset: final, ease: "none", duration: viaje }, 0).to(
             punto,
             { strokeDashoffset: final + corrimiento, ease: "none", duration: viaje },
@@ -136,33 +172,54 @@ export function NivelesEscala() {
           // Seguro definitivo: el tramo de salida por el borde de abajo es
           // largo y la cápsula ronda ahí un rato — el SVG entero se desvanece
           // antes del final, así después de este punto no queda tinta en
-          // escena pase lo que pase con la geometría.
-          if (cinta) tl.to(cinta, { autoAlpha: 0, ease: "none", duration: 0.6 }, FIN - 0.9);
+          // escena pase lo que pase con la geometría. Termina justo cuando
+          // arranca el último cierre (FIN es el fin de ese cierre, de ahí el
+          // -CIERRE): el remate de la sección se ve sin lazo encima.
+          if (cinta)
+            tl.to(
+              cinta,
+              { autoAlpha: 0, ease: "none", duration: 0.6 },
+              ENTRADA + FIN - CIERRE - 0.6,
+            );
         }
 
-        // "Del aula," se va (hacia arriba) antes de que "Docentes" aterrice:
-        // nunca comparten escena.
-        if (l1) tl.to(l1, { autoAlpha: 0, y: -30, ease: "power2.in", duration: 0.4 }, 0.55);
-
         // Cada nivel LLEGA subiendo desde abajo, se PLANTA abierta y se
-        // CIERRA recién cuando la siguiente aterrizó (la última no se cierra:
-        // cede abierta con las demás). Al aterrizar suelta un ping.
+        // CIERRA recién cuando la siguiente aterrizó. Al aterrizar suelta un
+        // ping. LAS CINCO se cierran, la última incluida (Mateo, 2026-09-05):
+        // antes cedía abierta y el patrón quedaba cortado a medias. Como no
+        // tiene una card que la siga, la fórmula le da el turno que le
+        // tocaría a la sexta, así conserva exactamente el mismo rato abierta
+        // y sola que tuvieron las otras cuatro.
         cards.forEach((card, i) => {
-          const t = i * PASO;
+          const t = ENTRADA + i * PASO;
           const icono = card.querySelector("[data-collapse-icon]");
           const cuerpo = card.querySelector("[data-collapse]");
           const ping = card.querySelector("[data-nivel-ping]");
           tl.to(card, { y: 0, autoAlpha: 1, ease: "power2.out", duration: SUBIDA }, t);
-          if (i < cards.length - 1) {
-            const tc = (i + 1) * PASO + SUBIDA * 0.7 + CIERRE_TRAS;
-            if (icono) tl.to(icono, { height: 0, autoAlpha: 0, marginBottom: 0, ease: "power1.inOut", duration: 0.7 }, tc);
-            if (cuerpo) tl.to(cuerpo, { height: 0, autoAlpha: 0, marginTop: 0, ease: "power1.inOut", duration: 0.8 }, tc);
+          {
+            const tc = ENTRADA + (i + 1) * PASO + CIERRE_INICIO;
+            if (icono)
+              tl.to(
+                icono,
+                { height: 0, autoAlpha: 0, marginBottom: 0, ease: "power1.inOut", duration: CIERRE * 0.9 },
+                tc,
+              );
+            if (cuerpo)
+              tl.to(
+                cuerpo,
+                { height: 0, autoAlpha: 0, marginTop: 0, ease: "power1.inOut", duration: CIERRE },
+                tc,
+              );
           }
           if (ping) {
             tl.fromTo(
               ping,
               { scale: 0.3, autoAlpha: 0.7 },
-              { scale: 2.1, autoAlpha: 0, ease: "power1.out", duration: 0.9 },
+              // Dura exactamente hasta que arranca el cierre de la card
+              // anterior (por eso CIERRE_TRAS y no un número suelto): la
+              // onda es el remate de ESTA llegada y se apaga antes de que
+              // el ojo tenga que irse al cierre de la otra.
+              { scale: 2.1, autoAlpha: 0, ease: "power1.out", duration: CIERRE_TRAS },
               t + SUBIDA * 0.7,
             );
           }
@@ -207,7 +264,7 @@ export function NivelesEscala() {
         // Respiro corto después de la última card (el scrub termina de
         // asentarse) y la zona se acaba: el sticky se suelta con las cinco
         // cards en escena.
-        tl.to({}, { duration: 0.5 }, FIN);
+        tl.to({}, { duration: 0.5 }, ENTRADA + FIN);
       }, stage);
 
       return () => {
@@ -303,30 +360,6 @@ export function NivelesEscala() {
             sostiene.
           </p>
         </div>
-
-        {/* Titular de apertura: "Del aula," abre la sección y se va antes de
-            la primera card. Decorativo (aria-hidden): sin el remate que lo
-            completaba es media frase, y la idea entera sigue en el título y
-            la bajada de arriba. */}
-        {live && (
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-10 flex items-center"
-          >
-            {/* <p>, no <h2>: el h2 de la sección es el título de arriba.
-                Mismo contenedor y padding que el encabezado: "Del aula,"
-                convive con el título al principio y tienen que alinear. */}
-            <p
-              data-nivel-headline
-              className="font-display text-azul-principal mx-auto w-full max-w-screen-xl px-5 font-extrabold tracking-[-0.03em] md:px-10"
-              style={{ fontSize: "clamp(2.4rem, 1rem + 5vw, 5rem)", lineHeight: 1.02 }}
-            >
-              <span data-nivel-l1 className="block">
-                Del aula,
-              </span>
-            </p>
-          </div>
-        )}
 
         {/* Los 5 niveles como cards. */}
         <div
