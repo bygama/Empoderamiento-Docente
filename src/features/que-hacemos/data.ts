@@ -108,22 +108,31 @@ export const TAMBORES: Tambor[] = [
 ];
 
 // ── Nuestro enfoque — diferenciales (palabras de Dani, jun 2026) ─────────────
+// Van en una fila de cuatro columnas y se leen como un bloque: si una bajada
+// se pasa de largo, esa columna cae a tres líneas y rompe la simetría de la
+// fila. Por eso las cuatro se sostienen parejas, títulos entre 17 y 22
+// caracteres y bajadas entre 40 y 46 (Mateo, 2026-09-05: antes el tercero
+// tenía 82 y bajaba a tres líneas). Al editar cualquiera de estas frases,
+// mantener el largo.
+// PENDIENTE validar con Dani: son sus palabras, y acá quedaron acortadas.
+// El tercero pasó a repartirse entre título y bajada: el título afirma y la
+// bajada enumera las tres miradas, que están todas.
 export const DIFERENCIALES = [
   {
     k: "Partimos de lo que hay",
-    d: "para potenciar — nunca desde lo que falta.",
+    d: "para potenciar, nunca desde lo que falta.",
   },
   {
-    k: "Nada enlatado",
-    d: "cada propuesta se piensa de manera singular, contemplando su contexto.",
+    k: "Nada viene enlatado",
+    d: "cada propuesta se piensa para su contexto.",
   },
   {
-    k: "El conocimiento no es neutro",
-    d: "miramos el aprendizaje desde el género, los derechos humanos y la justicia social.",
+    k: "Ningún saber es neutro",
+    d: "género, derechos humanos y justicia social.",
   },
   {
     k: "Escenarios reales",
-    d: "generamos escenarios de aprendizaje para que la transformación sea real.",
+    d: "escenarios de aprendizaje para un cambio real.",
   },
 ] as const;
 
