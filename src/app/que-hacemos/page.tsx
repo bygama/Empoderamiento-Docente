@@ -52,7 +52,13 @@ export default function QueHacemosPage() {
       <div id="lineas" className="scroll-mt-28">
         <TorreLineas />
       </div>
-      <CaminoDeTrabajo />
+      {/* «Cómo trabajamos» se mete 62svh POR DEBAJO del escenario
+          de la torre (z-20): durante la cola de salida la torre vuelve
+          transparente su superficie y esta sección sube por detrás del tubo
+          que se va. Solo en lg + motion, donde existe la torre animada. */}
+      <div className="lg:-mt-[62svh] lg:motion-reduce:mt-0">
+        <CaminoDeTrabajo />
+      </div>
       <NivelesEscala />
       {/* El enfoque (TRANSFORMACIÓN armándose en pantalla) remata la página
           antes del cierre: es la idea con la que hay que irse. */}

@@ -56,9 +56,26 @@ const SVH_POR_TAMBOR = 130; // cuánto scroll dura cada estación de la torre
 // trabado ("tarda en dejarme scrollear"); sin nada, el tambor se iba a la
 // izquierda antes de verse quieto (Mateo, 2026-09-02).
 const ARRANQUE_SVH = 40;
-const ZONA_SVH = TAMBORES.length * SVH_POR_TAMBOR + ARRANQUE_SVH;
+// SALIDA: cola al final de la zona en la que la última estación se va como
+// se fueron las otras. Sin esto el 07 se asentaba y, al soltarse el sticky,
+// lo que subía era una foto congelada del tubo. En la cola la torre sigue
+// subiendo y girando (por scroll, nunca por tiempo: Mateo sacó la deriva en
+// reposo para que el nombre no se escape) y tarjeta y rieles se apagan; el
+// sticky se suelta con el tubo ya en movimiento y saliendo por arriba.
+// Durante la cola la SUPERFICIE gris (y las nieblas) se vuelven
+// transparentes: la sección siguiente se mete media pantalla por debajo
+// (62svh, ver el -mt en page.tsx) y sube por detrás del tubo que se va. Sin esto
+// quedaban casi dos pantallas de gris vacío entre la torre y lo siguiente.
+const SALIDA_SVH = 40;
+const ZONA_SVH = TAMBORES.length * SVH_POR_TAMBOR + ARRANQUE_SVH + SALIDA_SVH;
 /** Fracción del recorrido de la zona (alto − 100svh) que ocupa el arranque. */
 const ARRANQUE = ARRANQUE_SVH / (ZONA_SVH - 100);
+/** Ídem para la cola de salida. */
+const SALIDA = SALIDA_SVH / (ZONA_SVH - 100);
+// Cuánto sube (en estaciones) y cuánto gira (grados) la torre durante la
+// cola: el 07 sale de cuadro por arriba a ritmo de página, sin acelerón.
+const SUBIDA_SALIDA = 1.3;
+const GIRO_SALIDA = 40;
 // Ángulos de los chips de frase sobre la banda (3 por tambor, repartidos).
 const CHIP_ANGS = [40, 160, 280];
 // Giro total de la torre a lo largo del recorrido. Antes 560°: un scroll
@@ -74,6 +91,10 @@ const GIRO_TOTAL = 300;
 // estación: al borde izquierdo del arco legible, para leer desde el
 // principio. Al scrollear, el resto del nombre entra por la derecha.
 const ALINEA = -46;
+// Cantidad de líneas en letras para el rótulo de presentación ("Siete
+// líneas de acción"): sale del dato, así si vuelven a cambiar la cantidad
+// se actualiza solo. Fuera de rango cae al número.
+const NUMEROS = ["", "Una", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"];
 
 /** `angs[j]` = ángulo de la rebanada j (no hay paso uniforme, ver abajo). */
 type GeoTambor = { f: number; angs: number[]; slices: string[] };
@@ -155,6 +176,11 @@ export function TorreLineas() {
   const fillRef = useRef<HTMLSpanElement | null>(null);
   const pctRef = useRef<HTMLSpanElement | null>(null);
   const veloRef = useRef<HTMLSpanElement | null>(null);
+  const rotuloRef = useRef<HTMLParagraphElement | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
+  const rielDerRef = useRef<HTMLDivElement | null>(null);
+  const superficieRef = useRef<HTMLSpanElement | null>(null);
+  const nieblaRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
   const [geo, setGeo] = useState<Geo | null>(null);
@@ -211,7 +237,8 @@ export function TorreLineas() {
     );
     // Sin deriva no hace falta asentado: en cada estación el nombre queda
     // alineado por construcción.
-    const rotDe = (i: number, pv: number) => fase[i] - pv * GIRO_TOTAL;
+    const rotDe = (i: number, pv: number, salida: number) =>
+      fase[i] - pv * GIRO_TOTAL - salida * GIRO_SALIDA;
 
     // ARMADO: el primer tambor se CONSTRUYE sobre la superficie que emerge
     // del blanco. Nace como una LÍNEA recta legible (el nombre entero,
@@ -393,13 +420,38 @@ export function TorreLineas() {
     const pintar = () => {
       // Viaje de la torre: el avance de la zona menos el arranque (ver
       // ARRANQUE_SVH).
-      const pv = Math.min(1, Math.max(0, (avance.p - ARRANQUE) / (1 - ARRANQUE)));
+      const pv = Math.min(
+        1,
+        Math.max(0, (avance.p - ARRANQUE) / (1 - ARRANQUE - SALIDA)),
+      );
+      // Cola de salida (0→1 en el último tramo de la zona, ver SALIDA_SVH).
+      const salida = Math.min(1, Math.max(0, (avance.p - (1 - SALIDA)) / SALIDA));
+      // Tarjeta y rieles se apagan en la primera mitad de la cola: el tubo
+      // se va solo, sin UI colgada.
+      const uiSalida = 1 - Math.min(1, salida / 0.55);
 
       // El velo blanco lo disuelve el armado (por tiempo): la superficie
       // gris y su trama EMERGEN del blanco en que terminó el faro.
       if (veloRef.current) veloRef.current.style.opacity = String(build.velo);
-      if (apoyoRef.current) apoyoRef.current.style.opacity = String(build.apoyo);
-      const y = -pv * (n - 1) * geo.sp;
+      if (apoyoRef.current) apoyoRef.current.style.opacity = String(build.apoyo * uiSalida);
+      if (navRef.current) navRef.current.style.opacity = String(uiSalida);
+      if (rielDerRef.current) rielDerRef.current.style.opacity = String(uiSalida);
+      // La superficie y las nieblas se van con la cola: la sección siguiente
+      // sube por detrás del tubo.
+      if (superficieRef.current) superficieRef.current.style.opacity = String(1 - salida);
+      for (const nb of nieblaRefs.current) if (nb) nb.style.opacity = String(1 - salida);
+      // El RÓTULO ("Siete líneas de acción") presenta la lista una sola vez:
+      // se enciende con la línea legible, quieto, y se va en cuanto la línea
+      // empieza a enrollarse. Después el marco queda en el encabezado del
+      // riel. Sin esto el usuario salía del faro a "DESARROLLO PROFESIONAL"
+      // en letras de 150px sin saber de qué era la lista.
+      if (rotuloRef.current) {
+        const seVa = Math.min(1, build.rollo / 0.35);
+        rotuloRef.current.style.opacity = String(build.linea * (1 - seVa));
+        rotuloRef.current.style.transform = `translate(-50%, ${-14 * seVa}px)`;
+      }
+      // En la cola la torre sigue subiendo: el 07 sale por arriba.
+      const y = -(pv * (n - 1) + salida * SUBIDA_SALIDA) * geo.sp;
       tower.style.transform = `translateY(${y}px)`;
       for (let i = 0; i < n; i++) {
         const drum = drumRefs.current[i];
@@ -421,7 +473,7 @@ export function TorreLineas() {
           ocultos[i] = false;
         }
         // Giro: fase del tambor + scroll (en sentido de lectura).
-        const rot = rotDe(i, pv);
+        const rot = rotDe(i, pv, salida);
         // Solo el PRIMER tambor se arma: es el que recibe el deslumbre. Los
         // demás ya llegan montados desde arriba, como siempre.
         const rollo = i === 0 ? build.rollo : 1;
@@ -653,7 +705,8 @@ export function TorreLineas() {
     const top = zone.getBoundingClientRect().top + window.scrollY;
     const pv = i / (TAMBORES.length - 1);
     const destino =
-      top + (zone.offsetHeight - window.innerHeight) * (ARRANQUE + (1 - ARRANQUE) * pv);
+      top +
+      (zone.offsetHeight - window.innerHeight) * (ARRANQUE + (1 - ARRANQUE - SALIDA) * pv);
     const lenis = getLenis();
     if (lenis) lenis.scrollTo(destino, { duration: 1.4 });
     else window.scrollTo({ top: destino, behavior: "smooth" });
@@ -721,6 +774,7 @@ export function TorreLineas() {
               de que la luz se corra. */}
           {live && (
             <span
+              ref={superficieRef}
               aria-hidden="true"
               className="bg-gris-fondo pointer-events-none absolute inset-0"
             >
@@ -744,6 +798,9 @@ export function TorreLineas() {
           {live && (
             <>
               <span
+                ref={(el) => {
+                  nieblaRefs.current[0] = el;
+                }}
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-0 z-10 h-40"
                 style={{
@@ -752,6 +809,9 @@ export function TorreLineas() {
                 }}
               />
               <span
+                ref={(el) => {
+                  nieblaRefs.current[1] = el;
+                }}
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-60"
                 style={{
@@ -764,11 +824,29 @@ export function TorreLineas() {
 
           {live && geo ? (
             <>
+              {/* ── Rótulo de presentación sobre la línea (solo en el armado) ── */}
+              <p
+                ref={rotuloRef}
+                aria-hidden="true"
+                className="text-azul-principal/70 pointer-events-none absolute top-[12%] left-1/2 z-20 flex items-center gap-3 font-mono text-[0.7rem] tracking-[0.18em] whitespace-nowrap uppercase"
+                style={{ opacity: 0, transform: "translate(-50%, 0px)" }}
+              >
+                <span aria-hidden="true" className="bg-verde-concepto inline-block h-px w-8" />
+                {NUMEROS[TAMBORES.length] ?? TAMBORES.length} líneas de acción
+                <span aria-hidden="true" className="bg-verde-concepto inline-block h-px w-8" />
+              </p>
+
               {/* ── Riel izquierdo: las estaciones, clickeables ──────────── */}
               <nav
+                ref={navRef}
                 aria-hidden="true"
                 className="absolute top-1/2 left-4 z-20 hidden -translate-y-1/2 flex-col gap-1 lg:flex xl:left-8"
               >
+                {/* Encabezado del riel: el riel es la tabla de contenidos de
+                    la sección; esto es el nombre de la tabla. Permanente. */}
+                <p className="text-azul-principal/80 mb-2 font-mono text-[0.62rem] font-semibold tracking-[0.16em] uppercase">
+                  Líneas de acción
+                </p>
                 {TAMBORES.map((t, i) => (
                   <button
                     key={t.id}
@@ -796,6 +874,7 @@ export function TorreLineas() {
 
               {/* ── Riel derecho: progreso del recorrido ─────────────────── */}
               <div
+                ref={rielDerRef}
                 aria-hidden="true"
                 className="absolute top-1/2 right-5 z-20 hidden -translate-y-1/2 flex-col items-center gap-3 lg:flex xl:right-9"
               >

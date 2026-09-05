@@ -31,6 +31,18 @@ const PAPELES: readonly (readonly string[])[] = [
   ],
 ];
 
+/**
+ * Peso de cada carpeta en desktop: la pila es más gruesa hacia abajo (01
+ * fina, 03 gruesa), como carpetas apiladas de verdad. Solo padding: la
+ * banda visible de una carpeta cubierta es el alto total de su tapa, así
+ * que el padding ES el grosor. La última no usa `pb`: conserva su base.
+ */
+const PESO_TAPA: readonly { pt: string; pb: string }[] = [
+  { pt: "lg:pt-8", pb: "lg:pb-8" },
+  { pt: "lg:pt-10", pb: "lg:pb-10" },
+  { pt: "lg:pt-12", pb: "lg:pb-12" },
+];
+
 type Props = {
   caso: CasoInvestigacion;
   indice: number;
@@ -66,12 +78,15 @@ export function CarpetaCaso({
   refBoton,
 }: Props) {
   const tinte = TINTES[caso.tinte];
+  const peso = PESO_TAPA[indice] ?? PESO_TAPA[PESO_TAPA.length - 1];
 
+  // pt − mt = −4px en todos los breakpoints: la carpeta siguiente apoya 4px
+  // por encima del fin de la anterior (pila sin aire).
   return (
     <li
       ref={refItem}
       data-carpeta-item
-      className="pointer-events-none relative list-none pt-11 md:-mt-12 md:first:mt-0"
+      className="pointer-events-none relative list-none pt-11 md:-mt-12 md:first:mt-0 lg:-mt-13 lg:pt-12 lg:first:mt-0"
       style={{ zIndex: 10 + indice }}
     >
       {/* pointer-events: el padding del solape (li) no captura taps de la
@@ -95,7 +110,7 @@ export function CarpetaCaso({
           <span
             data-carpeta-tab
             aria-hidden="true"
-            className={`absolute -top-10 ${OFFSET_PESTANA[indice] ?? "left-[2%]"} ${tinte.tinta} z-0 block h-10 w-56`}
+            className={`absolute -top-10 ${OFFSET_PESTANA[indice] ?? "left-[2%]"} ${tinte.tinta} z-0 block h-10 w-56 lg:-top-11 lg:h-11`}
           >
             <Pestana className="h-full w-full">
               <span className={`${ROTULO_TAB} whitespace-nowrap ${tinte.texto}`}>
@@ -176,8 +191,8 @@ export function CarpetaCaso({
               inicia (ver la expansión). Teclado: foco = preapertura. */}
           <span
             data-carpeta-front
-            className={`${tinte.carpeta} ${tinte.carpetaHover} ${tinte.grano} ${tinte.texto} relative z-20 mt-1 block overflow-hidden rounded-t-lg px-8 py-6 shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-14px_30px_-20px_rgb(31_45_77/0.35)] transition-[background-color] duration-500 ease-out [backface-visibility:hidden] md:px-10 lg:px-12 ${
-              esUltima ? "rounded-b-2xl pb-20 md:pb-24" : "rounded-b-none"
+            className={`${tinte.carpeta} ${tinte.carpetaHover} ${tinte.grano} ${tinte.texto} relative z-20 mt-1 block overflow-hidden rounded-t-lg px-8 py-6 shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-14px_30px_-20px_rgb(31_45_77/0.35)] transition-[background-color] duration-500 ease-out [backface-visibility:hidden] md:px-10 lg:px-12 ${peso.pt} ${
+              esUltima ? "rounded-b-2xl pb-20 md:pb-24" : `rounded-b-none ${peso.pb}`
             }`}
           >
             {/* Anatomía de la tapa: luz del canto, lomo y pliegue inferior */}
@@ -214,7 +229,7 @@ export function CarpetaCaso({
                 {/* Número fantasma: rotulación de archivo, no dato */}
                 <span
                   aria-hidden="true"
-                  className={`font-display text-[2.6rem] leading-[0.9] font-extrabold tracking-tight select-none ${tinte.marcaAgua}`}
+                  className={`font-display text-[2.6rem] leading-[0.9] font-extrabold tracking-tight select-none lg:text-[3.8rem] ${tinte.marcaAgua}`}
                 >
                   {caso.numero}
                 </span>

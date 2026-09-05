@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { InvestigacionHero } from "@/features/investigacion/components/InvestigacionHero";
-import { PorQueInvestigamos } from "@/features/investigacion/components/PorQueInvestigamos";
+import { CartaAbierta } from "@/features/investigacion/components/CartaAbierta";
 import { LineasInvestigacion } from "@/features/investigacion/components/LineasInvestigacion";
-import { CicloInvestigacionAplicada } from "@/features/investigacion/components/CicloInvestigacionAplicada";
-import { ProyectosAplicaciones } from "@/features/investigacion/components/ProyectosAplicaciones";
-import { VolvemosInvestigar } from "@/features/investigacion/components/VolvemosInvestigar";
+import { EspiralInvestigacion } from "@/features/investigacion/components/EspiralInvestigacion";
 import { InvestigacionEnAccion } from "@/features/investigacion/components/InvestigacionEnAccion";
-import { ConexionBiblioteca } from "@/features/investigacion/components/ConexionBiblioteca";
 import { CierreInvestigacion } from "@/features/investigacion/components/CierreInvestigacion";
 
 export const metadata: Metadata = {
@@ -20,21 +17,22 @@ export const metadata: Metadata = {
  * docs/content/arquitectura-investigacion.md (fase de contenido; el diseño
  * de cada sección se maqueta en una fase posterior).
  *
- * «Proyectos y aplicaciones» venía de Qué hacemos y va acá, después del
- * ciclo de investigación aplicada: es lo que investigamos, puesto a
- * trabajar (pedido de Mateo, 2026-09-02).
+ * «Proyectos y aplicaciones» (traída de Qué hacemos el 2026-09-02) se
+ * quitó de la página el 2026-09-04: eran áreas del modelo conceptual sin
+ * proyectos reales, y su lugar lo ocupa el recorrido de casos.
+ *
+ * «Ciclo de investigación aplicada» y «Volvemos a investigar» se cuentan
+ * en un solo escenario (la espiral doble): `#ciclo` es la sección y
+ * `#evidencia` un ancla interna que aterriza en la segunda vuelta.
  */
 export default function InvestigacionPage() {
   return (
     <main>
       <InvestigacionHero />
-      <PorQueInvestigamos />
+      <CartaAbierta />
       <LineasInvestigacion />
-      <CicloInvestigacionAplicada />
-      <ProyectosAplicaciones />
-      <VolvemosInvestigar />
+      <EspiralInvestigacion />
       <InvestigacionEnAccion />
-      <ConexionBiblioteca />
       <CierreInvestigacion />
     </main>
   );
