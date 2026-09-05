@@ -23,6 +23,7 @@
 | Glosario          | [`GLOSSARY.md`](GLOSSARY.md)                    | Jerga del dominio educativo de ED, vocabulario de UI, frases pilares          |
 | Mensajes de marca | [`MESSAGING.md`](MESSAGING.md)                  | Copy canónico: tagline, hero, triángulo de pilares, manifiesto, tono de voz   |
 | Arquitectura de contenidos | [`content/`](content/)                 | Arquitectura editorial por página («Qué hacemos», «Investigación»): secciones, copy propuesto, CTAs, pendientes VALIDAR |
+| Mapa del sitio    | [`content/site-map-ED.pdf`](content/site-map-ED.pdf) | Árbol de páginas y navegación del sitio (PDF, 7 páginas)                     |
 | Estilo de código  | [`conventions/CODE-STYLE.md`](conventions/CODE-STYLE.md) | Decisiones de estilo que las tools no enforce-an + índice de configs |
 | Código IA-friendly| [`AI_GUIDELINES.md`](AI_GUIDELINES.md)          | Reglas detalladas: naming, archivos chicos, TS, Tailwind v4, GSAP            |
 | ADRs              | [`architecture/adrs/`](architecture/adrs/README.md) | Decisiones arquitectónicas (stack base, backend con Supabase, etc.)   |
