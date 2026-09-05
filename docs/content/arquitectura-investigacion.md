@@ -262,6 +262,14 @@ Patrón **distinto** del abanico de cartas del home y de las cards de
 
 ## 6. Sección 4 — Ciclo de investigación aplicada (`#ciclo`)
 
+> **Decisión de diseño (04-09-2026):** las secciones 4 y 5 se cuentan en
+> **un solo escenario pinneado** — la espiral doble (`EspiralInvestigacion`):
+> primera vuelta = ciclo pedagógico, bisagra «no cierra el ciclo», segunda
+> vuelta = ciclo de evidencia bajo el título «Implementar no es terminar»,
+> y un lazo de retorno al inicio. El copy de ambas secciones se conserva
+> íntegro. `#ciclo` es la sección; `#evidencia` es un ancla interna que
+> aterriza en la bisagra. La cinta y el CTA a Biblioteca quedan al pie.
+
 Foco: el **ciclo pedagógico** (cómo una experiencia se convierte en
 comprensión y transformación). El ciclo de evidencia va en la sección 5 —
 no mezclarlos.
