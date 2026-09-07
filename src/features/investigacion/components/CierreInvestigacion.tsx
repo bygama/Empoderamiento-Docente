@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { PUNTOS } from "./constelacion";
@@ -331,10 +330,9 @@ export function CierreInvestigacion() {
         <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(200px,17vw)_1fr] lg:gap-x-6">
           {/* Primera parada del haz: dónde vive lo que investigamos. */}
           <div id="biblioteca" data-cierre-bloque className="max-w-[30rem] lg:max-w-none lg:justify-self-end">
-            <Eyebrow variant="light">Producción académica</Eyebrow>
             <h2
               data-cierre-titulo
-              className="font-display text-azul-claro mt-5 font-extrabold tracking-[-0.02em] text-balance"
+              className="font-display text-azul-claro font-extrabold tracking-[-0.02em] text-balance"
               style={{ fontSize: "clamp(1.6rem, 0.8rem + 1.5vw, 2.1rem)", lineHeight: 1.08 }}
             >
               La investigación también se comparte.

@@ -25,7 +25,7 @@ if (typeof window !== "undefined") {
  * - Vuelta 1 (nodos 0–3): el ciclo pedagógico.
  * - LA BISAGRA (viaje 3→4): «no cierra el ciclo: abre nuevas preguntas».
  *   El personaje no se va: sigue girando. El título cambia a «Implementar
- *   no es terminar» y la volanta a «Volvemos a investigar».
+ *   no es terminar».
  * - Vuelta 2 (nodos 4–7): el ciclo de evidencia, más abierto.
  * - EL LAZO: del último nodo vuelve al primero por afuera (se traza en
  *   verde) y el personaje aterriza donde empezó: abrimos otro ciclo. El
@@ -66,7 +66,6 @@ export function crearEspiral({ zona }: Escena) {
   const rotulos = q<SVGTextElement>("[data-espiral-rotulo]");
   const personaje = q<SVGGElement>("[data-espiral-personaje]")[0];
   const bloques = q<HTMLElement>("[data-espiral-bloque]");
-  const volantas = q<HTMLElement>("[data-espiral-volanta]");
   const titulos = q<HTMLElement>("[data-espiral-titulo]");
 
   const largoLazo = lazo.getTotalLength();
@@ -109,7 +108,6 @@ export function crearEspiral({ zona }: Escena) {
   rotulos.forEach((r, k) => gsap.set(r, { autoAlpha: k === 0 ? 1 : 0 }));
   colocar(0);
   bloques.forEach((b, i) => gsap.set(b, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 14 }));
-  volantas.forEach((v, i) => gsap.set(v, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 12 }));
   titulos.forEach((t, i) => gsap.set(t, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 18 }));
 
   const sinRender = { immediateRender: false } as const;
@@ -172,12 +170,10 @@ export function crearEspiral({ zona }: Escena) {
     salida(bloques[bloqueEstacion(k)], t + 0.05);
 
     if (esBisagra) {
-      // La bisagra: el título y la volanta cambian en pleno viaje, y entra
+      // La bisagra: el título cambia en pleno viaje, y entra
       // «no cierra el ciclo: abre nuevas preguntas».
       salida(titulos[0], t + 0.1);
-      salida(volantas[0], t + 0.1);
       entrada(titulos[1], t + 0.3);
-      entrada(volantas[1], t + 0.3);
       entrada(bloques[bloqueBisagra], t + 0.3);
       brotaNodo(llegada, t + T.viaje - 0.06);
       tBisagra = t + T.viaje;

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { getLenis } from "@/lib/lenis";
 import { CASOS } from "./data";
@@ -464,15 +463,14 @@ export function CasosInvestigacion() {
           {indiceVisible && (
             <div className="relative">
               <div ref={introRef} data-casos-intro>
-                {/* Invitación, no lectura: eyebrow + título y las carpetas
-                    hablan solas. El único apoyo es el rótulo de archivo. */}
+                {/* Invitación, no lectura: el título y las carpetas hablan
+                    solas. El único apoyo es el rótulo de archivo. */}
                 <div className="flex flex-wrap items-end justify-between gap-6">
                   <div className="max-w-3xl">
-                    <Eyebrow>Investigación en acción</Eyebrow>
                     <RevealLines
                       as="h2"
                       enabled={!introRevelado}
-                      className="font-display text-azul-principal mt-4 text-h2 font-extrabold tracking-[-0.02em]"
+                      className="font-display text-azul-principal text-h2 font-extrabold tracking-[-0.02em]"
                     >
                       Casos de investigación
                     </RevealLines>

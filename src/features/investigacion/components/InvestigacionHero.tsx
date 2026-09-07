@@ -2,7 +2,6 @@
 
 import { Fragment, useRef, useState } from "react";
 import gsap from "gsap";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Highlight } from "@/components/ui/Highlight";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
@@ -143,12 +142,9 @@ export function InvestigacionHero() {
         {/* Acto 1 — reposo: titular a la izquierda, constelación a la derecha. */}
         <div className="relative z-10 mx-auto my-auto grid w-full max-w-screen-xl items-center gap-x-16 gap-y-10 px-6 pt-28 pb-12 md:px-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div data-acto-hero>
-            <div data-hero-rise>
-              <Eyebrow>Investigación</Eyebrow>
-            </div>
             <RevealLines
               as="h1"
-              className="font-display text-azul-principal mt-6 max-w-[16ch] font-extrabold tracking-[-0.025em]"
+              className="font-display text-azul-principal max-w-[16ch] font-extrabold tracking-[-0.025em]"
               style={{
                 fontSize: "clamp(2.4rem, 1rem + 2.9vw, 3.9rem)",
                 lineHeight: 1.06,
