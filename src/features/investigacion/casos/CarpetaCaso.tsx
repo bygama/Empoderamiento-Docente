@@ -123,6 +123,12 @@ export function CarpetaCaso({
   const [desplegada, setDesplegada] = useState(false);
   const idPanel = useId();
 
+  // Redondeo de la base. Abajo de md la pila no existe —las carpetas van
+  // sueltas, separadas— así que TODAS cierran redondeadas; con la base
+  // recta se veían dos puntas contra el fondo. De md para arriba las
+  // cubiertas la pierden: ahí sí las tapa la carpeta siguiente.
+  const baseRedondeada = esUltima ? "rounded-b-2xl" : "rounded-b-2xl md:rounded-b-none";
+
   // pt − mt = −4px en todos los breakpoints: la carpeta siguiente apoya 4px
   // por encima del fin de la anterior (pila sin aire).
   return (
@@ -149,15 +155,28 @@ export function CarpetaCaso({
         <span
           data-carpeta-back
           aria-hidden="true"
-          className={`absolute inset-x-0 top-0 bottom-0 transition-[bottom] duration-[380ms] ease-out motion-safe:group-hover:-bottom-3 ${tinte.carpeta} ${
-            esUltima ? "rounded-2xl" : "rounded-t-2xl"
-          }`}
+          className={`absolute inset-x-0 top-0 bottom-0 rounded-t-2xl transition-[bottom] duration-[380ms] ease-out motion-safe:group-hover:-bottom-3 ${tinte.carpeta} ${baseRedondeada}`}
         >
           <span
-            className={`absolute inset-0 bg-[rgb(10_16_30/0.22)] ${
-              esUltima ? "rounded-2xl" : "rounded-t-2xl"
-            }`}
+            className={`absolute inset-0 rounded-t-2xl bg-[rgb(10_16_30/0.22)] ${baseRedondeada}`}
           />
+          {/* Faldón: la carpeta sigue 20px por debajo de donde termina.
+              No se ve nunca de frente —la carpeta siguiente lo tapa— pero
+              rellena las dos esquinas que la curva de esa carpeta deja
+              descubiertas. La pila solapa 2px y ese radio mide 16, así que
+              por el hueco se veía esta carpeta cortada en seco y, más
+              abajo, el fondo: eso era la punta. Ahora el color llega hasta
+              donde la siguiente ya tiene el ancho completo — 16px le
+              alcanzaban justo, y con 20 quedan 4 de colchón para los
+              subpíxeles y para los tres grosores de tapa.
+              Va colgado del lomo (`top-full`) para acompañarlo cuando se
+              estira en hover, y con el mismo 12% de sombra con el que
+              cierra la tapa, para que el empalme no cambie de tono. */}
+          {!esUltima && (
+            <span className={`absolute inset-x-0 top-full hidden h-5 md:block ${tinte.carpeta}`}>
+              <span className="absolute inset-0 bg-[rgb(10_16_30/0.12)]" />
+            </span>
+          )}
         </span>
 
         {/* ABRIR: capa que cubre la carpeta entera. Va sin z-index propio
@@ -265,8 +284,8 @@ export function CarpetaCaso({
         <span
           data-carpeta-front
           className={`${tinte.carpeta} ${tinte.carpetaHover} ${tinte.grano} ${tinte.texto} pointer-events-none relative z-20 mt-1 block overflow-hidden rounded-t-lg px-8 py-6 shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-14px_30px_-20px_rgb(31_45_77/0.35)] transition-[background-color,box-shadow,translate] duration-[380ms] ease-out group-hover:shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-17px_26px_-13px_rgb(31_45_77/0.6)] [backface-visibility:hidden] motion-safe:group-hover:translate-y-3 md:px-10 lg:px-12 ${peso.pt} ${
-            esUltima ? "rounded-b-2xl pb-20 md:pb-24" : `rounded-b-none ${peso.pb}`
-          }`}
+            esUltima ? "pb-20 md:pb-24" : peso.pb
+          } ${baseRedondeada}`}
         >
           {/* Anatomía de la tapa: luz del canto y pliegue inferior. El
               canto se enciende al abrirse: es el filo que queda expuesto
