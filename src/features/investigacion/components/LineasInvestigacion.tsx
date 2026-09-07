@@ -420,7 +420,12 @@ export function LineasInvestigacion() {
       ref={zonaRef}
       id="lineas"
       aria-label="Líneas de investigación"
-      className="bg-azul-principal bg-grain-dark relative overflow-x-clip pt-24"
+      // isolate: el grano mezcla adentro y los z-index de las carpetas no
+      // compiten con el resto de la página. El clip recorta a los costados y
+      // por abajo (la carpeta que sale inclinada se mete bajo la sección
+      // siguiente en vez de colgar sobre su hoja) y deja el tope abierto
+      // para no cortar la esquina que se levanta al entrar.
+      className="bg-azul-principal bg-grain-dark relative isolate pt-24 [clip-path:inset(-100vh_0_0)]"
     >
       {/* El campo navy de la carta sigue acá: mismo grain y misma grilla de
           puntos, que asoma en el respiro de arriba y en las cuñas que dejan
