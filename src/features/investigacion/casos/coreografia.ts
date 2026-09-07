@@ -121,14 +121,30 @@ export function aperturaLugar(opts: {
 
   gsap.set(li, { height: li.offsetHeight, zIndex: 60 });
   gsap.set(front, { height: front.offsetHeight });
-  // Congelar la capa CSS de hover (transition-transform vs GSAP) — ver
-  // memoria del proyecto: cada write re-dispararía la transición.
-  const translateHover = getComputedStyle(cuerpo).translate;
+  // Congelar la capa CSS de hover — ver memoria del proyecto: cada write
+  // re-dispararía la transición. Al hacer clic, la carpeta está abierta
+  // por hover: la tapa y los slivers llevan un `translate` y el lomo un
+  // `bottom` negativo. Como la carpeta se va de viaje, el cursor la pierde a los
+  // pocos frames y esas transiciones los devolverían a su lugar en pleno
+  // vuelo, peleándole a GSAP. Se clava el valor que tengan ahora y se
+  // corta la transición. (`translate` y `transform` son propiedades
+  // distintas y se componen: lo que GSAP escriba después no pisa el
+  // desplazamiento del hover.)
   const tab = q(li, "[data-carpeta-tab]");
-  gsap.set([cuerpo, sliver, tab].filter(Boolean), { transition: "none" });
-  if (translateHover && translateHover !== "none") {
-    gsap.set(cuerpo, { translate: translateHover });
+  const sliver2 = q(li, "[data-carpeta-sliver2]");
+  const papeles = [...li.querySelectorAll<HTMLElement>("[data-carpeta-papel]")];
+  for (const el of [cuerpo, front, back, sliver, sliver2, tab, ...papeles]) {
+    if (!el) continue;
+    const desplazado = getComputedStyle(el).translate;
+    gsap.set(el, { transition: "none" });
+    if (desplazado && desplazado !== "none") {
+      gsap.set(el, { translate: desplazado });
+    }
   }
+  // El lomo es la única pieza del hover que no se mueve con `translate`
+  // (acompaña la caída de la tapa estirando su borde de abajo), así que
+  // se clava aparte.
+  gsap.set(back, { bottom: getComputedStyle(back).bottom });
   const expansion = q(li, "[data-carpeta-expansion]");
   if (expansion) {
     gsap.set(expansion, {
@@ -185,7 +201,6 @@ export function aperturaLugar(opts: {
 
   // D — apertura física LATERAL: la tapa pivota desde el lomo izquierdo.
   const sombraTapa = q(li, "[data-carpeta-front-sombra]");
-  const sliver2 = q(li, "[data-carpeta-sliver2]");
   tl.set(li, { perspective: 1200, perspectiveOrigin: "38% 50%" }, 0.88)
     .set(sheet, { autoAlpha: 1 }, 0.88)
     .to(
