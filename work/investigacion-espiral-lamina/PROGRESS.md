@@ -2,7 +2,7 @@
 
 ## In progress
 
-- Paso 4 del PLAN (layout live nuevo + coreografía nueva).
+- Paso 6 del PLAN (registrar la decisión en el doc de contenido).
 
 ## Dónde corre
 
@@ -67,7 +67,38 @@
   `matchMedia` de montaje van por Playwright (`browser_resize` +
   `browser_navigate`); Orca sigue para todo lo demás.
 
+- **Pasos 4 y 5 — la lámina y su encaje** (2026-09-07, un solo commit: el
+  encaje no se pudo validar separado del anclaje, ver DECISIONS). Nuevos
+  `EspiralLamina.tsx` (escena live: rincón narrador con tres voces, figura
+  bajo la cámara, nueve anotaciones colgadas de los nodos por
+  left/right/top/bottom) y `recorrido-espiral.ts` (personaje y cámara como
+  funciones del tiempo); `coreografia-espiral.ts` reescrita en tres
+  movimientos (`RECORRIDO_ESPIRAL` 3000, todo fromTo explícito);
+  `EspiralInvestigacion.tsx` queda como compositor (90 líneas);
+  `lamina-espiral.ts` con encuadre interior 1.6×, `alcance` por anotación
+  (remate 118) y `LARGO_GUIA`; `estaciones.ts` con `breve` (textos cortos
+  para la lámina, pedido del owner; la estática conserva los canónicos).
+  Aceptación (navegador de Orca sobre el 3001): `[data-espiral-anotacion]`
+  9, `[data-espiral-voz]` 3, `[data-espiral-guia]` 9; `end − start` del pin
+  = 3000; probe de escena en 0 / 0.29 / 0.49 / 0.80 / 1.0, ida, resize y
+  vuelta → anotaciones {0} · {0,1,2,3} · {4} · {4,5,6,7} · {8} y voces {0} ·
+  {0} · {1} · {2} · {2} en las nueve lecturas, OK true; guía del remate en
+  p=1: opacity 1, dashoffset 0; probe de encaje (dentro de la hoja, sin
+  pisar voz ni chrome, opacidad > 0.5) OK true a 1536×850, 1920×1080 y
+  1280×720; `pnpm typecheck` → 0; `eslint` → 0; `wc -l` ≤ 200 en todos;
+  `grep -E "#[0-9a-fA-F]{6}"` → 0. Capturas `s7-*.png` en el scratchpad.
+  `#evidencia` queda para work-verify (DoD 10). Commits: content(…) textos
+  breves + feat(…) lámina anotada con cámara.
+
 ## Tried and failed
+
+- Anclar las anotaciones con `-translate-*` de Tailwind: GSAP reescribe el
+  `transform` y se pierde. Cajas por left/right/top/bottom.
+- `gsap.set(camara, { x, y, scale, svgOrigin: "0 0" })`: matriz distinta a
+  la calculada. Cámara escrita a mano desde el tiempo.
+- `autoAlpha` solo en el `from` de la guía: al final queda apagada.
+  Explícito en ambos extremos.
+- `.to()` con scrub e invalidateOnRefresh: estados fantasma al volver.
 
 - Probe con `node --import C:/...`: Node toma `C:` como esquema de URL; va
   `file:///C:/...`. Y el hook de resolución con regex `\.` en un heredoc perdió
@@ -77,7 +108,7 @@
 
 ## Next
 
-- Paso 4 del PLAN en el worktree.
+- Paso 6 del PLAN (docs) y después work-verify.
 
 ## Verification
 

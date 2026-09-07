@@ -1,114 +1,77 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  BISAGRA,
-  ESTACIONES,
-  LARGO_ESPIRAL,
-  LONGITUD_NODO,
-  RADIO_NODO,
-} from "./espiral";
+import { BISAGRA, ESTACIONES, LARGO_ESPIRAL, LONGITUD_NODO, RADIO_NODO } from "./espiral";
+import { ANOTACIONES, INDICE_REMATE, LARGO_GUIA } from "./lamina-espiral";
+import { crearCamara, crearRecorrido } from "./recorrido-espiral";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 /**
- * Coreografía de la espiral doble — «Cómo una experiencia se convierte en
- * transformación» + «Implementar no es terminar», un solo escenario
- * pinneado (Hoja 03 del archivo).
- *
- * El personaje —el punto naranja del hero— recorre la espiral estación por
- * estación. Cada tramo: el personaje viaja al nodo siguiente mientras la
- * espiral se traza detrás, el nodo aparece al llegar y el texto de la
- * estación releva al anterior. Ocho estaciones en dos vueltas:
- *
- * - Vuelta 1 (nodos 0–3): el ciclo pedagógico.
- * - LA BISAGRA (viaje 3→4): «no cierra el ciclo: abre nuevas preguntas».
- *   El personaje no se va: sigue girando. El título cambia a «Implementar
- *   no es terminar».
- * - Vuelta 2 (nodos 4–7): el ciclo de evidencia, más abierto.
- * - EL LAZO: del último nodo vuelve al primero por afuera (se traza en
- *   verde) y el personaje aterriza donde empezó: abrimos otro ciclo. El
- *   remate: la evidencia vuelve al proceso.
- *
- * El personaje NO se anima con tweens: su posición sale del TIEMPO de la
- * timeline (tramos de longitud sobre espiral + lazo encadenados, con
- * getPointAtLength), como las estrellas del cierre. Con scrub, el orden en
- * que GSAP renderiza varios tweens sobre un mismo proxy no es de fiar;
- * una función del tiempo es determinista en ambas direcciones.
- * Patrón: como las otras coreografías, acá solo se construye la timeline.
+ * Coreografía de la lámina (Hoja 03), en tres movimientos: la vuelta 1 en
+ * primer plano (el personaje recorre 01→04 de un gesto y cada nodo brota y
+ * anota al paso); la bisagra (cruza 04→05 mientras la cámara se aleja y el
+ * rincón releva título 1 → nota → título 2); la vuelta 2 y el lazo (05→08,
+ * las anotaciones se retiran, el lazo verde lo devuelve al 01 y ahí
+ * aterriza el remate). La escena completa está contada en
+ * EspiralInvestigacion.tsx. Personaje y cámara salen del TIEMPO de la
+ * timeline (recorrido-espiral.ts); acá solo se construye la timeline.
  */
-
-type Escena = {
-  /** Lo que se pinnea (la hoja de una pantalla). */
-  zona: HTMLElement;
-};
 
 /** Tiempos (unidades del timeline). */
 const T = {
   intro: 0.3,
-  viaje: 0.6,
-  lectura: 0.55,
-  /** Pausa extra en la bisagra, para leer «no cierra el ciclo». */
-  bisagra: 0.6,
-  lazo: 0.9,
-  remate: 0.8,
+  vuelta: 1.6,
+  /** Al fin de cada vuelta: la última anotación entra en ~0.36 y hay que leerla. */
+  pausa: 0.6,
+  /** Después del relevo del rincón, antes de arrancar la vuelta 2. */
+  respiro: 0.3,
+  bisagra: 1.0,
+  /** Lectura de «no cierra el ciclo» antes de que entre el título 2. */
+  lecturaNota: 0.5,
+  relevo: 0.2,
+  lazo: 0.8,
+  remate: 0.6,
 } as const;
 
 /** Alto del recorrido pinneado en px de scroll. */
-export const RECORRIDO_ESPIRAL = 7000;
+export const RECORRIDO_ESPIRAL = 3000;
 
-export function crearEspiral({ zona }: Escena) {
+/** `zona` es lo que se pinnea: la hoja de una pantalla. */
+export function crearEspiral({ zona }: { zona: HTMLElement }) {
   const q = gsap.utils.selector(zona);
   const espiral = q<SVGPathElement>("[data-espiral-path]")[0];
   const lazo = q<SVGPathElement>("[data-espiral-lazo]")[0];
   const nodos = q<SVGCircleElement>("[data-espiral-nodo]");
   const rotulos = q<SVGTextElement>("[data-espiral-rotulo]");
-  const personaje = q<SVGGElement>("[data-espiral-personaje]")[0];
-  const bloques = q<HTMLElement>("[data-espiral-bloque]");
-  const titulos = q<HTMLElement>("[data-espiral-titulo]");
+  // Guías y anotaciones vienen en orden de ANOTACIONES; las voces son
+  // título 1, nota de la bisagra, título 2.
+  const guias = q<SVGLineElement>("[data-espiral-guia]");
+  const anotaciones = q<HTMLElement>("[data-espiral-anotacion]");
+  const voces = q<HTMLElement>("[data-espiral-voz]");
 
-  const largoLazo = lazo.getTotalLength();
-
-  // ── El personaje: tramos {t0, t1, l0, l1} sobre espiral + lazo
-  //    encadenados; la longitud actual sale del tiempo de la timeline.
-  type Tramo = { t0: number; t1: number; l0: number; l1: number };
-  const tramos: Tramo[] = [];
+  const recorrido = crearRecorrido(espiral, lazo, q<SVGGElement>("[data-espiral-personaje]")[0]);
+  const camara = crearCamara(q<SVGGElement>("[data-espiral-camara]")[0]);
+  const { tramos, largoLazo } = recorrido;
   const suave = gsap.parseEase("power1.inOut");
-  const longitudEn = (time: number) => {
-    let l = 0;
-    for (const tr of tramos) {
-      if (time <= tr.t0) break;
-      const u = Math.min(1, (time - tr.t0) / (tr.t1 - tr.t0));
-      l = tr.l0 + (tr.l1 - tr.l0) * suave(u);
-    }
-    return l;
-  };
-  const colocar = (l: number) => {
-    const p =
-      l <= LARGO_ESPIRAL
-        ? espiral.getPointAtLength(l)
-        : lazo.getPointAtLength(Math.min(l - LARGO_ESPIRAL, largoLazo));
-    personaje.setAttribute("transform", `translate(${p.x} ${p.y})`);
-  };
+  const lineal = (u: number) => u;
 
-  // Índice del bloque de texto de cada estación (la bisagra ocupa un lugar
-  // entre la 3 y la 4; el remate va al final).
-  const bloqueEstacion = (k: number) => (k < BISAGRA ? k : k + 1);
-  const bloqueBisagra = BISAGRA;
-  const bloqueRemate = ESTACIONES + 1;
-
-  // ── Estado pre-paint: espiral sin trazar, solo el primer nodo, el
-  //    personaje en él, primer bloque y primer título visibles.
+  // ── Estado pre-paint: cámara en primer plano, espiral sin trazar, solo
+  //    el primer nodo con su anotación, el personaje en él, título 1.
   gsap.set(espiral, { strokeDasharray: LARGO_ESPIRAL, strokeDashoffset: LARGO_ESPIRAL });
   // El lazo arranca invisible: con linecap redondo, un dash de largo cero
   // igual pinta un punto en el nodo de salida.
   gsap.set(lazo, { strokeDasharray: largoLazo, strokeDashoffset: largoLazo, autoAlpha: 0 });
   nodos.forEach((n, k) => gsap.set(n, { attr: { r: k === 0 ? RADIO_NODO : 0 } }));
   rotulos.forEach((r, k) => gsap.set(r, { autoAlpha: k === 0 ? 1 : 0 }));
-  colocar(0);
-  bloques.forEach((b, i) => gsap.set(b, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 14 }));
-  titulos.forEach((t, i) => gsap.set(t, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 18 }));
+  guias.forEach((g, i) =>
+    gsap.set(g, { strokeDasharray: LARGO_GUIA, strokeDashoffset: i === 0 ? 0 : LARGO_GUIA, autoAlpha: i === 0 ? 1 : 0 }),
+  );
+  anotaciones.forEach((a, i) => gsap.set(a, { autoAlpha: i === 0 ? 1 : 0, x: 0, y: 0 }));
+  voces.forEach((v, i) => gsap.set(v, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 18 }));
+  recorrido.enTiempo(0);
+  camara.enTiempo(0);
 
   const sinRender = { immediateRender: false } as const;
 
@@ -127,98 +90,112 @@ export function crearEspiral({ zona }: Escena) {
       refreshPriority: 0,
       onUpdate: (self) => {
         zona.dataset.progreso = self.progress.toFixed(3);
-        colocar(longitudEn(tl.time()));
+        recorrido.enTiempo(tl.time());
+        camara.enTiempo(tl.time());
       },
     },
   });
 
-  const salida = (el: Element, at: number) =>
-    tl.to(el, { autoAlpha: 0, y: -12, duration: 0.22, ease: "power1.in" }, at);
-  const entrada = (el: Element, at: number) =>
-    tl.fromTo(
-      el,
-      { autoAlpha: 0, y: 14 },
-      { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out", ...sinRender },
-      at,
-    );
+  // ── Gestos. Todo fromTo explícito: con scrub e invalidateOnRefresh, un
+  //    .to() captura como inicio lo que encuentre y deja estados fantasma.
+  const entradaVoz = (i: number, at: number) =>
+    tl.fromTo(voces[i], { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out", ...sinRender }, at);
+  const salidaVoz = (i: number, at: number) =>
+    tl.fromTo(voces[i], { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -12, duration: 0.22, ease: "power1.in", ...sinRender }, at);
   const brotaNodo = (k: number, at: number) => {
-    tl.fromTo(
-      nodos[k],
-      { attr: { r: 0 } },
-      { attr: { r: RADIO_NODO }, duration: 0.18, ease: "back.out(2)", ...sinRender },
-      at,
-    );
+    tl.fromTo(nodos[k], { attr: { r: 0 } }, { attr: { r: RADIO_NODO }, duration: 0.18, ease: "back.out(2)", ...sinRender }, at);
     tl.fromTo(rotulos[k], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15, ...sinRender }, at + 0.05);
   };
-
-  let t = T.intro;
-  let tBisagra = 0;
-
-  // ── Las siete travesías entre estaciones.
-  for (let k = 0; k < ESTACIONES - 1; k++) {
-    const llegada = k + 1;
-    const esBisagra = llegada === BISAGRA;
-
-    // El personaje viaja y la espiral se traza detrás.
-    tramos.push({ t0: t, t1: t + T.viaje, l0: LONGITUD_NODO[k], l1: LONGITUD_NODO[llegada] });
+  /** La anotación se despliega desde el nodo: la guía se dibuja y el bloque
+   *  entra con un desplazamiento corto hacia afuera. */
+  const entraAnotacion = (i: number, at: number) => {
+    const [nx, ny] = ANOTACIONES[i].normal;
+    tl.fromTo(
+      guias[i],
+      { strokeDashoffset: LARGO_GUIA, autoAlpha: 0 },
+      { strokeDashoffset: 0, autoAlpha: 1, duration: 0.15, ...sinRender },
+      at,
+    );
+    tl.fromTo(
+      anotaciones[i],
+      { autoAlpha: 0, x: -nx * 12, y: -ny * 12 },
+      { autoAlpha: 1, x: 0, y: 0, duration: 0.3, ease: "power2.out", ...sinRender },
+      at + 0.06,
+    );
+  };
+  const saleAnotacion = (i: number, at: number) => {
+    tl.fromTo(anotaciones[i], { autoAlpha: 1, x: 0, y: 0 }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
+    tl.fromTo(guias[i], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
+  };
+  /** Una vuelta: un solo tramo del nodo `a` al `b` a velocidad constante,
+   *  con el trazo detrás; cada nodo brota y anota al paso. */
+  const vuelta = (a: number, b: number, t0: number) => {
+    const l0 = LONGITUD_NODO[a];
+    const l1 = LONGITUD_NODO[b];
+    tramos.push({ t0, t1: t0 + T.vuelta, l0, l1, ease: lineal });
     tl.fromTo(
       espiral,
-      { strokeDashoffset: LARGO_ESPIRAL - LONGITUD_NODO[k] },
-      { strokeDashoffset: LARGO_ESPIRAL - LONGITUD_NODO[llegada], duration: T.viaje, ease: "power1.inOut", ...sinRender },
-      t,
+      { strokeDashoffset: LARGO_ESPIRAL - l0 },
+      { strokeDashoffset: LARGO_ESPIRAL - l1, duration: T.vuelta, ...sinRender },
+      t0,
     );
-    salida(bloques[bloqueEstacion(k)], t + 0.05);
-
-    if (esBisagra) {
-      // La bisagra: el título cambia en pleno viaje, y entra
-      // «no cierra el ciclo: abre nuevas preguntas».
-      salida(titulos[0], t + 0.1);
-      entrada(titulos[1], t + 0.3);
-      entrada(bloques[bloqueBisagra], t + 0.3);
-      brotaNodo(llegada, t + T.viaje - 0.06);
-      tBisagra = t + T.viaje;
-      // Pausa de lectura de la bisagra; después releva la estación 05.
-      const tRelevo = t + T.viaje + T.bisagra;
-      salida(bloques[bloqueBisagra], tRelevo);
-      entrada(bloques[bloqueEstacion(llegada)], tRelevo + 0.12);
-      t = tRelevo + 0.12 + T.lectura;
-    } else {
-      brotaNodo(llegada, t + T.viaje - 0.06);
-      entrada(bloques[bloqueEstacion(llegada)], t + T.viaje - 0.02);
-      t += T.viaje + T.lectura;
+    for (let k = a + 1; k <= b; k++) {
+      const tk = t0 + T.vuelta * ((LONGITUD_NODO[k] - l0) / (l1 - l0));
+      brotaNodo(k, tk - 0.04);
+      entraAnotacion(k, tk);
     }
-  }
+    return t0 + T.vuelta;
+  };
 
-  // ── El lazo: se traza en verde y el personaje vuelve al primer nodo.
-  tramos.push({ t0: t, t1: t + T.lazo, l0: LARGO_ESPIRAL, l1: LARGO_ESPIRAL + largoLazo });
-  tl.fromTo(lazo, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.02, ...sinRender }, t);
+  // ── 1. Vuelta 1, en primer plano.
+  let t = vuelta(0, BISAGRA - 1, T.intro) + T.pausa;
+
+  // ── 2. La bisagra: 04→05 mientras la cámara se aleja.
+  tramos.push({ t0: t, t1: t + T.bisagra, l0: LONGITUD_NODO[BISAGRA - 1], l1: LONGITUD_NODO[BISAGRA], ease: suave });
+  camara.programar(t, t + T.bisagra, gsap.parseEase("power2.inOut"));
   tl.fromTo(
-    lazo,
-    { strokeDashoffset: largoLazo },
-    { strokeDashoffset: 0, duration: T.lazo, ease: "power1.inOut", ...sinRender },
+    espiral,
+    { strokeDashoffset: LARGO_ESPIRAL - LONGITUD_NODO[BISAGRA - 1] },
+    { strokeDashoffset: LARGO_ESPIRAL - LONGITUD_NODO[BISAGRA], duration: T.bisagra, ease: "power1.inOut", ...sinRender },
     t,
   );
-  salida(bloques[bloqueEstacion(ESTACIONES - 1)], t + 0.05);
-  entrada(bloques[bloqueRemate], t + T.lazo * 0.55);
-  // Al aterrizar, el primer nodo late: acá empieza otra vez.
-  tl.fromTo(
-    nodos[0],
-    { attr: { r: RADIO_NODO } },
-    { attr: { r: RADIO_NODO * 1.6 }, duration: 0.12, ease: "power2.out", ...sinRender },
-    t + T.lazo,
-  );
-  tl.to(nodos[0], { attr: { r: RADIO_NODO }, duration: 0.18, ease: "power1.inOut" }, t + T.lazo + 0.12);
-  t += T.lazo + T.remate;
+  for (let k = 0; k < BISAGRA; k++) saleAnotacion(k, t);
+  salidaVoz(0, t + 0.05);
+  entradaVoz(1, t + 0.3);
+  brotaNodo(BISAGRA, t + T.bisagra - 0.04);
+  entraAnotacion(BISAGRA, t + T.bisagra);
+  const tLlegadaBisagra = t + T.bisagra;
+  const tNota = tLlegadaBisagra + T.lecturaNota;
+  salidaVoz(1, tNota);
+  entradaVoz(2, tNota + T.relevo);
+  t = tNota + T.relevo + T.respiro;
+
+  // ── 3. Vuelta 2, en plano general.
+  t = vuelta(BISAGRA, ESTACIONES - 1, t) + T.pausa;
+
+  // ── El lazo: las anotaciones se retiran, se traza en verde y el
+  //    personaje vuelve al primer nodo, que late. Ahí aterriza el remate.
+  for (let k = BISAGRA; k < ESTACIONES; k++) saleAnotacion(k, t);
+  tramos.push({ t0: t, t1: t + T.lazo, l0: LARGO_ESPIRAL, l1: LARGO_ESPIRAL + largoLazo, ease: suave });
+  tl.fromTo(lazo, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.02, ...sinRender }, t);
+  tl.fromTo(lazo, { strokeDashoffset: largoLazo }, { strokeDashoffset: 0, duration: T.lazo, ease: "power1.inOut", ...sinRender }, t);
+  const tLlegada = t + T.lazo;
+  tl.fromTo(nodos[0], { attr: { r: RADIO_NODO } }, { attr: { r: RADIO_NODO * 1.6 }, duration: 0.12, ease: "power2.out", ...sinRender }, tLlegada);
+  tl.fromTo(nodos[0], { attr: { r: RADIO_NODO * 1.6 } }, { attr: { r: RADIO_NODO }, duration: 0.18, ease: "power1.inOut", ...sinRender }, tLlegada + 0.12);
+  entraAnotacion(INDICE_REMATE, tLlegada);
+  t = tLlegada + T.remate;
 
   // Respiro final antes de soltar el pin (fija el largo total del timeline).
   tl.to({}, { duration: 0.01 }, t);
 
-  /** Progreso (0–1) en el que llega la bisagra: destino del ancla #evidencia. */
-  const progresoBisagra = tBisagra / tl.duration();
+  /** Progreso (0–1) en el que el personaje llega a 05: destino de #evidencia. */
+  const progresoBisagra = tLlegadaBisagra / tl.duration();
 
-  /** El transform del personaje se escribe a mano: ctx.revert() no lo
-   *  conoce. Volver al nodo 0, que es lo que dibuja el SSR. */
-  const restaurar = () => colocar(0);
+  /** Personaje y cámara se escriben a mano: ctx.revert() no los conoce. */
+  const restaurar = () => {
+    recorrido.restaurar();
+    camara.restaurar();
+  };
 
   return { tl, progresoBisagra, restaurar };
 }

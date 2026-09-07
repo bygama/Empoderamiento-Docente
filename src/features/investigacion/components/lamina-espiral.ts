@@ -33,7 +33,9 @@ export const ENCUADRE_INTERIOR: Encuadre = (() => {
   return {
     cx: (Math.min(...xs) + Math.max(...xs)) / 2,
     cy: (Math.min(...ys) + Math.max(...ys)) / 2,
-    alto: 240,
+    // 1.6×: la vuelta interior ocupa el cuadro y deja lugar adentro para
+    // que cuelguen las anotaciones de arriba y de abajo.
+    alto: 300,
   };
 })();
 
@@ -57,7 +59,17 @@ type Anotacion = {
   readonly encuadre: Encuadre;
   /** Dirección unitaria en la que sale del nodo. */
   readonly normal: readonly [number, number];
+  /** Hasta dónde llega la guía desde el centro del nodo (unidades del viewBox). */
+  readonly alcance: number;
 };
+
+/** La guía arranca pasado el rótulo (que vive a 22 sobre la normal) y
+ *  termina en el ancla de la anotación. Unidades del viewBox. */
+const GUIA_DESDE = 32;
+const GUIA_HASTA = 58;
+/** El remate cuelga del nodo 01 pero su caja va afuera de la segunda
+ *  vuelta: la guía cruza el anillo en diagonal hasta pasar el trazo. */
+const ALCANCE_REMATE = 118;
 
 /** Un cuarto de vuelta por estación: el lado sale del cuadrante. */
 const LADO_POR_CUADRANTE: ReadonlyArray<Lado> = ["arriba", "derecha", "abajo", "izquierda"];
@@ -86,33 +98,32 @@ export const ANOTACIONES: ReadonlyArray<Anotacion> = [
     lado: LADO_POR_CUADRANTE[k % LADO_POR_CUADRANTE.length],
     encuadre: k < BISAGRA ? ENCUADRE_INTERIOR : ENCUADRE_GENERAL,
     normal: normalNodo(k),
+    alcance: GUIA_HASTA,
   })),
   {
     nodo: 0,
     lado: "arriba-derecha",
     encuadre: ENCUADRE_GENERAL,
     normal: [Math.SQRT1_2, -Math.SQRT1_2],
+    alcance: ALCANCE_REMATE,
   },
 ];
 
-/** La guía arranca pasado el rótulo (que vive a 22 sobre la normal) y
- *  termina en el ancla de la anotación. Unidades del viewBox. */
-const GUIA_DESDE = 32;
-const GUIA_HASTA = 58;
-/** Largo de cada guía (para dibujarla con dash). */
-export const LARGO_GUIA = GUIA_HASTA - GUIA_DESDE;
+/** Largo de la guía más larga: el dash de todas se dibuja con este valor,
+ *  así que cada una se traza a la misma velocidad. */
+export const LARGO_GUIA = ALCANCE_REMATE - GUIA_DESDE;
 
 /** Segmento de la guía de la anotación `i`, en unidades del viewBox (va
  *  dentro del grupo de cámara, así que escala con ella). */
 export function guiaAnotacion(i: number): { x1: number; y1: number; x2: number; y2: number } {
-  const { nodo, normal } = ANOTACIONES[i];
+  const { nodo, normal, alcance } = ANOTACIONES[i];
   const [x, y] = NODOS[nodo];
   const [nx, ny] = normal;
   return {
     x1: x + nx * GUIA_DESDE,
     y1: y + ny * GUIA_DESDE,
-    x2: x + nx * GUIA_HASTA,
-    y2: y + ny * GUIA_HASTA,
+    x2: x + nx * alcance,
+    y2: y + ny * alcance,
   };
 }
 
