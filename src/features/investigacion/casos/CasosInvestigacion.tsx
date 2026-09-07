@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { getLenis } from "@/lib/lenis";
 import { CASOS } from "./data";
-import { ROTULO_MICRO } from "./tintes";
 import { CarpetaCaso } from "./CarpetaCaso";
 import { ExpedienteCaso } from "./ExpedienteCaso";
 import { NavegacionCasos } from "./NavegacionCasos";
@@ -52,7 +51,6 @@ export function CasosInvestigacion() {
   const shellRef = useRef<HTMLDivElement | null>(null);
   const tituloRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLDivElement | null>(null);
-  const remateRef = useRef<HTMLDivElement | null>(null);
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
   const botonesRef = useRef<(HTMLButtonElement | null)[]>([]);
   const ultimaAbiertaRef = useRef<number | null>(null);
@@ -155,18 +153,6 @@ export function CasosInvestigacion() {
           onComplete: () => {
             entradaHechaRef.current = true;
           },
-          scrollTrigger: { trigger: section, start: "top 70%", once: true },
-        },
-      );
-      gsap.fromTo(
-        "[data-casos-remate]",
-        { autoAlpha: 0 },
-        {
-          autoAlpha: 1,
-          duration: 0.5,
-          delay: 0.6,
-          ease: "power1.out",
-          clearProps: "opacity,visibility",
           scrollTrigger: { trigger: section, start: "top 70%", once: true },
         },
       );
@@ -358,9 +344,7 @@ export function CasosInvestigacion() {
         otrasAbajo: itemsRef.current.filter(
           (el, j): el is HTMLLIElement => j > i && el !== null,
         ),
-        introEls: [introRef.current, remateRef.current].filter(
-          (el): el is HTMLDivElement => el !== null,
-        ),
+        introEls: introRef.current ? [introRef.current] : [],
         shell,
         hoja,
         lugar,
@@ -400,9 +384,7 @@ export function CasosInvestigacion() {
     // Pre-paint: el índice recién montado arranca oculto Y la página se
     // alinea con la sección de forma instantánea — todo antes del primer
     // paint, con el telón recién transparentado: el reflow no se ve.
-    const introEls = [introRef.current, remateRef.current].filter(
-      (el): el is HTMLDivElement => el !== null,
-    );
+    const introEls = introRef.current ? [introRef.current] : [];
     gsap.set(items, { autoAlpha: 0 });
     if (introEls.length) gsap.set(introEls, { autoAlpha: 0 });
     alinearConSeccion(72);
@@ -463,25 +445,16 @@ export function CasosInvestigacion() {
           {indiceVisible && (
             <div className="relative">
               <div ref={introRef} data-casos-intro>
-                {/* Invitación, no lectura: el título y las carpetas hablan
-                    solas. El único apoyo es el rótulo de archivo. */}
-                <div className="flex flex-wrap items-end justify-between gap-6">
-                  <div className="max-w-3xl">
-                    <RevealLines
-                      as="h2"
-                      enabled={!introRevelado}
-                      className="font-display text-azul-principal text-h2 font-extrabold tracking-[-0.02em]"
-                    >
-                      Casos de investigación
-                    </RevealLines>
-                  </div>
-                  <p
-                    className={`text-azul-principal/70 hidden shrink-0 items-center gap-3 pb-2 lg:flex ${ROTULO_MICRO}`}
-                  >
-                    ARCHIVO · {CASOS.length.toString().padStart(2, "0")} EXPEDIENTES
-                  </p>
-                </div>
-                <div className="border-azul-principal/10 mt-10 border-t" />
+                {/* Invitación, no lectura: el título solo, y las carpetas
+                    hablan por sí mismas. Sin rótulo de archivo ni regla: el
+                    andamiaje de expediente ya lo pone cada carpeta. */}
+                <RevealLines
+                  as="h2"
+                  enabled={!introRevelado}
+                  className="font-display text-azul-principal max-w-3xl text-h2 font-extrabold tracking-[-0.02em]"
+                >
+                  Casos de investigación
+                </RevealLines>
               </div>
 
               <ol
@@ -507,20 +480,6 @@ export function CasosInvestigacion() {
                 ))}
               </ol>
 
-              {/* Remate del archivo: cierra la ficha, espejo de la línea
-                  «ARCHIVO · 03 EXPEDIENTES» de arriba. */}
-              <div
-                ref={remateRef}
-                data-casos-remate
-                className="border-azul-principal/10 mt-10 flex items-baseline justify-between gap-6 border-t pt-4"
-              >
-                <p className={`text-azul-principal/70 ${ROTULO_MICRO}`}>
-                  ARCHIVO ED — INVESTIGACIÓN EN ACCIÓN
-                </p>
-                <p className={`text-gris-texto ${ROTULO_MICRO}`}>
-                  {CASOS.length.toString().padStart(2, "0")} CARPETAS
-                </p>
-              </div>
             </div>
           )}
 
