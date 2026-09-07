@@ -2,7 +2,7 @@
 
 ## In progress
 
-- Review de cierre (seats frescos) y handoff.
+- Cierre: PR a main y merge por rebase (work-handoff).
 
 ## Dónde corre
 
@@ -138,7 +138,9 @@
 
 ## Next
 
-- work-verify: DoD completa, review de cierre, handoff.
+- Nada pendiente en la lane. Deuda fuera de alcance: lint preexistente en
+  que-hacemos/TorreLineas.tsx y quienes-somos/MiradaEd.tsx; validación de
+  contenido de los textos breves (`breve`, `clave`) por el owner.
 
 ## Verification
 
@@ -159,6 +161,9 @@ hidratar, reduced-motion y el ancla).
 | 8 pin | `pin-spacer.offsetHeight − zona.offsetHeight` | 3000 · PASS |
 | 9 estática intacta | SSR de `<section id="ciclo">` byte a byte igual al baseline (`cmp` exit 0, 11467 bytes); Playwright 390×844: live false, 0 guías, 0 anotaciones, 2 `ol`, 8 `li`, destacado presente (captura de la hoja 03 `lamina-touch-390x844-ciclo.png` en el scratchpad; el «antes» no se guardó por un error de ruta, la identidad del SSR lo cubre); Playwright 1536×850 con `reducedMotion: reduce`: 0 guías, sin cámara, sin pin, 2 `ol` / 8 `li` | PASS |
 | 10 `#evidencia` | Playwright 1536×850 → `/investigacion#evidencia`: `zona.dataset.progreso` 0.435 estable en 4 lecturas; esperado 3.7 / 8.51 = 0.4348 | PASS |
+
+Review de cierre: 0 seats, por override explícito del owner («sin reviewers
+y fue confio pr merge», en DECISIONS). Rung de review declarado NO corrido.
 
 Además: probe de escena ida + resize + vuelta → conjuntos exactos en las
 nueve lecturas; probe de subrayado OK; consola sin errores ni warnings en
