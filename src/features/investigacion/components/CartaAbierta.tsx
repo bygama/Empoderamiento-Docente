@@ -9,6 +9,7 @@ import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import type { Figura } from "./constelacion";
 import { FiguraConstelacion } from "./FiguraConstelacion";
+import { PuntosCampo } from "./PuntosCampo";
 import { crearCarta } from "./coreografia-carta";
 
 /**
@@ -196,16 +197,8 @@ export function CartaAbierta() {
           data-carta-campo
           className="bg-azul-principal bg-grain-dark absolute inset-0 -z-10"
         >
-          {/* Grid de puntos del manual §6, blanco tenue sobre navy. */}
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 opacity-[0.13]"
-            style={{
-              backgroundImage: "radial-gradient(white 1px, transparent 1.5px)",
-              backgroundSize: "44px 44px",
-              backgroundPosition: "22px 22px",
-            }}
-          />
+          {/* Grid de puntos, anclado abajo: sigue bajo las carpetas de líneas. */}
+          <PuntosCampo anclaje="abajo" />
           {live && (
             // Copia en luz del título: vive ADENTRO del campo para que el
             // borde del círculo la revele (la copia en tinta queda DEBAJO del
