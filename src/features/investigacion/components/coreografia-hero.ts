@@ -37,8 +37,14 @@ const TINTA_PRENDIDA = "rgba(31, 45, 77, 0.94)";
 const NUMERO_APAGADO = "rgba(107, 116, 128, 0.8)";
 const NUMERO_PRENDIDO = "rgba(31, 45, 77, 1)";
 
-const HOLD = 4.8;
-const MORPH = 1.5;
+/**
+ * Ritmo del loop de reposo. Antes 4.8 / 1.5: la primera transformación
+ * llegaba a los ~7 s de cargar y casi nadie la veía antes de scrollear.
+ * Ahora cada figura se sostiene 2 s y el morph dura ~1 s: un ciclo de 3 s,
+ * y la primera transformación ocurre con el titular todavía leyéndose.
+ */
+const HOLD = 2;
+const MORPH = 0.95;
 
 type Constelacion = {
   circulos: SVGCircleElement[];
