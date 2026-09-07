@@ -214,17 +214,16 @@ export function CierreInvestigacion() {
   }, [reduced]);
 
   return (
-    // El tint del dock pinta la muesca de las esquinas redondeadas del
-    // footer. Va "medio" y no "azul": con azul la muesca se llenaba del
-    // mismo navy del cierre y el redondeo se perdía, y con gris quedaba una
-    // cuña casi blanca contra el navy. azul-medio es la forma plana azul
-    // que DESIGN.md §155 pide para los bloques de identidad: la esquina se
-    // marca con color, no con un hueco.
-    <div ref={zonaRef} data-footer-dock-tint="medio">
+    // Con el tint "noche" el footer se monta --footer-solapa sobre esta
+    // sección con la muesca transparente: el redondeo recorta la escena
+    // real (haz, nubes, grano), que ningún color plano iguala. Por eso la
+    // sección deja esa franja de cielo bajo el piso (pb) y el faro y la
+    // palabra se plantan sobre el piso, no sobre el borde de la caja.
+    <div ref={zonaRef} data-footer-dock-tint="noche">
       <section
         ref={hojaRef}
         aria-label="Cierre e invitación a conversar"
-        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden text-white"
+        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden pb-[var(--footer-solapa)] text-white"
       >
         {/* ── El cielo: cae la noche sobre el archivo. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
@@ -315,7 +314,7 @@ export function CierreInvestigacion() {
           style={{
             fontSize: "clamp(4.2rem, 15.4vw, 12.6rem)",
             lineHeight: 0.78,
-            bottom: "-0.16em",
+            bottom: "calc(var(--footer-solapa) - 0.16em)",
             color: "color-mix(in srgb, var(--color-azul-claro) 13%, transparent)",
           }}
         >
@@ -326,7 +325,7 @@ export function CierreInvestigacion() {
             unicornio delante del wordmark). El ancho escala con el alto para
             que la linterna quede a la altura de los mensajes en cualquier
             pantalla. */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 hidden justify-center lg:flex">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[var(--footer-solapa)] z-30 hidden justify-center lg:flex">
           <div data-cierre-linterna className="w-[clamp(168px,26svh,236px)]">
             <LinternaFaro className="block h-auto w-full" />
           </div>
