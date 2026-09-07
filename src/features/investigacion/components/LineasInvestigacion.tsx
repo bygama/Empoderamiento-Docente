@@ -208,15 +208,24 @@ function Hoja({
   );
 }
 
-/** Tinte de cada carpeta: la 02 es apenas más oscura (otra carpeta del cajón). */
+/**
+ * Tinte de cada carpeta: la 02 es apenas más oscura (otra carpeta del cajón).
+ *
+ * La sombra hacia arriba es la misma forma en las dos, pero cae sobre
+ * superficies distintas: la de la 01 se proyecta sobre el navy y necesita el
+ * negro al 65% para leerse; la de la 02 se proyecta sobre la carpeta 01, que
+ * es clara, y ahí ese mismo negro canta demasiado. Va en navy y más suave.
+ */
 const TINTE_CARPETA = [
   {
     fondo: "bg-azul-claro",
     tinta: "text-azul-claro",
+    sombra: "shadow-[0_-28px_70px_-30px_rgb(0_0_0/0.65)]",
   },
   {
     fondo: "bg-[color-mix(in_srgb,var(--color-azul-claro)_86%,var(--color-azul-principal))]",
     tinta: "text-[color-mix(in_srgb,var(--color-azul-claro)_86%,var(--color-azul-principal))]",
+    sombra: "shadow-[0_-28px_70px_-30px_rgb(31_45_77/0.35)]",
   },
 ] as const;
 
@@ -242,7 +251,7 @@ function CarpetaLineas({
     <div
       ref={refCarpeta}
       data-lineas-carpeta
-      className={`${tinte.fondo} bg-grain-light relative -ml-[10vw] w-[120vw] shadow-[0_-28px_70px_-30px_rgb(0_0_0/0.65)] will-change-transform ${
+      className={`${tinte.fondo} ${tinte.sombra} bg-grain-light relative -ml-[10vw] w-[120vw] will-change-transform ${
         indice === 0 ? "" : "-mt-28"
       }`}
       style={{ zIndex: 10 + indice }}
