@@ -2,7 +2,7 @@
 
 ## In progress
 
-- work-verify (DoD §6 del SPEC) y cierre.
+- Review de cierre (seats frescos) y handoff.
 
 ## Dónde corre
 
@@ -117,6 +117,11 @@
 
 ## Tried and failed
 
+- `pnpm lint` del proyecto falla por `react-hooks/refs` en
+  `que-hacemos/TorreLineas.tsx` (refs asignadas durante el render) y un
+  warning en `quienes-somos/MiradaEd.tsx`. Preexistente en `main`, fuera de
+  esta lane: queda para un fix propio.
+
 - Anclar las anotaciones con `-translate-*` de Tailwind: GSAP reescribe el
   `transform` y se pierde. Cajas por left/right/top/bottom.
 - `gsap.set(camara, { x, y, scale, svgOrigin: "0 0" })`: matriz distinta a
@@ -137,4 +142,25 @@
 
 ## Verification
 
-- (sin evidencia de cierre todavía)
+Corrida el 2026-09-07 en el worktree, rama `feat/investigacion-espiral-lamina`
+en `2a8af1f`, contra `http://localhost:3001` (navegador embebido de Orca
+para los probes de escena y encaje; Playwright para viewport fijo antes de
+hidratar, reduced-motion y el ancla).
+
+| DoD | Evidencia | Resultado |
+| --- | --- | --- |
+| 1 `pnpm typecheck` | `tsc --noEmit` | exit 0 · PASS |
+| 2 `pnpm lint` | proyecto entero: 5 errores + 1 warning, todos en `que-hacemos/TorreLineas.tsx` y `quienes-somos/MiradaEd.tsx`, archivos idénticos a la base `ed54f91` (`git diff --stat ed54f91 -- src/features/que-hacemos/` vacío); `eslint` sobre los 9 archivos de la lane | lane exit 0 · PASS con deuda preexistente fuera de alcance (ver Tried and failed) |
+| 3 `pnpm build` | `next build`, `/investigacion` prerenderizada | exit 0 · PASS |
+| 4 copy íntegro | grep -F de los 8 nombres, la nota de bisagra y el remate en `estaciones.ts` | 10 / 10 · PASS |
+| 5 sin hex | `grep -E "#[0-9a-fA-F]{6}"` sobre los 9 archivos tocados/creados en `src/` | 0 · PASS |
+| 6 tamaño | `wc -l` máximo: `coreografia-espiral.ts` 183 | ≤ 200 · PASS |
+| 7 encaje | probe `probe-encaje.js` (toda anotación con opacidad > 0.5 dentro de la hoja, sin cruzar la voz visible ni el chrome) en 0 / 0.30 / 0.49 / 0.82 / 1.0 | OK a 1536×850, 1920×1080 y 1280×720 · PASS |
+| 8 pin | `pin-spacer.offsetHeight − zona.offsetHeight` | 3000 · PASS |
+| 9 estática intacta | SSR de `<section id="ciclo">` byte a byte igual al baseline (`cmp` exit 0, 11467 bytes); Playwright 390×844: live false, 0 guías, 0 anotaciones, 2 `ol`, 8 `li`, destacado presente (captura de la hoja 03 `lamina-touch-390x844-ciclo.png` en el scratchpad; el «antes» no se guardó por un error de ruta, la identidad del SSR lo cubre); Playwright 1536×850 con `reducedMotion: reduce`: 0 guías, sin cámara, sin pin, 2 `ol` / 8 `li` | PASS |
+| 10 `#evidencia` | Playwright 1536×850 → `/investigacion#evidencia`: `zona.dataset.progreso` 0.435 estable en 4 lecturas; esperado 3.7 / 8.51 = 0.4348 | PASS |
+
+Además: probe de escena ida + resize + vuelta → conjuntos exactos en las
+nueve lecturas; probe de subrayado OK; consola sin errores ni warnings en
+la carga de la escena.
+
