@@ -1,17 +1,16 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Highlight } from "@/components/ui/Highlight";
-import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
-import { ChevronDown } from "@/components/ui/icons";
+import { Search } from "@/components/ui/icons";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { ClipPapel, Pestana } from "../casos/Garabatos";
+import { ClipPapel, FlechaManuscrita, Pestana } from "../casos/Garabatos";
 import { ROTULO_MICRO, ROTULO_TAB } from "../casos/tintes";
-import { FiguraConstelacion } from "./FiguraConstelacion";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -20,310 +19,409 @@ if (typeof window !== "undefined") {
 /**
  * Taxonomía de 6 líneas del doc maestro (SÍNTESIS — nombres oficiales en
  * VALIDAR con ED antes del lanzamiento; después, reconciliar el puente de
- * Biblioteca con esta taxonomía). «Incluye» según
- * docs/content/arquitectura-investigacion.md §5.
+ * Biblioteca con esta taxonomía). Preguntas literales de
+ * docs/content/arquitectura-investigacion.md §5; «buscamos» es la síntesis
+ * de una línea de cada pregunta; «temas» son tres de los «incluye».
+ *
+ * Se reparten en dos carpetas con un criterio editorial: las preguntas
+ * sobre EL SABER (el conocimiento matemático) y las preguntas sobre LA
+ * PRÁCTICA (docentes, escenarios, evidencia). Conocer y transformar.
  */
-const LINEAS = [
+type Linea = {
+  nombre: string;
+  pregunta: string;
+  buscamos: string;
+  temas: readonly [string, string, string];
+};
+
+type Carpeta = {
+  numero: string;
+  rotulo: string;
+  /** Anotación manuscrita sobre el título (la instrucción de lectura). */
+  anotacion: string;
+  /** Título grande adentro de la carpeta (la 01 usa el H2 de la sección). */
+  titulo: string;
+  /** Rótulo mono bajo el título. */
+  subtitulo: string;
+  sujecion: "clip" | "cinta";
+  lineas: readonly Linea[];
+};
+
+const CARPETAS: readonly Carpeta[] = [
   {
-    nombre: "Empoderamiento y desarrollo profesional docente",
-    pregunta:
-      "¿Cómo se transforma la relación de las y los docentes con el saber y qué condiciones fortalecen su autonomía y capacidad de acción?",
-    incluye: [
-      "liderazgo",
-      "comunidades de aprendizaje",
-      "reflexión sobre la práctica",
-      "desarrollo profesional sostenido",
-      "toma de decisiones",
-      "adaptación de situaciones",
+    numero: "01",
+    rotulo: "EL SABER",
+    anotacion: "No son servicios. Son preguntas.",
+    titulo: "Qué estudiamos y qué buscamos comprender.",
+    subtitulo: "Preguntas sobre el conocimiento",
+    sujecion: "clip",
+    lineas: [
+      {
+        nombre: "Socioepistemología y construcción social del conocimiento matemático",
+        pregunta:
+          "¿Cómo se construye, usa y resignifica el conocimiento matemático en prácticas sociales y contextos educativos?",
+        buscamos:
+          "cómo el conocimiento matemático toma sentido en las prácticas de quienes lo usan.",
+        temas: ["prácticas sociales", "matemática y realidad", "exclusión y participación"],
+      },
+      {
+        nombre: "Discurso y problematización de la matemática escolar",
+        pregunta:
+          "¿Qué formas de presentar la matemática se han naturalizado y cómo pueden revisarse para ampliar sentidos, estrategias y posibilidades de aprendizaje?",
+        buscamos:
+          "qué se da por sentado en la matemática escolar y qué se abre al revisarlo.",
+        temas: ["libros de texto", "tareas", "argumentación"],
+      },
+      {
+        nombre: "Desarrollo y funcionalidad del pensamiento matemático",
+        pregunta:
+          "¿Cómo pueden los contenidos escolares convertirse en herramientas para decidir, argumentar, interpretar información y actuar en el mundo?",
+        buscamos:
+          "cómo los contenidos se vuelven herramientas para pensar y decidir.",
+        temas: ["estrategias", "toma de decisiones", "ciudadanía"],
+      },
     ],
   },
   {
-    nombre:
-      "Socioepistemología y construcción social del conocimiento matemático",
-    pregunta:
-      "¿Cómo se construye, usa y resignifica el conocimiento matemático en prácticas sociales y contextos educativos?",
-    incluye: [
-      "prácticas sociales",
-      "contextos de significación",
-      "matemática y realidad",
-      "construcción social del conocimiento",
-      "exclusión y participación",
+    numero: "02",
+    rotulo: "LA PRÁCTICA",
+    anotacion: "Y en la práctica",
+    titulo: "Qué preguntamos sobre las condiciones y las personas.",
+    subtitulo: "Segunda carpeta del mismo cajón",
+    sujecion: "cinta",
+    lineas: [
+      {
+        nombre: "Empoderamiento y desarrollo profesional docente",
+        pregunta:
+          "¿Cómo se transforma la relación de las y los docentes con el saber y qué condiciones fortalecen su autonomía y capacidad de acción?",
+        buscamos:
+          "cómo una comunidad docente gana autonomía para decidir sobre su práctica.",
+        temas: ["liderazgo", "comunidades de aprendizaje", "reflexión sobre la práctica"],
+      },
+      {
+        nombre: "Escenarios, currículum y recursos para el aprendizaje",
+        pregunta:
+          "¿Qué condiciones, tareas, currículas y materiales habilitan participación, múltiples estrategias, debate y construcción de sentido?",
+        buscamos:
+          "qué condiciones y materiales habilitan participación y debate en el aula.",
+        temas: ["situaciones de aprendizaje", "tareas disruptivas", "voz estudiantil"],
+      },
+      {
+        nombre: "Evidencia, evaluación y mejora educativa",
+        pregunta:
+          "¿Qué evidencias permiten comprender una intervención, interpretar sus efectos y tomar mejores decisiones sin reducir el aprendizaje a una cifra?",
+        buscamos:
+          "qué evidencia explica una intervención más allá de una cifra.",
+        temas: ["diseño de instrumentos", "estudios de impacto", "sistematización"],
+      },
     ],
   },
+];
+
+/** Inclinación de la carpeta al entrar y al salir (grados, sentido de la referencia). */
+const INCLINACION = -5;
+
+/** Las hojas puestas a mano: giro y aire distinto por columna. */
+const HOJA_POSE = [
+  "lg:-rotate-[0.9deg] lg:mt-3",
+  "lg:rotate-[0.5deg]",
+  "lg:-rotate-[0.4deg] lg:mt-6",
+] as const;
+
+/** Puntas de papel asomando por la boca de cada carpeta (mal guardadas). */
+const PAPELES: readonly (readonly string[])[] = [
+  [
+    "left-[42%] -top-[9px] h-4 w-24 rotate-[0.6deg] bg-white/95",
+    "left-[54%] -top-[6px] h-3.5 w-14 -rotate-[1deg] bg-white/75",
+    "left-[70%] -top-[8px] h-4 w-28 rotate-[0.3deg] bg-white/90",
+  ],
+  [
+    "left-[50%] -top-[8px] h-4 w-20 -rotate-[0.7deg] bg-white/95",
+    "left-[63%] -top-[6px] h-3.5 w-24 rotate-[0.9deg] bg-white/80",
+    "left-[78%] -top-[9px] h-4 w-16 -rotate-[0.4deg] bg-white/90",
+  ],
+];
+
+/** Cinta adhesiva en la esquina (sujeción de la carpeta 02). */
+function Cinta({ className = "" }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`bg-azul-claro/70 pointer-events-none absolute block h-6 w-20 rotate-[-38deg] shadow-[0_1px_2px_rgb(31_45_77/0.15)] ${className}`}
+      style={{
+        backgroundImage:
+          "repeating-linear-gradient(90deg, transparent 0 6px, rgb(255 255 255 / 0.25) 6px 7px)",
+      }}
+    />
+  );
+}
+
+/** Una hoja: la pregunta es la protagonista; el nombre, rótulo de archivo. */
+function Hoja({
+  linea,
+  numero,
+  pose,
+  sujecion,
+}: {
+  linea: Linea;
+  numero: string;
+  pose: string;
+  sujecion: Carpeta["sujecion"];
+}) {
+  return (
+    <li
+      className={`bg-grain-light text-azul-principal relative flex flex-col rounded-[4px] bg-white px-7 pt-9 pb-7 shadow-[0_22px_50px_-26px_rgb(31_45_77/0.55),0_2px_6px_-2px_rgb(31_45_77/0.2)] lg:px-8 lg:pt-10 ${pose}`}
+    >
+      {sujecion === "clip" ? (
+        <ClipPapel className="text-azul-principal/45 absolute -top-3 right-7 h-11 w-6" />
+      ) : (
+        <Cinta className="-top-3 -right-5" />
+      )}
+      <span className={`${ROTULO_MICRO} text-gris-texto/80 tabular-nums`}>
+        Línea {numero}
+      </span>
+      <h3 className="font-display mt-4 text-[1.32rem] leading-[1.22] font-bold tracking-[-0.015em] lg:text-[1.42rem]">
+        {linea.pregunta}
+      </h3>
+      <p className="mt-5 text-[0.98rem] leading-[1.6]">
+        <span className="text-verde-concepto-texto font-medium">Buscamos comprender</span>{" "}
+        {linea.buscamos}
+      </p>
+      <p className={`${ROTULO_MICRO} text-gris-texto/75 mt-5 leading-[1.9]`}>
+        {linea.temas.join(" · ")}
+      </p>
+      <div className="border-azul-principal/15 mt-auto flex items-end justify-between gap-4 border-t border-dashed pt-5">
+        <span className="text-azul-principal/70 max-w-[20ch] font-sans text-[0.78rem] leading-[1.4] font-medium">
+          {linea.nombre}
+        </span>
+        <Link
+          href="#en-accion"
+          aria-label={`Ver en acción: ${linea.nombre}`}
+          className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto inline-flex shrink-0 items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          <Search size={14} />
+          Ver en acción
+        </Link>
+      </div>
+    </li>
+  );
+}
+
+/** Tinte de cada carpeta: la 02 es apenas más oscura (otra carpeta del cajón). */
+const TINTE_CARPETA = [
   {
-    nombre: "Discurso y problematización de la matemática escolar",
-    pregunta:
-      "¿Qué formas de presentar la matemática se han naturalizado y cómo pueden revisarse para ampliar sentidos, estrategias y posibilidades de aprendizaje?",
-    incluye: [
-      "discurso matemático escolar",
-      "libros de texto",
-      "tareas",
-      "proporcionalidad",
-      "lenguaje simbólico",
-      "errores",
-      "argumentación",
-      "resignificación del saber",
-    ],
+    fondo: "bg-azul-claro",
+    tinta: "text-azul-claro",
   },
   {
-    nombre: "Desarrollo y funcionalidad del pensamiento matemático",
-    pregunta:
-      "¿Cómo pueden los contenidos escolares convertirse en herramientas para decidir, argumentar, interpretar información y actuar en el mundo?",
-    incluye: [
-      "estrategias",
-      "algoritmos",
-      "razonamiento",
-      "toma de decisiones",
-      "inferencia",
-      "medición",
-      "visualización",
-      "predicción",
-      "ciudadanía",
-    ],
-  },
-  {
-    nombre: "Escenarios, currículum y recursos para el aprendizaje",
-    pregunta:
-      "¿Qué condiciones, tareas, currículas y materiales habilitan participación, múltiples estrategias, debate y construcción de sentido?",
-    incluye: [
-      "situaciones de aprendizaje",
-      "diseño curricular",
-      "materiales",
-      "tareas disruptivas",
-      "voz estudiantil",
-      "diálogo",
-      "tecnología pertinente",
-    ],
-  },
-  {
-    nombre: "Evidencia, evaluación y mejora educativa",
-    pregunta:
-      "¿Qué evidencias permiten comprender una intervención, interpretar sus efectos y tomar mejores decisiones sin reducir el aprendizaje a una cifra?",
-    incluye: [
-      "diseño de instrumentos",
-      "análisis de resultados",
-      "evaluación educativa",
-      "estudios de impacto",
-      "sistematización",
-      "mejora continua",
-    ],
+    fondo: "bg-[color-mix(in_srgb,var(--color-azul-claro)_86%,var(--color-azul-principal))]",
+    tinta: "text-[color-mix(in_srgb,var(--color-azul-claro)_86%,var(--color-azul-principal))]",
   },
 ] as const;
 
 /**
- * Sección 3 — Líneas de investigación (`#lineas`): LA CARPETA.
+ * La carpeta A PANTALLA COMPLETA, como en la referencia: ocupa todo el
+ * ancho, sin marco, con su título adentro y aire alrededor. Es más ancha
+ * que el viewport (120vw) para que, inclinada al entrar, no deje huecos en
+ * los costados. Pestaña, número fantasma, papeles asomando, sello, marca
+ * seca y las tres hojas.
+ */
+function CarpetaLineas({
+  carpeta,
+  indice,
+  refCarpeta,
+}: {
+  carpeta: Carpeta;
+  indice: number;
+  refCarpeta: (el: HTMLDivElement | null) => void;
+}) {
+  const primeraLinea = indice * 3;
+  const tinte = TINTE_CARPETA[indice] ?? TINTE_CARPETA[0];
+  return (
+    <div
+      ref={refCarpeta}
+      data-lineas-carpeta
+      className={`${tinte.fondo} bg-grain-light relative -ml-[10vw] w-[120vw] shadow-[0_-28px_70px_-30px_rgb(0_0_0/0.65)] will-change-transform ${
+        indice === 0 ? "" : "-mt-28"
+      }`}
+      style={{ zIndex: 10 + indice }}
+    >
+      {/* Pestaña troquelada, grande como en la referencia. La 02 va corrida. */}
+      <span
+        aria-hidden="true"
+        className={`${tinte.tinta} absolute -top-12 z-0 block h-12 w-[19rem] lg:-top-14 lg:h-14 lg:w-[22rem] ${
+          indice === 0 ? "left-[13vw]" : "left-[30vw]"
+        }`}
+      >
+        <Pestana className="h-full w-full">
+          <span className={`${ROTULO_TAB} text-azul-principal whitespace-nowrap`}>
+            {carpeta.numero} · {carpeta.rotulo}
+          </span>
+        </Pestana>
+      </span>
+
+      {/* Papeles mal guardados asomando por la boca. */}
+      {PAPELES[indice]?.map((clases) => (
+        <span
+          key={clases}
+          aria-hidden="true"
+          className={`pointer-events-none absolute z-0 block rounded-t-[3px] shadow-[0_-2px_5px_-2px_rgb(31_45_77/0.4)] ${clases}`}
+        />
+      ))}
+
+      {/* Canto iluminado de la tapa. */}
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-white/40" />
+
+      {/* Contenido: dentro del viewport (compensa el ancho extra). */}
+      <div className="relative mx-[10vw] px-6 pt-28 pb-24 md:px-10 lg:pt-32 lg:pb-28">
+        {/* Número fantasma: rotulación de archivo. */}
+        <span
+          aria-hidden="true"
+          className="font-display text-azul-principal/[0.08] pointer-events-none absolute top-10 left-6 text-[8rem] leading-none font-extrabold tracking-tight select-none md:left-10 lg:top-12 lg:text-[10rem]"
+        >
+          {carpeta.numero}
+        </span>
+
+        {/* Sello de archivo, en ángulo. */}
+        <span
+          aria-hidden="true"
+          className={`${ROTULO_MICRO} text-azul-principal/60 border-azul-principal/40 absolute top-14 right-6 hidden rotate-[-4deg] rounded-[3px] border px-3 py-1.5 md:right-10 lg:block`}
+        >
+          ARCHIVO ED · LÍNEAS · {carpeta.numero} / 02
+        </span>
+
+        <div className="text-azul-principal relative mx-auto max-w-screen-xl">
+          {/* Encabezado adentro de la carpeta, centrado y en un renglón, como
+              la carpeta de tres tarjetas de la referencia. */}
+          <div className="flex flex-col items-center text-center">
+            <span className="text-azul-principal/75 inline-flex items-end gap-3">
+              <span className="border-azul-principal/60 font-display border-b-2 pb-0.5 text-[0.95rem] font-medium tracking-wide uppercase">
+                {carpeta.anotacion}
+              </span>
+              {indice === 0 && (
+                <FlechaManuscrita className="text-verde-concepto h-6 w-12 shrink-0 rotate-[40deg]" />
+              )}
+            </span>
+            <h2
+              className="font-display mt-5 font-extrabold tracking-[-0.02em] text-balance"
+              style={{ fontSize: "clamp(1.7rem, 0.9rem + 1.7vw, 2.6rem)", lineHeight: 1.12 }}
+            >
+              {indice === 0 ? (
+                <>
+                  Qué <Highlight>estudiamos</Highlight> y qué buscamos comprender.
+                </>
+              ) : (
+                carpeta.titulo
+              )}
+            </h2>
+            <p className={`${ROTULO_MICRO} text-azul-principal/70 mt-4 uppercase`}>
+              {carpeta.numero} · {carpeta.rotulo} — {carpeta.subtitulo}
+            </p>
+          </div>
+
+          <ol className="mt-12 grid items-start gap-6 lg:mt-14 lg:grid-cols-3 lg:gap-8">
+            {carpeta.lineas.map((linea, i) => (
+              <Hoja
+                key={linea.nombre}
+                linea={linea}
+                numero={String(primeraLinea + i + 1).padStart(2, "0")}
+                pose={HOJA_POSE[i] ?? ""}
+                sujecion={carpeta.sujecion}
+              />
+            ))}
+          </ol>
+        </div>
+
+        {/* Marca seca ED en la base. */}
+        <Image
+          src="/brand/logotipo-principal-ed.png"
+          alt=""
+          aria-hidden="true"
+          width={395}
+          height={433}
+          className="pointer-events-none absolute right-6 bottom-8 h-12 w-auto opacity-[0.16] select-none md:right-10 lg:bottom-10 lg:h-14"
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Sección 3 — Líneas de investigación (`#lineas`): DOS CARPETAS DEL MISMO
+ * CAJÓN, A PANTALLA COMPLETA.
  *
- * Costura con la carta: sobre el mismo navy, una carpeta manila (azul
- * claro, con pestaña troquelada) entra INCLINADA desde abajo y se asienta
- * plana a medida que llega — el gesto de la referencia (la carpeta que tapa
- * la noche), sin pin: un scrub corto ligado a la entrada de la sección.
- * Adentro, la hoja blanca con clip: título grande fijo a la izquierda con
- * la lupa («Mirar de cerca», la figura de esta sección) y, a la derecha,
- * las seis líneas como filas con regla punteada. Nombre y pregunta siempre
- * visibles; «incluye» como chips al abrir. Una fila abierta por vez.
+ * Seis preguntas en dos carpetas manila con criterio editorial (el saber /
+ * la práctica), tres hojas por carpeta. Cada hoja lleva la pregunta como
+ * titular —la protagonista, según la arquitectura editorial—, una línea
+ * «buscamos comprender», tres temas como nota al margen, y la lupa como
+ * botón «Ver en acción» hacia el archivo de casos: mirar de cerca una línea
+ * es ir a ver dónde se investiga.
  *
- * El punto naranja —el personaje— deja la lupa para marcar la fila abierta
- * y vuelve a la figura cuando se cierra.
- *
- * Touch / reduced-motion: carpeta plana desde el principio (el acordeón
- * funciona igual).
+ * Como en la referencia, cada carpeta ocupa toda la pantalla y lleva su
+ * título adentro, con aire. La carpeta 01 entra inclinada sobre el navy de
+ * la carta y se asienta; la 02 entra igual y tapa a la 01. Sin pin: un
+ * scrub corto por carpeta ligado a su entrada. Touch / reduced-motion:
+ * carpetas planas.
  */
 export function LineasInvestigacion() {
   const zonaRef = useRef<HTMLElement | null>(null);
-  const carpetaRef = useRef<HTMLDivElement | null>(null);
-  const listaRef = useRef<HTMLOListElement | null>(null);
-  const filasRef = useRef<(HTMLLIElement | null)[]>([]);
+  const carpetasRef = useRef<(HTMLDivElement | null)[]>([]);
   const reduced = useReducedMotion();
-  const [abierta, setAbierta] = useState<number | null>(null);
-  const [marcaTop, setMarcaTop] = useState<number | null>(null);
-  const baseId = useId();
 
-  // ── La costura: la carpeta entra inclinada y se asienta con el scroll.
   useIsomorphicLayoutEffect(() => {
     if (reduced) return;
     if (!window.matchMedia("(hover: hover) and (min-width: 64rem)").matches)
       return;
     const zona = zonaRef.current;
-    const carpeta = carpetaRef.current;
-    if (!zona || !carpeta) return;
+    if (!zona) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        carpeta,
-        { rotation: -4.5, y: 110, transformOrigin: "50% 100%" },
-        {
-          rotation: 0,
-          y: 0,
-          ease: "none",
+      carpetasRef.current.forEach((carpeta) => {
+        if (!carpeta) return;
+        // La regla de la referencia: la carpeta está derecha solo cuando está
+        // CENTRADA en la ventana. Viene inclinada, se aplana al llegar al
+        // medio y se vuelve a inclinar (mismo ángulo, mismo sentido) al irse.
+        // El tramo "top bottom → bottom top" tiene su mitad exacta cuando el
+        // centro de la carpeta pasa por el centro de la ventana. Pivote en el
+        // centro para que al girar no se desplace.
+        const tl = gsap.timeline({
+          defaults: { transformOrigin: "50% 50%" },
           scrollTrigger: {
-            trigger: zona,
+            trigger: carpeta,
             start: "top bottom",
-            end: "top 12%",
+            end: "bottom top",
             scrub: true,
             invalidateOnRefresh: true,
           },
-        },
-      );
+        });
+        tl.fromTo(
+          carpeta,
+          { rotation: INCLINACION },
+          { rotation: 0, duration: 0.42, ease: "power2.out", immediateRender: false },
+          0,
+        );
+        tl.to(carpeta, { rotation: INCLINACION, duration: 0.42, ease: "power2.in" }, 0.58);
+      });
     }, zona);
     return () => ctx.revert();
   }, [reduced]);
-
-  // ── El personaje se posa junto a la fila abierta (medido en layout).
-  useIsomorphicLayoutEffect(() => {
-    if (abierta === null) {
-      setMarcaTop(null);
-      return;
-    }
-    const li = filasRef.current[abierta];
-    if (!li) return;
-    // Alineado con el número de la fila (padding superior del botón).
-    setMarcaTop(li.offsetTop + 34);
-  }, [abierta]);
 
   return (
     <section
       ref={zonaRef}
       id="lineas"
       aria-label="Líneas de investigación"
-      className="bg-azul-principal overflow-x-clip px-2.5 pt-16 pb-2.5"
+      className="bg-azul-principal overflow-x-clip pt-24"
     >
-      {/* ── La carpeta manila con su pestaña. */}
-      <div
-        ref={carpetaRef}
-        data-lineas-carpeta
-        className="bg-azul-claro bg-grain-light relative mx-auto max-w-[110rem] rounded-xl p-3 shadow-[0_-24px_60px_-30px_rgb(0_0_0/0.6)] will-change-transform"
-      >
-        <span
-          aria-hidden="true"
-          className="text-azul-claro absolute -top-10 left-[3%] z-0 block h-10 w-[21rem] lg:-top-11 lg:h-11"
-        >
-          <Pestana className="h-full w-full">
-            <span className={`${ROTULO_TAB} text-azul-principal whitespace-nowrap`}>
-              LÍNEAS DE INVESTIGACIÓN
-            </span>
-          </Pestana>
-        </span>
-
-        {/* ── La hoja. */}
-        <div className="bg-grain-light text-azul-principal relative rounded-lg bg-white px-8 py-14 lg:px-16 lg:py-20">
-          <ClipPapel
-            className="text-azul-principal/40 absolute -top-3 right-14 hidden h-12 w-7 lg:block"
-          />
-
-          <div className="mx-auto grid max-w-screen-xl gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-            {/* ── Izquierda: título grande fijo + la lupa + CTA. */}
-            <div className="lg:sticky lg:top-24 lg:self-start">
-              <Eyebrow>Líneas de investigación</Eyebrow>
-              <h2
-                className="font-display mt-6 max-w-[12ch] font-extrabold tracking-[-0.025em]"
-                style={{ fontSize: "clamp(2.2rem, 1rem + 3vw, 3.8rem)", lineHeight: 1.04 }}
-              >
-                Qué <Highlight>estudiamos</Highlight> y qué buscamos
-                comprender.
-              </h2>
-              <p className="mt-6 max-w-[38ch] text-[1.02rem] leading-[1.7] lg:text-[1.08rem]">
-                Estas líneas no describen servicios: describen preguntas. Son
-                los grandes temas que investigamos y los que sostienen, por
-                debajo, cada intervención que diseñamos y acompañamos.
-              </p>
-
-              <div className="mt-10 flex items-end gap-6">
-                <FiguraConstelacion
-                  id="lupa"
-                  personajeVisible={abierta === null}
-                  className="w-28 shrink-0 lg:w-32"
-                />
-                <span className={`text-gris-texto/80 mb-2 block ${ROTULO_MICRO} uppercase`}>
-                  02 / 04 · Mirar de cerca
-                </span>
-              </div>
-
-              <div className="mt-10">
-                <ButtonSecondary href="#en-accion" withArrow>
-                  Mirá la investigación en acción
-                </ButtonSecondary>
-              </div>
-            </div>
-
-            {/* ── Derecha: las seis líneas, filas con regla punteada. */}
-            <ol ref={listaRef} className="relative">
-              {/* El personaje, posado junto a la fila abierta. */}
-              <span
-                aria-hidden="true"
-                data-lineas-personaje
-                className="bg-naranja-accion absolute -left-6 h-3 w-3 rounded-full transition-[top,opacity,transform] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                style={{
-                  top: marcaTop ?? 0,
-                  opacity: marcaTop === null ? 0 : 1,
-                  transform: marcaTop === null ? "scale(0)" : "scale(1)",
-                }}
-              />
-              {LINEAS.map((linea, i) => {
-                const estaAbierta = abierta === i;
-                const panelId = `${baseId}-panel-${i}`;
-                return (
-                  <li
-                    key={linea.nombre}
-                    ref={(el) => {
-                      filasRef.current[i] = el;
-                    }}
-                    className="border-azul-principal/25 border-b border-dashed first:border-t"
-                  >
-                    <button
-                      type="button"
-                      aria-expanded={estaAbierta}
-                      aria-controls={panelId}
-                      onClick={() => setAbierta(estaAbierta ? null : i)}
-                      className="group focus-visible:outline-verde-concepto grid w-full grid-cols-[2.75rem_minmax(0,1fr)_2rem] items-start gap-x-4 py-7 text-left focus-visible:outline-2 focus-visible:outline-offset-4"
-                    >
-                      <span className={`${ROTULO_MICRO} text-gris-texto/80 pt-1.5 tabular-nums`}>
-                        0{i + 1}
-                      </span>
-                      <span>
-                        <span className="font-display group-hover:text-azul-medio block text-[1.2rem] leading-tight font-bold transition-colors lg:text-[1.3rem]">
-                          {linea.nombre}
-                        </span>
-                        <span className="text-azul-principal/85 mt-2.5 block text-[0.98rem] leading-[1.6]">
-                          {linea.pregunta}
-                        </span>
-                      </span>
-                      <span
-                        className={`text-azul-principal/70 mt-1 flex h-7 w-7 items-center justify-center rounded-full border border-current transition-transform duration-500 ${
-                          estaAbierta ? "rotate-180" : ""
-                        }`}
-                      >
-                        <ChevronDown size={14} />
-                      </span>
-                    </button>
-                    <div
-                      id={panelId}
-                      role="region"
-                      aria-hidden={!estaAbierta}
-                      className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                      style={{ gridTemplateRows: estaAbierta ? "1fr" : "0fr" }}
-                    >
-                      <div className="min-h-0 overflow-hidden">
-                        <div className="flex flex-wrap items-center gap-2 pb-7 pl-[3.75rem]">
-                          <span className={`${ROTULO_MICRO} text-gris-texto/80 mr-2 uppercase`}>
-                            Incluye
-                          </span>
-                          {linea.incluye.map((chip) => (
-                            <span
-                              key={chip}
-                              className="border-azul-medio/40 text-azul-principal rounded-full border px-3 py-1 text-[0.82rem] leading-none"
-                            >
-                              {chip}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        </div>
-      </div>
+      {CARPETAS.map((carpeta, i) => (
+        <CarpetaLineas
+          key={carpeta.numero}
+          carpeta={carpeta}
+          indice={i}
+          refCarpeta={(el) => {
+            carpetasRef.current[i] = el;
+          }}
+        />
+      ))}
     </section>
   );
 }
