@@ -426,6 +426,15 @@ export function LineasInvestigacion() {
           puntos, que asoma en el respiro de arriba y en las cuñas que dejan
           las carpetas al entrar inclinadas. */}
       <PuntosCampo anclaje="arriba" />
+      {/* Piso de la sección: la última carpeta sale inclinada y deja una cuña
+          a la derecha. Ahí tiene que verse lo que sigue (gris-fondo), no el
+          navy del cajón: la carpeta se apoya sobre la sección de abajo. Más
+          alto que la cuña máxima (5° sobre 120vw ≈ 4.4vw en el borde) para
+          que su canto nunca asome; bajo las carpetas, sobre los puntos. */}
+      <span
+        aria-hidden="true"
+        className="bg-gris-fondo pointer-events-none absolute inset-x-0 bottom-0 h-[6vw]"
+      />
       {CARPETAS.map((carpeta, i) => (
         <CarpetaLineas
           key={carpeta.numero}
