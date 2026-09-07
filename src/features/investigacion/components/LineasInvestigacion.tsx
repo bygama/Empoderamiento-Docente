@@ -10,6 +10,7 @@ import { Search } from "@/components/ui/icons";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ClipPapel, FlechaManuscrita, Pestana } from "../casos/Garabatos";
+import { PuntosCampo } from "./PuntosCampo";
 import { ROTULO_MICRO, ROTULO_TAB } from "../casos/tintes";
 
 if (typeof window !== "undefined") {
@@ -410,8 +411,12 @@ export function LineasInvestigacion() {
       ref={zonaRef}
       id="lineas"
       aria-label="Líneas de investigación"
-      className="bg-azul-principal overflow-x-clip pt-24"
+      className="bg-azul-principal bg-grain-dark relative overflow-x-clip pt-24"
     >
+      {/* El campo navy de la carta sigue acá: mismo grain y misma grilla de
+          puntos, que asoma en el respiro de arriba y en las cuñas que dejan
+          las carpetas al entrar inclinadas. */}
+      <PuntosCampo anclaje="arriba" />
       {CARPETAS.map((carpeta, i) => (
         <CarpetaLineas
           key={carpeta.numero}
