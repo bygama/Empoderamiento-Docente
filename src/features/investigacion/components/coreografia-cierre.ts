@@ -268,7 +268,9 @@ export function crearAscenso({ zona, hoja }: Escena) {
   //    Mismo ease que el ascenso, así el mundo entero frena junto. El faro
   //    sube adentro de la última —la banda— y la lámpara se enciende cuando
   //    esa se disuelve.
-  const altoHoja = () => hoja.clientHeight;
+  // Alto de la escena sin la franja reservada bajo el piso: el viaje de las
+  // nubes no cambia con la solapa del footer.
+  const altoHoja = () => hoja.clientHeight - solapa();
   nubes.forEach((nb, i) => {
     const cerca = Number(nb.dataset.nubeCerca);
     const recorrido =
