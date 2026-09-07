@@ -121,7 +121,7 @@ export function EspiralInvestigacion() {
             <div className="relative z-10 mx-auto my-auto grid w-full max-w-screen-xl items-center gap-x-16 px-6 py-10 md:px-12 lg:grid-cols-[0.95fr_1.05fr]">
               {/* Izquierda: la espiral. */}
               <div className="mx-auto w-full max-w-[min(500px,64svh)]">
-                <EspiralSvg />
+                <EspiralSvg lamina />
               </div>
 
               {/* Derecha: título y la estación actual (relevos). */}
