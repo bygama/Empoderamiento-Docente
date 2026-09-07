@@ -1,0 +1,8 @@
+# Normalización de finales de línea.
+#
+# El repo trabaja en CRLF (core.autocrlf=true en Windows), pero los hooks de
+# git los ejecuta `sh`: si git los escribe con CRLF, el shell falla con
+# "bad interpreter: /bin/sh^M" y el hook queda roto en la máquina de quien
+# haga checkout. Por eso van forzados a LF en toda plataforma.
+.githooks/** text eol=lf
+*.sh        text eol=lf
