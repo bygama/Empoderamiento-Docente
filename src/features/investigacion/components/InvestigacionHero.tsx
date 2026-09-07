@@ -128,8 +128,10 @@ export function InvestigacionHero() {
 
   return (
     <section ref={zoneRef} aria-label="Investigar para transformar" className="bg-gris-fondo p-2.5">
-      {/* La hoja: único hero del sitio que abre en claro. */}
-      <div className="ring-azul-principal/10 relative isolate flex min-h-[calc(100svh-1.25rem)] overflow-hidden rounded-xl bg-white bg-grain-light shadow-[0_24px_60px_-30px_rgb(31_45_77/0.25)] ring-1">
+      {/* La hoja: único hero del sitio que abre en claro. La sombra es corta a
+          propósito: la sección solo deja 10px de canaleta (p-2.5) y la de
+          abajo pinta su fondo encima, así que una sombra larga se ve cortada. */}
+      <div className="ring-azul-principal/10 relative isolate flex min-h-[calc(100svh-1.25rem)] overflow-hidden rounded-xl bg-white bg-grain-light shadow-[0_4px_12px_-8px_rgb(31_45_77/0.35)] ring-1">
         {/* Folio de archivo (guiño al remate de la pila de expedientes). */}
         <span
           data-hero-rise
