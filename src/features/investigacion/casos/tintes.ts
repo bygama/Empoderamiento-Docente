@@ -91,12 +91,31 @@ export const TINTES: Record<
 };
 
 /**
- * Posición horizontal de la pestaña de cada carpeta dentro del archivo:
- * contiguas desde la izquierda (cada una arranca donde termina la anterior,
- * como separadores reales de un cajón). El ancho de pestaña es w-56
- * (224px ≈ 19% del contenedor de 1200): pasos de 19%.
+ * Posición horizontal de la pestaña de cada carpeta dentro del archivo.
+ *
+ * EN DESORDEN, no en escalera. Un cajón de verdad no tiene los separadores
+ * ordenados de izquierda a derecha: los fue poniendo alguien, con el
+ * tiempo, donde había lugar. La secuencia salta —izquierda, derecha, medio,
+ * derecha— y ninguna pestaña arranca donde termina la anterior.
+ *
+ * Pueden pisarse en horizontal sin taparse: entre una pestaña y la
+ * siguiente hay de 119 a 150px de separación vertical (el alto de la banda
+ * visible de cada carpeta) y la pestaña mide 44. Eso es lo que habilita el
+ * desorden; las que se solapan en x nunca son consecutivas.
+ *
+ * Dos juegos de valores porque la pestaña tiene ancho FIJO y la carpeta no.
+ * En una carpeta de 1200px la pestaña ocupa el 19%, pero en un teléfono
+ * pasa del 60%: con un solo juego las últimas se salían de su carpeta (a
+ * 324px de viewport la cuarta sobresalía 108px, y eso ya pasaba con la
+ * escalera). Abajo de md el desorden es el mismo pero comprimido, y la
+ * pestaña se angosta a w-48 para que entre.
  */
-export const OFFSET_PESTANA = ["left-[2%]", "left-[21%]", "left-[40%]"] as const;
+export const OFFSET_PESTANA = [
+  "left-[0%] md:left-[8%]",
+  "left-[20%] md:left-[55%]",
+  "left-[8%] md:left-[31%]",
+  "left-[30%] md:left-[64%]",
+] as const;
 
 /**
  * Familia micro-tipográfica del archivo (el design system termina en
