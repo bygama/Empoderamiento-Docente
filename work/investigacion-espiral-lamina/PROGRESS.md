@@ -90,6 +90,22 @@
   `#evidencia` queda para work-verify (DoD 10). Commits: content(…) textos
   breves + feat(…) lámina anotada con cámara.
 
+- **Paso 5b — jerarquía y entrada escalonada** (2026-09-07). `estaciones.ts`
+  gana `clave` por estación; `EspiralLamina.tsx` marca la clave con un
+  `<mark>` en peso medio y un span de subrayado verde (`data-anot-subrayado`),
+  nombre en `clamp(1.1rem, 2.1svh, 1.3rem)` y cuerpo en azul al 75 %;
+  nuevo `anotacion-espiral.ts` (57 líneas) con `gestosAnotacion`: reposo,
+  entrada (guía → bloque → nombre → texto → subrayado con scaleX) y salida;
+  `coreografia-espiral.ts` los usa y queda en 182 líneas; `pausa` 0.6 → 0.8
+  porque la última anotación de cada vuelta tarda ~0.56 en entrar.
+  Aceptación (navegador de Orca sobre el 3001): probe de escena ida, resize
+  y vuelta en 0 / 0.30 / 0.49 / 0.82 / 1.0 → OK; probe de subrayado (solo el
+  de la 01 a p=0; los cuatro a scaleX 1 con nombre y texto a opacidad 1 a
+  p=0.30; los cuatro de la vuelta 2 a p=0.82; el remate a p=1) → OK; encaje
+  OK a 1536×850, 1920×1080 y 1280×720; typecheck → 0; eslint → 0; ≤ 200
+  líneas; cero hex. Capturas `s8-*.png`. Commit: style(investigacion):
+  jerarquizar y escalonar las anotaciones de la lámina.
+
 ## Tried and failed
 
 - Anclar las anotaciones con `-translate-*` de Tailwind: GSAP reescribe el

@@ -112,6 +112,18 @@ una sola vez después del último paso; no es un paso de este plan.
    casos; capturas PNG de los diez estados guardadas en el scratchpad y
    revisadas con `Read`. *(judgment · medium)*
 
+5b. **Jerarquía y entrada escalonada de las anotaciones** (pedido del owner
+   el 2026-09-07 tras ver la escena: «mejorar jerarquías así no está muy
+   plano… y si podés meter alguna animación»). Nombre más grande y apretado,
+   cuerpo un tono más bajo, una frase `clave` por estación en peso medio con
+   subrayado verde (span con scaleX, no text-decoration); entrada: guía →
+   bloque → nombre → texto → subrayado, en `anotacion-espiral.ts`. Commit
+   `style(investigacion): …`.
+   Aceptación: probes de escena (ida, resize, vuelta) y de encaje en los
+   tres viewports siguen OK; a p=0.29 los cuatro `[data-anot-subrayado]`
+   visibles tienen scaleX 1 y a p=0 solo el de la anotación 0; typecheck,
+   lint, ≤ 200 líneas por archivo. *(judgment · medium)*
+
 6. **Registrar la decisión** en `docs/content/arquitectura-investigacion.md` §6:
    una nota fechada 2026-09-07 debajo de la del 04-09 (lámina anotada, cámara de
    dos encuadres, pin de 3000 px, copy íntegro) y actualizar el doc-comment de

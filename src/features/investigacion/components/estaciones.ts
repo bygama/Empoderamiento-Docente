@@ -5,12 +5,15 @@
  * maestro y los usa la versión estática (y el SSR). `breve` es la versión
  * corta para las anotaciones de la lámina, pedida por el owner el
  * 2026-09-07 («son muy largos»): misma idea, menos palabras; el destacado
- * no va en la lámina. Pendiente de validación de contenido.
+ * no va en la lámina. `clave` es la frase de `breve` que la lámina subraya
+ * en verde (conceptos): tiene que aparecer literal dentro de `breve`.
+ * Pendiente de validación de contenido.
  */
 export type Estacion = {
   nombre: string;
   texto: string;
   breve: string;
+  clave: string;
   destacado?: string;
 };
 
@@ -21,6 +24,7 @@ export const VUELTA_1: ReadonlyArray<Estacion> = [
       "Las y los participantes viven situaciones que permiten cuestionar sentidos, explorar estrategias y problematizar la matemática escolar desde su propia experiencia.",
     breve:
       "Las y los participantes viven situaciones para cuestionar sentidos, explorar estrategias y problematizar la matemática escolar desde su propia experiencia.",
+    clave: "viven situaciones",
     destacado:
       "«Vivir para hacer vivir»: para diseñar nuevos escenarios, el cuerpo docente necesita experimentar otra relación con la matemática.",
   },
@@ -30,6 +34,7 @@ export const VUELTA_1: ReadonlyArray<Estacion> = [
       "Las propuestas se interpretan y se llevan a aulas, instituciones o programas reales. No se reproducen mecánicamente: se contextualizan desde el conocimiento profesional de quienes las implementan.",
     breve:
       "Las propuestas se llevan a aulas, instituciones o programas reales, contextualizadas desde el conocimiento profesional de quienes las implementan.",
+    clave: "programas reales",
   },
   {
     nombre: "Práctica reflexiva",
@@ -37,6 +42,7 @@ export const VUELTA_1: ReadonlyArray<Estacion> = [
       "Se analiza lo ocurrido, se intercambian experiencias, se confrontan decisiones y se observan las respuestas, estrategias y argumentos que produjo la situación.",
     breve:
       "Se analiza lo ocurrido, se intercambian experiencias y se confrontan decisiones a partir de lo que produjo la situación.",
+    clave: "confrontan decisiones",
   },
   {
     nombre: "Resignificación del conocimiento matemático escolar",
@@ -44,6 +50,7 @@ export const VUELTA_1: ReadonlyArray<Estacion> = [
       "La experiencia permite revisar sentidos, usos y formas de participación. El conocimiento deja de ser solo un contenido a transmitir: se convierte en una herramienta para comprender y actuar.",
     breve:
       "El conocimiento deja de ser solo un contenido a transmitir: se convierte en una herramienta para comprender y actuar.",
+    clave: "comprender y actuar",
   },
 ];
 
@@ -54,6 +61,7 @@ export const VUELTA_2: ReadonlyArray<Estacion> = [
       "Recuperamos producciones, decisiones, interacciones, resultados y testimonios, siempre con resguardo ético de docentes, estudiantes e instituciones.",
     breve:
       "Recuperamos producciones, decisiones, resultados y testimonios, con resguardo ético de docentes, estudiantes e instituciones.",
+    clave: "resguardo ético",
   },
   {
     nombre: "Analizar e interpretar",
@@ -61,6 +69,7 @@ export const VUELTA_2: ReadonlyArray<Estacion> = [
       "Leemos las evidencias en relación con las preguntas, el contexto y los objetivos. Una cifra aislada no explica por sí sola qué ocurrió ni por qué.",
     breve:
       "Leemos las evidencias en relación con las preguntas, el contexto y los objetivos. Una cifra aislada no explica qué ocurrió.",
+    clave: "Una cifra aislada",
   },
   {
     nombre: "Sistematizar y producir conocimiento",
@@ -68,6 +77,7 @@ export const VUELTA_2: ReadonlyArray<Estacion> = [
       "Organizamos aprendizajes, reconocemos patrones y elaboramos explicaciones: la experiencia se convierte en conocimiento que puede comunicarse, discutirse y transferirse.",
     breve:
       "Reconocemos patrones y elaboramos explicaciones: la experiencia se convierte en conocimiento que puede comunicarse y transferirse.",
+    clave: "puede comunicarse",
   },
   {
     nombre: "Retroalimentar y ajustar",
@@ -75,6 +85,7 @@ export const VUELTA_2: ReadonlyArray<Estacion> = [
       "Volvemos sobre el diseño, acompañamos nuevas decisiones y abrimos otro ciclo de investigación y acción.",
     breve:
       "Volvemos sobre el diseño, acompañamos nuevas decisiones y abrimos otro ciclo de investigación y acción.",
+    clave: "abrimos otro ciclo",
   },
 ];
 
