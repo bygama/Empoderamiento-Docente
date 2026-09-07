@@ -54,16 +54,129 @@ const CIELO: ReadonlyArray<readonly [number, number, number]> = [
 ];
 
 /**
+ * Bultos de cada silueta de nube: centro (% del cajón), radios (% del cajón)
+ * y densidad. Pocos, grandes y muy solapados: la masa se lee entera, con
+ * bordes irregulares, y no como óvalos sueltos. Todo bulto muere bien
+ * adentro de su cajón (ver `fondoNube`): ningún recorte recto. Un mismo
+ * dibujo a distinto tamaño, giro y lugar no se reconoce como repetido.
+ */
+const SILUETAS = {
+  cumuloA: [
+    [50, 64, 46, 26, 0.5],
+    [30, 48, 26, 32, 0.55],
+    [50, 38, 28, 36, 0.6],
+    [70, 46, 26, 32, 0.55],
+    [22, 66, 22, 22, 0.4],
+  ],
+  cumuloB: [
+    [48, 66, 46, 24, 0.5],
+    [28, 50, 24, 30, 0.5],
+    [48, 36, 28, 38, 0.6],
+    [68, 44, 26, 32, 0.55],
+    [82, 60, 20, 22, 0.4],
+  ],
+  mediana: [
+    [50, 62, 44, 24, 0.45],
+    [32, 46, 24, 32, 0.5],
+    [54, 36, 26, 36, 0.55],
+    [74, 50, 22, 28, 0.45],
+    [20, 62, 20, 22, 0.35],
+  ],
+  jiron: [
+    [50, 52, 46, 22, 0.4],
+    [30, 46, 24, 26, 0.35],
+    [64, 44, 26, 28, 0.4],
+    [82, 56, 18, 18, 0.28],
+  ],
+  // La banda que vela el faro: ancha, y más densa que lo que le tocaría
+  // por distancia, porque un velo tenue no envuelve nada.
+  banda: [
+    [50, 62, 46, 24, 0.6],
+    [22, 50, 22, 30, 0.55],
+    [42, 42, 26, 34, 0.65],
+    [66, 46, 26, 32, 0.6],
+    [84, 56, 16, 22, 0.45],
+  ],
+} as const satisfies Record<string, ReadonlyArray<readonly [number, number, number, number, number]>>;
+
+/**
+ * Las nubes del descenso: la capa más cercana a la cámara. La hoja llega
+ * metida en ellas y, al pinnearse, la cámara baja un buen rato entre nubes
+ * antes de que el faro asome; las nubes suben y se van en primer plano y
+ * el faro sube a su encuentro adentro de la última. Es un CAMPO fijo en el
+ * espacio: cada nube tiene su lugar (`y` más allá del 100 para las que
+ * esperan bajo el piso) y todas se mueven con la misma cámara, cada una a
+ * la velocidad de su profundidad (`cerca`, 0–1: las cercanas, más grandes
+ * y densas, viajan más rápido; las lejanas, más claras, más lento). `giro`
+ * saca la masa del eje. Solo existen en la coreografía: el SSR dibuja el
+ * final, y ahí ya pasaron.
+ */
+type Nube = {
+  /** Cajón: esquina (% del escenario), ancho (% del ancho) y alto (% del alto). */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  cerca: number;
+  giro: number;
+  silueta: keyof typeof SILUETAS;
+};
+
+const NUBES: ReadonlyArray<Nube> = [
+  // En cuadro cuando llega la hoja: la cámara está metida en las nubes.
+  { x: -14, y: 46, w: 72, h: 46, cerca: 1, giro: -3, silueta: "cumuloA" },
+  { x: 42, y: 58, w: 74, h: 44, cerca: 0.92, giro: 2.5, silueta: "cumuloB" },
+  { x: 12, y: 14, w: 56, h: 34, cerca: 0.7, giro: -1.5, silueta: "mediana" },
+  { x: 58, y: 6, w: 52, h: 32, cerca: 0.62, giro: 3.5, silueta: "mediana" },
+  { x: -10, y: -4, w: 42, h: 24, cerca: 0.3, giro: -1, silueta: "jiron" },
+  { x: 30, y: 30, w: 44, h: 26, cerca: 0.35, giro: 1.5, silueta: "jiron" },
+  { x: 66, y: 40, w: 46, h: 24, cerca: 0.25, giro: -2.5, silueta: "jiron" },
+  // Esperan bajo el piso y van entrando a medida que la cámara baja.
+  { x: 18, y: 88, w: 44, h: 24, cerca: 0.3, giro: 1, silueta: "jiron" },
+  { x: 50, y: 100, w: 54, h: 32, cerca: 0.6, giro: -2.5, silueta: "mediana" },
+  { x: 60, y: 118, w: 44, h: 24, cerca: 0.28, giro: -1.5, silueta: "jiron" },
+  { x: 8, y: 120, w: 70, h: 44, cerca: 0.95, giro: 2, silueta: "cumuloA" },
+  { x: 36, y: 135, w: 56, h: 34, cerca: 0.68, giro: 1.5, silueta: "mediana" },
+  { x: -20, y: 150, w: 76, h: 46, cerca: 1, giro: -2, silueta: "cumuloB" },
+  { x: 30, y: 185, w: 72, h: 44, cerca: 0.9, giro: 3, silueta: "cumuloA" },
+  // La última: la banda. El faro sube adentro de ella y la lámpara se
+  // enciende cuando se disuelve; su `y` está puesto para que llegue a la
+  // linterna justo entonces (depende de DESCENSO, en coreografia-cierre.ts).
+  { x: 2, y: 168, w: 92, h: 30, cerca: 0.3, giro: -2, silueta: "banda" },
+];
+
+/** Tinta de una nube: azul-medio, más claro cuanto más lejos, con su alfa. */
+const tintaNube = (cerca: number, alfa: number) =>
+  `color-mix(in srgb, color-mix(in srgb, var(--color-azul-claro) ${Math.round(18 + (1 - cerca) * 30)}%, var(--color-azul-medio)) ${Math.round(alfa * 100)}%, transparent)`;
+
+/**
+ * Los bultos apilados como capas de fondo. Interior parejo (la tinta se
+ * sostiene hasta el 36% del radio) y caída larga hasta transparente en el
+ * 72%: con bultos grandes y muy solapados, la masa se lee entera —una
+ * silueta con bordes irregulares— y no como óvalos sueltos.
+ */
+function fondoNube(n: Nube) {
+  return SILUETAS[n.silueta]
+    .map(([cx, cy, rx, ry, a]) => {
+      const d = a * (0.65 + 0.4 * n.cerca);
+      return `radial-gradient(ellipse ${rx}% ${ry}% at ${cx}% ${cy}%, ${tintaNube(n.cerca, d)} 0%, ${tintaNube(n.cerca, d * 0.9)} 36%, ${tintaNube(n.cerca, d * 0.45)} 58%, transparent 72%)`;
+    })
+    .join(", ");
+}
+
+/**
  * Sección 8 — Cierre, absorbiendo la Conexión con Biblioteca (§9 y §10 de
  * docs/content/arquitectura-investigacion.md). Es una INVITACIÓN, no una
  * lectura: eyebrow + título + botón de cada lado, y la luz haciendo el resto.
  *
  * «Cae la noche sobre el archivo»: la hoja llega enmarcada como la hoja 01
- * del hero y, al pinnearse, el marco se disuelve y el navy se expande hasta
- * los bordes. Sube el faro —el mismo de Qué hacemos, recortado y grande—
- * plantado en el piso y DELANTE de la palabra que el hero prometió
- * («Investigamos para… transformar»), gira, se enciende arriba y el haz lee
- * de costado: primero se posa sobre la Biblioteca, después sobre el cierre.
+ * del hero, metida entre nubes, y al pinnearse el marco se disuelve y el
+ * navy se expande hasta los bordes. La cámara baja: las nubes del primer
+ * plano suben y se van (ver NUBES) y el faro sube a su encuentro —el mismo
+ * de Qué hacemos, recortado y grande— plantado en el piso y DELANTE de la
+ * palabra que el hero prometió («Investigamos para… transformar»), gira, se
+ * enciende arriba y el haz lee de costado: primero se posa sobre la
+ * Biblioteca, después sobre el cierre.
  * Los 13 puntos del hero vuelven como estrellas y la luz los va tocando.
  *
  * El SSR renderiza el último frame (todo encendido y en su lugar): es lo que
@@ -155,8 +268,36 @@ export function CierreInvestigacion() {
           style={{ boxShadow: "0 0 0 2rem var(--color-gris-fondo)" }}
         />
 
-        {/* Folio: la hoja 01 abrió el archivo; esta lo cierra. */}
-        <span className="text-azul-claro/60 absolute top-7 right-8 z-30 hidden font-mono text-[0.68rem] tracking-[0.2em] uppercase lg:block">
+        {/* ── Las nubes: la capa más cercana. En primer plano, sobre el faro
+            y la palabra y bajo el marco y el folio. Invisibles hasta que la
+            coreografía las enciende: sin ella (touch, reduced-motion) la
+            hoja es el último frame y las nubes ya pasaron. */}
+        <div
+          aria-hidden="true"
+          data-cierre-nubes
+          className="pointer-events-none invisible absolute inset-0 z-[32] hidden opacity-0 lg:block"
+        >
+          {NUBES.map((n) => (
+            <span
+              key={`n-${n.x}-${n.y}`}
+              data-cierre-nube
+              data-nube-cerca={n.cerca}
+              data-nube-giro={n.giro}
+              className="absolute block"
+              style={{
+                left: `${n.x}%`,
+                top: `${n.y}%`,
+                width: `${n.w}%`,
+                height: `${n.h}%`,
+                backgroundImage: fondoNube(n),
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Folio: la hoja 01 abrió el archivo; esta lo cierra. Va impreso
+            en el papel, no en la escena: por encima de las nubes. */}
+        <span className="text-azul-claro/60 absolute top-7 right-8 z-[36] hidden font-mono text-[0.68rem] tracking-[0.2em] uppercase lg:block">
           Archivo ED · Última hoja
         </span>
 

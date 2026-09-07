@@ -16,10 +16,13 @@ if (typeof window !== "undefined") {
  * Coreografía del cierre de Investigación — «cae la noche sobre el archivo».
  *
  * La hoja llega enmarcada y, al pinnearse, el marco se disuelve: la noche se
- * expande hasta los bordes. El scroll cuenta el ascenso: el faro sube desde
- * el piso GIRANDO (una vuelta entera, frenando al llegar; la óptica rompe la
- * simetría del tambor para que una vuelta se lea como una) y casi arriba se
- * enciende — chispa → cristal → halo. Después el HAZ LEE DE COSTADO: nace
+ * expande hasta los bordes. El scroll cuenta un descenso de cámara: un buen
+ * tramo solo entre nubes (DESCENSO), que suben y se van en primer plano —las
+ * cercanas rápido, las lejanas se disuelven últimas—, y recién después el
+ * faro sube a su encuentro desde el piso GIRANDO
+ * (una vuelta entera, frenando al llegar; la óptica rompe la simetría del
+ * tambor para que una vuelta se lea como una) y casi arriba se enciende —
+ * chispa → cristal → halo. Después el HAZ LEE DE COSTADO: nace
  * apuntando al cielo, gira y se posa sobre la Biblioteca (el título se
  * enciende), vuelve por arriba y se posa sobre el cierre (la Biblioteca queda
  * a media luz, el cierre se enciende). Nunca barre el piso. Las 13 estrellas
@@ -48,6 +51,26 @@ type Escena = {
 const AIRE_OCULTO = 60;
 /** El cristal apagado sigue siendo un panel: las barras giran contra él. */
 const VIDRIO_APAGADO = 0.38;
+/**
+ * Cuánto baja la cámara entre nubes ANTES de que el faro asome (unidades
+ * del timeline). La escena del faro —ascenso, luz, barridos— va corrida
+ * esto y sigue en su propio tiempo, sin tocar: subir o bajar el descenso
+ * no mueve nada de lo suyo.
+ */
+const DESCENSO = 1;
+/** Alto del recorrido pinneado en px. 2800 era el de la escena del faro
+ *  sola (~870 px por unidad); el descenso suma lo suyo al mismo ritmo. */
+const RECORRIDO = 2800 + Math.round(870 * DESCENSO);
+/**
+ * Las nubes. Es un campo fijo que la cámara atraviesa: todas se mueven el
+ * mismo TIEMPO (`viaje`: el descenso y, encima, el ascenso del faro hasta
+ * que se enciende la lámpara) y distinta DISTANCIA por unidad, en altos de
+ * hoja: eso es el paralaje. La más cercana recorre `recorridoCerca` por
+ * unidad, la más lejana `recorridoLejos`, y las del medio se interpolan.
+ * Cada una se disuelve en su último tramo; la capa entera se apaga al
+ * final: cielo limpio pase lo que pase con el alto del viewport.
+ */
+const NUBES = { recorridoCerca: 1.4, recorridoLejos: 0.45, viaje: DESCENSO + 1 } as const;
 
 /** Foco del haz en coordenadas del SVG de la linterna (= FOCO de LinternaFaro). */
 const ORIGEN_HAZ = "950 385";
@@ -84,6 +107,8 @@ export function crearAscenso({ zona, hoja }: Escena) {
   const titulos = q<HTMLElement>("[data-cierre-titulo]");
   const palabra = q<HTMLElement>("[data-cierre-palabra]")[0];
   const marco = q<HTMLElement>("[data-cierre-marco]")[0];
+  const capaNubes = q<HTMLElement>("[data-cierre-nubes]")[0];
+  const nubes = q<HTMLElement>("[data-cierre-nube]");
 
   // ── El giro: proyectar las barras y la óptica para el θ actual.
   const giro = { theta: 360 };
@@ -118,6 +143,18 @@ export function crearAscenso({ zona, hoja }: Escena) {
   //    apagada, mensajes y estrellas esperando. θ = 360 ≡ 0: la pose de
   //    partida es la del SSR.
   gsap.set(marco, { autoAlpha: 1 });
+  // La hoja llega metida en las nubes: se prenden ya, antes del pin.
+  gsap.set(capaNubes, { autoAlpha: 1 });
+  nubes.forEach((nb) =>
+    gsap.set(nb, {
+      y: 0,
+      xPercent: 0,
+      rotation: Number(nb.dataset.nubeGiro),
+      autoAlpha: 1,
+      transformOrigin: "50% 50%",
+      willChange: "transform",
+    }),
+  );
   gsap.set(linterna, { y: altoOculto });
   gsap.set(vidrio, { opacity: VIDRIO_APAGADO });
   gsap.set([nucleo, halo], { autoAlpha: 0, scale: 0.3, transformOrigin: "50% 50%" });
@@ -187,12 +224,18 @@ export function crearAscenso({ zona, hoja }: Escena) {
 
   const sinRender = { immediateRender: false } as const;
 
+  // ── La escena del faro (ascenso, luz, barridos) se arma en su propio
+  //    tiempo y se agrega al timeline principal corrida DESCENSO: todo lo
+  //    suyo conserva sus posiciones de siempre. Las estrellas leen el
+  //    tiempo de la escena, no el del scroll.
+  const escena = gsap.timeline({ defaults: { ease: "none" } });
+
   const tl = gsap.timeline({
     defaults: { ease: "none" },
     scrollTrigger: {
       trigger: zona,
       start: "top top",
-      end: "+=2800",
+      end: `+=${RECORRIDO}`,
       scrub: true,
       pin: true,
       anticipatePin: 1,
@@ -200,7 +243,7 @@ export function crearAscenso({ zona, hoja }: Escena) {
       onRefresh: () => {
         angulos = null;
       },
-      onUpdate: () => pintarEstrellas(tl.time()),
+      onUpdate: () => pintarEstrellas(escena.time()),
     },
   });
 
@@ -213,16 +256,48 @@ export function crearAscenso({ zona, hoja }: Escena) {
   );
   tl.to(marco, { autoAlpha: 0, duration: 0.12 }, 0.18);
 
+  // ── Las nubes: la cámara baja a través de ellas —primero un buen tramo
+  //    solo entre nubes (DESCENSO), después con el faro subiendo a su
+  //    encuentro—. Todas arrancan en 0 y duran lo mismo (es UN movimiento
+  //    de cámara); lo que cambia es cuánto recorre cada una: las cercanas,
+  //    más de un alto de hoja por unidad (cruzan el cuadro y salen por
+  //    arriba), las lejanas, menos de medio (se disuelven donde están).
+  //    Mismo ease que el ascenso, así el mundo entero frena junto. El faro
+  //    sube adentro de la última —la banda— y la lámpara se enciende cuando
+  //    esa se disuelve.
+  const altoHoja = () => hoja.clientHeight;
+  nubes.forEach((nb, i) => {
+    const cerca = Number(nb.dataset.nubeCerca);
+    const recorrido =
+      NUBES.recorridoLejos + (NUBES.recorridoCerca - NUBES.recorridoLejos) * cerca;
+    // Deriva lateral leve, alternada: la cámara no baja en riel.
+    const lado = i % 2 === 0 ? 1 : -1;
+    tl.fromTo(
+      nb,
+      { y: 0, xPercent: 0 },
+      {
+        y: () => -altoHoja() * recorrido * NUBES.viaje,
+        xPercent: lado * (2 + 4 * cerca),
+        duration: NUBES.viaje,
+        ease: "power1.out",
+        ...sinRender,
+      },
+      0,
+    );
+    tl.to(nb, { autoAlpha: 0, duration: NUBES.viaje * 0.25 }, NUBES.viaje * 0.75);
+  });
+  tl.to(capaNubes, { autoAlpha: 0, duration: 0.05 }, NUBES.viaje);
+
   // ── Ascenso y giro: sube frenando y gira una vuelta entera con el MISMO
   //    ease que la subida (cuadrático): la vuelta se reparte sobre todo el
   //    ascenso y se ve mientras el faro asoma.
-  tl.fromTo(
+  escena.fromTo(
     linterna,
     { y: altoOculto },
     { y: 0, duration: 1.2, ease: "power1.out", ...sinRender },
     0,
   );
-  tl.fromTo(
+  escena.fromTo(
     giro,
     { theta: 360 },
     { theta: 0, duration: 1.2, ease: "power1.out", onUpdate: girar, ...sinRender },
@@ -230,7 +305,7 @@ export function crearAscenso({ zona, hoja }: Escena) {
   );
 
   // ── Las estrellas (los puntos del hero) se prenden durante el ascenso.
-  tl.fromTo(
+  escena.fromTo(
     estrellas,
     { autoAlpha: 0 },
     {
@@ -243,20 +318,20 @@ export function crearAscenso({ zona, hoja }: Escena) {
   );
 
   // ── El encendido, casi llegando arriba: chispa → cristal → halo.
-  tl.fromTo(
+  escena.fromTo(
     nucleo,
     { autoAlpha: 0, scale: 0.3 },
     { autoAlpha: 1, scale: 1.3, duration: 0.06, ease: "power2.out", ...sinRender },
     1.0,
   );
-  tl.to(nucleo, { scale: 1, duration: 0.1, ease: "power1.inOut" }, 1.06);
-  tl.fromTo(
+  escena.to(nucleo, { scale: 1, duration: 0.1, ease: "power1.inOut" }, 1.06);
+  escena.fromTo(
     vidrio,
     { opacity: VIDRIO_APAGADO },
     { opacity: 1, duration: 0.14, ...sinRender },
     1.04,
   );
-  tl.fromTo(
+  escena.fromTo(
     halo,
     { autoAlpha: 0, scale: 0.3 },
     { autoAlpha: 1, scale: 1, duration: 0.2, ease: "power2.out", ...sinRender },
@@ -265,15 +340,15 @@ export function crearAscenso({ zona, hoja }: Escena) {
 
   // ── El haz nace apuntando al cielo (el `set` explícito evita que el orden
   //    de render de la primera carga lo deje en el from del segundo barrido).
-  tl.set(haz, { beta: HAZ_CIELO, onUpdate: apuntar }, 1.19);
-  tl.fromTo(
+  escena.set(haz, { beta: HAZ_CIELO, onUpdate: apuntar }, 1.19);
+  escena.fromTo(
     haces,
     { autoAlpha: 0 },
     { autoAlpha: 1, duration: 0.15, ...sinRender },
     1.2,
   );
   // ...gira y se posa sobre la Biblioteca (primer barrido).
-  tl.fromTo(
+  escena.fromTo(
     haz,
     { beta: HAZ_CIELO },
     {
@@ -286,20 +361,20 @@ export function crearAscenso({ zona, hoja }: Escena) {
     BARRIDO_1.desde,
   );
   // El bloque izquierdo llega con la luz y su título se enciende.
-  tl.fromTo(
+  escena.fromTo(
     bloques[0],
     { autoAlpha: 0, y: 18 },
     { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out", ...sinRender },
     1.55,
   );
-  tl.fromTo(
+  escena.fromTo(
     titulos[0],
     { color: TITULO_PENUMBRA, textShadow: RESPLANDOR_OFF },
     { color: TITULO_ENCENDIDO, textShadow: RESPLANDOR_ON, duration: 0.22, ...sinRender },
     1.62,
   );
   // Pausa de lectura, y el haz vuelve por arriba hasta el cierre (segundo barrido).
-  tl.fromTo(
+  escena.fromTo(
     haz,
     { beta: HAZ_BIBLIOTECA },
     {
@@ -312,24 +387,26 @@ export function crearAscenso({ zona, hoja }: Escena) {
     BARRIDO_2.desde,
   );
   // La luz se va de la Biblioteca: el título vuelve a la penumbra, leído.
-  tl.to(
+  escena.to(
     titulos[0],
     { color: TITULO_PENUMBRA, textShadow: RESPLANDOR_OFF, duration: 0.3 },
     2.22,
   );
   // ...y llega al cierre: el bloque derecho, con el único naranja, se enciende.
-  tl.fromTo(
+  escena.fromTo(
     bloques[1],
     { autoAlpha: 0, y: 18 },
     { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out", ...sinRender },
     2.55,
   );
-  tl.fromTo(
+  escena.fromTo(
     titulos[1],
     { color: TITULO_PENUMBRA, textShadow: RESPLANDOR_OFF },
     { color: TITULO_ENCENDIDO, textShadow: RESPLANDOR_ON, duration: 0.22, ...sinRender },
     2.66,
   );
+
+  tl.add(escena, DESCENSO);
 
   // Respiro final antes de soltar el pin hacia el footer.
   tl.to({}, { duration: 0.35 });
