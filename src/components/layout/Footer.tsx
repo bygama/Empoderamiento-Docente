@@ -66,7 +66,7 @@ export function Footer() {
   return (
     <footer
       data-section="footer"
-      className="bg-azul-principal relative isolate overflow-hidden rounded-t-[1.5rem] text-white md:rounded-t-[2.5rem]"
+      className="bg-azul-principal relative isolate overflow-hidden rounded-t-[var(--footer-radio)] text-white"
     >
       {/* ── Bloque principal ─────────────────────────────────────────── */}
       <div className="mx-auto grid max-w-screen-xl gap-x-10 gap-y-8 px-5 pt-11 pb-8 md:grid-cols-12 md:px-10 md:pt-14">
