@@ -7,158 +7,22 @@ import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ROTULO_MICRO } from "../casos/tintes";
-import {
-  BISAGRA,
-  NODOS,
-  PATH_ESPIRAL,
-  PATH_LAZO,
-  RADIO_NODO,
-  RADIO_PERSONAJE,
-  VIEWBOX_ESPIRAL,
-  rotuloNodo,
-} from "./espiral";
 import { crearEspiral } from "./coreografia-espiral";
+import { EspiralEstatica } from "./EspiralEstatica";
+import { EspiralSvg } from "./EspiralSvg";
+import {
+  BISAGRA_TEXTO,
+  REMATE_TEXTO,
+  VUELTA_1,
+  VUELTA_2,
+  numero,
+  type Estacion,
+} from "./estaciones";
 
-/**
- * Las ocho estaciones de la espiral. Vuelta 1 = ciclo pedagógico (copy
- * según docs/content/arquitectura-investigacion.md §6); vuelta 2 = ciclo
- * de evidencia (§7). Los textos son los canónicos del doc maestro.
- */
-type Estacion = { nombre: string; texto: string; destacado?: string };
-
-const VUELTA_1: ReadonlyArray<Estacion> = [
-  {
-    nombre: "Fase experiencial",
-    texto:
-      "Las y los participantes viven situaciones que permiten cuestionar sentidos, explorar estrategias y problematizar la matemática escolar desde su propia experiencia.",
-    destacado:
-      "«Vivir para hacer vivir»: para diseñar nuevos escenarios, el cuerpo docente necesita experimentar otra relación con la matemática.",
-  },
-  {
-    nombre: "Implementación en contexto",
-    texto:
-      "Las propuestas se interpretan y se llevan a aulas, instituciones o programas reales. No se reproducen mecánicamente: se contextualizan desde el conocimiento profesional de quienes las implementan.",
-  },
-  {
-    nombre: "Práctica reflexiva",
-    texto:
-      "Se analiza lo ocurrido, se intercambian experiencias, se confrontan decisiones y se observan las respuestas, estrategias y argumentos que produjo la situación.",
-  },
-  {
-    nombre: "Resignificación del conocimiento matemático escolar",
-    texto:
-      "La experiencia permite revisar sentidos, usos y formas de participación. El conocimiento deja de ser solo un contenido a transmitir: se convierte en una herramienta para comprender y actuar.",
-  },
-];
-
-const VUELTA_2: ReadonlyArray<Estacion> = [
-  {
-    nombre: "Registrar evidencias",
-    texto:
-      "Recuperamos producciones, decisiones, interacciones, resultados y testimonios, siempre con resguardo ético de docentes, estudiantes e instituciones.",
-  },
-  {
-    nombre: "Analizar e interpretar",
-    texto:
-      "Leemos las evidencias en relación con las preguntas, el contexto y los objetivos. Una cifra aislada no explica por sí sola qué ocurrió ni por qué.",
-  },
-  {
-    nombre: "Sistematizar y producir conocimiento",
-    texto:
-      "Organizamos aprendizajes, reconocemos patrones y elaboramos explicaciones: la experiencia se convierte en conocimiento que puede comunicarse, discutirse y transferirse.",
-  },
-  {
-    nombre: "Retroalimentar y ajustar",
-    texto:
-      "Volvemos sobre el diseño, acompañamos nuevas decisiones y abrimos otro ciclo de investigación y acción.",
-  },
-];
-
-const BISAGRA_TEXTO =
-  "La cuarta etapa no cierra el ciclo: abre nuevas preguntas. Por eso volvemos a investigar.";
-
-const REMATE_TEXTO =
-  "Implementar es generar una nueva oportunidad para observar, comprender y decidir. La evidencia vuelve al proceso: mejora la intervención y fortalece la capacidad de los equipos.";
-
-const numero = (i: number) => String(i + 1).padStart(2, "0");
-
-/** La espiral doble como dibujo: nodos, personaje, lazo. El SSR la dibuja formada. */
-function EspiralSvg({ className = "" }: { className?: string }) {
+/** Bloque de estación en la escena: apilado en absoluto, lo releva la coreografía. */
+function Bloque({ numeroTexto, nombre, texto, destacado }: Estacion & { numeroTexto: string }) {
   return (
-    <svg
-      data-espiral-svg
-      viewBox={`0 0 ${VIEWBOX_ESPIRAL.w} ${VIEWBOX_ESPIRAL.h}`}
-      role="img"
-      aria-label="Espiral de dos vueltas con ocho estaciones: el ciclo pedagógico y el ciclo de evidencia, unidos por un lazo que vuelve al inicio"
-      className={`h-auto w-full overflow-visible ${className}`}
-    >
-      <path
-        data-espiral-path
-        d={PATH_ESPIRAL}
-        fill="none"
-        stroke="var(--color-azul-medio)"
-        strokeOpacity="0.55"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        data-espiral-lazo
-        d={PATH_LAZO}
-        fill="none"
-        stroke="var(--color-verde-concepto)"
-        strokeOpacity="0.85"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-      {NODOS.map(([x, y], k) => {
-        const [rx, ry] = rotuloNodo(k);
-        return (
-          <g key={k}>
-            <circle
-              data-espiral-nodo
-              cx={x}
-              cy={y}
-              r={RADIO_NODO}
-              fill={k < BISAGRA ? "var(--color-azul-medio)" : "var(--color-verde-concepto)"}
-            />
-            <text
-              data-espiral-rotulo
-              x={rx}
-              y={ry}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="var(--color-gris-texto)"
-              fontSize="11"
-              letterSpacing="0.14em"
-              className="font-mono"
-            >
-              {numero(k)}
-            </text>
-          </g>
-        );
-      })}
-      {/* El personaje, en el primer nodo (posición SSR = nodo 0). */}
-      <g data-espiral-personaje transform={`translate(${NODOS[0][0]} ${NODOS[0][1]})`}>
-        <circle r={RADIO_PERSONAJE * 1.9} fill="var(--color-naranja-accion)" opacity="0.16" />
-        <circle r={RADIO_PERSONAJE} fill="var(--color-naranja-accion)" />
-      </g>
-    </svg>
-  );
-}
-
-function Bloque({
-  numeroTexto,
-  nombre,
-  texto,
-  destacado,
-  live,
-}: Estacion & { numeroTexto: string; live: boolean }) {
-  return (
-    <div
-      data-espiral-bloque={live ? "" : undefined}
-      className={live ? "absolute inset-0" : "relative"}
-    >
+    <div data-espiral-bloque="" className="absolute inset-0">
       <span className={`${ROTULO_MICRO} text-gris-texto/80 block tabular-nums`}>
         {numeroTexto}
       </span>
@@ -175,12 +39,9 @@ function Bloque({
   );
 }
 
-function Nota({ texto, live }: { texto: string; live: boolean }) {
+function Nota({ texto }: { texto: string }) {
   return (
-    <div
-      data-espiral-bloque={live ? "" : undefined}
-      className={live ? "absolute inset-0" : "relative"}
-    >
+    <div data-espiral-bloque="" className="absolute inset-0">
       <p className="font-display max-w-[34ch] text-[1.35rem] leading-[1.4] font-medium lg:text-[1.5rem]">
         {texto}
       </p>
@@ -199,10 +60,10 @@ function Nota({ texto, live }: { texto: string; live: boolean }) {
  * evidencia). Ahí cambia el título: «Implementar no es terminar». Al final
  * un lazo lo devuelve al primer nodo: abrimos otro ciclo. Hoja 03 del
  * archivo, sobre el mismo papel que el hero. Coreografía en
- * coreografia-espiral.ts.
+ * coreografia-espiral.ts; dibujo en EspiralSvg.tsx; copy en estaciones.ts.
  *
  * `#evidencia` es un ancla interna que salta a la bisagra.
- * Touch / reduced-motion: las dos listas en flujo con la espiral formada.
+ * Touch / reduced-motion: EspiralEstatica (que es también lo que dibuja el SSR).
  */
 export function EspiralInvestigacion() {
   const zonaRef = useRef<HTMLDivElement | null>(null);
@@ -284,64 +145,23 @@ export function EspiralInvestigacion() {
                 </div>
                 <div className="relative mt-8 min-h-[15rem] lg:min-h-[16rem]">
                   {VUELTA_1.map((e, i) => (
-                    <Bloque key={e.nombre} {...e} numeroTexto={`${numero(i)} / 08`} live />
+                    <Bloque key={e.nombre} {...e} numeroTexto={`${numero(i)} / 08`} />
                   ))}
-                  <Nota texto={BISAGRA_TEXTO} live />
+                  <Nota texto={BISAGRA_TEXTO} />
                   {VUELTA_2.map((e, i) => (
-                    <Bloque
-                      key={e.nombre}
-                      {...e}
-                      numeroTexto={`${numero(i + VUELTA_1.length)} / 08`}
-                      live
-                    />
+                    <Bloque key={e.nombre} {...e} numeroTexto={`${numero(i + VUELTA_1.length)} / 08`} />
                   ))}
-                  <Nota texto={REMATE_TEXTO} live />
+                  <Nota texto={REMATE_TEXTO} />
                 </div>
                 {/* Ancla interna: Volvemos a investigar vive en la segunda vuelta. */}
                 <span id="evidencia" aria-hidden="true" />
               </div>
             </div>
           ) : (
-            <div className="relative z-10 mx-auto grid w-full max-w-screen-xl gap-x-16 gap-y-12 px-6 py-20 md:px-12 lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="mx-auto w-full max-w-[420px] lg:sticky lg:top-24 lg:self-start">
-                <EspiralSvg />
-              </div>
-              <div className="space-y-16">
-                <div>
-                  <h2 className="font-display max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
-                    Cómo una <Highlight>experiencia</Highlight> se convierte en
-                    transformación.
-                  </h2>
-                  <ol className="mt-8 space-y-8">
-                    {VUELTA_1.map((e, i) => (
-                      <li key={e.nombre}>
-                        <Bloque {...e} numeroTexto={numero(i)} live={false} />
-                      </li>
-                    ))}
-                  </ol>
-                  <p className="font-display mt-8 max-w-[34ch] text-[1.25rem] leading-[1.4] font-medium">
-                    {BISAGRA_TEXTO}
-                  </p>
-                </div>
-                <div id="evidencia">
-                  <h2 className="font-display max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
-                    Implementar no es <Highlight>terminar</Highlight>.
-                  </h2>
-                  <p className="mt-5 max-w-[42ch] text-body">{REMATE_TEXTO}</p>
-                  <ol className="mt-8 space-y-8">
-                    {VUELTA_2.map((e, i) => (
-                      <li key={e.nombre}>
-                        <Bloque {...e} numeroTexto={numero(i + VUELTA_1.length)} live={false} />
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </div>
-            </div>
+            <EspiralEstatica />
           )}
         </div>
       </div>
-
     </section>
   );
 }

@@ -2,8 +2,7 @@
 
 ## In progress
 
-- Paso 1 hecho y pendiente de commit; sigue el paso 2 (extracción sin cambiar
-  el render).
+- Paso 3 del PLAN (grupo de cámara y guías en el SVG).
 
 ## Dónde corre
 
@@ -42,6 +41,17 @@
   → `PROBE OK`, exit 0 (nueve anclas con lado esperado, todas dentro de
   [−35, 135] %; general = identidad). Commit: el del paso 1 (feat: calcular la cámara y las anotaciones).
 
+- **Paso 2 — extracción sin cambiar el render** (2026-09-07). Nuevos
+  `EspiralSvg.tsx` (76), `EspiralEstatica.tsx` (76, con su `Bloque` estático
+  privado) y `estaciones.ts` (63, el copy de las ocho estaciones, la nota y el
+  remate); `EspiralInvestigacion.tsx` queda en 167 líneas como compositor con
+  el layout live viejo y sus `Bloque`/`Nota` de escena. Aceptación:
+  `pnpm typecheck` → 0; `eslint src/features/investigacion/components/` → 0;
+  `wc -l` ≤ 200 en los cuatro; SSR de `<section id="ciclo">` desde
+  `http://localhost:3001/investigacion` → `cmp` con `baseline-ciclo-ssr.html`
+  exit 0 (11467 bytes idénticos). Commit: refactor(investigacion): extraer el
+  svg y la versión estática de la espiral.
+
 ## Tried and failed
 
 - Probe con `node --import C:/...`: Node toma `C:` como esquema de URL; va
@@ -52,7 +62,7 @@
 
 ## Next
 
-- Paso 2 del PLAN en el worktree.
+- Paso 3 del PLAN en el worktree.
 
 ## Verification
 
