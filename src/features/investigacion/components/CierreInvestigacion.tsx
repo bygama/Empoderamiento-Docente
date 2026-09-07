@@ -172,8 +172,7 @@ function fondoNube(n: Nube) {
  * del hero, metida entre nubes, y al pinnearse el marco se disuelve y el
  * navy se expande hasta los bordes. La cámara baja: las nubes del primer
  * plano suben y se van (ver NUBES) y el faro sube a su encuentro —el mismo
- * de Qué hacemos, recortado y grande— plantado en el piso y DELANTE de la
- * palabra que el hero prometió («Investigamos para… transformar»), gira, se
+ * de Qué hacemos, recortado y grande— plantado en el piso. Gira, se
  * enciende arriba y el haz lee de costado: primero se posa sobre la
  * Biblioteca, después sobre el cierre.
  * Los 13 puntos del hero vuelven como estrellas y la luz los va tocando.
@@ -217,9 +216,8 @@ export function CierreInvestigacion() {
     // Con el tint "noche" el footer se monta --footer-radio sobre esta
     // sección con la muesca transparente: el redondeo recorta el cielo
     // real (el final del degradé, con su grano), que ningún color plano
-    // iguala. Por eso la
-    // sección deja esa franja de cielo bajo el piso (pb) y el faro y la
-    // palabra se plantan sobre el piso, no sobre el borde de la caja.
+    // iguala. Por eso la sección deja esa franja de cielo bajo el piso
+    // (pb) y el faro se planta sobre el piso, no sobre el borde de la caja.
     <div ref={zonaRef} data-footer-dock-tint="noche">
       <section
         ref={hojaRef}
@@ -276,7 +274,7 @@ export function CierreInvestigacion() {
         />
 
         {/* ── Las nubes: la capa más cercana. En primer plano, sobre el faro
-            y la palabra y bajo el marco y el folio. Invisibles hasta que la
+            y bajo el marco y el folio. Invisibles hasta que la
             coreografía las enciende: sin ella (touch, reduced-motion) la
             hoja es el último frame y las nubes ya pasaron. */}
         <div
@@ -308,24 +306,7 @@ export function CierreInvestigacion() {
           Archivo ED · Última hoja
         </span>
 
-        {/* ── La palabra gigante, detrás de todo: el hero dijo «Investigamos
-            para…»; acá está el resto. */}
-        <span
-          aria-hidden="true"
-          data-cierre-palabra
-          className="font-display pointer-events-none absolute right-0 bottom-0 left-0 z-20 text-center font-extrabold tracking-[-0.045em] whitespace-nowrap select-none"
-          style={{
-            fontSize: "clamp(4.2rem, 15.4vw, 12.6rem)",
-            lineHeight: 0.78,
-            bottom: "calc(var(--footer-radio) - 0.16em)",
-            color: "color-mix(in srgb, var(--color-azul-claro) 13%, transparent)",
-          }}
-        >
-          transformar
-        </span>
-
-        {/* ── El faro, plantado en el piso y DELANTE de la palabra (como el
-            unicornio delante del wordmark). El ancho escala con el alto para
+        {/* ── El faro, plantado en el piso. El ancho escala con el alto para
             que la linterna quede a la altura de los mensajes en cualquier
             pantalla. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-[var(--footer-radio)] z-30 hidden justify-center lg:flex">

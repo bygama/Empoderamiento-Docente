@@ -105,7 +105,6 @@ export function crearAscenso({ zona, hoja }: Escena) {
   const estrellas = q<SVGCircleElement>("[data-cierre-estrella]");
   const bloques = q<HTMLElement>("[data-cierre-bloque]");
   const titulos = q<HTMLElement>("[data-cierre-titulo]");
-  const palabra = q<HTMLElement>("[data-cierre-palabra]")[0];
   const marco = q<HTMLElement>("[data-cierre-marco]")[0];
   const capaNubes = q<HTMLElement>("[data-cierre-nubes]")[0];
   const nubes = q<HTMLElement>("[data-cierre-nube]");
@@ -211,18 +210,6 @@ export function crearAscenso({ zona, hoja }: Escena) {
     gsap.set(haces, { rotation: haz.beta, svgOrigin: ORIGEN_HAZ });
   };
   pintarEstrellas(0);
-
-  // ── La palabra llega con la hoja (antes del pin): sube del piso y se asienta.
-  gsap.fromTo(
-    palabra,
-    { y: 70, autoAlpha: 0 },
-    {
-      y: 0,
-      autoAlpha: 1,
-      ease: "none",
-      scrollTrigger: { trigger: hoja, start: "top 90%", end: "top 20%", scrub: true },
-    },
-  );
 
   const sinRender = { immediateRender: false } as const;
 
