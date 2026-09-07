@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -17,51 +16,59 @@ import { crearCarta } from "./coreografia-carta";
  * dice: la socioepistemología es la red (conocimiento como construcción
  * social), problematizar es la pregunta, el empoderamiento es la espiral
  * (proceso progresivo) y el pensamiento matemático es la lupa (analizar).
- * Las definiciones son el texto canónico de estos conceptos en el sitio
- * (docs/content/arquitectura-investigacion.md §4).
+ *
+ * El texto canónico de estos conceptos
+ * (docs/content/arquitectura-investigacion.md §4) es una sola parrafada por
+ * concepto, y de golpe no se lee: acá se parte en sus dos mitades naturales
+ * —la que está antes de los dos puntos es la DEFINICIÓN, el resto es el
+ * DESARROLLO— y las colas se recortan para que las cuatro fichas pesen
+ * parecido (28–29 palabras cada una) y midan lo mismo en la grilla.
  */
 const FUNDAMENTOS: ReadonlyArray<{
   titulo: string;
   figura: Figura["id"];
+  /** Qué es, en un renglón: el nivel que se lee de un vistazo. */
+  definicion: string;
+  /** Cómo se despliega: el nivel que se lee si el concepto interesa. */
   texto: string;
-  aclaracion?: string;
 }> = [
   {
     titulo: "Socioepistemología",
     figura: "red",
+    definicion: "El conocimiento matemático como una construcción social.",
     texto:
-      "Una mirada que comprende el conocimiento matemático como una construcción social: estudia cómo adquiere sentido en contextos, usos, decisiones e interacciones concretas, en lugar de separarlo de las personas y de sus prácticas.",
+      "Estudia cómo adquiere sentido en contextos, usos, decisiones e interacciones concretas, en lugar de separarlo de las personas y de sus prácticas.",
   },
   {
     titulo: "Problematización de la matemática escolar",
     figura: "pregunta",
+    definicion: "Revisar lo que suele darse por sentado.",
     texto:
-      "Revisar lo que suele darse por sentado: por qué se enseña un contenido de determinada manera, qué sentido tiene una tarea, qué estrategias habilita, qué argumentos produce y cómo se relaciona con la vida de quienes aprenden.",
+      "Por qué se enseña un contenido así, qué sentido tiene una tarea y cómo se relaciona con la vida de quienes aprenden.",
   },
   {
     titulo: "Empoderamiento docente desde el saber",
     figura: "espiral",
+    definicion: "Un proceso progresivo y colectivo.",
     texto:
-      "Un proceso progresivo y colectivo: las y los docentes fortalecen su autonomía, cuestionan prácticas naturalizadas, toman decisiones con fundamento y reconocen su capacidad de transformar desde el conocimiento.",
-    aclaracion:
-      "No es poder sobre estudiantes ni sobre otras personas: es poder sobre la propia práctica.",
+      "Las y los docentes fortalecen su autonomía, cuestionan prácticas naturalizadas, toman decisiones con fundamento y reconocen su capacidad de transformar desde el conocimiento.",
   },
   {
     titulo: "Desarrollo del pensamiento matemático",
     figura: "lupa",
+    definicion: "Una forma de analizar y actuar.",
     texto:
-      "Construir una forma de analizar y actuar: buscar estrategias, formular hipótesis, argumentar, anticipar, decidir y comprender información. Los contenidos escolares funcionan como herramientas, no como un fin aislado.",
+      "Buscar estrategias, formular hipótesis, argumentar, anticipar y decidir. Los contenidos escolares funcionan como herramientas de ese trabajo, no como un fin aislado.",
   },
 ];
 
-/** Volanta + título. Dos copias superpuestas en la coreografía (ver abajo). */
+/** El título. Dos copias superpuestas en la coreografía (ver abajo). */
 function Titulo({ tono }: { tono: "tinta" | "luz" }) {
   const luz = tono === "luz";
   return (
     <div className="flex flex-col items-center text-center">
-      <Eyebrow variant={luz ? "light" : "dark"}>Por qué investigamos</Eyebrow>
       <h2
-        className={`font-display mt-5 font-extrabold tracking-[-0.025em] ${
+        className={`font-display font-extrabold tracking-[-0.025em] ${
           luz ? "text-white" : "text-azul-principal"
         }`}
         style={{ fontSize: "clamp(2.4rem, 1rem + 3.4vw, 4.2rem)", lineHeight: 1.04 }}
@@ -72,7 +79,14 @@ function Titulo({ tono }: { tono: "tinta" | "luz" }) {
   );
 }
 
-/** La hoja de la carta: apertura, idea central y posdata transversal. */
+/**
+ * La hoja de la carta: apertura, idea central y posdata transversal.
+ *
+ * Tres pesos bien separados —apertura al cuerpo, idea central grande y
+ * posdata chica en gris— porque la carta se lee de una sola pasada, sin
+ * scroll propio: si los tres párrafos pesan igual no se sabe cuál es el
+ * que importa. El texto es el del §4 recortado a la mitad por lo mismo.
+ */
 function Hoja({ live }: { live: boolean }) {
   return (
     <article
@@ -86,28 +100,24 @@ function Hoja({ live }: { live: boolean }) {
       <span className="text-gris-texto/70 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
         Archivo ED · Hoja 02
       </span>
-      <p className="mt-6 text-[1.02rem] leading-[1.7] lg:text-[1.08rem]">
+      <p className="text-azul-principal/85 mt-6 text-[0.98rem] leading-[1.7] lg:text-[1.02rem]">
         Empoderamiento Docente nació de una pregunta: ¿qué sucede cuando las y
         los docentes transforman su relación con el saber matemático escolar
         y reconocen su capacidad de intervenir en la realidad? Esa pregunta
-        creció mediante investigación, trabajo con comunidades docentes e
-        intervenciones sostenidas. Hoy sigue orientando una forma de actuar
-        en la que conocer y transformar son parte del mismo proceso.
+        sigue orientando todo lo que hacemos.
       </p>
-      <p className="font-display mt-7 text-[1.28rem] leading-[1.4] font-medium lg:text-[1.4rem]">
+      <p className="font-display mt-7 text-[1.42rem] leading-[1.32] font-semibold lg:text-[1.62rem]">
         No investigamos para observar la escuela desde afuera.{" "}
         <Highlight>Investigamos con los contextos educativos</Highlight> para
         comprender lo que ocurre, construir alternativas y aprender de su
         implementación.
       </p>
-      <p className="text-gris-texto mt-7 text-[0.92rem] leading-[1.65]">
+      <p className="text-gris-texto mt-7 text-[0.86rem] leading-[1.6]">
         <span className="text-azul-principal/70 mr-2 font-mono text-[0.7rem] tracking-[0.16em] uppercase">
           P. D.
         </span>
-        Género, inclusión, derechos humanos, ciudadanía y justicia social
-        atraviesan nuestras preguntas, nuestros materiales y nuestras
-        relaciones educativas. No son un capítulo aparte: son criterios con
-        los que investigamos.
+        Género, inclusión, derechos humanos, ciudadanía y justicia social no
+        son un capítulo aparte: son criterios con los que investigamos.
       </p>
       <div className="mt-8 flex items-center justify-between">
         <Image
@@ -270,9 +280,11 @@ export function CartaAbierta() {
                 data-ficha
                 className="bg-grain-light text-azul-principal relative rounded-lg bg-white p-7 shadow-[0_24px_50px_-28px_rgb(0_0_0/0.55)] will-change-transform"
               >
+                {/* Tres pesos, de mayor a menor: nombre del concepto,
+                    definición de un renglón y desarrollo. */}
                 <div className="flex items-center gap-5">
                   <FiguraConstelacion id={f.figura} className="w-14 shrink-0" />
-                  <h3 className="font-display text-[1.18rem] leading-tight font-bold">
+                  <h3 className="font-display text-[1.2rem] leading-[1.2] font-bold tracking-[-0.01em] text-balance">
                     {f.titulo}
                   </h3>
                 </div>
@@ -282,12 +294,12 @@ export function CartaAbierta() {
                   style={{ gridTemplateRows: "1fr" }}
                 >
                   <div className="min-h-0 overflow-hidden">
-                    <p className="mt-4 text-[0.95rem] leading-[1.65]">{f.texto}</p>
-                    {f.aclaracion ? (
-                      <p className="mt-3 text-[0.95rem] leading-[1.65] font-medium">
-                        {f.aclaracion}
-                      </p>
-                    ) : null}
+                    <p className="font-display mt-5 text-[1.02rem] leading-[1.4] font-semibold">
+                      {f.definicion}
+                    </p>
+                    <p className="text-gris-texto mt-2.5 text-[0.88rem] leading-[1.65]">
+                      {f.texto}
+                    </p>
                   </div>
                 </div>
               </li>
