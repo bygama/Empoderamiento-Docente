@@ -51,6 +51,10 @@ body {
   /* Patrón de puntos azulado (manual §6): azul-medio sólido — usado en el
      Hero y bloques con composición dots + círculo verde sobre fondo claro. */
   --pattern-dot-blue: rgb(74 111 165 / 0.9);
+  /* Cuánto se monta el footer sobre el cierre de Investigación (tint
+     "noche", ver abajo): el radio de sus esquinas en md+. El cierre reserva
+     esa misma franja de cielo bajo su piso. */
+  --footer-solapa: 2.5rem;
 }
 
 /* Cursor nativo oculto cuando el cursor custom está activo (solo desktop). */
@@ -474,18 +478,31 @@ html {
    blancos en las esquinas.
      gris  → cierres que flotan sobre gris-fondo (Novedades, Qué hacemos):
              la muesca toma el mismo gris y el redondeo se lee contra él.
-     medio → cierres que terminan en navy (Investigación, Quiénes somos).
-             Sin teñir, la muesca deja dos triángulos blancos en el
-             encuentro; teñida del mismo navy desaparece, y con ella el
+     medio → cierres que terminan en el mismo navy del footer (Quiénes
+             somos). Sin teñir, la muesca deja dos triángulos blancos en el
+             encuentro; teñida de ese navy desaparece, y con ella el
              redondeo del footer. azul-medio es la «forma plana azul» que
              DESIGN.md §155 pide para los bloques de identidad: la esquina
-             queda marcada con color en vez de con un hueco. */
+             queda marcada con color en vez de con un hueco.
+     noche → el cierre de Investigación termina en una escena viva: el haz
+             del faro y las nubes pasan por las esquinas y ningún color
+             plano coincide (medio dejaba un parche azul; el navy del piso,
+             un cuadrado más oscuro que el cielo iluminado). En vez de
+             teñir, el footer se monta --footer-solapa sobre el cierre con
+             la muesca transparente y el redondeo recorta la escena real.
+             El cierre deja esa franja de cielo bajo su piso (ver
+             CierreInvestigacion). */
 body:has([data-footer-dock-tint="gris"]) [data-footer-dock] {
   background-color: var(--color-gris-fondo);
 }
 
 body:has([data-footer-dock-tint="medio"]) [data-footer-dock] {
   background-color: var(--color-azul-medio);
+}
+
+body:has([data-footer-dock-tint="noche"]) [data-footer-dock] {
+  background-color: transparent;
+  margin-top: calc(-1 * var(--footer-solapa));
 }
 
 /* === Qué hacemos — noche de faro ========================================== */
