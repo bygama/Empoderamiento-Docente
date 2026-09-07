@@ -50,13 +50,34 @@ export function LenisProvider({ children }: { children: ReactNode }) {
     // (hot-reload en dev, imágenes tardías, secciones que montan después). Sin
     // esto Lenis cachea el alto viejo y clampea el scroll antes del final del
     // documento — síntoma: "no se puede bajar" en mitad de una sección larga.
+    //
+    // Son dos costos muy distintos. lenis.resize() es leer un scrollHeight y
+    // va siempre, en el próximo frame. ScrollTrigger.refresh() recalcula
+    // TODOS los triggers y pins de la página —en Investigación, con tres
+    // escenas pinneadas y valores por función, ~270 ms medidos— y congela lo
+    // que esté pasando. Por eso se reserva para cambios ESTRUCTURALES del
+    // alto (una sección que monta, un pin que aparece) y espera a que el alto
+    // deje de moverse: una transición CSS dispara el observer en cada frame.
+    // Un acordeón que se abre en hover, un tooltip o una fuente que llega
+    // mueven la página unos píxeles y no lo justifican; los triggers quedan
+    // desfasados esos píxeles hasta el próximo cambio grande y no se nota.
+    // (Los casos de Investigación se trababan exactamente por esto: cada
+    // hover y cada apertura disparaban dos o tres refresh seguidos.)
+    const UMBRAL_REFRESH = 240; // px de alto que separan "estructural" de "cosmético"
+    const ESPERA_REFRESH = 120; // ms quieto antes de recalcular
     let resizeRaf = 0;
-    const resync = () => {
+    let refreshTimer = 0;
+    let altoRefrescado = 0;
+    const resync = (entradas: ResizeObserverEntry[]) => {
       cancelAnimationFrame(resizeRaf);
-      resizeRaf = requestAnimationFrame(() => {
-        lenis.resize();
+      resizeRaf = requestAnimationFrame(() => lenis.resize());
+      const alto = entradas[entradas.length - 1]?.contentRect.height ?? document.body.scrollHeight;
+      if (Math.abs(alto - altoRefrescado) < UMBRAL_REFRESH) return;
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => {
+        altoRefrescado = alto;
         ScrollTrigger.refresh();
-      });
+      }, ESPERA_REFRESH);
     };
     const resizeObserver = new ResizeObserver(resync);
     resizeObserver.observe(document.body);
@@ -64,6 +85,7 @@ export function LenisProvider({ children }: { children: ReactNode }) {
     return () => {
       resizeObserver.disconnect();
       cancelAnimationFrame(resizeRaf);
+      window.clearTimeout(refreshTimer);
       gsap.ticker.remove(tickerFn);
       lenis.off("scroll", ScrollTrigger.update);
       registerLenis(null);
