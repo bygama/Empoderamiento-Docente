@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Highlight } from "@/components/ui/Highlight";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -287,17 +286,9 @@ export function EspiralInvestigacion() {
                 <EspiralSvg />
               </div>
 
-              {/* Derecha: volanta, título y la estación actual (relevos). */}
+              {/* Derecha: título y la estación actual (relevos). */}
               <div>
-                <div className="relative h-6">
-                  <span data-espiral-volanta className="absolute inset-0">
-                    <Eyebrow>Ciclo de investigación aplicada</Eyebrow>
-                  </span>
-                  <span data-espiral-volanta className="absolute inset-0">
-                    <Eyebrow>Volvemos a investigar</Eyebrow>
-                  </span>
-                </div>
-                <div className="relative mt-5 min-h-[7.2rem] lg:min-h-[8.4rem]">
+                <div className="relative min-h-[7.2rem] lg:min-h-[8.4rem]">
                   <h2
                     data-espiral-titulo
                     className="font-display absolute inset-x-0 top-0 max-w-[18ch] font-extrabold tracking-[-0.025em]"
@@ -340,8 +331,7 @@ export function EspiralInvestigacion() {
               </div>
               <div className="space-y-16">
                 <div>
-                  <Eyebrow>Ciclo de investigación aplicada</Eyebrow>
-                  <h2 className="font-display mt-5 max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
+                  <h2 className="font-display max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
                     Cómo una <Highlight>experiencia</Highlight> se convierte en
                     transformación.
                   </h2>
@@ -357,8 +347,7 @@ export function EspiralInvestigacion() {
                   </p>
                 </div>
                 <div id="evidencia">
-                  <Eyebrow>Volvemos a investigar</Eyebrow>
-                  <h2 className="font-display mt-5 max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
+                  <h2 className="font-display max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
                     Implementar no es <Highlight>terminar</Highlight>.
                   </h2>
                   <p className="mt-5 max-w-[42ch] text-body">{REMATE_TEXTO}</p>
