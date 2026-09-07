@@ -166,7 +166,12 @@ export function CarpetaCaso({
           >
             <span
               data-carpeta-sheet
-              className="bg-grain-light renglones-papel absolute top-[1414px] left-[4%] block h-[560px] w-[92%] rounded-t-2xl bg-white p-10 opacity-0 shadow-[0_-18px_60px_-30px_rgb(31_45_77/0.45)] lg:p-14"
+              /* rounded-t-[1.2rem] y no rounded-t-2xl: es el radio de la
+                 hoja del expediente ([data-exp-hoja]). Esta hoja aterriza
+                 encima de aquella y las dos conviven ~400ms; con radios
+                 distintos quedaba un sobrante de 3px en cada esquina de
+                 arriba durante el relevo. */
+              className="bg-grain-light renglones-papel absolute top-[1414px] left-[4%] block h-[560px] w-[92%] rounded-t-[1.2rem] bg-white p-10 opacity-0 shadow-[0_-18px_60px_-30px_rgb(31_45_77/0.45)] lg:p-14"
             >
               <span className={`text-gris-texto block ${ROTULO_MICRO}`}>
                 EXPEDIENTE

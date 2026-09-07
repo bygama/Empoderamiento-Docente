@@ -222,10 +222,14 @@ export function aperturaLugar(opts: {
 
   // E — la hoja emerge Y ATERRIZA en un solo gesto: morph medido en el
   // momento (la geometría del li ya está quieta: x y rotate asentados).
+  // Aterriza EN BLANCO y del tamaño exacto del artículo: de 2.2 a 2.6 esta
+  // hoja y la real conviven en escena, y si no coinciden el relevo se ve
+  // (era lo que se leía como turbio al abrir).
   tl.add(() => {
     gsap.set(clip, { overflow: "visible" });
     const rSheet = sheet.getBoundingClientRect();
     const rHoja = hoja.getBoundingClientRect();
+    const rotuloTapa = sheet.querySelectorAll<HTMLElement>(":scope > *");
     registrar(
       gsap
         .timeline()
@@ -235,12 +239,26 @@ export function aperturaLugar(opts: {
             x: `+=${rHoja.left - rSheet.left}`,
             y: `+=${rHoja.top - rSheet.top}`,
             width: rHoja.width,
-            height: Math.min(rHoja.height, vh * 0.92),
+            // Alto EXACTO, sin tope. Con Math.min(…, 92vh) la plancha
+            // quedaba ~300px corta: no llegaba a cubrir el artículo y su
+            // borde y su sombra cruzaban la hoja a media altura, con el
+            // tercio de abajo del artículo ya asomando por debajo.
+            // Cubriéndolo entero el relevo es blanco sobre blanco de la
+            // misma medida — y del mismo papel, las dos llevan
+            // `renglones-papel`—, o sea invisible.
+            height: rHoja.height,
             duration: 0.78,
             ease: "power3.inOut",
           },
           0,
         )
+        // El rótulo de tapa de la carpeta («EXPEDIENTE / CASO 01 / eje») se
+        // apaga en el primer tercio del vuelo: la hoja sale del cajón con
+        // lo que decía la carpeta y llega a la mesa en blanco, lista para
+        // escribirse. Si sobrevive al aterrizaje queda fantasmeado encima
+        // de la lámina y del contexto mientras la plancha se disuelve: dos
+        // contenidos distintos a media opacidad.
+        .to(rotuloTapa, { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 0)
         // Deriva de rotación propia del gesto (propiedad aparte: no pelea
         // con el tween de posición).
         .to(sheet, { rotate: -2, duration: 0.32, ease: "power2.out" }, 0)
@@ -260,12 +278,14 @@ export function aperturaLugar(opts: {
     { autoAlpha: 1, duration: 0.4, ease: "power1.inOut" },
     2.05,
   );
-  tl.fromTo(
-    hoja,
-    { autoAlpha: 0 },
-    { autoAlpha: 1, duration: 0.26, ease: "power1.out" },
-    2.2,
-  );
+  // El artículo se enciende ENTERO y de una, escondido detrás de la plancha
+  // blanca, que a esta altura ya aterrizó: misma posición, mismo tamaño,
+  // mismo papel. No necesita fade propio — lo que se ve es la plancha
+  // disolviéndose encima, que es la tinta apareciendo en la hoja. Antes
+  // entraba a los 2.2, cuando el morph todavía se estaba acomodando y no lo
+  // tapaba del todo: por los bordes el artículo asomaba a media opacidad
+  // mientras la plancha terminaba de llegar.
+  tl.set(hoja, { autoAlpha: 1 }, 2.38);
   tl.to(sheet, { autoAlpha: 0, duration: 0.22, ease: "power1.out" }, 2.42);
   if (ficha) {
     tl.to(ficha, { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" }, 2.1);
