@@ -238,10 +238,11 @@ export function ImpulsanEd() {
   return (
     <section
       aria-label="Quiénes sostienen ED — el equipo"
-      // La página termina sobre esta lámina navy y el footer también es navy:
-      // sin teñir la muesca del footer, su esquina redondeada deja dos
-      // triángulos blancos justo en el encuentro (ver globals.css).
-      data-footer-dock-tint="azul"
+      // La página termina sobre esta lámina navy y el footer también es
+      // navy. Sin teñir, la muesca del footer deja dos triángulos blancos en
+      // el encuentro; teñida de navy desaparece, y con ella el redondeo del
+      // footer. Va azul-medio: la esquina se marca con color (ver globals.css).
+      data-footer-dock-tint="medio"
       className="bg-azul-principal relative z-[45] -mt-[4svh] overflow-clip rounded-t-[2.5rem] text-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.45)]"
     >
       {/* Textura de puntos de marca */}
