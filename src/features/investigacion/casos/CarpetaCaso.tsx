@@ -268,14 +268,15 @@ export function CarpetaCaso({
             esUltima ? "rounded-b-2xl pb-20 md:pb-24" : `rounded-b-none ${peso.pb}`
           }`}
         >
-          {/* Anatomía de la tapa: luz del canto, lomo y pliegue inferior.
-              El canto se enciende al abrirse: es el filo que queda
-              expuesto cuando la tapa se separa. */}
+          {/* Anatomía de la tapa: luz del canto y pliegue inferior. El
+              canto se enciende al abrirse: es el filo que queda expuesto
+              cuando la tapa se separa. (Había también una franja oscura
+              de 10px pegada al borde izquierdo, el canto doblado de la
+              carpeta; se leía como un borde de otro color y se sacó.) */}
           <span
             aria-hidden="true"
             className="absolute inset-x-0 top-0 h-px bg-white/25 transition-colors duration-[380ms] ease-out group-hover:bg-white/45"
           />
-          <span aria-hidden="true" className="absolute top-0 bottom-0 left-0 w-2.5 bg-[rgb(10_16_30/0.16)]" />
           <span
             aria-hidden="true"
             className="absolute inset-x-0 bottom-0 h-9 bg-gradient-to-t from-[rgb(10_16_30/0.12)] to-transparent"
