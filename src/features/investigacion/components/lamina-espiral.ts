@@ -99,6 +99,8 @@ export const ANOTACIONES: ReadonlyArray<Anotacion> = [
  *  termina en el ancla de la anotación. Unidades del viewBox. */
 const GUIA_DESDE = 32;
 const GUIA_HASTA = 58;
+/** Largo de cada guía (para dibujarla con dash). */
+export const LARGO_GUIA = GUIA_HASTA - GUIA_DESDE;
 
 /** Segmento de la guía de la anotación `i`, en unidades del viewBox (va
  *  dentro del grupo de cámara, así que escala con ella). */

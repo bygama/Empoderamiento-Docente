@@ -2,7 +2,7 @@
 
 ## In progress
 
-- Paso 3 del PLAN (grupo de cámara y guías en el SVG).
+- Paso 4 del PLAN (layout live nuevo + coreografía nueva).
 
 ## Dónde corre
 
@@ -52,6 +52,21 @@
   exit 0 (11467 bytes idénticos). Commit: refactor(investigacion): extraer el
   svg y la versión estática de la espiral.
 
+- **Paso 3 — grupo de cámara y guías** (2026-09-07). `EspiralSvg` gana la
+  prop `lamina`: con ella el dibujo va dentro de `<g data-espiral-camara>` y
+  suma nueve `<line data-espiral-guia data-indice>` con `opacity="0"` (la
+  coreografía las dibuja); sin ella renderiza exactamente como antes.
+  `lamina-espiral.ts` exporta `LARGO_GUIA`. El layout live pasa
+  `<EspiralSvg lamina />`. Aceptación: typecheck → 0; eslint → 0; navegador
+  de Orca sobre el 3001 a 1592×969 (live): guías 9, cámara true; Playwright a
+  390×844: live false, guías 0, cámara false; SSR de `#ciclo` → `cmp` exit 0
+  con el baseline. Commit: feat(investigacion): agrupar la espiral bajo una
+  cámara y trazar las guías.
+  Maña: en el navegador de Orca `set viewport` se pierde al navegar y la
+  hidratación gana la carrera, así que los chequeos a viewport fijo con
+  `matchMedia` de montaje van por Playwright (`browser_resize` +
+  `browser_navigate`); Orca sigue para todo lo demás.
+
 ## Tried and failed
 
 - Probe con `node --import C:/...`: Node toma `C:` como esquema de URL; va
@@ -62,7 +77,7 @@
 
 ## Next
 
-- Paso 3 del PLAN en el worktree.
+- Paso 4 del PLAN en el worktree.
 
 ## Verification
 
