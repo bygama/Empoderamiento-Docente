@@ -320,7 +320,12 @@ export function CasosInvestigacion() {
       // scroll del expediente vive en su propia capa.
       detenerScroll();
       setEstado("open");
-      ScrollTrigger.refresh();
+      // Sin ScrollTrigger.refresh() acá: era global (toda la página, ~80 ms
+      // medidos) y redundante. Los triggers del expediente se miden al
+      // crearse —su scroller es la capa fija, que no se mueve— y el
+      // corrimiento de la página por el índice que se desmonta lo detecta el
+      // ResizeObserver de LenisProvider, que refresca cuando el alto se
+      // asienta.
       tituloRef.current?.focus({ preventScroll: true });
       // Back presionado a mitad de la transición: cerrar recién ahora.
       if (cierrePendienteRef.current) {
