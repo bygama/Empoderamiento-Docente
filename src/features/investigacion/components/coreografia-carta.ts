@@ -22,9 +22,13 @@ if (typeof window !== "undefined") {
  *    emerge de su boca, lineal con el scroll, hasta el centro de lectura,
  *    tapando el título. Las cuatro fichas esperan en las esquinas,
  *    inclinadas, cerradas (solo figura + nombre), con una deriva leve.
- * 3. LA CARTA SE VA POR ARRIBA y el sobre se hunde. Las fichas viajan de
- *    las esquinas a una grilla 2×2 en el centro y se enderezan.
- * 4. LAS FICHAS SE ABREN: la definición se despliega y la figura de cada
+ * 3. LA CARTA VUELVE. Sube alto —hasta que el pie se despega del sobre y
+ *    se lee entera—, el sobre se hunde debajo suyo, y recién ahí la carta
+ *    BAJA al centro del campo vacío y se queda quieta un respiro. No se va
+ *    de una: se deja leer sin nada encima.
+ * 4. LA CARTA SE VA POR ARRIBA y las fichas viajan de las esquinas a una
+ *    grilla 2×2 en el centro y se enderezan.
+ * 5. LAS FICHAS SE ABREN: la definición se despliega y la figura de cada
  *    una se forma (los puntos caen en su lugar, las aristas se trazan).
  *    Respiro y el pin suelta.
  *
@@ -58,25 +62,32 @@ const ESQUINA = {
   deriva: -18,
 } as const;
 
-/** Tiempos (unidades del timeline). */
+/** Tiempos (unidades del timeline). 1 unidad = 1000px de scroll. */
 const T = {
   wipe: { desde: 0, hasta: 0.7 },
   sobreEntra: { desde: 0.45, hasta: 0.95 },
   fichasEntran: { desde: 0.6, cada: 0.08 },
-  cartaSube: { desde: 1.0, hasta: 2.1 },
+  cartaSube: { desde: 1.0, hasta: 2.05 },
   tituloSeVa: { desde: 1.5, hasta: 1.85 },
-  // La carta sale LINEAL y despacio (se termina de leer mientras sube) y
-  // se va del todo ANTES de que las fichas viajen: nunca se pisan.
-  cartaSale: { desde: 2.5, hasta: 3.7 },
-  sobreSale: { desde: 2.7, hasta: 3.3 },
-  fichasViajan: { desde: 3.7, dura: 0.8, cada: 0.1 },
-  fichasAbren: { desde: 4.45, dura: 0.35, cada: 0.06 },
-  figurasForman: { desde: 4.5, dura: 0.5, cada: 0.06 },
-  fin: 5.3,
+  // El sobre se hunde mientras la carta se queda arriba: la carta es hija
+  // del sobre, así que compensa el hundimiento en la misma ventana y con
+  // el mismo ease para no moverse ni un píxel en pantalla.
+  sobreSale: { desde: 2.05, hasta: 2.75 },
+  // Ahora sí: campo vacío y la carta baja al centro, entera.
+  cartaVuelve: { desde: 2.75, hasta: 3.35 },
+  // El respiro que pidió la escena: quieta, sin nada encima, para leerla.
+  cartaSeQueda: { hasta: 3.95 },
+  // Y recién entonces se va, LINEAL y del todo ANTES de que las fichas
+  // viajen: nunca se pisan.
+  cartaSale: { desde: 3.95, hasta: 4.85 },
+  fichasViajan: { desde: 4.85, dura: 0.8, cada: 0.1 },
+  fichasAbren: { desde: 5.6, dura: 0.35, cada: 0.06 },
+  figurasForman: { desde: 5.65, dura: 0.5, cada: 0.06 },
+  fin: 6.45,
 } as const;
 
 /** Alto del recorrido pinneado en px de scroll. */
-export const RECORRIDO_CARTA = 5300;
+export const RECORRIDO_CARTA = 6450;
 
 /** Largo de la arista j de una figura (para el trazado con dash). */
 function largoArista(figura: (typeof FIGURAS)[number], j: number) {
@@ -106,16 +117,25 @@ export function crearCarta({ zona, hoja }: Escena) {
   // ── Geometría de la carta, sin transforms (offsets de layout): el sobre
   //    es hijo posicionado de la hoja y la carta, hija posicionada del sobre.
   const topCarta = () => sobre.offsetTop + carta.offsetTop;
-  /** Posición de lectura: centrada, pero nunca con el encabezado de la
-   *  carta fuera de pantalla (en viewports bajos la hoja es más alta que
-   *  el escenario: se lee el arranque acá y el resto mientras sube). */
-  const yLectura = () =>
-    Math.max((alto() - carta.offsetHeight) / 2, alto() * 0.07) - topCarta();
   /** El sobre se hunde bajo el piso con solapa y todo (la solapa asoma
    *  9rem por arriba de su caja). */
   const hundidoSobre = () => sobre.offsetHeight + 200;
-  /** La carta es hija del sobre: al salir por arriba tiene que compensar
-   *  el hundimiento del sobre, que la arrastra hacia abajo. */
+  /** Arriba del todo: la carta sube hasta que su pie se despega del borde
+   *  superior del sobre y se puede leer entera. Si la carta es más alta
+   *  que ese hueco, el techo manda y el pie queda tapado hasta que el
+   *  sobre se hunda. */
+  const yAlto = () =>
+    Math.max(
+      alto() * 0.03 - topCarta(),
+      alto() - sobre.offsetHeight - 12 - carta.offsetHeight - topCarta(),
+    );
+  /** La vuelta: centrada en el escenario, ya sin sobre que le tape el pie. */
+  const yEntera = () =>
+    Math.max((alto() - carta.offsetHeight) / 2, alto() * 0.05) - topCarta();
+  /** La carta es hija del sobre: si el sobre baja hundidoSobre px, la
+   *  carta baja con él. Para quedarse donde está tiene que restar lo mismo
+   *  (es lo que ya hace ySalida). */
+  const conSobreHundido = (y: () => number) => () => y() - hundidoSobre();
   const ySalida = () => -(topCarta() + carta.offsetHeight + 40 + hundidoSobre());
 
   // ── Geometría de las fichas: de su celda en la grilla a su esquina. La
@@ -255,7 +275,7 @@ export function crearCarta({ zona, hoja }: Escena) {
   tl.fromTo(
     carta,
     { y: 0 },
-    { y: yLectura, duration: T.cartaSube.hasta - T.cartaSube.desde, ...sinRender },
+    { y: yAlto, duration: T.cartaSube.hasta - T.cartaSube.desde, ...sinRender },
     T.cartaSube.desde,
   );
   tl.to(
@@ -276,19 +296,45 @@ export function crearCarta({ zona, hoja }: Escena) {
     );
   });
 
-  // ── 3. La carta se va por arriba, el sobre se hunde y las fichas viajan
-  //    de las esquinas a la grilla.
-  tl.fromTo(
-    carta,
-    { y: yLectura },
-    { y: ySalida, duration: T.cartaSale.hasta - T.cartaSale.desde, ...sinRender },
-    T.cartaSale.desde,
-  );
+  // ── 3. El sobre se hunde bajo la carta, que se queda clavada arriba; y
+  //    con el campo vacío la carta baja al centro y descansa.
   tl.fromTo(
     sobre,
     { y: 0 },
     { y: hundidoSobre, duration: T.sobreSale.hasta - T.sobreSale.desde, ease: "power1.in", ...sinRender },
     T.sobreSale.desde,
+  );
+  // Misma ventana y mismo ease que el sobre: se anulan y la carta no se mueve.
+  tl.fromTo(
+    carta,
+    { y: yAlto },
+    {
+      y: conSobreHundido(yAlto),
+      duration: T.sobreSale.hasta - T.sobreSale.desde,
+      ease: "power1.in",
+      ...sinRender,
+    },
+    T.sobreSale.desde,
+  );
+  tl.fromTo(
+    carta,
+    { y: conSobreHundido(yAlto) },
+    {
+      y: conSobreHundido(yEntera),
+      duration: T.cartaVuelve.hasta - T.cartaVuelve.desde,
+      ease: "power2.out",
+      ...sinRender,
+    },
+    T.cartaVuelve.desde,
+  );
+
+  // ── 4. La carta se va por arriba (después del respiro) y las fichas
+  //    viajan de las esquinas a la grilla.
+  tl.fromTo(
+    carta,
+    { y: conSobreHundido(yEntera) },
+    { y: ySalida, duration: T.cartaSale.hasta - T.cartaSale.desde, ...sinRender },
+    T.cartaSale.desde,
   );
   fichas.forEach((li, i) => {
     tl.fromTo(
@@ -312,7 +358,7 @@ export function crearCarta({ zona, hoja }: Escena) {
     );
   });
 
-  // ── 4. Las fichas se abren y sus figuras se forman.
+  // ── 5. Las fichas se abren y sus figuras se forman.
   textos.forEach((texto, i) => {
     tl.fromTo(
       texto,
