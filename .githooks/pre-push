@@ -1,0 +1,26 @@
+#!/bin/sh
+# ---------------------------------------------------------------------------
+# pre-push - React Doctor avisa, nunca frena.
+#
+# La deuda de React que ya arrastra el repo no se arregla en este push: la
+# idea es tenerla a la vista cada vez que se empuja, para ir bajandola de a
+# poco. Por eso el hook SIEMPRE termina en 0.
+#
+# Ojo: react-doctor sale con codigo != 0 cuando ENCUENTRA errores, no cuando
+# falla. Aca ese codigo se ignora a proposito; el reporte que ya imprimio es
+# todo lo que interesa.
+#
+# Se instala solo: el script `prepare` de package.json apunta core.hooksPath
+# a .githooks/ en cada install. Para saltearlo una vez:
+#   SKIP_REACT_DOCTOR=1 git push
+# ---------------------------------------------------------------------------
+set -u
+
+[ "${SKIP_REACT_DOCTOR:-0}" != "0" ] && exit 0
+
+printf '\n\033[1m> React Doctor\033[0m \033[2m(informativo: no frena el push)\033[0m\n\n'
+
+pnpm run react-doctor
+
+printf '\n\033[2m  Nada de esto frena el push. Para saltearlo: SKIP_REACT_DOCTOR=1 git push\033[0m\n\n'
+exit 0
