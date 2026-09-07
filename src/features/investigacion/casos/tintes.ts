@@ -93,17 +93,10 @@ export const TINTES: Record<
 /**
  * Posición horizontal de la pestaña de cada carpeta dentro del archivo:
  * contiguas desde la izquierda (cada una arranca donde termina la anterior,
- * como separadores reales de un cajón).
- *
- * Medidas FIJAS, no porcentajes. La pestaña mide w-56 (224px) siempre, así
- * que con pasos porcentuales las posiciones dependían del ancho de la
- * carpeta: eran 2/21/40%, calculados para un contenedor de 1200. Al sangrar
- * la pila hasta el borde derecho la carpeta pasa a medir ~1560 y esos pasos
- * se estiran a ~296px, dejando huecos entre pestañas. Estos tres valores
- * (24px, 252, 480) son los que daban esos porcentajes a 1200: el dibujo de
- * siempre, ahora a cualquier ancho.
+ * como separadores reales de un cajón). El ancho de pestaña es w-56
+ * (224px ≈ 19% del contenedor de 1200): pasos de 19%.
  */
-export const OFFSET_PESTANA = ["left-6", "left-[15.75rem]", "left-[30rem]"] as const;
+export const OFFSET_PESTANA = ["left-[2%]", "left-[21%]", "left-[40%]"] as const;
 
 /**
  * Familia micro-tipográfica del archivo (el design system termina en
