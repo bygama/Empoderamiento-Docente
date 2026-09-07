@@ -457,8 +457,20 @@ export function CasosInvestigacion() {
                 </RevealLines>
               </div>
 
+              {/* La pila SALE del contenedor por la derecha hasta el borde
+                  de la pantalla: el archivo se lee como un cajón que sigue
+                  más allá del cuadro. La izquierda se queda en la grilla,
+                  alineada con el título y con el remate de abajo — esos son
+                  texto y pertenecen a la columna de lectura, las carpetas
+                  son el objeto. `calc(50% - 50vw)` es justo lo que hay del
+                  borde de la carpeta al de la pantalla: la mitad de lo que
+                  le sobra al viewport sobre el ancho del contenedor. (50vw
+                  cuenta la barra de scroll, así que sobra media barra: la
+                  recorta el overflow-hidden de la sección.) Desde md, que es
+                  donde las carpetas dejan de ser tarjetas sueltas y forman
+                  la pila. */}
               <ol
-                className={`mt-20 flex flex-col gap-5 md:block ${
+                className={`mt-20 flex flex-col gap-5 md:mr-[calc(50%-50vw)] md:block ${
                   estado === "index" ? "" : "pointer-events-none"
                 }`}
               >
