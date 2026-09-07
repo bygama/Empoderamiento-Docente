@@ -89,9 +89,11 @@ export default function RootLayout({
           {/* Fondo detrás del footer: la muesca de sus esquinas superiores
               redondeadas toma ESTE color. Blanco por defecto (matchea las
               páginas que terminan en blanco). Si la página termina sobre
-              gris-fondo —el cierre de Novedades—, esa sección se marca con
-              [data-footer-dock-tint="gris"] y la muesca toma ese gris (regla en
-              globals.css) para que el encuentro no muestre triángulos blancos. */}
+              otro color, su última sección se marca con
+              [data-footer-dock-tint="<color>"] y una regla de globals.css
+              tiñe la muesca (gris, medio) o, en "noche", la vuelve
+              transparente y sube el footer --footer-radio sobre el cierre
+              para que el redondeo recorte la escena. */}
           <div data-footer-dock className="bg-white">
             <Footer />
           </div>
