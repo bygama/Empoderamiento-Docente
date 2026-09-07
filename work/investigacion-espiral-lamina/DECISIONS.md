@@ -64,3 +64,35 @@ esta lane se commitea en el checkout principal.
 Agregarla a `espiral.ts` lo llevaba a 223 líneas (tope 200). Además separa
 dos cosas distintas: la geometría de la figura (que comparten SSR y
 coreografía) y la geometría de la lámina (cámara + anotaciones).
+
+## 2026-09-07 — Textos breves en la lámina (pedido del owner, anula «copy íntegro» solo ahí)
+
+El owner, viendo la escena: «reducí textos son muy largos». Las anotaciones
+de la lámina usan `breve` / `destacadoBreve` (estaciones.ts), versiones
+cortas escritas en la lane a partir del texto canónico, con las frases pilar
+literales y lenguaje inclusivo. La versión estática (touch, reduced-motion,
+SSR) conserva `texto` / `destacado` íntegros del doc de contenido, así que
+la DoD 4 (copy íntegro por grep) sigue valiendo. Las versiones breves quedan
+pendientes de validación de contenido por el owner.
+
+## 2026-09-07 — Anclaje de anotaciones sin `translate`
+
+GSAP reescribe el `transform` del bloque que anima y se lleva puesto el
+`translate` de Tailwind (medido: `translate: none`, `transform:
+translate(0px, 0px)` con `-translate-y-full` en la clase). Las cajas se
+cuelgan del ancla con left/right/top/bottom y las laterales se centran con
+una caja de alto cero; GSAP solo toca el bloque interior.
+
+## 2026-09-07 — Cámara y personaje como funciones del tiempo
+
+`gsap.set` con `svgOrigin: "0 0"` produjo una matriz distinta a la calculada
+(translate −334/−501 en vez de −162/−302). En lugar de depurar el origen de
+GSAP para SVG, la cámara escribe el atributo `transform` a mano desde el
+tiempo de la timeline, igual que el personaje (recorrido-espiral.ts).
+
+## 2026-09-07 — Todo fromTo, sin `.to()`
+
+Con scrub e `invalidateOnRefresh`, un `.to()` captura como inicio lo que
+encuentre en el refresh y deja estados fantasma al volver atrás (el remate
+visible al inicio, según captura del owner). Igual que el hero: valores
+explícitos en ambos extremos.
