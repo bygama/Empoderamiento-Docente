@@ -460,9 +460,9 @@ export function CasosInvestigacion() {
               {/* La pila SALE del contenedor por la derecha hasta el borde
                   de la pantalla: el archivo se lee como un cajón que sigue
                   más allá del cuadro. La izquierda se queda en la grilla,
-                  alineada con el título y con el remate de abajo — esos son
-                  texto y pertenecen a la columna de lectura, las carpetas
-                  son el objeto. `calc(50% - 50vw)` es justo lo que hay del
+                  alineada con el título — que es texto y pertenece a la
+                  columna de lectura, mientras que las carpetas son el
+                  objeto. `calc(50% - 50vw)` es justo lo que hay del
                   borde de la carpeta al de la pantalla: la mitad de lo que
                   le sobra al viewport sobre el ancho del contenedor. (50vw
                   cuenta la barra de scroll, así que sobra media barra: la
