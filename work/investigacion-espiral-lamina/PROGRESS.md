@@ -40,7 +40,7 @@
   `pnpm typecheck` → 0; `eslint` sobre los dos archivos → 0;
   `node --import file:///<scratch>/hooks-ts.mjs <scratch>/probe-espiral.mjs`
   → `PROBE OK`, exit 0 (nueve anclas con lado esperado, todas dentro de
-  [−35, 135] %; general = identidad). Commit: pendiente de OK del owner.
+  [−35, 135] %; general = identidad). Commit: el del paso 1 (feat: calcular la cámara y las anotaciones).
 
 ## Tried and failed
 
