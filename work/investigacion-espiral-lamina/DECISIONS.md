@@ -113,3 +113,11 @@ hijo absoluto no reparta el subrayado entre dos líneas.
 El encaje (paso 5) dependía del anclaje reescrito en el paso 4 y no había
 un estado intermedio verificable entre ambos. Un commit, con la aceptación
 de los dos pasos en PROGRESS.
+
+## 2026-09-07 — Cero reviewers en el cierre (override del owner, literal)
+
+Pregunta de cierre (tres seats en Sonnet propuestos: corrección contra el
+SPEC, fallas silenciosas, tipos e interfaces). Respuesta del owner, textual:
+«sin reviewers y fue confio pr merge». La review de cierre queda en cero
+seats por su palabra; la DoD por comando está completa en PROGRESS. PR a
+main y merge por rebase, como pide AGENTS.md §5.7.

@@ -21,6 +21,9 @@ una sola vez después del último paso; no es un paso de este plan.
 
 ## Pasos
 
+Estado al cierre (2026-09-07): 0, 1, 2, 3, 4+5, 5b y 6 ejecutados con su
+aceptación registrada en PROGRESS.
+
 0. **Baseline y entorno** (sin commit; evidencia en PROGRESS). Levantar `pnpm dev`
    en una terminal de Orca. En el navegador de Orca, a 390×844, ir a
    `/investigacion#ciclo` y guardar en el scratchpad (a) captura PNG y (b) el
