@@ -45,16 +45,41 @@ const CAJA: Record<Lado, string> = {
   "arriba-derecha": "w-[36ch] pb-2 pl-1",
 };
 
+/** Jerarquía: nombre en Manrope, grande y apretado; cuerpo en Inter, un
+ *  tono más bajo; la frase clave en peso medio con el subrayado verde. */
 const TIPO = {
-  nombre: { fontSize: "clamp(1rem, 1.9svh, 1.2rem)", lineHeight: 1.2 } satisfies CSSProperties,
+  nombre: { fontSize: "clamp(1.1rem, 2.1svh, 1.3rem)", lineHeight: 1.15 } satisfies CSSProperties,
   texto: { fontSize: "clamp(0.9rem, 1.65svh, 1rem)", lineHeight: 1.5 } satisfies CSSProperties,
   remate: { fontSize: "clamp(1.05rem, 2svh, 1.3rem)", lineHeight: 1.4 } satisfies CSSProperties,
   titulo: { fontSize: "clamp(1.9rem, 0.9rem + 2.2vw, 3rem)", lineHeight: 1.06 } satisfies CSSProperties,
   nota: { fontSize: "clamp(1.3rem, 0.8rem + 1.2vw, 1.75rem)", lineHeight: 1.3 } satisfies CSSProperties,
 } as const;
 
+/** El texto con su frase clave marcada: el subrayado verde es un span
+ *  aparte para poder dibujarlo con scaleX (el `Highlight` de los títulos
+ *  usa text-decoration, que no se anima con transform). */
+function ConClave({ texto, clave }: { texto: string; clave: string }) {
+  const i = texto.indexOf(clave);
+  if (i < 0) return <>{texto}</>;
+  return (
+    <>
+      {texto.slice(0, i)}
+      <mark className="text-azul-principal relative bg-transparent font-medium whitespace-nowrap">
+        {clave}
+        <span
+          data-anot-subrayado
+          aria-hidden="true"
+          className="bg-verde-concepto absolute inset-x-0 -bottom-[0.1em] h-[0.12em]"
+        />
+      </mark>
+      {texto.slice(i + clave.length)}
+    </>
+  );
+}
+
 /** Una anotación de la lámina, colgada de su nodo por la guía. El número
- *  no se repite: vive en el rótulo del SVG. GSAP anima el bloque interior. */
+ *  no se repite: vive en el rótulo del SVG. GSAP anima el bloque interior
+ *  y sus partes (anotacion-espiral.ts). */
 function Anotacion({ indice, children }: { indice: number; children: ReactNode }) {
   const { lado } = ANOTACIONES[indice];
   return (
@@ -103,9 +128,9 @@ export function EspiralLamina() {
       </div>
 
       {/* La figura, con la relación del viewBox; las anotaciones se
-          posicionan en % de este cuadro. */}
-      {/* Presupuesto vertical: la anotación 01 necesita ~110 px sobre su
-          ancla y quedar bajo el header flotante; la 07, ~110 px bajo la suya. */}
+          posicionan en % de este cuadro. Presupuesto vertical: la
+          anotación 01 necesita ~110 px sobre su ancla y quedar bajo el
+          header flotante; la 07, ~110 px bajo la suya. */}
       <div
         data-espiral-figura
         className="relative mt-[clamp(8rem,15svh,9.5rem)] aspect-[400/480] overflow-visible"
@@ -114,16 +139,16 @@ export function EspiralLamina() {
         <EspiralSvg lamina />
         {ESTACIONES_EN_ORDEN.map((e, i) => (
           <Anotacion key={e.nombre} indice={i}>
-            <h3 className="font-display font-bold" style={TIPO.nombre}>
+            <h3 data-anot-nombre className="font-display font-bold tracking-[-0.01em]" style={TIPO.nombre}>
               {e.nombre}
             </h3>
-            <p className="mt-1.5" style={TIPO.texto}>
-              {e.breve}
+            <p data-anot-texto className="text-azul-principal/75 mt-2" style={TIPO.texto}>
+              <ConClave texto={e.breve} clave={e.clave} />
             </p>
           </Anotacion>
         ))}
         <Anotacion indice={INDICE_REMATE}>
-          <p className="font-display font-medium" style={TIPO.remate}>
+          <p data-anot-texto className="font-display font-medium" style={TIPO.remate}>
             {REMATE_TEXTO}
           </p>
         </Anotacion>

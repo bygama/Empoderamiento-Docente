@@ -96,3 +96,20 @@ Con scrub e `invalidateOnRefresh`, un `.to()` captura como inicio lo que
 encuentre en el refresh y deja estados fantasma al volver atrás (el remate
 visible al inicio, según captura del owner). Igual que el hero: valores
 explícitos en ambos extremos.
+
+## 2026-09-07 — Paso 5b: jerarquía y animación de las anotaciones (pedido del owner)
+
+«Me encanta. Ahora podrías mejorar jerarquías así no está muy plano y es
+intuitivo de leer, y si podés meter alguna animación a eso te banco». Se
+suma como paso 5b de la misma lane. Frase clave por estación (`clave` en
+estaciones.ts, literal dentro de `breve`) subrayada en verde: mismo
+lenguaje que el `Highlight` de los títulos, pero con un span que se dibuja
+con scaleX porque text-decoration no se anima solo con transform. El
+subrayado y la frase van con `whitespace-nowrap` para que un inline con
+hijo absoluto no reparta el subrayado entre dos líneas.
+
+## 2026-09-07 — Pasos 4 y 5 en un solo commit
+
+El encaje (paso 5) dependía del anclaje reescrito en el paso 4 y no había
+un estado intermedio verificable entre ambos. Un commit, con la aceptación
+de los dos pasos en PROGRESS.

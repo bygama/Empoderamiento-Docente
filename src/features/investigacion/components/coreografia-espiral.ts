@@ -1,7 +1,8 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BISAGRA, ESTACIONES, LARGO_ESPIRAL, LONGITUD_NODO, RADIO_NODO } from "./espiral";
-import { ANOTACIONES, INDICE_REMATE, LARGO_GUIA } from "./lamina-espiral";
+import { gestosAnotacion } from "./anotacion-espiral";
+import { ANOTACIONES, INDICE_REMATE } from "./lamina-espiral";
 import { crearCamara, crearRecorrido } from "./recorrido-espiral";
 
 if (typeof window !== "undefined") {
@@ -23,8 +24,9 @@ if (typeof window !== "undefined") {
 const T = {
   intro: 0.3,
   vuelta: 1.6,
-  /** Al fin de cada vuelta: la última anotación entra en ~0.36 y hay que leerla. */
-  pausa: 0.6,
+  /** Al fin de cada vuelta: la última anotación termina de entrar en ~0.56
+   *  (guía, bloque, nombre, texto, subrayado) y hay que poder leerla. */
+  pausa: 0.8,
   /** Después del relevo del rincón, antes de arrancar la vuelta 2. */
   respiro: 0.3,
   bisagra: 1.0,
@@ -65,10 +67,6 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
   gsap.set(lazo, { strokeDasharray: largoLazo, strokeDashoffset: largoLazo, autoAlpha: 0 });
   nodos.forEach((n, k) => gsap.set(n, { attr: { r: k === 0 ? RADIO_NODO : 0 } }));
   rotulos.forEach((r, k) => gsap.set(r, { autoAlpha: k === 0 ? 1 : 0 }));
-  guias.forEach((g, i) =>
-    gsap.set(g, { strokeDasharray: LARGO_GUIA, strokeDashoffset: i === 0 ? 0 : LARGO_GUIA, autoAlpha: i === 0 ? 1 : 0 }),
-  );
-  anotaciones.forEach((a, i) => gsap.set(a, { autoAlpha: i === 0 ? 1 : 0, x: 0, y: 0 }));
   voces.forEach((v, i) => gsap.set(v, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 18 }));
   recorrido.enTiempo(0);
   camara.enTiempo(0);
@@ -96,6 +94,11 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
     },
   });
 
+  // Los gestos de cada anotación (anotacion-espiral.ts); solo la primera
+  // arranca a la vista.
+  const gestos = ANOTACIONES.map((a, i) => gestosAnotacion(tl, anotaciones[i], guias[i], a.normal));
+  gestos.forEach((g, i) => g.reposo(i === 0));
+
   // ── Gestos. Todo fromTo explícito: con scrub e invalidateOnRefresh, un
   //    .to() captura como inicio lo que encuentre y deja estados fantasma.
   const entradaVoz = (i: number, at: number) =>
@@ -105,27 +108,6 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
   const brotaNodo = (k: number, at: number) => {
     tl.fromTo(nodos[k], { attr: { r: 0 } }, { attr: { r: RADIO_NODO }, duration: 0.18, ease: "back.out(2)", ...sinRender }, at);
     tl.fromTo(rotulos[k], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15, ...sinRender }, at + 0.05);
-  };
-  /** La anotación se despliega desde el nodo: la guía se dibuja y el bloque
-   *  entra con un desplazamiento corto hacia afuera. */
-  const entraAnotacion = (i: number, at: number) => {
-    const [nx, ny] = ANOTACIONES[i].normal;
-    tl.fromTo(
-      guias[i],
-      { strokeDashoffset: LARGO_GUIA, autoAlpha: 0 },
-      { strokeDashoffset: 0, autoAlpha: 1, duration: 0.15, ...sinRender },
-      at,
-    );
-    tl.fromTo(
-      anotaciones[i],
-      { autoAlpha: 0, x: -nx * 12, y: -ny * 12 },
-      { autoAlpha: 1, x: 0, y: 0, duration: 0.3, ease: "power2.out", ...sinRender },
-      at + 0.06,
-    );
-  };
-  const saleAnotacion = (i: number, at: number) => {
-    tl.fromTo(anotaciones[i], { autoAlpha: 1, x: 0, y: 0 }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
-    tl.fromTo(guias[i], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
   };
   /** Una vuelta: un solo tramo del nodo `a` al `b` a velocidad constante,
    *  con el trazo detrás; cada nodo brota y anota al paso. */
@@ -142,7 +124,7 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
     for (let k = a + 1; k <= b; k++) {
       const tk = t0 + T.vuelta * ((LONGITUD_NODO[k] - l0) / (l1 - l0));
       brotaNodo(k, tk - 0.04);
-      entraAnotacion(k, tk);
+      gestos[k].entra(tk);
     }
     return t0 + T.vuelta;
   };
@@ -159,11 +141,11 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
     { strokeDashoffset: LARGO_ESPIRAL - LONGITUD_NODO[BISAGRA], duration: T.bisagra, ease: "power1.inOut", ...sinRender },
     t,
   );
-  for (let k = 0; k < BISAGRA; k++) saleAnotacion(k, t);
+  for (let k = 0; k < BISAGRA; k++) gestos[k].sale(t);
   salidaVoz(0, t + 0.05);
   entradaVoz(1, t + 0.3);
   brotaNodo(BISAGRA, t + T.bisagra - 0.04);
-  entraAnotacion(BISAGRA, t + T.bisagra);
+  gestos[BISAGRA].entra(t + T.bisagra);
   const tLlegadaBisagra = t + T.bisagra;
   const tNota = tLlegadaBisagra + T.lecturaNota;
   salidaVoz(1, tNota);
@@ -175,14 +157,14 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
 
   // ── El lazo: las anotaciones se retiran, se traza en verde y el
   //    personaje vuelve al primer nodo, que late. Ahí aterriza el remate.
-  for (let k = BISAGRA; k < ESTACIONES; k++) saleAnotacion(k, t);
+  for (let k = BISAGRA; k < ESTACIONES; k++) gestos[k].sale(t);
   tramos.push({ t0: t, t1: t + T.lazo, l0: LARGO_ESPIRAL, l1: LARGO_ESPIRAL + largoLazo, ease: suave });
   tl.fromTo(lazo, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.02, ...sinRender }, t);
   tl.fromTo(lazo, { strokeDashoffset: largoLazo }, { strokeDashoffset: 0, duration: T.lazo, ease: "power1.inOut", ...sinRender }, t);
   const tLlegada = t + T.lazo;
   tl.fromTo(nodos[0], { attr: { r: RADIO_NODO } }, { attr: { r: RADIO_NODO * 1.6 }, duration: 0.12, ease: "power2.out", ...sinRender }, tLlegada);
   tl.fromTo(nodos[0], { attr: { r: RADIO_NODO * 1.6 } }, { attr: { r: RADIO_NODO }, duration: 0.18, ease: "power1.inOut", ...sinRender }, tLlegada + 0.12);
-  entraAnotacion(INDICE_REMATE, tLlegada);
+  gestos[INDICE_REMATE].entra(tLlegada);
   t = tLlegada + T.remate;
 
   // Respiro final antes de soltar el pin (fija el largo total del timeline).
