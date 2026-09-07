@@ -264,11 +264,13 @@ export function CierreInvestigacion() {
         </div>
 
         {/* ── El marco: la hoja llega enmarcada (como la hoja 01) y la noche
-            lo disuelve al pinnearse. Invisible si la coreografía no corre. */}
+            lo disuelve al pinnearse. Invisible si la coreografía no corre.
+            Abajo se ancla al piso reservado (pb), no al borde de la caja: la
+            caja mide 100svh más esa franja y el borde queda bajo el fold. */}
         <div
           aria-hidden="true"
           data-cierre-marco
-          className="pointer-events-none invisible absolute inset-2.5 z-40 rounded-xl opacity-0"
+          className="pointer-events-none invisible absolute inset-x-2.5 top-2.5 bottom-[calc(var(--footer-radio)+0.625rem)] z-40 rounded-xl opacity-0"
           style={{ boxShadow: "0 0 0 2rem var(--color-gris-fondo)" }}
         />
 

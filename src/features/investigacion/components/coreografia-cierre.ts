@@ -138,6 +138,8 @@ export function crearAscenso({ zona, hoja }: Escena) {
   };
 
   const altoOculto = () => linterna.offsetHeight + AIRE_OCULTO;
+  /** Franja de cielo reservada bajo el piso para la solapa del footer (pb). */
+  const solapa = () => parseFloat(getComputedStyle(hoja).paddingBottom) || 0;
 
   // ── Estado pre-paint: la hoja enmarcada, el faro bajo el piso, luz
   //    apagada, mensajes y estrellas esperando. θ = 360 ≡ 0: la pose de
@@ -248,10 +250,11 @@ export function crearAscenso({ zona, hoja }: Escena) {
   });
 
   // ── Cae la noche: el marco se disuelve y el navy llega a los bordes.
+  //    Abajo el borde es el piso reservado, no la caja: va de piso+10px a piso.
   tl.fromTo(
     marco,
-    { top: "0.625rem", right: "0.625rem", bottom: "0.625rem", left: "0.625rem", borderRadius: "0.75rem" },
-    { top: 0, right: 0, bottom: 0, left: 0, borderRadius: 0, duration: 0.22, ease: "power2.out", ...sinRender },
+    { top: "0.625rem", right: "0.625rem", bottom: () => solapa() + 10, left: "0.625rem", borderRadius: "0.75rem" },
+    { top: 0, right: 0, bottom: () => solapa(), left: 0, borderRadius: 0, duration: 0.22, ease: "power2.out", ...sinRender },
     0,
   );
   tl.to(marco, { autoAlpha: 0, duration: 0.12 }, 0.18);
