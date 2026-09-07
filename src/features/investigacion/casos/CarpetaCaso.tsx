@@ -155,9 +155,10 @@ export function CarpetaCaso({
         <span
           data-carpeta-back
           aria-hidden="true"
-          className={`absolute inset-x-0 top-0 bottom-0 rounded-t-2xl transition-[bottom] duration-[380ms] ease-out motion-safe:group-hover:-bottom-3 ${tinte.carpeta} ${baseRedondeada}`}
+          className={`absolute inset-x-0 top-0 bottom-0 rounded-t-2xl transition-[bottom] duration-[380ms] ease-out motion-safe:group-hover:-bottom-3 ${tinte.carpeta} ${tinte.grano} ${baseRedondeada}`}
         >
           <span
+            data-carpeta-back-sombra
             className={`absolute inset-0 rounded-t-2xl bg-[rgb(10_16_30/0.22)] ${baseRedondeada}`}
           />
           {/* Faldón: la carpeta sigue 20px por debajo de donde termina.
@@ -173,7 +174,10 @@ export function CarpetaCaso({
               estira en hover, y con el mismo 12% de sombra con el que
               cierra la tapa, para que el empalme no cambie de tono. */}
           {!esUltima && (
-            <span className={`absolute inset-x-0 top-full hidden h-5 md:block ${tinte.carpeta}`}>
+            <span
+              data-carpeta-faldon
+              className={`absolute inset-x-0 top-full hidden h-5 md:block ${tinte.carpeta}`}
+            >
               <span className="absolute inset-0 bg-[rgb(10_16_30/0.12)]" />
             </span>
           )}

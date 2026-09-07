@@ -16,8 +16,12 @@ if (typeof window !== "undefined") {
  * oculto desde el click, así EL LUGAR EMPIEZA A EXISTIR MIENTRAS LA
  * CARPETA VIAJA (rótulo y título display entran en paralelo al viaje;
  * nunca más una banda flotando en vacío gris). La física de la carpeta
- * (press → viaje → tapa que pivota → hoja que emerge y hace morph) es la
- * firma propia y se conserva.
+ * (press → viaje → tapa que pivota y sale de cuadro → hoja que emerge y
+ * hace morph) es la firma propia y se conserva. UN SOLO OBJETO: el lomo
+ * de la carpeta crece hasta ser la carcasa del expediente y la pestaña
+ * viaja hasta su lugar en ella, con la misma técnica de la hoja — medir
+ * el destino y aterrizar encima—. Nada se desvanece en un lugar para
+ * reaparecer en otro.
  *
  * CIERRE (~1s, eficiente): mismo vocabulario comprimido — sin ceremonia.
  * La carpeta baja HACIA la posición real de su banda (medida) mientras el
@@ -85,8 +89,10 @@ export function aperturaLugar(opts: {
   const ficha = q(lugar, "[data-exp-ficha]");
   const banda = q(lugar, "[data-exp-banda]");
   const tabsLaterales = lugar.querySelectorAll<HTMLElement>("[data-exp-tab-lateral]");
+  // Lo que recede SIN destino: las hojas de adentro y los papeles. El lomo,
+  // la tapa y la pestaña tienen el suyo (ver D y E) y no van acá.
   const partesCarpeta = li.querySelectorAll<HTMLElement>(
-    "[data-carpeta-back],[data-carpeta-front],[data-carpeta-tab],[data-carpeta-sliver],[data-carpeta-sliver2],[data-carpeta-papel]",
+    "[data-carpeta-sliver],[data-carpeta-sliver2],[data-carpeta-papel]",
   );
 
   /* — PRE-PAINT: el lugar monta invisible POR PIEZAS (cada una tiene su
@@ -208,6 +214,17 @@ export function aperturaLugar(opts: {
       { rotateY: -76, duration: 0.58, ease: "power2.inOut", transformOrigin: "0% 50%" },
       0.92,
     )
+    // …y termina de abrirse: pasa los 90° y el backface-visibility:hidden
+    // de la tapa deja de pintarla — una puerta que sale de cuadro. Antes
+    // se quedaba 400ms clavada a -76°, una franja navy sin destino, y se
+    // desvanecía bajando con el resto. El autoAlpha es red de seguridad
+    // por si algún motor pinta el reverso igual.
+    .to(
+      front,
+      { rotateY: -100, duration: 0.42, ease: "power2.in", transformOrigin: "0% 50%" },
+      1.5,
+    )
+    .set(front, { autoAlpha: 0 }, 1.92)
     .to(li, { x: 26, rotate: 0.6, duration: 0.58, ease: "power2.inOut" }, 0.92)
     .to(li, { rotate: 0, duration: 0.25, ease: "power2.out" }, 1.42)
     .to(
@@ -225,58 +242,118 @@ export function aperturaLugar(opts: {
   // Aterriza EN BLANCO y del tamaño exacto del artículo: de 2.2 a 2.6 esta
   // hoja y la real conviven en escena, y si no coinciden el relevo se ve
   // (era lo que se leía como turbio al abrir).
+  // Y EN PARALELO, LO MISMO PARA EL LOMO Y LA PESTAÑA. El lomo —lo que
+  // queda a la vista cuando la tapa se abre— crece hasta ser la carcasa
+  // del expediente, que es literalmente el interior de cartón de la
+  // carpeta; y la pestaña viaja hasta su lugar en esa carcasa. Antes la
+  // hoja era lo único que se transformaba: la tapa y la pestaña se
+  // desvanecían donde estaban y la carcasa aparecía con un fade en otro
+  // lado, con su pestaña del otro lado. Dos objetos empalmados, y el
+  // salto de la pestaña de izquierda a derecha delataba el corte.
   tl.add(() => {
     gsap.set(clip, { overflow: "visible" });
     const rSheet = sheet.getBoundingClientRect();
     const rHoja = hoja.getBoundingClientRect();
     const rotuloTapa = sheet.querySelectorAll<HTMLElement>(":scope > *");
-    registrar(
-      gsap
-        .timeline()
-        .to(
-          sheet,
-          {
-            x: `+=${rHoja.left - rSheet.left}`,
-            y: `+=${rHoja.top - rSheet.top}`,
-            width: rHoja.width,
-            // Alto EXACTO, sin tope. Con Math.min(…, 92vh) la plancha
-            // quedaba ~300px corta: no llegaba a cubrir el artículo y su
-            // borde y su sombra cruzaban la hoja a media altura, con el
-            // tercio de abajo del artículo ya asomando por debajo.
-            // Cubriéndolo entero el relevo es blanco sobre blanco de la
-            // misma medida — y del mismo papel, las dos llevan
-            // `renglones-papel`—, o sea invisible.
-            height: rHoja.height,
-            duration: 0.78,
-            ease: "power3.inOut",
-          },
-          0,
-        )
-        // El rótulo de tapa de la carpeta («EXPEDIENTE / CASO 01 / eje») se
-        // apaga en el primer tercio del vuelo: la hoja sale del cajón con
-        // lo que decía la carpeta y llega a la mesa en blanco, lista para
-        // escribirse. Si sobrevive al aterrizaje queda fantasmeado encima
-        // de la lámina y del contexto mientras la plancha se disuelve: dos
-        // contenidos distintos a media opacidad.
-        .to(rotuloTapa, { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 0)
-        // Deriva de rotación propia del gesto (propiedad aparte: no pelea
-        // con el tween de posición).
-        .to(sheet, { rotate: -2, duration: 0.32, ease: "power2.out" }, 0)
-        .to(sheet, { rotate: 0, duration: 0.38, ease: "power2.inOut" }, 0.34),
-    );
+    const rLomo = back.getBoundingClientRect();
+    const rCarcasa = shell.getBoundingClientRect();
+    const radioCarcasa = getComputedStyle(shell).borderTopLeftRadius;
+    const sombraLomo = q(li, "[data-carpeta-back-sombra]");
+    const faldon = q(li, "[data-carpeta-faldon]");
+    const pestanaLugar = q(lugar, "[data-exp-pestana]");
+    // Un solo vuelo para las tres piezas: llegan juntas.
+    const vuelo = { duration: 0.78, ease: "power3.inOut" };
+    const morph = gsap.timeline();
+    morph
+      .to(
+        sheet,
+        {
+          x: `+=${rHoja.left - rSheet.left}`,
+          y: `+=${rHoja.top - rSheet.top}`,
+          width: rHoja.width,
+          // Alto EXACTO, sin tope. Con Math.min(…, 92vh) la plancha
+          // quedaba ~300px corta: no llegaba a cubrir el artículo y su
+          // borde y su sombra cruzaban la hoja a media altura, con el
+          // tercio de abajo del artículo ya asomando por debajo.
+          // Cubriéndolo entero el relevo es blanco sobre blanco de la
+          // misma medida — y del mismo papel, las dos llevan
+          // `renglones-papel`—, o sea invisible.
+          height: rHoja.height,
+          ...vuelo,
+        },
+        0,
+      )
+      // El rótulo de tapa de la carpeta («EXPEDIENTE / CASO 01 / eje») se
+      // apaga en el primer tercio del vuelo: la hoja sale del cajón con
+      // lo que decía la carpeta y llega a la mesa en blanco, lista para
+      // escribirse. Si sobrevive al aterrizaje queda fantasmeado encima
+      // de la lámina y del contexto mientras la plancha se disuelve: dos
+      // contenidos distintos a media opacidad.
+      .to(rotuloTapa, { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 0)
+      // Deriva de rotación propia del gesto (propiedad aparte: no pelea
+      // con el tween de posición).
+      .to(sheet, { rotate: -2, duration: 0.32, ease: "power2.out" }, 0)
+      .to(sheet, { rotate: 0, duration: 0.38, ease: "power2.inOut" }, 0.34)
+      // El lomo se hace carcasa. La carcasa sigue mucho más allá del
+      // borde de abajo (mide ~2800px: es todo el expediente), así que con
+      // crecer hasta pasar el fold alcanza — lo que queda afuera no se
+      // ve. El radio va al de la carcasa, esquina por esquina (el lomo
+      // tiene las de abajo en cero y un shorthand mixto no interpola), y
+      // el giro que le dio la fase D vuelve a cero.
+      .to(
+        back,
+        {
+          x: `+=${rCarcasa.left - rLomo.left}`,
+          y: `+=${rCarcasa.top - rLomo.top}`,
+          width: rCarcasa.width,
+          height: window.innerHeight - rCarcasa.top + 80,
+          borderTopLeftRadius: radioCarcasa,
+          borderTopRightRadius: radioCarcasa,
+          borderBottomLeftRadius: radioCarcasa,
+          borderBottomRightRadius: radioCarcasa,
+          rotateY: 0,
+          ...vuelo,
+        },
+        0,
+      );
+    // El velo oscuro del lomo (el 22% de negro que lo hace leer como
+    // interior) se disuelve durante el vuelo: la carcasa es el color
+    // plano, y si el lomo aterriza más oscuro el relevo se ve.
+    if (sombraLomo) {
+      morph.to(sombraLomo, { autoAlpha: 0, duration: 0.5, ease: "power1.inOut" }, 0.1);
+    }
+    // El faldón colgaba del lomo para tapar las esquinas de la pila; acá
+    // asomaría por debajo de la carcasa.
+    if (faldon) morph.set(faldon, { autoAlpha: 0 }, 0);
+    // La pestaña viaja hasta la pestaña de la carcasa: mismo ancho, y el
+    // alto se ajusta en el camino (44 → 40).
+    if (tab && pestanaLugar) {
+      const rTab = tab.getBoundingClientRect();
+      const rPest = pestanaLugar.getBoundingClientRect();
+      morph.to(
+        tab,
+        {
+          x: `+=${rPest.left - rTab.left}`,
+          y: `+=${rPest.top - rTab.top}`,
+          height: rPest.height,
+          ...vuelo,
+        },
+        0,
+      );
+    }
+    registrar(morph);
   }, 1.68);
 
-  // F — la carpeta-objeto recede y el lugar se instala alrededor de la
-  // hoja: cartón, ficha, pestañas y banda, en cascada corta.
+  // F — lo que no tiene destino recede (las hojas de adentro y los
+  // papeles), y el lugar se instala: ficha, pestañas y banda, en cascada
+  // corta. La carcasa NO hace fade: se enciende de golpe debajo del lomo
+  // que acaba de aterrizar encima, igual que la hoja debajo de la plancha
+  // (ver abajo). Antes entraba con un fade de 2.05 a 2.45 en un lugar
+  // donde todavía no había nada: aparecía de la nada.
   tl.to(
     partesCarpeta,
     { autoAlpha: 0, y: "+=70", duration: 0.45, ease: "power2.in" },
     1.78,
-  ).fromTo(
-    shell,
-    { autoAlpha: 0 },
-    { autoAlpha: 1, duration: 0.4, ease: "power1.inOut" },
-    2.05,
   );
   // El artículo se enciende ENTERO y de una, escondido detrás de la plancha
   // blanca, que a esta altura ya aterrizó: misma posición, mismo tamaño,
@@ -285,8 +362,14 @@ export function aperturaLugar(opts: {
   // entraba a los 2.2, cuando el morph todavía se estaba acomodando y no lo
   // tapaba del todo: por los bordes el artículo asomaba a media opacidad
   // mientras la plancha terminaba de llegar.
-  tl.set(hoja, { autoAlpha: 1 }, 2.38);
-  tl.to(sheet, { autoAlpha: 0, duration: 0.22, ease: "power1.out" }, 2.42);
+  // La carcasa y la hoja se encienden juntas, a la vez y de una, con el
+  // lomo y la plancha ya aterrizados encima; después se disuelven los de
+  // arriba y quedan los de abajo, del mismo color y la misma medida. La
+  // pestaña de la carpeta se apaga al terminar su vuelo, sobre la de la
+  // carcasa, que ya está encendida desde 2.38 debajo de ella.
+  tl.set([shell, hoja], { autoAlpha: 1 }, 2.38);
+  tl.to([sheet, back], { autoAlpha: 0, duration: 0.22, ease: "power1.out" }, 2.42);
+  if (tab) tl.set(tab, { autoAlpha: 0 }, 2.46);
   if (ficha) {
     tl.to(ficha, { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" }, 2.1);
   }
@@ -295,7 +378,9 @@ export function aperturaLugar(opts: {
       tabsLaterales,
       { x: 24, autoAlpha: 0 },
       { x: 0, autoAlpha: 1, duration: 0.4, ease: "power2.out", stagger: 0.07 },
-      2.25,
+      // Después de que la carcasa se encienda (2.38): son hijas suyas, y
+      // lo que animen antes de eso ocurre a opacidad cero.
+      2.4,
     );
   }
   if (banda) {
