@@ -472,12 +472,22 @@ html {
    [data-footer-dock-tint="<color>"] y el :has() a nivel de página tiñe la
    muesca de ese mismo color: sin eso, en el encuentro aparecen dos triángulos
    blancos en las esquinas.
-     gris → cierres que flotan sobre gris-fondo (Novedades, Qué hacemos).
-     azul → páginas que terminan sobre la lámina navy (Quiénes somos): ahí el
-            footer también es navy, así que la muesca desaparece y el color
-            corre continuo hasta el pie. */
+     gris  → cierres que flotan sobre gris-fondo (Novedades, Qué hacemos):
+             la muesca toma el mismo gris y el redondeo se lee contra él.
+     medio → cierres que terminan en navy pero QUIEREN el redondeo visible
+             (Investigación). Gris ahí daría una cuña casi blanca contra el
+             navy; azul-medio es la «forma plana azul» que DESIGN.md §155
+             pide para los bloques de identidad, así que la esquina queda
+             marcada con color en vez de con un hueco.
+     azul  → páginas que terminan sobre la lámina navy y quieren el color
+             corrido hasta el pie (Quiénes somos): ahí la muesca desaparece
+             y con ella el redondeo. */
 body:has([data-footer-dock-tint="gris"]) [data-footer-dock] {
   background-color: var(--color-gris-fondo);
+}
+
+body:has([data-footer-dock-tint="medio"]) [data-footer-dock] {
+  background-color: var(--color-azul-medio);
 }
 
 body:has([data-footer-dock-tint="azul"]) [data-footer-dock] {

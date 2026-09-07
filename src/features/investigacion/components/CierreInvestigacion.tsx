@@ -214,7 +214,13 @@ export function CierreInvestigacion() {
   }, [reduced]);
 
   return (
-    <div ref={zonaRef} data-footer-dock-tint="azul">
+    // El tint del dock pinta la muesca de las esquinas redondeadas del
+    // footer. Va "medio" y no "azul": con azul la muesca se llenaba del
+    // mismo navy del cierre y el redondeo se perdía, y con gris quedaba una
+    // cuña casi blanca contra el navy. azul-medio es la forma plana azul
+    // que DESIGN.md §155 pide para los bloques de identidad: la esquina se
+    // marca con color, no con un hueco.
+    <div ref={zonaRef} data-footer-dock-tint="medio">
       <section
         ref={hojaRef}
         aria-label="Cierre e invitación a conversar"
