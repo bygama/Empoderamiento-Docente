@@ -16,13 +16,16 @@ if (typeof window !== "undefined") {
  * oculto desde el click, así EL LUGAR EMPIEZA A EXISTIR MIENTRAS LA
  * CARPETA VIAJA (rótulo y título display entran en paralelo al viaje;
  * nunca más una banda flotando en vacío gris). La física de la carpeta
- * (press → viaje → tapa que pivota → hoja que emerge y hace morph) es la
- * firma propia y se conserva.
+ * (press → viaje AL CENTRO → tapa que pivota → hoja que emerge y hace
+ * morph) es la firma propia y se conserva. El viaje se acomoda al centro
+ * porque la pila vive sangrada contra el borde derecho y el expediente es
+ * una pieza centrada: sacar la carpeta del cajón y ponerla sobre la mesa.
  *
  * CIERRE (~1s, eficiente): mismo vocabulario comprimido — sin ceremonia.
- * La carpeta baja HACIA la posición real de su banda (medida) mientras el
- * archivo se re-apila solapado; la pestaña de la banda pulsa el tinte al
- * final (sin movimiento: regla de motion).
+ * La carpeta vuelve HACIA la posición real de su banda (medida): cae y
+ * deriva al costado, la apertura al revés, mientras el archivo se re-apila
+ * solapado; la pestaña de la banda pulsa el tinte al final (sin
+ * movimiento: regla de motion).
  *
  * SWITCH (~1.3s): patrón de la referencia — la banda «SIGUIENTE
  * EXPEDIENTE» (que ya está en pantalla con su color) SUBE y se convierte
@@ -118,6 +121,15 @@ export function aperturaLugar(opts: {
   const rLi = li.getBoundingClientRect();
   const alturaEscenario = Math.min(vh * 0.52, 540);
   const yViaje = vh * 0.4 - rLi.top;
+  // La pila vive sangrada contra el borde derecho (es un cajón que sigue
+  // más allá del cuadro) pero el expediente es una pieza centrada. Así que
+  // al sacar la carpeta, además de bajar, se acomoda al centro: un solo
+  // gesto en vez de dos, y la carpeta centrada mide casi lo mismo que la
+  // carcasa, así que el morph de la hoja llega con poco salto lateral.
+  // clientWidth y no innerWidth: la barra de scroll todavía está ahí
+  // mientras dura la apertura. Abajo de md la pila no sangra y esto da ~0.
+  const xCentro =
+    (document.documentElement.clientWidth - rLi.width) / 2 - rLi.left;
 
   gsap.set(li, { height: li.offsetHeight, zIndex: 60 });
   gsap.set(front, { height: front.offsetHeight });
@@ -165,7 +177,7 @@ export function aperturaLugar(opts: {
   // C — el viaje… y EL LUGAR NACE EN PARALELO: rótulo primero, después el
   // título revelándose línea por línea. Cuando la tapa empiece a pivotar,
   // el lugar ya recibió a la carpeta.
-  tl.to(li, { y: yViaje, duration: 0.75, ease: "power3.inOut" }, 0.26)
+  tl.to(li, { x: xCentro, y: yViaje, duration: 0.75, ease: "power3.inOut" }, 0.26)
     .to(li, { rotate: -1.1, duration: 0.4, ease: "power2.out" }, 0.26)
     .to(li, { rotate: 0, duration: 0.35, ease: "power2.inOut" }, 0.66)
     .to(front, { height: alturaEscenario, duration: 0.75, ease: "power3.inOut" }, 0.26)
@@ -193,7 +205,10 @@ export function aperturaLugar(opts: {
       { rotateY: -76, duration: 0.58, ease: "power2.inOut", transformOrigin: "0% 50%" },
       0.92,
     )
-    .to(li, { x: 26, rotate: 0.6, duration: 0.58, ease: "power2.inOut" }, 0.92)
+    // El empujón lateral de la tapa al abrirse va SOBRE la posición
+    // centrada (xCentro + 26, no 26 pelado): si no, la carpeta se volvía a
+    // correr a la derecha justo cuando se abre.
+    .to(li, { x: xCentro + 26, rotate: 0.6, duration: 0.58, ease: "power2.inOut" }, 0.92)
     .to(li, { rotate: 0, duration: 0.25, ease: "power2.out" }, 1.42)
     .to(
       back,
@@ -316,12 +331,21 @@ export function transicionCierre(opts: {
   tl.add(() => {
     const rShell = shell.getBoundingClientRect();
     let deltaY = 110;
+    // …y deriva hacia el costado donde vive la pila: es la apertura al
+    // revés — sale al centro, vuelve al cajón—. Centro contra centro,
+    // porque la carcasa y la banda no miden lo mismo. Acotado como la
+    // caída: más que eso deja de leerse como guardar algo y parece que se
+    // va de viaje. Abajo de md la pila no sangra y da 0.
+    let deltaX = 0;
     if (liDestino) {
       const rLi = liDestino.getBoundingClientRect();
       deltaY = Math.max(40, Math.min(rLi.top - rShell.top, 220));
+      const centros = rLi.left + rLi.width / 2 - (rShell.left + rShell.width / 2);
+      deltaX = Math.max(-220, Math.min(centros, 220));
     }
     registrar(
       gsap.to(shell, {
+        x: `+=${deltaX}`,
         y: `+=${deltaY}`,
         scale: 0.96,
         rotate: -1.2,
