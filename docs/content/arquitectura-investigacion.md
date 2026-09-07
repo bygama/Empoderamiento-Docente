@@ -100,7 +100,10 @@ problematizar, interpretar, resignificar, producir evidencia, sistematizar).
 
 ### Copy visible
 
-- **Volanta:** Por qué investigamos
+- **Volanta:** ninguna. La página no lleva volantas: se sacaron todas el
+  2026-09-07 porque el «dash verde + rótulo en versalitas» repetido sección
+  tras sección le daba a la página un aire de plantilla generada. El H2
+  abre solo.
 - **H2 (SÍNTESIS):**
   > Nacimos de una **pregunta**.
 
@@ -108,13 +111,15 @@ problematizar, interpretar, resignificar, producir evidencia, sistematizar).
   repetir la historia: acá solo la alusión mínima que permite el doc
   maestro §26.)
 
-- **Apertura (SÍNTESIS, ~62 palabras):**
+- **Apertura (SÍNTESIS, ~38 palabras):**
   > Empoderamiento Docente nació de una pregunta: ¿qué sucede cuando las y
   > los docentes transforman su relación con el saber matemático escolar y
-  > reconocen su capacidad de intervenir en la realidad? Esa pregunta
-  > creció mediante investigación, trabajo con comunidades docentes e
-  > intervenciones sostenidas. Hoy sigue orientando una forma de actuar en
-  > la que conocer y transformar son parte del mismo proceso.
+  > reconocen su capacidad de intervenir en la realidad? Esa pregunta sigue
+  > orientando todo lo que hacemos.
+
+  (Recortada de ~62 a ~38 palabras el 2026-09-07: la carta se lee de una
+  sola pasada, sin scroll propio, y con la versión larga el párrafo del
+  medio —la idea central, que es el que importa— llegaba tarde.)
 
 - **Idea central (cita destacada):**
   > No investigamos para observar la escuela desde afuera. Investigamos con
@@ -126,11 +131,24 @@ problematizar, interpretar, resignificar, producir evidencia, sistematizar).
 Las definiciones «web recomendadas» del doc maestro §17 son el **texto
 canónico** de estos conceptos en todo el sitio.
 
+En la card, ese texto canónico se sirve partido en sus dos mitades
+naturales —lo anterior a los dos puntos es la **definición** (un renglón,
+peso fuerte) y el resto es el **desarrollo** (chico y en gris)— y las colas
+se recortan para que las cuatro cards pesen parecido: 29 / 29 / 28 / 28
+palabras. Sin eso, la card C sacaba una fila entera de ventaja a las otras
+y la grilla quedaba despareja. El recorte de cada una está abajo, junto a
+su texto canónico.
+
 **A. Socioepistemología**
 > Una mirada que comprende el conocimiento matemático como una construcción
 > social: estudia cómo adquiere sentido en contextos, usos, decisiones e
 > interacciones concretas, en lugar de separarlo de las personas y de sus
 > prácticas.
+
+*En la card (7 + 22):* «El conocimiento matemático como una construcción
+social.» / «Estudia cómo adquiere sentido en contextos, usos, decisiones e
+interacciones concretas, en lugar de separarlo de las personas y de sus
+prácticas.»
 
 *Guardarraíl:* nunca «teoría compleja que demuestra que toda matemática es
 relativa» (incorrecto y simplificador).
@@ -140,6 +158,12 @@ relativa» (incorrecto y simplificador).
 > determinada manera, qué sentido tiene una tarea, qué estrategias
 > habilita, qué argumentos produce y cómo se relaciona con la vida de
 > quienes aprenden.
+
+*En la card (7 + 22):* «Revisar lo que suele darse por sentado.» / «Por qué
+se enseña un contenido así, qué sentido tiene una tarea y cómo se relaciona
+con la vida de quienes aprenden.» — se caen «qué estrategias habilita» y
+«qué argumentos produce», que son los dos ítems más redundantes de la
+enumeración.
 
 *Ampliado (VIDEOS, ejemplo concreto que pide el doc maestro §34):*
 > Antes de llevar una actividad al aula, la o el docente la vive: explora
@@ -152,17 +176,38 @@ relativa» (incorrecto y simplificador).
 > autonomía, cuestionan prácticas naturalizadas, toman decisiones con
 > fundamento y reconocen su capacidad de transformar desde el conocimiento.
 
+*En la card (5 + 23):* «Un proceso progresivo y colectivo.» / el texto
+canónico completo, sin recortar.
+
 *Aclaración obligatoria (visible, no escondida en el ampliado):*
 > No es poder sobre estudiantes ni sobre otras personas: es poder sobre la
 > propia práctica.
+
+> [!WARNING]
+> **Fuera de la card desde el 2026-09-07, por decisión del owner.** Cortaba
+> la lectura de la grilla y era el único texto de las cuatro cards que no
+> tenía par en las otras tres. Con esto la aclaración **no aparece en
+> ningún lado del sitio**: es la única vez que estaba escrita. Si más
+> adelante hay que reponerla, no vuelve a la card — busquémosle un lugar
+> propio donde no rompa la paridad (el ampliado del concepto, o la sección
+> de Qué hacemos que habla de empoderamiento).
 
 **D. Desarrollo del pensamiento matemático**
 > Construir una forma de analizar y actuar: buscar estrategias, formular
 > hipótesis, argumentar, anticipar, decidir y comprender información. Los
 > contenidos escolares funcionan como herramientas, no como un fin aislado.
 
+*En la card (6 + 22):* «Una forma de analizar y actuar.» / «Buscar
+estrategias, formular hipótesis, argumentar, anticipar y decidir. Los
+contenidos escolares funcionan como herramientas de ese trabajo, no como un
+fin aislado.»
+
 ### Perspectivas transversales (banda integrada al pie, no quinta card)
 
+> Género, inclusión, derechos humanos, ciudadanía y justicia social no son
+> un capítulo aparte: son criterios con los que investigamos.
+
+(Versión larga, la del doc maestro, que la posdata de la carta resume:)
 > Género, inclusión, derechos humanos, ciudadanía y justicia social
 > atraviesan nuestras preguntas, nuestros materiales y nuestras relaciones
 > educativas. No son un capítulo aparte: son criterios con los que
