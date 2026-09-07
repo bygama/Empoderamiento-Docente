@@ -315,6 +315,15 @@ Patrón **distinto** del abanico de cartas del home y de las cards de
 > íntegro. `#ciclo` es la sección; `#evidencia` es un ancla interna que
 > aterriza en la bisagra. La cinta y el CTA a Biblioteca quedan al pie.
 
+> **Decisión de diseño (07-09-2026):** la espiral doble pasa a ser una
+> **lámina que se dibuja sola**. La figura ocupa la hoja bajo una cámara de
+> dos encuadres (primer plano en la vuelta pedagógica, plano general desde
+> la bisagra), cada etapa se anota sobre su nodo al paso del personaje y el
+> remate aterriza en el nodo 01: tres movimientos y un pin de 3000 px en
+> vez de diez paradas y 7000. Las anotaciones usan versiones **breves** de
+> cada etapa (`estaciones.ts`, a validar) con una frase clave subrayada; la
+> versión estática (touch, reduced-motion) conserva el copy íntegro de §6-7.
+
 Foco: el **ciclo pedagógico** (cómo una experiencia se convierte en
 comprensión y transformación). El ciclo de evidencia va en la sección 5 —
 no mezclarlos.

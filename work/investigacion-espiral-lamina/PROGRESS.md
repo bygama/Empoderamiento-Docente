@@ -2,7 +2,7 @@
 
 ## In progress
 
-- Paso 6 del PLAN (registrar la decisión en el doc de contenido).
+- work-verify (DoD §6 del SPEC) y cierre.
 
 ## Dónde corre
 
@@ -106,6 +106,15 @@
   líneas; cero hex. Capturas `s8-*.png`. Commit: style(investigacion):
   jerarquizar y escalonar las anotaciones de la lámina.
 
+- **Paso 6 — registrar la decisión** (2026-09-07). Nota fechada 07-09-2026
+  (formato del doc) debajo de la del 04-09 en
+  `docs/content/arquitectura-investigacion.md` §6; los doc-comments de
+  `EspiralInvestigacion.tsx` y `coreografia-espiral.ts` ya describen la
+  escena nueva desde el paso 4. Aceptación: `grep -c "07-09-2026"` → 1 (el
+  PLAN decía "2026-09-07"; el doc fecha DD-MM-YYYY); en la coreografía la
+  única mención a «releva» es la del rincón narrador, que sí releva. Commit:
+  docs(investigacion): registrar la lámina anotada en el doc de contenido.
+
 ## Tried and failed
 
 - Anclar las anotaciones con `-translate-*` de Tailwind: GSAP reescribe el
@@ -124,7 +133,7 @@
 
 ## Next
 
-- Paso 6 del PLAN (docs) y después work-verify.
+- work-verify: DoD completa, review de cierre, handoff.
 
 ## Verification
 
