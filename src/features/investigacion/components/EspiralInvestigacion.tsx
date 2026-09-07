@@ -245,10 +245,13 @@ export function EspiralInvestigacion() {
 
   return (
     <section id="ciclo" aria-label="Ciclo de investigación aplicada y evidencia" className="bg-gris-fondo">
-      {/* ── La hoja 03: el escenario pinneado. */}
+      {/* ── La hoja 03: el escenario pinneado. La sombra es corta a propósito,
+          como la del hero: la sección solo deja 10px de canaleta (p-2.5) y la
+          de casos pinta su fondo encima, así que una sombra larga se ve
+          cortada al ras. */}
       <div ref={zonaRef} className="p-2.5">
         <div
-          className={`ring-azul-principal/10 bg-grain-light text-azul-principal relative isolate overflow-hidden rounded-xl bg-white shadow-[0_24px_60px_-30px_rgb(31_45_77/0.25)] ring-1 ${
+          className={`ring-azul-principal/10 bg-grain-light text-azul-principal relative isolate overflow-hidden rounded-xl bg-white shadow-[0_4px_12px_-8px_rgb(31_45_77/0.35)] ring-1 ${
             live ? "flex h-[calc(100svh-1.25rem)]" : "min-h-[calc(100svh-1.25rem)]"
           }`}
         >
