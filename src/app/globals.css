@@ -51,10 +51,17 @@ body {
   /* Patrón de puntos azulado (manual §6): azul-medio sólido — usado en el
      Hero y bloques con composición dots + círculo verde sobre fondo claro. */
   --pattern-dot-blue: rgb(74 111 165 / 0.9);
-  /* Cuánto se monta el footer sobre el cierre de Investigación (tint
-     "noche", ver abajo): el radio de sus esquinas en md+. El cierre reserva
-     esa misma franja de cielo bajo su piso. */
-  --footer-solapa: 2.5rem;
+  /* Radio de las esquinas superiores del footer: el footer lo consume para
+     su redondeo, y el tint "noche" (ver abajo) lo usa como solapa sobre el
+     cierre de Investigación, que reserva esa misma franja de cielo bajo su
+     piso. Un solo valor para que el redondeo y la solapa no se separen. */
+  --footer-radio: 1.5rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --footer-radio: 2.5rem;
+  }
 }
 
 /* Cursor nativo oculto cuando el cursor custom está activo (solo desktop). */
@@ -488,7 +495,7 @@ html {
              del faro y las nubes pasan por las esquinas y ningún color
              plano coincide (medio dejaba un parche azul; el navy del piso,
              un cuadrado más oscuro que el cielo iluminado). En vez de
-             teñir, el footer se monta --footer-solapa sobre el cierre con
+             teñir, el footer se monta --footer-radio sobre el cierre con
              la muesca transparente y el redondeo recorta la escena real.
              El cierre deja esa franja de cielo bajo su piso (ver
              CierreInvestigacion). */
@@ -502,7 +509,7 @@ body:has([data-footer-dock-tint="medio"]) [data-footer-dock] {
 
 body:has([data-footer-dock-tint="noche"]) [data-footer-dock] {
   background-color: transparent;
-  margin-top: calc(-1 * var(--footer-solapa));
+  margin-top: calc(-1 * var(--footer-radio));
 }
 
 /* === Qué hacemos — noche de faro ========================================== */
