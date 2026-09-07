@@ -4,10 +4,8 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Highlight } from "@/components/ui/Highlight";
-import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { CINTA } from "../data";
 import { ROTULO_MICRO } from "../casos/tintes";
 import {
   BISAGRA,
@@ -203,14 +201,11 @@ function Nota({ texto, live }: { texto: string; live: boolean }) {
  * archivo, sobre el mismo papel que el hero. Coreografía en
  * coreografia-espiral.ts.
  *
- * Afuera del pin: la cinta navy con producción real de ED y el CTA a
- * Biblioteca. `#evidencia` es un ancla interna que salta a la bisagra.
+ * `#evidencia` es un ancla interna que salta a la bisagra.
  * Touch / reduced-motion: las dos listas en flujo con la espiral formada.
  */
 export function EspiralInvestigacion() {
   const zonaRef = useRef<HTMLDivElement | null>(null);
-  const cintaRef = useRef<HTMLDivElement | null>(null);
-  const pieRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
 
@@ -247,24 +242,6 @@ export function EspiralInvestigacion() {
       restaurar();
     };
   }, [live]);
-
-  // La cinta corre mientras está a la vista (loop, no coreografía).
-  useIsomorphicLayoutEffect(() => {
-    const cinta = cintaRef.current;
-    const pie = pieRef.current;
-    if (!cinta || !pie || reduced) return;
-    const loop = gsap.to(cinta, { xPercent: -50, duration: 28, ease: "none", repeat: -1, paused: true });
-    const st = ScrollTrigger.create({
-      trigger: pie,
-      start: "top bottom",
-      end: "bottom top",
-      onToggle: (self) => (self.isActive ? loop.play() : loop.pause()),
-    });
-    return () => {
-      st.kill();
-      loop.kill();
-    };
-  }, [reduced]);
 
   return (
     <section id="ciclo" aria-label="Ciclo de investigación aplicada y evidencia" className="bg-gris-fondo">
@@ -365,35 +342,6 @@ export function EspiralInvestigacion() {
         </div>
       </div>
 
-      {/* ── Pie, fuera del pin: la cinta con producción real y el CTA. */}
-      <div ref={pieRef}>
-        <div className="bg-azul-principal mx-2.5 mt-2.5 overflow-hidden rounded-xl py-3.5" aria-label="Producción reciente">
-          <div ref={cintaRef} className="flex w-max gap-10 whitespace-nowrap will-change-transform">
-            {[0, 1].map((copia) => (
-              <div key={copia} aria-hidden={copia === 1 || undefined} className="flex gap-10">
-                {CINTA.map((item) => (
-                  <span
-                    key={item}
-                    className="text-azul-claro/90 flex items-center gap-10 font-mono text-[0.72rem] tracking-[0.16em] uppercase"
-                  >
-                    {item}
-                    <span className="bg-verde-concepto inline-block h-1.5 w-1.5 rounded-full" />
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between gap-6 px-6 pt-10 pb-14 md:px-12">
-          <p className="text-azul-principal/85 max-w-[46ch] text-[1rem] leading-[1.6]">
-            Lo que la espiral produce se publica: artículos, capítulos, libros y
-            materiales que vuelven al aula.
-          </p>
-          <ButtonSecondary href="/biblioteca" withArrow>
-            Conocé lo que publicamos
-          </ButtonSecondary>
-        </div>
-      </div>
     </section>
   );
 }
