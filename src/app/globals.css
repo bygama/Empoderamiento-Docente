@@ -489,15 +489,15 @@ html {
              somos). Sin teñir, la muesca deja dos triángulos blancos en el
              encuentro; teñida de ese navy desaparece, y con ella el
              redondeo del footer. azul-medio es la «forma plana azul» que
-             DESIGN.md §155 pide para los bloques de identidad: la esquina
+             DESIGN.md §6 pide para los bloques de identidad: la esquina
              queda marcada con color en vez de con un hueco.
-     noche → el cierre de Investigación termina en una escena viva: el haz
-             del faro y las nubes pasan por las esquinas y ningún color
-             plano coincide (medio dejaba un parche azul; el navy del piso,
-             un cuadrado más oscuro que el cielo iluminado). En vez de
-             teñir, el footer se monta --footer-radio sobre el cierre con
-             la muesca transparente y el redondeo recorta la escena real.
-             El cierre deja esa franja de cielo bajo su piso (ver
+     noche → el cierre de Investigación termina en el cielo de la noche:
+             un degradé con grano que ningún color plano iguala (medio
+             dejaba un parche azul; el navy del piso, un cuadrado más
+             oscuro que el cielo a su alrededor). En vez de teñir, el
+             footer se monta --footer-radio sobre el cierre con la muesca
+             transparente y el redondeo recorta ese cielo real. El cierre
+             deja esa franja de cielo bajo su piso (ver
              CierreInvestigacion). */
 body:has([data-footer-dock-tint="gris"]) [data-footer-dock] {
   background-color: var(--color-gris-fondo);

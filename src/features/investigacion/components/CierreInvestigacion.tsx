@@ -215,8 +215,9 @@ export function CierreInvestigacion() {
 
   return (
     // Con el tint "noche" el footer se monta --footer-radio sobre esta
-    // sección con la muesca transparente: el redondeo recorta la escena
-    // real (haz, nubes, grano), que ningún color plano iguala. Por eso la
+    // sección con la muesca transparente: el redondeo recorta el cielo
+    // real (el final del degradé, con su grano), que ningún color plano
+    // iguala. Por eso la
     // sección deja esa franja de cielo bajo el piso (pb) y el faro y la
     // palabra se plantan sobre el piso, no sobre el borde de la caja.
     <div ref={zonaRef} data-footer-dock-tint="noche">
