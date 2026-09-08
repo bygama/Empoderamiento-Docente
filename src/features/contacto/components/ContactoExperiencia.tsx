@@ -766,7 +766,7 @@ export function ContactoExperiencia() {
                           className="h-8 w-8 rounded-full border-2 border-white object-cover"
                         />
                       ))}
-                      <span className="bg-azul-principal flex h-8 w-8 items-center justify-center rounded-full border-2 border-white font-mono text-[0.6rem] font-medium text-white">
+                      <span className="bg-azul-principal flex h-8 w-8 items-center justify-center rounded-full border-2 border-white font-mono text-[0.66rem] font-medium text-white">
                         +{EQUIPO_RESTO}
                       </span>
                     </div>

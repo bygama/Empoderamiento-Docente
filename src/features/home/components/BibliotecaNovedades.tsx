@@ -119,7 +119,7 @@ export function BibliotecaNovedades() {
                       {/* Tile de archivo */}
                       <span className="bg-azul-claro/30 text-azul-medio relative flex h-16 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-xl">
                         <BookOpen size={22} />
-                        <span className="font-mono text-[0.6rem] font-medium tracking-[0.12em]">
+                        <span className="font-mono text-[0.66rem] font-medium tracking-[0.12em]">
                           {formato}
                         </span>
                       </span>
