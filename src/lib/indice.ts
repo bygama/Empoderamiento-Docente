@@ -34,6 +34,16 @@ export function irASeccion(id: string) {
   window.setTimeout(corregir, 1200);
 }
 
+/** Corta hasta un elemento; con `centrar`, lo deja al medio de la pantalla. */
+export function irAElemento(el: HTMLElement, centrar = false) {
+  const r = el.getBoundingClientRect();
+  const destino = Math.max(
+    0,
+    r.top + window.scrollY - (centrar ? (window.innerHeight - r.height) / 2 : 0),
+  );
+  saltarA(destino);
+}
+
 export function irArriba() {
   saltarA(0);
 }
