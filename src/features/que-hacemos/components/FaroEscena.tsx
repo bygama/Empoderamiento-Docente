@@ -23,7 +23,11 @@
  * vía color-mix; nada de amarillo (la luz es blanco→azul-claro); las
  * estrellas insinúan el grid de puntos §6 (alineadas a múltiplos de 44px)
  * pero escasas y atmosféricas, no un wallpaper. El faro es una representación
- * conceptual —arquitectónica, esbelta— no el isotipo del logo (manual §10).
+ * conceptual —arquitectónica, esbelta— no el isotipo del logo (manual §10),
+ * pero desde 2026-09-08 (decisión de ED) toma del isotipo su RITMO: dos
+ * franjas y dos ojos de buey apagados, alternados de arriba a abajo (ventana,
+ * franja, ventana, franja, puerta), para que el ojo lo reconozca como el
+ * mismo faro.
  * Todo determinista: SSR e hidratación idénticas.
  */
 
@@ -355,12 +359,13 @@ function CapaFaro() {
         {/* Sombra proyectada por la galería sobre el arranque del fuste. */}
         <polygon points={`${(950 - fuste(431)).toFixed(1)},431 ${(950 + fuste(431)).toFixed(1)},431 ${(950 + fuste(447)).toFixed(1)},447 ${(950 - fuste(447)).toFixed(1)},447`} fill="url(#qh2-sombra-gal)" />
         {/* Juntas de sillería, casi subliminales (aguantan el acercamiento) */}
-        {[452, 468, 484, 500, 540, 548, 588, 596].map((y) => (
+        {[452, 484, 516, 540, 580, 588].map((y) => (
           <line key={`j-${y}`} x1={950 - fuste(y)} y1={y} x2={950 + fuste(y)} y2={y} style={{ stroke: AZUL }} strokeOpacity="0.05" strokeWidth="1" />
         ))}
-        {/* Tres franjas azules: siguen la curva del fuste y llevan la misma
-            caída de luz lateral que el cuerpo (materialidad, no stickers). */}
-        {[[470, 482], [516, 528], [562, 574]].map(([y1, y2]) => (
+        {/* Dos franjas azules (como el isotipo): siguen la curva del fuste y
+            llevan la misma caída de luz lateral que el cuerpo (materialidad,
+            no stickers). */}
+        {[[490, 503], [553, 566]].map(([y1, y2]) => (
           <g key={`fr-${y1}`}>
             <polygon
               points={`${950 - fuste(y1)},${y1} ${950 + fuste(y1)},${y1} ${950 + fuste(y2)},${y2} ${950 - fuste(y2)},${y2}`}
@@ -368,6 +373,16 @@ function CapaFaro() {
             />
             <line x1={950 - fuste(y1)} y1={y1 + 0.5} x2={950 + fuste(y1)} y2={y1 + 0.5} stroke="white" strokeOpacity="0.1" strokeWidth="0.9" />
             <line x1={950 - fuste(y2)} y1={y2 - 0.4} x2={950 + fuste(y2)} y2={y2 - 0.4} stroke="black" strokeOpacity="0.1" strokeWidth="0.9" />
+          </g>
+        ))}
+        {/* Dos ojos de buey APAGADOS (como el isotipo): uno arriba de la
+            primera franja y otro entre las dos; con el mismo gradiente de las
+            franjas y un filo de luz arriba, para que sean del cuerpo. */}
+        {[468, 530].map((cy) => (
+          <g key={`ob-${cy}`}>
+            <circle cx="950" cy={cy} r="4.4" fill="url(#qh2-franja)" />
+            <path d={`M945.9,${cy - 0.7} A4.1,4.1 0 0 1 954.1,${cy - 0.7}`} fill="none" stroke="white" strokeOpacity="0.14" strokeWidth="0.9" />
+            <path d={`M945.9,${cy + 1} A4.1,4.1 0 0 0 954.1,${cy + 1}`} fill="none" stroke="black" strokeOpacity="0.12" strokeWidth="0.9" />
           </g>
         ))}
         {/* Puerta: marco + hoja con arco, dintel y umbral. */}

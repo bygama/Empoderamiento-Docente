@@ -156,8 +156,10 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
         fill="black"
         opacity="0.16"
       />
-      {/* Dos franjas azules que siguen la caída de luz lateral (como el original). */}
-      {[[486, 498], [540, 552]].map(([y1, y2]) => (
+      {/* Dos franjas azules a la altura del hero de Qué hacemos (ritmo del
+          isotipo: ventana, franja, ventana, franja, puerta). Siguen la caída
+          de luz lateral. */}
+      {[[490, 503], [553, 566]].map(([y1, y2]) => (
         <g key={`fr-${y1}`}>
           <polygon
             points={`${950 - fuste(y1)},${y1} ${950 + fuste(y1)},${y1} ${950 + fuste(y2)},${y2} ${950 - fuste(y2)},${y2}`}
@@ -165,6 +167,15 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
             opacity="0.85"
           />
           <line x1={950 - fuste(y1)} y1={y1 + 0.5} x2={950 + fuste(y1)} y2={y1 + 0.5} stroke="white" strokeOpacity="0.1" strokeWidth="0.9" />
+        </g>
+      ))}
+
+      {/* Los dos ojos de buey APAGADOS, a la misma altura que en el hero. */}
+      {[468, 530].map((cy) => (
+        <g key={`ob-${cy}`}>
+          <circle cx="950" cy={cy} r="4.4" style={{ fill: AZUL }} opacity="0.85" />
+          <path d={`M945.9,${cy - 0.7} A4.1,4.1 0 0 1 954.1,${cy - 0.7}`} fill="none" stroke="white" strokeOpacity="0.14" strokeWidth="0.9" />
+          <path d={`M945.9,${cy + 1} A4.1,4.1 0 0 0 954.1,${cy + 1}`} fill="none" stroke="black" strokeOpacity="0.12" strokeWidth="0.9" />
         </g>
       ))}
 
