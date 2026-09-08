@@ -12,7 +12,9 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-  weight: ["400", "500"],
+  // 600 real para el activo del navbar: sin el archivo, el navegador
+  // sintetiza la negrita (mas gorda y borrosa que la de verdad).
+  weight: ["400", "500", "600"],
 });
 
 const manrope = Manrope({
@@ -26,7 +28,9 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-jetbrains-mono",
-  weight: ["400", "500"],
+  // 600 real para el activo del navbar: sin el archivo, el navegador
+  // sintetiza la negrita (mas gorda y borrosa que la de verdad).
+  weight: ["400", "500", "600"],
 });
 
 // Manuscrita — SOLO para anotaciones "a mano" dentro de los expedientes de
