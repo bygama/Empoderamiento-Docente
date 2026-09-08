@@ -16,6 +16,8 @@ import {
   Facebook,
 } from "@/components/ui/icons";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
+import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
+import { irASeccion } from "@/lib/indice";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { siteConfig } from "@/config/site";
 
@@ -53,6 +55,7 @@ export function MobileNav() {
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
   const pathname = usePathname();
+  const secciones = useSeccionesPagina();
 
   // true recién en cliente (post-hidratación): el portal a <body> se monta
   // solo entonces. Patrón canónico sin setState-en-efecto ni mismatch.
@@ -151,6 +154,13 @@ export function MobileNav() {
 
   const close = () => setOpen(false);
 
+  // Saltar a una sección de la página actual: cierra el menú y corta
+  // directo (ver irASeccion). La espera deja que el body suelte el lock.
+  const irA = (id: string) => {
+    close();
+    window.setTimeout(() => irASeccion(id), 60);
+  };
+
   return (
     <>
       <button
@@ -244,6 +254,31 @@ export function MobileNav() {
                   );
                 })}
               </ul>
+
+              {/* Secciones de la página actual: el atajo para no recorrer
+                  todas las escenas hasta llegar a la que se busca. En
+                  desktop esto es la columna de marcas del borde derecho
+                  (IndicePagina). */}
+              {secciones.length >= 2 && (
+                <div className="mt-8">
+                  <p className="text-gris-texto font-mono text-[0.68rem] font-medium tracking-[0.2em] uppercase">
+                    En esta página
+                  </p>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {secciones.map((s) => (
+                      <li key={s.id}>
+                        <button
+                          type="button"
+                          onClick={() => irA(s.id)}
+                          className="border-azul-principal/15 text-azul-principal hover:border-azul-principal inline-flex min-h-10 items-center rounded-full border px-3.5 font-sans text-[0.9rem] font-medium transition-colors"
+                        >
+                          {s.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </nav>
 
             {/* Acción focal (Contacto) + mail real. */}
