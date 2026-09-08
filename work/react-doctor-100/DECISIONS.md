@@ -129,3 +129,86 @@ IndicePagina (paso 14) y CarpetaCaso (paso 19), el paso 9 pasa a ser el código 
 la foto viajera del overlay (los aliados ya viven en `src/config/aliados.ts`), y aparece el
 paso 32 (píldoras de IndicePagina como botón). Los pasos `[batch]` que cruzan features se
 siguen commiteando por scope.
+
+## 2026-09-08 — El tope de 200 líneas aplica a lo creado y a lo que se parte
+
+Medido al ejecutar el paso 1: la lane toca 17 archivos de más de 200 líneas que no
+son splits planificados y donde el cambio es de una línea (un import, un hoist, una
+clase): `equipo.ts` (2483, datos), `casos/coreografia.ts` (710), `FaroEscena.tsx`
+(558), `profileParts.tsx` (453), `coreografia-cierre.ts` (418), `LineasAccion.tsx`
+(404), `MobileNav.tsx` (341), `CartaAbierta.tsx` (306), `HeroQuienes.tsx` (310),
+`NovedadDestacada.tsx` (310), `CaminoDeTrabajo.tsx` (295), `RotadorPalabras.tsx`
+(293), `LanzamientosRecientes.tsx` (279), `TransicionFaro.tsx` (238), `Footer.tsx`
+(230), `EnfoqueTransformacion.tsx` (224), `BibliotecaNovedades.tsx` (217). Decisión
+del owner: el tope aplica a los archivos que la lane crea y a los componentes que
+parte (con sus subcarpetas); los otros no crecen ni una línea pero no se parten acá
+(deuda aparte: datos, coreografías, SVG). La DoD §6.3 del SPEC se lee así.
+Descartadas: partir los 17 también; partir solo los componentes `.tsx`.
+Consecuencia inmediata: las preguntas del faro van a `preguntas-faro.ts` (47 líneas)
+y no a `que-hacemos/data.ts`, que habría pasado de 185 a 233.
+
+## 2026-09-08 — RedEd no está montado: evidencia con ruta temporal
+
+`RedEd` y `DistintoEd` no se renderizan en `/quienes-somos` (comentario en
+`src/app/quienes-somos/page.tsx`: página muy larga; los componentes quedan por si se
+reincorporan). El SSR idéntico y los PROBES de esa ruta no ejercitan el split del paso
+16. Decisión: la evidencia sale de una ruta temporal `src/app/probe-red/page.tsx` que
+monta `<RedEd />`, creada en este checkout y en el worktree rd-baseline, nunca
+commiteada y borrada al cerrar el paso; sobre ella corren `PROBE red-hover` y PROBES a
+cuatro fracciones contra los dos servers y se comparan entre sí (3002 = base).
+Descartadas: montar RedEd en la página (cambio de producto fuera de la lane); saltar la
+evidencia (el split reparte el árbol de efectos; sin probe no hay paridad). La misma
+regla vale para cualquier otro componente sin montar que la lane parta.
+
+## 2026-09-08 — Tope de 200 sobre la lista de archivos del PLAN
+
+Cuando la lista de piezas del PLAN no alcanza para dejar cada archivo bajo 200 líneas, se
+agrega un módulo más en la misma subcarpeta antes que recortar comentarios o dejar un
+archivo pasado. Casos: OrigenEd (coreografía en cuatro módulos, no dos), TeamProfileOverlay
+(`apertura-overlay.ts` aparte de `coreografia-overlay.ts`, y el teclado Escape + Tab en
+`useTecladoOverlay.ts` aunque el PLAN lo dejaba en el compositor hasta el paso 34: el paso 34
+lo borra igual al pasar a `<dialog>`). Descartadas: podar los comentarios (el porqué es parte
+del código en este repo); pasar el tope a 250 (DoD §6.3 fijada por el owner).
+
+## 2026-09-08 — Coreografías puras sobre un contexto, no fábricas con refs
+
+El lint del compilador de React (`react-hooks/refs`) rechaza pasar refs a una función
+que se llama durante el render («Cannot access refs during render»), aunque la función
+solo las guarde para después. Regla para los splits que quedan: las coreografías extraídas
+son funciones puras que reciben un objeto de contexto (elementos, estado mutable, setters)
+armado DENTRO del handler o del efecto que las llama; o bien hooks de verdad (`use*`, con
+sus propios useRef/useEffect), a los que sí se les pueden pasar refs. Nada de
+`crear<X>({ ref })` en el cuerpo del componente. Descartadas: nombrar `use*` a funciones que
+no usan hooks (la guía de React lo desaconseja); `eslint-disable` (fuera del SPEC).
+
+## 2026-09-08 — Los refs por tambor se crean en el callback-ref
+
+El paso 5 sembró `spanRefs`/`chipRefs` con `useRef(TAMBORES.map(() => []))` para sacar el
+vaciado en render (`no-ref-current-in-render`). Eso introdujo dos `rerender-lazy-ref-init`:
+el inicializador de `useRef` corre en CADA render aunque el valor se descarte. El paso 26 los
+cierra con el patrón que los aros ya usaban: ref inicializado en `[]` y la fila creada al
+vuelo en el callback-ref (`(spans.current[i] ??= [])[j] = el`). Nada se vacía en render y no
+se reconstruye una matriz por render. Descartadas: `useState(() => …)` (estado mutable que
+nadie lee para renderizar); `spans.current ??= …` en el cuerpo del componente (vuelve a
+escribir un ref durante el render).
+
+## 2026-09-08 — El hint en hover también sale del markup
+
+`PersonCard` tenía `group-hover:will-change-transform` / `group-focus-visible:…`: un hint
+acotado al hover, que react-doctor NO marca (no es permanente). Igual se saca: la aceptación
+del paso 28 pide que `will-change` no aparezca en ningún className ni style de JSX, y la
+transición que lo usaba es un `scale` de 600 ms sobre una `<img>` que el compositor ya
+maneja. Descartada: dejarlo por ser la forma CSS canónica de acotar el hint — deja una
+excepción en la regla que la próxima persona no puede distinguir de un descuido.
+
+## 2026-09-08 — Los borrados se commitean antes de medir con react-doctor
+
+`react-doctor` arma su lista de archivos con el índice de git, no con el disco: en el paso 34,
+con `useTecladoOverlay.ts` borrado pero sin commitear, el chequeo `dead-code` murió con
+`ENOENT` al intentar leerlo y la herramienta ESCONDIÓ el score entero («Results are
+incomplete»), dejando una salida que se parece mucho a «un solo hallazgo, todo bien». Regla
+de la lane: un paso que borra archivos se commitea ANTES de correr `RD` como aceptación, y
+una salida sin línea `Score:` no cuenta como medición — se abre con `--json` y se leen
+`projects[0].skippedChecks` / `skippedCheckReasons`, que la consola no imprime. Descartadas:
+correr `RD` sobre el worktree sucio y restar el hallazgo a ojo (mide otra cosa); `git stash`
+alrededor de la medición (esconde el paso que se está verificando).
