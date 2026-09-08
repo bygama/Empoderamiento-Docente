@@ -510,10 +510,22 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
   `scrollY` en 3502 con `#materiales` a 96px del viewport en LOS DOS servidores, sin
   navegar (`location.search` vacío). Commit `935efe1`.
 
+- **Paso 36 — documentación viva** (2026-09-08). `docs/AI_GUIDELINES.md` §11 suma la regla
+  que sostuvo los pasos 27-28: el `will-change` lo pone y lo saca la coreografía (dentro del
+  `gsap.context()`/`matchMedia`, que lo limpia en el revert; o `style.willChange` con su
+  limpieza explícita), nunca un `className` ni un `style` de JSX, porque ahí queda para
+  siempre y el navegador sostiene una capa por elemento. §2 suma la receta de los 17 splits:
+  tres o más piezas van a una subcarpeta en kebab-case con el compositor quieto en su ruta
+  (nadie actualiza imports), datos a `data.ts`, coreografía a `coreografia-<nombre>.ts`
+  llamada por el MISMO efecto y en la misma posición, y cada pedazo de markup a su archivo;
+  con dos piezas no se abre carpeta. El cheat sheet §18 suma la línea del `will-change`.
+  Aceptación: `grep -c "will-change" docs/AI_GUIDELINES.md` → 2 (≥ 1) y `grep -c
+  "subcarpeta" docs/AI_GUIDELINES.md` → 1 (≥ 1). Commit `PENDIENTE`.
+
 ## In progress
 
-- PLAN paso 36: las entradas de `docs/AI_GUIDELINES.md`. Después, el DoD completo
-  (work-verify §6) y los 4 seats de review.
+- PLAN terminado (36/36). Falta el DoD completo (work-verify, SPEC §6 + §0.1) y los 4 seats
+  de review; después work-handoff y el OK del owner para push y PR.
 
 ## Dónde corre
 

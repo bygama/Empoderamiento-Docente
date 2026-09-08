@@ -30,6 +30,26 @@ repite, repetirlo igual; si una decisión es estándar, no innovar.
 Si un archivo se acerca al límite, **partirlo antes** que después. Claude
 trabaja mejor cuando puede leer un archivo entero con contexto suficiente.
 
+**Cuando un componente se parte en tres o más piezas, las piezas van a una
+subcarpeta** con el nombre del componente en kebab-case, y el compositor se
+queda donde estaba (nadie tiene que actualizar sus imports):
+
+```
+components/
+├── TeamProfileOverlay.tsx        ← el compositor, en su ruta de siempre
+└── overlay/                      ← sus piezas
+    ├── usePortalModal.ts         ← el portal, el lock y el foco
+    ├── apertura-overlay.ts       ← la entrada
+    ├── coreografia-overlay.ts    ← tiempos, cierre y helpers
+    └── PerfilShell.tsx           ← un pedazo de markup
+```
+
+El reparto típico: los datos a `data.ts`, la coreografía a
+`coreografia-<nombre>.ts` (una función `crear<Nombre>(…)` que devuelve su
+limpieza y la llama el MISMO efecto de antes, en la misma posición), y cada
+pedazo de markup a su propio archivo. Dos piezas no justifican la carpeta:
+quedan al lado del compositor.
+
 ---
 
 ## 3. Naming
@@ -201,6 +221,17 @@ Comentar solo cuando:
   ```
 - Animar solo `transform` y `opacity`. Nunca `width`, `height`, `top`,
   `left`.
+- **El `will-change` es de la coreografía, no del markup.** Nunca en un
+  `className` ni en un `style` de JSX: ahí queda puesto para siempre y el
+  navegador mantiene una capa por elemento aunque no se anime nada. Lo pone
+  y lo saca quien anima:
+  ```ts
+  // Dentro del gsap.context() / matchMedia: el revert lo limpia solo.
+  gsap.set(capas, { willChange: "transform" });
+  ```
+  Si la animación no pasa por GSAP, `el.style.willChange = "transform"` al
+  empezar y `el.style.willChange = ""` en la limpieza — el hint dura lo que
+  dura el movimiento.
 
 ---
 
@@ -310,6 +341,7 @@ Cuando se sumen tests:
 - Tokens, no hardcodes.
 - Lenguaje inclusivo siempre.
 - Comentarios solo para el "por qué".
+- El `will-change` lo pone y lo saca la coreografía, nunca el markup.
 - Server por defecto, client cuando hace falta.
 - Commits atómicos con Conventional Commits.
 - Cualquier decisión que no se infiere del código va a un `.md`.
