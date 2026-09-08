@@ -21,7 +21,7 @@ export function FotoTambor({ tambor, y, refFoto }: Props) {
     <div
       ref={refFoto}
       aria-hidden="true"
-      className="absolute will-change-transform"
+      className="absolute"
       style={{ transform: `translate(-50%, -50%) translateY(${y}px)` }}
     >
       {/* Resplandor del acento detrás de la foto: da aire de color al

@@ -516,13 +516,13 @@ export function FaroEscena() {
       style={{ "--qh-origen": ORIGEN_CSS } as React.CSSProperties}
     >
       <div data-capa="cielo" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaCielo />
           <VelosAlba />
         </div>
       </div>
       <div data-capa="horizonte" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaHorizonte />
         </div>
       </div>
@@ -535,12 +535,12 @@ export function FaroEscena() {
           fijo mostraba su banda clara del horizonte flotando sobre el navy
           (se leía como una sombra celeste). El mundo entero baja junto. */}
       <div data-capa="faro" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaFaro />
         </div>
       </div>
       <div data-capa="marMedio" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaMarMedio />
         </div>
       </div>

@@ -65,6 +65,8 @@ export function EnfoqueTransformacion() {
 
     const ctx = gsap.context(() => {
       const nuevas = gsap.utils.toArray<HTMLElement>("[data-enf-nueva]");
+      // El hint viene con la coreografía del pin y se va con el contexto.
+      gsap.set(nuevas, { willChange: "transform" });
 
       // Estado inicial: la palabra está desparramada e invisible; se arma
       // cuando le toca.
@@ -161,7 +163,7 @@ export function EnfoqueTransformacion() {
                       <span
                         key={i}
                         data-enf-nueva
-                        className="font-display text-verde-concepto inline-block font-extrabold tracking-[-0.02em] will-change-transform"
+                        className="font-display text-verde-concepto inline-block font-extrabold tracking-[-0.02em]"
                         style={{
                           fontSize: "clamp(2.4rem, 0.6rem + 6.4vw, 5.6rem)",
                           lineHeight: 1,

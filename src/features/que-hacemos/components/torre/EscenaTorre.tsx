@@ -29,7 +29,7 @@ export function EscenaTorre({ geo, refs }: Props) {
           transformStyle: "preserve-3d",
         }}
       >
-        <div ref={tower} className="will-change-transform" style={{ transformStyle: "preserve-3d" }}>
+        <div ref={tower} style={{ transformStyle: "preserve-3d" }}>
           {TAMBORES.map((t, i) => (
             <FotoTambor
               key={"foto-" + t.id}

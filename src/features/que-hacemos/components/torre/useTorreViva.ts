@@ -77,6 +77,13 @@ export function useTorreViva(refs: RefsTorre) {
     // ticker para el latido y la deriva en reposo, que ya no existen — y
     // repintar siete tambores a 60 fps con el scroll quieto era CPU tirada.
     const ctx = gsap.context(() => {
+      // Quince capas con fotos de 30vmin: el hint entra con la escena (solo
+      // con `live`) y se va con el contexto. En la clase promovía la torre
+      // entera aunque la sección estuviera a tres pantallas de distancia.
+      gsap.set(
+        [towerRef.current, ...refs.drums.current, ...refs.fotos.current].filter(Boolean),
+        { willChange: "transform" },
+      );
       // El escenario se prende con la zona y se apaga SOLO al salir por
       // ARRIBA (progreso 0), donde el flash del faro tiene que quedar
       // despejado. Por ABAJO se queda prendido: al terminar la zona el

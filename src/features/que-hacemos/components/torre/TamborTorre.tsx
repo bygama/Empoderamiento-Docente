@@ -26,7 +26,7 @@ export function TamborTorre({ tambor, i, geo, g, refDrum, refAro, refChip, refSp
   return (
     <div
       ref={refDrum}
-      className="absolute will-change-transform"
+      className="absolute"
       style={{
         transformStyle: "preserve-3d",
         transform: `translate(-50%, -50%) translateY(${i * geo.sp}px)`,

@@ -145,7 +145,7 @@ export function QueHacemosHero() {
       <CieloPolvo />
 
       <div
-        className="relative z-10 mx-auto flex w-full max-w-screen-xl flex-col items-center px-5 text-center will-change-transform md:px-10"
+        className="relative z-10 mx-auto flex w-full max-w-screen-xl flex-col items-center px-5 text-center md:px-10"
         style={{
           // Sigue al mouse y ADEMÁS se inclina apenas hacia él (mira al
           // cursor) — mismos signos que useTilt: rotateY con x, rotateX

@@ -29,6 +29,9 @@ export function crearCoreografiaFaro(root: HTMLElement, alto: HTMLElement) {
     // Promoción a GPU solo mientras la coreografía existe (el fallback
     // estático no paga las texturas de 6 capas full-viewport).
     gsap.set(camara.capas.map((c) => c.el), { willChange: "transform" });
+    // Y las cuatro capas de la llegada ([data-faro-shift]), que sube y frena
+    // en el tramo del hero: mismo dueño, misma vida (mm.revert las limpia).
+    gsap.set(root.querySelectorAll("[data-faro-shift]"), { willChange: "transform" });
 
     // El CTA del cierre es alcanzable solo cuando la coreografía corre
     // (en el fallback el bloque está invisible: inert lo saca del foco).

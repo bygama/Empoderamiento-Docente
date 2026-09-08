@@ -51,6 +51,9 @@ export function CaminoDeTrabajo() {
     if (!zone || !stage || !track) return;
 
     const ctx = gsap.context(() => {
+      // La capa más grande de la app (siete anchos de pantalla): el hint solo
+      // mientras la escena existe, y se va con el contexto.
+      gsap.set(track, { willChange: "transform" });
       const fotos = gsap.utils.toArray<HTMLElement>("[data-cam-foto]");
       const n = PASOS_TRABAJO.length;
 
@@ -203,7 +206,7 @@ export function CaminoDeTrabajo() {
           {live ? (
             /* ── El tren horizontal ─────────────────────────────────────── */
             <div className="relative min-h-0 flex-1">
-              <div ref={trackRef} className="flex h-full w-max will-change-transform">
+              <div ref={trackRef} className="flex h-full w-max">
                 {PASOS_TRABAJO.map((paso) => (
                   <article
                     key={paso.n}
