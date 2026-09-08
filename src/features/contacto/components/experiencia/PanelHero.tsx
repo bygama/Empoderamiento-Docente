@@ -23,7 +23,7 @@ export function PanelHero({ activo }: { activo: boolean }) {
           <span className="sr-only">{TITULO}</span>
           <span data-hero-titulo aria-hidden="true" className="inline-block whitespace-nowrap">
             {TITULO.split("").map((c, i) => (
-              <span key={i} data-hero-char className="inline-block opacity-0 will-change-transform">
+              <span key={i} data-hero-char className="inline-block opacity-0">
                 {c}
               </span>
             ))}
