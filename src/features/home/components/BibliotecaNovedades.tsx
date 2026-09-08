@@ -99,7 +99,7 @@ export function BibliotecaNovedades() {
                 >
                   Biblioteca
                 </h3>
-                <span className="text-azul-principal group-hover:text-naranja-accion transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
+                <span className="text-azul-principal group-hover:text-naranja-accion transition-[color,transform] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
                   <ArrowUpRight size={28} strokeWidth={2} />
                 </span>
               </Link>
@@ -164,7 +164,7 @@ export function BibliotecaNovedades() {
                 >
                   Novedades
                 </h3>
-                <span className="text-azul-principal group-hover:text-naranja-accion transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
+                <span className="text-azul-principal group-hover:text-naranja-accion transition-[color,transform] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
                   <ArrowUpRight size={28} strokeWidth={2} />
                 </span>
               </Link>

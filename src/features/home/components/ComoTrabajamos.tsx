@@ -76,7 +76,7 @@ export function ComoTrabajamos() {
               href="/que-hacemos"
               className="group focus-visible:outline-naranja-accion inline-flex items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4"
             >
-              <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-all duration-500 group-hover:text-white">
+              <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
                 <ArrowRight
                   size={17}
                   className="transition-transform duration-300 group-hover:translate-x-0.5"
