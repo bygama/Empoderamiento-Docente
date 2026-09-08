@@ -12,7 +12,7 @@ import { irArriba, irASeccion } from "@/lib/indice";
  * las escenas animadas que hay antes, y de volver arriba sin desandarlas.
  *
  * Desktop (lg+): una columna de marquitas finas pegada al borde derecho, a
- * media altura. Cada marca es una sección (más «Arriba»); la activa es más
+ * media altura. Cada marca es una sección (más «Portada»); la activa es más
  * larga. Las marcas van en blanco con `mix-blend-difference`: sobre claro se
  * ven oscuras y sobre navy claras, sin elegir color a mano por sección. Ojo:
  * el blend tiene que estar en el propio elemento fijo (un fijo es su propio
@@ -105,7 +105,7 @@ export function IndicePagina() {
       setMostrarSubir(!bloqueado && y > vh * 1.5);
 
       // Activa: la última sección cuyo borde superior ya pasó el 40% de la
-      // pantalla. Antes de la primera no hay ninguna (queda «Arriba»).
+      // pantalla. Antes de la primera no hay ninguna (queda «Portada»).
       let actual: string | null = null;
       for (const s of secciones) {
         const el = document.getElementById(s.id);
@@ -174,8 +174,9 @@ export function IndicePagina() {
 
   if (secciones.length < 2) return null;
 
-  // «Arriba» siempre primero: no es una sección, es el tope de la página.
-  const items: Item[] = [{ id: null, label: "Arriba" }, ...secciones];
+  // «Portada» siempre primero: no es una sección, es el tope de la página
+  // (el hero). Se llama así y no «Arriba» ni «Inicio»: Inicio es la home.
+  const items: Item[] = [{ id: null, label: "Portada" }, ...secciones];
   const esActiva = (id: string | null) =>
     id === null ? activa === null : id === activa;
   const ir = (it: Item) => (it.id === null ? irArriba() : irASeccion(it.id));
