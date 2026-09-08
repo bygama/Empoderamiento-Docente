@@ -29,7 +29,7 @@ export function CampoCardsMobile() {
             transform: "translate(-50%, -50%)",
           }}
         >
-          <div data-mcard className="will-change-transform">
+          <div data-mcard>
             <div
               className="relative w-full overflow-hidden rounded-2xl shadow-[0_28px_70px_-28px_rgb(31_45_77_/_0.5)] ring-1 ring-white/40"
               style={{ aspectRatio: c.ar }}

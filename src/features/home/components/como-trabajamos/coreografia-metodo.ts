@@ -14,6 +14,9 @@ if (typeof window !== "undefined") {
 export function crearMetodo(el: HTMLElement) {
   const ctx = gsap.context(() => {
     const pasos = el.querySelectorAll<HTMLElement>("[data-paso]");
+    // El hint lo pone la coreografía (el filter es lo caro y lo que de verdad
+    // se anima por frame); antes iba en un style del JSX, permanente.
+    gsap.set(pasos, { willChange: "opacity, transform, filter" });
     const navDots = el.querySelectorAll<HTMLElement>("[data-nav-dot]");
     const glowBg = el.querySelector<HTMLElement>("[data-glow-bg]");
 

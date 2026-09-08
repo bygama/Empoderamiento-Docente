@@ -46,7 +46,7 @@ export function Hero() {
   // Parallax de mouse (fórmula de la referencia): --pnx/--pny en -1..1 desde el
   // centro; cada card los multiplica por su profundidad ([data-card-mouse]) y se
   // desplaza EN CONTRA del mouse. El RAF con lerp vive en el hook compartido.
-  useMouseParallax(ref, { x: "--pnx", y: "--pny", ease: 0.09, activo: !reduced });
+  useMouseParallax(ref, { x: "--pnx", y: "--pny", ease: 0.09, activo: !reduced, promover: "[data-card-mouse]" });
 
   return (
     <section

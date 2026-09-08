@@ -63,6 +63,9 @@ export function HeroQuienes() {
       const mision = panel.querySelector<HTMLElement>("[data-mision-layer]");
       const line = panel.querySelector<HTMLElement>("[data-wipe-line]");
       if (!about || !mision || !line) return;
+      // La línea se escribe en cada tick del scrub: el hint es suyo mientras
+      // la escena vive, no de la clase.
+      gsap.set(line, { willChange: "transform" });
 
       // Las dos capas pasan a SUPERPONERSE (en flow quedaban apiladas para reduced-motion).
       gsap.set([about, mision], { position: "absolute", top: 0, left: 0, width: "100%", height: "100%" });
@@ -259,7 +262,7 @@ export function HeroQuienes() {
             <span
               data-wipe-line
               aria-hidden="true"
-              className="bg-verde-concepto pointer-events-none absolute top-0 left-0 z-30 w-[3px] rounded-full opacity-0 shadow-[0_0_18px_rgba(31,154,120,0.55)] will-change-transform"
+              className="bg-verde-concepto pointer-events-none absolute top-0 left-0 z-30 w-[3px] rounded-full opacity-0 shadow-[0_0_18px_rgba(31,154,120,0.55)]"
             />
 
             {/* Indicador horizontal de progreso (Quiénes somos → Misión).

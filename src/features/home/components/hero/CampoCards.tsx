@@ -27,7 +27,6 @@ export function CampoCards() {
           >
             <div
               data-card-mouse
-              className="will-change-transform"
               style={{ transform: `translate(calc(var(--pnx, 0) * ${depth}px), calc(var(--pny, 0) * ${depth}px))` }}
             >
               <div data-card-inner className="relative">

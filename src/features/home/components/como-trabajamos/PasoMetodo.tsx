@@ -13,7 +13,6 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
     <div
       data-paso={idx}
       className="absolute inset-0 flex items-center"
-      style={{ willChange: "opacity, transform, filter" }}
     >
       <div className="mx-auto grid w-full max-w-screen-xl grid-cols-12 items-center gap-x-6 px-5 md:gap-x-8 md:px-10">
 
