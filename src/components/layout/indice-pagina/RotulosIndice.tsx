@@ -25,6 +25,13 @@ type Props = {
  * el nav del header: se opera con el mouse, y quien va por teclado usa ese
  * nav. Las tres primeras clases resetean lo que el agente le pone a un botón
  * (borde, fondo y alineación) para que se vea igual que el span de antes.
+ *
+ * El `onMouseDown` que cancela el default NO es decoración: `tabIndex={-1}`
+ * saca al botón del tabulador pero NO del foco por clic, y un descendiente
+ * enfocado hace que Chrome IGNORE el `aria-hidden` del contenedor y exponga
+ * todo el índice —justo lo que este bloque evita— además de dejar el foco en
+ * un control sin contexto. Cancelando el mousedown el clic sigue disparando y
+ * el foco no se mueve.
  */
 export function RotulosIndice({
   items,
@@ -55,6 +62,7 @@ export function RotulosIndice({
               type="button"
               tabIndex={-1}
               ref={refPildora(i)}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => onIr(i, it)}
               className={`cursor-pointer appearance-none rounded-full border-0 bg-transparent px-2.5 py-1 text-left font-mono text-[0.62rem] tracking-[0.2em] whitespace-nowrap uppercase shadow-[0_6px_18px_-10px_rgb(31_45_77/0.45)] ring-1 backdrop-blur transition-colors duration-200 ${
                 interactivo && cerca === i
