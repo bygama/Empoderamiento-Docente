@@ -598,3 +598,74 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 
 <!-- Solo evidencia PASS, la escribe work-verify (lo más nuevo arriba). El cierre no
      cierra la lane sin un bloque PASS vigente acá. -->
+
+### 2026-09-08 — DoD del SPEC §6, capas estáticas y de comportamiento: PASS (falta la review)
+
+- **§6.1 react-doctor**: `pnpm dlx react-doctor --no-supply-chain src` → **`Score: 100 / 100`**
+  y «No issues found!». En `--json`: `summary.score` 100, `totalDiagnosticCount` 0,
+  `errorCount` 0, `warningCount` 0, `projects[0].skippedChecks` `[]`, `complete: true`,
+  278 archivos analizados.
+- **§6.2 gates**: `pnpm typecheck` exit 0; `pnpm lint` exit 0; `pnpm build` exit 0 (12 rutas
+  prerenderizadas). El build limpia `.next`: los run files de Playwright se respaldan antes.
+- **§6.3 tamaño**: los 138 archivos que la lane CREA en `src/` están todos ≤ 200 líneas.
+  El comando literal del SPEC (`main...HEAD`) mide contra `main` y arrastra los 223 archivos
+  que también tocó gar; contra la base real de la lane (`112de56`) son 194. **Abierto**: 17
+  archivos modificados que la lane NO parte crecieron entre 2 y 11 líneas (comentarios del
+  porqué y traslados de will-change), y 22 modificados superan las 200 líneas desde antes de
+  la lane. Ver la pregunta al owner abajo.
+- **§6.4 extensiones**: `git diff --name-only --diff-filter=A main...HEAD -- src | grep -E
+  '.jsx?
+` → 0 líneas.
+- **§6.5 supresiones**: `grep -rn "react-doctor-disable|no-img-element" src` → 0; no hay
+  `doctor.config.*`; `package.json` sin clave `reactDoctor`.
+- **§6.6 hex**: `#[0-9a-fA-F]{6}` → 69 en HEAD y 69 en `main` (no sube).
+- **§6.7 paridad SSR de fase 1**: registrada paso por paso arriba (cada split con su `cmp`
+  contra el baseline).
+- **§6.8 texto visible**: `textContent` del `<body>` SSR (sin scripts ni estilos) de las 8
+  rutas **idéntico** al baseline: biblioteca 6659, contacto 1649, home 5847, investigación
+  8497, novedades 3738, libro 2399, que-hacemos 4937, quiénes-somos 5195 caracteres.
+- **§6.9 interacciones** (Playwright, lane 3000 contra base 3002 donde aplica):
+  `PROBE menu-mobile` → `ok: true`; `PROBE perfil-dialog` inmersivo y shell → `ok: true`;
+  `PROBE casos` → `ok: true` (abrir, cambiar, Escape, Back y deep link); `PROBE buscador`
+  → `ok: true`; `PROBE menu-abierto` → `ok: true` (las 6 cajas del panel abierto iguales a
+  la base al centésimo).
+- **§6.10 capturas y probes de fase 2**: 168 capturas pareadas `<ruta>-<estado>-<antes|
+  despues>.png` (`capturas/` 96 a 1536×850, `capturas-m/` 64 a 390×844, `capturas-int/` 8
+  de los estados por interacción); «antes» = servidor de la base (3002), «después» = lane
+  (3000), los dos medidos hoy con el mismo protocolo. Probes numéricos: **desktop 48/48 sin
+  diferencias** (exit 0); **mobile 32/32 con una sola clase de diferencia**, las 192 entradas
+  de `data-mnav-item`/`data-mnav-cta` que pasan a caja `0,0,0,0` porque un `<dialog>`
+  CERRADO no se maqueta y el `<div>` anterior sí (invisible pero ocupando); `PROBE
+  menu-abierto` cubre el estado que importa.
+- **§6.11 feature_list.json**: 37/37 filas en `passing`, cada una con su evidencia y su
+  commit.
+- **§6.12 documentación**: `grep -c "will-change" docs/AI_GUIDELINES.md` → 2;
+  `grep -c "subcarpeta"` → 1.
+- **§6.13 review de 4 seats**: PENDIENTE.
+
+### Dos cosas que el cierre encontró y arregló
+
+1. **El panel mobile abierto medía mal desde el paso 33** (`fix(layout)` `575382f`): el
+   `<dialog>` quedó con `inset-0` pero sin tamaño propio y el user agent le da
+   `width`/`height: fit-content`; los ítems medían 321px en vez de 342 y estaban 59px más
+   arriba. Lo encontró `PROBE menu-abierto`, no el ojo: el probe de §6.9a solo miraba
+   display, opacidad, foco y Tab. Mismo bug que el del overlay del equipo (paso 34).
+2. **`data-haz` no es determinista**: `que-hacemos-0.8` marcaba el segundo `[data-haz]`
+   (el haz `der`, con `opacity: 0` y `visibility: hidden` en las dos puntas) con la
+   rotación corrida. Contrastado contra el servidor de la base HOY: la base da
+   `0.94,0.34` y la lane `0.94,0.35`, y **la base contra SÍ MISMA en dos pasadas también
+   difiere** (`191.4` vs `191.88` de traslación) por encima de la tolerancia. Es ruido del
+   elemento, no de la lane: entra a `PROBE_IGNORE` junto con `data-svg-origin` (el mismo
+   nodo), documentado con esa evidencia.
+
+### Pregunta abierta para el owner (no la resuelve el agente)
+
+El PLAN dice «ningún archivo tocado o creado en `src/` supera las 200 líneas». Los creados
+cumplen (138/138). Los **tocados y no partidos** no: 22 ya superaban las 200 antes de la
+lane (hasta `equipo.ts` con 2483) y 17 crecieron un poco con este trabajo (entre 2 y 11
+líneas: comentarios del porqué que el repo pide y los traslados de will-change). Cumplir la
+letra obligaría a partir ~22 archivos que react-doctor no marca y que el PLAN nunca listó.
+Las opciones son: (a) leer el tope como lo que la lane ejecutó —vale para lo que crea y para
+lo que parte— y anotarlo en DECISIONS; (b) recortar los 17 a su cuenta original sacando
+comentarios; (c) abrir una lane nueva para partir esos 22. Recomendación: (a), y (c) como
+lane aparte si el tope se quiere universal.

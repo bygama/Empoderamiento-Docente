@@ -1,39 +1,261 @@
 [
-  { "id": "F01", "behavior": "only-export-components = 0: geometrías y tiempos en módulos .ts, importadores actualizados (PLAN 1)", "verification": "RD src only-export-components → 0; SSR /investigacion /que-hacemos /quienes-somos idéntico", "state": "not_started", "evidence": null },
-  { "id": "F02", "behavior": "prefer-module-scope-pure-function y -static-value = 0: los 8 hoists (PLAN 2)", "verification": "RD src prefer-module-scope-pure-function prefer-module-scope-static-value → 0; SSR de las 8 rutas idéntico", "state": "not_started", "evidence": null },
-  { "id": "F03", "behavior": "no-array-index-as-key y js-combine-iterations = 0 (PLAN 3)", "verification": "RD src no-array-index-as-key js-combine-iterations → 0; SSR /novedades/libro-socioepistemologia /quienes-somos idéntico", "state": "not_started", "evidence": null },
-  { "id": "F04", "behavior": "no-unguarded-browser-global-in-render-or-hook-init = 0 vía src/lib/viewport.ts y guard SSR en FichaNovedad (PLAN 4)", "verification": "RD src no-unguarded-browser-global-in-render-or-hook-init → 0; SSR /biblioteca /quienes-somos /novedades/libro-socioepistemologia idéntico; PROBES /biblioteca /quienes-somos", "state": "not_started", "evidence": null },
-  { "id": "F05", "behavior": "no-ref-current-in-render = 0: TorreLineas sin reseteos en render (PLAN 5)", "verification": "RD src/features/que-hacemos no-ref-current-in-render → 0; SSR /que-hacemos idéntico; PROBES /que-hacemos", "state": "not_started", "evidence": null },
-  { "id": "F06", "behavior": "prefer-use-effect-event = 0: CasosInvestigacion con useEffectEvent y la interacción intacta (PLAN 6)", "verification": "RD src/features/investigacion prefer-use-effect-event → 0; SSR /investigacion idéntico; PROBE casos-interaccion → true", "state": "not_started", "evidence": null },
-  { "id": "F07", "behavior": "useMouseParallax compartido por Hero y QueHacemosHero (PLAN 7)", "verification": "GATES; SSR / y /que-hacemos idéntico; PROBE hero-mouse, qh-mouse → true", "state": "not_started", "evidence": null },
-  { "id": "F08", "behavior": "acoplarLamina compartido por RedEd, MiradaEd y OrigenEd (PLAN 8)", "verification": "GATES; SSR /quienes-somos idéntico; PROBES /quienes-somos", "state": "not_started", "evidence": null },
-  { "id": "F09", "behavior": "TeamProfileOverlay sin el camino muerto de recorte ni cutoutCrop; foto viajera como div sin <img> (PLAN 9)", "verification": "RD src no-broken-image-source → 0; grep -c cutoutCrop src → 0; SSR /quienes-somos idéntico; PROBE perfil-inmersivo, perfil-shell → true", "state": "not_started", "evidence": null },
-  { "id": "F10", "behavior": "Split ComoTrabajamos ≤ 200 líneas por archivo, escena intacta (PLAN 10)", "verification": "RD src/features/home no-giant-component sin ComoTrabajamos; wc -l ≤ 200; SSR / idéntico; PROBES /", "state": "not_started", "evidence": null },
-  { "id": "F11", "behavior": "Split Hero (PLAN 11)", "verification": "RD src/features/home no-giant-component sin Hero; wc -l ≤ 200; SSR / idéntico; PROBES / desktop y mobile", "state": "not_started", "evidence": null },
-  { "id": "F12", "behavior": "Split QueHacemosHero (PLAN 12)", "verification": "RD src/features/que-hacemos no-giant-component sin QueHacemosHero; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos; PROBE qh-portal → true", "state": "not_started", "evidence": null },
-  { "id": "F13", "behavior": "Split NivelesEscala (PLAN 13)", "verification": "RD src/features/que-hacemos no-giant-component sin NivelesEscala; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos", "state": "not_started", "evidence": null },
-  { "id": "F14", "behavior": "Split IndicePagina con useImanIndice y BotonSubir (PLAN 14)", "verification": "RD src/components no-giant-component → 0; wc -l ≤ 200; SSR de las 8 rutas idéntico; PROBES /investigacion", "state": "not_started", "evidence": null },
-  { "id": "F15", "behavior": "Split DestacadosBiblioteca (PLAN 15)", "verification": "RD src/features/biblioteca no-giant-component → 0; wc -l ≤ 200; SSR /biblioteca idéntico; PROBES /biblioteca", "state": "not_started", "evidence": null },
-  { "id": "F16", "behavior": "Split RedEd (PLAN 16)", "verification": "RD src/features/quienes-somos no-giant-component sin RedEd; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos; PROBE red-hover → true", "state": "not_started", "evidence": null },
-  { "id": "F17", "behavior": "Split MiradaEd (PLAN 17)", "verification": "RD src/features/quienes-somos no-giant-component sin MiradaEd; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos", "state": "not_started", "evidence": null },
-  { "id": "F18", "behavior": "Split OrigenEd (PLAN 18)", "verification": "RD src/features/quienes-somos no-giant-component sin OrigenEd; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos", "state": "not_started", "evidence": null },
-  { "id": "F19", "behavior": "Split CarpetaCaso con TapaCarpeta; no-high-complexity en CarpetaCaso = 0 (PLAN 19)", "verification": "RD src/features/investigacion no-giant-component no-high-complexity-react-function sin CarpetaCaso; wc -l ≤ 200; SSR /investigacion idéntico; PROBES /investigacion", "state": "not_started", "evidence": null },
-  { "id": "F20", "behavior": "Split ExpedienteCaso (PLAN 20)", "verification": "RD src/features/investigacion no-giant-component sin ExpedienteCaso; wc -l ≤ 200; SSR /investigacion idéntico; PROBE caso-abierto → true", "state": "not_started", "evidence": null },
-  { "id": "F21", "behavior": "Split TeamProfileOverlay: usePortalModal, viaje-foto, coreografia-overlay, PerfilShell (PLAN 21)", "verification": "RD src/features/quienes-somos no-giant-component sin TeamProfileOverlay; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBE perfil-inmersivo, perfil-shell → true", "state": "not_started", "evidence": null },
-  { "id": "F22", "behavior": "Split ContactoExperiencia (PLAN 22)", "verification": "RD src/features/contacto no-giant-component → 0; wc -l ≤ 200; SSR /contacto idéntico; PROBE contacto-intro, contacto-tema → true", "state": "not_started", "evidence": null },
-  { "id": "F23", "behavior": "Split CasosInvestigacion por hooks (PLAN 23)", "verification": "RD src/features/investigacion no-giant-component sin CasosInvestigacion; wc -l ≤ 200; SSR /investigacion idéntico; PROBE casos-interaccion → true", "state": "not_started", "evidence": null },
-  { "id": "F24", "behavior": "Split QueHacemosHeroFaro con los tres contratos de regresión intactos (PLAN 24)", "verification": "RD src/features/que-hacemos no-giant-component sin QueHacemosHeroFaro; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos", "state": "not_started", "evidence": null },
-  { "id": "F25", "behavior": "Split ImmersiveProfile; no-high-complexity-react-function = 0 (PLAN 25)", "verification": "RD src/features/quienes-somos no-giant-component no-high-complexity-react-function → 0; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBE perfil-inmersivo → true; rama lineal con reduced-motion", "state": "not_started", "evidence": null },
-  { "id": "F26", "behavior": "Split TorreLineas con pintor como factory; no-giant-component = 0 en todo src (PLAN 26)", "verification": "RD src no-giant-component → 0; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos desktop y mobile", "state": "not_started", "evidence": null },
-  { "id": "F27", "behavior": "no-transition-all y no-scale-from-zero = 0, también por grep (PLAN 27)", "verification": "RD src no-transition-all no-scale-from-zero → 0; grep -rn transition-all src → 0; diff SSR limitado a tokens transition-*/scale-x-*", "state": "not_started", "evidence": null },
-  { "id": "F28", "behavior": "no-permanent-will-change = 0: quitados o en manos de la coreografía (PLAN 28)", "verification": "RD src no-permanent-will-change → 0; grep will-change solo en coreografía/hooks; diff SSR limitado a will-change; PROBES de las 8 rutas desktop y mobile; reduced-motion 390×844 → will-change auto en [data-faro-shift] y [data-capa]", "state": "not_started", "evidence": null },
-  { "id": "F29", "behavior": "Aliados con next/image en Footer y DatosDuros, dimensiones en src/config/aliados.ts (PLAN 29)", "verification": "RD src nextjs-no-img-element → 6; curl /_next/image de unesco.png → 200; capturas footer y datos duros", "state": "not_started", "evidence": null },
-  { "id": "F30", "behavior": "Perfil con next/image ×6 y cutoutSize en Profile; FLIP y viaje de la foto intactos (PLAN 30)", "verification": "RD src nextjs-no-img-element → 0; PROBE perfil-inmersivo, perfil-shell → true; probe FLIP (transform identidad, ancho > 0)", "state": "not_started", "evidence": null },
-  { "id": "F31", "behavior": "html-no-nested-interactive = 0: PaisDropdown con handlers en el li (PLAN 31)", "verification": "RD src/features/contacto html-no-nested-interactive → 0; PROBE pais-dropdown → true", "state": "not_started", "evidence": null },
-  { "id": "F32", "behavior": "click-events-have-key-events y no-static-element-interactions = 0: píldoras de IndicePagina como button (PLAN 32)", "verification": "RD src/components click-events-have-key-events no-static-element-interactions → 0; diff SSR limitado a las píldoras; PROBE indice-pildora → true", "state": "not_started", "evidence": null },
-  { "id": "F33", "behavior": "MobileNav como <dialog> con trampa de foco y salida animada (PLAN 33)", "verification": "RD src/components prefer-html-dialog → 0; PROBE menu-mobile → true; captura 390×844", "state": "not_started", "evidence": null },
-  { "id": "F34", "behavior": "TeamProfileOverlay como <dialog>, sin inert manual, FLIP, viaje y scroll intactos, índice lateral escondido (PLAN 34)", "verification": "RD src prefer-html-dialog → 0; PROBE perfil-inmersivo, perfil-shell → true ([inert] = 0, scrollY ±1); capturas", "state": "not_started", "evidence": null },
-  { "id": "F35", "behavior": "no-prevent-default = 0: buscador como div role=search con el mismo scroll (PLAN 35)", "verification": "RD src/features/biblioteca no-prevent-default → 0; PROBE buscador → true", "state": "not_started", "evidence": null },
-  { "id": "F36", "behavior": "docs/AI_GUIDELINES.md documenta las dos convenciones nuevas (PLAN 36)", "verification": "grep -c will-change docs/AI_GUIDELINES.md ≥ 1; grep -c subcarpeta docs/AI_GUIDELINES.md ≥ 1", "state": "not_started", "evidence": null },
-  { "id": "F37", "behavior": "Cierre: react-doctor 100/100 con 0 diagnósticos, typecheck, lint, build, sin supresiones, sin hex nuevos, texto visible intacto (SPEC §6 + §0.1)", "verification": "react-doctor --json src → totalDiagnosticCount 0 y score 100; pnpm typecheck && pnpm lint && pnpm build exit 0; grep react-doctor-disable|no-img-element src → 0; grep transition-all src → 0; hex(HEAD) ≤ hex(112de56); textContent SSR de las 8 rutas idéntico", "state": "not_started", "evidence": null }
+  {
+    "id": "F01",
+    "behavior": "only-export-components = 0: geometrías y tiempos en módulos .ts, importadores actualizados (PLAN 1)",
+    "verification": "RD src only-export-components → 0; SSR /investigacion /que-hacemos /quienes-somos idéntico",
+    "state": "passing",
+    "evidence": "PLAN 1 — pnpm typecheck → 0; pnpm lint → 6 problemas, los mismos de la base (5 errores de refs en render en TorreLineas, que arregla el paso 5, y el warning CENTRO de MiradaEd): sin problemas nuevos; RD src only-export-components → 0; SSR idéntico en /investigacion, /que-hacemos, /quienes-somos. Commits: acb3936, 9f6b022, 431bf93."
+  },
+  {
+    "id": "F02",
+    "behavior": "prefer-module-scope-pure-function y -static-value = 0: los 8 hoists (PLAN 2)",
+    "verification": "RD src prefer-module-scope-pure-function prefer-module-scope-static-value → 0; SSR de las 8 rutas idéntico",
+    "state": "passing",
+    "evidence": "PLAN 2 — typecheck → 0; lint → los 6 de la base; RD src prefer-module-scope-pure-function prefer-module-scope-static-value → 0 y 0; SSR idéntico en las 8 rutas. Commits 1b6191a, ffc9ce9, 6f261b4, e0897dd, f0b90ab (uno por scope). Commits: 1b6191a, ffc9ce9, 6f261b4, e0897dd, f0b90ab."
+  },
+  {
+    "id": "F03",
+    "behavior": "no-array-index-as-key y js-combine-iterations = 0 (PLAN 3)",
+    "verification": "RD src no-array-index-as-key js-combine-iterations → 0; SSR /novedades/libro-socioepistemologia /quienes-somos idéntico",
+    "state": "passing",
+    "evidence": "PLAN 3 — typecheck → 0; lint → los 6 de la base; RD src no-array-index-as-key js-combine-iterations → 0 y 0; SSR idéntico en /novedades/libro-socioepistemologia y /quienes-somos. Commits: los dos refactor(novedades) y refactor(quienes-somos) que siguen a f0b90ab. Commit: f0b90ab."
+  },
+  {
+    "id": "F04",
+    "behavior": "no-unguarded-browser-global-in-render-or-hook-init = 0 vía src/lib/viewport.ts y guard SSR en FichaNovedad (PLAN 4)",
+    "verification": "RD src no-unguarded-browser-global-in-render-or-hook-init → 0; SSR /biblioteca /quienes-somos /novedades/libro-socioepistemologia idéntico; PROBES /biblioteca /quienes-somos",
+    "state": "passing",
+    "evidence": "PLAN 4 — typecheck → 0; lint → los 6 de la base; RD src no-unguarded-browser-global-in-render-or-hook-init → 0; SSR idéntico en /biblioteca, /quienes-somos, /novedades/libro-socioepistemologia; PROBES /biblioteca /quienes-somos (Playwright 1536×850, 6 fracciones cada una) → 12 archivos, 0 diferencias (re-verificado contra el baseline hidratado; ver «Tried and failed»). Commits refactor(lib) y fix(noveda… Commit: 1cf0b54."
+  },
+  {
+    "id": "F05",
+    "behavior": "no-ref-current-in-render = 0: TorreLineas sin reseteos en render (PLAN 5)",
+    "verification": "RD src/features/que-hacemos no-ref-current-in-render → 0; SSR /que-hacemos idéntico; PROBES /que-hacemos",
+    "state": "passing",
+    "evidence": "PLAN 5 — typecheck → 0; **lint → exit 0** (queda solo el warning CENTRO de MiradaEd); RD src no-ref-current-in-render → 0; SSR /que-hacemos idéntico; PROBES /que-hacemos (6 fracciones) → 0 diferencias (re-verificado contra el baseline hidratado). Commit fix(que-hacemos) después de 7225846. Commit: 7225846."
+  },
+  {
+    "id": "F06",
+    "behavior": "prefer-use-effect-event = 0: CasosInvestigacion con useEffectEvent y la interacción intacta (PLAN 6)",
+    "verification": "RD src/features/investigacion prefer-use-effect-event → 0; SSR /investigacion idéntico; PROBE casos-interaccion → true",
+    "state": "passing",
+    "evidence": "PLAN 6 — typecheck → 0; lint → exit 0 (1 warning heredado); RD src/features/investigacion prefer-use-effect-event → 0; SSR /investigacion idéntico; PROBE casos-interaccion (.next/pw/casos.js: abrir → hash y lugar visible; siguiente → hash del caso 2; Escape → cerrado y hash vacío; abrir + Back → cerrado; deep link en página nueva → abierto) → ok: true antes y después del cambio. Commit refactor(investig… Commit: ee941d3."
+  },
+  {
+    "id": "F07",
+    "behavior": "useMouseParallax compartido por Hero y QueHacemosHero (PLAN 7)",
+    "verification": "GATES; SSR / y /que-hacemos idéntico; PROBE hero-mouse, qh-mouse → true",
+    "state": "passing",
+    "evidence": "PLAN 7 — typecheck → 0; lint → exit 0; SSR / y /que-hacemos idéntico; PROBE hero-mouse y qh-mouse (.next/pw/mouse.js) → ok: true con los mismos valores antes y después (0.8229 / 0.6471 tras el mismo recorrido de mouse); PROBES / /que-hacemos → 0 diferencias contra el baseline hidratado con el protocolo de mouse centrado (la primera comparación dio 12 falsos diffs por el mousemove sintético: ver «Tried a… Commit: c109fe2."
+  },
+  {
+    "id": "F08",
+    "behavior": "acoplarLamina compartido por RedEd, MiradaEd y OrigenEd (PLAN 8)",
+    "verification": "GATES; SSR /quienes-somos idéntico; PROBES /quienes-somos",
+    "state": "passing",
+    "evidence": "PLAN 8 — typecheck → 0; lint → exit 0; SSR /quienes-somos idéntico; PROBES /quienes-somos → 0 diferencias contra el baseline (con el mouse centrado, una card de persona queda en hover en la fracción 0.8: el baseline lo comparte). Commit refactor(quienes-somos) después de da8bd6f. Commit: da8bd6f."
+  },
+  {
+    "id": "F09",
+    "behavior": "TeamProfileOverlay sin el camino muerto de recorte ni cutoutCrop; foto viajera como div sin <img> (PLAN 9)",
+    "verification": "RD src no-broken-image-source → 0; grep -c cutoutCrop src → 0; SSR /quienes-somos idéntico; PROBE perfil-inmersivo, perfil-shell → true",
+    "state": "passing",
+    "evidence": "PLAN 9 — typecheck → 0; lint → exit 0; RD src no-broken-image-source → 0; nextjs-no-img-element 9 → 8; grep cutoutCrop src → 0; SSR /quienes-somos idéntico; PROBE perfil-inmersivo y perfil-shell (.next/pw/perfil-3000.js, referencia perfil-3002.js sobre la base) → ok: true con los mismos números en base y después (retrato [976,221,480,629] con opacidad 1, hero shell [235,165,416,520], foco en «Volver al … Commit: f0dff74."
+  },
+  {
+    "id": "F10",
+    "behavior": "Split ComoTrabajamos ≤ 200 líneas por archivo, escena intacta (PLAN 10)",
+    "verification": "RD src/features/home no-giant-component sin ComoTrabajamos; wc -l ≤ 200; SSR / idéntico; PROBES /",
+    "state": "passing",
+    "evidence": "PLAN 10 — typecheck → 0; lint → exit 0; RD src/features/home no-giant-component → solo Hero; LINEAS ≤ 200 en las cinco piezas; SSR / idéntico; PROBES / → 0 diferencias. Commit refactor(home) después de cbf8d8c. Commit: cbf8d8c."
+  },
+  {
+    "id": "F11",
+    "behavior": "Split Hero (PLAN 11)",
+    "verification": "RD src/features/home no-giant-component sin Hero; wc -l ≤ 200; SSR / idéntico; PROBES / desktop y mobile",
+    "state": "passing",
+    "evidence": "PLAN 11 — typecheck → 0; lint → exit 0; RD src/features/home no-giant-component → 0; LINEAS ≤ 200; SSR / idéntico; PROBES / → 0 diferencias a 1536×850 (6) y 390×844 (4). Commit refactor(home) después de dd7bff8. Commit: dd7bff8."
+  },
+  {
+    "id": "F12",
+    "behavior": "Split QueHacemosHero (PLAN 12)",
+    "verification": "RD src/features/que-hacemos no-giant-component sin QueHacemosHero; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos; PROBE qh-portal → true",
+    "state": "passing",
+    "evidence": "PLAN 12 — typecheck → 0; lint → exit 0; RD src/features/que-hacemos no-giant-component → quedan NivelesEscala, QueHacemosHeroFaro y TorreLineas; LINEAS ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos → 0 diferencias; PROBE qh-portal (.next/pw/portal.js: hover carga 0.15, hold 0.71 con squash, fuego y viaje a scrollY 1103, cápsula descargada) → ok: true. Commit refactor(que-hacemos) después de 4fa6f60. Commit: 4fa6f60."
+  },
+  {
+    "id": "F13",
+    "behavior": "Split NivelesEscala (PLAN 13)",
+    "verification": "RD src/features/que-hacemos no-giant-component sin NivelesEscala; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos",
+    "state": "passing",
+    "evidence": "PLAN 13 — typecheck → 0; lint → exit 0; RD src/features/que-hacemos no-giant-component → quedan QueHacemosHeroFaro y TorreLineas; LINEAS ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos → 0 diferencias. Commit refactor(que-hacemos) después de be621d1. Commit: be621d1."
+  },
+  {
+    "id": "F14",
+    "behavior": "Split IndicePagina con useImanIndice y BotonSubir (PLAN 14)",
+    "verification": "RD src/components no-giant-component → 0; wc -l ≤ 200; SSR de las 8 rutas idéntico; PROBES /investigacion",
+    "state": "passing",
+    "evidence": "PLAN 14 — typecheck → 0; lint → exit 0; RD src/components no-giant-component → 0; LINEAS ≤ 200; SSR idéntico en las 8 rutas; PROBES /investigacion → 0 diferencias; PROBE indice (.next/pw/indice.js: con el cursor en la tercera fila las marcas pasan de 12 a [12,29,32,17,12,12] px, la píldora 2 sube a opacidad 1 y se pinta navy, el click salta a «Líneas» y cambia aria-current) → ok: true. Commit refactor(la… Commit: 0b25623."
+  },
+  {
+    "id": "F15",
+    "behavior": "Split DestacadosBiblioteca (PLAN 15)",
+    "verification": "RD src/features/biblioteca no-giant-component → 0; wc -l ≤ 200; SSR /biblioteca idéntico; PROBES /biblioteca",
+    "state": "passing",
+    "evidence": "PLAN 15 — typecheck → 0; lint → exit 0; RD src/features/biblioteca no-giant-component → 0; LINEAS ≤ 200 en las piezas; SSR /biblioteca idéntico; PROBES /biblioteca → 0 diferencias. Commit refactor(biblioteca) después de d950ced. Commit: d950ced."
+  },
+  {
+    "id": "F16",
+    "behavior": "Split RedEd (PLAN 16)",
+    "verification": "RD src/features/quienes-somos no-giant-component sin RedEd; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos; PROBE red-hover → true",
+    "state": "passing",
+    "evidence": "PLAN 16 — typecheck → 0; lint → exit 0 (solo el warning base de CENTRO); RD src/features/quienes-somos no-giant-component → 4 (RedEd fuera); LINEAS ≤ 200; SSR /quienes-somos idéntico y PROBES /quienes-somos → 0 diferencias (RedEd NO está montado ahí, ver DECISIONS); con la ruta temporal /probe-red en ambos servers: PROBE red-hover → ok: true en 3000 y 3002 con los mismos números (r 12 → 16 → 12, texto ve… Commit: c60963f."
+  },
+  {
+    "id": "F17",
+    "behavior": "Split MiradaEd (PLAN 17)",
+    "verification": "RD src/features/quienes-somos no-giant-component sin MiradaEd; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos",
+    "state": "passing",
+    "evidence": "PLAN 17 — typecheck → 0; lint → exit 0 y 0 warnings (cayó el de CENTRO); RD src/features/quienes-somos no-giant-component → 3 (MiradaEd fuera); LINEAS ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos → 0 diferencias. Commit: bf427d0."
+  },
+  {
+    "id": "F18",
+    "behavior": "Split OrigenEd (PLAN 18)",
+    "verification": "RD src/features/quienes-somos no-giant-component sin OrigenEd; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos",
+    "state": "passing",
+    "evidence": "PLAN 18 — typecheck → 0; lint → exit 0; RD src/features/quienes-somos no-giant-component → 2 (OrigenEd fuera); LINEAS ≤ 200; SSR /quienes-somos idéntico; PROBES /quienes-somos → 0 diferencias. Commit: 3097feb."
+  },
+  {
+    "id": "F19",
+    "behavior": "Split CarpetaCaso con TapaCarpeta; no-high-complexity en CarpetaCaso = 0 (PLAN 19)",
+    "verification": "RD src/features/investigacion no-giant-component no-high-complexity-react-function sin CarpetaCaso; wc -l ≤ 200; SSR /investigacion idéntico; PROBES /investigacion",
+    "state": "passing",
+    "evidence": "PLAN 19 — typecheck → 0; lint → exit 0; RD src/features/investigacion no-giant-component no-high-complexity-react-function → 2 + 0 (CarpetaCaso fuera de las dos); LINEAS ≤ 200; SSR /investigacion idéntico; PROBES /investigacion → 0 diferencias. Commit: 72e45e9."
+  },
+  {
+    "id": "F20",
+    "behavior": "Split ExpedienteCaso (PLAN 20)",
+    "verification": "RD src/features/investigacion no-giant-component sin ExpedienteCaso; wc -l ≤ 200; SSR /investigacion idéntico; PROBE caso-abierto → true",
+    "state": "passing",
+    "evidence": "PLAN 20 — typecheck → 0; lint → exit 0; RD src/features/investigacion no-giant-component → 1 (solo CasosInvestigacion); LINEAS ≤ 200; SSR /investigacion idéntico; PROBE caso-abierto (.next/pw/exp.js, 3000 vs 3002): firma estructural del expediente abierto idéntica (hash 2944313356, 23252 chars), reveals 2/8 → 4/8 → 8/8 bloques, asentado −2.6° → 0, sello 0 → 0.75, indicio 1 → 0, parallax con los mismos co… Commit: 87b1bfe."
+  },
+  {
+    "id": "F21",
+    "behavior": "Split TeamProfileOverlay: usePortalModal, viaje-foto, coreografia-overlay, PerfilShell (PLAN 21)",
+    "verification": "RD src/features/quienes-somos no-giant-component sin TeamProfileOverlay; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBE perfil-inmersivo, perfil-shell → true",
+    "state": "passing",
+    "evidence": "PLAN 21 — typecheck → 0; lint → exit 0; RD src/features/quienes-somos no-giant-component → 1 (solo ImmersiveProfile); LINEAS ≤ 200; SSR /quienes-somos idéntico; PROBE perfil-inmersivo + perfil-shell (.next/pw/perfil-3000.js vs perfil-3002.js): JSON idéntico (foco en «Volver al equipo», 29 inert, retrato 976/221/480/629 y 235/165/416/520, scroll restaurado al píxel, foco de vuelta en la card). Commit: fd86a1e."
+  },
+  {
+    "id": "F22",
+    "behavior": "Split ContactoExperiencia (PLAN 22)",
+    "verification": "RD src/features/contacto no-giant-component → 0; wc -l ≤ 200; SSR /contacto idéntico; PROBE contacto-intro, contacto-tema → true",
+    "state": "passing",
+    "evidence": "PLAN 22 — typecheck → 0; lint → exit 0; RD src/features/contacto sin no-giant-component y sin hallazgos nuevos; LINEAS ≤ 200; SSR /contacto idéntico; PROBE contacto-intro + contacto-tema (.next/pw/contacto.js, 3000 vs 3002): intro armada y desarmada sola, tema → formulario con foco en #ct-nombre y rail «Investigación», vuelta, ?tema=alianzas aterriza en el formulario, rueda saltea: idéntico salvo las opa… Commit: 2e5513e."
+  },
+  {
+    "id": "F23",
+    "behavior": "Split CasosInvestigacion por hooks (PLAN 23)",
+    "verification": "RD src/features/investigacion no-giant-component sin CasosInvestigacion; wc -l ≤ 200; SSR /investigacion idéntico; PROBE casos-interaccion → true",
+    "state": "passing",
+    "evidence": "PLAN 23 — typecheck → 0; lint → exit 0; RD src/features/investigacion sin no-giant-component (quedan will-change y transition-all para la fase 2); LINEAS ≤ 200; SSR /investigacion idéntico; PROBE casos-interaccion (.next/pw/casos.js vs casos-3002.js): abrir, siguiente, Escape, abrir + atrás y deep link → JSON idéntico (scrollY 18890 / 18954 / 18883). Commit: 6a24ff0."
+  },
+  {
+    "id": "F24",
+    "behavior": "Split QueHacemosHeroFaro con los tres contratos de regresión intactos (PLAN 24)",
+    "verification": "RD src/features/que-hacemos no-giant-component sin QueHacemosHeroFaro; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos",
+    "state": "passing",
+    "evidence": "PLAN 24 — typecheck → 0; lint → exit 0; RD src/features/que-hacemos no-giant-component → 1 (TorreLineas; QueHacemosHeroFaro fuera); LINEAS ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos → 0 diferencias (6 fracciones estables). Commit feda538. Pendiente visto acá: rerender-lazy-ref-init ×2 en que-hacemos (los useRef(TAMBORES.map(...)) del paso 5): se resuelven en el paso 26. Commit: feda538."
+  },
+  {
+    "id": "F25",
+    "behavior": "Split ImmersiveProfile; no-high-complexity-react-function = 0 (PLAN 25)",
+    "verification": "RD src/features/quienes-somos no-giant-component no-high-complexity-react-function → 0; wc -l ≤ 200; SSR /quienes-somos idéntico; PROBE perfil-inmersivo → true; rama lineal con reduced-motion",
+    "state": "passing",
+    "evidence": "PLAN 25 — typecheck → 0; lint → exit 0; RD src/features/quienes-somos → sin no-giant-component ni no-high-complexity-react-function (quedan will-change ×9, img ×6 y dialog ×1 para la fase 2); LINEAS ≤ 200; SSR /quienes-somos idéntico; PROBE perfil-inmersivo/perfil-shell → JSON idéntico al de la base (retrato 976/221/480/629, foco, inert 29, scroll restaurado); PROBE perfil-lineal nuevo (.next/pw/perfil-r… Commit: 31509f6."
+  },
+  {
+    "id": "F26",
+    "behavior": "Split TorreLineas con pintor como factory; no-giant-component = 0 en todo src (PLAN 26)",
+    "verification": "RD src no-giant-component → 0; wc -l ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos desktop y mobile",
+    "state": "passing",
+    "evidence": "PLAN 26 — typecheck → 0; lint → exit 0; RD src → no-giant-component 0, no-high-complexity-react-function 0, rerender-lazy-ref-init 0; LINEAS ≤ 200; SSR /que-hacemos idéntico; PROBES /que-hacemos 1536×850 (6 fracciones) y 390×844 (4 fracciones, fallback plano) → 0 diferencias. Commit: b520867."
+  },
+  {
+    "id": "F27",
+    "behavior": "no-transition-all y no-scale-from-zero = 0, también por grep (PLAN 27)",
+    "verification": "RD src no-transition-all no-scale-from-zero → 0; grep -rn transition-all src → 0; diff SSR limitado a tokens transition-*/scale-x-*",
+    "state": "passing",
+    "evidence": "PLAN 27 — typecheck → 0; lint → exit 0; RD src no-transition-all no-scale-from-zero → 0 y 0; grep -rn \"transition-all\" src → 0 (DoD §6.14); SSR de las 8 rutas idéntico salvo los tokens transition-* / scale-x-* (ssr-tokens.mjs del scratchpad, exit 0). Commits: 35c0a0f, affe3ed, 821b8c7, d1ea0ee, 22513b6, fdec539, 1f007bc."
+  },
+  {
+    "id": "F28",
+    "behavior": "no-permanent-will-change = 0: quitados o en manos de la coreografía (PLAN 28)",
+    "verification": "RD src no-permanent-will-change → 0; grep will-change solo en coreografía/hooks; diff SSR limitado a will-change; PROBES de las 8 rutas desktop y mobile; reduced-motion 390×844 → will-change auto en [data-faro-shift] y [data-capa]",
+    "state": "passing",
+    "evidence": "PLAN 28 — typecheck → 0; lint → exit 0; RD src no-permanent-will-change → 0; grep -rnE \"will-change-|willChange\" src → solo módulos de coreografía y hooks (ninguno en un className ni en un style de JSX); SSR de las 8 rutas contra el paso 27 idéntico salvo los tokens de will-change (ssr-tokens.mjs, exit 0); PROBES de las 8 rutas a 1536×850 (48 archivos) y 390×844 (32) → 0 diferencias, con los cambios de w… Commits: cab1ce9, 68e1fa2, a16cc47, a84f300, 4e1537c, bc0ee1d, 4c43a7b, a52fce8."
+  },
+  {
+    "id": "F29",
+    "behavior": "Aliados con next/image en Footer y DatosDuros, dimensiones en src/config/aliados.ts (PLAN 29)",
+    "verification": "RD src nextjs-no-img-element → 6; curl /_next/image de unesco.png → 200; capturas footer y datos duros",
+    "state": "passing",
+    "evidence": "PLAN 29 — typecheck → 0; lint → exit 0; RD src nextjs-no-img-element → 6 (solo los del perfil, paso 30); /_next/image?url=%2Faliados%2Funesco.png&w=1920&q=75 → 200 y science-up&w=640 → 200; /aliados/techint.svg → 200; SSR de las 8 rutas contra el paso 28 idéntico fuera de los <li> de las tiras; PROBE aliados (.next/pw/aliados.js, 3000 vs 3002) → ok: true: los 10 logos con la misma caja, x, opacidad y fil… Commit: 4857346."
+  },
+  {
+    "id": "F30",
+    "behavior": "Perfil con next/image ×6 y cutoutSize en Profile; FLIP y viaje de la foto intactos (PLAN 30)",
+    "verification": "RD src nextjs-no-img-element → 0; PROBE perfil-inmersivo, perfil-shell → true; probe FLIP (transform identidad, ancho > 0)",
+    "state": "passing",
+    "evidence": "PLAN 30 — typecheck → 0; lint → exit 0; RD src nextjs-no-img-element → 0 (RD total: 6, todos de los pasos 31-35); /_next/image?url=%2Fequipo%2Fkarla-gomez.jpg&w=640 → 200; SSR /quienes-somos sin cambios; PROBE perfil-inmersivo + perfil-shell → ok: true con los mismos números; PROBE flip-figura (.next/pw/flip-figura.js, 3000 vs 3002) → ok: true: mover en transform none, imagen cargada, y caja del mover, d… Commit: 9536144."
+  },
+  {
+    "id": "F31",
+    "behavior": "html-no-nested-interactive = 0: PaisDropdown con handlers en el li (PLAN 31)",
+    "verification": "RD src/features/contacto html-no-nested-interactive → 0; PROBE pais-dropdown → true",
+    "state": "passing",
+    "evidence": "PLAN 31 — typecheck → 0; lint → exit 0; RD src/features/contacto → 100/100 y 0 hallazgos; SSR /contacto sin cambios (el desplegable cerrado no aparece); PROBE pais-dropdown (.next/pw/pais.js, 3000 vs 3002) → ok: true: mismas 6 opciones y mismos textos, 0 interactivos anidados (la base tenía 6), Enter + ArrowDown ×2 elige «Argentina» en los dos, y el clic sobre la cuarta opción elige «Colombia» en los dos… Commit: d31105d."
+  },
+  {
+    "id": "F32",
+    "behavior": "click-events-have-key-events y no-static-element-interactions = 0: píldoras de IndicePagina como button (PLAN 32)",
+    "verification": "RD src/components click-events-have-key-events no-static-element-interactions → 0; diff SSR limitado a las píldoras; PROBE indice-pildora → true",
+    "state": "passing",
+    "evidence": "PLAN 32 — typecheck → 0; lint → exit 0; RD src/components → solo prefer-html-dialog (paso 33); LINEAS ≤ 200; SSR de las 8 rutas contra el paso 29 idéntico fuera de ese elemento; PROBE indice-pildora (.next/pw/indice-pildora.js, 3000 vs 3002) → ok: true: mismas cuatro filas en la misma posición, el imán las acerca los mismos píxeles (1330→1322, 1393→1391, 1370→1368), el clic navega, y [aria-hidden] button… Commit: 328c8a6."
+  },
+  {
+    "id": "F33",
+    "behavior": "MobileNav como <dialog> con trampa de foco y salida animada (PLAN 33)",
+    "verification": "RD src/components prefer-html-dialog → 0; PROBE menu-mobile → true; captura 390×844",
+    "state": "passing",
+    "evidence": "PLAN 33 — typecheck → 0; lint → exit 0; RD src/components → 100/100 y 0 hallazgos; LINEAS ≤ 200; SSR de las 8 rutas byte a byte idéntico (el panel se portalea y solo existe en cliente); PROBE menu-mobile (.next/pw/menu-mobile.js, 390×844) → ok: true: cerrado display: none, abierto display: flex con opacidad 1 y foco en «Cerrar menú», 12 enfocables con el Tab siempre dentro del diálogo, Tab desde el últim… Commit: 108652c."
+  },
+  {
+    "id": "F34",
+    "behavior": "TeamProfileOverlay como <dialog>, sin inert manual, FLIP, viaje y scroll intactos, índice lateral escondido (PLAN 34)",
+    "verification": "RD src prefer-html-dialog → 0; PROBE perfil-inmersivo, perfil-shell → true ([inert] = 0, scrollY ±1); capturas",
+    "state": "passing",
+    "evidence": "PLAN 34 — typecheck → 0; lint → exit 0; RD src → 86/100 y un solo hallazgo, el no-prevent-default del paso 35; LINEAS ≤ 200 (199 / 152 / 114 / 97); SSR /quienes-somos byte a byte idéntico contra el paso 33 (el overlay solo existe en cliente); PROBE perfil-inmersivo y PROBE perfil-shell (.next/pw/perfil-dialog.js, SPEC §6.9b) → ok: true en las dos variantes: tag DIALOG con open, transform/filter none y wi… Commit: 87a46fa."
+  },
+  {
+    "id": "F35",
+    "behavior": "no-prevent-default = 0: buscador como div role=search con el mismo scroll (PLAN 35)",
+    "verification": "RD src/features/biblioteca no-prevent-default → 0; PROBE buscador → true",
+    "state": "passing",
+    "evidence": "PLAN 35 — typecheck → 0; lint → exit 0; **RD src → 100 / 100, «No issues found!», skippedChecks: [], complete: true, 278 archivos**; LINEAS: BibliotecaHero 169; SSR /biblioteca contra el paso 33 idéntico salvo los dos tokens del paso (<form … role=\"search\"> → <search> y type=\"submit\" → type=\"button\") y texto visible idéntico; PROBE buscador (.next/pw/buscador.js, 3000 vs 3002) → ok: true: envoltorio SEAR… Commit: 935efe1."
+  },
+  {
+    "id": "F36",
+    "behavior": "docs/AI_GUIDELINES.md documenta las dos convenciones nuevas (PLAN 36)",
+    "verification": "grep -c will-change docs/AI_GUIDELINES.md ≥ 1; grep -c subcarpeta docs/AI_GUIDELINES.md ≥ 1",
+    "state": "passing",
+    "evidence": "PLAN 36 — grep -c \"will-change\" docs/AI_GUIDELINES.md → 2 (≥ 1) y grep -c \"subcarpeta\" docs/AI_GUIDELINES.md → 1 (≥ 1). Commit: 255c4f5."
+  },
+  {
+    "id": "F37",
+    "behavior": "Cierre: react-doctor 100/100 con 0 diagnósticos, typecheck, lint, build, sin supresiones, sin hex nuevos, texto visible intacto (SPEC §6 + §0.1)",
+    "verification": "react-doctor --json src → totalDiagnosticCount 0 y score 100; pnpm typecheck && pnpm lint && pnpm build exit 0; grep react-doctor-disable|no-img-element src → 0; grep transition-all src → 0; hex(HEAD) ≤ hex(112de56); textContent SSR de las 8 rutas idéntico",
+    "state": "passing",
+    "evidence": "Cierre 2026-09-08 (work-verify, DoD §6): react-doctor --json src → score 100/100, totalDiagnosticCount 0, skippedChecks [], complete true, 278 archivos; pnpm typecheck y pnpm lint exit 0; pnpm build exit 0; 0 archivos .js/.jsx agregados; 0 supresiones (react-doctor-disable / no-img-element), sin doctor.config.* ni clave reactDoctor; hex #RRGGBB 69 en HEAD = 69 en main; texto visible del SSR idéntico al baseline en las 8 rutas; PROBES 1536×850 48/48 sin diferencias y 390×844 32/32 solo con las cajas del panel mobile cerrado (un <dialog> cerrado no se maqueta), cubiertas por PROBE menu-abierto que las mide iguales a la base con el panel abierto; 168 capturas antes/después pareadas; PROBE menu-mobile, perfil-dialog (inmersivo y shell), casos y buscador → ok true."
+  }
 ]
