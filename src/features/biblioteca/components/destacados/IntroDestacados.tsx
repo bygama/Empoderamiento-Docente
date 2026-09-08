@@ -50,7 +50,7 @@ export function IntroDestacados({
             <div
               key={titulo}
               data-viajera
-              className="bg-azul-claro/30 relative aspect-[3/4] overflow-hidden rounded-xl will-change-transform"
+              className="bg-azul-claro/30 relative aspect-[3/4] overflow-hidden rounded-xl"
             >
               <Image
                 src={material.portada}

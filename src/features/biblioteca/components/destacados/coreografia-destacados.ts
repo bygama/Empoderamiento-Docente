@@ -47,6 +47,9 @@ export function crearDestacados({ root, row, slot, artsWrap, items, setActivo }:
       if (!row || !slot || !wrap) return;
 
       const imgs = gsap.utils.toArray<HTMLElement>("[data-viajera]", row);
+      // El hint de composición lo pone la coreografía y se va con ella (antes
+      // vivía en la clase, promoviendo cuatro capas toda la sesión).
+      gsap.set(imgs, { willChange: "transform" });
       const arts = items.filter((el): el is HTMLElement => !!el);
 
       // Geometría del destino: la pila vive centrada verticalmente en el

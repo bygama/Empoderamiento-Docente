@@ -135,6 +135,8 @@ export function PuenteInvestigacion() {
 
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>("[data-pila-card]", pila);
+      // El hint viene con la coreografía (solo con `live`) y se va con ella.
+      gsap.set(cards, { willChange: "transform" });
 
       // El paso se mide del layout (offsetLeft ignora transforms).
       const paso = () => (cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : 0);
@@ -237,7 +239,7 @@ export function PuenteInvestigacion() {
                     c.tema.card +
                     " overflow-hidden shadow-[0_28px_70px_-32px_rgb(15_23_42/0.45)] " +
                     (live
-                      ? "absolute inset-y-0 rounded-[1.5rem] will-change-transform md:rounded-[2rem]"
+                      ? "absolute inset-y-0 rounded-[1.5rem] md:rounded-[2rem]"
                       : "relative rounded-2xl")
                   }
                   style={
