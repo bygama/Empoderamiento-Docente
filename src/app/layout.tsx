@@ -3,6 +3,7 @@ import { Caveat, Courier_Prime, Inter, Manrope, JetBrains_Mono } from "next/font
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { IndicePagina } from "@/components/layout/IndicePagina";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { siteConfig } from "@/config/site";
 
@@ -85,6 +86,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <LenisProvider>
           <Header />
+          <IndicePagina />
           {children}
           {/* Fondo detrás del footer: la muesca de sus esquinas superiores
               redondeadas toma ESTE color. Blanco por defecto (matchea las
