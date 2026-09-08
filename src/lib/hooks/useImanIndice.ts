@@ -48,7 +48,7 @@ export function useImanIndice(
 
   const navRef = useRef<HTMLElement | null>(null);
   const marcas = useRef<(HTMLSpanElement | null)[]>([]);
-  const pildoras = useRef<(HTMLSpanElement | null)[]>([]);
+  const pildoras = useRef<(HTMLButtonElement | null)[]>([]);
   const anims = useRef<Animadores | null>(null);
   const enHover = useRef(false);
   const temporizadores = useRef<number[]>([]);
@@ -59,7 +59,7 @@ export function useImanIndice(
     if (secciones.length < 2) return;
     const n = secciones.length + 1;
     const m = marcas.current.slice(0, n).filter(Boolean) as HTMLSpanElement[];
-    const p = pildoras.current.slice(0, n).filter(Boolean) as HTMLSpanElement[];
+    const p = pildoras.current.slice(0, n).filter(Boolean) as HTMLButtonElement[];
     const cfg = { duration: reduced ? 0 : 0.35, ease: "power3.out" };
     gsap.set(m, { width: ANCHO_BASE, opacity: 0.45 });
     gsap.set(p, { x: CORRIMIENTO, opacity: 0, scale: 1 });

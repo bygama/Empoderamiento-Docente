@@ -6,6 +6,7 @@ import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
 import { ANCHO_BASE, useImanIndice, type ItemIndice } from "@/lib/hooks/useImanIndice";
 import { irArriba, irASeccion } from "@/lib/indice";
 import { BotonSubir } from "./indice-pagina/BotonSubir";
+import { RotulosIndice } from "./indice-pagina/RotulosIndice";
 
 /**
  * Índice de la página: la forma de llegar a una sección sin recorrer todas
@@ -159,40 +160,22 @@ export function IndicePagina() {
         </ol>
       </nav>
 
-      {/* Rótulos: misma grilla de filas que las marcas, corrida el ancho de la
-          marca estirada más el aire. Se mueven con GSAP (ver aplicar). */}
-      <div
-        aria-hidden="true"
-        onPointerEnter={(e) => entrar(e.clientY)}
-        onPointerMove={(e) => entrar(e.clientY)}
-        onPointerLeave={salir}
-        className={`fixed top-1/2 right-[4.25rem] z-40 hidden -translate-y-1/2 transition-opacity duration-300 lg:block ${
-          visible ? "opacity-100" : "opacity-0"
-        } ${interactivo ? "pointer-events-auto" : "pointer-events-none"}`}
-      >
-        <ol className="flex flex-col items-end">
-          {items.map((it, i) => (
-            <li key={it.id ?? "arriba"} className="flex h-7 items-center justify-end">
-              <span
-                ref={(el) => {
-                  pildoras.current[i] = el;
-                }}
-                onClick={() => {
-                  tic(i);
-                  ir(it);
-                }}
-                className={`cursor-pointer rounded-full px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] uppercase whitespace-nowrap shadow-[0_6px_18px_-10px_rgb(31_45_77/0.45)] ring-1 backdrop-blur transition-colors duration-200 ${
-                  interactivo && cerca === i
-                    ? "bg-azul-principal ring-azul-principal text-white"
-                    : "text-azul-principal ring-azul-principal/10 bg-white/92"
-                } ${esActiva(it.id) ? "font-semibold" : ""}`}
-              >
-                {it.label}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </div>
+      <RotulosIndice
+        items={items}
+        visible={visible}
+        interactivo={interactivo}
+        cerca={cerca}
+        esActiva={esActiva}
+        refPildora={(i) => (el) => {
+          pildoras.current[i] = el;
+        }}
+        onEntrar={entrar}
+        onSalir={salir}
+        onIr={(i, it) => {
+          tic(i);
+          ir(it);
+        }}
+      />
 
       <BotonSubir visible={mostrarSubir} />
     </>
