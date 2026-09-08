@@ -490,13 +490,6 @@ export function Hero() {
           }}
         />
         <div data-hero-copy className="mx-auto max-w-2xl translate-y-[5vh]">
-          {/* Qué es ED, en una línea y sin esperar la coreografía: la frase
-              del cartel oficial. No lleva data-hero-* a propósito: está
-              visible desde el primer frame (Raquel y Daniela, 2026-09-08). */}
-          <p className="text-azul-principal/75 mb-5 inline-flex items-center gap-3 font-sans text-[0.9rem] font-medium md:text-[0.95rem]">
-            <span aria-hidden="true" className="bg-verde-concepto block h-px w-8" />
-            Consultora especializada en la transformación del aprendizaje matemático
-          </p>
           <h1
             data-hero-headline
             className="font-display font-bold text-balance tracking-[-0.02em]"
