@@ -3,7 +3,7 @@ import { APERTURA, clipDe, EASE_VIAJE, ESPERA_IMAGEN, paresDe, type RefsOverlay 
 import { apoyarViajera, medirDestino, viajarFoto } from "./viaje-foto";
 
 type Apertura = {
-  root: HTMLDivElement | null;
+  root: HTMLDialogElement | null;
   originEl: HTMLElement | null;
   reduced: boolean;
   immersive: boolean;

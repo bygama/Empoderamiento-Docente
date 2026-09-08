@@ -40,7 +40,7 @@ export type RefsOverlay = {
 };
 
 type Cierre = {
-  root: HTMLDivElement | null;
+  root: HTMLDialogElement | null;
   originEl: HTMLElement | null;
   reduced: boolean;
   immersive: boolean;
@@ -55,14 +55,20 @@ type Cierre = {
  * (o sin root) termina de inmediato.
  */
 export function cerrarOverlay({ root, originEl, reduced, immersive, refs, alTerminar }: Cierre) {
-  if (reduced || !root) {
+  // El `close()` va al final de la salida: un `<dialog>` cerrado no se pinta,
+  // así que cerrarlo antes cortaría la animación en el primer frame.
+  const finish = () => {
+    root?.close();
     alTerminar();
+  };
+  if (reduced || !root) {
+    finish();
     return;
   }
   const from = originEl?.getBoundingClientRect();
   const desdeCard = !!(from && from.width > 0);
   const pares = paresDe(originEl);
-  const tl = gsap.timeline({ onComplete: alTerminar });
+  const tl = gsap.timeline({ onComplete: finish });
   if (pares.length) tl.to(pares, { opacity: 1, scale: 1, duration: 0.45, ease: "power2.out" }, 0.15);
   tl.to([refs.back.current, refs.copiar.current], { opacity: 0, y: -8, duration: 0.2, ease: "power2.in" }, 0);
   if (immersive) {

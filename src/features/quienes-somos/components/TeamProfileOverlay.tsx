@@ -9,7 +9,6 @@ import { useCopiar } from "@/lib/hooks/useCopiar";
 import type { Persona } from "@/features/quienes-somos/data/equipo";
 import { ImmersiveProfile } from "@/features/quienes-somos/components/profile/ImmersiveProfile";
 import { usePortalModal } from "./overlay/usePortalModal";
-import { useTecladoOverlay } from "./overlay/useTecladoOverlay";
 import { abrirOverlay } from "./overlay/apertura-overlay";
 import { cerrarOverlay, type RefsOverlay } from "./overlay/coreografia-overlay";
 import { PerfilShell } from "./overlay/PerfilShell";
@@ -30,10 +29,15 @@ import { PerfilShell } from "./overlay/PerfilShell";
  *     (`data-profile-scroller`, `data-lenis-prevent` para no pelear con Lenis) y
  *     renderiza <ImmersiveProfile>, que trae su propia narrativa y coreografía.
  *
- * Piezas (`overlay/`): `usePortalModal` (portal, lock, inert, foco, scroll),
- * `useTecladoOverlay` (Escape + Tab atrapado), `apertura-overlay.ts` (la
- * entrada), `coreografia-overlay.ts` (tiempos, pares, clip-path y el cierre),
- * `viaje-foto.ts` (la foto viajera).
+ * El root es un `<dialog>` abierto con `showModal()`: el navegador pone el
+ * top layer, hace inerte el resto de la página y atrapa el Tab — tres cosas
+ * que antes estaban a mano (un loop de `inert` sobre los hijos de <body> y un
+ * listener de teclado). No recibe `transform`, `filter` ni `will-change`:
+ * crearían bloque contenedor para los `fixed` de adentro.
+ *
+ * Piezas (`overlay/`): `usePortalModal` (portal, lock, showModal, foco,
+ * scroll), `apertura-overlay.ts` (la entrada), `coreografia-overlay.ts`
+ * (tiempos, pares, clip-path y el cierre), `viaje-foto.ts` (la foto viajera).
  */
 export function TeamProfileOverlay({
   persona,
@@ -56,7 +60,7 @@ export function TeamProfileOverlay({
   const [container] = useState<HTMLDivElement | null>(() =>
     typeof document !== "undefined" ? document.createElement("div") : null,
   );
-  const rootRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDialogElement | null>(null);
   const backdropRef = useRef<HTMLDivElement | null>(null);
   const heroRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -103,23 +107,29 @@ export function TeamProfileOverlay({
     cerrarOverlay({ root: rootRef.current, originEl, reduced, immersive, refs, alTerminar: onClose });
   }, [originEl, onClose, reduced, immersive, refs]);
 
-  // ── Teclado: ESC cierra · Tab atrapado ─────────────────────────────────
-  useTecladoOverlay(rootRef, requestClose);
-
   if (!container) return null;
 
   return createPortal(
-    <div
+    <dialog
       ref={rootRef}
-      role="dialog"
-      aria-modal="true"
       aria-label={`Perfil de ${persona.profile?.fullName ?? persona.nombre}`}
       data-profile-scroller={immersive ? "" : undefined}
       data-lenis-prevent={immersive ? "" : undefined}
+      // Escape: el navegador dispara `cancel` y cerraría de golpe; se lo frena
+      // para que el cierre pase por la salida animada (que llama a close()).
+      onCancel={(e) => {
+        e.preventDefault();
+        requestClose();
+      }}
+      // `m-0 max-h-none max-w-none border-0 bg-transparent p-0` neutraliza el
+      // estilo que el agente le da a un <dialog> (centrado, con borde, fondo
+      // blanco y topes de tamaño) para que siga siendo full-bleed, y `h-full
+      // w-full` tampoco sobra: su `width: fit-content` le gana al ancho
+      // implícito del inset y dejaba el panel angosto (el retrato del shell
+      // medía 254px en vez de 416). El `backdrop` propio lo pinta el lienzo.
       className={
-        immersive
-          ? "invisible fixed inset-0 z-[100] overflow-x-hidden overflow-y-auto overscroll-contain"
-          : "invisible fixed inset-0 z-[100]"
+        "invisible fixed inset-0 z-[100] m-0 h-full w-full max-h-none max-w-none border-0 bg-transparent p-0 backdrop:bg-transparent" +
+        (immersive ? " overflow-x-hidden overflow-y-auto overscroll-contain" : "")
       }
     >
       {/* Lienzo claro (nunca negro) — fijo al viewport. En el inmersivo es
@@ -183,7 +193,7 @@ export function TeamProfileOverlay({
       ) : (
         <PerfilShell persona={persona} refHero={heroRef} refContenido={contentRef} />
       )}
-    </div>,
+    </dialog>,
     container,
   );
 }
