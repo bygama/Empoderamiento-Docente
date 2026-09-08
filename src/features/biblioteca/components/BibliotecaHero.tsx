@@ -132,12 +132,12 @@ export function BibliotecaHero() {
             no pasa nunca. <search> es el landmark nativo (mejor que un
             role="search" pegado a un div) y el Enter y la lupa comparten el
             salto. El `flex` de la clase lo saca del display inline que un
-            navegador viejo le daría al elemento desconocido, y el `role`
-            explícito le devuelve el landmark a los que tampoco conocen el
-            elemento (antes de Chrome 118 / Safari 17 / Firefox 118). */}
+            navegador viejo le daría al elemento desconocido. Sin `role`
+            explícito: sería redundante sobre `<search>` (react-doctor lo marca)
+            y el landmark ya es nativo en Chrome 118 / Safari 17 / Firefox 118
+            para arriba. */}
         <search
           data-bh-rise
-          role="search"
           className="focus-within:ring-azul-claro/70 mt-9 flex w-full max-w-xl items-stretch gap-1.5 rounded-xl bg-white p-1.5 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.45)] focus-within:ring-2"
         >
           <label htmlFor="biblioteca-buscar" className="sr-only">

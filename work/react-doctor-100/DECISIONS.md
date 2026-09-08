@@ -271,3 +271,14 @@ PROGRESS, en `feature_list.json` y en las entradas de este archivo, y un rebase 
 invalidaría todos para ahorrar caracteres. Queda como regla para la próxima lane: header
 ≤ 72, scope por carpeta tocada y `feat` solo si el sitio hace algo nuevo. Descartadas:
 `rebase -i` para reescribir los 15 headers; dejar de anotar los sha para poder reescribir.
+
+## 2026-09-08 — `<search>` va sin `role="search"` explícito
+
+El seat de accesibilidad pidió sumar `role="search"` al `<search>` del hero de biblioteca
+para los navegadores anteriores a Chrome 118 / Safari 17 / Firefox 118, que no le dan rol
+implícito. Se agregó, y react-doctor lo devolvió como `no-redundant-roles`: el score cayó de
+100 a 96. Como el pedido del owner es 100/100 sin apagar ni una regla, el rol sale. El
+landmark queda nativo en todo navegador que conozca el elemento —los tres de esa lista salieron
+en 2023— y en los anteriores el buscador sigue siendo un campo con su `<label>`, que es lo que
+era antes de la lane. Lo que NO se hace es dejar el rol y bajar el score, ni suprimir la regla.
+Descartadas: volver a `<div role="search">` (reabre `prefer-tag-over-role`); `react-doctor-disable`.
