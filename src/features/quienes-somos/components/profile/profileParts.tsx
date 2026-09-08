@@ -429,7 +429,7 @@ export function CategoryRail({
             <span
               aria-hidden="true"
               className={cx(
-                "absolute top-[0.42rem] left-[-1.25rem] block rounded-full transition-[background-color,width,height,transform,box-shadow] duration-500",
+                "absolute top-[0.42rem] left-[-1.25rem] block rounded-full transition-[background-color,width,height,translate,box-shadow] duration-500",
                 active
                   ? cx(a.bg, "h-2.5 w-2.5 translate-x-[-0.5px]", a.glow)
                   : passed

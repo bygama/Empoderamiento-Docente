@@ -36,7 +36,7 @@ export function RielEstaciones({ refNav, refBoton, onSaltar }: Props) {
           // columna) y las demás retroceden al 40%. Sin bold ni
           // fondo: en mono chica el bold se empasta y el fondo
           // vuelve botonera al riel.
-          className="group text-gris-texto/40 hover:text-azul-principal data-[active=true]:text-azul-principal flex cursor-pointer items-center gap-2 py-0.5 text-left font-mono text-[0.62rem] tracking-[0.12em] uppercase transition-[color,font-size,transform] duration-300 ease-out data-[active=true]:translate-x-1 data-[active=true]:text-[0.72rem]"
+          className="group text-gris-texto/40 hover:text-azul-principal data-[active=true]:text-azul-principal flex cursor-pointer items-center gap-2 py-0.5 text-left font-mono text-[0.62rem] tracking-[0.12em] uppercase transition-[color,font-size,translate] duration-300 ease-out data-[active=true]:translate-x-1 data-[active=true]:text-[0.72rem]"
         >
           {/* El punto se estira a un guion verde en la activa: el
               gesto de "estás acá" lee mejor que un punto más grande. */}

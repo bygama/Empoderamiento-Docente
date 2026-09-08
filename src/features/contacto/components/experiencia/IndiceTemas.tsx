@@ -54,7 +54,7 @@ export function IndiceTemas({ onElegir }: Props) {
             <ArrowRight
               size={20}
               aria-hidden="true"
-              className="text-azul-medio/45 group-hover:text-verde-concepto shrink-0 transition-[color,transform] duration-300 group-hover:translate-x-1"
+              className="text-azul-medio/45 group-hover:text-verde-concepto shrink-0 transition-[color,translate] duration-300 group-hover:translate-x-1"
             />
           </button>
         ))}

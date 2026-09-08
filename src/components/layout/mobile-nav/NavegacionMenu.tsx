@@ -45,7 +45,7 @@ export function NavegacionMenu({ pathname, secciones, onCerrar, onIrASeccion }: 
                 </span>
                 <ArrowUpRight
                   size={22}
-                  className={`shrink-0 transition-[color,opacity,transform] duration-300 ${
+                  className={`shrink-0 transition-[color,opacity,translate] duration-300 ${
                     active
                       ? "text-verde-concepto opacity-100"
                       : "text-azul-principal/40 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"

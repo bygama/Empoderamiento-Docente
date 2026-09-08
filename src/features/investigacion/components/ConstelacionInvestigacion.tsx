@@ -78,7 +78,7 @@ export function ConstelacionInvestigacion({
           {FIGURAS.map((f, i) => (
             <span
               key={f.id}
-              className={`absolute inset-0 flex items-center transition-[opacity,transform] duration-500 ${
+              className={`absolute inset-0 flex items-center transition-[opacity,translate] duration-500 ${
                 i === figuraActiva
                   ? "translate-y-0 opacity-100"
                   : "translate-y-3 opacity-0"

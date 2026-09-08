@@ -134,7 +134,7 @@ export function Footer() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         aria-hidden="true"
-                        className={`h-5 w-5 shrink-0 transition-[opacity,transform] duration-300 ${
+                        className={`h-5 w-5 shrink-0 transition-[opacity,translate] duration-300 ${
                           esAccion
                             ? "opacity-100"
                             : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-70"

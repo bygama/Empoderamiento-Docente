@@ -43,7 +43,7 @@ export function NavegacionCasos({
     <div
       inert={!visible}
       aria-hidden={!visible}
-      className={`fixed right-0 bottom-0 left-0 z-[60] transition-[opacity,transform] duration-300 md:right-8 md:bottom-8 md:left-auto ${
+      className={`fixed right-0 bottom-0 left-0 z-[60] transition-[opacity,translate] duration-300 md:right-8 md:bottom-8 md:left-auto ${
         visible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-4 opacity-0"
