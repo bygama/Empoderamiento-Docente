@@ -8,6 +8,7 @@ import { ArrowUpRight } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { altoViewport } from "@/lib/viewport";
 import { ACCION, DESTACADOS, MATERIALES } from "../data/materiales";
 
 if (typeof window !== "undefined") {
@@ -86,7 +87,7 @@ export function DestacadosBiblioteca() {
         // Geometría del destino: la pila vive centrada verticalmente en el
         // viewport (top S, alto H), sobre la columna de medios (slot).
         const H = () => slot.getBoundingClientRect().height;
-        const S = () => (window.innerHeight - H()) / 2;
+        const S = () => (altoViewport() - H()) / 2;
 
         // z invertido: la primera portada arriba de la pila.
         imgs.forEach((img, i) => gsap.set(img, { zIndex: imgs.length - i }));

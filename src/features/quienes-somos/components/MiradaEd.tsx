@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { altoViewport, anchoDocumento } from "@/lib/viewport";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -229,8 +230,8 @@ export function MiradaEd() {
       const capasCamara = [stageLineas, stage];
 
       // clientWidth (sin scrollbar): la cámara aterriza donde el usuario ve.
-      const W = () => document.documentElement.clientWidth;
-      const H = () => window.innerHeight;
+      const W = anchoDocumento;
+      const H = altoViewport;
 
       // ── Acople de la lámina clara sobre el navy de Origen (se conserva) ──
       // El origin va en un set previo: en un fromTo con scrub GSAP no lo
