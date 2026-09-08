@@ -6,7 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "@/components/ui/icons";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import type { Profile, StageVariant } from "@/features/quienes-somos/data/equipo";
-import { ACCENT, CategoryRail, StageContent } from "./profileParts";
+import { ACCENT } from "./acentos";
+import { CategoryRail, StageContent } from "./profileParts";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
