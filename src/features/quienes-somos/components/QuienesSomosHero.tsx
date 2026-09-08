@@ -140,7 +140,7 @@ export function QuienesSomosHero() {
       <div className="relative z-10 flex flex-col items-start gap-6 md:items-end">
         <p
           data-hero-foot
-          className="text-azul-principal max-w-[42ch] font-sans text-[1.05rem] leading-relaxed font-medium md:text-right md:text-[1.2rem]"
+          className="text-azul-principal max-w-[42ch] font-sans text-[1.05rem] leading-relaxed font-medium [text-wrap:balance] md:max-w-[62ch] md:text-right md:text-[1.2rem]"
         >
           Somos investigación, diseño y acompañamiento: un proceso colectivo que
           cambia la relación con el saber matemático escolar.
