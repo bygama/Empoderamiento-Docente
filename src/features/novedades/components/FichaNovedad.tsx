@@ -137,8 +137,8 @@ export function FichaNovedad({ n }: { n: Novedad }) {
                 <h2 className="font-display text-azul-principal text-[1.3rem] font-bold tracking-[-0.01em]">
                   {s.titulo}
                 </h2>
-                {s.parrafos.map((parrafo, i) => (
-                  <p key={i} className="text-gris-texto mt-4 font-sans text-[1.02rem] leading-relaxed">
+                {s.parrafos.map((parrafo) => (
+                  <p key={parrafo} className="text-gris-texto mt-4 font-sans text-[1.02rem] leading-relaxed">
                     {parrafo}
                   </p>
                 ))}
