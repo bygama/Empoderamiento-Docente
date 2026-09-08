@@ -231,10 +231,12 @@ const TINTE_CARPETA = [
 
 /**
  * La carpeta A PANTALLA COMPLETA, como en la referencia: ocupa todo el
- * ancho, sin marco, con su título adentro y aire alrededor. Es más ancha
- * que el viewport (120vw) para que, inclinada al entrar, no deje huecos en
- * los costados. Pestaña, número fantasma, papeles asomando, sello, marca
- * seca y las tres hojas.
+ * ancho, sin marco, con su título adentro y aire alrededor. En desktop es
+ * más ancha que el viewport (120vw) para que, inclinada al entrar, no deje
+ * huecos en los costados; en mobile no hay inclinación y va al ancho justo,
+ * porque si sobresale la página queda más ancha que la pantalla y el
+ * celular la achica entera. Pestaña, número fantasma, papeles asomando,
+ * sello, marca seca y las tres hojas.
  */
 function CarpetaLineas({
   carpeta,
@@ -251,7 +253,7 @@ function CarpetaLineas({
     <div
       ref={refCarpeta}
       data-lineas-carpeta
-      className={`${tinte.fondo} ${tinte.sombra} bg-grain-light relative -ml-[10vw] w-[120vw] will-change-transform ${
+      className={`${tinte.fondo} ${tinte.sombra} bg-grain-light relative w-full will-change-transform lg:-ml-[10vw] lg:w-[120vw] ${
         indice === 0 ? "" : "-mt-28"
       }`}
       style={{ zIndex: 10 + indice }}
@@ -260,7 +262,7 @@ function CarpetaLineas({
       <span
         aria-hidden="true"
         className={`${tinte.tinta} absolute -top-12 z-0 block h-12 w-[19rem] lg:-top-14 lg:h-14 lg:w-[22rem] ${
-          indice === 0 ? "left-[13vw]" : "left-[30vw]"
+          indice === 0 ? "left-[4vw] lg:left-[13vw]" : "right-[4vw] lg:right-auto lg:left-[30vw]"
         }`}
       >
         <Pestana className="h-full w-full">
@@ -282,8 +284,8 @@ function CarpetaLineas({
       {/* Canto iluminado de la tapa. */}
       <span aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-white/40" />
 
-      {/* Contenido: dentro del viewport (compensa el ancho extra). */}
-      <div className="relative mx-[10vw] px-6 pt-28 pb-24 md:px-10 lg:pt-32 lg:pb-28">
+      {/* Contenido: dentro del viewport (en desktop compensa el ancho extra). */}
+      <div className="relative px-6 pt-28 pb-24 md:px-10 lg:mx-[10vw] lg:pt-32 lg:pb-28">
         {/* Número fantasma: rotulación de archivo. */}
         <span
           aria-hidden="true"
