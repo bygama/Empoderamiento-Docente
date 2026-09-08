@@ -149,13 +149,6 @@ export type Profile = {
    * Default: "recorte" (el caso original).
    */
   figura?: "recorte" | "marco" | "sin";
-  /**
-   * Dónde vive el recorte DENTRO de la foto de la card (fracciones de ancho y
-   * alto de `fotoDe(key)`). Con esto la foto viajera de la apertura aterriza
-   * alineada al píxel sobre la figura y el fondo puede disolverse en su lugar.
-   * Se mide una vez (búsqueda del recorte en la foto original) y se anota acá.
-   */
-  cutoutCrop?: { x: number; y: number; w: number; h: number };
   /** Imagen de la figura. Opcional: con `figura: "sin"` no existe. */
   cutout?: string;
   cutoutPosition?: string;

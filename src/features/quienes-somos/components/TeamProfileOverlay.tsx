@@ -41,24 +41,6 @@ const LLEGADA_FOTO = APERTURA + PAUSA_APOYO;
 /** Espera máxima a que cargue la imagen del perfil antes de viajar (para
  *  medir su recuadro real, no la caja que lo reserva). */
 const ESPERA_IMAGEN = 300;
-/** Figura "recorte": el fondo de la foto se disuelve en degradé, de afuera
- *  hacia adentro, dejando la figura parada sobre el papel. */
-const DISOLUCION_FONDO = 0.65;
-
-/** Máscara radial de la foto viajera: `r` = hasta dónde queda foto (en % del
- *  radio); más allá, transparente con borde suave. */
-function mascara(r: number) {
-  return `radial-gradient(ellipse 100% 100% at 50% 42%, black ${r}%, transparent ${r + 24}%)`;
-}
-
-/** Geometría "object-fit: cover" de una imagen dentro de una caja. */
-function coverEn(box: { width: number; height: number }, iw: number, ih: number, pos: string) {
-  const [px, py] = pos.split(" ").map((v) => (parseFloat(v) || 50) / 100);
-  const k = Math.max(box.width / iw, box.height / ih);
-  const w = iw * k;
-  const h = ih * k;
-  return { left: (box.width - w) * px, top: (box.height - h) * py, width: w, height: h };
-}
 /** Arranca decidido y frena largo: "despacio" en la curva, no en la duración. */
 const EASE_VIAJE = "power3.inOut";
 
@@ -167,27 +149,9 @@ export function TeamProfileOverlay({
         const medirDestino = () => {
           const dImg = imgFigura?.getBoundingClientRect();
           if (!dImg || dImg.width === 0) return cajaFigura?.getBoundingClientRect();
-          // Figura "recorte": la <img> es más grande que lo que pinta
-          // (object-fit: contain, apoyada abajo). El destino es lo PINTADO.
-          if (imgFigura && persona.profile?.figura === "recorte" && imgFigura.naturalWidth > 0) {
-            const iw = imgFigura.naturalWidth;
-            const ih = imgFigura.naturalHeight;
-            const k = Math.min(dImg.width / iw, dImg.height / ih);
-            const w = iw * k;
-            const h = ih * k;
-            const [px, py] = getComputedStyle(imgFigura)
-              .objectPosition.split(" ")
-              .map((v) => (parseFloat(v) || 50) / 100);
-            return new DOMRect(dImg.left + (dImg.width - w) * px, dImg.top + (dImg.height - h) * py, w, h);
-          }
           return dImg;
         };
         const viaja = !!(immersive && fotoViaja && viajera && f && f.width > 0 && (imgFigura || cajaFigura));
-        // Figura "recorte" con el recorte ubicado: la foto de la card viaja con
-        // su imagen adentro reencuadrándose, para aterrizar ALINEADA AL PÍXEL
-        // sobre la figura; después el fondo se disuelve en su lugar.
-        const crop = persona.profile?.figura === "recorte" ? persona.profile.cutoutCrop : undefined;
-        const alineable = !!(viaja && crop && originImg && originImg.naturalWidth > 0);
         const imgViajera = viajera?.querySelector("img") ?? null;
         const heroFlip = !!(!immersive && hero && f && f.width > 0);
         const lineas = contentRef.current ? Array.from(contentRef.current.children) : [];
@@ -205,11 +169,6 @@ export function TeamProfileOverlay({
             imgViajera.style.objectPosition = getComputedStyle(originImg).objectPosition;
           }
           gsap.set(viajera, { left: f.left, top: f.top, width: f.width, height: f.height, autoAlpha: 1, borderRadius: "1.25rem" });
-          if (alineable && imgViajera && originImg) {
-            // La imagen adentro arranca con el encuadre de la card (cover).
-            const c = coverEn(f, originImg.naturalWidth, originImg.naturalHeight, getComputedStyle(originImg).objectPosition);
-            gsap.set(imgViajera, { position: "absolute", objectFit: "fill", maxWidth: "none", ...c });
-          }
           if (figura) gsap.set(figura, { autoAlpha: 0 });
         }
         if (heroFlip && hero && f) {
@@ -261,42 +220,13 @@ export function TeamProfileOverlay({
               top: d.top,
               width: d.width,
               height: d.height,
-              borderRadius: alineable ? "0.75rem" : "1.75rem",
+              borderRadius: "1.75rem",
               duration: APERTURA,
               ease: EASE_VIAJE,
             });
-            if (alineable && imgViajera && originImg && crop) {
-              // La imagen se reencuadra en el viaje: del cover de la card a la
-              // ventana del recorte, así al llegar coincide con la figura.
-              const iw = originImg.naturalWidth;
-              const ih = originImg.naturalHeight;
-              const wF = d.width / crop.w;
-              const hF = wF * (ih / iw);
-              gsap.to(imgViajera, {
-                left: -crop.x * wF,
-                top: -crop.y * hF,
-                width: wF,
-                height: hF,
-                duration: APERTURA,
-                ease: EASE_VIAJE,
-              });
-              // Al apoyarse, la figura ya está debajo (alineada, no se nota);
-              // después el FONDO SE DISUELVE EN DEGRADÉ, de afuera hacia adentro.
-              if (figura) gsap.set(figura, { autoAlpha: 1, delay: APERTURA });
-              const velo = { r: 112 };
-              gsap.to(velo, {
-                r: -26,
-                duration: DISOLUCION_FONDO,
-                delay: LLEGADA_FOTO,
-                ease: "power2.inOut",
-                onStart: () => gsap.set(viajera, { boxShadow: "none" }),
-                onUpdate: () => gsap.set(viajera, { maskImage: mascara(velo.r), webkitMaskImage: mascara(velo.r) }),
-                onComplete: () => gsap.set(viajera, { autoAlpha: 0 }),
-              });
-            } else {
-              gsap.to(viajera, { autoAlpha: 0, duration: 0.3, delay: LLEGADA_FOTO, ease: "power2.inOut" });
-              if (figura) gsap.to(figura, { autoAlpha: 1, duration: 0.3, delay: LLEGADA_FOTO, ease: "power2.out" });
-            }
+            // Se apoya, queda quieta un instante y recién ahí se funde en la figura.
+            gsap.to(viajera, { autoAlpha: 0, duration: 0.3, delay: LLEGADA_FOTO, ease: "power2.inOut" });
+            if (figura) gsap.to(figura, { autoAlpha: 1, duration: 0.3, delay: LLEGADA_FOTO, ease: "power2.out" });
           } else if (immersive && fotoViaja) {
             // Sin destino medible la foto no viaja; la figura no puede quedar
             // escondida (ImmersiveProfile la dejó en 0 esperando a este overlay).
