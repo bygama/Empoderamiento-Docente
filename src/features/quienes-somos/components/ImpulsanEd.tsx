@@ -20,9 +20,10 @@ if (typeof window !== "undefined") {
  * (PersonCard) a cuatro escalas, en progresión sostenida — 481 → 379 → 304 →
  * 232 px de ancho con el container en su tope de 1280:
  *
- *   N1 Dirección General      → Daniela: card ancha, masthead arriba-izquierda.
- *   N2 Dirección              → Karla y Raquel: cards menores, escalonadas
- *                               abajo-derecha, una debajo de la otra.
+ *   N1 Dirección General      → Daniela: card ancha, al CENTRO del masthead.
+ *   N2 Dirección              → Karla (izquierda) y Raquel (derecha): cards
+ *                               menores, una de cada lado, más abajo y a la
+ *                               misma altura entre sí.
  *   N3 Líderes de área/proy.  → grilla ESTABLE de cards medianas (2 columnas).
  *   N4 Facilitación y diseño  → grilla ESTABLE 3×2 de cards compactas.
  *
@@ -316,42 +317,42 @@ export function ImpulsanEd() {
           </p>
         </div>
 
-        {/* ── Masthead: N1 Daniela + N2 Karla, dos retratos escalonados ──── */}
+        {/* ── Masthead: N1 Daniela al centro, N2 una de cada lado ─────────
+            Tres columnas: la del medio mide lo que medía la card de Daniela
+            (30rem) y las laterales se reparten el resto, así que las cards de
+            dirección conservan su escala. Las laterales bajan 9rem: Daniela
+            preside y las dos direcciones la flanquean a la misma altura. */}
         <div
           data-team-group
           data-reveal-y="34"
           data-reveal-dur="0.85"
           data-reveal-stagger="0.18"
-          className="relative mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8"
+          className="relative mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_30rem_minmax(0,1fr)] lg:gap-8"
         >
-          {/* N1 — Dirección General (retrato grande, arriba-izquierda) */}
-          <div className="lg:col-span-5">
+          {/* N1 — Dirección General (retrato grande, al centro) */}
+          <div className="sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[30rem] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none">
             <KickerRotulo>Dirección general</KickerRotulo>
             <div data-reveal className="mt-4">
               <PersonCard persona={DANIELA} onOpen={openProfile} />
             </div>
           </div>
 
-          {/* N2 — Dirección (retratos menores, abajo-derecha, escalonados). La
-              columna sostiene las dos direcciones —académica e institucional—
-              una debajo de la otra: siguen la diagonal que abre Daniela sin
-              achicarse para entrar en la misma fila. */}
-          <div className="lg:col-span-4 lg:col-start-9 lg:mt-[9rem] lg:self-start">
-            <KickerRotulo>Dirección</KickerRotulo>
-            <ul className="mt-4 grid gap-8">
-              {direccion.map((persona) => (
-                <li key={persona.key} data-reveal>
-                  <PersonCard persona={persona} onOpen={openProfile} />
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Conector verde discreto entre las dos direcciones (solo desktop) */}
-          <span
-            aria-hidden="true"
-            className="via-verde-concepto/40 absolute top-[56%] left-[43%] hidden h-px w-[15%] -rotate-[18deg] bg-gradient-to-r from-transparent to-transparent lg:block"
-          />
+          {/* N2 — Dirección: una card de cada lado, más abajo, a la misma
+              altura entre sí. Orden de lectura: académica a la izquierda,
+              institucional a la derecha. */}
+          {direccion.map((persona, i) => (
+            <div
+              key={persona.key}
+              className={`lg:row-start-1 lg:mt-[9rem] lg:self-start ${
+                i === 0 ? "lg:col-start-1" : "lg:col-start-3"
+              }`}
+            >
+              <KickerRotulo>Dirección</KickerRotulo>
+              <div data-reveal className="mt-4">
+                <PersonCard persona={persona} onOpen={openProfile} />
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* ── N3 — Líderes de área y proyecto: 2×2, cuatro pares ─────────── */}
