@@ -14,9 +14,10 @@
 // chico en dos líneas (UCSH, Science Up) necesita más alto que un wordmark de
 // una línea (UNESCO, Bloom) para pesar lo mismo. La tira de la home tiene el
 // renglón un poco más alto (h-12) que la del pie (h-11), por eso van dos.
+// Orden pedido por ED (2026-09-08): UNESCO primero, Techint segundo.
 export const ALIADOS = [
-  { src: "/aliados/techint.svg", alt: "Techint", alto: { home: "h-12", pie: "h-11" } },
   { src: "/aliados/unesco.png", alt: "UNESCO", alto: { home: "h-8", pie: "h-7" } },
+  { src: "/aliados/techint.svg", alt: "Techint", alto: { home: "h-12", pie: "h-11" } },
   { src: "/aliados/bloom.png", alt: "Bloom", alto: { home: "h-8", pie: "h-7" } },
   {
     src: "/aliados/ucsh.png",
