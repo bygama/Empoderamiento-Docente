@@ -76,8 +76,10 @@ function Rotulo({
  * apoyados sobre el color — collage de evidencias, análisis como hoja
  * mecanografiada con clip, aprendizaje como post-it, síntesis en placa,
  * sello ED con logo estampado directo sobre el cartón y producción como
- * etiquetas. El lugar (capa fija con scroll propio, data-lenis-prevent
- * para que Lenis no se coma la rueda) abre con título display ancho +
+ * etiquetas. El lugar (capa fija con scroll propio: `data-lenis-prevent`
+ * para que Lenis no se coma la rueda y `data-scroll-principal` para que el
+ * navbar se esconda y aparezca siguiendo ESTE recorrido y no el de la
+ * ventana, que queda congelada debajo) abre con título display ancho +
  * ficha catalográfica y un indicio de scroll que se apaga al recorrer.
  * Las pestañas de los otros casos son parte del objeto: asoman del canto
  * derecho de la carcasa. Tipografías de material (no de UI): manuscrita
@@ -226,6 +228,7 @@ export function ExpedienteCaso({
       ref={refLugar}
       data-exp-lugar
       data-lenis-prevent
+      data-scroll-principal
       id="expediente-caso"
       aria-label={`Expediente del caso ${caso.numero}`}
       className={`fixed inset-0 z-50 overflow-x-hidden overflow-y-auto overscroll-contain ${
