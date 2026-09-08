@@ -117,7 +117,7 @@ export function CierreQueHacemos() {
             data-qhc-foot
             className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
           >
-            <ButtonPrimary href="/contacto">Hablemos de tu contexto</ButtonPrimary>
+            <ButtonPrimary href="/contacto?tema=formacion">Hablemos de tu contexto</ButtonPrimary>
             <Link
               href="/investigacion"
               className="group text-azul-claro hover:text-white inline-flex items-center gap-2 font-sans text-[0.95rem] font-medium transition-colors"

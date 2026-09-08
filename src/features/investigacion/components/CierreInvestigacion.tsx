@@ -351,7 +351,7 @@ export function CierreInvestigacion() {
               Investigar permite hacer mejores preguntas.
             </h2>
             <div className="mt-8">
-              <ButtonPrimary href="/contacto">Conversemos</ButtonPrimary>
+              <ButtonPrimary href="/contacto?tema=investigacion">Conversemos</ButtonPrimary>
             </div>
           </div>
         </div>
