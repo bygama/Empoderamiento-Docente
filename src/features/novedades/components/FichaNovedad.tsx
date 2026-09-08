@@ -21,6 +21,18 @@ import { GuiaNota } from "./GuiaNota";
  * Si se llegó vía la transición del faro (flag en sessionStorage), los
  * reveals del titular y la foto esperan a que el telón destape (~0.7s).
  */
+const irASeccion = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  e.preventDefault();
+  const el = document.getElementById(`s-${id}`);
+  if (!el) return;
+  const lenis = getLenis();
+  if (lenis) {
+    lenis.scrollTo(el, { offset: -120, duration: 1 });
+  } else {
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 120 });
+  }
+};
+
 export function FichaNovedad({ n }: { n: Novedad }) {
   const abrir = useTransicionFaro();
   const secciones = n.cuerpo ?? [];
@@ -52,18 +64,6 @@ export function FichaNovedad({ n }: { n: Novedad }) {
       return;
     e.preventDefault();
     abrir("/novedades");
-  };
-
-  const irASeccion = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const el = document.getElementById(`s-${id}`);
-    if (!el) return;
-    const lenis = getLenis();
-    if (lenis) {
-      lenis.scrollTo(el, { offset: -120, duration: 1 });
-    } else {
-      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 120 });
-    }
   };
 
   // Sección activa de la guía: la primera visible en la franja de lectura.
