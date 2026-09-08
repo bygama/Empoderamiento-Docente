@@ -70,7 +70,7 @@ function RevealFoco({
   return (
     <div ref={ref} className={`overflow-hidden ${className}`}>
       {/* El overscale 1.1 cubre el sangrado de bordes que produce el blur. */}
-      <div className="h-full w-full will-change-transform">{children}</div>
+      <div className="h-full w-full">{children}</div>
     </div>
   );
 }
