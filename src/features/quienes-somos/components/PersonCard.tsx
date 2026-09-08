@@ -129,7 +129,7 @@ function Caption({
       >
         {persona.nombre}
       </span>
-      <span className={cx("mt-0.5 line-clamp-2 font-sans leading-snug", cfg.rol, hover ? "text-white/85" : "text-azul-principal/75")}>
+      <span className={cx("mt-0.5 line-clamp-3 font-sans leading-snug sm:line-clamp-2", cfg.rol, hover ? "text-white/85" : "text-azul-principal/75")}>
         {persona.rol}
       </span>
       <span className="mt-2 flex items-center justify-between gap-2">
