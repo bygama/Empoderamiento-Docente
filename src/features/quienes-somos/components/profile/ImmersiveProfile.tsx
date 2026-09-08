@@ -127,9 +127,8 @@ export function ImmersiveProfile({
   // Buscar por identidad (n), no por posición (motor reutilizable).
   const activeCategoryId =
     activeStage > 0 ? profile.stages.find((s) => s.n === activeStage)?.categoryId ?? null : null;
-  const passedIds = new Set(
-    profile.stages.filter((s) => s.n <= activeStage).map((s) => s.categoryId),
-  );
+  const passedIds = new Set<string>();
+  for (const s of profile.stages) if (s.n <= activeStage) passedIds.add(s.categoryId);
   /** Tratamiento de la fotografía (ver `Profile.figura`). */
   const figura = profile.figura ?? "recorte";
   // Titular en dos tiempos (frase real, partida en oraciones para jerarquía).
@@ -694,7 +693,7 @@ export function ImmersiveProfile({
                 style={{ fontSize: "clamp(1.45rem, 1.05rem + 1.3vw, 2.05rem)", lineHeight: 1.22 }}
               >
                 {headlineParts.map((part, i) => (
-                  <span key={i} className={cx("block", i === 0 ? "text-azul-principal" : "text-azul-medio")}>
+                  <span key={part} className={cx("block", i === 0 ? "text-azul-principal" : "text-azul-medio")}>
                     {part}
                   </span>
                 ))}

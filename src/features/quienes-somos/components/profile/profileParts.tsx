@@ -77,8 +77,8 @@ function MiniList({ items, color }: { items: Milestone[]; color: ProfileStage["c
   const a = ACCENT[color];
   return (
     <ul className="mt-7 space-y-2.5">
-      {items.map((m, i) => (
-        <li key={i} data-reveal-el className="flex items-baseline gap-3">
+      {items.map((m) => (
+        <li key={m.title} data-reveal-el className="flex items-baseline gap-3">
           <span aria-hidden="true" className={cx("h-1.5 w-1.5 shrink-0 translate-y-[-1px] rounded-full", a.bg)} />
           <span className="font-sans text-[0.95rem] leading-snug">
             <span className="text-azul-principal font-medium">{m.title}</span>
@@ -130,8 +130,8 @@ function FichaPanel({ stage }: { stage: ProfileStage }) {
         className="border-azul-principal/10 bg-gris-fondo/60 max-w-[30rem] rounded-2xl border p-5"
       >
         <ul className="space-y-4">
-          {stage.milestones?.map((m, i) => (
-            <li key={i}>
+          {stage.milestones?.map((m) => (
+            <li key={m.title}>
               {m.period && (
                 <span className={cx("font-mono text-[0.66rem] font-semibold tracking-[0.12em] uppercase", a.text)}>
                   {m.period}
@@ -149,9 +149,9 @@ function FichaPanel({ stage }: { stage: ProfileStage }) {
             Ramificaciones · estancias
           </span>
           <ul className="mt-2.5 flex flex-wrap gap-3">
-            {stage.branches.map((b, i) => (
+            {stage.branches.map((b) => (
               <li
-                key={i}
+                key={`${b.place}-${b.period ?? ""}`}
                 data-reveal-el
                 className="border-azul-principal/15 relative rounded-lg border border-dashed px-3.5 py-2"
               >
@@ -194,8 +194,8 @@ function ConceptoBlock({ stage }: { stage: ProfileStage }) {
             Una línea sostenida
           </span>
           <ul className="mt-2.5 space-y-1.5">
-            {stage.milestones.map((m, i) => (
-              <CompactRow key={i} m={{ period: m.period, title: m.title }} color={stage.color} />
+            {stage.milestones.map((m) => (
+              <CompactRow key={m.title} m={{ period: m.period, title: m.title }} color={stage.color} />
             ))}
           </ul>
         </div>
@@ -226,15 +226,15 @@ function HitosBlock({ stage }: { stage: ProfileStage }) {
   const resto = stage.milestones?.filter((m) => !m.primary) ?? [];
   return (
     <div className="mt-7">
-      {primarios.length > 0 && <ul className="space-y-5">{primarios.map((m, i) => <PrimaryRow key={i} m={m} color={stage.color} />)}</ul>}
+      {primarios.length > 0 && <ul className="space-y-5">{primarios.map((m) => <PrimaryRow key={m.title} m={m} color={stage.color} />)}</ul>}
       {resto.length > 0 && (
         <div className="mt-6">
           <span data-reveal-el className="text-gris-texto/90 font-mono text-[0.62rem] tracking-[0.18em] uppercase">
             También en esos años
           </span>
           <ul className="mt-2.5 space-y-1.5">
-            {resto.map((m, i) => (
-              <CompactRow key={i} m={m} color={stage.color} />
+            {resto.map((m) => (
+              <CompactRow key={m.title} m={m} color={stage.color} />
             ))}
           </ul>
         </div>
@@ -253,7 +253,7 @@ function MapaBlock({ stage }: { stage: ProfileStage }) {
     <ul className="mt-8 flex max-w-[38rem] flex-wrap items-start gap-x-4 gap-y-5">
       {stage.tags?.map((t, i) => (
         <li
-          key={i}
+          key={t}
           data-reveal-el
           className="border-azul-principal/12 rounded-full border bg-white px-4 py-2 font-sans text-[0.86rem] font-medium text-azul-principal shadow-[0_10px_28px_-20px_rgb(31_45_77/0.35)]"
           style={{ transform: `translateY(${OFFSETS_MAPA[i % OFFSETS_MAPA.length]}px)` }}
@@ -328,7 +328,7 @@ function RamasBlock({ stage, side }: { stage: ProfileStage; side: Side }) {
   return (
     <div className="mt-8 grid max-w-[40rem] gap-5 sm:grid-cols-2">
       {pubs.map((p, i) => (
-        <div key={i} className={cx(i % 2 === 1 && "sm:translate-y-8")}>
+        <div key={p.title} className={cx(i % 2 === 1 && "sm:translate-y-8")}>
           <PubPiece pub={p} color={stage.color} side={side} />
         </div>
       ))}
@@ -359,8 +359,8 @@ function SintesisBlock({ stage }: { stage: ProfileStage }) {
             En paralelo, hoy
           </span>
           <ul className="mt-2.5 grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
-            {resto.map((m, i) => (
-              <CompactRow key={i} m={m} color={stage.color} />
+            {resto.map((m) => (
+              <CompactRow key={m.title} m={m} color={stage.color} />
             ))}
           </ul>
         </div>

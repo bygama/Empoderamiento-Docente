@@ -175,6 +175,9 @@ function Pilar({
   );
 }
 
+/** El remate, palabra por palabra: la primera y la última van en verde. */
+const PALABRAS_REMATE = ["Vivir", "para", "hacer", "vivir."] as const;
+
 export function OrigenEd() {
   const rootRef = useRef<HTMLElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
@@ -881,8 +884,8 @@ export function OrigenEd() {
                 className="font-display font-bold tracking-[-0.02em]"
                 style={{ fontSize: "clamp(2.6rem, 1rem + 5.6vw, 5.4rem)", lineHeight: 1.05 }}
               >
-                {["Vivir", "para", "hacer", "vivir."].map((w, i) => (
-                  <Fragment key={i}>
+                {PALABRAS_REMATE.map((w, i) => (
+                  <Fragment key={w}>
                     <span
                       data-fin-word
                       className={`inline-block will-change-transform ${
