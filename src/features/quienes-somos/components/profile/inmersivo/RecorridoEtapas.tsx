@@ -59,7 +59,7 @@ export function RecorridoEtapas({ profile, activeStage, refTrack, refSvg, refPat
                   className={cx(
                     // 14.1px bold = "texto grande" para WCAG: el numeral en
                     // blanco sobre el acento queda sobre el umbral de 3:1.
-                    "flex h-10 w-10 items-center justify-center rounded-full border-2 font-mono text-[0.88rem] font-bold transition-all duration-500",
+                    "flex h-10 w-10 items-center justify-center rounded-full border-2 font-mono text-[0.88rem] font-bold transition-[border-color,color,background-color,transform,box-shadow] duration-500",
                     !current && "bg-white",
                     passed ? cx(a.border, a.text) : "border-azul-principal/20 text-azul-principal/35",
                     current && cx(a.bg, a.glow, "scale-110 !text-white"),
