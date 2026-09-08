@@ -39,6 +39,16 @@ const PASO_SCROLL = 280;
  * siempre (fade de opacidad, sin saltos de layout). Píldoras sobrias según
  * DESIGN §9: uniformes en gris-fondo, la primera activa en navy.
  */
+const irAlListado = () =>
+  document.getElementById("materiales")?.scrollIntoView({ behavior: "smooth" });
+
+// En celular las flechas no van: entre las dos se comían un tercio del ancho
+// y dejaban una sola píldora a la vista. Ahí el riel se arrastra con el dedo.
+const flechaClase = (activa: boolean) =>
+  `hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-azul-principal shadow-[0_16px_40px_-16px_rgb(0_0_0_/_0.4)] transition-[opacity,background-color] duration-300 hover:bg-azul-claro/60 md:flex ${
+    activa ? "opacity-100" : "pointer-events-none opacity-0"
+  }`;
+
 export function CategoriasRail() {
   const railRef = useRef<HTMLDivElement | null>(null);
   const [hayIzq, setHayIzq] = useState(false);
@@ -61,16 +71,6 @@ export function CategoriasRail() {
 
   const desplazar = (dir: 1 | -1) =>
     railRef.current?.scrollBy({ left: dir * PASO_SCROLL, behavior: "smooth" });
-
-  const irAlListado = () =>
-    document.getElementById("materiales")?.scrollIntoView({ behavior: "smooth" });
-
-  // En celular las flechas no van: entre las dos se comían un tercio del ancho
-  // y dejaban una sola píldora a la vista. Ahí el riel se arrastra con el dedo.
-  const flechaClase = (activa: boolean) =>
-    `hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-azul-principal shadow-[0_16px_40px_-16px_rgb(0_0_0_/_0.4)] transition-[opacity,background-color] duration-300 hover:bg-azul-claro/60 md:flex ${
-      activa ? "opacity-100" : "pointer-events-none opacity-0"
-    }`;
 
   return (
     <div className="flex items-center gap-2 md:gap-3">
