@@ -599,7 +599,7 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 <!-- Solo evidencia PASS, la escribe work-verify (lo más nuevo arriba). El cierre no
      cierra la lane sin un bloque PASS vigente acá. -->
 
-### 2026-09-08 — DoD del SPEC §6, capas estáticas y de comportamiento: PASS (falta la review)
+### 2026-09-08 — DoD del SPEC §6: **PASS PARCIAL** (12 de 13 criterios; §6.3 abierto)
 
 - **§6.1 react-doctor**: `pnpm dlx react-doctor --no-supply-chain src` → **`Score: 100 / 100`**
   y «No issues found!». En `--json`: `summary.score` 100, `totalDiagnosticCount` 0,
@@ -660,12 +660,32 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 
 ### Pregunta abierta para el owner (no la resuelve el agente)
 
-El PLAN dice «ningún archivo tocado o creado en `src/` supera las 200 líneas». Los creados
-cumplen (138/138). Los **tocados y no partidos** no: 22 ya superaban las 200 antes de la
-lane (hasta `equipo.ts` con 2483) y 17 crecieron un poco con este trabajo (entre 2 y 11
-líneas: comentarios del porqué que el repo pide y los traslados de will-change). Cumplir la
-letra obligaría a partir ~22 archivos que react-doctor no marca y que el PLAN nunca listó.
-Las opciones son: (a) leer el tope como lo que la lane ejecutó —vale para lo que crea y para
-lo que parte— y anotarlo en DECISIONS; (b) recortar los 17 a su cuenta original sacando
-comentarios; (c) abrir una lane nueva para partir esos 22. Recomendación: (a), y (c) como
-lane aparte si el tope se quiere universal.
+El SPEC §6.3 pide «`wc -l` ≤ 200 en cada archivo de `git diff --name-only main...HEAD -- src`
+(tocado **o creado**) → 0 archivos por encima». Los **creados** cumplen: 138 de 138. Los
+**tocados y no partidos**, no: **22 superan las 200** y ya lo hacían antes de la lane (de
+`equipo.ts` con 2483 a `BibliotecaNovedades.tsx` con 217).
+
+Los números exactos, sin suavizar (los corrigió el seat de reglas):
+
+- **17 archivos crecieron** en esta lane, de **2 a 17 líneas**. El crecimiento más grande es
+  `src/config/aliados.ts` (32→49, +17), no `equipo.ts` (+11).
+- **11 de esos 17 son justamente de los 22 que ya pasaban las 200**: la lane empujó un poco
+  más arriba archivos que ya estaban sobredimensionados (`equipo.ts`, `materiales.ts`,
+  `Footer.tsx`, `HeroQuienes`, `CaminoDeTrabajo`, `TransicionFaro`, `EnfoqueTransformacion`,
+  `LineasInvestigacion`, `coreografia-carta`, `EdEnMovimiento`, `PuenteInvestigacion`).
+- El conflicto no es solo con la letra del PLAN: la ruling **«El tope de 200 líneas aplica a
+  lo creado y a lo que se parte»** de DECISIONS cierra con «los otros **no crecen ni una
+  línea** pero no se parten acá», y seis de los archivos que crecieron están nombrados uno
+  por uno en esa misma entrada. Elegir (a) obliga a **enmendar esa cláusula**, no solo a
+  anotar una lectura nueva.
+
+Opciones y costo real:
+
+- **(a) leer el tope como creado + partido.** Dos ediciones de doc (SPEC §6.3 y la cláusula
+  de DECISIONS). Riesgo de código: cero. Deja 22 archivos >200 en `main`. **Recomendada.**
+- **(b) recortar los 17 a su cuenta original.** Borra los comentarios del porqué que AGENTS
+  §8 pide y que sostienen los traslados de will-change y las medidas de `next/image`; en
+  `equipo.ts` (el dato `cutoutSize` del paso 30) y `aliados.ts` es directamente inviable.
+- **(c) lane nueva para partir los 22.** Una L completa sobre archivos que `gar` también
+  toca, con conflictos garantizados y **cero ganancia de score** (react-doctor ya da 100 sin
+  eso). Sirve solo si el tope se quiere universal.
