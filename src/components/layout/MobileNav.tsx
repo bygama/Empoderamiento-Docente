@@ -106,8 +106,12 @@ export function MobileNav() {
             // `open:flex` y no `flex`: un `display` fijo le gana a la regla del
             // agente que esconde el dialog cerrado y el panel quedaría siempre
             // a la vista. El resto neutraliza margen, borde, fondo y topes de
-            // tamaño del agente para que siga siendo full-bleed.
-            className="faro-glow fixed inset-0 z-[70] m-0 hidden max-h-none max-w-none flex-col overflow-y-auto border-0 bg-transparent p-0 backdrop:bg-transparent open:flex lg:hidden"
+            // tamaño del agente para que siga siendo full-bleed, y `h-full
+            // w-full` no sobra al lado de `inset-0`: el agente le da al dialog
+            // `width`/`height: fit-content`, que le ganan al tamaño implícito
+            // del inset y encogían el panel (los ítems quedaban 21px más
+            // angostos y 59px más arriba que antes de ser <dialog>).
+            className="faro-glow fixed inset-0 z-[70] m-0 hidden h-full w-full max-h-none max-w-none flex-col overflow-y-auto border-0 bg-transparent p-0 backdrop:bg-transparent open:flex lg:hidden"
             style={{ visibility: "hidden" }}
           >
             {/* Barra superior: logo (→ Inicio) + cerrar. */}
