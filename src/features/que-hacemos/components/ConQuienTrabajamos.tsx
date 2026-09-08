@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ALIADOS } from "@/config/aliados";
 import { INTERLOCUTORES } from "@/features/que-hacemos/areas";
@@ -46,10 +47,14 @@ export function ConQuienTrabajamos() {
           <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-16">
             {ALIADOS.map((a) => (
               <li key={a.src} className="flex h-12 items-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {/* El alto lo manda la clase y el ancho va `auto`: las medidas del
+                    archivo (config/aliados) solo reservan la proporción. */}
+                <Image
                   src={a.src}
                   alt={a.alt}
+                  width={a.w}
+                  height={a.h}
+                  unoptimized={"vectorial" in a}
                   draggable={false}
                   className={`${a.alto.home} w-auto opacity-75 [filter:brightness(0)_invert(1)]`}
                 />
