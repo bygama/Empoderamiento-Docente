@@ -147,6 +147,9 @@ export function RotadorPalabras({
       const finalSpan = reel?.querySelector<HTMLElement>("[data-final]");
       if (!reel || !finalSpan || reel.dataset.built) return;
       reel.dataset.built = "1";
+      // El hint lo pide la coreografía, no la clase: vive lo que dura el giro
+      // y lo borra el `clearProps` de más abajo (y el de `limpiarBobina`).
+      gsap.set(reel, { willChange: "transform" });
 
       reel.insertBefore(
         fragmentoRuido(RUIDO_ENTRADA, finalSpan.textContent ?? ""),
@@ -213,6 +216,7 @@ export function RotadorPalabras({
       const finalSpan = reel?.querySelector<HTMLElement>("[data-final]");
       if (!reel || !finalSpan || reel.dataset.saliendo) return;
       reel.dataset.saliendo = "1";
+      gsap.set(reel, { willChange: "transform" });
 
       // Ruido DESPUÉS del real: la bobina sigue la misma dirección de giro.
       reel.appendChild(fragmentoRuido(RUIDO_SALIDA, finalSpan.textContent ?? ""));
