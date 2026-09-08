@@ -70,7 +70,7 @@ export function CapsulaPortal({ refCampo, refBoton, refInner }: CapsulaPortalPro
                 {ch}
               </span>
             ))}
-            <span className="inline-block w-0 -translate-x-1 opacity-0 transition-all duration-300 ease-out group-hover:w-[1.1em] group-hover:translate-x-1 group-hover:opacity-100">
+            <span className="inline-block w-0 -translate-x-1 opacity-0 transition-[width,transform,opacity] duration-300 ease-out group-hover:w-[1.1em] group-hover:translate-x-1 group-hover:opacity-100">
               ↓
             </span>
           </span>

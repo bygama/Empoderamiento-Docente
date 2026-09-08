@@ -40,7 +40,7 @@ export function RielEstaciones({ refNav, refBoton, onSaltar }: Props) {
         >
           {/* El punto se estira a un guion verde en la activa: el
               gesto de "estás acá" lee mejor que un punto más grande. */}
-          <span className="group-data-[active=true]:bg-verde-concepto inline-block h-1 w-1 rounded-full bg-current opacity-40 transition-all duration-300 ease-out group-data-[active=true]:w-3 group-data-[active=true]:opacity-100" />
+          <span className="group-data-[active=true]:bg-verde-concepto inline-block h-1 w-1 rounded-full bg-current opacity-40 transition-[width,opacity,background-color] duration-300 ease-out group-data-[active=true]:w-3 group-data-[active=true]:opacity-100" />
           {String(i + 1).padStart(2, "0")} {t.tambor}
         </button>
       ))}
