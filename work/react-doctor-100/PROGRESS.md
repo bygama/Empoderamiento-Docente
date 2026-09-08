@@ -599,7 +599,86 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 <!-- Solo evidencia PASS, la escribe work-verify (lo más nuevo arriba). El cierre no
      cierra la lane sin un bloque PASS vigente acá. -->
 
-### 2026-09-08 — DoD del SPEC §6: 13 de 13 criterios en verde salvo la review (§6.13), en curso
+### 2026-09-08 — Review de cierre: 4 seats en Opus (SPEC §6.13)
+
+Seats independientes, sin contexto de esta sesión, con la consigna de REFUTAR el PASS. Los
+veredictos, como los devolvieron (los cuatro mensajes llegaron cortados por tamaño; se pidió
+y se recibió la cola de cada uno):
+
+**Seat 1 — animación home + que-hacemos: «PASS CON OBSERVACIONES».** «No encontré nada que
+rompa la coreografía ni la limpieza. Los seis splits de fase 1 de mi lente son puros: mismas
+posiciones de timeline, mismos easings y duraciones, mismos gsap.set, mismo
+gsap.context/matchMedia, mismos cleanups y mismas fases de efecto.» Cuatro hallazgos bajos y
+uno informativo.
+
+**Seat 2 — animación quiénes-somos + investigación + resto: «FAIL (arreglable en un commit
+chico, pero son regresiones visibles y la lane se comprometió a cero cambios visibles —
+SPEC §2)».** Dos familias de regresión visual REALES que «los probes de la lane no podían
+detectar por construcción», más una afirmación de PROGRESS que no coincidía con el código y
+un hueco de verificación.
+
+**Seat 3 — React y accesibilidad: «PASS CON OBSERVACIONES».** «Un hallazgo que sí rompe
+accesibilidad y lo introdujo esta lane (paso 32), dos bugs de corrección en el foco del
+<dialog> nuevo, y tres observaciones menores.»
+
+**Seat 4 — reglas del repo: «PASS CON OBSERVACIONES».** «El 100/100 es real y está limpio: lo
+verifiqué de punta a punta» (corrió los comandos por su cuenta). Lo que no cerraba era el
+criterio de tamaño del DoD y detalles de registro y de commits.
+
+#### Qué se arregló, con su medición
+
+| Hallazgo | Arreglo y evidencia | Commit |
+|---|---|---|
+| ROJO — la píldora resaltada del índice quedaba SIN fondo: `bg-transparent` en la clase base le gana al `bg-azul-principal` condicional (misma especificidad; en el CSS construido sale después, 53035 contra 48961). Texto blanco sobre el fondo de la página. | Sale `bg-transparent`; las dos ramas del condicional ya traen su fondo. Medido: `rgb(31,45,77)` con texto blanco, igual que la base. | `b41bab0` |
+| ROJO — 15 `transition-[…transform…]` no animaban nada: en Tailwind v4 `translate-*` escribe la propiedad `translate` y `scale-*` escribe `scale`. El paso 27 cambió `transition-all` por listas que decían `transform` y el desplazamiento saltaba. | `transform` pasa a `translate` (14 sitios) y a `scale` (1). Medido contra la base: la flecha de «Biblioteca» pasa por 73 valores intermedios de `none` a `2px -2px`, misma trayectoria. | `b41bab0` |
+| ROJO — las píldoras del índice (`<button tabIndex={-1}>` dentro de `aria-hidden`) se quedaban el foco al clickearlas y Chrome ignora el `aria-hidden`, exponiendo la capa decorativa entera. | `onMouseDown` con `preventDefault`. Medido: el clic sigue navegando y el imán mueve las píldoras los mismos píxeles que la base. | `5b838fa` |
+| El foco al burger se pedía con el `<dialog>` todavía modal (inerte): era no-op y andaba de rebote por la restauración del propio `<dialog>`; además robaba el foco en cada re-corrida con el menú cerrado. | Restauración pegada al `close()` real. Medido abriendo SIN foco en el burger: vuelve igual. | `5b838fa` |
+| Con el menú abierto, agrandar la ventana más allá de `lg` dejaba el panel pintado, modal y con el scroll trabado. | Se cierra al cruzar a escritorio. Medido: `display: none`, `open: false` y scroll liberado (la base queda con el body en `overflow: hidden`). | `d144580` |
+| PROGRESS declaraba a `RotadorPalabras` dueño de su hint y el código no lo ponía: dos `clearProps` limpiaban algo inexistente. | La coreografía lo pide al armar y al sacar la bobina. Medido en /novedades: alterna `transform` girando y `auto` en reposo. | `d8a83ff` |
+| El PLAN paso 7 prometía promover `[data-card-mouse]` solo con puntero fino y el hero del home no lo pedía. | Gate propio por `(hover: hover)`, aparte de `soloHover` (que apaga el RAF). Medido: desktop 11/11, mobile 0/11. | `5c46c54` |
+| Hueco de verificación: ningún probe había scrolleado ADENTRO del `<dialog>` del perfil, que es el scroller de todos sus ScrollTrigger. | Probe nuevo `perfil-scroll.js`: scroller `DIALOG` contra `DIV` en la base, mismo alto (4029), mismos `scrollTop` en 5 fracciones y cero diferencias en los elementos del perfil inmersivo. | — |
+| El Enter del buscador perdió el cierre del teclado virtual que traía el submit implícito del `<form>`. | `blur()` antes del salto; `PROBE buscador` sigue en `ok: true`. | `d144580` |
+| El comentario de `PaisDropdown` prometía un `aria-activedescendant` que el archivo nunca tuvo. | Comentario corregido. | `d144580` |
+| Seis `export` sin ningún consumidor fuera de su archivo. | Pasan a locales. | `306927c` |
+| Registro: `F35` decía «div role=search»; la entrada de DECISIONS sobre módulos extra nombraba 2 casos de unos 12; el sub-límite de 80 líneas para hooks nunca se había registrado. | Los tres corregidos en DECISIONS y en `feature_list.json`. | `306927c` |
+
+Efecto secundario del arreglo de accesibilidad: sumar `role="search"` al `<search>` (lo pedía
+el seat 3 para navegadores anteriores a 2023) disparó `no-redundant-roles` y el score cayó a
+96. Como el pedido del owner es 100/100 sin apagar ni una regla, el rol salió y la decisión
+quedó escrita en DECISIONS (`a80259e`).
+
+#### Qué NO se arregló, y por qué
+
+- **Forma de los commits** (15 headers de más de 72 caracteres, el scope `ui` de `4857346`, y
+  `feat` donde correspondía `refactor`): son reales, pero los sha están citados en PROGRESS,
+  en `feature_list.json` y en DECISIONS, y reescribirlos los invalidaría todos. Queda como
+  regla para la próxima lane.
+- **`[data-mcard]` sin hint en mobile** (seat 1): es lo que mandaban el relevamiento §1a y el
+  SPEC §3.4. Anotado como primer sospechoso si aparece jank en el despliegue mobile.
+- **Alocación por frame en `pintar-torre.ts`** y **el par encendido/cierre del haz duplicado
+  entre `haz-faro.ts` y `escenas-faro.ts`**: preferencias del seat 1; el segundo ya estaba
+  duplicado en la base y lleva comentario en los dos lados.
+- **Los siete hooks de más de 80 líneas** de AGENTS §6: consecuencia registrada de la ruling
+  del owner sobre el tope.
+
+### 2026-09-08 — Verificación FINAL, después de los arreglos de la review
+
+- `RD --json src` → score 100, 0 diagnósticos, `skippedChecks: []`, `complete: true`, 278
+  archivos. `pnpm typecheck`, `pnpm lint` y `pnpm build` → exit 0.
+- PROBES sobre el estado final: **desktop 48/48 sin diferencias** (exit 0, con `data-haz` y
+  `data-svg-origin` en el ignore por no deterministas, probado base contra base); **mobile
+  32/32 con la única familia conocida**, las 192 entradas de `data-mnav-item` y
+  `data-mnav-cta` que pasan a caja `0,0,0,0` porque un `<dialog>` cerrado no se maqueta,
+  cubierta por `PROBE menu-abierto`, que mide el panel ABIERTO igual a la base al centésimo.
+- Probes de interacción, todos en `ok: true`: `menu-mobile`, `perfil-dialog` (inmersivo y
+  shell), `casos`, `buscador`, `indice-pildora`, `menu-abierto`, `perfil-scroll`,
+  `a11y-fix`, `wc-puntero`, `bobina-hint` y `flecha-anima`.
+- Las 168 capturas pareadas se tomaron antes de los arreglos de la review y no se rehicieron:
+  ninguno de esos arreglos cambia un estado congelado (tocan color en hover,
+  `transition-property`, `will-change` y el foco). Lo que sí se volvió a correr sobre el
+  estado final son los probes numéricos, que son el criterio de paso.
+
+### 2026-09-08 — DoD del SPEC §6: 13 de 13 criterios en verde incluida la review (§6.13)
 
 - **§6.1 react-doctor**: `pnpm dlx react-doctor --no-supply-chain src` → **`Score: 100 / 100`**
   y «No issues found!». En `--json`: `summary.score` 100, `totalDiagnosticCount` 0,
