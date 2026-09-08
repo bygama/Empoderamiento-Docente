@@ -4,11 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import gsap from "gsap";
-import { ArrowRight } from "@/components/ui/icons";
+import { ArrowRight, Enlace } from "@/components/ui/icons";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { useCopiar } from "@/lib/hooks/useCopiar";
 import { getLenis } from "@/lib/lenis";
 import { fotoDe, TIER_ROTULO, type Persona } from "@/features/quienes-somos/data/equipo";
 import { ImmersiveProfile } from "@/features/quienes-somos/components/profile/ImmersiveProfile";
@@ -47,6 +48,7 @@ export function TeamProfileOverlay({
   // variante lineal, que trae su propio h2 y todo el contenido en flujo.
   const desktopChoreo = useMediaQuery("(min-width: 64rem)");
   const staticProfile = reduced || !desktopChoreo;
+  const { copiado, copiar } = useCopiar();
   const [container] = useState<HTMLDivElement | null>(() =>
     typeof document !== "undefined" ? document.createElement("div") : null,
   );
@@ -283,6 +285,22 @@ export function TeamProfileOverlay({
       >
         <ArrowRight size={16} className="rotate-180" />
         Volver al equipo
+      </button>
+
+      {/* Copiar link — el perfil tiene dirección propia (?persona=clave):
+          sirve para mandar «mirá el perfil de X» por donde sea. */}
+      <button
+        type="button"
+        onClick={() =>
+          copiar(
+            `${window.location.origin}/quienes-somos?persona=${persona.key}`,
+            "link",
+          )
+        }
+        className="border-azul-principal/15 text-azul-principal hover:border-verde-concepto hover:text-verde-concepto focus-visible:outline-verde-concepto fixed top-6 right-6 z-10 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2.5 font-sans text-[0.9rem] font-medium backdrop-blur-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:top-8 md:right-8"
+      >
+        <Enlace size={16} aria-hidden="true" />
+        {copiado === "link" ? "Copiado" : "Copiar link"}
       </button>
 
       {immersive ? (

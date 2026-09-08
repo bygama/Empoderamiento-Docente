@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { DANIELA, porTier, type Persona } from "@/features/quienes-somos/data/equipo";
+import { irAElemento } from "@/lib/indice";
+import { DANIELA, EQUIPO, porTier, type Persona } from "@/features/quienes-somos/data/equipo";
 import { PersonCard } from "@/features/quienes-somos/components/PersonCard";
 import { TeamProfileOverlay } from "@/features/quienes-somos/components/TeamProfileOverlay";
 
@@ -136,9 +137,33 @@ export function ImpulsanEd() {
   // Dirección (nivel 2): académica + institucional. Antes era una sola card.
   const direccion = porTier(2);
 
+  // El perfil abierto queda en la URL (?persona=clave) sin sumar entradas
+  // al historial: así se puede copiar y mandar; al cerrar, se limpia.
   const openProfile = (persona: Persona, el: HTMLButtonElement) => {
     setSelected({ persona, el });
+    window.history.replaceState(window.history.state, "", `?persona=${persona.key}`);
   };
+  const closeProfile = () => {
+    setSelected(null);
+    window.history.replaceState(window.history.state, "", window.location.pathname);
+  };
+
+  // Link directo: si la URL ya trae ?persona=, se lleva la página hasta esa
+  // card y se abre el perfil desde ahí, un momento después del montaje.
+  useEffect(() => {
+    const clave = new URLSearchParams(window.location.search).get("persona");
+    if (!clave) return;
+    const persona = EQUIPO.find((p) => p.key === clave);
+    const el = rootRef.current?.querySelector<HTMLButtonElement>(
+      `[data-persona-key="${clave}"]`,
+    );
+    if (!persona || !el) return;
+    const t = window.setTimeout(() => {
+      irAElemento(el, true);
+      setSelected({ persona, el });
+    }, 400);
+    return () => window.clearTimeout(t);
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -390,7 +415,7 @@ export function ImpulsanEd() {
         <TeamProfileOverlay
           persona={selected.persona}
           originEl={selected.el}
-          onClose={() => setSelected(null)}
+          onClose={closeProfile}
         />
       )}
     </section>
