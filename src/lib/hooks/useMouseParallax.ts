@@ -47,7 +47,14 @@ export function useMouseParallax(
     let cy = 0;
     let raf = 0;
     let started = false;
-    const capas = promover ? Array.from(el.querySelectorAll<HTMLElement>(promover)) : [];
+    // El hint va SOLO con puntero fino, y con su propio `matchMedia`: sin
+    // `mousemove` las capas no se mueven nunca y promoverlas sostendría una capa
+    // de compositor al pedo. Va aparte de `soloHover` a propósito — ese apaga
+    // también el RAF, y el hero del home nunca lo tuvo apagado.
+    const capas =
+      promover && window.matchMedia("(hover: hover)").matches
+        ? Array.from(el.querySelectorAll<HTMLElement>(promover))
+        : [];
     for (const capa of capas) capa.style.willChange = "transform";
     const clamp = (v: number) => (v < -1 ? -1 : v > 1 ? 1 : v);
     const onMove = (e: MouseEvent) => {

@@ -10,6 +10,12 @@ import { useRef } from "react";
  * se vacían en el cuerpo del componente —mutar un ref durante el render, que
  * un render descartado dejaba sin repoblar— ni se reconstruye una matriz por
  * render (el inicializador de `useRef` corre en cada uno aunque se descarte).
+ *
+ * OJO con las deps: el objeto que devuelve es NUEVO en cada render (los `useRef`
+ * de adentro no, esos son estables). El efecto que arma la coreografía lo usa
+ * pero NO lo lista en sus deps, a propósito: agregarlo rearmaría la torre entera
+ * en cada render. `exhaustive-deps` no lo ve porque `useIsomorphicLayoutEffect`
+ * es un alias propio que la regla no inspecciona — o sea que acá no hay red.
  */
 export function useRefsTorre() {
   return {
