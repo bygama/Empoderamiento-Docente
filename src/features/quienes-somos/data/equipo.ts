@@ -149,6 +149,13 @@ export type Profile = {
    * Default: "recorte" (el caso original).
    */
   figura?: "recorte" | "marco" | "sin";
+  /**
+   * Dónde vive el recorte DENTRO de la foto de la card (fracciones de ancho y
+   * alto de `fotoDe(key)`). Con esto la foto viajera de la apertura aterriza
+   * alineada al píxel sobre la figura y el fondo puede disolverse en su lugar.
+   * Se mide una vez (búsqueda del recorte en la foto original) y se anota acá.
+   */
+  cutoutCrop?: { x: number; y: number; w: number; h: number };
   /** Imagen de la figura. Opcional: con `figura: "sin"` no existe. */
   cutout?: string;
   cutoutPosition?: string;
@@ -217,8 +224,11 @@ export const EQUIPO: Persona[] = [
       role: "Dirección General",
       location: "Santiago de Chile, Chile",
       origin: "Buenos Aires, Argentina",
-      figura: "recorte",
-      cutout: "/equipo/daniela-reyes-cutout.webp",
+      // Marco como el resto de la dirección (decisión de ED, 2026-09-08):
+      // la misma foto de la card, con la pared de fondo. El recorte sin fondo
+      // (daniela-reyes-cutout.webp) queda en el repo por si se retoma.
+      figura: "marco",
+      cutout: "/equipo/daniela-reyes.jpg",
       cutoutPosition: "50% 22%",
       headline:
         "Del aula a la investigación. De la investigación, a la transformación educativa.",
