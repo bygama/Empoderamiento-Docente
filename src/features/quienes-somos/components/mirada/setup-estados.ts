@@ -55,7 +55,10 @@ export function prepararEstados(e: Escena) {
   const W = anchoDocumento;
   const H = altoViewport;
 
-  gsap.set(capasCamara, { transformOrigin: "0 0" });
+  // El hint es de la coreografía: las dos capas reciben la cámara en cada
+  // frame, y nodos y fichas entran y salen con el scrub. En las clases
+  // promovía todo aunque la escena no estuviera montada (`live`).
+  gsap.set(capasCamara, { transformOrigin: "0 0", willChange: "transform" });
   gsap.set([centro, sintesis], { position: "absolute", inset: 0 });
   gsap.set(sintesis, { autoAlpha: 0 });
   const fogInit = q("[data-sintesis-fog]");
@@ -131,6 +134,7 @@ export function prepararEstados(e: Escena) {
       maxWidth: "12.5rem",
       autoAlpha: 0,
       y: 12,
+      willChange: "transform",
     });
   });
   // (Sin "respiración": el vaivén infinito de ±5px del grupo, pensado
@@ -141,7 +145,7 @@ export function prepararEstados(e: Escena) {
   // Nodos: nacen apagados y chicos; líneas sin dibujar; ramas ocultas.
   // El origin va en el centro del PUNTO (7px): al escalar, el punto
   // queda clavado al extremo de su línea y el label crece hacia afuera.
-  gsap.set(nodoCores, { autoAlpha: 0, scale: 0.6, transformOrigin: "7px 50%" });
+  gsap.set(nodoCores, { autoAlpha: 0, scale: 0.6, transformOrigin: "7px 50%", willChange: "transform" });
   gsap.set(nodoHalos, { autoAlpha: 0 });
   [...lineas, ...ramas].forEach((p) => {
     const len = p.getTotalLength();

@@ -41,7 +41,7 @@ export function PilaresOrigen() {
         titulo={
           <blockquote
             data-quote-card
-            className={`${PILAR_TITULO} relative will-change-transform`}
+            className={`${PILAR_TITULO} relative`}
           >
             {/* Comilla: marca centrada sobre la cita en mobile y volada
                 al margen en desktop, para que las tres líneas alineen

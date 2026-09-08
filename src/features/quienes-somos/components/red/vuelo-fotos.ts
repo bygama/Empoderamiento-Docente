@@ -49,6 +49,9 @@ export function resaltarArea(root: HTMLElement, area: SpecKey | null) {
           y: fy - (r.top + r.height / 2),
           scale: 0.25,
           autoAlpha: 0,
+          // El hint dura el vuelo y se limpia al aterrizar (antes vivía en la
+          // clase de cada avatar, promovido desde el SSR).
+          willChange: "transform",
         },
         {
           x: 0,
@@ -59,6 +62,7 @@ export function resaltarArea(root: HTMLElement, area: SpecKey | null) {
           ease: "power3.out",
           delay: i * 0.07,
           overwrite: "auto",
+          onComplete: () => gsap.set(av, { clearProps: "willChange" }),
         },
       );
     });

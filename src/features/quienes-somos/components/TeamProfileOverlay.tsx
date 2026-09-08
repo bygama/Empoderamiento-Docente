@@ -138,7 +138,7 @@ export function TeamProfileOverlay({
         <div
           ref={viajeraRef}
           aria-hidden="true"
-          className="pointer-events-none invisible fixed z-[6] overflow-hidden bg-cover bg-no-repeat shadow-[0_40px_100px_-40px_rgb(31_45_77/0.5)] will-change-[left,top,width,height]"
+          className="pointer-events-none invisible fixed z-[6] overflow-hidden bg-cover bg-no-repeat shadow-[0_40px_100px_-40px_rgb(31_45_77/0.5)]"
         />
       )}
 

@@ -16,7 +16,7 @@ export function BeatRemate() {
           <Fragment key={w}>
             <span
               data-fin-word
-              className={`inline-block will-change-transform ${
+              className={`inline-block ${
                 i === 0 || i === 3 ? "text-verde-concepto" : "text-white"
               }`}
             >

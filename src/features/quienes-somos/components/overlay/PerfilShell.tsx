@@ -20,7 +20,7 @@ export function PerfilShell({ persona, refHero, refContenido }: Props) {
       <div className="grid w-full items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
         <div
           ref={refHero}
-          className="relative mx-auto aspect-[4/5] w-full max-w-[26rem] overflow-hidden rounded-[1.8rem] shadow-[0_40px_100px_-40px_rgb(31_45_77/0.5)] ring-1 ring-black/5 will-change-transform"
+          className="relative mx-auto aspect-[4/5] w-full max-w-[26rem] overflow-hidden rounded-[1.8rem] shadow-[0_40px_100px_-40px_rgb(31_45_77/0.5)] ring-1 ring-black/5"
         >
           {/* Quien pidió no publicar retrato lleva la misma superficie
               tipográfica que en su card, no un hueco (ver Persona.sinFoto). */}

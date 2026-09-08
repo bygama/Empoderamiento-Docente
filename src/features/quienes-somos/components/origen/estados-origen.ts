@@ -50,6 +50,8 @@ export function prepararEstados(p: Piezas) {
       autoAlpha: 0,
       transformPerspective: 1000,
       transformOrigin: "center bottom",
+      // El hint viene con la coreografía y se va con su contexto.
+      willChange: "transform",
     });
   }
   gsap.set(quoteLines, { yPercent: 115 });
@@ -67,7 +69,7 @@ export function prepararEstados(p: Piezas) {
   nodos.forEach((n) => gsap.set(n, { attr: { r: 0 } }));
   // Hitos futuros: presentes como expectativa (tenues), no invisibles.
   gsap.set(labels, { autoAlpha: 0.16, y: 14 });
-  gsap.set(finWords, { autoAlpha: 0, scale: 1.7, filter: "blur(10px)" });
+  gsap.set(finWords, { autoAlpha: 0, scale: 1.7, filter: "blur(10px)", willChange: "transform" });
   if (finRule) gsap.set(finRule, { scaleX: 0 });
   if (finSub) gsap.set(finSub, { autoAlpha: 0, y: 18 });
 }

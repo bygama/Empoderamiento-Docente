@@ -13,7 +13,7 @@ export function MapaConstelacion({ live }: { live: boolean }) {
         data-stage-lineas
         aria-hidden="true"
         className={
-          "absolute inset-0 will-change-transform motion-reduce:hidden" +
+          "absolute inset-0 motion-reduce:hidden" +
           (live ? "" : " hidden")
         }
       >
@@ -71,7 +71,7 @@ export function MapaConstelacion({ live }: { live: boolean }) {
         data-stage
         aria-hidden="true"
         className={
-          "absolute inset-0 will-change-transform motion-reduce:hidden" +
+          "absolute inset-0 motion-reduce:hidden" +
           (live ? "" : " hidden")
         }
       >
@@ -93,7 +93,7 @@ export function MapaConstelacion({ live }: { live: boolean }) {
           >
             <div
               data-nodo-core={i}
-              className="flex items-center gap-3 will-change-transform"
+              className="flex items-center gap-3"
             >
               <span className="relative flex h-3.5 w-3.5 shrink-0 items-center justify-center">
                 {/* Halo pre-pintado: solo se anima su opacidad */}

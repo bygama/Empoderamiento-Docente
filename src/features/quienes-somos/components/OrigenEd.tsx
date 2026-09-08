@@ -85,7 +85,7 @@ export function OrigenEd() {
         <div className="sticky top-0 h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto">
           <div
             data-story-tilt
-            className="relative h-full w-full will-change-transform [transform-style:preserve-3d] motion-reduce:h-auto"
+            className="relative h-full w-full [transform-style:preserve-3d] motion-reduce:h-auto"
           >
             <PanelFotos />
 

@@ -29,7 +29,7 @@ export function DockEspecialidad({ area }: { area: SpecKey | null }) {
                     <span
                       key={per.key}
                       data-dock-av
-                      className="relative block h-14 w-14 overflow-hidden rounded-full shadow-[0_8px_20px_-8px_rgb(31_45_77/0.4)] ring-2 ring-white will-change-transform"
+                      className="relative block h-14 w-14 overflow-hidden rounded-full shadow-[0_8px_20px_-8px_rgb(31_45_77/0.4)] ring-2 ring-white"
                     >
                       <Image src={`/equipo/${per.key}.jpg`} alt={per.nombre} fill sizes="56px" className="object-cover" />
                     </span>

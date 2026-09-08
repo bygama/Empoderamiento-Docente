@@ -8,8 +8,13 @@ import type { Piezas } from "./estados-origen";
  * Cada ScrollTrigger es dueño exclusivo de su elemento: no dependemos del
  * orden de render de GSAP cuando ambos escriben las mismas propiedades.
  */
-export function prepararPanel(root: HTMLElement, { panel, photoFrames, notchRail }: Piezas) {
+export function prepararPanel(root: HTMLElement, { panel, lamina, photoFrames, notchRail }: Piezas) {
   if (!panel) return;
+  // El panel entra y sale con dos scrubs y está quieto en el medio: el hint
+  // vive con la coreografía (el contexto lo revierte), no en las clases.
+  gsap.set([panel, lamina, ...photoFrames, notchRail].filter(Boolean), {
+    willChange: "transform",
+  });
   gsap.set(photoFrames.slice(1), { autoAlpha: 0 });
   if (notchRail) gsap.set(notchRail, { yPercent: 8 });
   gsap.fromTo(

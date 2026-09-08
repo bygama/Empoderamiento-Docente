@@ -13,19 +13,19 @@ export function PanelFotos() {
   return (
     <div
       data-photo-panel
-      className="absolute inset-0 z-0 hidden will-change-transform md:block motion-reduce:hidden"
+      className="absolute inset-0 z-0 hidden md:block motion-reduce:hidden"
     >
       <div className={`h-full ${GRILLA}`}>
         <div className="col-start-2 mt-[13svh] h-[74svh]">
           <div
             data-photo-lamina
-            className="relative h-full w-full overflow-hidden rounded-[1.75rem] bg-white/[0.04] shadow-[0_60px_140px_-50px_rgb(0_0_0/0.7)] will-change-transform"
+            className="relative h-full w-full overflow-hidden rounded-[1.75rem] bg-white/[0.04] shadow-[0_60px_140px_-50px_rgb(0_0_0/0.7)]"
           >
             {FOTOS.map((f, i) => (
               <div
                 key={f.src}
                 data-photo={i}
-                className={`absolute inset-0 will-change-transform ${i === 0 ? "" : "opacity-0"}`}
+                className={`absolute inset-0 ${i === 0 ? "" : "opacity-0"}`}
               >
                 {/* Bleed del 7% para la deriva vertical sin descubrir bordes */}
                 <div data-photo-img className="absolute -inset-[7%]">
@@ -61,7 +61,7 @@ export function PanelFotos() {
             <div
               data-notch-rail
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 -left-px z-10 w-[22px] will-change-transform"
+              className="pointer-events-none absolute inset-y-0 -left-px z-10 w-[22px]"
             >
               <svg
                 viewBox="0 0 18 144"

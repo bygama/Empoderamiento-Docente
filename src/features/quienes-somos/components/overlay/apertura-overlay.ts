@@ -60,6 +60,8 @@ export function abrirOverlay({ root, originEl, reduced, immersive, fotoViaja, re
           scaleX: f.width / to.width,
           scaleY: f.height / to.height,
           transformOrigin: "top left",
+          // El hint dura lo que dura el viaje: lo revierte el contexto.
+          willChange: "transform",
         });
       }
       if (!immersive) gsap.set(lineas, { opacity: 0, x: -22 });

@@ -25,7 +25,7 @@ export function FichasPerspectiva({ p, i, live }: Props) {
         <li
           key={f}
           data-ficha
-          className="border-azul-principal/12 rounded-xl border bg-white px-5 py-3 font-sans text-[0.95rem] font-medium shadow-[0_10px_30px_-18px_rgb(31_45_77/0.35)] will-change-transform"
+          className="border-azul-principal/12 rounded-xl border bg-white px-5 py-3 font-sans text-[0.95rem] font-medium shadow-[0_10px_30px_-18px_rgb(31_45_77/0.35)]"
           style={{
             color: "#1f2d4d",
             borderLeft: `3px solid ${p.accent}`,
