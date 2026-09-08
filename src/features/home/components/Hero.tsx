@@ -9,6 +9,7 @@ import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { hasEntered, onEnter } from "@/lib/intro-signal";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { useMouseParallax } from "@/lib/hooks/useMouseParallax";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -305,44 +306,20 @@ export function Hero() {
       });
     }, scope);
 
-    // Parallax de mouse (fórmula de la referencia): un solo RAF con lerp setea
-    // --pnx/--pny (-1..1 desde el centro). Cada card los multiplica por su
-    // profundidad (capa [data-card-mouse]) y se desplaza EN CONTRA del mouse.
-    let tnx = 0;
-    let tny = 0;
-    let cnx = 0;
-    let cny = 0;
-    let started = false;
-    let raf = 0;
-    const clamp = (v: number) => (v < -1 ? -1 : v > 1 ? 1 : v);
-    const onMove = (e: MouseEvent) => {
-      tnx = clamp((e.clientX / window.innerWidth - 0.5) * 2);
-      tny = clamp((e.clientY / window.innerHeight - 0.5) * 2);
-      started = true;
-    };
-    const EASE = 0.09; // más bajo = más retardo (trailing/lerp)
-    const tick = () => {
-      cnx += (tnx - cnx) * EASE;
-      cny += (tny - cny) * EASE;
-      if (started) {
-        scope.style.setProperty("--pnx", cnx.toFixed(4));
-        scope.style.setProperty("--pny", cny.toFixed(4));
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    raf = requestAnimationFrame(tick);
     const refresh = window.setTimeout(() => ScrollTrigger.refresh(), 200);
 
     return () => {
       window.clearTimeout(refresh);
       if (fallback) window.clearTimeout(fallback);
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(raf);
       cleanupEnter?.();
       ctx.revert();
     };
   }, [reduced]);
+
+  // Parallax de mouse (fórmula de la referencia): --pnx/--pny en -1..1 desde el
+  // centro; cada card los multiplica por su profundidad ([data-card-mouse]) y se
+  // desplaza EN CONTRA del mouse. El RAF con lerp vive en el hook compartido.
+  useMouseParallax(ref, { x: "--pnx", y: "--pny", ease: 0.09, activo: !reduced });
 
   return (
     <section

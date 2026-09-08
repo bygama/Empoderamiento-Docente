@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { useMouseParallax } from "@/lib/hooks/useMouseParallax";
 import { DURACION_RECORRIDO } from "./tiempos-faro";
 
 // ── Polvo de estrellas del primer viewport ─────────────────────────────────
@@ -107,44 +108,10 @@ export function QueHacemosHero() {
   }, [reduced]);
 
   // ── Mouse-parallax del hero ────────────────────────────────────────────
-  // RAF único con lerp (EASE bajo = trailing suave). Solo actualiza CSS vars;
-  // las capas mueven vía transform con calc() — GSAP nunca toca esos nodos,
-  // así que no hay pelea de transforms.
-  useIsomorphicLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root || reduced) return;
-    if (!window.matchMedia("(hover: hover)").matches) return;
-
-    let tx = 0;
-    let ty = 0;
-    let cx = 0;
-    let cy = 0;
-    let raf = 0;
-    let started = false;
-    const clamp = (v: number) => (v < -1 ? -1 : v > 1 ? 1 : v);
-    const onMove = (e: MouseEvent) => {
-      tx = clamp((e.clientX / window.innerWidth - 0.5) * 2);
-      ty = clamp((e.clientY / window.innerHeight - 0.5) * 2);
-      started = true;
-    };
-    const EASE = 0.07; // más bajo = más retardo (muy smooth, sin exagerar)
-    const tick = () => {
-      cx += (tx - cx) * EASE;
-      cy += (ty - cy) * EASE;
-      if (started) {
-        root.style.setProperty("--qhx", cx.toFixed(4));
-        root.style.setProperty("--qhy", cy.toFixed(4));
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    raf = requestAnimationFrame(tick);
-
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, [reduced]);
+  // Solo actualiza CSS vars; las capas mueven vía transform con calc() — GSAP
+  // nunca toca esos nodos, así que no hay pelea de transforms. EASE bajo =
+  // trailing suave. Solo con hover real. El RAF con lerp vive en el hook.
+  useMouseParallax(rootRef, { x: "--qhx", y: "--qhy", ease: 0.07, activo: !reduced, soloHover: true });
 
   // ── Estrella fugaz ocasional ───────────────────────────────────────────
   // UNA sola, cada ~9-13s, arriba del cielo (nunca sobre el titular), rápida
