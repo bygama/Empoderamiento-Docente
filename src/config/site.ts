@@ -19,6 +19,9 @@ export const siteConfig = {
 
   contacto: {
     email: "contacto@empoderamientodocente.org",
+    // Número de WhatsApp en formato internacional sin signos (ej. 56912345678).
+    // Sin número no se muestra ningún botón: no inventar (pendiente de Raquel).
+    whatsapp: undefined as string | undefined,
     direccion: {
       calle: "Avenida Irarrázaval 2821",
       complemento: "Torre B, Oficina 527",

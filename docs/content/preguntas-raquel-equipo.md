@@ -126,3 +126,10 @@ Las marcadas con **(!)** son las que traban algo concreto de la web.
     eso o quieren un texto propio?
 33. ¿Qué querés que se lleve alguien que conoce ED por primera vez? Una frase.
 34. Visión a futuro de ED, en pocas líneas.
+
+## Contacto
+
+35. **(!)** ¿Hay un número de WhatsApp institucional para poner en la web? Hoy el
+    formulario abre el correo de quien escribe; en un celular sin app de correo
+    no pasa nada, y WhatsApp es por donde se mueve la mayoría. Con el número, la
+    web muestra el botón sola.

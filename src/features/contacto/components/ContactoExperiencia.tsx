@@ -14,6 +14,7 @@ import {
   Compass,
 } from "@/components/ui/icons";
 import { PaisDropdown } from "./PaisDropdown";
+import { CanalDirecto } from "./CanalDirecto";
 import { siteConfig } from "@/config/site";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -128,6 +129,9 @@ export function ContactoExperiencia() {
   const [vista, setVista] = useState<Vista>("hero");
   const [tema, setTema] = useState<TemaKey | null>(null);
   const [introListo, setIntroListo] = useState(false);
+  // Texto que armó el formulario: en el cierre se puede copiar tal cual y
+  // mandar por donde sea, por si el correo no se abrió.
+  const [mensajeListo, setMensajeListo] = useState("");
   const animando = useRef(false);
   const introVivo = useRef(true);
   const introTl = useRef<gsap.core.Timeline | null>(null);
@@ -571,6 +575,7 @@ export function ContactoExperiencia() {
       .filter((l) => l !== null)
       .join("\n");
 
+    setMensajeListo(`${asunto}\n\n${cuerpo}`);
     // mientras no haya backend, abre el correo con todo precargado
     window.location.href = `mailto:${siteConfig.contacto.email}?subject=${encodeURIComponent(
       asunto,
@@ -858,15 +863,12 @@ export function ContactoExperiencia() {
 
               {/* Canal directo (antes en la barra fija): al pie del índice,
                   jerarquía menor. Centrado bajo la columna del índice. */}
-              <p data-ap-head className="text-gris-texto mt-5 text-center font-sans text-[0.85rem]">
-                ¿Preferís escribir directo?{" "}
-                <a
-                  href={`mailto:${siteConfig.contacto.email}`}
-                  className="text-azul-principal hover:text-verde-concepto font-medium transition-colors"
-                >
-                  {siteConfig.contacto.email}
-                </a>
-              </p>
+              <div data-ap-head className="mt-5 text-center">
+                <p className="text-gris-texto font-sans text-[0.85rem]">
+                  ¿Preferís escribir directo?
+                </p>
+                <CanalDirecto className="mt-2.5" />
+              </div>
             </div>
           </div>
         </div>
@@ -1076,15 +1078,12 @@ export function ContactoExperiencia() {
           </p>
           <p data-fin-bit className="text-gris-texto mt-6 max-w-[52ch] font-sans text-[0.98rem] leading-relaxed">
             Dejamos tu mensaje listo en tu correo: revisalo y envialo cuando
-            quieras. ¿No se abrió? Escribinos a{" "}
-            <a
-              href={`mailto:${siteConfig.contacto.email}`}
-              className="text-azul-principal hover:text-verde-concepto font-medium transition-colors"
-            >
-              {siteConfig.contacto.email}
-            </a>
-            .
+            quieras. Si no se abrió nada, copialo y mandalo por donde te quede
+            más cómodo.
           </p>
+          <div data-fin-bit className="mt-5">
+            <CanalDirecto mensaje={mensajeListo} />
+          </div>
           <button
             data-fin-bit
             type="button"
