@@ -10,6 +10,57 @@ en esta carpeta: `relevamiento-bugs.md`, `relevamiento-performance.md`,
 `relevamiento-gigantes.md`. Diagnóstico inicial en `react-doctor-baseline.json`
 (`pnpm dlx react-doctor --no-supply-chain --json src`).
 
+## 0. Enmienda del 2026-09-08 (aprobada por el owner en conversación)
+
+Motivo: al abrir la fase 0 apareció la lane `bygama/gar` (worktree de Orca, en vuelo)
+con 64 archivos de `src/` solapados con esta. Decisión del owner: esta lane se rebasea
+sobre gar y gar mergea primero (ver DECISIONS). Lo que cambia respecto de §1-§7:
+
+1. **Base y baseline.** Rama sobre `bygama/gar`. Baseline: **57/100, 126 hallazgos, 44
+   archivos** (`react-doctor-baseline.json`; el de `main` en
+   `react-doctor-baseline-main.json`). Delta detallado en `relevamiento-delta.md`.
+   DoD nueva (6.14): `grep -rn "transition-all" src` → 0 líneas, porque react-doctor no
+   lee `className` con template literal (CarpetaCaso 376 y 408, NavegacionCasos 46 son
+   sitios reales que el reporte no muestra).
+2. **Gigantes.** LineasAccion sale de la lista (gar la bajó del umbral). Entran
+   `components/layout/IndicePagina.tsx` (372 líneas: el imán del índice a
+   `src/lib/hooks/useImanIndice.ts`, el botón de subir a pieza propia) y
+   `investigacion/casos/CarpetaCaso.tsx` (436: la tapa a `TapaCarpeta.tsx`, que se
+   lleva también la alta complejidad). Siguen siendo 17.
+3. **IndicePagina:335** (`<span onClick>` dentro de una capa `aria-hidden`; dos
+   hallazgos): pasa a `<button type="button" tabIndex={-1}>` con las mismas clases;
+   `ir` se hoistea a módulo.
+4. **TeamProfileOverlay** (598 líneas). Antes del split, un commit propio borra el camino
+   muerto de `figura: "recorte"` (~60 líneas) y **borra `cutoutCrop` del tipo
+   `Profile`** (declarado sin datos ni consumidor). La foto viajera pasa de `<img>`
+   clonado a `<div>` con `background-image: url(currentSrc)` y `background-size:
+   cover` (mismo efecto y misma caché, sin `<img>`, sin supresión). Sus dos
+   `will-change`: el de la viajera se borra (propiedades de layout), el del hero shell lo
+   pone y saca GSAP. En el split no se extrae `useFocusTrap`: el teclado queda en el
+   compositor y el `<dialog>` lo reemplaza entero.
+5. **Restricciones del `<dialog>` del overlay:** el `<dialog>` no recibe `transform`,
+   `filter` ni `will-change` (crearían bloque contenedor para los `fixed` de adentro);
+   es él mismo quien lleva `data-profile-scroller`, `data-lenis-prevent`,
+   `overflow-y-auto` y `overscroll-contain`; `useLockScroll` se conserva aunque el
+   `<dialog>` haga la página inerte (IndicePagina detecta overlays leyendo
+   `body.style.overflow`); sacar la rama Escape del listener de `window` y agregar
+   `onCancel` van en el mismo commit; el foco a «volver» se pone después de
+   `showModal()`.
+6. **Contratos que trajo gar y el split respeta:** `abrirRef` y el efecto de deep link
+   (`location.hash`) en CasosInvestigacion; `data-scroll-principal`, `data-exp-pestana`
+   y `useCopiar` en ExpedienteCaso; el efecto de `?tema=` de ContactoExperiencia corre
+   un frame después del montaje y llama `finIntro()`; NavegacionCasos no cambia de forma.
+7. **Aliados:** `src/config/aliados.ts` ya existe (lo creó gar; Footer y DatosDuros lo
+   consumen con `alto.pie` / `alto.home`). El paso pasa a sumar `width`/`height` ahí
+   y a convertir los dos `<img>` a `next/image`.
+8. **Instrumento de probes (§7.2):** los estados congelados se miden con Playwright
+   (viewport fijo antes de hidratar; emulación táctil real para 390×844; contexto nuevo
+   por pasada); el navegador embebido de Orca queda para interacciones y capturas.
+   Baseline tomado: 8 rutas × 6 fracciones a 1536×850 y 8 × 4 a 390×844, más una
+   captura del tope de cada ruta en cada viewport. Los atributos que derivan solos
+   (animación perpetua) se excluyen de la comparación por lista explícita, obtenida de
+   una doble pasada del baseline contra sí mismo.
+
 ## 1. Propósito
 
 `pnpm react-doctor` (react-doctor 0.9.13 sobre `src/`) da hoy **58/100 (Critical)**: 120
