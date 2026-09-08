@@ -6,11 +6,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
-import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
+import { NAV_LINKS, CTA_LINK, HOME_LINK, esPaginaActiva } from "@/config/nav";
+import { irEnPagina, partirDestino } from "@/lib/navegar";
 import {
   Menu,
   X,
   ArrowUpRight,
+  ChevronDown,
   Instagram,
   Linkedin,
   Facebook,
@@ -56,6 +58,10 @@ export function MobileNav() {
   const reduced = useReducedMotion();
   const pathname = usePathname();
   const secciones = useSeccionesPagina();
+  // Submenú desplegado (acordeón): el de la página actual arranca abierto.
+  const [desplegado, setDesplegado] = useState<string | null>(
+    () => NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null,
+  );
 
   // true recién en cliente (post-hidratación): el portal a <body> se monta
   // solo entonces. Patrón canónico sin setState-en-efecto ni mismatch.
@@ -71,6 +77,7 @@ export function MobileNav() {
   if (pathname !== prevPath) {
     setPrevPath(pathname);
     setOpen(false);
+    setDesplegado(NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null);
   }
 
   const panelRef = useRef<HTMLDivElement>(null);
@@ -160,6 +167,17 @@ export function MobileNav() {
     close();
     window.setTimeout(() => irASeccion(id), 60);
   };
+  // Destino de un submenú: en la misma página corta directo (con la
+  // misma espera); en otra, navega Next y aterriza el layout.
+  const irADestino = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (partirDestino(href).pathname !== pathname) {
+      close();
+      return;
+    }
+    e.preventDefault();
+    close();
+    window.setTimeout(() => irEnPagina(href), 60);
+  };
 
   return (
     <>
@@ -223,33 +241,68 @@ export function MobileNav() {
             >
               <ul>
                 {NAV_LINKS.map((link) => {
-                  const active = pathname === link.href;
+                  const active = esPaginaActiva(pathname, link.href);
+                  const sub = link.submenu ?? [];
+                  const abierto = desplegado === link.href;
                   return (
-                    <li key={link.href} data-mnav-item>
-                      <Link
-                        href={link.href}
-                        onClick={close}
-                        aria-current={active ? "page" : undefined}
-                        className="group border-azul-principal/10 flex items-center justify-between border-b py-4"
-                      >
-                        <span
-                          className={`font-display text-[clamp(1.6rem,1rem+4vw,2.4rem)] font-bold tracking-[-0.01em] transition-colors ${
-                            active
-                              ? "text-verde-concepto"
-                              : "text-azul-principal group-hover:text-verde-concepto"
-                          }`}
+                    <li key={link.href} data-mnav-item className="border-azul-principal/10 border-b">
+                      <div className="flex items-center justify-between">
+                        <Link
+                          href={link.href}
+                          onClick={close}
+                          aria-current={active ? "page" : undefined}
+                          className="group flex flex-1 items-center justify-between py-4"
                         >
-                          {link.label}
-                        </span>
-                        <ArrowUpRight
-                          size={22}
-                          className={`shrink-0 transition-all duration-300 ${
-                            active
-                              ? "text-verde-concepto opacity-100"
-                              : "text-azul-principal/40 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-                          }`}
-                        />
-                      </Link>
+                          <span
+                            className={`font-display text-[clamp(1.6rem,1rem+4vw,2.4rem)] font-bold tracking-[-0.01em] transition-colors ${
+                              active
+                                ? "text-verde-concepto"
+                                : "text-azul-principal group-hover:text-verde-concepto"
+                            }`}
+                          >
+                            {link.label}
+                          </span>
+                          <ArrowUpRight
+                            size={22}
+                            className={`shrink-0 transition-all duration-300 ${
+                              active
+                                ? "text-verde-concepto opacity-100"
+                                : "text-azul-principal/40 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                            }`}
+                          />
+                        </Link>
+                        {sub.length > 0 && (
+                          <button
+                            type="button"
+                            aria-label={`${abierto ? "Ocultar" : "Ver"} secciones de ${link.label}`}
+                            aria-expanded={abierto}
+                            onClick={() => setDesplegado(abierto ? null : link.href)}
+                            className="text-azul-principal/60 hover:text-azul-principal ml-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform"
+                            style={{ transform: abierto ? "rotate(180deg)" : undefined }}
+                          >
+                            <ChevronDown size={20} />
+                          </button>
+                        )}
+                      </div>
+                      {sub.length > 0 && (
+                        <ul
+                          hidden={!abierto}
+                          className="flex flex-wrap gap-2 pb-4"
+                        >
+                          {sub.map((s) => (
+                            <li key={s.href}>
+                              <Link
+                                href={s.href}
+                                scroll={false}
+                                onClick={(e) => irADestino(e, s.href)}
+                                className="border-azul-principal/15 text-azul-principal hover:border-azul-principal inline-flex min-h-10 items-center rounded-full border px-3.5 font-sans text-[0.9rem] font-medium transition-colors"
+                              >
+                                {s.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   );
                 })}

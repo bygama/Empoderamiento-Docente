@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { IndicePagina } from "@/components/layout/IndicePagina";
+import { AterrizajePorLink } from "@/components/layout/AterrizajePorLink";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { siteConfig } from "@/config/site";
 
@@ -93,6 +94,7 @@ export default function RootLayout({
           </a>
           <Header />
           <IndicePagina />
+          <AterrizajePorLink />
           {children}
           {/* Fondo detrás del footer: la muesca de sus esquinas superiores
               redondeadas toma ESTE color. Blanco por defecto (matchea las
