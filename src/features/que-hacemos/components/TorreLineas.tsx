@@ -164,9 +164,13 @@ export function TorreLineas() {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const towerRef = useRef<HTMLDivElement | null>(null);
   const drumRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const spanRefs = useRef<(HTMLSpanElement | null)[][]>([]);
+  // Las matrices por tambor nacen sembradas: TAMBORES es constante de módulo y los
+  // callback-refs del JSX escriben cada celda en cada commit, así que nada queda
+  // viejo. Antes se vaciaban en el cuerpo del componente (mutar un ref durante el
+  // render), que un render descartado dejaba sin repoblar.
+  const spanRefs = useRef<(HTMLSpanElement | null)[][]>(TAMBORES.map(() => []));
   const fotoRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const chipRefs = useRef<(HTMLDivElement | null)[][]>([]);
+  const chipRefs = useRef<(HTMLDivElement | null)[][]>(TAMBORES.map(() => []));
   const aroRefs = useRef<(HTMLDivElement | null)[][]>([]);
   const tituloRef = useRef<HTMLParagraphElement | null>(null);
   const fraseRef = useRef<HTMLParagraphElement | null>(null);
@@ -689,12 +693,6 @@ export function TorreLineas() {
       ctx.revert();
     };
   }, [live, geo]);
-
-  drumRefs.current = [];
-  spanRefs.current = TAMBORES.map(() => []);
-  railRefs.current = [];
-  fotoRefs.current = [];
-  chipRefs.current = TAMBORES.map(() => []);
 
   // Riel izquierdo: saltar a la estación i (misma cuenta que hace pintar
   // al revés: posición de scroll donde el viaje pv = i/(n-1), contando el
