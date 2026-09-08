@@ -206,8 +206,11 @@ usa lenguaje inclusivo:
 ### 5.4. Logos de aliados
 
 Solo publicar con autorización confirmada por el usuario. Por defecto, NO
-publicar. Aliados a chequear antes de cada uso: Ministerios de Educación
-(CL/MX/AR), Techint, OEI, ser+, SEMS-SEP, CENEVAL.
+publicar. Los autorizados son exactamente los de la carpeta «LOGOS ALIANZAS»
+de ED (hoy: Techint, UNESCO, Bloom/ser+, UCSH, Science Up); la lista única
+vive en `src/config/aliados.ts` y el detalle en
+`docs/content/aliados-fuentes-drive.md`. Ministerio de Educación: no se
+puede por contrato. OEI, SEMS-SEP, CENEVAL: sin autorización, no van.
 
 ### 5.5. Mensajes pilares
 
