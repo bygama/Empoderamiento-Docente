@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
@@ -305,29 +305,34 @@ export function CasosInvestigacion() {
   }, []);
 
   /* ── Escape cierra el expediente ──────────────────────────────────── */
+  // Effect Events: los listeners se suscriben por estado (activo / estado) y
+  // leen siempre la última versión del handler, sin re-suscribirse cada vez
+  // que cambia la identidad de un callback.
+  const onEscape = useEffectEvent((e: KeyboardEvent) => {
+    if (e.key === "Escape") solicitarCierre();
+  });
   useEffect(() => {
     if (activo === null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") solicitarCierre();
-    };
+    const onKey = (e: KeyboardEvent) => onEscape(e);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [activo, solicitarCierre]);
+  }, [activo]);
 
   /* ── «Atrás» del navegador cierra el lugar ────────────────────────── */
+  const onPopstate = useEffectEvent(() => {
+    historialRef.current = false;
+    if (estadoRef.current === "open") {
+      cerrar();
+    } else if (estadoRef.current === "opening" || estadoRef.current === "switching") {
+      cierrePendienteRef.current = true;
+    }
+  });
   useEffect(() => {
     if (activo === null && estado === "index") return;
-    const onPop = () => {
-      historialRef.current = false;
-      if (estadoRef.current === "open") {
-        cerrar();
-      } else if (estadoRef.current === "opening" || estadoRef.current === "switching") {
-        cierrePendienteRef.current = true;
-      }
-    };
+    const onPop = () => onPopstate();
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
-  }, [activo, estado, cerrar]);
+  }, [activo, estado]);
 
   /* ── Entrada del expediente (tras abrir o cambiar de caso) ────────── */
   useIsomorphicLayoutEffect(() => {
