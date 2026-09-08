@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { DURACION_RECORRIDO } from "./QueHacemosHeroFaro";
+import { DURACION_RECORRIDO } from "./tiempos-faro";
 
 // ── Polvo de estrellas del primer viewport ─────────────────────────────────
 // El cielo real lo pinta el fondo compartido + la escena del faro (detrás);

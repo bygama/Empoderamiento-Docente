@@ -8,7 +8,10 @@ import { getLenis } from "@/lib/lenis";
 import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { FaroEscena, CAPAS_Z, FOCO_X, FOCO_Y } from "./FaroEscena";
+import { HAZ_VERBO, PREGUNTAS, VERBO_POS } from "./preguntas-faro";
+import { CAPAS_Z, FOCO_X, FOCO_Y } from "./faro-geometria";
+import { FaroEscena } from "./FaroEscena";
+import { BEATS, despues, DURACION_RECORRIDO, FIN_PREGUNTAS, PASO_PREGUNTA } from "./tiempos-faro";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -62,88 +65,6 @@ if (typeof window !== "undefined") {
  */
 
 const P = 1100; // distancia focal de la cámara imaginaria
-
-/**
- * Las preguntas con las que empieza cada proyecto.
- *
- * ANTES esta escena mostraba los cinco VERBOS del método (Dialogamos,
- * Investigamos, Diseñamos, Implementamos, Evaluamos) bajo el rótulo «Cómo
- * trabajamos» — que es, textual, el título de una sección que viene más
- * abajo en esta misma página y cuenta lo mismo. La escena resumía el
- * contenido que la seguía.
- *
- * Ahora se queda solo con las preguntas: la escena PREGUNTA y las secciones
- * de abajo RESPONDEN. Es lo que el faro hace de verdad —alumbrar para ver
- * qué hay— y no le pisa el texto a nadie.
- */
-const PREGUNTAS: ReadonlyArray<{ antes: string; clave: string; resto: string }> = [
-  // La primera es la TESIS —las otras cuatro se desprenden de ella— y por
-  // eso es la líder: más grande y más ancha (ver el JSX). Cada pregunta
-  // lleva UNA palabra clave con el marcador de concepto del sitio (celeste
-  // + subrayado verde, pintado por la luz cuando el haz la alcanza): antes
-  // eran cinco bloques blancos idénticos y se leían planos.
-  { antes: "¿Qué se quiere ", clave: "transformar", resto: " y por qué?" },
-  { antes: "¿Qué sabemos de este problema y qué necesitamos ", clave: "comprender", resto: " mejor?" },
-  { antes: "¿Qué puede producir un ", clave: "cambio real", resto: " en este contexto?" },
-  { antes: "¿Qué está ocurriendo y qué necesitan ", clave: "quienes lo sostienen", resto: "?" },
-  { antes: "¿Qué ", clave: "aprendimos", resto: " y qué puede sostener el equipo hacia adelante?" },
-];
-
-/** Posición del bloque de texto de cada verbo (viewport, desktop). */
-const VERBO_POS: ReadonlyArray<React.CSSProperties> = [
-  // La líder es más alta (dos líneas grandes): arranca más arriba para que
-  // su pie quede lejos del horizonte.
-  { left: "8%", top: "33%" },
-  { left: "11%", top: "18%" },
-  { right: "6%", top: "15%", textAlign: "right" },
-  { right: "9%", top: "55%", textAlign: "right" },
-  { left: "50%", bottom: "18%", transform: "translateX(-50%)", textAlign: "center" },
-];
-
-/** Ángulo del haz por verbo (izq = óptica izquierda, der = derecha). */
-const HAZ_VERBO: ReadonlyArray<{ lado: "izq" | "der"; rot: number }> = [
-  { lado: "izq", rot: -21 },
-  { lado: "izq", rot: -13 },
-  { lado: "der", rot: 42 },
-  { lado: "der", rot: 59 },
-  { lado: "izq", rot: -58 },
-];
-
-/* ── Escala de tiempo de la coreografía ────────────────────────────────────
- *
- * Las preguntas (S2) se ESTIRARON. Con beats de ~0.062 cada pregunta quedaba
- * plenamente legible apenas 0.01 (≈6vh, dos muescas de rueda) y el tramo
- * pasaba entero en un envión: era imposible scrollear sin que se fuera todo.
- * Ahora cada beat dura PASO_PREGUNTA y lo que viene después (cierre y
- * deslumbre) corre CORRIMIENTO en bloque, sin cambiar de velocidad.
- *
- * Para que S0 y S1 no se hagan más lentos, el runway (h-[…vh] del <section>)
- * crece en la misma proporción: alto = DURACION_RECORRIDO · 620vh + 200vh
- * (los 200 son la pantalla que corre detrás del hero y la del viewport).
- * Si se toca una cosa, se toca la otra. */
-const INICIO_PREGUNTAS = 0.4;
-// 0.30 ≈ 1.8 pantallas por pregunta. Con 0.15 un scroll chico sin querer
-// pasaba dos títulos de largo.
-const PASO_PREGUNTA = 0.3;
-/** Un beat por pregunta. */
-const BEATS = PREGUNTAS.map((_, i) => INICIO_PREGUNTAS + i * PASO_PREGUNTA);
-/**
- * La última pregunta dura lo mismo que las otras: se va 0.03 antes de donde
- * caería un beat siguiente. Con +0.06 (herencia de cuando los beats medían
- * 0.062) quedaba plena 0.01 (≈6vh): aparecía, se iba al toque y el
- * subrayado no llegaba a pintarse.
- */
-const FIN_PREGUNTAS = BEATS[BEATS.length - 1] + PASO_PREGUNTA - 0.03;
-/** En la coreografía original S2 terminaba en 0.73; de ahí el corrimiento. */
-const CORRIMIENTO = FIN_PREGUNTAS - 0.73;
-/** Posición original (post-S2) → posición actual. */
-const despues = (t: number) => t + CORRIMIENTO;
-/**
- * Duración total de la línea de tiempo. Quien convierta una posición a
- * progreso del runway (por ejemplo el viaje del botón del hero) divide por
- * esto.
- */
-export const DURACION_RECORRIDO = despues(1);
 
 export function QueHacemosHeroFaro() {
   const rootRef = useRef<HTMLElement | null>(null);
@@ -237,7 +158,6 @@ export function QueHacemosHeroFaro() {
       // tweens de cada tick: los bloques de texto son HTML por fuera del SVG
       // y la cámara transforma el SVG en cada frame, así que el ángulo
       // correcto cambia constantemente.
-
 
       // Promoción a GPU solo mientras la coreografía existe (el fallback
       // estático no paga las texturas de 6 capas full-viewport).
