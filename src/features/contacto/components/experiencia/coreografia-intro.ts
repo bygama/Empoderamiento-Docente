@@ -5,7 +5,7 @@ import { crearGhostTitulo } from "./ghost-titulo";
 // Los ghosts viven en <body> (position:fixed), fuera del ctx de GSAP: si la
 // intro se saltea o el componente se desmonta a mitad de vuelo, nadie más
 // los saca.
-export function limpiarGhosts(c: Contexto) {
+function limpiarGhosts(c: Contexto) {
   c.estado.ghosts.forEach((g) => g.remove());
   c.estado.ghosts = [];
 }
@@ -21,7 +21,7 @@ export function finIntro(c: Contexto) {
 }
 
 // ── HERO → APERTURA: el desarme (viaje de ida) ────────────────────────────
-export function desarmar(c: Contexto) {
+function desarmar(c: Contexto) {
   if (c.estado.animando) return;
   const root = c.root;
   if (!root) return;

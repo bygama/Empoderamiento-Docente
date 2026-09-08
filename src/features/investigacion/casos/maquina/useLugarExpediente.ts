@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { getLenis } from "@/lib/lenis";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
-export type EstadoLugar = "index" | "opening" | "open" | "switching" | "closing";
+type EstadoLugar = "index" | "opening" | "open" | "switching" | "closing";
 
 /**
  * La máquina del archivo: estado (index → opening → open → switching |

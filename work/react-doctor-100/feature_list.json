@@ -239,7 +239,7 @@
   },
   {
     "id": "F35",
-    "behavior": "no-prevent-default = 0: buscador como div role=search con el mismo scroll (PLAN 35)",
+    "behavior": "no-prevent-default = 0: buscador como <search> (el PLAN pedía div role=search; ver DECISIONS) con el mismo scroll (PLAN 35)",
     "verification": "RD src/features/biblioteca no-prevent-default → 0; PROBE buscador → true",
     "state": "passing",
     "evidence": "PLAN 35 — typecheck → 0; lint → exit 0; **RD src → 100 / 100, «No issues found!», skippedChecks: [], complete: true, 278 archivos**; LINEAS: BibliotecaHero 169; SSR /biblioteca contra el paso 33 idéntico salvo los dos tokens del paso (<form … role=\"search\"> → <search> y type=\"submit\" → type=\"button\") y texto visible idéntico; PROBE buscador (.next/pw/buscador.js, 3000 vs 3002) → ok: true: envoltorio SEAR… Commit: 935efe1."

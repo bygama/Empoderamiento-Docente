@@ -3,7 +3,7 @@ import type { Geo, GeoTambor } from "./geometria-torre";
 /** Escala de la línea: a tamaño final no entra en pantalla (~2000px). */
 export const ESCALA_LINEA = 0.55;
 export const DEG = Math.PI / 180;
-export const wrap180 = (a: number) => ((((a + 180) % 360) + 360) % 360) - 180;
+const wrap180 = (a: number) => ((((a + 180) % 360) + 360) % 360) - 180;
 
 type Letras = {
   spans: (HTMLSpanElement | null)[];

@@ -1,7 +1,7 @@
 import gsap from "gsap";
 
 /** Catmull-Rom → cúbicas de Bézier: camino suave que pasa por cada punto. */
-export function smoothPath(pts: Array<{ x: number; y: number }>): string {
+function smoothPath(pts: Array<{ x: number; y: number }>): string {
   if (pts.length < 2) return "";
   const d = [`M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`];
   for (let i = 0; i < pts.length - 1; i++) {

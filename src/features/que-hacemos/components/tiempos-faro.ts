@@ -12,7 +12,7 @@ import { PREGUNTAS } from "./preguntas-faro";
  * crece en la misma proporción: alto = DURACION_RECORRIDO · 620vh + 200vh
  * (los 200 son la pantalla que corre detrás del hero y la del viewport).
  * Si se toca una cosa, se toca la otra. */
-export const INICIO_PREGUNTAS = 0.4;
+const INICIO_PREGUNTAS = 0.4;
 // 0.30 ≈ 1.8 pantallas por pregunta. Con 0.15 un scroll chico sin querer
 // pasaba dos títulos de largo.
 export const PASO_PREGUNTA = 0.3;

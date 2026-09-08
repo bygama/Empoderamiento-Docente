@@ -211,6 +211,28 @@ transición que lo usaba es un `scale` de 600 ms sobre una `<img>` que el compos
 maneja. Descartada: dejarlo por ser la forma CSS canónica de acotar el hint — deja una
 excepción en la regla que la próxima persona no puede distinguir de un descuido.
 
+## 2026-09-08 — Los módulos extra del tope fueron ~12, no 2 (corrección del cierre)
+
+La entrada «Tope de 200 sobre la lista de archivos del PLAN» nombraba dos casos (OrigenEd y
+TeamProfileOverlay) como si fueran la excepción. La review de cierre contó los reales: además
+de esos dos, `entrada-hero`, `TitularQH`, `toggle-nivel`, `escenas-faro`, `capas-torre` +
+`useTorreViva` + `EscenarioTorre`, `contexto` + `ghost-titulo` + `useSaltoIntro` +
+`PanelFormulario`, `refs-perfil` + `estilos`, `RotulosIndice`, y el split entero de
+`MobileNav`. Cada caso está en PROGRESS con su paso; lo que quedó viejo es la lista de esta
+entrada. La regla no cambia —el tope manda sobre la lista de archivos del PLAN—, cambia el
+número: partir de verdad produce más módulos de los que un plan estima a ojo.
+
+## 2026-09-08 — El sub-límite de 80 líneas para hooks queda descartado con el de 150
+
+La ruling del owner cambió el tope de AGENTS §6 (150) por 200 planas, pero §6 también pide
+«hooks < 80 líneas» y eso nunca se dijo en voz alta. Siete hooks de la lane lo pasan:
+`useImanIndice` 183, `useTorreViva` 164, `useLugarExpediente` 152, `useTransicionesExpediente`
+142, `useAccionesLugar` 122, `useMenuAnimado` 104, `usePortalModal` 97. Son hooks de
+coreografía —máquina de estados, timelines, refs y limpieza— donde partir por debajo de 80
+separaría el efecto de su cleanup, que es justo lo que la receta de splits evita. Queda
+registrado: el tope de la lane es 200 para todo, hooks incluidos. Descartada: partir los
+siete para cumplir el sub-límite.
+
 ## 2026-09-08 — Los borrados se commitean antes de medir con react-doctor
 
 `react-doctor` arma su lista de archivos con el índice de git, no con el disco: en el paso 34,
@@ -235,3 +257,17 @@ render. Ojo con los probes: `<search>` lleva el rol IMPLÍCITO y NO matchea `[ro
 — el probe del buscador selecciona `search, [role="search"]` para medir lane y base con el
 mismo script. Descartadas: dejar el div con el rol (deja un hallazgo vivo, y el SPEC no
 permite apagar reglas); poner `role="search"` sobre `<search>` (rol redundante).
+
+## 2026-09-08 — La forma de los commits se corrige de acá en adelante, no reescribiendo
+
+La review de cierre encontró tres cosas de forma en los commits ya hechos: 15 de 65 headers
+pasan los 72 caracteres de `docs/COMMITS.md` §1 (el peor, 80: «perf(que-hacemos): nombrar las
+propiedades que transicionan en el hero y el riel»); el scope de `4857346` dice `ui` pero
+toca `config/`, `layout/` y `home/`; y las cuatro migraciones de accesibilidad de la fase 2
+se repartieron entre `feat` (los dos `<dialog>`) y `fix` (píldoras y buscador) cuando ninguna
+estrena funcionalidad para quien usa el sitio: las cuatro eran `refactor` o `fix`. Los tres
+son reales. No se reescriben: los sha de estos commits están citados uno por uno en
+PROGRESS, en `feature_list.json` y en las entradas de este archivo, y un rebase los
+invalidaría todos para ahorrar caracteres. Queda como regla para la próxima lane: header
+≤ 72, scope por carpeta tocada y `feat` solo si el sitio hace algo nuevo. Descartadas:
+`rebase -i` para reescribir los 15 headers; dejar de anotar los sha para poder reescribir.
