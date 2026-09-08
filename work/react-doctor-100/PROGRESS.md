@@ -520,7 +520,7 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
   llamada por el MISMO efecto y en la misma posición, y cada pedazo de markup a su archivo;
   con dos piezas no se abre carpeta. El cheat sheet §18 suma la línea del `will-change`.
   Aceptación: `grep -c "will-change" docs/AI_GUIDELINES.md` → 2 (≥ 1) y `grep -c
-  "subcarpeta" docs/AI_GUIDELINES.md` → 1 (≥ 1). Commit `PENDIENTE`.
+  "subcarpeta" docs/AI_GUIDELINES.md` → 1 (≥ 1). Commit `255c4f5`.
 
 ## In progress
 
