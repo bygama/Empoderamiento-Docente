@@ -157,6 +157,11 @@ export function PaisDropdown({
             const elegido = value === opt;
             const resaltado = active === i;
             return (
+              // La opción ES el <li role="option">: adentro tenía un <button>,
+              // que es un interactivo dentro de otro (el listbox ya lo es) y
+              // duplicaba el árbol para quien navega con lector. El teclado no
+              // lo usaba —lo maneja el input con aria-activedescendant— y el
+              // clic y el hover viven ahora acá.
               <li
                 key={opt}
                 ref={(el) => {
@@ -164,19 +169,14 @@ export function PaisDropdown({
                 }}
                 role="option"
                 aria-selected={elegido}
+                onClick={() => elegir(opt)}
+                onMouseEnter={() => setActive(i)}
+                className={`flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-left font-sans text-[0.95rem] transition-colors ${
+                  resaltado ? "bg-azul-claro/20" : ""
+                } ${elegido ? "text-verde-concepto font-medium" : "text-azul-principal"}`}
               >
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  onClick={() => elegir(opt)}
-                  onMouseEnter={() => setActive(i)}
-                  className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left font-sans text-[0.95rem] transition-colors ${
-                    resaltado ? "bg-azul-claro/20" : ""
-                  } ${elegido ? "text-verde-concepto font-medium" : "text-azul-principal"}`}
-                >
-                  <span>{opt}</span>
-                  {elegido && <Check size={15} className="text-verde-concepto shrink-0" />}
-                </button>
+                <span>{opt}</span>
+                {elegido && <Check size={15} className="text-verde-concepto shrink-0" />}
               </li>
             );
           })}
