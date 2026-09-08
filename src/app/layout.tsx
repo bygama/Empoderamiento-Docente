@@ -53,8 +53,7 @@ export const metadata: Metadata = {
       "Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas",
     template: "%s | Empoderamiento Docente",
   },
-  description:
-    "Consultora en educación especializada en Matemáticas. Acompañamos a equipos docentes con investigación, formación y acompañamiento situado.",
+  description: siteConfig.description,
   keywords: [
     "aprendizaje de las matemáticas",
     "desarrollo profesional docente",
@@ -67,8 +66,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     title:
       "Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas",
-    description:
-      "Consultora en educación especializada en Matemáticas. Investigación, formación y acompañamiento para equipos docentes.",
+    description: siteConfig.description,
     siteName: siteConfig.name,
   },
 };

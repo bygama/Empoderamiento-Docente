@@ -81,8 +81,9 @@ export function Footer() {
               alineada a la izquierda. */}
           <div className="flex items-center md:flex-1">
             <p className="text-azul-claro/85 max-w-xs font-sans text-[0.92rem] leading-relaxed">
-              Investigamos, diseñamos y acompañamos procesos educativos situados
-              junto a comunidades, instituciones y equipos docentes.
+              Consultora especializada en la transformación del aprendizaje
+              matemático. Investigación, materiales didácticos, desarrollo
+              profesional docente, acompañamiento, currículo y evaluación.
             </p>
           </div>
 

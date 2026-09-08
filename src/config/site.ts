@@ -14,8 +14,10 @@ export const siteConfig = {
   name: "Empoderamiento Docente",
   shortName: "ED",
   url: "https://empoderamientodocente.org",
+  // La frase del cartel oficial (2026) más las seis áreas: es lo que ve
+  // Google y lo que se comparte.
   description:
-    "Empoderamiento Docente trabaja desarrollo profesional docente con presencia en Chile, México, Argentina, Colombia y Brasil. Trayectos formativos, asesorías y comunidad en torno a la Matemática Educativa.",
+    "Consultora especializada en la transformación del aprendizaje matemático. Investigación, diseño de materiales didácticos, desarrollo profesional docente, acompañamiento, currículo y evaluación, en Chile, México, Argentina, Colombia y Brasil.",
 
   contacto: {
     email: "contacto@empoderamientodocente.org",
