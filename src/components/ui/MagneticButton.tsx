@@ -31,6 +31,9 @@ export function MagneticButton({
     const el = ref.current;
     if (!el) return;
 
+    // El hint vive lo que vive el listener: promover el botón toda la sesión
+    // (como hacía la clase) es una capa por CTA sin nadie que la use.
+    el.style.willChange = "transform";
     const moveX = gsap.quickTo(el, "x", { duration: 0.4, ease: "power3.out" });
     const moveY = gsap.quickTo(el, "y", { duration: 0.4, ease: "power3.out" });
 
@@ -49,13 +52,14 @@ export function MagneticButton({
     return () => {
       el.removeEventListener("mousemove", onMove);
       el.removeEventListener("mouseleave", onLeave);
+      el.style.willChange = "";
     };
   }, [reducedMotion, strength]);
 
   return (
     <span
       ref={ref}
-      className={`inline-block will-change-transform ${className ?? ""}`}
+      className={`inline-block ${className ?? ""}`}
     >
       {children}
     </span>

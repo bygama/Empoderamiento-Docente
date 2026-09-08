@@ -13,6 +13,13 @@ type OpcionesParallax = {
   activo?: boolean;
   /** Exigir hover real (`matchMedia`): en touch el listener nunca dispararía. */
   soloHover?: boolean;
+  /**
+   * Selector (dentro del elemento) de las capas que de verdad transforman.
+   * Reciben el `will-change` mientras el parallax corre y lo pierden al
+   * desmontar: el hint es de la coreografía, no de la clase — permanente
+   * promovía esas capas toda la sesión aunque nadie moviera el mouse.
+   */
+  promover?: string;
 };
 
 /**
@@ -27,7 +34,7 @@ type OpcionesParallax = {
  */
 export function useMouseParallax(
   ref: RefObject<HTMLElement | null>,
-  { x, y, ease = 0.09, activo = true, soloHover = false }: OpcionesParallax,
+  { x, y, ease = 0.09, activo = true, soloHover = false, promover }: OpcionesParallax,
 ) {
   useIsomorphicLayoutEffect(() => {
     const el = ref.current;
@@ -40,6 +47,8 @@ export function useMouseParallax(
     let cy = 0;
     let raf = 0;
     let started = false;
+    const capas = promover ? Array.from(el.querySelectorAll<HTMLElement>(promover)) : [];
+    for (const capa of capas) capa.style.willChange = "transform";
     const clamp = (v: number) => (v < -1 ? -1 : v > 1 ? 1 : v);
     const onMove = (e: MouseEvent) => {
       tx = clamp((e.clientX / window.innerWidth - 0.5) * 2);
@@ -61,6 +70,7 @@ export function useMouseParallax(
     return () => {
       window.removeEventListener("mousemove", onMove);
       cancelAnimationFrame(raf);
+      for (const capa of capas) capa.style.willChange = "";
     };
-  }, [ref, x, y, ease, activo, soloHover]);
+  }, [ref, x, y, ease, activo, soloHover, promover]);
 }

@@ -122,7 +122,7 @@ export function RevealImage({
     >
       {/* Capa interna: aloja el overscale settle SIN romper el clip del wrapper.
           h-full/w-full para que el contenido llene el wrapper. */}
-      <div ref={innerRef} className="h-full w-full will-change-transform">
+      <div ref={innerRef} className="h-full w-full">
         {children}
       </div>
     </div>
