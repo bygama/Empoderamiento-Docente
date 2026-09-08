@@ -70,7 +70,8 @@ const PASOS = [
 ] as const;
 
 /**
- * Bloque sticky scroll-telling. h-[500vh] + sticky top-0 h-screen
+ * Bloque sticky scroll-telling. h-[500vh] (380vh en celular: cinco
+ * pantallas para cinco pasos se hacían largas con el dedo) + sticky top-0 h-screen
  * (sin pin:true — compatible con Lenis). 5 pasos con fotos reales que
  * se cross-fadean con el progreso del scroll. Timeline scrubbed mapea
  * 0→1 a las N fases (el número de pasos se lee de PASOS). Nav lateral de
@@ -214,7 +215,7 @@ export function ComoTrabajamos() {
       className="bg-grain-light relative overflow-clip bg-gradient-to-b from-white via-white to-gris-fondo/20"
       aria-label="Cómo trabajamos"
     >
-      <div className="relative h-[500vh]">
+      <div className="relative h-[380vh] md:h-[500vh]">
         <div className="sticky top-0 flex h-screen flex-col overflow-hidden">
 
           {/* Glow verde ambiental */}
