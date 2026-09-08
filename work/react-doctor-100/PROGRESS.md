@@ -599,6 +599,61 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 <!-- Solo evidencia PASS, la escribe work-verify (lo más nuevo arriba). El cierre no
      cierra la lane sin un bloque PASS vigente acá. -->
 
+### 2026-09-08 — main entra a la lane (20 commits) y vuelve a 100/100
+
+`origin/main` avanzó **20 commits** mientras corría la lane (submenús del navbar con activo
+en dos niveles, las seis áreas de Qué hacemos, `?tipo=` en Biblioteca, SEO, redes,
+«Portada» en el índice). Decisión del owner: **merge**, no rebase — el rebase replayaba 77
+commits y el mismo conflicto reaparecía hasta 14 veces, cada resolución intermedia teniendo
+que quedar coherente; el merge lo resuelve una vez con los dos estados finales a la vista.
+
+**Chocaron 5 archivos, todos de los que la lane había partido.** Lo nuevo se portó ADENTRO de
+la estructura partida, nunca al revés:
+
+| Archivo | Qué traía main | Dónde quedó |
+|---|---|---|
+| `MobileNav.tsx` | acordeón de submenús (105 líneas) | `mobile-nav/NavegacionMenu.tsx`, con el estado del desplegado y `irADestino` en el compositor. La flecha conserva `transition-[color,opacity,translate]`, no el `transition-all` de main |
+| `IndicePagina.tsx` | «Arriba» → «Portada» | `useImanIndice.ts`, que es donde la lane arma los items |
+| `QueHacemosHeroFaro.tsx` | copy del cartel y CTA «Ver las seis áreas» con ancla `#areas` | `hero-faro/CierreFaro.tsx` |
+| `QueHacemosHero.tsx` | chips de las seis áreas | el compositor, entre `TitularQH` y `CapsulaPortal`, mismo lugar del DOM |
+| `ButtonPrimary.tsx` | prop `onClick` | conservado, con la transición explícita de la lane |
+
+**No se perdió nada de main**: `git merge-base --is-ancestor origin/main HEAD` → verdadero,
+los 20 commits son ancestros. Los 9 archivos que main creó están todos, y `config/nav.ts`,
+`lib/navegar.ts` y `que-hacemos/areas.ts` quedaron idénticos a los suyos. Contra
+`origin/main`, los únicos archivos que difieren son `Header.tsx` y `MobileNav.tsx`, y es
+porque la lane les sacó código a módulos. Respaldo previo al merge: rama
+`backup/react-doctor-100-pre-rebase` en `ca7f0e7`.
+
+**El árbol mergeado daba 88/100 con 4 hallazgos, los cuatro en código de main** (`5f85e3f`):
+
+- `Header` pasaba las 300 líneas → partido con la receta de la lane:
+  `header/coreografia-intro.ts` (135) y `header/auto-hide.ts` (79), las dos llamadas por el
+  MISMO efecto y en la misma posición; el compositor queda en 169.
+- `destinosAca` hacía `map().filter(Boolean)` → `flatMap`, una sola pasada.
+- `AterrizajePorLink` decodificaba el hash sin guarda: un «%» suelto tira `URIError` y
+  cortaba el efecto → `try/catch` con caída al hash crudo.
+- `ConQuienTrabajamos` servía los logos con `<img>` **y un `eslint-disable` de
+  `no-img-element`**, que el DoD §6.5 prohíbe → `next/image` con las medidas de
+  `config/aliados`, igual que Footer y DatosDuros.
+
+**Verificación del resultado**: `RD src` → **100/100, 0 diagnósticos, 289 archivos**;
+typecheck, lint y build en exit 0. `PROBE navbar-merge` (nuevo) → `ok: true`: el intro del
+navbar morfea después del split (wordmark 203→0, links 0→750, 6 ítems), el auto-hide esconde
+y trae la píldora (top 16 → −120 → 16) y el acordeón abre uno solo por vez (5 chevrons, el de
+la página actual abierto). Los probes de la lane siguen en verde: `menu-mobile`,
+`perfil-dialog` (inmersivo y shell), `casos` y `buscador`.
+
+Dos notas para el que siga:
+
+- `menu-mobile` necesitó dos ajustes de INSTRUMENTO, no de código: ahora el panel tiene
+  enlaces dentro de `<ul hidden>` (no enfocables), así que cuenta solo los visibles; y entre
+  el último y el primero el foco para en el chrome del navegador Y en el propio `<dialog>`,
+  que es enfocable como contenedor modal, así que tabula hasta llegar con tope.
+- El worktree `rd-baseline` (112de56, puerto 3002) **ya no sirve como comparación** para las
+  páginas que main tocó: quedó dos docenas de commits atrás. Sigue valiendo para las que main
+  no tocó (fue el que resolvió el buscador y el perfil hoy mismo).
+
 ### 2026-09-08 — Review de cierre: 4 seats en Opus (SPEC §6.13)
 
 Seats independientes, sin contexto de esta sesión, con la consigna de REFUTAR el PASS. Los
