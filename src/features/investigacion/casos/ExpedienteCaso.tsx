@@ -11,7 +11,8 @@ import { ROTULO_MICRO, ROTULO_SECCION, ROTULO_TAB, TINTES } from "./tintes";
 import { EvidenciasCaso, QUERY_PUNTERO_FINO } from "./EvidenciasCaso";
 import { LaminaCaso } from "./LaminaCaso";
 import { ClipPapel, FlechaManuscrita, Pestana, SubrayadoMarcador } from "./Garabatos";
-import { ArrowRight } from "@/components/ui/icons";
+import { ArrowRight, Enlace } from "@/components/ui/icons";
+import { useCopiar } from "@/lib/hooks/useCopiar";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -97,6 +98,7 @@ export function ExpedienteCaso({
   const cuerpoRef = useRef<HTMLDivElement | null>(null);
   const [recorrido, setRecorrido] = useState(false);
   const reduced = useReducedMotion();
+  const { copiado, copiar } = useCopiar();
   const tinte = TINTES[caso.tinte];
   const oscuro = caso.tinte !== "claro";
   const siguiente = indice < casos.length - 1 ? casos[indice + 1] : null;
@@ -246,6 +248,18 @@ export function ExpedienteCaso({
                 DEMO
               </span>
             )}
+            {/* El caso tiene dirección propia (#slug): copiarla para mandar
+                «leé este caso» por donde sea. */}
+            <button
+              type="button"
+              onClick={() =>
+                copiar(`${window.location.origin}/investigacion#${caso.slug}`, "link")
+              }
+              className="border-azul-principal/25 text-azul-principal hover:border-azul-principal focus-visible:outline-verde-concepto inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              <Enlace size={13} aria-hidden="true" />
+              {copiado === "link" ? "COPIADO" : "COPIAR LINK"}
+            </button>
           </p>
           <h3
             ref={refTitulo}
