@@ -33,7 +33,7 @@ export function ButtonSecondary({
     <Link
       href={href}
       onClick={onClick}
-      className={`group focus-visible:outline-verde-concepto inline-flex items-center justify-center gap-2 rounded-lg border bg-transparent px-6 py-3 font-sans text-[0.95rem] font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 ${themed}`}
+      className={`group focus-visible:outline-verde-concepto inline-flex items-center justify-center gap-2 rounded-lg border bg-transparent px-6 py-3 font-sans text-[0.95rem] font-medium transition-[background-color,color] focus-visible:outline-2 focus-visible:outline-offset-2 ${themed}`}
     >
       <span>{children}</span>
       {withArrow && (
