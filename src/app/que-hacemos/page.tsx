@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 // Hero → Líneas → Cómo trabajamos → Niveles → Enfoque → Cierre.
 export default function QueHacemosPage() {
   return (
-    <main>
+    <main id="contenido" tabIndex={-1}>
       {/* FONDO COMPARTIDO: el hero y la escena del faro son dos cielos
           nocturnos seguidos; con un fondo cada uno siempre quedaba una línea
           horizontal en la junta (igualar los colores no alcanza: el SVG del

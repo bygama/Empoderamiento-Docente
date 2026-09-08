@@ -27,7 +27,7 @@ export const metadata: Metadata = {
  */
 export default function InvestigacionPage() {
   return (
-    <main>
+    <main id="contenido" tabIndex={-1}>
       <InvestigacionHero />
       <CartaAbierta />
       <LineasInvestigacion />
