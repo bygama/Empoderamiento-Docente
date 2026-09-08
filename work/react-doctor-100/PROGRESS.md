@@ -494,9 +494,26 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
   después de Escape (la salida se anima) y cerrado al final, scroll restaurado exacto
   (13515 y 14017) y foco de vuelta en la card. Commit `87a46fa`.
 
+- **Paso 35 — el buscador del hero de biblioteca sin `<form>`** (2026-09-08). El
+  `<form onSubmit={preventDefault}>` que solo bajaba a `#materiales` pasa a `<search>` y el
+  botón a `type="button"`; Enter en el campo (`onKeyDown`) y clic en la lupa llaman a la
+  misma `irAMateriales`. Dos correcciones sobre lo que pedía el PLAN, las dos por hallazgos
+  nuevos que abrió el propio cambio (DECISIONS): el envoltorio es `<search>` y no
+  `<div role="search">` (`prefer-tag-over-role`), e `irAMateriales` vive en el módulo y no en
+  el cuerpo del componente (`prefer-module-scope-pure-function`). Aceptación: typecheck → 0;
+  lint → exit 0; **`RD src` → 100 / 100, «No issues found!», `skippedChecks: []`,
+  `complete: true`, 278 archivos**; LINEAS: BibliotecaHero 169; SSR `/biblioteca` contra el
+  paso 33 idéntico salvo los dos tokens del paso (`<form … role="search">` → `<search>` y
+  `type="submit"` → `type="button"`) y texto visible idéntico; `PROBE buscador`
+  (`.next/pw/buscador.js`, 3000 vs 3002) → `ok: true`: envoltorio `SEARCH` + botón `button`
+  en la lane contra `FORM` + `submit` en la base, y las dos vías (Enter y clic) dejan
+  `scrollY` en 3502 con `#materiales` a 96px del viewport en LOS DOS servidores, sin
+  navegar (`location.search` vacío). Commit `935efe1`.
+
 ## In progress
 
-- PLAN paso 35: el buscador de biblioteca sin `<form>`.
+- PLAN paso 36: las entradas de `docs/AI_GUIDELINES.md`. Después, el DoD completo
+  (work-verify §6) y los 4 seats de review.
 
 ## Dónde corre
 

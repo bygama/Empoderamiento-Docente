@@ -212,3 +212,16 @@ una salida sin línea `Score:` no cuenta como medición — se abre con `--json`
 `projects[0].skippedChecks` / `skippedCheckReasons`, que la consola no imprime. Descartadas:
 correr `RD` sobre el worktree sucio y restar el hallazgo a ojo (mide otra cosa); `git stash`
 alrededor de la medición (esconde el paso que se está verificando).
+
+## 2026-09-08 — El buscador del hero usa `<search>`, no `<div role="search">`
+
+El PLAN (paso 35) pedía `<div role="search">`. Sacado el `<form>`, react-doctor levantó
+`prefer-tag-over-role` sobre ese mismo div: el elemento nativo `<search>` da la semántica que
+el rol imita. Se usa el elemento; el rol explícito sobra y no se agrega. Como el elemento es
+reciente, la clase mantiene un `flex` propio (un navegador que no lo conozca lo trataría como
+inline). En el mismo paso, `irAMateriales` sube al módulo por
+`prefer-module-scope-pure-function`: no lee props ni estado, y adentro se rearmaba por
+render. Ojo con los probes: `<search>` lleva el rol IMPLÍCITO y NO matchea `[role="search"]`
+— el probe del buscador selecciona `search, [role="search"]` para medir lane y base con el
+mismo script. Descartadas: dejar el div con el rol (deja un hallazgo vivo, y el SPEC no
+permite apagar reglas); poner `role="search"` sobre `<search>` (rol redundante).
