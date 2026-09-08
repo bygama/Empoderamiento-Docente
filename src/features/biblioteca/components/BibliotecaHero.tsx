@@ -34,6 +34,13 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * cursor. Los tiempos de este timeline están ACOPLADOS a las constantes del
  * barrido en PuntosFaro. Sin motion / prefers-reduced-motion: todo visible.
  */
+// Enter en el campo y clic en la lupa hacen lo MISMO (hoy, bajar al listado):
+// un solo lugar donde cambiarlo cuando el buscador filtre de verdad. Vive en
+// el módulo porque no lee props ni estado: adentro se rearmaría por render.
+function irAMateriales() {
+  document.getElementById("materiales")?.scrollIntoView({ behavior: "smooth" });
+}
+
 export function BibliotecaHero() {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -120,16 +127,15 @@ export function BibliotecaHero() {
 
         {/* Buscador — por ahora ancla al futuro listado (#materiales);
             cuando exista el catálogo, pasa a filtrarlo de verdad. */}
-        <form
+        {/* No es un <form>: no hay nada que enviar ni endpoint que responda, y
+            un submit cancelado con preventDefault promete un envío que sin JS
+            no pasa nunca. <search> es el landmark nativo (mejor que un
+            role="search" pegado a un div) y el Enter y la lupa comparten el
+            salto. El `flex` de la clase lo saca del display inline que un
+            navegador viejo le daría al elemento desconocido. */}
+        <search
           data-bh-rise
-          role="search"
           className="focus-within:ring-azul-claro/70 mt-9 flex w-full max-w-xl items-stretch gap-1.5 rounded-xl bg-white p-1.5 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.45)] focus-within:ring-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            document
-              .getElementById("materiales")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
         >
           <label htmlFor="biblioteca-buscar" className="sr-only">
             Buscar publicaciones y recursos
@@ -138,16 +144,20 @@ export function BibliotecaHero() {
             id="biblioteca-buscar"
             type="search"
             placeholder="Buscá por título, tema o autora…"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") irAMateriales();
+            }}
             className="text-azul-principal placeholder:text-gris-texto min-w-0 flex-1 bg-transparent px-3.5 font-sans text-[0.98rem] outline-none"
           />
           <button
-            type="submit"
+            type="button"
             aria-label="Buscar"
+            onClick={irAMateriales}
             className="bg-naranja-accion flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white transition-opacity hover:opacity-90"
           >
             <Search size={20} />
           </button>
-        </form>
+        </search>
       </div>
 
       {/* ── Riel de categorías al pie del hero ─────────────────────────── */}
