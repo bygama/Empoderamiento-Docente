@@ -31,6 +31,50 @@ import { ImmersiveProfile } from "@/features/quienes-somos/components/profile/Im
  *     renderiza <ImmersiveProfile>, que trae su propia narrativa y coreografía.
  */
 
+/** Tiempos de la transformación card → perfil (y su reverso). */
+const APERTURA = 0.95;
+const CIERRE = 0.55;
+/** La foto viajera se apoya y se queda QUIETA un instante antes de fundirse
+ *  en la figura recortada: primero llega, después cambia de piel. */
+const PAUSA_APOYO = 0.15;
+const LLEGADA_FOTO = APERTURA + PAUSA_APOYO;
+/** Espera máxima a que cargue la imagen del perfil antes de viajar (para
+ *  medir su recuadro real, no la caja que lo reserva). */
+const ESPERA_IMAGEN = 300;
+/** Figura "recorte": el fondo de la foto se disuelve en degradé, de afuera
+ *  hacia adentro, dejando la figura parada sobre el papel. */
+const DISOLUCION_FONDO = 0.65;
+
+/** Máscara radial de la foto viajera: `r` = hasta dónde queda foto (en % del
+ *  radio); más allá, transparente con borde suave. */
+function mascara(r: number) {
+  return `radial-gradient(ellipse 100% 100% at 50% 42%, black ${r}%, transparent ${r + 24}%)`;
+}
+
+/** Geometría "object-fit: cover" de una imagen dentro de una caja. */
+function coverEn(box: { width: number; height: number }, iw: number, ih: number, pos: string) {
+  const [px, py] = pos.split(" ").map((v) => (parseFloat(v) || 50) / 100);
+  const k = Math.max(box.width / iw, box.height / ih);
+  const w = iw * k;
+  const h = ih * k;
+  return { left: (box.width - w) * px, top: (box.height - h) * py, width: w, height: h };
+}
+/** Arranca decidido y frena largo: "despacio" en la curva, no en la duración. */
+const EASE_VIAJE = "power3.inOut";
+
+/** Rectángulo de la card como recorte del lienzo (con su radio). */
+function clipDe(r: DOMRect) {
+  return `inset(${r.top}px ${window.innerWidth - r.right}px ${window.innerHeight - r.bottom}px ${r.left}px round 1.5rem)`;
+}
+
+/** Las demás cards del equipo (las que no se abrieron): se alejan y vuelven. */
+function paresDe(originEl: HTMLElement | null): HTMLElement[] {
+  const seccion = originEl?.closest("#equipo");
+  if (!seccion) return [];
+  const propia = originEl?.closest("[data-reveal]");
+  return Array.from(seccion.querySelectorAll<HTMLElement>("[data-reveal]")).filter((el) => el !== propia);
+}
+
 export function TeamProfileOverlay({
   persona,
   originEl,
@@ -57,7 +101,15 @@ export function TeamProfileOverlay({
   const heroRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const backRef = useRef<HTMLButtonElement | null>(null);
+  const copiarRef = useRef<HTMLButtonElement | null>(null);
+  const patronRef = useRef<HTMLDivElement | null>(null);
+  const inmersivoRef = useRef<HTMLDivElement | null>(null);
+  const viajeraRef = useRef<HTMLDivElement | null>(null);
   const closingRef = useRef(false);
+  // En el inmersivo de escritorio, la FOTO de la card viaja (la lleva este
+  // overlay) y la figura recortada la releva al llegar. Se decide en render
+  // porque ImmersiveProfile lo necesita como prop.
+  const fotoViaja = immersive && !staticProfile && !!originEl?.querySelector("img");
 
   useLockScroll(true);
 
@@ -86,70 +138,208 @@ export function TeamProfileOverlay({
     backRef.current?.focus();
 
     let ctx: gsap.Context | undefined;
+    // Las otras cards se alejan mientras la elegida se convierte en el perfil;
+    // se restauran al cerrar (cleanup) — viven fuera del portal, así que no
+    // entran en el gsap.context del root.
+    const pares = paresDe(originEl);
     if (root && !reduced) {
-      ctx = gsap.context(() => {
-        // INMERSIVO: la card ES el origen físico — el panel blanco se expande
-        // desde su rectángulo (clip-path) mientras figura y nombre FLIPean
-        // (eso lo coreografía ImmersiveProfile). Sin flash ni corte de pantalla.
-        if (immersive) {
-          const from = originEl?.getBoundingClientRect();
-          const backdrop = backdropRef.current;
-          if (backdrop && from && from.width > 0) {
-            gsap.fromTo(
-              backdrop,
-              {
-                clipPath: `inset(${from.top}px ${window.innerWidth - from.right}px ${window.innerHeight - from.bottom}px ${from.left}px round 1.5rem)`,
-              },
-              {
-                clipPath: "inset(0px 0px 0px 0px round 0rem)",
-                duration: 0.8,
-                ease: "power3.inOut",
-                onComplete: () => gsap.set(backdrop, { clearProps: "clipPath" }),
-              },
-            );
-          } else {
-            gsap.fromTo(backdropRef.current, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "power2.out" });
+      if (pares.length) gsap.to(pares, { opacity: 0.4, scale: 0.98, duration: 0.45, ease: "power2.out" });
+      ctx = gsap.context((self) => {
+        const backdrop = backdropRef.current;
+        const from = originEl?.getBoundingClientRect();
+        const desdeCard = !!(from && from.width > 0);
+        const originImg = originEl?.querySelector("img");
+        const f = originImg?.getBoundingClientRect();
+        const hero = heroRef.current;
+        const viajera = viajeraRef.current;
+        // Destino: la caja de la figura recortada; lo que se revela es su
+        // MOVER (la caja la gobierna la coreografía de scroll del perfil).
+        const figura = root.querySelector<HTMLElement>("[data-portrait-mover]");
+        // El destino es el recuadro de la IMAGEN recortada (no su caja, que
+        // tiene aire a la izquierda): así el fundido cambia de foto a figura
+        // sobre el mismo lugar.
+        const cajaFigura = root.querySelector<HTMLElement>("[data-portrait-outer]");
+        const imgFigura = figura?.querySelector("img");
+        // El DESTINO se mide recién al arrancar el viaje, con la imagen del
+        // perfil ya cargada: su recuadro real (alineado a la derecha dentro
+        // de la caja que lo reserva). Medirlo antes daba la caja entera y la
+        // foto aterrizaba corrida respecto de la figura.
+        const medirDestino = () => {
+          const dImg = imgFigura?.getBoundingClientRect();
+          if (!dImg || dImg.width === 0) return cajaFigura?.getBoundingClientRect();
+          // Figura "recorte": la <img> es más grande que lo que pinta
+          // (object-fit: contain, apoyada abajo). El destino es lo PINTADO.
+          if (imgFigura && persona.profile?.figura === "recorte" && imgFigura.naturalWidth > 0) {
+            const iw = imgFigura.naturalWidth;
+            const ih = imgFigura.naturalHeight;
+            const k = Math.min(dImg.width / iw, dImg.height / ih);
+            const w = iw * k;
+            const h = ih * k;
+            const [px, py] = getComputedStyle(imgFigura)
+              .objectPosition.split(" ")
+              .map((v) => (parseFloat(v) || 50) / 100);
+            return new DOMRect(dImg.left + (dImg.width - w) * px, dImg.top + (dImg.height - h) * py, w, h);
           }
-          gsap.fromTo(
-            backRef.current,
-            { opacity: 0, y: -8 },
-            { opacity: 1, y: 0, duration: 0.5, delay: 0.55, ease: "power2.out" },
-          );
-          return;
+          return dImg;
+        };
+        const viaja = !!(immersive && fotoViaja && viajera && f && f.width > 0 && (imgFigura || cajaFigura));
+        // Figura "recorte" con el recorte ubicado: la foto de la card viaja con
+        // su imagen adentro reencuadrándose, para aterrizar ALINEADA AL PÍXEL
+        // sobre la figura; después el fondo se disuelve en su lugar.
+        const crop = persona.profile?.figura === "recorte" ? persona.profile.cutoutCrop : undefined;
+        const alineable = !!(viaja && crop && originImg && originImg.naturalWidth > 0);
+        const imgViajera = viajera?.querySelector("img") ?? null;
+        const heroFlip = !!(!immersive && hero && f && f.width > 0);
+        const lineas = contentRef.current ? Array.from(contentRef.current.children) : [];
+
+        // ── ESTADOS INICIALES, YA: todo arranca en la card (el lienzo
+        //    recortado a su rectángulo, la foto sobre su foto), así el primer
+        //    frame no muestra el perfil terminado.
+        if (backdrop && desdeCard) gsap.set(backdrop, { clipPath: clipDe(from) });
+        else if (backdrop) gsap.set(backdrop, { autoAlpha: 0 });
+        if (patronRef.current) gsap.set(patronRef.current, { autoAlpha: 0 });
+        gsap.set([backRef.current, copiarRef.current], { opacity: 0, y: -8 });
+        if (viaja && viajera && f) {
+          if (imgViajera && originImg) {
+            imgViajera.src = originImg.currentSrc || originImg.src;
+            imgViajera.style.objectPosition = getComputedStyle(originImg).objectPosition;
+          }
+          gsap.set(viajera, { left: f.left, top: f.top, width: f.width, height: f.height, autoAlpha: 1, borderRadius: "1.25rem" });
+          if (alineable && imgViajera && originImg) {
+            // La imagen adentro arranca con el encuadre de la card (cover).
+            const c = coverEn(f, originImg.naturalWidth, originImg.naturalHeight, getComputedStyle(originImg).objectPosition);
+            gsap.set(imgViajera, { position: "absolute", objectFit: "fill", maxWidth: "none", ...c });
+          }
+          if (figura) gsap.set(figura, { autoAlpha: 0 });
         }
+        if (heroFlip && hero && f) {
+          const to = hero.getBoundingClientRect();
+          gsap.set(hero, {
+            x: f.left - to.left,
+            y: f.top - to.top,
+            scaleX: f.width / to.width,
+            scaleY: f.height / to.height,
+            transformOrigin: "top left",
+          });
+        }
+        if (!immersive) gsap.set(lineas, { opacity: 0, x: -22 });
 
-        gsap.fromTo(backdropRef.current, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "power2.out" });
+        // ── EL VIAJE arranca dos frames después: el montaje del perfil (y
+        //    la decodificación de sus imágenes) traba el primer frame, y con
+        //    lagSmoothing(0) —que fija Lenis— GSAP no perdona esa pausa: los
+        //    tweens saltarían al final. Con los estados ya puestos no se ve
+        //    nada raro mientras tanto.
+        const arrancar = () => {
+          // El fondo nace de la card.
+          if (backdrop && desdeCard) {
+            gsap.to(backdrop, {
+              clipPath: "inset(0px 0px 0px 0px round 0rem)",
+              duration: APERTURA,
+              ease: EASE_VIAJE,
+              onComplete: () => gsap.set(backdrop, { clearProps: "clipPath" }),
+            });
+          } else if (backdrop) {
+            gsap.to(backdrop, { autoAlpha: 1, duration: 0.4, ease: "power2.out" });
+          }
+          if (patronRef.current)
+            gsap.to(patronRef.current, { autoAlpha: 0.35, duration: 0.5, delay: 0.35 });
+          gsap.to([backRef.current, copiarRef.current], {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            delay: APERTURA * 0.75,
+            ease: "power2.out",
+          });
 
-        // El FLIP-lite del hero es exclusivo del SHELL (el inmersivo trae su
-        // propia entrada de figura recortada).
-        if (!immersive) {
-          const hero = heroRef.current;
-          const originImg = originEl?.querySelector("img");
-          if (hero && originImg) {
-            const from = originImg.getBoundingClientRect();
-            const to = hero.getBoundingClientRect();
-            if (from.width > 0 && to.width > 0) {
-              gsap.fromTo(
-                hero,
-                {
-                  x: from.left - to.left,
-                  y: from.top - to.top,
-                  scaleX: from.width / to.width,
-                  scaleY: from.height / to.height,
-                  transformOrigin: "top left",
-                },
-                { x: 0, y: 0, scaleX: 1, scaleY: 1, duration: 0.6, ease: "power3.inOut" },
-              );
+          // La foto viaja (inmersivo): hasta el recuadro exacto de la figura
+          // recortada, creciendo; se apoya, queda quieta un instante y recién
+          // ahí se funde en ella. Nada se mueve durante el fundido.
+          const d = viaja ? medirDestino() : undefined;
+          if (viaja && viajera && d && d.width > 0) {
+            gsap.to(viajera, {
+              left: d.left,
+              top: d.top,
+              width: d.width,
+              height: d.height,
+              borderRadius: alineable ? "0.75rem" : "1.75rem",
+              duration: APERTURA,
+              ease: EASE_VIAJE,
+            });
+            if (alineable && imgViajera && originImg && crop) {
+              // La imagen se reencuadra en el viaje: del cover de la card a la
+              // ventana del recorte, así al llegar coincide con la figura.
+              const iw = originImg.naturalWidth;
+              const ih = originImg.naturalHeight;
+              const wF = d.width / crop.w;
+              const hF = wF * (ih / iw);
+              gsap.to(imgViajera, {
+                left: -crop.x * wF,
+                top: -crop.y * hF,
+                width: wF,
+                height: hF,
+                duration: APERTURA,
+                ease: EASE_VIAJE,
+              });
+              // Al apoyarse, la figura ya está debajo (alineada, no se nota);
+              // después el FONDO SE DISUELVE EN DEGRADÉ, de afuera hacia adentro.
+              if (figura) gsap.set(figura, { autoAlpha: 1, delay: APERTURA });
+              const velo = { r: 112 };
+              gsap.to(velo, {
+                r: -26,
+                duration: DISOLUCION_FONDO,
+                delay: LLEGADA_FOTO,
+                ease: "power2.inOut",
+                onStart: () => gsap.set(viajera, { boxShadow: "none" }),
+                onUpdate: () => gsap.set(viajera, { maskImage: mascara(velo.r), webkitMaskImage: mascara(velo.r) }),
+                onComplete: () => gsap.set(viajera, { autoAlpha: 0 }),
+              });
             } else {
-              gsap.fromTo(hero, { autoAlpha: 0, scale: 0.96 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: "power3.out" });
+              gsap.to(viajera, { autoAlpha: 0, duration: 0.3, delay: LLEGADA_FOTO, ease: "power2.inOut" });
+              if (figura) gsap.to(figura, { autoAlpha: 1, duration: 0.3, delay: LLEGADA_FOTO, ease: "power2.out" });
             }
+          } else if (immersive && fotoViaja) {
+            // Sin destino medible la foto no viaja; la figura no puede quedar
+            // escondida (ImmersiveProfile la dejó en 0 esperando a este overlay).
+            if (viajera) gsap.set(viajera, { autoAlpha: 0 });
+            if (figura) gsap.to(figura, { autoAlpha: 1, duration: 0.4, ease: "power2.out" });
           }
-          gsap.fromTo(
-            contentRef.current,
-            { autoAlpha: 0, y: 20 },
-            { autoAlpha: 1, y: 0, duration: 0.5, delay: 0.15, ease: "power3.out" },
-          );
-        }
+
+          // La foto viaja (shell): el retrato mismo, desde la card.
+          if (heroFlip && hero) {
+            gsap.to(hero, { x: 0, y: 0, scaleX: 1, scaleY: 1, duration: APERTURA, ease: EASE_VIAJE });
+          }
+          // El texto llega último, desde la izquierda, escalonado.
+          if (!immersive && lineas.length) {
+            gsap.to(lineas, { opacity: 1, x: 0, duration: 0.55, delay: APERTURA * 0.55, stagger: 0.08, ease: "power3.out" });
+          }
+        };
+        // ...y si la imagen del perfil todavía no cargó, la espera (hasta
+        // ESPERA_IMAGEN) para conocer el destino exacto. La card ya la
+        // precargó al pasar el mouse, así que casi siempre está lista.
+        let raf = 0;
+        let timer = 0;
+        let arrancado = false;
+        const arrancarUnaVez = () => {
+          if (arrancado) return;
+          arrancado = true;
+          imgFigura?.removeEventListener("load", arrancarUnaVez);
+          self.add(arrancar);
+        };
+        raf = requestAnimationFrame(() => {
+          raf = requestAnimationFrame(() => {
+            if (imgFigura && !imgFigura.complete && viaja) {
+              imgFigura.addEventListener("load", arrancarUnaVez, { once: true });
+              timer = window.setTimeout(arrancarUnaVez, ESPERA_IMAGEN);
+            } else {
+              arrancarUnaVez();
+            }
+          });
+        });
+        return () => {
+          cancelAnimationFrame(raf);
+          window.clearTimeout(timer);
+          imgFigura?.removeEventListener("load", arrancarUnaVez);
+        };
       }, root);
     } else if (root && reduced) {
       gsap.set(root, { autoAlpha: 1 });
@@ -157,6 +347,7 @@ export function TeamProfileOverlay({
 
     return () => {
       ctx?.revert();
+      if (pares.length) gsap.set(pares, { clearProps: "opacity,transform" });
       siblings.forEach((s) => {
         s.removeAttribute("aria-hidden");
         s.removeAttribute("inert");
@@ -195,30 +386,54 @@ export function TeamProfileOverlay({
       finish();
       return;
     }
-    if (immersive) {
-      // El scroller no puede animar FLIP de card; salida por fade.
-      gsap.to(rootRef.current, { autoAlpha: 0, duration: 0.32, ease: "power2.in", onComplete: finish });
-      return;
-    }
-    const hero = heroRef.current;
-    const originImg = originEl?.querySelector("img");
+    // LO MISMO AL REVÉS, MÁS RÁPIDO: la foto vuelve a la card, el lienzo se
+    // contrae hasta su rectángulo y la sección recupera su opacidad.
+    const from = originEl?.getBoundingClientRect();
+    const desdeCard = !!(from && from.width > 0);
+    const pares = paresDe(originEl);
     const tl = gsap.timeline({ onComplete: finish });
-    if (hero && originImg) {
-      const from = originImg.getBoundingClientRect();
-      const to = hero.getBoundingClientRect();
-      if (from.width > 0 && to.width > 0) {
-        tl.to(hero, {
-          x: from.left - to.left,
-          y: from.top - to.top,
-          scaleX: from.width / to.width,
-          scaleY: from.height / to.height,
-          duration: 0.5,
-          ease: "power3.inOut",
-        }, 0);
+    if (pares.length) tl.to(pares, { opacity: 1, scale: 1, duration: 0.45, ease: "power2.out" }, 0.15);
+    tl.to([backRef.current, copiarRef.current], { opacity: 0, y: -8, duration: 0.2, ease: "power2.in" }, 0);
+    if (immersive) {
+      // El scroller no puede llevar la figura de vuelta: su contenido se
+      // disuelve mientras el lienzo se contrae hacia la card.
+      if (inmersivoRef.current)
+        tl.to(inmersivoRef.current, { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 0);
+    } else {
+      const hero = heroRef.current;
+      const originImg = originEl?.querySelector("img");
+      if (hero && originImg) {
+        const f = originImg.getBoundingClientRect();
+        const to = hero.getBoundingClientRect();
+        if (f.width > 0 && to.width > 0) {
+          tl.to(
+            hero,
+            {
+              x: f.left - to.left,
+              y: f.top - to.top,
+              scaleX: f.width / to.width,
+              scaleY: f.height / to.height,
+              duration: CIERRE,
+              ease: EASE_VIAJE,
+            },
+            0,
+          );
+        }
       }
+      tl.to(contentRef.current, { autoAlpha: 0, x: -12, duration: 0.25, ease: "power2.in" }, 0);
     }
-    tl.to(contentRef.current, { autoAlpha: 0, y: 12, duration: 0.28, ease: "power2.in" }, 0);
-    tl.to(backdropRef.current, { autoAlpha: 0, duration: 0.4, ease: "power2.inOut" }, 0.05);
+    if (patronRef.current) tl.to(patronRef.current, { autoAlpha: 0, duration: 0.25 }, 0);
+    if (backdropRef.current && desdeCard) {
+      tl.fromTo(
+        backdropRef.current,
+        { clipPath: "inset(0px 0px 0px 0px round 0rem)" },
+        { clipPath: clipDe(from), duration: CIERRE, ease: EASE_VIAJE },
+        0.05,
+      );
+      tl.to(backdropRef.current, { autoAlpha: 0, duration: 0.15 }, 0.05 + CIERRE - 0.1);
+    } else {
+      tl.to(backdropRef.current, { autoAlpha: 0, duration: 0.4, ease: "power2.inOut" }, 0.05);
+    }
   }, [originEl, onClose, reduced, immersive]);
 
   // ── Teclado: ESC cierra · Tab atrapado ─────────────────────────────────
@@ -273,7 +488,20 @@ export function TeamProfileOverlay({
           y el cierre, no en toda la experiencia); en el shell, marfil + patrón. */}
       <div ref={backdropRef} className={immersive ? "fixed inset-0 bg-white" : "bg-gris-fondo fixed inset-0"} />
       {!immersive && (
-        <div aria-hidden="true" className="pattern-dots pointer-events-none fixed inset-0 opacity-[0.35]" />
+        <div ref={patronRef} aria-hidden="true" className="pattern-dots pointer-events-none fixed inset-0 opacity-[0.35]" />
+      )}
+
+      {/* La foto viajera: la foto de la card, que cruza la pantalla hasta el
+          lugar de la figura recortada y se funde en ella (solo inmersivo). */}
+      {fotoViaja && (
+        <div
+          ref={viajeraRef}
+          aria-hidden="true"
+          className="pointer-events-none invisible fixed z-[6] overflow-hidden shadow-[0_40px_100px_-40px_rgb(31_45_77/0.5)] will-change-[left,top,width,height]"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- clon animado de la foto ya cargada en la card */}
+          <img alt="" className="h-full w-full object-cover" />
+        </div>
       )}
 
       {/* Volver al equipo — fijo (persiste durante el scroll del inmersivo) */}
@@ -290,6 +518,7 @@ export function TeamProfileOverlay({
       {/* Copiar link — el perfil tiene dirección propia (?persona=clave):
           sirve para mandar «mirá el perfil de X» por donde sea. */}
       <button
+        ref={copiarRef}
         type="button"
         onClick={() =>
           copiar(
@@ -304,12 +533,15 @@ export function TeamProfileOverlay({
       </button>
 
       {immersive ? (
-        <ImmersiveProfile
-          profile={persona.profile!}
-          reduced={staticProfile}
-          originEl={originEl}
-          onClose={requestClose}
-        />
+        <div ref={inmersivoRef}>
+          <ImmersiveProfile
+            profile={persona.profile!}
+            reduced={staticProfile}
+            originEl={originEl}
+            onClose={requestClose}
+            figuraDesdeCard={!fotoViaja}
+          />
+        </div>
       ) : (
         <div className="relative z-[1] mx-auto flex h-full max-w-screen-xl items-center px-6 md:px-12">
           <div className="grid w-full items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">

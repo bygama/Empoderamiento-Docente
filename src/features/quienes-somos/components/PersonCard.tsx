@@ -160,6 +160,20 @@ function Caption({
   );
 }
 
+/**
+ * Precarga la imagen del perfil (figura recortada o retrato) al pasar por la
+ * card: al abrir, el overlay necesita medir su recuadro real para que la foto
+ * viajera aterrice exacto sobre ella. Una vez por persona.
+ */
+const precargadas = new Set<string>();
+function precargarPerfil(persona: Persona) {
+  const src = persona.profile?.cutout;
+  if (!src || precargadas.has(src)) return;
+  precargadas.add(src);
+  const img = new window.Image();
+  img.src = src;
+}
+
 export function PersonCard({
   persona,
   onOpen,
@@ -175,6 +189,8 @@ export function PersonCard({
       data-persona-card
       data-persona-key={persona.key}
       onClick={(e) => onOpen(persona, e.currentTarget)}
+      onPointerEnter={() => precargarPerfil(persona)}
+      onFocus={() => precargarPerfil(persona)}
       aria-label={`Ver la trayectoria de ${persona.nombre}, ${persona.rol}`}
       className={cx(
         "group relative block w-full cursor-pointer overflow-hidden text-left ring-1 ring-white/10 transition-shadow duration-500",

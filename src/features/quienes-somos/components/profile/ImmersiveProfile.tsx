@@ -85,12 +85,18 @@ export function ImmersiveProfile({
   reduced,
   originEl,
   onClose,
+  figuraDesdeCard = true,
 }: {
   profile: Profile;
   reduced: boolean;
   /** Card de origen (FLIP figura + nombre). Puede ser null. */
   originEl: HTMLElement | null;
   onClose: () => void;
+  /**
+   * false = la FOTO de la card ya viaja hasta acá (la lleva el overlay); la
+   * figura recortada no FLIPea: aparece cuando esa foto llega, y la reemplaza.
+   */
+  figuraDesdeCard?: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const identityRef = useRef<HTMLDivElement | null>(null);
@@ -374,10 +380,15 @@ export function ImmersiveProfile({
       const heroEls = gsap.utils.toArray<HTMLElement>("[data-hero-el]");
       gsap.set(heroEls, { opacity: 0, y: 26 });
       gsap.set(identity, { opacity: 0 });
-      if (portraitOuterRef.current) gsap.set(portraitOuterRef.current, { autoAlpha: 0 });
+      // El OUTER lo gobierna la coreografía de scroll (tween scrubbeado que
+      // lo retira): en el modo sin FLIP propio queda visible y es el MOVER
+      // el que arranca oculto, para que el overlay lo revele cuando llega
+      // la foto viajera sin pelear con ese tween.
+      if (portraitOuterRef.current) gsap.set(portraitOuterRef.current, { autoAlpha: figuraDesdeCard ? 0 : 1 });
+      if (!figuraDesdeCard && portraitMoverRef.current) gsap.set(portraitMoverRef.current, { autoAlpha: 0 });
 
       const intro = gsap.timeline({ delay: 0.18, defaults: { ease: "power3.inOut" } });
-      const cardImg = originEl?.querySelector("img");
+      const cardImg = figuraDesdeCard ? originEl?.querySelector("img") : null;
       const cardName = originEl?.querySelector<HTMLElement>('[data-caption="rest"] [data-card-name]');
       const mover = portraitMoverRef.current;
       if (cardImg && mover && portraitOuterRef.current) {
@@ -399,7 +410,9 @@ export function ImmersiveProfile({
           );
         }
       }
-      if (portraitOuterRef.current)
+      // Sin FLIP propio, la figura la revela el overlay cuando la foto
+      // viajera llega (la releva con un fundido): acá no se toca.
+      if (portraitOuterRef.current && figuraDesdeCard)
         intro.to(portraitOuterRef.current, { autoAlpha: 1, duration: 0.45, ease: "power2.out" }, 0);
       if (identity && cardName) {
         const nr = cardName.getBoundingClientRect();
@@ -449,7 +462,7 @@ export function ImmersiveProfile({
     }, wrapRef);
 
     return () => ctx.revert();
-  }, [reduced, profile, originEl]);
+  }, [reduced, profile, originEl, figuraDesdeCard]);
 
   // ════════════════════════ REDUCED MOTION (lineal) ═══════════════════════
   if (reduced) {
@@ -592,12 +605,14 @@ export function ImmersiveProfile({
       {figura !== "sin" && profile.cutout && (
         <div
           ref={portraitOuterRef}
+          data-portrait-outer
           aria-hidden="true"
           className="pointer-events-none fixed bottom-0 z-[5] hidden h-[min(74vh,700px)] w-[30rem] items-end justify-end lg:flex"
           style={{ right: "max(1.25rem, calc((100vw - 1440px)/2 + 2rem))" }}
         >
           <div
             ref={portraitMoverRef}
+            data-portrait-mover
             className={cx(
               "relative flex h-full w-full items-end justify-end",
               figura === "marco" && "pb-[9vh]",
