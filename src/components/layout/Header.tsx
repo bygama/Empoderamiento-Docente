@@ -37,6 +37,11 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 // saltea (el bug viejo venía justamente del listener).
 const HERO_HOLD_MS = 3200;
 const SCROLLED_HOLD_MS = 900;
+// Si la persona ya quiere hacer algo (mueve el mouse, scrollea, toca, teclea)
+// no se la hace esperar: el wordmark se sostiene este mínimo y los links
+// entran. Quien mira quieto ve la coreografía completa.
+const MIN_HOLD_MS = 700;
+const EVENTOS_INTENCION = ["pointermove", "wheel", "touchstart", "keydown"] as const;
 
 export function Header() {
   const ref = useRef<HTMLElement>(null);
@@ -55,6 +60,7 @@ export function Header() {
     let fallback: number | undefined;
     let openTimer: number | undefined;
     let ran = false;
+    let quitarIntencion = () => {};
 
     const ctx = gsap.context(() => {
       // Estado inicial CERRADO: logo + wordmark expandido + visible, links
@@ -67,11 +73,9 @@ export function Header() {
       });
       gsap.set("[data-nav-links]", { width: 0, autoAlpha: 0 });
       gsap.set("[data-nav-item]", { autoAlpha: 0, x: -8 });
-      // Mobile: la hamburguesa arranca COLAPSADA (width 0) durante la fase del
-      // wordmark, igual que los links en desktop. Aparece cuando el wordmark se
-      // esconde → así "Empoderamiento Docente" tiene toda la píldora y entra en
-      // cualquier pantalla. En desktop la hamburguesa es display:none (inocuo).
-      gsap.set("[data-nav-burger]", { width: 0, autoAlpha: 0 });
+      // Mobile: la hamburguesa NO se esconde durante el wordmark. Sin ella la
+      // página queda sin navegación hasta que termina el intro, y un celular
+      // no tiene otra puerta.
 
       const play = () => {
         if (ran) return;
@@ -110,13 +114,6 @@ export function Header() {
               stagger: 0.07,
             },
             "<0.12",
-          )
-          // Mobile: la hamburguesa se despliega (width + fade) a la par que en
-          // desktop entran los links — es el mismo beat de "se abre el navbar".
-          .to(
-            "[data-nav-burger]",
-            { width: "auto", autoAlpha: 1, duration: 0.5, ease: "power3.out" },
-            "<",
           );
       };
 
@@ -126,10 +123,29 @@ export function Header() {
       // wordmark siempre tiene su momento (el bug viejo venía del listener).
       const schedule = () => {
         const pastHero = window.scrollY > window.innerHeight * 0.5;
+        const arranque = performance.now();
         openTimer = window.setTimeout(
           play,
           pastHero ? SCROLLED_HOLD_MS : HERO_HOLD_MS,
         );
+        // Intención de uso: adelanta la apertura al mínimo de sostén.
+        const intencion = () => {
+          quitarIntencion();
+          if (ran) return;
+          window.clearTimeout(openTimer);
+          const faltante = Math.max(
+            0,
+            MIN_HOLD_MS - (performance.now() - arranque),
+          );
+          openTimer = window.setTimeout(play, faltante);
+        };
+        EVENTOS_INTENCION.forEach((ev) =>
+          window.addEventListener(ev, intencion, { passive: true }),
+        );
+        quitarIntencion = () =>
+          EVENTOS_INTENCION.forEach((ev) =>
+            window.removeEventListener(ev, intencion),
+          );
       };
 
       // Se dispara cuando el gate termina (página revelada). Fallback por si no
@@ -144,6 +160,7 @@ export function Header() {
     return () => {
       if (fallback) window.clearTimeout(fallback);
       if (openTimer) window.clearTimeout(openTimer);
+      quitarIntencion();
       cleanupReveal?.();
       ctx.revert();
     };
