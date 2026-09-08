@@ -66,6 +66,8 @@ const cercania = (i: number, r: number) => {
   return Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
 };
 
+const ir = (it: Item) => (it.id === null ? irArriba() : irASeccion(it.id));
+
 export function IndicePagina() {
   const secciones = useSeccionesPagina();
   const reduced = useReducedMotion();
@@ -178,7 +180,6 @@ export function IndicePagina() {
   const items: Item[] = [{ id: null, label: "Arriba" }, ...secciones];
   const esActiva = (id: string | null) =>
     id === null ? activa === null : id === activa;
-  const ir = (it: Item) => (it.id === null ? irArriba() : irASeccion(it.id));
 
   /** Posición continua del cursor en filas (0 = centro de la primera). */
   const filaDesde = (clientY: number) => {
