@@ -23,7 +23,7 @@ export function IndiceTemas({ onElegir }: Props) {
             type="button"
             data-tema-card
             onClick={(e) => onElegir(t.key, e.currentTarget)}
-            className="group border-azul-claro/45 hover:border-verde-concepto/50 focus-visible:outline-verde-concepto flex items-center gap-4 rounded-xl border bg-white/55 px-4 py-3 text-left transition-all duration-300 hover:bg-white hover:shadow-[0_16px_36px_-22px_rgb(31_45_77/0.45)] focus-visible:outline-2 focus-visible:-outline-offset-2 md:gap-5 md:px-5 md:py-3.5"
+            className="group border-azul-claro/45 hover:border-verde-concepto/50 focus-visible:outline-verde-concepto flex items-center gap-4 rounded-xl border bg-white/55 px-4 py-3 text-left transition-[border-color,background-color,box-shadow] duration-300 hover:bg-white hover:shadow-[0_16px_36px_-22px_rgb(31_45_77/0.45)] focus-visible:outline-2 focus-visible:-outline-offset-2 md:gap-5 md:px-5 md:py-3.5"
           >
             {/* Baldosa de ícono de marca (identifica el tema). */}
             <span
@@ -54,7 +54,7 @@ export function IndiceTemas({ onElegir }: Props) {
             <ArrowRight
               size={20}
               aria-hidden="true"
-              className="text-azul-medio/45 group-hover:text-verde-concepto shrink-0 transition-all duration-300 group-hover:translate-x-1"
+              className="text-azul-medio/45 group-hover:text-verde-concepto shrink-0 transition-[color,transform] duration-300 group-hover:translate-x-1"
             />
           </button>
         ))}

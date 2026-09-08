@@ -57,7 +57,7 @@ export function CamposContacto() {
             solo acepta href). Único naranja en pantalla. */}
         <button
           type="submit"
-          className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-[background-color,box-shadow] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <span>Enviar consulta</span>
           <ArrowUpRight
