@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { getLenis } from "@/lib/lenis";
+import { irAElemento } from "@/lib/indice";
 import { CASOS } from "./data";
 import { CarpetaCaso } from "./CarpetaCaso";
 import { ExpedienteCaso } from "./ExpedienteCaso";
@@ -180,7 +181,7 @@ export function CasosInvestigacion() {
   }, [estado]);
 
   /* ── Acciones ─────────────────────────────────────────────────────── */
-  const abrir = (i: number) => {
+  const abrir = (i: number, desdeUrl = false) => {
     if (estadoRef.current !== "index") return;
     ultimaAbiertaRef.current = i;
     entradaHechaRef.current = true;
@@ -188,12 +189,17 @@ export function CasosInvestigacion() {
     setEstado("opening");
     setAnuncio(`Expediente abierto. Caso ${CASOS[i].numero}: ${CASOS[i].pregunta}`);
     // Entrada en el historial: el lugar se comporta como página nueva y el
-    // botón «atrás» del navegador lo cierra (popstate → cerrar).
-    try {
-      window.history.pushState({ edExpediente: CASOS[i].id }, "", `#${CASOS[i].slug}`);
-      historialRef.current = true;
-    } catch {
+    // botón «atrás» del navegador lo cierra (popstate → cerrar). Si se llegó
+    // por link directo, la URL ya trae el hash: no se suma otra entrada.
+    if (desdeUrl) {
       historialRef.current = false;
+    } else {
+      try {
+        window.history.pushState({ edExpediente: CASOS[i].id }, "", `#${CASOS[i].slug}`);
+        historialRef.current = true;
+      } catch {
+        historialRef.current = false;
+      }
     }
     const li = itemsRef.current[i];
     if (reduced || !li) {
@@ -213,6 +219,16 @@ export function CasosInvestigacion() {
   const cerrar = useCallback(() => {
     if (estadoRef.current !== "open") return;
     setAnuncio("Expediente cerrado. Índice de casos de investigación.");
+    // Si el hash quedó en la URL (llegada por link directo, sin entrada
+    // propia en el historial), se saca para que la dirección vuelva a ser
+    // la de la página.
+    if (!historialRef.current && window.location.hash) {
+      window.history.replaceState(
+        window.history.state,
+        "",
+        window.location.pathname + window.location.search,
+      );
+    }
     if (reduced) {
       regresoPendienteRef.current = true;
       reanudarScroll();
@@ -268,6 +284,25 @@ export function CasosInvestigacion() {
       onListo: () => setActivo(j),
     });
   };
+
+  /* ── Link directo (#slug): abre el expediente al cargar ─────────── */
+  // `abrir` se lee por ref para no atar el efecto de montaje a su identidad.
+  const abrirRef = useRef(abrir);
+  useEffect(() => {
+    abrirRef.current = abrir;
+  });
+  useEffect(() => {
+    const slug = window.location.hash.replace(/^#/, "");
+    if (!slug) return;
+    const i = CASOS.findIndex((c) => c.slug === slug);
+    if (i < 0) return;
+    const t = window.setTimeout(() => {
+      const el = botonesRef.current[i];
+      if (el) irAElemento(el, true);
+      abrirRef.current(i, true);
+    }, 500);
+    return () => window.clearTimeout(t);
+  }, []);
 
   /* ── Escape cierra el expediente ──────────────────────────────────── */
   useEffect(() => {
