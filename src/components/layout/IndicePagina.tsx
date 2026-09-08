@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ArrowRight } from "@/components/ui/icons";
+import { useEffect, useState } from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
+import { ANCHO_BASE, useImanIndice, type ItemIndice } from "@/lib/hooks/useImanIndice";
 import { irArriba, irASeccion } from "@/lib/indice";
+import { BotonSubir } from "./indice-pagina/BotonSubir";
 
 /**
  * Índice de la página: la forma de llegar a una sección sin recorrer todas
@@ -20,11 +20,10 @@ import { irArriba, irASeccion } from "@/lib/indice";
  * transparente del padre y desaparecería), por eso marcas y rótulos son dos
  * capas fijas hermanas y no una sola.
  *
- * El hover es un imán: la marca más cercana al cursor se estira y las vecinas
- * un poco, con caída suave. Los rótulos entran en píldoras blancas,
- * escalonados desde la fila del cursor hacia afuera, y el más cercano se
- * resalta en navy; se pueden clickear igual que las marcas. Todo con
- * quickTo de GSAP (un tween por propiedad, retarget en cada movimiento).
+ * El hover es un imán (ver useImanIndice): la marca más cercana al cursor se
+ * estira y las vecinas un poco, con caída suave. Los rótulos entran en
+ * píldoras blancas, escalonados desde la fila del cursor hacia afuera, y el
+ * más cercano se resalta en navy; se pueden clickear igual que las marcas.
  *
  * No aparece hasta que el hero quedó atrás (ahí no hay nada que saltear) y
  * se esconde cuando el pie tapa la pantalla o cuando un overlay bloqueó el
@@ -32,41 +31,14 @@ import { irArriba, irASeccion } from "@/lib/indice";
  * a algo que no está.
  *
  * Mobile: la lista de secciones vive en el menú hamburguesa (MobileNav) y
- * acá queda solo un botón chico para subir, que aparece después de una
- * pantalla y media de scroll.
+ * acá queda solo un botón chico para subir (BotonSubir), que aparece después
+ * de una pantalla y media de scroll.
  *
  * Las secciones se declaran con `data-indice="Rótulo"` + `id` (ver
  * useSeccionesPagina). El salto es instantáneo a propósito (ver irASeccion).
  */
 
-/** Alto de cada fila (h-7). Las dos capas comparten esta grilla. */
-const ALTO_FILA = 28;
-/** Ancho de la marca en px: en reposo, activa, y cuánto se estira con el cursor encima. */
-const ANCHO_BASE = 12;
-const ANCHO_ACTIVA = 24;
-const ANCHO_EXTRA = 20;
-/** Alcance del imán, en filas: a una fila de distancia queda cerca del 25%. */
-const SIGMA = 0.6;
-/** Corrimiento de la píldora escondida, en px. */
-const CORRIMIENTO = 8;
-
-type Item = { id: string | null; label: string };
-
-type Animadores = {
-  ancho: ((v: number) => void)[];
-  tinta: ((v: number) => void)[];
-  x: ((v: number) => void)[];
-  op: ((v: number) => void)[];
-  escala: ((v: number) => void)[];
-};
-
-/** Cuánto pesa la fila `i` con el cursor en la posición (continua) `r`. */
-const cercania = (i: number, r: number) => {
-  const d = i - r;
-  return Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
-};
-
-const ir = (it: Item) => (it.id === null ? irArriba() : irASeccion(it.id));
+const ir = (it: ItemIndice) => (it.id === null ? irArriba() : irASeccion(it.id));
 
 export function IndicePagina() {
   const secciones = useSeccionesPagina();
@@ -74,16 +46,6 @@ export function IndicePagina() {
   const [activa, setActiva] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
   const [mostrarSubir, setMostrarSubir] = useState(false);
-  const [hover, setHover] = useState(false);
-  const [cerca, setCerca] = useState<number | null>(null);
-
-  const navRef = useRef<HTMLElement | null>(null);
-  const marcas = useRef<(HTMLSpanElement | null)[]>([]);
-  const pildoras = useRef<(HTMLSpanElement | null)[]>([]);
-  const anims = useRef<Animadores | null>(null);
-  const enHover = useRef(false);
-  const temporizadores = useRef<number[]>([]);
-  const gracia = useRef(0);
 
   // ── Visibilidad y sección activa (por scroll) ────────────────────────────
   useEffect(() => {
@@ -140,132 +102,10 @@ export function IndicePagina() {
     };
   }, [secciones]);
 
-  // ── Animadores: un quickTo por propiedad, por marca y por píldora ────────
-  useEffect(() => {
-    if (secciones.length < 2) return;
-    const n = secciones.length + 1;
-    const m = marcas.current.slice(0, n).filter(Boolean) as HTMLSpanElement[];
-    const p = pildoras.current.slice(0, n).filter(Boolean) as HTMLSpanElement[];
-    const cfg = { duration: reduced ? 0 : 0.35, ease: "power3.out" };
-    gsap.set(m, { width: ANCHO_BASE, opacity: 0.45 });
-    gsap.set(p, { x: CORRIMIENTO, opacity: 0, scale: 1 });
-    anims.current = {
-      ancho: m.map((el) => gsap.quickTo(el, "width", cfg)),
-      tinta: m.map((el) => gsap.quickTo(el, "opacity", cfg)),
-      x: p.map((el) => gsap.quickTo(el, "x", cfg)),
-      op: p.map((el) => gsap.quickTo(el, "opacity", cfg)),
-      escala: p.map((el) => gsap.quickTo(el, "scale", cfg)),
-    };
-    return () => {
-      gsap.killTweensOf([...m, ...p]);
-      anims.current = null;
-    };
-  }, [secciones, reduced]);
-
-  // ── Reposo: la activa larga, el resto corto. Solo cuando no hay cursor. ──
-  useEffect(() => {
-    const a = anims.current;
-    if (!a || hover) return;
-    const ids: (string | null)[] = [null, ...secciones.map((s) => s.id)];
-    ids.forEach((id, i) => {
-      const es = id === null ? activa === null : id === activa;
-      a.ancho[i]?.(es ? ANCHO_ACTIVA : ANCHO_BASE);
-      a.tinta[i]?.(es ? 1 : 0.45);
-    });
-  }, [activa, hover, secciones]);
+  const { items, hover, cerca, navRef, marcas, pildoras, esActiva, entrar, salir, tic } =
+    useImanIndice(secciones, activa, reduced);
 
   if (secciones.length < 2) return null;
-
-  // «Arriba» siempre primero: no es una sección, es el tope de la página.
-  const items: Item[] = [{ id: null, label: "Arriba" }, ...secciones];
-  const esActiva = (id: string | null) =>
-    id === null ? activa === null : id === activa;
-
-  /** Posición continua del cursor en filas (0 = centro de la primera). */
-  const filaDesde = (clientY: number) => {
-    const nav = navRef.current;
-    if (!nav) return 0;
-    return (clientY - nav.getBoundingClientRect().top) / ALTO_FILA - 0.5;
-  };
-
-  const limpiarTemporizadores = () => {
-    temporizadores.current.forEach((t) => window.clearTimeout(t));
-    temporizadores.current = [];
-  };
-
-  /** Marcas y píldoras según dónde está el cursor. */
-  const aplicar = (r: number, escalonado: boolean) => {
-    const a = anims.current;
-    if (!a) return;
-    const idx = Math.round(Math.max(0, Math.min(items.length - 1, r)));
-    items.forEach((it, i) => {
-      const c = cercania(i, r);
-      const base = esActiva(it.id) ? ANCHO_ACTIVA : ANCHO_BASE;
-      a.ancho[i]?.(base + ANCHO_EXTRA * c);
-      a.tinta[i]?.(esActiva(it.id) ? 1 : 0.45 + 0.55 * c);
-      const pildora = () => {
-        a.x[i]?.(CORRIMIENTO * (1 - c));
-        a.op[i]?.(0.6 + 0.4 * c);
-        a.escala[i]?.(1 + 0.05 * c);
-      };
-      // Entrada escalonada desde la fila del cursor hacia afuera.
-      if (escalonado && !reduced) {
-        temporizadores.current.push(
-          window.setTimeout(pildora, 28 * Math.abs(i - idx)),
-        );
-      } else pildora();
-    });
-    setCerca(idx);
-  };
-
-  const entrar = (clientY: number) => {
-    window.clearTimeout(gracia.current);
-    const r = filaDesde(clientY);
-    if (!enHover.current) {
-      enHover.current = true;
-      setHover(true);
-      limpiarTemporizadores();
-      aplicar(r, true);
-    } else aplicar(r, false);
-  };
-
-  const salir = () => {
-    // Un respiro para cruzar el aire entre las marcas y las píldoras.
-    window.clearTimeout(gracia.current);
-    gracia.current = window.setTimeout(() => {
-      enHover.current = false;
-      setHover(false);
-      setCerca(null);
-      limpiarTemporizadores();
-      const a = anims.current;
-      if (!a) return;
-      items.forEach((it, i) => {
-        a.ancho[i]?.(esActiva(it.id) ? ANCHO_ACTIVA : ANCHO_BASE);
-        a.tinta[i]?.(esActiva(it.id) ? 1 : 0.45);
-        a.x[i]?.(CORRIMIENTO);
-        a.op[i]?.(0);
-        a.escala[i]?.(1);
-      });
-    }, 120);
-  };
-
-  /** Tic de confirmación en la marca al clickear. */
-  const tic = (i: number) => {
-    const el = marcas.current[i];
-    if (!el || reduced) return;
-    gsap.fromTo(
-      el,
-      { scaleX: 1 },
-      {
-        scaleX: 1.5,
-        duration: 0.12,
-        yoyo: true,
-        repeat: 1,
-        ease: "power2.out",
-        transformOrigin: "100% 50%",
-      },
-    );
-  };
 
   const interactivo = visible && hover;
 
@@ -354,20 +194,7 @@ export function IndicePagina() {
         </ol>
       </div>
 
-      {/* Mobile: volver arriba. */}
-      <button
-        type="button"
-        onClick={irArriba}
-        aria-label="Volver arriba"
-        tabIndex={mostrarSubir ? 0 : -1}
-        className={`border-azul-principal/15 text-azul-principal fixed right-4 bottom-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border bg-white/85 shadow-[0_10px_30px_-12px_rgb(31_45_77/0.35)] backdrop-blur transition-[opacity,translate] duration-300 lg:hidden ${
-          mostrarSubir
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-3 opacity-0"
-        }`}
-      >
-        <ArrowRight size={18} className="-rotate-90" aria-hidden="true" />
-      </button>
+      <BotonSubir visible={mostrarSubir} />
     </>
   );
 }
