@@ -428,7 +428,11 @@ export function LineasInvestigacion() {
       // por abajo (la carpeta que sale inclinada se mete bajo la sección
       // siguiente en vez de colgar sobre su hoja) y deja el tope abierto
       // para no cortar la esquina que se levanta al entrar.
-      className="bg-azul-principal bg-grain-dark relative isolate pt-24 [clip-path:inset(-100vh_0_0)]"
+      // overflow-x-clip: el clip-path esconde lo pintado pero NO saca las
+      // carpetas de 120vw del área de scroll (la página tenía scroll
+      // horizontal). `clip` no crea contenedor de scroll: pins y sticky
+      // siguen igual, y el tope sigue abierto en vertical.
+      className="bg-azul-principal bg-grain-dark relative isolate overflow-x-clip pt-24 [clip-path:inset(-100vh_0_0)]"
     >
       {/* El campo navy de la carta sigue acá: mismo grain y misma grilla de
           puntos, que asoma en el respiro de arriba y en las cuñas que dejan
