@@ -133,7 +133,7 @@ export function CierreBiblioteca() {
           </p>
 
           <div data-cierre-foot className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-            <ButtonPrimary href="/contacto">¿Buscás un material puntual?</ButtonPrimary>
+            <ButtonPrimary href="/contacto?tema=otra">¿Buscás un material puntual?</ButtonPrimary>
             <Link
               href="/novedades"
               className="group text-azul-claro hover:text-white inline-flex items-center gap-2 font-sans text-[0.95rem] font-medium transition-colors"

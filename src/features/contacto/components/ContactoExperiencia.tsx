@@ -343,6 +343,31 @@ export function ContactoExperiencia() {
     };
   }, [reduced]);
 
+  // ── Tema por URL (?tema=formacion|investigacion|alianzas|prensa|otra) ──
+  // Quien llega desde un CTA que ya dice de qué quiere hablar no tiene que
+  // pasar por el hero ni volver a elegir el tema: aterriza en el formulario.
+  // Va un frame después del montaje, cuando la intro ya se armó, para
+  // matarla limpia.
+  useEffect(() => {
+    const pedido = new URLSearchParams(window.location.search).get("tema");
+    const key = TEMAS.find((t) => t.key === pedido)?.key;
+    if (!key) return;
+    const raf = requestAnimationFrame(() => {
+      introTl.current?.kill();
+      desarmeTl.current?.kill();
+      setTema(key);
+      setVista("formulario");
+      gsap.set(panel("hero"), { autoAlpha: 0 });
+      gsap.set(panel("apertura"), { autoAlpha: 0 });
+      gsap.set(panel("formulario"), { autoAlpha: 1 });
+      gsap.set("[data-campo]", { autoAlpha: 1, y: 0 });
+      finIntro();
+    });
+    return () => cancelAnimationFrame(raf);
+    // Solo al montar: lee la URL una vez.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Mientras la intro corre, cualquier intento de scroll la saltea. Estos
   // handlers son los que reemplazan al lock: en captura, el evento se consume
   // ANTES de llegarle a Lenis (si no, acumula el impulso y arrastra la página
