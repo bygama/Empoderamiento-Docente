@@ -22,7 +22,6 @@ export function useRefsPerfil() {
     sidebar: useRef<HTMLElement | null>(null),
     portraitOuter: useRef<HTMLDivElement | null>(null),
     portraitMover: useRef<HTMLDivElement | null>(null),
-    portraitImg: useRef<HTMLImageElement | null>(null),
     track: useRef<HTMLDivElement | null>(null),
     path: useRef<SVGPathElement | null>(null),
     svg: useRef<SVGSVGElement | null>(null),

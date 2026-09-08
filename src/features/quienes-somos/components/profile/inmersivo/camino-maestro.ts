@@ -38,27 +38,25 @@ export function crearCaminoMaestro(r: RefsPerfil, st: St) {
 }
 
 /**
- * Recalcular tras layout inicial + carga de la figura + resize. Devuelve la
- * limpieza (raf, timer, listeners), en el mismo orden de siempre.
+ * Recalcular tras el layout inicial y en cada resize. Devuelve también
+ * `recalcular` para el `onLoad` de la figura: antes eso era un listener de
+ * `load` sobre la `<img>`, pero con `next/image` el aviso lo da el componente.
  */
-export function programarRecalculos(
-  self: gsap.Context,
-  setupPath: () => void,
-  img: HTMLImageElement | null,
-) {
-  const rafId = requestAnimationFrame(() => self.add(() => { setupPath(); ScrollTrigger.refresh(); }));
-  const onImgLoad = () => self.add(() => { setupPath(); ScrollTrigger.refresh(); });
-  if (img && !img.complete) img.addEventListener("load", onImgLoad, { once: true });
+export function programarRecalculos(self: gsap.Context, setupPath: () => void) {
+  const recalcular = () => self.add(() => { setupPath(); ScrollTrigger.refresh(); });
+  const rafId = requestAnimationFrame(recalcular);
   let rz = 0;
   const onResize = () => {
     window.clearTimeout(rz);
-    rz = window.setTimeout(() => self.add(() => { setupPath(); ScrollTrigger.refresh(); }), 180);
+    rz = window.setTimeout(recalcular, 180);
   };
   window.addEventListener("resize", onResize);
-  return () => {
-    cancelAnimationFrame(rafId);
-    window.clearTimeout(rz);
-    img?.removeEventListener("load", onImgLoad);
-    window.removeEventListener("resize", onResize);
+  return {
+    recalcular,
+    limpiar: () => {
+      cancelAnimationFrame(rafId);
+      window.clearTimeout(rz);
+      window.removeEventListener("resize", onResize);
+    },
   };
 }

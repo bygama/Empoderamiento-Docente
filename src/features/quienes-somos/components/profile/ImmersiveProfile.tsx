@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -75,10 +75,14 @@ export function ImmersiveProfile({
 }) {
   const r = useRefsPerfil();
   const { wrap, identity, idLine1, idLine2, idRole, clone, cloneL1, cloneL2, cloneRole } = r;
-  const { hero, heroBody, sidebar, portraitOuter, portraitMover, portraitImg } = r;
+  const { hero, heroBody, sidebar, portraitOuter, portraitMover } = r;
   const { track, path, svg, closing, closingFig } = r;
 
   const [activeStage, setActiveStage] = useState(0);
+  // El camino se mide contra la figura: cuando la imagen termina de cargar hay
+  // que rehacerlo. La coreografía deja acá su `recalcular` y el `onLoad` de la
+  // figura lo llama (antes era un listener de `load` sobre la `<img>`).
+  const recalcularCamino = useRef(() => {});
   const nombrePila = profile.fullName.split(" ")[0];
   const apellido = profile.fullName.split(" ").slice(1).join(" ") || profile.fullName;
   // Buscar por identidad (n), no por posición (motor reutilizable).
@@ -108,9 +112,10 @@ export function ImmersiveProfile({
       crearEtapas(r, st, setActiveStage);
       crearCierre(r, st);
       const quitarIntro = crearApertura(r, { scroller, originEl, figuraDesdeCard, medidas });
-      const limpiarRecalculos = programarRecalculos(self, setupPath, r.portraitImg.current);
+      const { recalcular, limpiar } = programarRecalculos(self, setupPath);
+      recalcularCamino.current = recalcular;
       return () => {
-        limpiarRecalculos();
+        limpiar();
         quitarIntro();
       };
     }, wrap);
@@ -152,7 +157,7 @@ export function ImmersiveProfile({
         modo="fija"
         refOuter={portraitOuter}
         refMover={portraitMover}
-        refImg={portraitImg}
+        onCargar={() => recalcularCamino.current()}
       />
 
       {/* ── Contenido scrolleable (banda compartida con las capas fijas) ── */}
