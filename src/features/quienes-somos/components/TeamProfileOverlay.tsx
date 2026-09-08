@@ -152,7 +152,6 @@ export function TeamProfileOverlay({
           return dImg;
         };
         const viaja = !!(immersive && fotoViaja && viajera && f && f.width > 0 && (imgFigura || cajaFigura));
-        const imgViajera = viajera?.querySelector("img") ?? null;
         const heroFlip = !!(!immersive && hero && f && f.width > 0);
         const lineas = contentRef.current ? Array.from(contentRef.current.children) : [];
 
@@ -164,9 +163,9 @@ export function TeamProfileOverlay({
         if (patronRef.current) gsap.set(patronRef.current, { autoAlpha: 0 });
         gsap.set([backRef.current, copiarRef.current], { opacity: 0, y: -8 });
         if (viaja && viajera && f) {
-          if (imgViajera && originImg) {
-            imgViajera.src = originImg.currentSrc || originImg.src;
-            imgViajera.style.objectPosition = getComputedStyle(originImg).objectPosition;
+          if (originImg) {
+            viajera.style.backgroundImage = `url("${originImg.currentSrc || originImg.src}")`;
+            viajera.style.backgroundPosition = getComputedStyle(originImg).objectPosition;
           }
           gsap.set(viajera, { left: f.left, top: f.top, width: f.width, height: f.height, autoAlpha: 1, borderRadius: "1.25rem" });
           if (figura) gsap.set(figura, { autoAlpha: 0 });
@@ -422,16 +421,15 @@ export function TeamProfileOverlay({
       )}
 
       {/* La foto viajera: la foto de la card, que cruza la pantalla hasta el
-          lugar de la figura recortada y se funde en ella (solo inmersivo). */}
+          lugar de la figura y se funde en ella (solo inmersivo). Es un FONDO,
+          no una <img>: reutiliza la imagen que la card ya decodificó (misma
+          URL, sale de caché) sin segunda descarga ni optimizador de por medio. */}
       {fotoViaja && (
         <div
           ref={viajeraRef}
           aria-hidden="true"
-          className="pointer-events-none invisible fixed z-[6] overflow-hidden shadow-[0_40px_100px_-40px_rgb(31_45_77/0.5)] will-change-[left,top,width,height]"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- clon animado de la foto ya cargada en la card */}
-          <img alt="" className="h-full w-full object-cover" />
-        </div>
+          className="pointer-events-none invisible fixed z-[6] overflow-hidden bg-cover bg-no-repeat shadow-[0_40px_100px_-40px_rgb(31_45_77/0.5)] will-change-[left,top,width,height]"
+        />
       )}
 
       {/* Volver al equipo — fijo (persiste durante el scroll del inmersivo) */}
