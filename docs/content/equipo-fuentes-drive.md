@@ -111,9 +111,16 @@ doctorado en curso desde 2020; RELIME 2016-2019 y editora desde 2019; ED desde 2
 Cimates 2025) + publicaciones y materiales del Plan Nacional Aprender Matemática +
 LinkedIn e Instagram. Foto nueva `Foto_PaginaED_Wen.jpg` (21 jul).
 
-**Pedro Vidal-Szabó** (`1IHzbkTmU9oXz-3UN29eHdGVHUHnmEKH4`) — card sí; recorrido
-depende de un link. Ficha con 3 publicaciones e Instagram; el CV está en
-sites.google.com/pucv.cl/pedrovidal-szabo, no en Drive. Foto de marzo.
+**Pedro Vidal-Szabó** (`1IHzbkTmU9oXz-3UN29eHdGVHUHnmEKH4`) — completo para todo
+desde el 2026-09-07. Ficha con 3 publicaciones (las que él eligió) e Instagram;
+el CV no está en Drive sino en su Google Site público
+(sites.google.com/pucv.cl/pedrovidal-szabo): formación con fechas (UMCE 2012 y
+2013; postítulo, magíster y doctorado en el IMA-PUCV en 2014, 2015 y 2022, con
+dos becas CONICYT), 12 experiencias laborales (Sumo Primero en Terreno
+2019-2024 hasta director académico de la macrozona 2; UDD, UAH, UCSH; hoy
+Universidad de Los Lagos, sede Osorno), 10 proyectos (dos FONDECYT con Soledad
+Estrella; ED desde mayo de 2021), 15 artículos y 36 presentaciones. Con eso se
+armó su recorrido de 6 etapas en `equipo.ts`. Foto de marzo, una sola.
 
 **Paola Balda** (`18FoB1u8s39zmyjn43Z84nALuebohQ5QW`) — completa para todo.
 Ficha con 8 artículos 2024-2026 y todas las redes (Instagram, ORCID, CVLAC, ResearchGate,
@@ -204,7 +211,8 @@ Cambios de estructura que esto trajo:
 ### Segunda tanda: los siete que ya tenían CV
 
 Con el material que ya estaba en el Drive se armaron siete recorridos más, así
-que **11 de las 15 personas tienen recorrido**:
+que **11 de las 15 personas tienen recorrido** (12 desde el 2026-09-07, cuando
+se sumó Pedro con el CV de su Google Site):
 
 | Persona | Etapas | De dónde sale |
 |---------|--------|---------------|
@@ -236,6 +244,7 @@ Criterios que se siguieron:
 3. Iván Pérez: fechas de su trayectoria (la semblanza no las trae) y fotos actuales.
 4. Judith Hernández: CV extendido si se quiere un recorrido con etapas; el resumen de
    2 páginas alcanza para un perfil corto.
-5. Pedro Vidal-Szabó: bajar el CV del Google Sites o pedirlo en archivo.
+5. Pedro Vidal-Szabó: resuelto el 2026-09-07 con el CV de su Google Site. Solo
+   falta confirmar que su institución actual es la Universidad de Los Lagos.
 6. Confirmar con Raquel su rótulo final («Directora de Gestión Institucional» figura
    «a confirmar» en la planilla).
