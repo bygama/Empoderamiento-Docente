@@ -65,8 +65,10 @@ export function CategoriasRail() {
   const irAlListado = () =>
     document.getElementById("materiales")?.scrollIntoView({ behavior: "smooth" });
 
+  // En celular las flechas no van: entre las dos se comían un tercio del ancho
+  // y dejaban una sola píldora a la vista. Ahí el riel se arrastra con el dedo.
   const flechaClase = (activa: boolean) =>
-    `flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-azul-principal shadow-[0_16px_40px_-16px_rgb(0_0_0_/_0.4)] transition-[opacity,background-color] duration-300 hover:bg-azul-claro/60 ${
+    `hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-azul-principal shadow-[0_16px_40px_-16px_rgb(0_0_0_/_0.4)] transition-[opacity,background-color] duration-300 hover:bg-azul-claro/60 md:flex ${
       activa ? "opacity-100" : "pointer-events-none opacity-0"
     }`;
 
