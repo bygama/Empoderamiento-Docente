@@ -244,9 +244,11 @@ function HitosBlock({ stage }: { stage: ProfileStage }) {
 }
 
 /* ── VARIANTE mapa: constelación de territorios (no lista) ────────────── */
+/** Desfase vertical de cada territorio: constelación, no lista. */
+const OFFSETS_MAPA = [0, 14, -8, 18, 4];
+
 function MapaBlock({ stage }: { stage: ProfileStage }) {
   const a = ACCENT[stage.color];
-  const offsets = [0, 14, -8, 18, 4];
   return (
     <ul className="mt-8 flex max-w-[38rem] flex-wrap items-start gap-x-4 gap-y-5">
       {stage.tags?.map((t, i) => (
@@ -254,7 +256,7 @@ function MapaBlock({ stage }: { stage: ProfileStage }) {
           key={i}
           data-reveal-el
           className="border-azul-principal/12 rounded-full border bg-white px-4 py-2 font-sans text-[0.86rem] font-medium text-azul-principal shadow-[0_10px_28px_-20px_rgb(31_45_77/0.35)]"
-          style={{ transform: `translateY(${offsets[i % offsets.length]}px)` }}
+          style={{ transform: `translateY(${OFFSETS_MAPA[i % OFFSETS_MAPA.length]}px)` }}
         >
           <span className={cx("mr-2 inline-block h-1.5 w-1.5 rounded-full align-middle", a.bg)} aria-hidden="true" />
           {t}
