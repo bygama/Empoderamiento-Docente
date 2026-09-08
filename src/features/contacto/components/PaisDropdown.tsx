@@ -159,9 +159,10 @@ export function PaisDropdown({
             return (
               // La opción ES el <li role="option">: adentro tenía un <button>,
               // que es un interactivo dentro de otro (el listbox ya lo es) y
-              // duplicaba el árbol para quien navega con lector. El teclado no
-              // lo usaba —lo maneja el input con aria-activedescendant— y el
-              // clic y el hover viven ahora acá.
+              // duplicaba el árbol para quien navega con lector. El teclado
+              // nunca pasó por ese botón —iba con tabIndex={-1} y todo se
+              // maneja en el onKey del disparador—, y el clic y el hover viven
+              // ahora acá.
               <li
                 key={opt}
                 ref={(el) => {

@@ -132,9 +132,12 @@ export function BibliotecaHero() {
             no pasa nunca. <search> es el landmark nativo (mejor que un
             role="search" pegado a un div) y el Enter y la lupa comparten el
             salto. El `flex` de la clase lo saca del display inline que un
-            navegador viejo le daría al elemento desconocido. */}
+            navegador viejo le daría al elemento desconocido, y el `role`
+            explícito le devuelve el landmark a los que tampoco conocen el
+            elemento (antes de Chrome 118 / Safari 17 / Firefox 118). */}
         <search
           data-bh-rise
+          role="search"
           className="focus-within:ring-azul-claro/70 mt-9 flex w-full max-w-xl items-stretch gap-1.5 rounded-xl bg-white p-1.5 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.45)] focus-within:ring-2"
         >
           <label htmlFor="biblioteca-buscar" className="sr-only">
@@ -144,8 +147,14 @@ export function BibliotecaHero() {
             id="biblioteca-buscar"
             type="search"
             placeholder="Buscá por título, tema o autora…"
+            // El blur ANTES del salto: con un <form> de un solo campo, la
+            // tecla Buscar del teclado virtual disparaba el submit implícito,
+            // que en iOS y Android además cierra el teclado. Sin form hay que
+            // cerrarlo a mano o el teclado tapa justo lo que se acaba de traer.
             onKeyDown={(e) => {
-              if (e.key === "Enter") irAMateriales();
+              if (e.key !== "Enter") return;
+              e.currentTarget.blur();
+              irAMateriales();
             }}
             className="text-azul-principal placeholder:text-gris-texto min-w-0 flex-1 bg-transparent px-3.5 font-sans text-[0.98rem] outline-none"
           />

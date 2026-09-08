@@ -11,6 +11,7 @@ import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
 import { irASeccion } from "@/lib/indice";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useMenuAnimado } from "./mobile-nav/useMenuAnimado";
 import { NavegacionMenu } from "./mobile-nav/NavegacionMenu";
 import { PieMenu } from "./mobile-nav/PieMenu";
@@ -59,6 +60,14 @@ export function MobileNav() {
     setPrevPath(pathname);
     setOpen(false);
   }
+
+  // Este menú es de < lg: si la ventana cruza a escritorio con el panel
+  // abierto, el nav de escritorio ya está a la vista y el panel se quedaría
+  // encima —modal, con la página inerte y el scroll trabado—. Se cierra, con
+  // el mismo ajuste en render que el cambio de ruta. (En `false` durante el
+  // SSR, que es el fallback seguro: no cerrar.)
+  const esDesktop = useMediaQuery("(min-width: 64rem)");
+  if (esDesktop && open) setOpen(false);
 
   const panelRef = useRef<HTMLDialogElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
