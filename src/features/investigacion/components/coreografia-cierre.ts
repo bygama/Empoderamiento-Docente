@@ -6,7 +6,7 @@ import {
   proyectarLente,
   RADIO_CRISTAL,
   RADIO_GALERIA,
-} from "./LinternaFaro";
+} from "./linterna-geometria";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
