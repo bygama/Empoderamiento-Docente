@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { IndicePagina } from "@/components/layout/IndicePagina";
+import { AterrizajePorLink } from "@/components/layout/AterrizajePorLink";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { siteConfig } from "@/config/site";
 
@@ -11,7 +12,9 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-  weight: ["400", "500"],
+  // 600 real para el activo del navbar: sin el archivo, el navegador
+  // sintetiza la negrita (mas gorda y borrosa que la de verdad).
+  weight: ["400", "500", "600"],
 });
 
 const manrope = Manrope({
@@ -25,7 +28,9 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-jetbrains-mono",
-  weight: ["400", "500"],
+  // 600 real para el activo del navbar: sin el archivo, el navegador
+  // sintetiza la negrita (mas gorda y borrosa que la de verdad).
+  weight: ["400", "500", "600"],
 });
 
 // Manuscrita — SOLO para anotaciones "a mano" dentro de los expedientes de
@@ -53,8 +58,7 @@ export const metadata: Metadata = {
       "Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas",
     template: "%s | Empoderamiento Docente",
   },
-  description:
-    "Consultora en educación especializada en Matemáticas. Acompañamos a equipos docentes con investigación, formación y acompañamiento situado.",
+  description: siteConfig.description,
   keywords: [
     "aprendizaje de las matemáticas",
     "desarrollo profesional docente",
@@ -67,8 +71,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     title:
       "Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas",
-    description:
-      "Consultora en educación especializada en Matemáticas. Investigación, formación y acompañamiento para equipos docentes.",
+    description: siteConfig.description,
     siteName: siteConfig.name,
   },
 };
@@ -95,6 +98,7 @@ export default function RootLayout({
           </a>
           <Header />
           <IndicePagina />
+          <AterrizajePorLink />
           {children}
           {/* Fondo detrás del footer: la muesca de sus esquinas superiores
               redondeadas toma ESTE color. Blanco por defecto (matchea las

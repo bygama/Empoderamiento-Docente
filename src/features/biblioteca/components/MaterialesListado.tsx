@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Search } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
+import { EVENTO_URL } from "@/lib/navegar";
 import {
   ACCION,
   ANIOS,
@@ -28,6 +29,25 @@ type Filtros = {
 
 const SIN_FILTROS: Filtros = { tipo: null, publico: null, anio: null };
 
+/** `?tipo=` de la URL, si es un tipo real del catálogo. */
+function tipoDeUrl(): string | null {
+  const t = new URLSearchParams(window.location.search).get("tipo");
+  return t && (TIPOS as readonly string[]).includes(t) ? t : null;
+}
+
+/** Escribe (o borra) `?tipo=` sin tocar el historial ni el hash. */
+function escribirTipoEnUrl(tipo: string | null) {
+  const qs = new URLSearchParams(window.location.search);
+  if (tipo) qs.set("tipo", tipo);
+  else qs.delete("tipo");
+  const q = qs.toString();
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${window.location.pathname}${q ? `?${q}` : ""}${window.location.hash}`,
+  );
+}
+
 /**
  * Listado de recursos (#materiales, sitemap: "Buscador + filtros · Listado").
  * Arquitectura de la referencia: sidebar de filtros a la izquierda —
@@ -49,6 +69,24 @@ export function MaterialesListado() {
   const [busqueda, setBusqueda] = useState("");
   const [filtros, setFiltros] = useState<Filtros>(SIN_FILTROS);
   const rootRef = useRef<HTMLElement | null>(null);
+
+  // El TIPO viaja en la URL (`?tipo=`): así el submenú "Biblioteca" del
+  // navbar llega con el filtro aplicado desde cualquier página, y el link
+  // se puede compartir. Se lee al montar y cada vez que el navbar cambia
+  // la URL estando acá (EVENTO_URL) o al volver con el historial.
+  useEffect(() => {
+    const leer = () => {
+      const tipo = tipoDeUrl();
+      setFiltros((f) => (f.tipo === tipo ? f : { ...f, tipo }));
+    };
+    leer();
+    window.addEventListener(EVENTO_URL, leer);
+    window.addEventListener("popstate", leer);
+    return () => {
+      window.removeEventListener(EVENTO_URL, leer);
+      window.removeEventListener("popstate", leer);
+    };
+  }, []);
 
   const hayFiltros =
     busqueda !== "" || Object.values(filtros).some((v) => v !== null);
@@ -83,6 +121,7 @@ export function MaterialesListado() {
 
   const cambiarFiltro = (parcial: Partial<Filtros>) => {
     setFiltros((f) => ({ ...f, ...parcial }));
+    if ("tipo" in parcial) escribirTipoEnUrl(parcial.tipo ?? null);
     volverAlListado();
   };
 
@@ -94,6 +133,7 @@ export function MaterialesListado() {
   const limpiar = () => {
     setBusqueda("");
     setFiltros(SIN_FILTROS);
+    escribirTipoEnUrl(null);
     volverAlListado();
   };
 

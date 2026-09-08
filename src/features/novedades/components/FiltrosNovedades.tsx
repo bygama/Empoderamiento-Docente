@@ -65,7 +65,9 @@ export function FiltrosNovedades() {
     if (filtro !== "todas") qs.set("categoria", filtro);
     if (p !== 1) qs.set("pagina", String(p));
     const q = qs.toString();
-    window.history.replaceState(null, "", `${window.location.pathname}${q ? `?${q}` : ""}`);
+    // Se conserva el hash: al llegar por `/novedades#ultimas` (navbar) la
+    // URL no tiene que perder la sección.
+    window.history.replaceState(null, "", `${window.location.pathname}${q ? `?${q}` : ""}${window.location.hash}`);
 
     const cards = Array.from(grid.querySelectorAll<HTMLElement>("[data-card]"));
 

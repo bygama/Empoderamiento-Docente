@@ -5,7 +5,8 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HOME_LINK } from "@/config/nav";
+import { NAV_LINKS, HOME_LINK, esPaginaActiva } from "@/config/nav";
+import { irEnPagina, partirDestino } from "@/lib/navegar";
 import { Menu, X } from "@/components/ui/icons";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
@@ -44,6 +45,10 @@ export function MobileNav() {
   const reduced = useReducedMotion();
   const pathname = usePathname();
   const secciones = useSeccionesPagina();
+  // Submenú desplegado (acordeón): el de la página actual arranca abierto.
+  const [desplegado, setDesplegado] = useState<string | null>(
+    () => NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null,
+  );
 
   // true recién en cliente (post-hidratación): el portal a <body> se monta
   // solo entonces. Patrón canónico sin setState-en-efecto ni mismatch.
@@ -59,6 +64,7 @@ export function MobileNav() {
   if (pathname !== prevPath) {
     setPrevPath(pathname);
     setOpen(false);
+    setDesplegado(NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null);
   }
 
   // Este menú es de < lg: si la ventana cruza a escritorio con el panel
@@ -83,6 +89,17 @@ export function MobileNav() {
   const irA = (id: string) => {
     close();
     window.setTimeout(() => irASeccion(id), 60);
+  };
+  // Destino de un submenú: en la misma página corta directo (con la
+  // misma espera); en otra, navega Next y aterriza el layout.
+  const irADestino = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (partirDestino(href).pathname !== pathname) {
+      close();
+      return;
+    }
+    e.preventDefault();
+    close();
+    window.setTimeout(() => irEnPagina(href), 60);
   };
 
   return (
@@ -154,8 +171,11 @@ export function MobileNav() {
             <NavegacionMenu
               pathname={pathname}
               secciones={secciones}
+              desplegado={desplegado}
+              onDesplegar={setDesplegado}
               onCerrar={close}
               onIrASeccion={irA}
+              onIrADestino={irADestino}
             />
 
             <PieMenu onCerrar={close} />

@@ -1,7 +1,7 @@
 import { HeroQuienes } from "@/features/home/components/HeroQuienes";
+import { QueHacemosResumen } from "@/features/home/components/QueHacemosResumen";
 import { DatosDuros } from "@/features/home/components/DatosDuros";
 import { ComoTrabajamos } from "@/features/home/components/ComoTrabajamos";
-import { LineasAccion } from "@/features/home/components/LineasAccion";
 import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNovedades";
 
 export default function Home() {
@@ -13,9 +13,12 @@ export default function Home() {
       <HeroQuienes />
       {/* Ancla del scroll-hint del Hero */}
       <div id="contenido" />
+      {/* Qué hace ED, en texto plano y antes de cualquier escena larga
+          (2026-09-08). Reemplaza al abanico de siete líneas (LineasAccion)
+          que estaba después de «Cómo trabajamos». */}
+      <QueHacemosResumen />
       <DatosDuros />
       <ComoTrabajamos />
-      <LineasAccion />
       <BibliotecaNovedades />
     </main>
   );

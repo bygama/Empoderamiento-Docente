@@ -35,7 +35,7 @@ const cercania = (i: number, r: number) => {
  * las vecinas un poco, con caída suave; los rótulos entran en píldoras
  * escalonados desde la fila del cursor hacia afuera, y el más cercano se
  * resalta. Todo con quickTo de GSAP (un tween por propiedad, retarget en cada
- * movimiento). Devuelve los items (con «Arriba» primero), los refs para colgar
+ * movimiento). Devuelve los items (con «Portada» primero), los refs para colgar
  * de cada marca y cada píldora, y los handlers de puntero, foco y click.
  */
 export function useImanIndice(
@@ -88,8 +88,9 @@ export function useImanIndice(
     });
   }, [activa, hover, secciones]);
 
-  // «Arriba» siempre primero: no es una sección, es el tope de la página.
-  const items: ItemIndice[] = [{ id: null, label: "Arriba" }, ...secciones];
+  // «Portada» siempre primero: no es una sección, es el tope de la página
+  // (el hero). Se llama así y no «Arriba» ni «Inicio»: Inicio es la home.
+  const items: ItemIndice[] = [{ id: null, label: "Portada" }, ...secciones];
   const esActiva = (id: string | null) =>
     id === null ? activa === null : id === activa;
 

@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
-import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
+import { NAV_LINKS, CTA_LINK, HOME_LINK, esPaginaActiva } from "@/config/nav";
+import { NavDropdown } from "./NavDropdown";
+import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
+import { EVENTO_URL, partirDestino } from "@/lib/navegar";
 import { MobileNav } from "./MobileNav";
 import { hasRevealed, onReveal } from "@/lib/intro-signal";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -51,7 +54,44 @@ export function Header() {
   // hero es más rápido, así que ese hold largo llega tarde y desfasado: ahí el
   // navbar arranca ya ABIERTO (el JSX por defecto es el estado abierto), sin
   // replay del intro. El intro es un momento de bienvenida del Inicio.
-  const isHome = usePathname() === "/";
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  // Submenús: un solo menú abierto a la vez. El activo de nivel 2 (la
+  // sección donde se está) sale de la misma regla que el índice lateral,
+  // medida sobre los destinos de la página actual; `search` es para los
+  // destinos con query (Biblioteca `?tipo=`).
+  const [abierto, setAbierto] = useState<string | null>(null);
+  const destinosAca = useMemo(() => {
+    const actual = NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href));
+    const ids = (actual?.submenu ?? []).map((s) => partirDestino(s.href).hash).filter(Boolean);
+    return Array.from(new Set(ids));
+  }, [pathname]);
+  const seccionActiva = useSeccionActiva(destinosAca);
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const leer = () => setSearch(window.location.search);
+    leer();
+    window.addEventListener(EVENTO_URL, leer);
+    window.addEventListener("popstate", leer);
+    return () => {
+      window.removeEventListener(EVENTO_URL, leer);
+      window.removeEventListener("popstate", leer);
+    };
+  }, [pathname]);
+  // Cerrar el menú abierto al cambiar de página (ajuste en render contra el
+  // valor previo, patrón de React; no en un efecto) y al scrollear.
+  const [rutaPrevia, setRutaPrevia] = useState(pathname);
+  if (pathname !== rutaPrevia) {
+    setRutaPrevia(pathname);
+    setAbierto(null);
+  }
+  useEffect(() => {
+    if (!abierto) return;
+    const cerrar = () => setAbierto(null);
+    window.addEventListener("scroll", cerrar, { passive: true });
+    return () => window.removeEventListener("scroll", cerrar);
+  }, [abierto]);
 
   useIsomorphicLayoutEffect(() => {
     const nav = ref.current;
@@ -290,14 +330,16 @@ export function Header() {
       >
         <ul className="text-azul-principal/70 hidden items-center gap-1 pr-2 font-sans text-[14px] font-medium lg:flex">
           {NAV_LINKS.map((link) => (
-            <li key={link.href} data-nav-item>
-              <Link
-                href={link.href}
-                className="hover:bg-azul-principal/5 hover:text-azul-principal rounded-lg px-3 py-2 transition-colors"
-              >
-                {link.label}
-              </Link>
-            </li>
+            <NavDropdown
+              key={link.href}
+              item={link}
+              pathname={pathname}
+              seccionActiva={seccionActiva}
+              search={search}
+              abierto={abierto === link.href}
+              onAbrir={() => setAbierto(link.href)}
+              onCerrar={() => setAbierto((a) => (a === link.href ? null : a))}
+            />
           ))}
         </ul>
         <Link

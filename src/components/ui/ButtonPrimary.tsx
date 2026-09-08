@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { ArrowUpRight } from "./icons";
 
 type Props = {
@@ -7,16 +7,19 @@ type Props = {
   children: ReactNode;
   /** Mostrar la flecha animada a la derecha del texto. Default true. */
   withArrow?: boolean;
+  /** Para interceptar la navegación (por ejemplo, cortar a una sección). */
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
 /**
  * CTA primario. Único naranja por viewport (DESIGN.md §1 reglas duras).
  * Sutil micro-shift de la flecha al hover refuerza la dirección del clic.
  */
-export function ButtonPrimary({ href, children, withArrow = true }: Props) {
+export function ButtonPrimary({ href, children, withArrow = true, onClick }: Props) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-[background-color,box-shadow] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
     >
       <span>{children}</span>

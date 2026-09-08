@@ -222,7 +222,6 @@ export function CierreInvestigacion() {
       <section
         ref={hojaRef}
         id="conversemos"
-        data-indice="Hablemos"
         aria-label="Cierre e invitación a conversar"
         className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden pb-[var(--footer-radio)] text-white"
       >

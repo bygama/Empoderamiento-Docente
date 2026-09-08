@@ -1,15 +1,15 @@
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { getLenis } from "@/lib/lenis";
 
-// «Ver líneas de acción» viaja con Lenis hasta el ARRANQUE de la torre.
-// El salto nativo a #lineas "no llevaba a ningún lado": caía 112px antes
+// «Ver las seis áreas» viaja con Lenis hasta el arranque de las áreas.
+// El salto nativo a #areas "no llevaba a ningún lado": caía 112px antes
 // del arranque (scroll-mt del ancla, pensado para el listado plano) sobre
 // el faro casi blanco, y Lenis, si todavía estaba deslizando, lo pisaba
 // en el frame siguiente. +4px para que ScrollTrigger dé la zona por
 // activa y arranque el armado (en el borde exacto, progreso 0, no lo
 // hace). El href queda como semántica y como fallback sin JS.
 const irALineas = (e: React.MouseEvent<HTMLAnchorElement>) => {
-  const destino = document.getElementById("lineas");
+  const destino = document.getElementById("areas");
   if (!destino) return;
   e.preventDefault();
   const top = destino.getBoundingClientRect().top + window.scrollY + 4;
@@ -20,7 +20,7 @@ const irALineas = (e: React.MouseEvent<HTMLAnchorElement>) => {
 
 /**
  * S4 · Cierre sobre la noche. Titular pedido por Gastón (VALIDAR con ED);
- * CTA real del proyecto hacia #lineas — en el copy validado es la acción
+ * CTA real del proyecto hacia #areas — en el copy validado es la acción
  * secundaria del hero (la primaria es «Conversemos»), acá va como
  * secundario (transparente + borde) y única acción del plano final:
  * VALIDAR jerarquía con ED. `inert` por defecto: en el fallback está
@@ -50,8 +50,8 @@ export function CierreFaro() {
             naranja: sobre la noche el primario era un bloque que
             competía con el titular. Sigue siendo la única acción. */}
         <div data-cta className="pointer-events-auto mt-9" style={{ opacity: 0 }}>
-          <ButtonSecondary href="#lineas" variant="dark" withArrow onClick={irALineas}>
-            Ver líneas de acción
+          <ButtonSecondary href="#areas" variant="dark" withArrow onClick={irALineas}>
+            Ver las seis áreas
           </ButtonSecondary>
         </div>
       </div>
