@@ -1,55 +1,13 @@
 "use client";
 
 import { useId, useState } from "react";
-import Image from "next/image";
 import type { CasoInvestigacion } from "./data";
-import { OFFSET_PESTANA, ROTULO_MICRO, ROTULO_TAB, TINTES } from "./tintes";
+import { OFFSET_PESTANA, ROTULO_TAB, TINTES } from "./tintes";
 import { Pestana } from "./Garabatos";
-
-/**
- * Puntas de papel asomando de la boca de cada carpeta: la pista de que
- * adentro hay documentos. En hover se sueltan un poco más, junto con las
- * hojas de adentro. Composición irregular por carpeta — anchos, alturas y
- * rotaciones levemente distintos, como hojas mal guardadas. Todas
- * arrancan en left ≥62%; con las pestañas en desorden alguna cae ahí
- * abajo, pero la pestaña va en z-0 y el papel en z-[8]: el papel tapa la
- * base de la pestaña, que es justo donde se funde con la tapa. z-[8] es
- * sobre el lomo y los slivers, y bajo el clip de la hoja (z-10) y la
- * tapa (z-20) — la base del papel queda "adentro".
- */
-const PAPELES: readonly (readonly string[])[] = [
-  [
-    "left-[63%] -top-[8px] h-4 w-20 rotate-[0.8deg] bg-white/95",
-    "left-[71%] -top-[6px] h-3.5 w-12 -rotate-[1.2deg] bg-white/75",
-    "left-[84%] -top-[9px] h-4 w-24 rotate-[0.3deg] bg-white/90",
-  ],
-  [
-    "left-[66%] -top-[9px] h-4 w-24 -rotate-[0.6deg] bg-white/95",
-    "left-[81%] -top-[6px] h-3.5 w-14 rotate-[1.1deg] bg-white/80",
-  ],
-  [
-    "left-[62%] -top-[7px] h-3.5 w-14 rotate-[1deg] bg-white/85",
-    "left-[70%] -top-[9px] h-4 w-24 -rotate-[0.8deg] bg-white/95",
-    "left-[86%] -top-[6px] h-3.5 w-12 -rotate-[0.4deg] bg-white/75",
-  ],
-  [
-    "left-[64%] -top-[9px] h-4 w-16 -rotate-[0.9deg] bg-white/90",
-    "left-[75%] -top-[6px] h-3.5 w-24 rotate-[0.5deg] bg-white/95",
-    "left-[88%] -top-[8px] h-4 w-10 rotate-[1.3deg] bg-white/80",
-  ],
-];
-
-/**
- * Peso de cada carpeta en desktop: la pila es más gruesa hacia abajo (01
- * fina, 03 gruesa), como carpetas apiladas de verdad. Solo padding: la
- * banda visible de una carpeta cubierta es el alto total de su tapa, así
- * que el padding ES el grosor. La última no usa `pb`: conserva su base.
- */
-const PESO_TAPA: readonly { pt: string; pb: string }[] = [
-  { pt: "lg:pt-8", pb: "lg:pb-8" },
-  { pt: "lg:pt-10", pb: "lg:pb-10" },
-  { pt: "lg:pt-12", pb: "lg:pb-12" },
-];
+import { PESO_TAPA } from "./carpeta/anatomia";
+import { LomoCarpeta } from "./carpeta/LomoCarpeta";
+import { DocumentosCarpeta } from "./carpeta/DocumentosCarpeta";
+import { TapaCarpeta } from "./carpeta/TapaCarpeta";
 
 type Props = {
   caso: CasoInvestigacion;
@@ -108,6 +66,12 @@ type Props = {
  * abrirla. El color del texto sale del tinte (blanco
  * en carpetas oscuras, navy en la clara). GSAP anima el <li> y la
  * anatomía; la coreografía congela las transiciones al abrir.
+ *
+ * Piezas (`carpeta/`): el lomo en `LomoCarpeta`, lo que hay adentro
+ * (slivers, papeles, hoja) en `DocumentosCarpeta`, la tapa con su rótulo y
+ * la anticipación en `TapaCarpeta`; papeles y grosores en `anatomia.ts`. El
+ * DOM es el mismo de siempre: la coreografía lo lee por selectores desde el
+ * `<li>`.
  */
 export function CarpetaCaso({
   caso,
@@ -144,44 +108,7 @@ export function CarpetaCaso({
           `group` vive acá y no en un botón: el tinte de hover tiene que
           responder desde cualquier parte de la carpeta. */}
       <div data-carpeta-cuerpo className="group relative">
-        {/* Lomo trasero (apenas más oscuro: profundidad del objeto). Su
-            borde de arriba NO se mueve nunca — es lo que fija el objeto en
-            la pila; si se levantara, la carpeta parecería desplegar algo
-            hacia arriba en vez de abrirse. Lo que hace en hover es
-            estirarse hacia abajo lo mismo que cae la tapa, para que la
-            tapa no le sobresalga por el pie: en las carpetas cubiertas no
-            se notaría, pero en la última asomaría media luna de un tono
-            más claro que el lomo. */}
-        <span
-          data-carpeta-back
-          aria-hidden="true"
-          className={`absolute inset-x-0 top-0 bottom-0 rounded-t-2xl transition-[bottom] duration-[380ms] ease-out motion-safe:group-hover:-bottom-3 ${tinte.carpeta} ${tinte.grano} ${baseRedondeada}`}
-        >
-          <span
-            data-carpeta-back-sombra
-            className={`absolute inset-0 rounded-t-2xl bg-[rgb(10_16_30/0.22)] ${baseRedondeada}`}
-          />
-          {/* Faldón: la carpeta sigue 20px por debajo de donde termina.
-              No se ve nunca de frente —la carpeta siguiente lo tapa— pero
-              rellena las dos esquinas que la curva de esa carpeta deja
-              descubiertas. La pila solapa 2px y ese radio mide 16, así que
-              por el hueco se veía esta carpeta cortada en seco y, más
-              abajo, el fondo: eso era la punta. Ahora el color llega hasta
-              donde la siguiente ya tiene el ancho completo — 16px le
-              alcanzaban justo, y con 20 quedan 4 de colchón para los
-              subpíxeles y para los tres grosores de tapa.
-              Va colgado del lomo (`top-full`) para acompañarlo cuando se
-              estira en hover, y con el mismo 12% de sombra con el que
-              cierra la tapa, para que el empalme no cambie de tono. */}
-          {!esUltima && (
-            <span
-              data-carpeta-faldon
-              className={`absolute inset-x-0 top-full hidden h-5 md:block ${tinte.carpeta}`}
-            >
-              <span className="absolute inset-0 bg-[rgb(10_16_30/0.12)]" />
-            </span>
-          )}
-        </span>
+        <LomoCarpeta tinte={tinte} esUltima={esUltima} baseRedondeada={baseRedondeada} />
 
         {/* ABRIR: capa que cubre la carpeta entera. Va sin z-index propio
             (no crea contexto de apilamiento) para que la pestaña que lleva
@@ -214,222 +141,19 @@ export function CarpetaCaso({
           </span>
         </button>
 
-        {/* Slivers de documentos: ADENTRO hay hojas. En reposo la tapa las
-            cubre enteras; quedan a la vista porque la tapa CAE, no porque
-            ellas suban. Se les deja apenas 4px de subida —contra los 12
-            que baja la tapa— para que el papel acompañe el gesto sin
-            protagonizarlo: si suben más, lo que se lee es algo saliendo de
-            la carpeta y no la carpeta abriéndose. */}
-        <span
-          data-carpeta-sliver
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-[3.5%] top-[7px] z-[6] h-3 rounded-t-[5px] bg-white/95 transition-[translate] duration-[380ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-y-1"
+        <DocumentosCarpeta caso={caso} tinte={tinte} indice={indice} />
+
+        <TapaCarpeta
+          caso={caso}
+          tinte={tinte}
+          peso={peso}
+          esUltima={esUltima}
+          interactiva={interactiva}
+          desplegada={desplegada}
+          onToggle={() => setDesplegada((v) => !v)}
+          idPanel={idPanel}
+          baseRedondeada={baseRedondeada}
         />
-        <span
-          data-carpeta-sliver2
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-[5%] top-[11px] z-[5] h-2 rounded-t-[4px] bg-white/70 transition-[translate] duration-[380ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:-translate-y-1"
-        />
-
-        {/* Papeles mal guardados: asoman por la boca y ahí se quedan,
-            también en hover. Son el punto fijo del gesto — la tapa cae
-            contra ellos, y eso es lo que se lee como abrirse. */}
-        {PAPELES[indice]?.map((clases) => (
-          <span
-            key={clases}
-            data-carpeta-papel
-            aria-hidden="true"
-            className={`pointer-events-none absolute z-[8] block rounded-t-[3px] shadow-[0_-2px_5px_-2px_rgb(31_45_77/0.4)] ${clases}`}
-          />
-        ))}
-
-        {/* Hoja real: emerge durante la apertura (clip abierto arriba,
-            cerrado abajo para que nunca asome bajo la carpeta) */}
-        <span
-          data-carpeta-clip
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 -top-[1400px] bottom-1 z-10 overflow-hidden"
-        >
-          <span
-            data-carpeta-sheet
-            /* rounded-t-[1.2rem] y no rounded-t-2xl: es el radio de la
-               hoja del expediente ([data-exp-hoja]). Esta hoja aterriza
-               encima de aquella y las dos conviven ~400ms; con radios
-               distintos quedaba un sobrante de 3px en cada esquina de
-               arriba durante el relevo. */
-            className="bg-grain-light renglones-papel absolute top-[1414px] left-[4%] block h-[560px] w-[92%] rounded-t-[1.2rem] bg-white p-10 opacity-0 shadow-[0_-18px_60px_-30px_rgb(31_45_77/0.45)] lg:p-14"
-          >
-            <span className={`text-gris-texto block ${ROTULO_MICRO}`}>
-              EXPEDIENTE
-            </span>
-            <span
-              className={`font-display mt-5 block text-[2.4rem] leading-none font-extrabold tracking-[-0.02em] ${tinte.acentoTexto}`}
-            >
-              CASO {caso.numero}
-            </span>
-            <span className="text-azul-principal/70 mt-4 block font-sans text-[0.95rem]">
-              {caso.eje}
-            </span>
-            <span className={`mt-8 block h-1 w-24 rounded-full ${tinte.suave}`} />
-          </span>
-        </span>
-
-        {/* Tapa frontal: cerrada muestra lo mínimo. ES la que se mueve en
-            hover — CAE 12px y descubre el papel que tenía tapado. El
-            gesto es suyo y va hacia abajo a propósito: el lomo, las hojas
-            y los papeles se quedan donde están, así lo que se lee es una
-            tapa abriéndose y no un contenido que emerge.
-            Se desplaza con `translate` y no con `transform`: son
-            propiedades distintas y se componen, así que el rotateY que le
-            anima la coreografía al abrir el expediente no lo pisa.
-            Va entera en pointer-events-none: los clics la atraviesan hasta
-            la capa de abrir que está debajo. El único que los repone es el
-            rótulo del eje, que al estar pintado acá (z-20) le gana. */}
-        <span
-          data-carpeta-front
-          className={`${tinte.carpeta} ${tinte.carpetaHover} ${tinte.grano} ${tinte.texto} pointer-events-none relative z-20 mt-1 block overflow-hidden rounded-t-lg px-8 py-6 shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-14px_30px_-20px_rgb(31_45_77/0.35)] transition-[background-color,box-shadow,translate] duration-[380ms] ease-out group-hover:shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-17px_26px_-13px_rgb(31_45_77/0.6)] [backface-visibility:hidden] motion-safe:group-hover:translate-y-3 md:px-10 lg:px-12 ${peso.pt} ${
-            esUltima ? "pb-20 md:pb-24" : peso.pb
-          } ${baseRedondeada}`}
-        >
-          {/* Anatomía de la tapa: luz del canto y pliegue inferior. El
-              canto se enciende al abrirse: es el filo que queda expuesto
-              cuando la tapa se separa. (Había también una franja oscura
-              de 10px pegada al borde izquierdo, el canto doblado de la
-              carpeta; se leía como un borde de otro color y se sacó.) */}
-          <span
-            aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-px bg-white/25 transition-colors duration-[380ms] ease-out group-hover:bg-white/45"
-          />
-          <span
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-9 bg-gradient-to-t from-[rgb(10_16_30/0.12)] to-transparent"
-          />
-          {/* Sombra de la tapa al pivotar (la anima coreografia.ts) */}
-          <span
-            data-carpeta-front-sombra
-            aria-hidden="true"
-            className="absolute inset-0 bg-[rgb(10_16_30)] opacity-0"
-          />
-
-          {/* Marca seca ED en la base del archivo (solo carpeta completa).
-              Logo ACTUAL de la marca (logotipo-principal-ed), versión
-              negativa — el mismo que usan navbar y footer. */}
-          {esUltima && (
-            <Image
-              src="/brand/logotipo-principal-ed-negativo.png"
-              alt=""
-              aria-hidden="true"
-              data-carpeta-rotulos
-              width={395}
-              height={433}
-              className="pointer-events-none absolute right-8 bottom-6 h-16 w-auto opacity-[0.14] select-none lg:right-12 lg:bottom-7 lg:h-20"
-            />
-          )}
-
-          <span data-carpeta-rotulos className="relative block">
-            <span className="flex items-start justify-between gap-10">
-              {/* Número fantasma: rotulación de archivo, no dato */}
-              <span
-                aria-hidden="true"
-                className={`font-display text-[2.6rem] leading-[0.9] font-extrabold tracking-tight select-none lg:text-[3.8rem] ${tinte.marcaAgua}`}
-              >
-                {caso.numero}
-              </span>
-
-              {/* Bloque de anticipación (derecha): el rótulo del eje ES el
-                  disparador. Los márgenes negativos anulan su padding en
-                  los cuatro lados — el área de toque crece sin ocupar más
-                  lugar del que ocupaba el texto solo. Importa: en pantallas
-                  angostas la columna ya no entra en la tapa (a 324px se
-                  sale 30px, el ancho mínimo de «EMPODERAMIENTO» con su
-                  tracking), y sin compensar el padding se saldría 16px
-                  más. inline-block y no block: como block se quedaba con
-                  el ancho entero de la columna y le robaba clics a la capa
-                  de abrir. */}
-              <span className="pt-1 text-right">
-                <button
-                  type="button"
-                  data-carpeta-toggle
-                  aria-expanded={desplegada}
-                  aria-controls={idPanel}
-                  onClick={() => interactiva && setDesplegada((v) => !v)}
-                  className={`-mx-2 -my-1 inline-block cursor-pointer rounded-sm px-2 py-1 text-right focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${ROTULO_MICRO} ${
-                    interactiva ? "pointer-events-auto" : "pointer-events-none"
-                  }`}
-                >
-                  <span className="sr-only">
-                    {desplegada ? "Ocultar" : "Ver"} de qué trata el caso{" "}
-                    {caso.numero}:{" "}
-                  </span>
-                  {caso.eje.toUpperCase()}
-                  <span
-                    aria-hidden="true"
-                    className={`ml-3 inline-block transition-transform duration-300 ${
-                      desplegada ? "-rotate-90" : ""
-                    }`}
-                  >
-                    ‹
-                  </span>
-                </button>
-                <span
-                  aria-hidden={!desplegada}
-                  className={`mt-2 block h-5 font-sans text-[0.88rem] transition-all duration-300 ${
-                    desplegada
-                      ? "opacity-100 motion-safe:translate-y-0"
-                      : "opacity-0 motion-safe:translate-y-1"
-                  }`}
-                >
-                  {caso.indicio}
-                </span>
-              </span>
-            </span>
-
-            {/* Anticipación desplegable: la abre y la cierra el rótulo de
-                arriba, y se queda como la dejaron. El contenido acompaña
-                con delay al abrir (espera a que el acordeón crezca) y sin
-                delay al cerrar: si no, el texto queda flotando sobre una
-                caja que ya se cerró. */}
-            <span
-              data-carpeta-expansion
-              id={idPanel}
-              className={`grid transition-[grid-template-rows] duration-[550ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-                desplegada ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-              }`}
-            >
-              <span aria-hidden={!desplegada} className="block overflow-hidden">
-                {/* pb-14: el texto termina ARRIBA de la zona donde muerde
-                    la pestaña de la carpeta siguiente (~52px) — la
-                    pestaña muerde color, nunca texto. */}
-                <span className="block pt-5 pb-14">
-                  {/* 50ch: las preguntas caben en DOS renglones con
-                      Manrope 800 (el umbral real es 48ch; +2 de colchón
-                      para retoques de copy). */}
-                  <span
-                    className={`font-display block max-w-[50ch] text-[1.55rem] leading-[1.15] font-extrabold tracking-[-0.015em] transition-all duration-[400ms] lg:text-[1.9rem] ${
-                      desplegada
-                        ? "opacity-100 delay-[250ms] motion-safe:translate-y-0"
-                        : "opacity-0 motion-safe:translate-y-2"
-                    }`}
-                  >
-                    {caso.pregunta}
-                  </span>
-                  <span
-                    className={`mt-5 flex flex-wrap items-center gap-x-8 gap-y-2 transition-opacity duration-[400ms] ${
-                      desplegada ? "opacity-100 delay-[250ms]" : "opacity-0"
-                    }`}
-                  >
-                    <span className={`inline-flex items-center gap-2 ${ROTULO_MICRO} underline-offset-4 group-hover:underline`}>
-                      ABRIR EXPEDIENTE ↗
-                    </span>
-                    {caso.esDemo && (
-                      <span className={ROTULO_MICRO}>DEMO · PROVISIONAL</span>
-                    )}
-                  </span>
-                </span>
-              </span>
-            </span>
-          </span>
-        </span>
       </div>
     </li>
   );

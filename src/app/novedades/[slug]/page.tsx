@@ -6,7 +6,9 @@ import { FichaNovedad } from "@/features/novedades/components/FichaNovedad";
 // Solo las novedades con cuerpo tienen ficha (piloto: el libro). El resto
 // del catálogo se irá sumando cargando `cuerpo` en data.ts.
 export function generateStaticParams() {
-  return NOVEDADES.filter((n) => n.cuerpo).map((n) => ({ slug: n.id }));
+  const slugs: Array<{ slug: string }> = [];
+  for (const n of NOVEDADES) if (n.cuerpo) slugs.push({ slug: n.id });
+  return slugs;
 }
 
 export async function generateMetadata({

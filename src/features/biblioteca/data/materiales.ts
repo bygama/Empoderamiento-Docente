@@ -232,3 +232,13 @@ export const DESTACADOS: Destacado[] = [
       "Una carpeta editable para planificar sin partir de cero: cada secuencia trae propósito, consigna y variantes según el grupo.",
   },
 ];
+
+
+// DESTACADOS referencia materiales del catálogo por título; si un título no
+// matchea (typo al editar la data), el destacado simplemente no se lista.
+export const ITEMS_DESTACADOS = DESTACADOS.flatMap((d) => {
+  const material = MATERIALES.find((m) => m.titulo === d.titulo);
+  return material ? [{ ...d, material }] : [];
+});
+
+export type ItemDestacado = (typeof ITEMS_DESTACADOS)[number];

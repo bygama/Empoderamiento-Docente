@@ -77,6 +77,8 @@ export function EdEnMovimiento() {
 
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>("[data-mov-card]");
+      // El hint viene con la coreografía (solo con `live`) y se va con ella.
+      gsap.set(cards, { willChange: "transform" });
       const phrases = gsap.utils.toArray<HTMLElement>("[data-mov-phrase]");
       const luz = stage.querySelector<HTMLElement>("[data-mov-luz]");
       const W = window.innerWidth;
@@ -261,7 +263,7 @@ export function EdEnMovimiento() {
               data-mov-card
               className={
                 live
-                  ? "absolute top-1/2 left-1/2 w-[clamp(200px,22vw,340px)] will-change-transform"
+                  ? "absolute top-1/2 left-1/2 w-[clamp(200px,22vw,340px)]"
                   : "relative"
               }
             >

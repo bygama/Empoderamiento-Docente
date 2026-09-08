@@ -107,6 +107,9 @@ export function crearCarta({ zona, hoja }: Escena) {
   const grilla = q<HTMLElement>("[data-carta-fichas]")[0];
   const fichas = q<HTMLElement>("[data-ficha]");
   const textos = q<HTMLElement>("[data-ficha-texto]");
+  // Las fichas viajan con scrub SOLO cuando la escena está viva: el hint
+  // viene con la coreografía y se va con su contexto.
+  gsap.set(fichas, { willChange: "transform" });
 
   const alto = () => hoja.clientHeight;
   const ancho = () => hoja.clientWidth;

@@ -7,6 +7,7 @@ import type {
   ProfilePublication,
   ProfileStage,
 } from "@/features/quienes-somos/data/equipo";
+import { ACCENT } from "./acentos";
 
 /**
  * PIEZAS PRESENTACIONALES del perfil inmersivo (Parte 2, refactor editorial).
@@ -24,40 +25,6 @@ import type {
  */
 
 const cx = (...p: Array<string | false | undefined>) => p.filter(Boolean).join(" ");
-
-/** Acentos de marca por familia temática. Clases LITERALES (Tailwind las escanea). */
-export const ACCENT: Record<
-  ProfileStage["color"],
-  { text: string; bg: string; border: string; soft: string; ring: string; glow: string; hex: string }
-> = {
-  verde: {
-    text: "text-verde-concepto-texto",
-    bg: "bg-verde-concepto",
-    border: "border-verde-concepto",
-    soft: "bg-verde-concepto/10",
-    ring: "ring-verde-concepto/30",
-    glow: "shadow-[0_0_0_6px_rgb(31_154_120/0.14)]",
-    hex: "#1f9a78",
-  },
-  azul: {
-    text: "text-azul-medio",
-    bg: "bg-azul-medio",
-    border: "border-azul-medio",
-    soft: "bg-azul-medio/10",
-    ring: "ring-azul-medio/30",
-    glow: "shadow-[0_0_0_6px_rgb(74_111_165/0.14)]",
-    hex: "#4a6fa5",
-  },
-  naranja: {
-    text: "text-naranja-accion-texto",
-    bg: "bg-naranja-accion",
-    border: "border-naranja-accion",
-    soft: "bg-naranja-accion/10",
-    ring: "ring-naranja-accion/30",
-    glow: "shadow-[0_0_0_6px_rgb(224_122_47/0.14)]",
-    hex: "#e07a2f",
-  },
-};
 
 type Side = "left" | "right";
 
@@ -110,8 +77,8 @@ function MiniList({ items, color }: { items: Milestone[]; color: ProfileStage["c
   const a = ACCENT[color];
   return (
     <ul className="mt-7 space-y-2.5">
-      {items.map((m, i) => (
-        <li key={i} data-reveal-el className="flex items-baseline gap-3">
+      {items.map((m) => (
+        <li key={m.title} data-reveal-el className="flex items-baseline gap-3">
           <span aria-hidden="true" className={cx("h-1.5 w-1.5 shrink-0 translate-y-[-1px] rounded-full", a.bg)} />
           <span className="font-sans text-[0.95rem] leading-snug">
             <span className="text-azul-principal font-medium">{m.title}</span>
@@ -163,8 +130,8 @@ function FichaPanel({ stage }: { stage: ProfileStage }) {
         className="border-azul-principal/10 bg-gris-fondo/60 max-w-[30rem] rounded-2xl border p-5"
       >
         <ul className="space-y-4">
-          {stage.milestones?.map((m, i) => (
-            <li key={i}>
+          {stage.milestones?.map((m) => (
+            <li key={m.title}>
               {m.period && (
                 <span className={cx("font-mono text-[0.66rem] font-semibold tracking-[0.12em] uppercase", a.text)}>
                   {m.period}
@@ -182,9 +149,9 @@ function FichaPanel({ stage }: { stage: ProfileStage }) {
             Ramificaciones · estancias
           </span>
           <ul className="mt-2.5 flex flex-wrap gap-3">
-            {stage.branches.map((b, i) => (
+            {stage.branches.map((b) => (
               <li
-                key={i}
+                key={`${b.place}-${b.period ?? ""}`}
                 data-reveal-el
                 className="border-azul-principal/15 relative rounded-lg border border-dashed px-3.5 py-2"
               >
@@ -227,8 +194,8 @@ function ConceptoBlock({ stage }: { stage: ProfileStage }) {
             Una línea sostenida
           </span>
           <ul className="mt-2.5 space-y-1.5">
-            {stage.milestones.map((m, i) => (
-              <CompactRow key={i} m={{ period: m.period, title: m.title }} color={stage.color} />
+            {stage.milestones.map((m) => (
+              <CompactRow key={m.title} m={{ period: m.period, title: m.title }} color={stage.color} />
             ))}
           </ul>
         </div>
@@ -259,15 +226,15 @@ function HitosBlock({ stage }: { stage: ProfileStage }) {
   const resto = stage.milestones?.filter((m) => !m.primary) ?? [];
   return (
     <div className="mt-7">
-      {primarios.length > 0 && <ul className="space-y-5">{primarios.map((m, i) => <PrimaryRow key={i} m={m} color={stage.color} />)}</ul>}
+      {primarios.length > 0 && <ul className="space-y-5">{primarios.map((m) => <PrimaryRow key={m.title} m={m} color={stage.color} />)}</ul>}
       {resto.length > 0 && (
         <div className="mt-6">
           <span data-reveal-el className="text-gris-texto/90 font-mono text-[0.62rem] tracking-[0.18em] uppercase">
             También en esos años
           </span>
           <ul className="mt-2.5 space-y-1.5">
-            {resto.map((m, i) => (
-              <CompactRow key={i} m={m} color={stage.color} />
+            {resto.map((m) => (
+              <CompactRow key={m.title} m={m} color={stage.color} />
             ))}
           </ul>
         </div>
@@ -277,17 +244,19 @@ function HitosBlock({ stage }: { stage: ProfileStage }) {
 }
 
 /* ── VARIANTE mapa: constelación de territorios (no lista) ────────────── */
+/** Desfase vertical de cada territorio: constelación, no lista. */
+const OFFSETS_MAPA = [0, 14, -8, 18, 4];
+
 function MapaBlock({ stage }: { stage: ProfileStage }) {
   const a = ACCENT[stage.color];
-  const offsets = [0, 14, -8, 18, 4];
   return (
     <ul className="mt-8 flex max-w-[38rem] flex-wrap items-start gap-x-4 gap-y-5">
       {stage.tags?.map((t, i) => (
         <li
-          key={i}
+          key={t}
           data-reveal-el
           className="border-azul-principal/12 rounded-full border bg-white px-4 py-2 font-sans text-[0.86rem] font-medium text-azul-principal shadow-[0_10px_28px_-20px_rgb(31_45_77/0.35)]"
-          style={{ transform: `translateY(${offsets[i % offsets.length]}px)` }}
+          style={{ transform: `translateY(${OFFSETS_MAPA[i % OFFSETS_MAPA.length]}px)` }}
         >
           <span className={cx("mr-2 inline-block h-1.5 w-1.5 rounded-full align-middle", a.bg)} aria-hidden="true" />
           {t}
@@ -359,7 +328,7 @@ function RamasBlock({ stage, side }: { stage: ProfileStage; side: Side }) {
   return (
     <div className="mt-8 grid max-w-[40rem] gap-5 sm:grid-cols-2">
       {pubs.map((p, i) => (
-        <div key={i} className={cx(i % 2 === 1 && "sm:translate-y-8")}>
+        <div key={p.title} className={cx(i % 2 === 1 && "sm:translate-y-8")}>
           <PubPiece pub={p} color={stage.color} side={side} />
         </div>
       ))}
@@ -390,8 +359,8 @@ function SintesisBlock({ stage }: { stage: ProfileStage }) {
             En paralelo, hoy
           </span>
           <ul className="mt-2.5 grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
-            {resto.map((m, i) => (
-              <CompactRow key={i} m={m} color={stage.color} />
+            {resto.map((m) => (
+              <CompactRow key={m.title} m={m} color={stage.color} />
             ))}
           </ul>
         </div>
@@ -460,7 +429,7 @@ export function CategoryRail({
             <span
               aria-hidden="true"
               className={cx(
-                "absolute top-[0.42rem] left-[-1.25rem] block rounded-full transition-all duration-500",
+                "absolute top-[0.42rem] left-[-1.25rem] block rounded-full transition-[background-color,width,height,translate,box-shadow] duration-500",
                 active
                   ? cx(a.bg, "h-2.5 w-2.5 translate-x-[-0.5px]", a.glow)
                   : passed

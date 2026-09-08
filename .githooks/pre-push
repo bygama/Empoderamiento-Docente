@@ -1,26 +1,44 @@
 #!/bin/sh
 # ---------------------------------------------------------------------------
-# pre-push - React Doctor avisa, nunca frena.
+# pre-push — el gate del repo. Ahora SÍ frena.
 #
-# La deuda de React que ya arrastra el repo no se arregla en este push: la
-# idea es tenerla a la vista cada vez que se empuja, para ir bajandola de a
-# poco. Por eso el hook SIEMPRE termina en 0.
+# Hasta el 2026-09-08 este hook solo avisaba, porque el repo arrastraba deuda
+# de React que no se arreglaba en un push. Esa deuda es cero: react-doctor da
+# 100/100 sin diagnosticos, y la regla es no volver atras (AGENTS.md §5.8).
 #
-# Ojo: react-doctor sale con codigo != 0 cuando ENCUENTRA errores, no cuando
-# falla. Aca ese codigo se ignora a proposito; el reporte que ya imprimio es
-# todo lo que interesa.
+# Corre tres cosas, de la mas barata a la mas cara (~10s en total):
+#   typecheck (~1s) · react-doctor (~3s) · lint (~6s)
+# El build NO va aca: es de CI, tarda demasiado para un push.
 #
-# Se instala solo: el script `prepare` de package.json apunta core.hooksPath
-# a .githooks/ en cada install. Para saltearlo una vez:
-#   SKIP_REACT_DOCTOR=1 git push
+# Corre TODAS aunque una falle, asi ves la lista completa de una y no vas
+# descubriendo problemas de a uno.
+#
+# Para saltearlo hay una sola puerta, la de git: `git push --no-verify`.
+# Queda en el reflog y se ve. A proposito no hay variable de entorno propia:
+# eso es lo que convierte un gate en decoracion.
 # ---------------------------------------------------------------------------
 set -u
 
-[ "${SKIP_REACT_DOCTOR:-0}" != "0" ] && exit 0
+fallo=0
 
-printf '\n\033[1m> React Doctor\033[0m \033[2m(informativo: no frena el push)\033[0m\n\n'
+titulo() {
+  printf '\n\033[1m> %s\033[0m\n' "$1"
+}
 
-pnpm run react-doctor
+titulo 'typecheck'
+if ! pnpm typecheck; then fallo=1; fi
 
-printf '\n\033[2m  Nada de esto frena el push. Para saltearlo: SKIP_REACT_DOCTOR=1 git push\033[0m\n\n'
+titulo 'react-doctor'
+if ! node scripts/verificar-react-doctor.mjs; then fallo=1; fi
+
+titulo 'lint'
+if ! pnpm lint; then fallo=1; fi
+
+if [ "$fallo" != 0 ]; then
+  printf '\n\033[31m\033[1m  Push frenado.\033[0m Arreglá lo de arriba y volvé a empujar.\n'
+  printf '\033[2m  Si de verdad tenés que pasar por encima: git push --no-verify\033[0m\n\n'
+  exit 1
+fi
+
+printf '\n\033[32m  Todo en verde.\033[0m\n\n'
 exit 0

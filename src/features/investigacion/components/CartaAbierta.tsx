@@ -272,7 +272,7 @@ export function CartaAbierta() {
               <li
                 key={f.titulo}
                 data-ficha
-                className="bg-grain-light text-azul-principal relative rounded-lg bg-white p-7 shadow-[0_24px_50px_-28px_rgb(0_0_0/0.55)] will-change-transform"
+                className="bg-grain-light text-azul-principal relative rounded-lg bg-white p-7 shadow-[0_24px_50px_-28px_rgb(0_0_0/0.55)]"
               >
                 {/* Tres pesos, de mayor a menor: nombre del concepto,
                     definición de un renglón y desarrollo. */}

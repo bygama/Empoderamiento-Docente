@@ -135,7 +135,7 @@ export function Footer() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         aria-hidden="true"
-                        className={`h-5 w-5 shrink-0 transition-all duration-300 ${
+                        className={`h-5 w-5 shrink-0 transition-[opacity,translate] duration-300 ${
                           esAccion
                             ? "opacity-100"
                             : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-70"
@@ -159,10 +159,14 @@ export function Footer() {
             <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-5">
               {ALIADOS.map((aliado) => (
                 <li key={aliado.src} className="flex h-11 items-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  {/* El alto lo manda la clase y el ancho va `auto`: las medidas
+                      del archivo (config/aliados) solo reservan la proporción. */}
+                  <Image
                     src={aliado.src}
                     alt={aliado.alt}
+                    width={aliado.w}
+                    height={aliado.h}
+                    unoptimized={"vectorial" in aliado}
                     draggable={false}
                     className={`${aliado.alto.pie} w-auto opacity-70 transition-opacity duration-300 hover:opacity-100 [filter:brightness(0)_invert(1)]`}
                   />

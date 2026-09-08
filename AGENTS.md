@@ -2,8 +2,12 @@
 
 > Contrato AI-neutral para trabajar dentro de este repositorio. Cualquier
 > agente de IA (Claude, Codex, Gemini, Cursor, otros) lee este archivo para
-> entender cómo opera el sistema. Mappings específicos de cada IA viven en
-> archivos adaptadores (`CLAUDE.md`, `GEMINI.md`, `.codex/`).
+> entender cómo opera el sistema: es la fuente de verdad, y lo que dice acá
+> vale igual sin importar con qué herramienta se trabaje.
+>
+> Lo específico de una herramienta vive en su adapter. Hoy hay uno solo,
+> `CLAUDE.md`, y es un puntero: mapea este contrato a Claude Code y no
+> agrega reglas propias. Si una regla importa, va acá.
 
 ---
 
@@ -25,6 +29,8 @@
   4. **Commits atómicos** Conventional, español, imperativo.
   5. **Confirmación humana** antes de commits, push, dependencias o tocar
      meta-docs.
+  6. **El gate no se negocia:** `react-doctor` 100/100 sin diagnósticos, más
+     typecheck y lint en verde. El `pre-push` lo verifica y frena (§5.8).
 - **Empezá leyendo:** este archivo + [`docs/README.md`](docs/README.md).
 
 ---
@@ -104,9 +110,8 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 /
 ├── README.md             ← onboarding humano (instalación, scripts, estructura)
 ├── AGENTS.md              ← este archivo (contrato AI-neutral)
-├── CLAUDE.md              ← adapter para Claude Code
-├── CODEX.md               ← adapter para OpenAI Codex CLI
-├── GEMINI.md              ← adapter para Gemini CLI
+├── CLAUDE.md              ← adapter para Claude Code: importa este archivo con
+│                            `@AGENTS.md` y solo agrega el mapeo de herramientas
 ├── DESIGN.md              ← sistema de diseño (tokens, tipos, reglas)
 ├── docs/
 │   ├── README.md          ← índice de documentación
@@ -117,6 +122,8 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 │   ├── conventions/       ← CODE-STYLE.md
 │   └── architecture/adrs/ ← decisiones arquitectónicas (ADRs)
 ├── skills/                ← workflows estables (adr-create, pr-review)
+├── .githooks/             ← pre-push: el gate de §5.8 (se instala solo)
+├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
 ├── public/                ← assets estáticos (brand/, imágenes)
 ├── src/
 │   ├── app/               ← App Router: layout.tsx, page.tsx, globals.css
@@ -127,6 +134,9 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 │   │   └── ui/            ← botones, reveals, íconos (ui/icons/)
 │   ├── features/          ← módulos por dominio
 │   │   └── home/components/ ← secciones del home (Hero, LineasAccion, …)
+│   │       └── hero/        ← al partir un componente, sus piezas van a una
+│   │                           subcarpeta con su nombre y el compositor se
+│   │                           queda en su ruta (AI_GUIDELINES §2)
 │   ├── config/            ← site.ts (datos institucionales) + nav.ts
 │   └── lib/               ← hooks/ y utilidades (intro-signal.ts)
 └── (config raíz)          ← tsconfig.json, eslint.config.mjs, next.config.ts,
@@ -139,10 +149,15 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 > con **Supabase** es la dirección elegida pero está **por integrar** (ver
 > [ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md)).
 
-**Golden rule:** los `.md` raíz y `docs/` son la fuente de verdad. Los
-adapters (`CLAUDE.md`, `CODEX.md`, `GEMINI.md`, y un futuro folder
-`.claude/`) solo mapean ese contrato a cada herramienta — nunca contenido
-propio.
+**Golden rule:** los `.md` raíz y `docs/` son la fuente de verdad. El
+adapter (`CLAUDE.md`, y un futuro folder `.claude/`) solo mapea ese contrato
+a su herramienta — nunca contenido propio. Una regla que solo existe en un
+adapter es una regla que el resto no cumple.
+
+Por eso `CLAUDE.md` **importa** este archivo (`@AGENTS.md` en su primera
+línea, que Claude Code resuelve al abrir la sesión) en vez de resumirlo: un
+resumen se desfasa, un import no. Cualquier adapter futuro hace lo mismo con
+el mecanismo que ofrezca su herramienta.
 
 ---
 
@@ -229,8 +244,7 @@ Ninguna IA ejecuta sin confirmación explícita del usuario:
 - `git commit`, `git push`, `git reset --hard`, force-push.
 - Crear/cerrar PRs o issues.
 - Agregar dependencias (`npm install`, `pnpm add`).
-- Modificar `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `GEMINI.md`,
-  `DESIGN.md`.
+- Modificar `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`.
 - Cualquier acción visible fuera del repo local.
 
 ### 5.7. Estrategia de merge a `main`
@@ -256,6 +270,38 @@ Ninguna IA ejecuta sin confirmación explícita del usuario:
 
 ---
 
+### 5.8. El gate: react-doctor en 100, y se arregla por código
+
+El repo llegó a `react-doctor` **100/100 sin diagnósticos** el 2026-09-08,
+partiendo de 57/100 con 126 hallazgos. La regla es no volver atrás.
+`.githooks/pre-push` corre typecheck, react-doctor y lint —unos 10 segundos—
+y **frena el push** si alguno falla. Se instala solo con `pnpm install`.
+
+- **Se arregla por código, siempre.** Prohibidos `react-doctor-disable`,
+  `doctor.config.*`, la clave `reactDoctor` en `package.json` y los
+  `eslint-disable` de reglas del gate. Si una regla parece un falso positivo,
+  se arregla igual con un cambio que preserve el comportamiento, o se discute
+  con el owner y queda escrito — nunca se apaga en silencio.
+- **Una medición incompleta no es un aprobado.** react-doctor arma su lista de
+  archivos con el índice de git: un borrado sin commitear le hace fallar el
+  análisis de mantenibilidad y **esconder el score**, con una salida que se
+  parece mucho a "todo bien". El verificador detecta ese caso y frena.
+- **La única puerta de salida es `git push --no-verify`**, que queda en el
+  reflog y se ve. A propósito no hay variable de entorno para saltear el gate:
+  eso es lo que convierte un gate en decoración.
+- **El build no está en el hook** porque tarda demasiado para un push; va en
+  CI y en el checklist de §10.
+
+Lo que el gate no puede medir, y por eso se pide igual: que el cambio sea el
+más simple que resuelve el problema, que no duplique lo que ya existe, y que
+la próxima persona pueda leerlo sin arqueología. Dos convenciones concretas
+que salieron de la migración y que sí se revisan a ojo: cuando un componente
+se parte, la receta y la subcarpeta están en `docs/AI_GUIDELINES.md` §2; y el
+`will-change` lo pone y lo saca la coreografía, nunca un `className` (§11 de
+esa misma guía).
+
+---
+
 ## 6. Quality Standards (medibles)
 
 ### Contenido
@@ -278,7 +324,15 @@ Ninguna IA ejecuta sin confirmación explícita del usuario:
 
 - [ ] TypeScript strict pasa sin warnings.
 - [ ] Lint pasa.
-- [ ] Componentes < 150 líneas, hooks < 80 líneas, utilidades < 100.
+- [ ] `react-doctor` da **100/100 sin diagnósticos** (§5.8). El `pre-push` lo
+      verifica; no hay forma de "casi".
+- [ ] Componentes **≤ 200 líneas**, y cuando se parten, sus piezas van a una
+      subcarpeta (`docs/AI_GUIDELINES.md` §2). react-doctor recién frena a las
+      300; el tope del proyecto es 200 y se cumple: los 17 componentes que
+      partió la migración quedaron todos por debajo.
+- [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
+      partir un hook por debajo de 80 suele separar el efecto de su limpieza,
+      que es justo lo que hay que evitar. Ahí manda el tope de 200.
 - [ ] Cero `any` sin comentario justificando.
 - [ ] Cero rutas relativas largas (`../../..`) — usar `@/` alias.
 
@@ -377,8 +431,9 @@ Para cualquier cambio listo para versionar:
 
 Antes de pedir merge a `main`:
 
-- [ ] `pnpm typecheck` (o equivalente) pasa.
+- [ ] `pnpm typecheck` pasa.
 - [ ] `pnpm lint` pasa.
+- [ ] `pnpm react-doctor` da 100/100 sin diagnósticos (§5.8).
 - [ ] `pnpm build` pasa.
 - [ ] Tests pasan (si existen).
 - [ ] Quality Standards (§6) cumplidos en lo modificado.
@@ -398,9 +453,9 @@ Antes de pedir merge a `main`:
 - **Guía de código IA-friendly:** `docs/AI_GUIDELINES.md`.
 - **Glosario del dominio:** `docs/GLOSSARY.md`.
 - **Adapter Claude:** `CLAUDE.md`.
-- **Adapter Gemini:** `GEMINI.md` (cuando se sume).
-- **Adapter Codex:** `.codex/AGENTS.override.md` (cuando se sume; Codex
-  lee `AGENTS.md` nativamente).
+- **Otras herramientas:** leen `AGENTS.md` directo (Codex lo hace de forma
+  nativa). Se suma un adapter solo si la herramienta necesita un mapeo que
+  este contrato no puede expresar.
 
 ---
 

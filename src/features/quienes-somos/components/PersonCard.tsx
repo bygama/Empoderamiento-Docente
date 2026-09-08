@@ -218,7 +218,7 @@ export function PersonCard({
           }
           /* El acercamiento de hover se multiplica por el zoom propio de la foto,
              así el gesto es el mismo para todos sin importar de qué encuadre parta. */
-          className="scale-[var(--foto-zoom)] object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[calc(var(--foto-zoom)*1.045)] group-hover:will-change-transform group-focus-visible:scale-[calc(var(--foto-zoom)*1.045)] group-focus-visible:will-change-transform"
+          className="scale-[var(--foto-zoom)] object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[calc(var(--foto-zoom)*1.045)] group-focus-visible:scale-[calc(var(--foto-zoom)*1.045)]"
         />
       )}
       {/* Captions pre-apilados: reposo (plate claro) ↔ hover (scrim navy) */}

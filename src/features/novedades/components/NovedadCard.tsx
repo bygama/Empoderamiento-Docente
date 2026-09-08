@@ -37,9 +37,9 @@ export function NovedadCard({ n }: { n: Novedad }) {
           Vive fuera del article: su overflow-hidden la recortaría. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[0_2px_4px_rgb(31_45_77/0.06),0_30px_60px_-24px_rgb(31_45_77/0.26)] transition-[transform,opacity] duration-300 ease-out group-hover:-translate-y-1.5 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[0_2px_4px_rgb(31_45_77/0.06),0_30px_60px_-24px_rgb(31_45_77/0.26)] transition-[translate,opacity] duration-300 ease-out group-hover:-translate-y-1.5 group-hover:opacity-100"
       />
-      <article className="border-azul-principal/8 group-hover:border-azul-claro/70 relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgb(31_45_77/0.04),0_18px_40px_-20px_rgb(31_45_77/0.14)] transition-[transform,border-color] duration-300 ease-out group-hover:-translate-y-1.5">
+      <article className="border-azul-principal/8 group-hover:border-azul-claro/70 relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgb(31_45_77/0.04),0_18px_40px_-20px_rgb(31_45_77/0.14)] transition-[translate,border-color] duration-300 ease-out group-hover:-translate-y-1.5">
         <div className="relative aspect-[16/10] w-full overflow-hidden">
           <Image
             src={n.imagen}

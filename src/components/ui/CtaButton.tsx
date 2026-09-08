@@ -30,7 +30,7 @@ export function CtaButton({ href, label, className, size = "md" }: CtaButtonProp
       >
         <span
           aria-hidden
-          className="absolute inset-0 origin-left scale-x-0 bg-black/15 transition-transform duration-500 ease-out group-hover:scale-x-100"
+          className="absolute inset-0 origin-left scale-x-[0.01] bg-black/15 transition-transform duration-500 ease-out group-hover:scale-x-100"
         />
         <span className="relative block overflow-hidden">
           <span className="block transition-transform duration-300 ease-out group-hover:-translate-y-full">

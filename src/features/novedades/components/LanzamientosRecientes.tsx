@@ -25,6 +25,8 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * en el borde derecho insinúa que hay más contenido (se apaga al llegar al
  * final). En touch no hace falta: el riel cortado + scroll nativo ya lo dicen.
  */
+const hoverFine = () => window.matchMedia("(hover: hover)").matches;
+
 export function LanzamientosRecientes() {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -32,8 +34,6 @@ export function LanzamientosRecientes() {
   const fadeRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   const st = useRef({ down: false, startX: 0, startScroll: 0, vx: 0, lastX: 0, raf: 0 });
-
-  const hoverFine = () => window.matchMedia("(hover: hover)").matches;
 
   /* La pill se posiciona directo al DOM (transform instantáneo, sin estado
      React); el "apretar" se transmite escalando el contenido interno, que sí

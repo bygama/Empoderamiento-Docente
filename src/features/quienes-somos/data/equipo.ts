@@ -149,15 +149,15 @@ export type Profile = {
    * Default: "recorte" (el caso original).
    */
   figura?: "recorte" | "marco" | "sin";
-  /**
-   * Dónde vive el recorte DENTRO de la foto de la card (fracciones de ancho y
-   * alto de `fotoDe(key)`). Con esto la foto viajera de la apertura aterriza
-   * alineada al píxel sobre la figura y el fondo puede disolverse en su lugar.
-   * Se mide una vez (búsqueda del recorte en la foto original) y se anota acá.
-   */
-  cutoutCrop?: { x: number; y: number; w: number; h: number };
   /** Imagen de la figura. Opcional: con `figura: "sin"` no existe. */
   cutout?: string;
+  /**
+   * Medidas REALES del archivo de `cutout`. `next/image` las pide para
+   * reservar la proporción: en el marco la foto va con `fill` y no hacen
+   * falta, pero el recorte (parado sobre el borde, alto por CSS y ancho
+   * auto) sin ellas no sabe cuánto espacio ocupar.
+   */
+  cutoutSize?: { width: number; height: number };
   cutoutPosition?: string;
   headline: string;
   intro: string;
@@ -229,6 +229,7 @@ export const EQUIPO: Persona[] = [
       // (daniela-reyes-cutout.webp) queda en el repo por si se retoma.
       figura: "marco",
       cutout: "/equipo/daniela-reyes.jpg",
+      cutoutSize: { width: 1200, height: 1600 },
       cutoutPosition: "50% 22%",
       headline:
         "Del aula a la investigación. De la investigación, a la transformación educativa.",
@@ -435,6 +436,7 @@ export const EQUIPO: Persona[] = [
       origin: "Mérida, Yucatán, México",
       figura: "marco",
       cutout: "/equipo/karla-gomez.jpg",
+      cutoutSize: { width: 581, height: 1032 },
       cutoutPosition: "50% 16%",
       headline: "Una tarea bien diseñada cambia la conversación del aula.",
       intro:
@@ -593,6 +595,7 @@ export const EQUIPO: Persona[] = [
       location: "Buenos Aires, Argentina",
       figura: "marco",
       cutout: "/equipo/raquel-ayala.jpg",
+      cutoutSize: { width: 1600, height: 1068 },
       headline: "De administrar personas a sostener una organización educativa.",
       intro:
         "Licenciada en Psicología, perita grafóloga superior y diplomada en Estudios de Género. Antes de ED trabajó más de una década en administración —forestal, de personal y logística—, se formó en clínica dentro del sistema público de salud y fue socia de una consultora de recursos humanos.",
@@ -768,6 +771,7 @@ export const EQUIPO: Persona[] = [
       location: "Zacatecas, México",
       figura: "marco",
       cutout: "/equipo/judith-hernandez.jpg",
+      cutoutSize: { width: 1456, height: 1600 },
       cutoutPosition: "50% 25%",
       headline: "El currículum de matemáticas, mirado como objeto de estudio.",
       intro:
@@ -924,6 +928,7 @@ export const EQUIPO: Persona[] = [
       origin: "Mérida, Yucatán, México",
       figura: "marco",
       cutout: "/equipo/luis-lopez.jpg",
+      cutoutSize: { width: 814, height: 1080 },
       headline: "Del álgebra que se enseña, al álgebra que se construye.",
       intro:
         "Profesor de matemáticas e investigador en Matemática Educativa. Estudia cómo se construye socialmente el lenguaje algebraico y lleva esa investigación al aula, a la formación docente y a los libros de texto con los que se estudia.",
@@ -1318,6 +1323,7 @@ export const EQUIPO: Persona[] = [
       origin: "Nezahualcóyotl, Estado de México",
       figura: "marco",
       cutout: "/equipo/wendolyne-rios.jpg",
+      cutoutSize: { width: 1920, height: 2560 },
       cutoutPosition: "50% 20%",
       headline: "Formar a quienes forman, desde el saber matemático transversal.",
       intro:
@@ -1498,6 +1504,7 @@ export const EQUIPO: Persona[] = [
       location: "Chile",
       figura: "marco",
       cutout: "/equipo/pedro-vidal-szabo.jpg",
+      cutoutSize: { width: 2395, height: 3600 },
       cutoutPosition: "50% 12%",
       headline: "Convertir los datos en visiones del mundo.",
       intro:
@@ -1744,6 +1751,7 @@ export const EQUIPO: Persona[] = [
       location: "Soacha, Cundinamarca, Colombia",
       figura: "marco",
       cutout: "/equipo/paola-balda.jpg",
+      cutoutSize: { width: 486, height: 524 },
       cutoutPosition: "50% 28%",
       headline: "Veinte años en la misma escuela, investigando desde adentro.",
       intro:
@@ -1960,6 +1968,7 @@ export const EQUIPO: Persona[] = [
       location: "Zacatecas, México",
       figura: "marco",
       cutout: "/equipo/darly-ku-euan.jpg",
+      cutoutSize: { width: 1280, height: 960 },
       cutoutPosition: "50% 45%",
       headline: "Investigar cómo se aprende, para poder diseñar cómo se enseña.",
       intro:
@@ -2098,6 +2107,7 @@ export const EQUIPO: Persona[] = [
       location: "San Pedro Cholula, Puebla, México",
       figura: "marco",
       cutout: "/equipo/luis-cabrera.jpg",
+      cutoutSize: { width: 960, height: 1280 },
       cutoutPosition: "50% 15%",
       headline: "Quince años enseñándole matemática a quienes enseñan matemática.",
       intro:
@@ -2312,6 +2322,7 @@ export const EQUIPO: Persona[] = [
       origin: "Yucatán, México",
       figura: "marco",
       cutout: "/equipo/eduardo-briceno.jpg",
+      cutoutSize: { width: 852, height: 1280 },
       cutoutPosition: "50% 14%",
       headline: "Qué aprendemos mirando cómo nuestros estudiantes usan una gráfica.",
       intro:

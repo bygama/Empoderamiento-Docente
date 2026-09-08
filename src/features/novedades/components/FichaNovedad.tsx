@@ -21,6 +21,18 @@ import { GuiaNota } from "./GuiaNota";
  * Si se llegó vía la transición del faro (flag en sessionStorage), los
  * reveals del titular y la foto esperan a que el telón destape (~0.7s).
  */
+const irASeccion = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  e.preventDefault();
+  const el = document.getElementById(`s-${id}`);
+  if (!el) return;
+  const lenis = getLenis();
+  if (lenis) {
+    lenis.scrollTo(el, { offset: -120, duration: 1 });
+  } else {
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 120 });
+  }
+};
+
 export function FichaNovedad({ n }: { n: Novedad }) {
   const abrir = useTransicionFaro();
   const secciones = n.cuerpo ?? [];
@@ -28,6 +40,9 @@ export function FichaNovedad({ n }: { n: Novedad }) {
   // Solo LEER en el initializer (StrictMode lo re-ejecuta: tiene que ser
   // puro); el flag se consume después, en un efecto.
   const [conTelon] = useState(() => {
+    // En el servidor no hay sessionStorage: el guard explícito reemplaza al
+    // catch como rama de SSR y deja el initializer puro.
+    if (typeof window === "undefined") return false;
     try {
       return sessionStorage.getItem(FLAG_ENTRADA_FARO) === "1";
     } catch {
@@ -52,18 +67,6 @@ export function FichaNovedad({ n }: { n: Novedad }) {
       return;
     e.preventDefault();
     abrir("/novedades");
-  };
-
-  const irASeccion = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const el = document.getElementById(`s-${id}`);
-    if (!el) return;
-    const lenis = getLenis();
-    if (lenis) {
-      lenis.scrollTo(el, { offset: -120, duration: 1 });
-    } else {
-      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 120 });
-    }
   };
 
   // Sección activa de la guía: la primera visible en la franja de lectura.
@@ -137,8 +140,8 @@ export function FichaNovedad({ n }: { n: Novedad }) {
                 <h2 className="font-display text-azul-principal text-[1.3rem] font-bold tracking-[-0.01em]">
                   {s.titulo}
                 </h2>
-                {s.parrafos.map((parrafo, i) => (
-                  <p key={i} className="text-gris-texto mt-4 font-sans text-[1.02rem] leading-relaxed">
+                {s.parrafos.map((parrafo) => (
+                  <p key={parrafo} className="text-gris-texto mt-4 font-sans text-[1.02rem] leading-relaxed">
                     {parrafo}
                   </p>
                 ))}

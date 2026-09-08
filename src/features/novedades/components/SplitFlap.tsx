@@ -165,7 +165,6 @@ export function SplitFlap({
             <span
               data-reel
               className="absolute inset-x-0 top-0 block"
-              style={{ willChange: "transform" }}
             >
               <span
                 data-final

@@ -34,7 +34,7 @@ export function LaminaCaso({ lamina, tinte, esDemo }: Props) {
       data-pieza-parallax
       data-exp-asienta
       data-profundidad="7"
-      className="relative rotate-[0.9deg] will-change-transform"
+      className="relative rotate-[0.9deg]"
     >
       <div className="bg-grain-light relative rounded-md bg-white p-2.5 pb-3 shadow-[0_30px_60px_-28px_rgb(31_45_77/0.5)] ring-1 ring-azul-principal/10 lg:p-3.5 lg:pb-4">
         {/* priority: la lámina es la pieza protagonista del revelado; tiene

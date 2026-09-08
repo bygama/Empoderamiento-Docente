@@ -104,6 +104,7 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
               // Reset a posición de partida, sin transición visible.
               velo.style.transitionDuration = "0ms";
               velo.style.visibility = "hidden";
+              velo.style.willChange = "";
               velo.style.transform = "translateY(100%)";
               if (destelloRef.current)
                 destelloRef.current.style.animationPlayState = "paused";
@@ -135,6 +136,8 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
       // Estados de partida sin transición, con reflow para fijarlos.
       velo.style.transitionDuration = "0ms";
       velo.style.visibility = "visible";
+      // Pantalla completa: el hint solo mientras el telón viaja.
+      velo.style.willChange = "transform";
       velo.style.transform = "translateY(100%)";
       marca.style.transitionDuration = "0ms";
       marca.style.opacity = "0";
@@ -190,7 +193,7 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
       <div
         ref={veloRef}
         aria-hidden="true"
-        className="bg-azul-principal fixed inset-0 z-[120] will-change-transform"
+        className="bg-azul-principal fixed inset-0 z-[120]"
         style={{
           visibility: "hidden",
           transform: "translateY(100%)",

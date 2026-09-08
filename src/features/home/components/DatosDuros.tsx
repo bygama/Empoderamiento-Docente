@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -119,10 +120,14 @@ export function DatosDuros() {
           <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-20">
             {ALIADOS.map((a) => (
               <li key={a.src} className="flex h-12 items-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {/* El alto lo manda la clase y el ancho va `auto`: las medidas del
+                    archivo (config/aliados) solo reservan la proporción. */}
+                <Image
                   src={a.src}
                   alt={a.alt}
+                  width={a.w}
+                  height={a.h}
+                  unoptimized={"vectorial" in a}
                   draggable={false}
                   className={`${a.alto.home} w-auto opacity-60 transition-opacity duration-300 [filter:brightness(0)_invert(1)] hover:opacity-100`}
                 />

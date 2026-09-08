@@ -70,7 +70,7 @@ function RevealFoco({
   return (
     <div ref={ref} className={`overflow-hidden ${className}`}>
       {/* El overscale 1.1 cubre el sangrado de bordes que produce el blur. */}
-      <div className="h-full w-full will-change-transform">{children}</div>
+      <div className="h-full w-full">{children}</div>
     </div>
   );
 }
@@ -116,6 +116,12 @@ function RevealFoco({
  * color-mix sobre el azul para pasar AA en texto chico. Profundidad con borde
  * azul-claro sutil + una sola sombra para el lift de la card montada.
  */
+// Verde legible sobre azul: verde-concepto puro queda en ~3.9:1 sobre
+// azul-principal (falla AA en texto chico); aclarado al 62% con blanco pasa.
+const VERDE_SOBRE_AZUL = {
+  color: "color-mix(in srgb, var(--color-verde-concepto) 62%, white)",
+};
+
 export function NovedadDestacada() {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -145,12 +151,6 @@ export function NovedadDestacada() {
     }, root);
     return () => ctx.revert();
   }, [reduced]);
-
-  // Verde legible sobre azul: verde-concepto puro queda en ~3.9:1 sobre
-  // azul-principal (falla AA en texto chico); aclarado al 62% con blanco pasa.
-  const verdeSobreAzul = {
-    color: "color-mix(in srgb, var(--color-verde-concepto) 62%, white)",
-  };
 
   return (
     <section
@@ -200,7 +200,7 @@ export function NovedadDestacada() {
               <div className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.16em] uppercase">
                 <ScrambleText
                   text={CATEGORIA_LABEL[principal.categoria]}
-                  style={verdeSobreAzul}
+                  style={VERDE_SOBRE_AZUL}
                 />
                 <span className="bg-azul-claro/40 h-1 w-1 rounded-full" />
                 <span className="text-azul-claro/80">{fechaCorta(principal.fecha)}</span>
@@ -277,7 +277,7 @@ export function NovedadDestacada() {
 
               <div className="flex min-w-0 flex-col justify-center p-5 md:p-7">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
-                  <span style={verdeSobreAzul}>
+                  <span style={VERDE_SOBRE_AZUL}>
                     {CATEGORIA_LABEL[segunda.categoria]}
                   </span>
                   <span className="bg-azul-claro/40 hidden h-1 w-1 rounded-full sm:block" />

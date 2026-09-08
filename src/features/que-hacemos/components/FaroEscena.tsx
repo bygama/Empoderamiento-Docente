@@ -1,3 +1,11 @@
+import {
+  FOCO_X,
+  FOCO_Y,
+  FUGA_X,
+  ORIGEN_CSS,
+  PUNTOS_VERBO,
+} from "./faro-geometria";
+
 /**
  * Escena del faro v2 — «Qué hacemos», por CAPAS DE PROFUNDIDAD.
  *
@@ -47,25 +55,6 @@ const SILUETA_SUAVE = mezcla(AZUL, 68, "black");
 const MARFIL = mezcla(AZUL_CLARO, 10, "white");
 const MARFIL_SOMBRA = mezcla(AZUL_MEDIO, 42, "white");
 
-/** Punto de fuga compartido (viewBox 1440x900) y su equivalente en %. */
-export const FUGA_X = 950;
-export const FUGA_Y = 522;
-export const ORIGEN_CSS = `${((FUGA_X / 1440) * 100).toFixed(2)}% ${((FUGA_Y / 900) * 100).toFixed(2)}%`;
-
-/** Profundidades conceptuales de cada capa (px hacia el fondo). */
-export const CAPAS_Z = {
-  cielo: 1500,
-  horizonte: 1050,
-  faro: 620,
-  marMedio: 300,
-  muelle: 90,
-  foreground: -140,
-} as const;
-
-/** Foco de la linterna, en coordenadas de la capa faro. */
-export const FOCO_X = FUGA_X;
-export const FOCO_Y = 388;
-
 /* ── Estrellas ────────────────────────────────────────────────────────────
  * Escasas y deterministas. Alineadas a la retícula de 44px (submúltiplo del
  * grid de marca) con radios/alfas variados: el ADN del patrón §6 queda
@@ -111,15 +100,6 @@ const DESTELLOS_MEDIO: ReadonlyArray<readonly [number, number, number, number]> 
 const ESPEJO: ReadonlyArray<readonly [number, number, number, number]> = [
   [700, 34, 0.3, -3], [716, 22, 0.24, 4], [734, 26, 0.18, -2],
   [756, 16, 0.13, 5], [782, 20, 0.09, -5], [812, 12, 0.06, 2],
-] as const;
-
-/**
- * Puntos del mar que el haz "toca" en el método (escena 2), en coordenadas
- * de la capa marMedio. El orden acompaña la coreografía de verbos: izquierda
- * lejos → izquierda alta → derecha → derecha cerca → centro (el camino).
- */
-export const PUNTOS_VERBO: ReadonlyArray<readonly [number, number]> = [
-  [270, 700], [180, 620], [1230, 680], [1150, 780], [720, 820],
 ] as const;
 
 function CapaCielo() {
@@ -536,13 +516,13 @@ export function FaroEscena() {
       style={{ "--qh-origen": ORIGEN_CSS } as React.CSSProperties}
     >
       <div data-capa="cielo" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaCielo />
           <VelosAlba />
         </div>
       </div>
       <div data-capa="horizonte" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaHorizonte />
         </div>
       </div>
@@ -555,12 +535,12 @@ export function FaroEscena() {
           fijo mostraba su banda clara del horizonte flotando sobre el navy
           (se leía como una sombra celeste). El mundo entero baja junto. */}
       <div data-capa="faro" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaFaro />
         </div>
       </div>
       <div data-capa="marMedio" className={capa}>
-        <div data-faro-shift className="absolute inset-0 will-change-transform">
+        <div data-faro-shift className="absolute inset-0">
           <CapaMarMedio />
         </div>
       </div>

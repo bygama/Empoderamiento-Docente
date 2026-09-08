@@ -15,7 +15,17 @@ import { aterrizarEn } from "@/lib/navegar";
 export function AterrizajePorLink() {
   const pathname = usePathname();
   useEffect(() => {
-    const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+    // decodeURIComponent tira URIError con un escape roto (un «%» suelto en el
+    // hash alcanza), y acá eso cortaría el efecto entero. Un hash que no se
+    // puede decodificar no es una sección: se usa crudo y, si tampoco existe,
+    // aterrizarEn no hace nada.
+    const crudo = window.location.hash.replace(/^#/, "");
+    let id = crudo;
+    try {
+      id = decodeURIComponent(crudo);
+    } catch {
+      id = crudo;
+    }
     if (!id) return;
     return aterrizarEn(id);
   }, [pathname]);

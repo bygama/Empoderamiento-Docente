@@ -1,39 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import gsap from "gsap";
-import { NAV_LINKS, CTA_LINK, HOME_LINK, esPaginaActiva } from "@/config/nav";
+import { NAV_LINKS, HOME_LINK, esPaginaActiva } from "@/config/nav";
 import { irEnPagina, partirDestino } from "@/lib/navegar";
-import {
-  Menu,
-  X,
-  ArrowUpRight,
-  ChevronDown,
-  Instagram,
-  Linkedin,
-  Facebook,
-} from "@/components/ui/icons";
+import { Menu, X } from "@/components/ui/icons";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
 import { irASeccion } from "@/lib/indice";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { siteConfig } from "@/config/site";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
+import { useMenuAnimado } from "./mobile-nav/useMenuAnimado";
+import { NavegacionMenu } from "./mobile-nav/NavegacionMenu";
+import { PieMenu } from "./mobile-nav/PieMenu";
 
-// Redes a mostrar — mismo criterio que el Footer: el href sale de
-// siteConfig.redes y, sin handle oficial, el ícono no se muestra.
-const REDES = [
-  { key: "instagram", label: "Instagram", Icon: Instagram },
-  { key: "linkedin", label: "LinkedIn", Icon: Linkedin },
-  { key: "facebook", label: "Facebook", Icon: Facebook },
-] as const satisfies ReadonlyArray<{
-  key: keyof typeof siteConfig.redes;
-  label: string;
-  Icon: typeof Instagram;
-}>;
 
 /**
  * Navegación mobile (< lg). Botón hamburguesa dentro de la píldora del Header
@@ -42,11 +25,15 @@ const REDES = [
  * editorial que el Footer: tipografía display + hairline + flecha ↗— y el CTA
  * "Contacto" queda como acción focal abajo.
  *
- * - El panel se PORTALEA a <body> para escapar del containing-block que crea el
+ * - El panel es un `<dialog>` abierto con `showModal()`: el navegador se
+ *   encarga del top layer, del `inert` sobre el resto de la página y de
+ *   atrapar el Tab, que antes no teníamos.
+ * - Se PORTALEA a <body> para escapar del containing-block que crea el
  *   `backdrop-blur` de la píldora: con un ancestro con `backdrop-filter`,
  *   `position:fixed` se ancla a ESE ancestro y no al viewport.
  * - Bloquea el scroll del body mientras está abierto (useLockScroll).
- * - Cierra con la X, Escape, click en un link, o al cambiar de ruta.
+ * - Cierra con la X, Escape (`onCancel`), click en un link, o al cambiar de
+ *   ruta; el `close()` real espera a que la timeline termine la reversa.
  * - Respeta prefers-reduced-motion (sin animación; apertura instantánea).
  */
 // Snapshot vacío para useSyncExternalStore: nunca cambia, solo distingue
@@ -80,84 +67,20 @@ export function MobileNav() {
     setDesplegado(NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null);
   }
 
-  const panelRef = useRef<HTMLDivElement>(null);
+  // Este menú es de < lg: si la ventana cruza a escritorio con el panel
+  // abierto, el nav de escritorio ya está a la vista y el panel se quedaría
+  // encima —modal, con la página inerte y el scroll trabado—. Se cierra, con
+  // el mismo ajuste en render que el cambio de ruta. (En `false` durante el
+  // SSR, que es el fallback seguro: no cerrar.)
+  const esDesktop = useMediaQuery("(min-width: 64rem)");
+  if (esDesktop && open) setOpen(false);
+
+  const panelRef = useRef<HTMLDialogElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-  const firstFocusRun = useRef(true);
 
   useLockScroll(open);
-
-  // Escape para cerrar.
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  // Timeline de apertura — se arma una vez que el panel existe en el DOM.
-  useEffect(() => {
-    if (!hydrated) return;
-    const panel = panelRef.current;
-    if (!panel) return;
-
-    const ctx = gsap.context(() => {
-      gsap.set(panel, { autoAlpha: 0 });
-      if (reduced) return; // sin timeline: lo maneja el efecto de abajo.
-
-      const items = panel.querySelectorAll("[data-mnav-item]");
-      const cta = panel.querySelector("[data-mnav-cta]");
-      tlRef.current = gsap
-        .timeline({ paused: true })
-        .to(panel, { autoAlpha: 1, duration: 0.3, ease: "power2.out" })
-        .from(
-          items,
-          {
-            autoAlpha: 0,
-            y: 20,
-            duration: 0.5,
-            ease: "power3.out",
-            stagger: 0.06,
-          },
-          "<0.05",
-        )
-        .from(
-          cta,
-          { autoAlpha: 0, y: 14, duration: 0.45, ease: "power3.out" },
-          "<0.12",
-        );
-    }, panel);
-
-    return () => {
-      ctx.revert();
-      tlRef.current = null;
-    };
-  }, [hydrated, reduced]);
-
-  // Play/reverse del panel + manejo de foco al abrir/cerrar.
-  useEffect(() => {
-    const panel = panelRef.current;
-    if (panel) {
-      if (reduced) {
-        gsap.set(panel, { autoAlpha: open ? 1 : 0 });
-      } else if (tlRef.current) {
-        if (open) tlRef.current.play();
-        else tlRef.current.reverse();
-      }
-    }
-    // Foco: al abrir, a la X; al cerrar, de vuelta al botón hamburguesa. Se
-    // saltea la PRIMERA corrida (montaje) para no robar el foco al cargar.
-    if (firstFocusRun.current) {
-      firstFocusRun.current = false;
-    } else if (open) {
-      closeRef.current?.focus();
-    } else {
-      toggleRef.current?.focus({ preventScroll: true });
-    }
-  }, [open, reduced]);
+  useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, closeRef });
 
   const close = () => setOpen(false);
 
@@ -196,14 +119,25 @@ export function MobileNav() {
 
       {hydrated &&
         createPortal(
-          <div
+          <dialog
             id="mobile-nav-panel"
             ref={panelRef}
-            role="dialog"
-            aria-modal="true"
             aria-label="Menú de navegación"
-            aria-hidden={!open}
-            className="faro-glow fixed inset-0 z-[70] flex flex-col overflow-y-auto lg:hidden"
+            // Escape: el navegador dispara `cancel` y cerraría de golpe; se lo
+            // frena para que el cierre pase por la reversa de la timeline.
+            onCancel={(e) => {
+              e.preventDefault();
+              setOpen(false);
+            }}
+            // `open:flex` y no `flex`: un `display` fijo le gana a la regla del
+            // agente que esconde el dialog cerrado y el panel quedaría siempre
+            // a la vista. El resto neutraliza margen, borde, fondo y topes de
+            // tamaño del agente para que siga siendo full-bleed, y `h-full
+            // w-full` no sobra al lado de `inset-0`: el agente le da al dialog
+            // `width`/`height: fit-content`, que le ganan al tamaño implícito
+            // del inset y encogían el panel (los ítems quedaban 21px más
+            // angostos y 59px más arriba que antes de ser <dialog>).
+            className="faro-glow fixed inset-0 z-[70] m-0 hidden h-full w-full max-h-none max-w-none flex-col overflow-y-auto border-0 bg-transparent p-0 backdrop:bg-transparent open:flex lg:hidden"
             style={{ visibility: "hidden" }}
           >
             {/* Barra superior: logo (→ Inicio) + cerrar. */}
@@ -234,159 +168,18 @@ export function MobileNav() {
               </button>
             </div>
 
-            {/* Navegación grande apilada (eco del Footer). */}
-            <nav
-              aria-label="Navegación principal"
-              className="flex flex-1 flex-col justify-center px-6 sm:px-8"
-            >
-              <ul>
-                {NAV_LINKS.map((link) => {
-                  const active = esPaginaActiva(pathname, link.href);
-                  const sub = link.submenu ?? [];
-                  const abierto = desplegado === link.href;
-                  return (
-                    <li key={link.href} data-mnav-item className="border-azul-principal/10 border-b">
-                      <div className="flex items-center justify-between">
-                        <Link
-                          href={link.href}
-                          onClick={close}
-                          aria-current={active ? "page" : undefined}
-                          className="group flex flex-1 items-center justify-between py-4"
-                        >
-                          <span
-                            className={`font-display text-[clamp(1.6rem,1rem+4vw,2.4rem)] font-bold tracking-[-0.01em] transition-colors ${
-                              active
-                                ? "text-verde-concepto"
-                                : "text-azul-principal group-hover:text-verde-concepto"
-                            }`}
-                          >
-                            {link.label}
-                          </span>
-                          <ArrowUpRight
-                            size={22}
-                            className={`shrink-0 transition-all duration-300 ${
-                              active
-                                ? "text-verde-concepto opacity-100"
-                                : "text-azul-principal/40 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-                            }`}
-                          />
-                        </Link>
-                        {sub.length > 0 && (
-                          <button
-                            type="button"
-                            aria-label={`${abierto ? "Ocultar" : "Ver"} secciones de ${link.label}`}
-                            aria-expanded={abierto}
-                            onClick={() => setDesplegado(abierto ? null : link.href)}
-                            className="text-azul-principal/60 hover:text-azul-principal ml-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform"
-                            style={{ transform: abierto ? "rotate(180deg)" : undefined }}
-                          >
-                            <ChevronDown size={20} />
-                          </button>
-                        )}
-                      </div>
-                      {sub.length > 0 && (
-                        <ul
-                          hidden={!abierto}
-                          className="flex flex-wrap gap-2 pb-4"
-                        >
-                          {sub.map((s) => (
-                            <li key={s.href}>
-                              <Link
-                                href={s.href}
-                                scroll={false}
-                                onClick={(e) => irADestino(e, s.href)}
-                                className="border-azul-principal/15 text-azul-principal hover:border-azul-principal inline-flex min-h-10 items-center rounded-full border px-3.5 font-sans text-[0.9rem] font-medium transition-colors"
-                              >
-                                {s.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+            <NavegacionMenu
+              pathname={pathname}
+              secciones={secciones}
+              desplegado={desplegado}
+              onDesplegar={setDesplegado}
+              onCerrar={close}
+              onIrASeccion={irA}
+              onIrADestino={irADestino}
+            />
 
-              {/* Secciones de la página actual: el atajo para no recorrer
-                  todas las escenas hasta llegar a la que se busca. En
-                  desktop esto es la columna de marcas del borde derecho
-                  (IndicePagina). */}
-              {secciones.length >= 2 && (
-                <div className="mt-8">
-                  <p className="text-gris-texto font-mono text-[0.68rem] font-medium tracking-[0.2em] uppercase">
-                    En esta página
-                  </p>
-                  <ul className="mt-3 flex flex-wrap gap-2">
-                    {secciones.map((s) => (
-                      <li key={s.id}>
-                        <button
-                          type="button"
-                          onClick={() => irA(s.id)}
-                          className="border-azul-principal/15 text-azul-principal hover:border-azul-principal inline-flex min-h-10 items-center rounded-full border px-3.5 font-sans text-[0.9rem] font-medium transition-colors"
-                        >
-                          {s.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </nav>
-
-            {/* Acción focal (Contacto) + mail real. */}
-            <div
-              data-mnav-cta
-              className="flex flex-col gap-5 px-6 pt-4 pb-10 sm:px-8"
-            >
-              <Link
-                href={CTA_LINK.href}
-                onClick={close}
-                className="bg-naranja-accion inline-flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 font-medium text-white transition-opacity hover:opacity-90"
-              >
-                {CTA_LINK.label}
-                <ArrowUpRight size={18} />
-              </Link>
-
-              {/* Mail de contacto: centrado, justo debajo del CTA. */}
-              <a
-                href={`mailto:${siteConfig.contacto.email}`}
-                className="text-gris-texto hover:text-azul-principal text-center font-mono text-[0.78rem] tracking-wide transition-colors"
-              >
-                {siteConfig.contacto.email}
-              </a>
-
-              {/* Redes sociales — con rótulo y botones circulares (buen target
-                  táctil). Solo las que tienen URL confirmada; sin ninguna, la
-                  fila entera no se muestra. */}
-              {REDES.some(({ key }) => siteConfig.redes[key]) && (
-                <div className="border-azul-principal/10 flex items-center justify-between gap-4 border-t pt-5">
-                  <span className="text-gris-texto font-mono text-[0.72rem] font-medium tracking-[0.18em] uppercase">
-                    Seguinos
-                  </span>
-                  <ul className="flex items-center gap-2.5">
-                    {REDES.map(({ key, label, Icon }) => {
-                      const url = siteConfig.redes[key];
-                      if (!url) return null;
-                      return (
-                        <li key={key}>
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={`Empoderamiento Docente en ${label}`}
-                            className="border-azul-principal/15 text-azul-principal/75 hover:border-azul-principal hover:bg-azul-principal inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors hover:text-white"
-                          >
-                            <Icon size={20} />
-                          </a>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>,
+            <PieMenu onCerrar={close} />
+          </dialog>,
           document.body,
         )}
     </>

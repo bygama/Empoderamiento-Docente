@@ -50,7 +50,7 @@ function limpiarBobina(cell: HTMLElement) {
   Array.from(reel.children).forEach((child) => {
     if (!(child as HTMLElement).hasAttribute("data-final")) child.remove();
   });
-  gsap.set(reel, { clearProps: "transform" });
+  gsap.set(reel, { clearProps: "transform,willChange" });
   delete reel.dataset.built;
   delete reel.dataset.saliendo;
 }
@@ -147,6 +147,9 @@ export function RotadorPalabras({
       const finalSpan = reel?.querySelector<HTMLElement>("[data-final]");
       if (!reel || !finalSpan || reel.dataset.built) return;
       reel.dataset.built = "1";
+      // El hint lo pide la coreografía, no la clase: vive lo que dura el giro
+      // y lo borra el `clearProps` de más abajo (y el de `limpiarBobina`).
+      gsap.set(reel, { willChange: "transform" });
 
       reel.insertBefore(
         fragmentoRuido(RUIDO_ENTRADA, finalSpan.textContent ?? ""),
@@ -172,7 +175,8 @@ export function RotadorPalabras({
                   child.remove();
                 }
               });
-              gsap.set(reel, { clearProps: "transform" });
+              // El hint muere con la bobina: cada ciclo la vuelve a pedir.
+              gsap.set(reel, { clearProps: "transform,willChange" });
               resueltas += 1;
               if (resueltas !== cells.length) return;
               timerRef.current = window.setTimeout(() => {
@@ -212,6 +216,7 @@ export function RotadorPalabras({
       const finalSpan = reel?.querySelector<HTMLElement>("[data-final]");
       if (!reel || !finalSpan || reel.dataset.saliendo) return;
       reel.dataset.saliendo = "1";
+      gsap.set(reel, { willChange: "transform" });
 
       // Ruido DESPUÉS del real: la bobina sigue la misma dirección de giro.
       reel.appendChild(fragmentoRuido(RUIDO_SALIDA, finalSpan.textContent ?? ""));
@@ -273,7 +278,6 @@ export function RotadorPalabras({
             <span
               data-reel
               className="absolute inset-x-0 top-0 block"
-              style={{ willChange: "transform" }}
             >
               {/* Mismo recorte por fila que el ruido: mientras la bobina pasa,
                   el carácter real tampoco derrama tinta a las vecinas. */}
