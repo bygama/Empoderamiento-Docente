@@ -40,6 +40,9 @@ export function FichaNovedad({ n }: { n: Novedad }) {
   // Solo LEER en el initializer (StrictMode lo re-ejecuta: tiene que ser
   // puro); el flag se consume después, en un efecto.
   const [conTelon] = useState(() => {
+    // En el servidor no hay sessionStorage: el guard explícito reemplaza al
+    // catch como rama de SSR y deja el initializer puro.
+    if (typeof window === "undefined") return false;
     try {
       return sessionStorage.getItem(FLAG_ENTRADA_FARO) === "1";
     } catch {
