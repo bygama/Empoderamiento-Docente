@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { acoplarLamina } from "./acople-lamina";
 import { altoViewport, anchoDocumento } from "@/lib/viewport";
 
 if (typeof window !== "undefined") {
@@ -234,21 +235,9 @@ export function MiradaEd() {
       const H = altoViewport;
 
       // ── Acople de la lámina clara sobre el navy de Origen (se conserva) ──
-      // El origin va en un set previo: en un fromTo con scrub GSAP no lo
-      // aplica en el frame 0 si viaja solo en el "to" (pitfall documentado
-      // en OrigenEd). Sin esto, escalar una sección de 780svh desde el
-      // centro abre una banda de fondo crudo sobre el navy anterior.
-      gsap.set(root, { transformOrigin: "50% 0%" });
-      gsap.fromTo(
-        root,
-        { scale: 0.97, y: 36 },
-        {
-          scale: 1,
-          y: 0,
-          ease: "none",
-          scrollTrigger: { trigger: root, start: "top 96%", end: "top 14%", scrub: true },
-        },
-      );
+      // Origen arriba: sin él, escalar una sección de 780svh desde el centro
+      // abre una banda de fondo crudo sobre el navy anterior (ver acople-lamina).
+      acoplarLamina(root, { origen: "50% 0%" });
 
       // ── Estados iniciales (solo con motion) ──────────────────────────────
       gsap.set(capasCamara, { transformOrigin: "0 0" });

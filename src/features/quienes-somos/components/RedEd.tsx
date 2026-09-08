@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "@/components/ui/icons";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { acoplarLamina } from "./acople-lamina";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -110,16 +111,8 @@ export function RedEd() {
     if (!root || reduced) return;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        root,
-        { scale: 0.97, y: 36 },
-        {
-          scale: 1,
-          y: 0,
-          ease: "none",
-          scrollTrigger: { trigger: root, start: "top 96%", end: "top 14%", scrub: true },
-        },
-      );
+      // Acople sobre la lámina anterior (compartido con Origen y Mirada).
+      acoplarLamina(root);
 
       const heads = gsap.utils.toArray<HTMLElement>("[data-red-head]");
       gsap.set(heads, { autoAlpha: 0, y: 24 });

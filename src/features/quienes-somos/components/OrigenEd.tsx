@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitChars } from "@/components/ui/SplitChars";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { acoplarLamina } from "./acople-lamina";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -198,23 +199,10 @@ export function OrigenEd() {
       if (beats.length !== 5 || !tilt) return;
 
       // ── Acople de la lámina sobre el hero (transición de sección) ────────
-      // transform-origin arriba: la lámina se ancla por su borde superior (el
-      // que toca el hero) y crece hacia abajo. Además evita que el escalado de
-      // una sección tan alta (560svh) empuje su tope fuera de vista — así deja
-      // asomar su cabecera en el hero (el "peek" que invita a scrollear).
-      // El origin se fija con un set previo: en un fromTo con scrub, GSAP no lo
-      // aplica en el frame 0 si va sólo en el objeto "to".
-      gsap.set(root, { transformOrigin: "50% 0%" });
-      gsap.fromTo(
-        root,
-        { scale: 0.955, y: 44 },
-        {
-          scale: 1,
-          y: 0,
-          ease: "none",
-          scrollTrigger: { trigger: root, start: "top 96%", end: "top 12%", scrub: true },
-        },
-      );
+      // Origen arriba: la lámina se ancla por el borde que toca el hero y crece
+      // hacia abajo, y así deja asomar su cabecera en el hero (el "peek" que
+      // invita a scrollear). Detalle del porqué en acople-lamina.
+      acoplarLamina(root, { escala: 0.955, y: 44, fin: "top 12%", origen: "50% 0%" });
 
       // ── Capas: pasan a superponerse (en flow quedan apiladas sin motion) ─
       gsap.set(beats, { position: "absolute", inset: 0 });
