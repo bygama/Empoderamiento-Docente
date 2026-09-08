@@ -129,8 +129,9 @@ export function CierreNovedades() {
             data-cierre-foot
             className="text-azul-claro mt-7 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed md:text-[1.2rem]"
           >
-            Escribinos y contamos lo que estamos haciendo, o seguinos en redes para
-            enterarte de cada novedad apenas sale.
+            {REDES.some(({ key }) => siteConfig.redes[key])
+              ? "Escribinos y contamos lo que estamos haciendo, o seguinos en redes para enterarte de cada novedad apenas sale."
+              : "Escribinos y te contamos lo que estamos haciendo."}
           </p>
 
           <div
@@ -138,25 +139,28 @@ export function CierreNovedades() {
             className="mt-10 flex flex-col items-center gap-7"
           >
             <ButtonPrimary href="/contacto">Hablemos</ButtonPrimary>
-            <ul className="flex items-center gap-5">
-              {REDES.map(({ key, label, Icon }) => {
-                const url = siteConfig.redes[key];
-                return (
-                  <li key={key}>
-                    <a
-                      href={url ?? "#"}
-                      {...(url
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                      aria-label={`Empoderamiento Docente en ${label}`}
-                      className="text-azul-claro/70 hover:text-white inline-flex transition-colors"
-                    >
-                      <Icon size={22} aria-hidden="true" />
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
+            {/* Solo las redes con URL confirmada: un ícono a «#» es un link muerto. */}
+            {REDES.some(({ key }) => siteConfig.redes[key]) && (
+              <ul className="flex items-center gap-5">
+                {REDES.map(({ key, label, Icon }) => {
+                  const url = siteConfig.redes[key];
+                  if (!url) return null;
+                  return (
+                    <li key={key}>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Empoderamiento Docente en ${label}`}
+                        className="text-azul-claro/70 hover:text-white inline-flex transition-colors"
+                      >
+                        <Icon size={22} aria-hidden="true" />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         </div>
       </section>

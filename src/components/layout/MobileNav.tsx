@@ -22,7 +22,7 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { siteConfig } from "@/config/site";
 
 // Redes a mostrar — mismo criterio que el Footer: el href sale de
-// siteConfig.redes y, sin handle oficial todavía, cae a "#" (no inventar URLs).
+// siteConfig.redes y, sin handle oficial, el ícono no se muestra.
 const REDES = [
   { key: "instagram", label: "Instagram", Icon: Instagram },
   { key: "linkedin", label: "LinkedIn", Icon: Linkedin },
@@ -303,33 +303,35 @@ export function MobileNav() {
                 {siteConfig.contacto.email}
               </a>
 
-              {/* Redes sociales — visibles, con rótulo y botones circulares
-                  (buen target táctil). El href sale de siteConfig.redes; sin
-                  handle oficial cae a "#" (mismo criterio que el Footer). */}
-              <div className="border-azul-principal/10 flex items-center justify-between gap-4 border-t pt-5">
-                <span className="text-gris-texto font-mono text-[0.72rem] font-medium tracking-[0.18em] uppercase">
-                  Seguinos
-                </span>
-                <ul className="flex items-center gap-2.5">
-                  {REDES.map(({ key, label, Icon }) => {
-                    const url = siteConfig.redes[key];
-                    return (
-                      <li key={key}>
-                        <a
-                          href={url ?? "#"}
-                          {...(url
-                            ? { target: "_blank", rel: "noopener noreferrer" }
-                            : {})}
-                          aria-label={`Empoderamiento Docente en ${label}`}
-                          className="border-azul-principal/15 text-azul-principal/75 hover:border-azul-principal hover:bg-azul-principal inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors hover:text-white"
-                        >
-                          <Icon size={20} />
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              {/* Redes sociales — con rótulo y botones circulares (buen target
+                  táctil). Solo las que tienen URL confirmada; sin ninguna, la
+                  fila entera no se muestra. */}
+              {REDES.some(({ key }) => siteConfig.redes[key]) && (
+                <div className="border-azul-principal/10 flex items-center justify-between gap-4 border-t pt-5">
+                  <span className="text-gris-texto font-mono text-[0.72rem] font-medium tracking-[0.18em] uppercase">
+                    Seguinos
+                  </span>
+                  <ul className="flex items-center gap-2.5">
+                    {REDES.map(({ key, label, Icon }) => {
+                      const url = siteConfig.redes[key];
+                      if (!url) return null;
+                      return (
+                        <li key={key}>
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Empoderamiento Docente en ${label}`}
+                            className="border-azul-principal/15 text-azul-principal/75 hover:border-azul-principal hover:bg-azul-principal inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors hover:text-white"
+                          >
+                            <Icon size={20} />
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>,
           document.body,

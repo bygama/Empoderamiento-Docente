@@ -27,9 +27,9 @@ import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
 // Las 7 rutas del sitemap: logo (Inicio) + nav principal + Contacto (acción).
 const FOOTER_NAV = [HOME_LINK, ...NAV_LINKS, CTA_LINK] as const;
 
-// Redes a mostrar. El href sale de siteConfig.redes; mientras no haya handle
-// oficial cae a "#" (no inventar URLs). Se muestran siempre para ocupar la
-// columna de marca — al cargar los handles reales quedan enlazadas solas.
+// Redes a mostrar. El href sale de siteConfig.redes: sin handle oficial el
+// ícono no se muestra (un ícono que lleva a «#» es un link muerto). Al
+// cargar los handles reales aparecen solos.
 const REDES = [
   { key: "instagram", label: "Instagram", Icon: Instagram },
   { key: "linkedin", label: "LinkedIn", Icon: Linkedin },
@@ -101,26 +101,28 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Redes al pie de la columna. */}
-          <ul className="flex items-center gap-4">
-            {REDES.map(({ key, label, Icon }) => {
-              const url = siteConfig.redes[key];
-              return (
-                <li key={key}>
-                  <a
-                    href={url ?? "#"}
-                    {...(url
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : {})}
-                    aria-label={`${name} en ${label}`}
-                    className="text-azul-claro/70 hover:text-white -m-2.5 inline-flex p-2.5 transition-colors"
-                  >
-                    <Icon size={20} aria-hidden="true" />
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+          {/* Redes al pie de la columna: solo las que tienen URL confirmada. */}
+          {REDES.some(({ key }) => siteConfig.redes[key]) && (
+            <ul className="flex items-center gap-4">
+              {REDES.map(({ key, label, Icon }) => {
+                const url = siteConfig.redes[key];
+                if (!url) return null;
+                return (
+                  <li key={key}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${name} en ${label}`}
+                      className="text-azul-claro/70 hover:text-white -m-2.5 inline-flex p-2.5 transition-colors"
+                    >
+                      <Icon size={20} aria-hidden="true" />
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
         {/* Columna navegación + sub-columnas */}
