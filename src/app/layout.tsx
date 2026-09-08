@@ -85,6 +85,14 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <LenisProvider>
+          {/* Para teclado y lectores de pantalla: saltear el header e ir al
+              contenido. Invisible hasta que recibe el foco. */}
+          <a
+            href="#contenido"
+            className="bg-azul-principal focus:outline-verde-concepto sr-only rounded-lg px-4 py-2 font-sans text-[0.95rem] font-medium text-white focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:outline-2 focus:outline-offset-2"
+          >
+            Saltar al contenido
+          </a>
           <Header />
           <IndicePagina />
           {children}

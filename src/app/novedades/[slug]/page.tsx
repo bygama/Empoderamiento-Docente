@@ -29,7 +29,7 @@ export default async function NovedadPage({
   const n = NOVEDADES.find((x) => x.id === slug && x.cuerpo);
   if (!n) notFound();
   return (
-    <main>
+    <main id="contenido" tabIndex={-1}>
       <FichaNovedad n={n} />
     </main>
   );

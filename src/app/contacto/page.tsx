@@ -15,7 +15,7 @@ export const metadata: Metadata = {
  */
 export default function ContactoPage() {
   return (
-    <main>
+    <main id="contenido" tabIndex={-1}>
       <ContactoExperiencia />
     </main>
   );

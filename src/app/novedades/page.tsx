@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function NovedadesPage() {
   return (
-    <main>
+    <main id="contenido" tabIndex={-1}>
       <NovedadesHero />
       <NovedadDestacada />
       <FiltrosNovedades />
