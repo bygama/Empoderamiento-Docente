@@ -4,6 +4,8 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MathField } from "@/components/ui/MathField";
+import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
+import { alClicCortarA } from "@/lib/navegar";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -135,7 +137,7 @@ export function QuienesSomosHero() {
       </h1>
 
       {/* ── Pie: bajada de identidad (abajo, a la derecha) ───────────────── */}
-      <div className="relative z-10 flex justify-start md:justify-end">
+      <div className="relative z-10 flex flex-col items-start gap-6 md:items-end">
         <p
           data-hero-foot
           className="text-azul-principal max-w-[42ch] font-sans text-[1.05rem] leading-relaxed font-medium md:text-right md:text-[1.2rem]"
@@ -143,6 +145,16 @@ export function QuienesSomosHero() {
           Somos investigación, diseño y acompañamiento: un proceso colectivo que
           cambia la relación con el saber matemático escolar.
         </p>
+        {/* Atajo a la sección que más se vuelve a buscar (decisión de ED,
+            2026-09-08): mismas palabras que el submenú y el título de la
+            sección, y corta directo como el navbar (la sección está al final,
+            después de dos escenas largas). Secundario: el naranja es para
+            Contacto. Entra con la bajada (data-hero-foot). */}
+        <div data-hero-foot>
+          <ButtonSecondary href="#equipo" onClick={alClicCortarA("equipo")}>
+            Quiénes sostienen ED
+          </ButtonSecondary>
+        </div>
       </div>
     </section>
   );

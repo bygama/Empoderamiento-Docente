@@ -8,6 +8,7 @@ import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { alClicCortarA } from "@/lib/navegar";
 import { FIGURAS } from "./constelacion";
 import { ConstelacionInvestigacion } from "./ConstelacionInvestigacion";
 import {
@@ -153,10 +154,16 @@ export function InvestigacionHero() {
               <Highlight>Investigamos</Highlight> para transformar la
               matemática escolar.
             </RevealLines>
+            {/* Los dos CTA cortan directo a su sección (sin recorrer las
+                escenas del medio), igual que el navbar. El secundario va a
+                los casos, lo que más se vuelve a buscar (decisión de ED,
+                2026-09-08; antes salía a la Biblioteca). */}
             <div data-hero-rise className="mt-9 flex flex-wrap gap-4">
-              <ButtonPrimary href="#lineas">Conocé qué investigamos</ButtonPrimary>
-              <ButtonSecondary href="/biblioteca">
-                Explorá la Biblioteca
+              <ButtonPrimary href="#lineas" onClick={alClicCortarA("lineas")}>
+                Conocé qué investigamos
+              </ButtonPrimary>
+              <ButtonSecondary href="#en-accion" onClick={alClicCortarA("en-accion")}>
+                Ver los casos
               </ButtonSecondary>
             </div>
           </div>
