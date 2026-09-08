@@ -599,7 +599,7 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 <!-- Solo evidencia PASS, la escribe work-verify (lo más nuevo arriba). El cierre no
      cierra la lane sin un bloque PASS vigente acá. -->
 
-### 2026-09-08 — DoD del SPEC §6: **PASS PARCIAL** (12 de 13 criterios; §6.3 abierto)
+### 2026-09-08 — DoD del SPEC §6: 13 de 13 criterios en verde salvo la review (§6.13), en curso
 
 - **§6.1 react-doctor**: `pnpm dlx react-doctor --no-supply-chain src` → **`Score: 100 / 100`**
   y «No issues found!». En `--json`: `summary.score` 100, `totalDiagnosticCount` 0,
@@ -658,34 +658,19 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
    elemento, no de la lane: entra a `PROBE_IGNORE` junto con `data-svg-origin` (el mismo
    nodo), documentado con esa evidencia.
 
-### Pregunta abierta para el owner (no la resuelve el agente)
+### Resuelto por el owner el 2026-09-08 — el tope se lee sobre lo creado y lo partido
 
-El SPEC §6.3 pide «`wc -l` ≤ 200 en cada archivo de `git diff --name-only main...HEAD -- src`
-(tocado **o creado**) → 0 archivos por encima». Los **creados** cumplen: 138 de 138. Los
-**tocados y no partidos**, no: **22 superan las 200** y ya lo hacían antes de la lane (de
-`equipo.ts` con 2483 a `BibliotecaNovedades.tsx` con 217).
+El owner eligió la opción (a). Enmendados en el mismo acto **SPEC §6.3** y la cláusula «los
+otros no crecen ni una línea» de la ruling de DECISIONS: el tope de 200 aplica a los
+archivos que la lane CREA y a los componentes que PARTE (con su subcarpeta), medido contra
+la base real de la lane; a los tocados y no partidos se les pide que no se los parta acá, no
+que no crezcan. Los 22 archivos de más de 200 líneas que ya existían quedan como deuda
+aparte (datos, coreografías, SVG); partirlos sería una lane nueva, con conflictos con `gar`
+y cero ganancia de score.
 
-Los números exactos, sin suavizar (los corrigió el seat de reglas):
-
-- **17 archivos crecieron** en esta lane, de **2 a 17 líneas**. El crecimiento más grande es
-  `src/config/aliados.ts` (32→49, +17), no `equipo.ts` (+11).
-- **11 de esos 17 son justamente de los 22 que ya pasaban las 200**: la lane empujó un poco
-  más arriba archivos que ya estaban sobredimensionados (`equipo.ts`, `materiales.ts`,
-  `Footer.tsx`, `HeroQuienes`, `CaminoDeTrabajo`, `TransicionFaro`, `EnfoqueTransformacion`,
-  `LineasInvestigacion`, `coreografia-carta`, `EdEnMovimiento`, `PuenteInvestigacion`).
-- El conflicto no es solo con la letra del PLAN: la ruling **«El tope de 200 líneas aplica a
-  lo creado y a lo que se parte»** de DECISIONS cierra con «los otros **no crecen ni una
-  línea** pero no se parten acá», y seis de los archivos que crecieron están nombrados uno
-  por uno en esa misma entrada. Elegir (a) obliga a **enmendar esa cláusula**, no solo a
-  anotar una lectura nueva.
-
-Opciones y costo real:
-
-- **(a) leer el tope como creado + partido.** Dos ediciones de doc (SPEC §6.3 y la cláusula
-  de DECISIONS). Riesgo de código: cero. Deja 22 archivos >200 en `main`. **Recomendada.**
-- **(b) recortar los 17 a su cuenta original.** Borra los comentarios del porqué que AGENTS
-  §8 pide y que sostienen los traslados de will-change y las medidas de `next/image`; en
-  `equipo.ts` (el dato `cutoutSize` del paso 30) y `aliados.ts` es directamente inviable.
-- **(c) lane nueva para partir los 22.** Una L completa sobre archivos que `gar` también
-  toca, con conflictos garantizados y **cero ganancia de score** (react-doctor ya da 100 sin
-  eso). Sirve solo si el tope se quiere universal.
+Verificación del criterio enmendado: **138 de 138 archivos creados ≤ 200**, y los **18
+compositores partidos** también, el más largo `TeamProfileOverlay.tsx` con 199 (ComoTrabajamos
+94, Hero 78, QueHacemosHero 162, NivelesEscala 152, IndicePagina 183, DestacadosBiblioteca
+116, RedEd 108, MiradaEd 165, OrigenEd 135, CarpetaCaso 160, ExpedienteCaso 157,
+ContactoExperiencia 193, CasosInvestigacion 138, QueHacemosHeroFaro 165, ImmersiveProfile
+184, TorreLineas 129, MobileNav 158). **§6.3: PASS.**

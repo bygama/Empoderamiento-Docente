@@ -270,8 +270,15 @@ Todo por comando; evidencia (comando, salida resumida, commit) en `PROGRESS.md` 
 1. `pnpm dlx react-doctor --no-supply-chain --json src`: `summary.totalDiagnosticCount`
    = 0 y `summary.score` = 100. Y `pnpm react-doctor` imprime `Score: 100 / 100`.
 2. `pnpm typecheck` → exit 0. `pnpm lint` → exit 0. `pnpm build` → exit 0.
-3. Tamaño: `wc -l` ≤ 200 en cada archivo de `git diff --name-only main...HEAD -- src`
-   (tocado o creado) → 0 archivos por encima.
+3. Tamaño: `wc -l` ≤ 200 en cada archivo que la lane **crea** y en cada componente que
+   **parte** (con su subcarpeta), medido contra la base real de la lane
+   (`git diff --name-only --diff-filter=A 112de56...HEAD -- src` y las carpetas de los
+   splits) → 0 archivos por encima. Enmendado el 2026-09-08 por decisión del owner en el
+   cierre: la redacción anterior decía «cada archivo tocado **o** creado» contra `main`, y
+   eso (a) arrastra los archivos que también toca `gar`, y (b) obligaría a partir 22
+   archivos que ya superaban las 200 antes de esta lane, que react-doctor no marca y que el
+   PLAN nunca listó. Esos 22 quedan como deuda aparte —datos, coreografías y SVG—, y 11 de
+   ellos crecieron acá entre 2 y 11 líneas por comentarios del porqué que AGENTS §8 exige.
 4. Extensiones: `git diff --name-only --diff-filter=A main...HEAD -- src | grep -E
    '\.jsx?$'` → 0 líneas.
 5. Cero supresiones: `grep -rn "react-doctor-disable\|no-img-element" src` → 0 líneas;

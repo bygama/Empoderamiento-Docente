@@ -143,6 +143,16 @@ clase): `equipo.ts` (2483, datos), `casos/coreografia.ts` (710), `FaroEscena.tsx
 del owner: el tope aplica a los archivos que la lane crea y a los componentes que
 parte (con sus subcarpetas); los otros no crecen ni una línea pero no se parten acá
 (deuda aparte: datos, coreografías, SVG). La DoD §6.3 del SPEC se lee así.
+
+**Enmienda del 2026-09-08 (cierre, decisión del owner).** La cláusula «no crecen ni una
+línea» no se cumplió y no se va a forzar: 17 archivos crecieron entre 2 y 17 líneas —el
+mayor es `aliados.ts`, 32→49— y 11 de ellos son de esta misma lista. Lo que crecieron son
+comentarios del porqué (AGENTS §8) que sostienen los traslados de `will-change` y las
+medidas de `next/image`, más el dato `cutoutSize` del paso 30 en `equipo.ts`. Recortarlos
+borraría justo la explicación que el repo pide. Queda: el tope se mide sobre lo creado y lo
+partido, y a los no partidos se les pide que no se los parta acá, no que no crezcan.
+Descartadas: recortar los comentarios para volver al conteo previo; abrir una lane para
+partir los 22 (conflictos con `gar` garantizados y cero ganancia de score).
 Descartadas: partir los 17 también; partir solo los componentes `.tsx`.
 Consecuencia inmediata: las preguntas del faro van a `preguntas-faro.ts` (47 líneas)
 y no a `que-hacemos/data.ts`, que habría pasado de 185 a 233.
