@@ -429,6 +429,7 @@ export function CasosInvestigacion() {
     <section
       ref={sectionRef}
       id="en-accion"
+      data-indice="Casos"
       aria-label="Investigación en acción"
       className={`bg-gris-fondo relative isolate overflow-hidden ${
         activo !== null ? "z-40" : ""

@@ -190,7 +190,12 @@ export function DestacadosBiblioteca() {
   const claseImagenInline = reduced ? "" : "lg:hidden";
 
   return (
-    <section ref={rootRef} aria-label="Material destacado">
+    <section
+      ref={rootRef}
+      id="destacados"
+      data-indice="Destacados"
+      aria-label="Material destacado"
+    >
       {/* ── Fase 1: intro con pantalla propia ───────────────────────────── */}
       {/* Alto por contenido (sin min-h de pantalla): así la banda azul viene
           enseguida después de las portadas. Los espacios son todos fijos:

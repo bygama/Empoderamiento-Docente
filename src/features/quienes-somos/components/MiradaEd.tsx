@@ -555,6 +555,7 @@ export function MiradaEd() {
     <section
       ref={rootRef}
       id="mirada"
+      data-indice="Nuestra mirada"
       className="bg-grain-light to-gris-fondo/60 relative z-30 -mt-[4svh] overflow-clip rounded-t-[2.5rem] bg-gradient-to-b from-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.35)]"
       aria-label="Nuestra mirada"
     >

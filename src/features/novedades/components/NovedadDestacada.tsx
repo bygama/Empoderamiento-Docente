@@ -155,6 +155,8 @@ export function NovedadDestacada() {
   return (
     <section
       ref={rootRef}
+      id="destacado"
+      data-indice="Destacado"
       className="bg-gris-fondo"
       aria-label="Novedades destacadas"
     >

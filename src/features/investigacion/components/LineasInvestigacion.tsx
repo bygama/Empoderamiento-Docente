@@ -421,6 +421,7 @@ export function LineasInvestigacion() {
     <section
       ref={zonaRef}
       id="lineas"
+      data-indice="Líneas"
       aria-label="Líneas de investigación"
       // isolate: el grano mezcla adentro y los z-index de las carpetas no
       // compiten con el resto de la página. El clip recorta a los costados y

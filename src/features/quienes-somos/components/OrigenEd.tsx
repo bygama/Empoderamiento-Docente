@@ -551,6 +551,7 @@ export function OrigenEd() {
     <section
       ref={rootRef}
       id="origen"
+      data-indice="Origen"
       className="bg-azul-principal relative z-20 -mt-[5svh] overflow-clip rounded-t-[2.5rem] text-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.45)]"
       aria-label="Origen, sentido y evolución"
     >

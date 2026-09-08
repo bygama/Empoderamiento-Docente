@@ -184,6 +184,7 @@ export function CartaAbierta() {
     <section
       ref={zonaRef}
       id="sentido"
+      data-indice="Sentido"
       aria-label="Por qué investigamos"
       className="bg-gris-fondo"
     >

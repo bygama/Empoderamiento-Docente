@@ -181,6 +181,8 @@ export function PuenteInvestigacion() {
 
   return (
     <section
+      id="puente-investigacion"
+      data-indice="Investigación"
       className="relative bg-white pb-16 md:pb-24"
       aria-label="Conexión con Investigación"
     >

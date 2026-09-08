@@ -138,7 +138,12 @@ export function LanzamientosRecientes() {
   };
 
   return (
-    <section className="bg-gris-fondo" aria-label="Lanzamientos y recursos recientes">
+    <section
+      id="recien-salido"
+      data-indice="Recién salido"
+      className="bg-gris-fondo"
+      aria-label="Lanzamientos y recursos recientes"
+    >
       <div className="mx-auto w-full max-w-screen-xl px-5 pt-20 md:px-10 md:pt-28">
         <div className="flex items-end justify-between gap-6">
           {/* Sin max-w: el titular entra en un solo renglón en desktop (con
