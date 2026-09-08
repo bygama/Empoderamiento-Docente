@@ -110,7 +110,8 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 /
 ├── README.md             ← onboarding humano (instalación, scripts, estructura)
 ├── AGENTS.md              ← este archivo (contrato AI-neutral)
-├── CLAUDE.md              ← adapter para Claude Code (puntero, sin reglas propias)
+├── CLAUDE.md              ← adapter para Claude Code: importa este archivo con
+│                            `@AGENTS.md` y solo agrega el mapeo de herramientas
 ├── DESIGN.md              ← sistema de diseño (tokens, tipos, reglas)
 ├── docs/
 │   ├── README.md          ← índice de documentación
@@ -152,6 +153,11 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 adapter (`CLAUDE.md`, y un futuro folder `.claude/`) solo mapea ese contrato
 a su herramienta — nunca contenido propio. Una regla que solo existe en un
 adapter es una regla que el resto no cumple.
+
+Por eso `CLAUDE.md` **importa** este archivo (`@AGENTS.md` en su primera
+línea, que Claude Code resuelve al abrir la sesión) en vez de resumirlo: un
+resumen se desfasa, un import no. Cualquier adapter futuro hace lo mismo con
+el mecanismo que ofrezca su herramienta.
 
 ---
 

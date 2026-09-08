@@ -1,24 +1,32 @@
 # CLAUDE.md — Adapter para Claude Code
 
-> **Esto no es un contrato: es un puntero.** Las reglas del repo viven en
-> [`AGENTS.md`](AGENTS.md) y valen igual con cualquier herramienta. Acá solo
-> está lo que es propio de Claude Code y no se puede decir de forma neutral.
+El contrato del repo es AGENTS.md, y esta línea lo trae entero a la sesión:
+
+@AGENTS.md
+
+> Eso de arriba no es un link: es un **import**. Claude Code resuelve los
+> `@archivo` de este CLAUDE.md y los carga en contexto al abrir la sesión, así
+> que el contrato ya está leído antes de la primera respuesta. Por eso acá no
+> se repite ni una regla suya.
 >
-> Si buscás una regla y no está acá, está en `AGENTS.md`. Si una regla está en
-> los dos lados, la de `AGENTS.md` es la que manda y la de acá sobra: borrala.
+> **Esto no es un contrato: es un adapter.** Solo tiene lo propio de Claude
+> Code, que no se puede decir de forma neutral. Si buscás una regla y no está
+> acá, está en `AGENTS.md`. Si está en los dos lados, manda la de `AGENTS.md`
+> y la de acá sobra: borrala.
 
 ---
 
-## Antes de responder
+## Lo demás se lee según la tarea
 
-1. **[`AGENTS.md`](AGENTS.md)** — contrato del sistema: reglas duras, el gate
-   de §5.8, quality standards, commit protocol, qué pide confirmación humana.
-2. **[`DESIGN.md`](DESIGN.md)** — tokens visuales, si vas a tocar UI.
-3. **[`docs/GLOSSARY.md`](docs/GLOSSARY.md)** — si vas a tocar copy.
-4. **[`docs/COMMITS.md`](docs/COMMITS.md)** — si la tarea termina en commits.
+El import de arriba cubre el contrato. Estos van a demanda, y `AGENTS.md`
+§«Read Order by Task» dice cuál para cada tipo de trabajo:
 
-Si hay un hook `SessionStart` que auto-inyecta `AGENTS.md`, el paso 1 ya está
-cubierto.
+- **[`DESIGN.md`](DESIGN.md)** — tokens visuales, si vas a tocar UI.
+- **[`docs/GLOSSARY.md`](docs/GLOSSARY.md)** — si vas a tocar copy.
+- **[`docs/COMMITS.md`](docs/COMMITS.md)** — si la tarea termina en commits.
+
+No se importan con `@`: se leen cuando hacen falta. Importarlos todos llenaría
+el contexto de cada sesión con lo que la mayoría de las tareas no usa.
 
 ---
 

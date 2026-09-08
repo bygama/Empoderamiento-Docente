@@ -15,7 +15,7 @@
 | Área              | Documento                                       | Para qué sirve                                                                |
 | ----------------- | ----------------------------------------------- | ----------------------------------------------------------------------------- |
 | Orquestación IA   | [`../AGENTS.md`](../AGENTS.md)                  | Contrato AI-neutral: hard rules, quality standards, anti-patterns, commit protocol |
-| Adapter Claude    | [`../CLAUDE.md`](../CLAUDE.md)                  | Puntero: mapea `AGENTS.md` a las herramientas de Claude Code, sin reglas propias |
+| Adapter Claude    | [`../CLAUDE.md`](../CLAUDE.md)                  | Importa `AGENTS.md` con `@` y agrega solo el mapeo de herramientas y los quirks |
 | Sistema de diseño | [`../DESIGN.md`](../DESIGN.md)                  | Tokens visuales: colores, tipografía, espaciado, componentes, iconografía    |
 | Commits           | [`COMMITS.md`](COMMITS.md)                      | Conventional Commits + atómicos + ejemplos por categoría                      |
 | Glosario          | [`GLOSSARY.md`](GLOSSARY.md)                    | Jerga del dominio educativo de ED, vocabulario de UI, frases pilares          |
