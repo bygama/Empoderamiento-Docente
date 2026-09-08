@@ -91,6 +91,8 @@ export function CierreBiblioteca() {
     <div className="bg-white px-5 pb-14 md:px-10 md:pb-20">
       <section
         ref={rootRef}
+        id="hablemos"
+        data-indice="Hablemos"
         className="bg-azul-principal relative isolate mx-auto w-full max-w-screen-xl overflow-hidden rounded-[1.5rem] text-white shadow-[0_32px_80px_-42px_rgb(15_23_42/0.5)] md:rounded-[2.5rem]"
         aria-label="Cierre"
       >

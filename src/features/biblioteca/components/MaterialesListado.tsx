@@ -114,6 +114,7 @@ export function MaterialesListado() {
     <section
       ref={rootRef}
       id="materiales"
+      data-indice="Catálogo"
       aria-label="Catálogo de materiales"
       className="scroll-mt-24 bg-white py-16 md:py-24"
     >

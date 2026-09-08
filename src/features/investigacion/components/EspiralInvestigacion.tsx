@@ -70,7 +70,12 @@ export function EspiralInvestigacion() {
   }, [live]);
 
   return (
-    <section id="ciclo" aria-label="Ciclo de investigación aplicada y evidencia" className="bg-gris-fondo">
+    <section
+      id="ciclo"
+      data-indice="Ciclo"
+      aria-label="Ciclo de investigación aplicada y evidencia"
+      className="bg-gris-fondo"
+    >
       {/* ── La hoja 03: el escenario pinneado. La sombra es corta a propósito,
           como la del hero: la sección solo deja 10px de canaleta (p-2.5) y la
           de casos pinta su fondo encima, así que una sombra larga se ve

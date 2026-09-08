@@ -208,6 +208,8 @@ export function ComoTrabajamos() {
   return (
     <section
       ref={rootRef}
+      id="como-trabajamos"
+      data-indice="Cómo trabajamos"
       data-section="metodo"
       className="bg-grain-light relative overflow-clip bg-gradient-to-b from-white via-white to-gris-fondo/20"
       aria-label="Cómo trabajamos"

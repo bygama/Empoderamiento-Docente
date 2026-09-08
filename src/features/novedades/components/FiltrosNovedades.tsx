@@ -147,7 +147,12 @@ export function FiltrosNovedades() {
   const chips: Filtro[] = ["todas", ...CATEGORIAS.map((c) => c.key)];
 
   return (
-    <section id="ultimas" className="bg-gris-fondo" aria-label="Últimas novedades">
+    <section
+      id="ultimas"
+      data-indice="Últimas"
+      className="bg-gris-fondo"
+      aria-label="Últimas novedades"
+    >
       <div className="mx-auto w-full max-w-screen-xl px-5 pt-6 pb-24 md:px-10 md:pb-28">
         {/* Sin max-w: los `ch` del wrapper se resolvían contra los 16px del
             body (~368px), no contra el tamaño del titular, y lo partían en dos. */}

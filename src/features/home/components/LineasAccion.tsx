@@ -293,6 +293,8 @@ export function LineasAccion() {
   return (
     <section
       ref={rootRef}
+      id="areas"
+      data-indice="Áreas"
       data-section="lineas"
       className="deck from-white to-gris-fondo relative bg-gradient-to-b"
       aria-label="Áreas de especialización"

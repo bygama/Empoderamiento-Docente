@@ -191,6 +191,8 @@ export function EdEnMovimiento() {
   return (
     <div
       ref={zoneRef}
+      id="ed-en-movimiento"
+      data-indice="ED en movimiento"
       className={"relative bg-azul-principal " + (live ? "h-[560svh]" : "")}
       aria-label="ED en movimiento"
     >

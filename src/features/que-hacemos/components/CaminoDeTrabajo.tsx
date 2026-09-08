@@ -131,7 +131,12 @@ export function CaminoDeTrabajo() {
   };
 
   return (
-    <section className="bg-gris-fondo relative" aria-label="Cómo trabajamos">
+    <section
+      id="camino"
+      data-indice="Cómo trabajamos"
+      className="bg-gris-fondo relative"
+      aria-label="Cómo trabajamos"
+    >
       <div ref={zoneRef} className={"relative " + (live ? "h-[380svh]" : "")}>
         <div
           ref={stageRef}

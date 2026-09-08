@@ -675,6 +675,7 @@ export function QueHacemosHeroFaro() {
     // con z mayor y sin fondo propio, así que se lee como una sola escena.
     <section
       id="faro"
+      data-indice="El faro"
       ref={rootRef}
       className="relative z-10 lg:-mt-[100svh] lg:motion-reduce:mt-0"
       aria-label="Qué hace Empoderamiento Docente"

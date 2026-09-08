@@ -239,7 +239,12 @@ export function HeroQuienes() {
       </div>
 
       {/* Quiénes somos → barrido verde → Misión (apilado debajo del hero). */}
-      <div ref={zoneRef} className="relative z-20 h-[340svh] motion-reduce:h-auto">
+      <div
+        ref={zoneRef}
+        id="quienes-somos"
+        data-indice="Quiénes somos"
+        className="relative z-20 h-[340svh] motion-reduce:h-auto"
+      >
         <div className="sticky top-0 h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto">
           <div ref={panelRef} className="relative h-full w-full motion-reduce:h-auto">
             {/* Capa 1: Quiénes somos (se borra). */}

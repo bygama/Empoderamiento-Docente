@@ -124,7 +124,12 @@ export function EnfoqueTransformacion() {
   // corte blanco → gris justo debajo de los diferenciales quedaba muy marcado
   // (Facundo, 2026-09-03).
   return (
-    <section className="bg-gris-fondo relative" aria-label="Nuestro enfoque">
+    <section
+      id="enfoque"
+      data-indice="Transformación"
+      className="bg-gris-fondo relative"
+      aria-label="Nuestro enfoque"
+    >
       {/* Contenido real para lectores de pantalla; la escena es decorativa. */}
       <p className="sr-only">
         No hacemos capacitación: hacemos transformación educativa.

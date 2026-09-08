@@ -283,6 +283,8 @@ export function NivelesEscala() {
   return (
     <div
       ref={zoneRef}
+      id="niveles"
+      data-indice="Niveles"
       // Mismo gris que trae la página desde la torre: con fondo blanco, la
       // cola de Qué hacemos alternaba gris / blanco / blanco / gris y cada
       // cambio era un corte seco (Facundo, 2026-09-03). Las cards son

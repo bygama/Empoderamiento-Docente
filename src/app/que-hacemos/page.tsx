@@ -49,7 +49,7 @@ export default function QueHacemosPage() {
       </div>
       {/* Ancla del CTA final del faro («Ver líneas de acción» → #lineas):
           el wrapper no altera el layout de la torre. */}
-      <div id="lineas" className="scroll-mt-28">
+      <div id="lineas" data-indice="Líneas de acción" className="scroll-mt-28">
         <TorreLineas />
       </div>
       {/* «Cómo trabajamos» se mete 62svh POR DEBAJO del escenario

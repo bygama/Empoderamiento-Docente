@@ -74,6 +74,8 @@ function trackPointer(e: MouseEvent<HTMLElement>) {
 export function BibliotecaNovedades() {
   return (
     <section
+      id="biblioteca-novedades"
+      data-indice="Biblioteca y novedades"
       data-section="biblioteca-novedades"
       className="bg-grain-light relative bg-white py-24 md:py-32"
       aria-label="Biblioteca y Novedades"

@@ -83,6 +83,8 @@ export function DatosDuros() {
   return (
     <section
       ref={rootRef}
+      id="en-numeros"
+      data-indice="En números"
       className="bg-azul-principal relative overflow-hidden pt-12 pb-14 md:pt-16 md:pb-20"
       aria-label="En números y alianzas"
     >

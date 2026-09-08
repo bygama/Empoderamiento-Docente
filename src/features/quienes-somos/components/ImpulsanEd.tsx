@@ -237,6 +237,8 @@ export function ImpulsanEd() {
 
   return (
     <section
+      id="equipo"
+      data-indice="El equipo"
       aria-label="Quiénes sostienen ED — el equipo"
       // La página termina sobre esta lámina navy y el footer también es
       // navy. Sin teñir, la muesca del footer deja dos triángulos blancos en
