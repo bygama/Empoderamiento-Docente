@@ -137,7 +137,7 @@ export function NavDropdown({
       <div
         className={`group flex items-center rounded-lg transition-colors ${
           enPagina
-            ? "bg-azul-principal/[0.07] text-azul-principal"
+            ? "bg-azul-principal/[0.07] text-azul-principal font-semibold"
             : "hover:bg-azul-principal/5 hover:text-azul-principal"
         }`}
       >
