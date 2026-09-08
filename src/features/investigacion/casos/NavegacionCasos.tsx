@@ -43,7 +43,7 @@ export function NavegacionCasos({
     <div
       inert={!visible}
       aria-hidden={!visible}
-      className={`fixed right-0 bottom-0 left-0 z-[60] transition-all duration-300 md:right-8 md:bottom-8 md:left-auto ${
+      className={`fixed right-0 bottom-0 left-0 z-[60] transition-[opacity,transform] duration-300 md:right-8 md:bottom-8 md:left-auto ${
         visible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-4 opacity-0"
@@ -94,7 +94,7 @@ export function NavegacionCasos({
               onClick={() => interactiva && onIr(indiceActivo + 1)}
               aria-label={`Siguiente caso: ${siguiente.numero}`}
               title={`Sigue — caso ${siguiente.numero}: ${siguiente.pregunta}`}
-              className="group bg-naranja-accion-texto hover:bg-naranja-accion-texto/90 focus-visible:outline-naranja-accion-texto inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 font-sans text-[0.95rem] font-semibold whitespace-nowrap text-white transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 sm:px-4"
+              className="group bg-naranja-accion-texto hover:bg-naranja-accion-texto/90 focus-visible:outline-naranja-accion-texto inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 font-sans text-[0.95rem] font-semibold whitespace-nowrap text-white transition-[background-color,box-shadow] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 sm:px-4"
             >
               {/* bg naranja-accion-texto (#b35a15): blanco sobre naranja-accion
                   da 3.0:1 y este cuerpo no califica como texto grande. */}

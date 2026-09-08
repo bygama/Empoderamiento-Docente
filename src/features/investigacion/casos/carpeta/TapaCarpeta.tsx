@@ -129,7 +129,7 @@ export function TapaCarpeta({
             </button>
             <span
               aria-hidden={!desplegada}
-              className={`mt-2 block h-5 font-sans text-[0.88rem] transition-all duration-300 ${
+              className={`mt-2 block h-5 font-sans text-[0.88rem] transition-[opacity,transform] duration-300 ${
                 desplegada
                   ? "opacity-100 motion-safe:translate-y-0"
                   : "opacity-0 motion-safe:translate-y-1"
@@ -161,7 +161,7 @@ export function TapaCarpeta({
                   Manrope 800 (el umbral real es 48ch; +2 de colchón
                   para retoques de copy). */}
               <span
-                className={`font-display block max-w-[50ch] text-[1.55rem] leading-[1.15] font-extrabold tracking-[-0.015em] transition-all duration-[400ms] lg:text-[1.9rem] ${
+                className={`font-display block max-w-[50ch] text-[1.55rem] leading-[1.15] font-extrabold tracking-[-0.015em] transition-[opacity,transform] duration-[400ms] lg:text-[1.9rem] ${
                   desplegada
                     ? "opacity-100 delay-[250ms] motion-safe:translate-y-0"
                     : "opacity-0 motion-safe:translate-y-2"
