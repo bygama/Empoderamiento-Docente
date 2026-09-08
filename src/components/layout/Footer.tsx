@@ -113,7 +113,7 @@ export function Footer() {
                       ? { target: "_blank", rel: "noopener noreferrer" }
                       : {})}
                     aria-label={`${name} en ${label}`}
-                    className="text-azul-claro/70 hover:text-white inline-flex transition-colors"
+                    className="text-azul-claro/70 hover:text-white -m-2.5 inline-flex p-2.5 transition-colors"
                   >
                     <Icon size={20} aria-hidden="true" />
                   </a>
