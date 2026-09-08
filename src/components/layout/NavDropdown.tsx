@@ -29,7 +29,9 @@ import { coincideDestino, irEnPagina, partirDestino } from "@/lib/navegar";
  * si no se superpone con ella), blanco pleno —sin transparencia: con
  * texto encima del hero se filtraba el título de atrás—, una columna,
  * sin kicker (el rótulo de arriba ya dice de qué página es y queda
- * marcado). Entra en 150 ms con CSS (sin GSAP: no compite con la intro
+ * marcado). Opaca pero en gris-fondo, no blanco puro: así sobre páginas
+ * claras iguala a la píldora y sobre navy queda un paso más clara, como la
+ * hoja que sale de la barra. Entra en 150 ms con CSS (sin GSAP: no compite con la intro
  * del navbar).
  */
 const DEMORA_ABRIR = 120;
@@ -130,8 +132,10 @@ export function NavDropdown({
         if (!rootRef.current?.contains(e.relatedTarget as Node | null)) onCerrar();
       }}
     >
+      {/* `group`: la flecha despierta con el ítem entero (hover, foco,
+          abierto, página actual); en reposo es apenas una insinuación. */}
       <div
-        className={`flex items-center rounded-lg transition-colors ${
+        className={`group flex items-center rounded-lg transition-colors ${
           enPagina
             ? "bg-azul-principal/[0.07] text-azul-principal"
             : "hover:bg-azul-principal/5 hover:text-azul-principal"
@@ -151,7 +155,9 @@ export function NavDropdown({
             aria-expanded={abierto}
             aria-controls={menuId}
             onClick={() => (abierto ? onCerrar() : onAbrir())}
-            className="rounded-md py-2 pr-2 pl-0.5 text-current/60 hover:text-current"
+            className={`rounded-md py-2 pr-2 pl-0.5 text-current transition-opacity duration-150 group-hover:opacity-100 focus-visible:opacity-100 ${
+              abierto || enPagina ? "opacity-100" : "opacity-30"
+            }`}
           >
             {/* Gira el ÍCONO sobre su propio centro (el botón tiene padding
                 desigual: rotarlo entero lo hacía desplazarse). */}
@@ -173,7 +179,7 @@ export function NavDropdown({
           hidden={!visible}
           // top: el borde inferior del botón + el padding de la píldora
           // (py-3) + su borde + 8px de respiro → cuelga de la píldora.
-          className={`border-azul-principal/10 absolute top-[calc(100%+0.75rem+1px+0.5rem)] left-0 z-10 min-w-[14rem] rounded-2xl border bg-white p-1.5 shadow-[0_24px_60px_-28px_rgb(31_45_77/0.45)] transition-[opacity,transform] duration-150 ease-out ${
+          className={`border-azul-principal/10 absolute top-[calc(100%+0.75rem+1px+0.5rem)] left-0 z-10 min-w-[14rem] rounded-2xl border bg-gris-fondo p-1.5 shadow-[0_24px_60px_-28px_rgb(31_45_77/0.45)] transition-[opacity,transform] duration-150 ease-out ${
             abierto ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
           }`}
         >
