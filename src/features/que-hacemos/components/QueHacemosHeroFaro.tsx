@@ -150,7 +150,7 @@ export function QueHacemosHeroFaro() {
   const altoRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
 
-  // «Ver líneas de acción» viaja con Lenis hasta el ARRANQUE de la torre.
+  // «Ver las seis áreas» viaja con Lenis hasta el arranque de las áreas.
   // El salto nativo a #lineas "no llevaba a ningún lado": caía 112px antes
   // del arranque (scroll-mt del ancla, pensado para el listado plano) sobre
   // el faro casi blanco, y Lenis, si todavía estaba deslizando, lo pisaba
@@ -158,7 +158,7 @@ export function QueHacemosHeroFaro() {
   // activa y arranque el armado (en el borde exacto, progreso 0, no lo
   // hace). El href queda como semántica y como fallback sin JS.
   const irALineas = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const destino = document.getElementById("lineas");
+    const destino = document.getElementById("areas");
     if (!destino) return;
     e.preventDefault();
     const top = destino.getBoundingClientRect().top + window.scrollY + 4;
@@ -708,8 +708,8 @@ export function QueHacemosHeroFaro() {
               de la página vive en QueHacemosHero, que va primero): la
               versión visual de abajo entra y sale con la coreografía. */}
           <h2 className="sr-only">
-            Diseñamos y acompañamos procesos que transforman la matemática
-            escolar.
+            Consultora especializada en la transformación del aprendizaje
+            matemático.
           </h2>
 
           {/* ══ Overlays de texto — una idea por momento ══ */}
@@ -725,9 +725,11 @@ export function QueHacemosHeroFaro() {
           </div>
 
           {/* S1 · Mensaje central — el momento tipográfico principal. También
-              es el fallback estático (sin JS / reduced-motion / <lg). El
-              subrayado de «procesos» se pinta con la luz (background-size).
-              aria-hidden: para AT el titular es el h1 sr-only de arriba. */}
+              es el fallback estático (sin JS / reduced-motion / <lg). Es la
+              frase del cartel oficial de ED (2026-09-08; antes decía «Diseñamos
+              y acompañamos procesos que transforman la matemática escolar»). El
+              subrayado de «aprendizaje matemático» se pinta con la luz
+              (background-size). aria-hidden: para AT está el h2 sr-only de arriba. */}
           <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center">
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
               {/* Sin eyebrow: «Qué hacemos» ya es el título de la página y
@@ -735,11 +737,11 @@ export function QueHacemosHeroFaro() {
                   momento tipográfico (pedido de Mateo, 2026-09-02). */}
               <div data-mensaje>
                 <p
-                  className="font-display max-w-[19ch] font-extrabold tracking-[-0.03em] text-white [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
+                  className="font-display max-w-[21ch] font-extrabold tracking-[-0.03em] text-balance text-white [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
                   style={{ fontSize: "clamp(2.6rem, 1.2rem + 3.9vw, 4.6rem)", lineHeight: 1.06 }}
                 >
-                  Diseñamos y acompañamos <Highlight>procesos</Highlight> que
-                  transforman la matemática escolar.
+                  Consultora especializada en la transformación del{" "}
+                  <Highlight>aprendizaje matemático</Highlight>.
                 </p>
               </div>
             </div>
@@ -824,8 +826,8 @@ export function QueHacemosHeroFaro() {
                   naranja: sobre la noche el primario era un bloque que
                   competía con el titular. Sigue siendo la única acción. */}
               <div data-cta className="pointer-events-auto mt-9" style={{ opacity: 0 }}>
-                <ButtonSecondary href="#lineas" variant="dark" withArrow onClick={irALineas}>
-                  Ver líneas de acción
+                <ButtonSecondary href="#areas" variant="dark" withArrow onClick={irALineas}>
+                  Ver las seis áreas
                 </ButtonSecondary>
               </div>
             </div>

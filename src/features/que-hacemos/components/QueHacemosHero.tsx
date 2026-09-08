@@ -3,6 +3,7 @@
 import { useRef, type CSSProperties } from "react";
 import gsap from "gsap";
 import { getLenis } from "@/lib/lenis";
+import { AREAS } from "@/features/que-hacemos/areas";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { DURACION_RECORRIDO } from "./QueHacemosHeroFaro";
@@ -36,6 +37,9 @@ const POLVO = (() => {
  * zona del cielo que toca respira un poco más de luz. Titular: "Generamos y /
  * transformamos." (antes "No formamos. / Transformamos."; se cambió a
  * pedido de Gastón el 2026-09-01). PENDIENTE validar titular exacto con ED.
+ * Debajo de la bajada van las SEIS ÁREAS del cartel oficial como chips que
+ * bajan a su bloque en #areas (2026-09-08): es lo único que el hero suma
+ * para decir qué hace ED; la frase del cartel va en la escena del faro.
  *
  * SIN escena de fotos: las imágenes flotantes competían con el titular y
  * adelantaban lo que la torre muestra mejor. En su lugar el primer viewport
@@ -515,6 +519,25 @@ export function QueHacemosHero() {
           sostenidos en investigación, que transforman la relación con la
           matemática escolar.
         </p>
+
+        {/* Las seis áreas del cartel, como chips: se leen de una y bajan a
+            su bloque en #areas. */}
+        <ul
+          data-qh-rise
+          aria-label="Áreas de trabajo"
+          className="mt-7 flex max-w-[64ch] flex-wrap justify-center gap-2"
+        >
+          {AREAS.map((a) => (
+            <li key={a.id}>
+              <a
+                href={`#area-${a.id}`}
+                className="focus-visible:outline-verde-concepto inline-flex min-h-9 items-center rounded-full border border-white/25 px-3.5 font-sans text-[0.85rem] text-white/85 transition-colors hover:border-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+              >
+                {a.nombre}
+              </a>
+            </li>
+          ))}
+        </ul>
 
         {/* Portal al recorrido: CÁPSULA DE LUZ VERDE — vidrio con halo que
             respira. Click u hold la cargan: el cuerpo se hincha y la luz
