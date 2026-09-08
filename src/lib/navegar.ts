@@ -59,6 +59,25 @@ export function irEnPagina(href: string) {
   if (d.hash) irASeccion(d.hash);
 }
 
+/**
+ * onClick para un botón/link de la MISMA página que apunta a `#id` (los CTA
+ * de los heros): en vez del ancla nativa —que con Lenis scrollea suave a
+ * través de todas las escenas del medio— corta directo, como el navbar.
+ * Con modificadores (nueva pestaña) no interviene.
+ */
+export function alClicCortarA(id: string) {
+  return (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}${window.location.search}#${id}`,
+    );
+    irASeccion(id);
+  };
+}
+
 /** Página recién montada: refresca los pins y corta a la sección del hash. */
 export function aterrizarEn(id: string): () => void {
   let raf = requestAnimationFrame(() => {
