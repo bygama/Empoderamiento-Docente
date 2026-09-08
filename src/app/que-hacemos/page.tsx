@@ -1,24 +1,28 @@
 import type { Metadata } from "next";
 import { QueHacemosHero } from "@/features/que-hacemos/components/QueHacemosHero";
 import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemosHeroFaro";
-import { EnfoqueTransformacion } from "@/features/que-hacemos/components/EnfoqueTransformacion";
-import { CaminoDeTrabajo } from "@/features/que-hacemos/components/CaminoDeTrabajo";
-import { TorreLineas } from "@/features/que-hacemos/components/TorreLineas";
+import { AreasQueHacemos } from "@/features/que-hacemos/components/AreasQueHacemos";
 import { NivelesEscala } from "@/features/que-hacemos/components/NivelesEscala";
+import { MiradaPasos } from "@/features/que-hacemos/components/MiradaPasos";
+import { ConQuienTrabajamos } from "@/features/que-hacemos/components/ConQuienTrabajamos";
 import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHacemos";
 
 export const metadata: Metadata = {
   title: "Qué hacemos",
   description:
-    "Cómo trabaja Empoderamiento Docente: líneas de acción, camino de trabajo, niveles de intervención y un enfoque que transforma la matemática escolar.",
+    "Consultora especializada en la transformación del aprendizaje matemático: investigación, diseño de materiales didácticos, desarrollo profesional docente, acompañamiento, currículo y evaluación.",
 };
 
-// Sitemap pág. 02 con desvíos pedidos por el cliente: el recorrido (la torre
-// de líneas) va INMEDIATAMENTE después del hero — el botón "Entrar" y el
-// scroll natural caen ahí — y «Nuestro enfoque» (TRANSFORMACIÓN armándose)
-// cierra la página, justo antes del CTA. «Proyectos y
-// aplicaciones» pasó a /investigacion (pedido de Mateo, 2026-09-02). Orden:
-// Hero → Líneas → Cómo trabajamos → Niveles → Enfoque → Cierre.
+// Orden nuevo (2026-09-08). Raquel y Daniela dijeron que la web se ve
+// espectacular pero no se entiende qué hace ED: había tantas animaciones
+// (faro, torre, camino) que el mensaje se perdía. La regla ahora es que el
+// texto manda y la animación acompaña: Hero (la frase del cartel visible
+// desde el primer segundo + escena del faro) → Áreas (las seis del cartel,
+// en texto plano) → Niveles → Cómo trabajamos (los seis verbos de «La
+// mirada ED», estáticos) → Con quién → Cierre. La torre de líneas y el
+// camino horizontal salen de esta página (los componentes quedan para
+// reubicarlos); «Nuestro enfoque» pasó a Quiénes somos, donde es manifiesto
+// y no compite con la oferta.
 export default function QueHacemosPage() {
   return (
     <main id="contenido" tabIndex={-1}>
@@ -43,26 +47,14 @@ export default function QueHacemosPage() {
         }}
       >
         <QueHacemosHero />
-        {/* Escena del faro por capas de profundidad (cámara scrubbed): entra
-            justo antes del recorrido, como antesala de la torre. */}
+        {/* Escena del faro por capas de profundidad (cámara scrubbed). Su
+            CTA final («Ver las seis áreas») baja a #areas. */}
         <QueHacemosHeroFaro />
       </div>
-      {/* Ancla del CTA final del faro («Ver líneas de acción» → #lineas):
-          el wrapper no altera el layout de la torre. */}
-      <div id="lineas" data-indice="Líneas de acción" className="scroll-mt-28">
-        <TorreLineas />
-      </div>
-      {/* «Cómo trabajamos» se mete 62svh POR DEBAJO del escenario
-          de la torre (z-20): durante la cola de salida la torre vuelve
-          transparente su superficie y esta sección sube por detrás del tubo
-          que se va. Solo en lg + motion, donde existe la torre animada. */}
-      <div className="lg:-mt-[62svh] lg:motion-reduce:mt-0">
-        <CaminoDeTrabajo />
-      </div>
+      <AreasQueHacemos />
       <NivelesEscala />
-      {/* El enfoque (TRANSFORMACIÓN armándose en pantalla) remata la página
-          antes del cierre: es la idea con la que hay que irse. */}
-      <EnfoqueTransformacion />
+      <MiradaPasos />
+      <ConQuienTrabajamos />
       <CierreQueHacemos />
     </main>
   );

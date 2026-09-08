@@ -1,5 +1,12 @@
 # Arquitectura editorial — Página «Qué hacemos»
 
+> **Actualización 2026-09-08.** La página se reordenó con la regla «el texto manda, la
+> animación acompaña»: hero con la frase del cartel oficial y las seis áreas → Áreas en
+> texto plano → Niveles → Cómo trabajamos (seis verbos, estático) → Con quién → Cierre.
+> Las seis áreas oficiales y su texto están en `src/features/que-hacemos/areas.ts` y en
+> `copy-que-hacemos.md`; el porqué y las fuentes, en `que-hace-ed-fuentes.md`. Lo que
+> sigue es la arquitectura original (siete líneas, torre, camino) y vale como historia.
+
 > **Fuente de verdad de contenidos:** `ED_Contenido_Maestro_Que_Hacemos_Investigacion.md`
 > (v1.0, 17-08-2026), Parte II. Este documento la convierte en arquitectura
 > de interfaz: qué se ve, qué se abre bajo interacción, qué deriva a otra
