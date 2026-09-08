@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Instagram, Linkedin, Facebook } from "@/components/ui/icons";
 import { siteConfig } from "@/config/site";
+import { ALIADOS } from "@/config/aliados";
 import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
 
 /**
@@ -40,24 +41,8 @@ const REDES = [
   Icon: typeof Instagram;
 }>;
 
-// Aliados con logo AUTORIZADO (negro sobre transparente → en el navy se
-// renderizan en blanco monocromo vía filtro). NO agregar un aliado sin su
-// archivo real ni sin OK.
-// Science Up va más alto que el resto (h-10 contra h-7/h-9) porque es un
-// lockup de dos líneas: su wordmark ocupa la mitad de la caja, así que a la
-// altura de los demás quedaría ópticamente la mitad de presente. Es un punto
-// menos que en DatosDuros (h-11) porque acá el <li> mide h-11 y no h-12.
-const ALIADOS = [
-  { src: "/aliados/techint.png", alt: "Techint", cls: "h-7" },
-  { src: "/aliados/roberto-rocca.svg", alt: "Roberto Rocca", cls: "h-7" },
-  { src: "/aliados/buenos-aires.png", alt: "Buenos Aires Ciudad", cls: "h-9" },
-  {
-    src: "/aliados/science-up.png",
-    alt: "Science Up — Consorcio Ciencia 2030 PUCV, USACH, UCN",
-    cls: "h-10",
-  },
-] as const;
-
+// Aliados: la lista y sus alturas viven en @/config/aliados (misma tira que
+// la home; acá el renglón es un poco más bajo, por eso `alto.pie`).
 const { name, paises } = siteConfig;
 
 export function Footer() {
@@ -178,7 +163,7 @@ export function Footer() {
                     src={aliado.src}
                     alt={aliado.alt}
                     draggable={false}
-                    className={`${aliado.cls} w-auto opacity-70 transition-opacity duration-300 hover:opacity-100 [filter:brightness(0)_invert(1)]`}
+                    className={`${aliado.alto.pie} w-auto opacity-70 transition-opacity duration-300 hover:opacity-100 [filter:brightness(0)_invert(1)]`}
                   />
                 </li>
               ))}

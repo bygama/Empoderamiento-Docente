@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { ALIADOS } from "@/config/aliados";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -16,29 +17,14 @@ if (typeof window !== "undefined") {
  * finales, sin animación).
  *
  * OJO: valores PLACEHOLDER — reemplazar por los reales de Empoderamiento Docente.
- * Logos de aliados: assets AUTORIZADOS (/public/aliados). El Footer lleva la
- * misma tira con su propia lista (y sus propias alturas, porque su <li> es más
- * bajo): si acá se suma o saca uno, replicarlo allá.
+ * Logos de aliados: la lista y sus alturas viven en @/config/aliados y son
+ * las mismas que usa el Footer.
  */
 const DATOS = [
   { value: 15, prefix: "+", suffix: "", label: "Años de trayectoria", nota: "Diseñando intervenciones situadas." },
   { value: 2000, prefix: "+", suffix: "", label: "Docentes", nota: "Acompañados en su práctica." },
   { value: 120, prefix: "+", suffix: "", label: "Escuelas", nota: "Transformando sus aulas." },
   { value: 5, prefix: "", suffix: "", label: "Países", nota: "Donde dejamos huella." },
-] as const;
-
-// Science Up va más alto que el resto (h-11 contra h-7/h-9) porque es un
-// lockup de dos líneas: su wordmark ocupa la mitad de la caja, así que a la
-// altura de los demás quedaría ópticamente la mitad de presente.
-const ALIADOS = [
-  { src: "/aliados/techint.png", alt: "Techint", cls: "h-7" },
-  { src: "/aliados/roberto-rocca.svg", alt: "Roberto Rocca", cls: "h-7" },
-  { src: "/aliados/buenos-aires.png", alt: "Buenos Aires Ciudad", cls: "h-9" },
-  {
-    src: "/aliados/science-up.png",
-    alt: "Science Up — Consorcio Ciencia 2030 PUCV, USACH, UCN",
-    cls: "h-11",
-  },
 ] as const;
 
 const fmt = (n: number) => n.toLocaleString("es-AR");
@@ -138,7 +124,7 @@ export function DatosDuros() {
                   src={a.src}
                   alt={a.alt}
                   draggable={false}
-                  className={`${a.cls} w-auto opacity-60 transition-opacity duration-300 [filter:brightness(0)_invert(1)] hover:opacity-100`}
+                  className={`${a.alto.home} w-auto opacity-60 transition-opacity duration-300 [filter:brightness(0)_invert(1)] hover:opacity-100`}
                 />
               </li>
             ))}
