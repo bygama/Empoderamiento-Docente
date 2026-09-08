@@ -115,11 +115,12 @@ export function LineasAccion() {
     const root = rootRef.current;
     if (!root) return;
 
-    // Con motion permitido se anima en todos lados: abanico horizontal en
-    // desktop, pila vertical superpuesta en mobile/tablet. Reduced-motion cae a
-    // la grilla estática.
+    // El abanico animado es solo para desktop con motion. En mobile y tablet
+    // va la grilla estática: la pila superpuesta que había dejaba seis de las
+    // siete cartas tapadas, el título asomando por los costados y el CTA
+    // montado sobre la última carta. Reduced-motion también cae a la grilla.
     if (reduced) return;
-    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
 
     const scroll = root.querySelector<HTMLElement>("[data-deck-scroll]");
     const stage = root.querySelector<HTMLElement>("[data-deck-stage]");
@@ -128,7 +129,6 @@ export function LineasAccion() {
     if (!scroll || !stage || cards.length !== AREAS.length) return;
 
     root.classList.add("is-live");
-    if (!isDesktop) root.classList.add("is-stack");
 
     // Limpieza de listeners del tilt interactivo (se llenan dentro del ctx).
     const tiltCleanups: Array<() => void> = [];
@@ -137,48 +137,21 @@ export function LineasAccion() {
       const total = cards.length;
       const center = (total - 1) / 2; // índice central
 
-      // Posición de reposo de cada carta según el dispositivo.
-      let restX: (i: number) => number;
-      let restY: (i: number) => number;
-      let restRot: (i: number) => number;
-
-      if (isDesktop) {
-        // Desktop: ABANICO horizontal. El paso (spread) se calcula EN VIVO desde
-        // el ancho del escenario y de la carta (responsiva, ver globals.css). Así,
-        // al cambiar el ancho de la ventana se recalcula (ver onResize) y el
-        // abanico NO se pasa de la pantalla. Margen cómodo a los costados.
-        const stepNow = () => {
-          const cardW = cards[0].offsetWidth || CARD_W;
-          const half = stage.clientWidth / 2;
-          const maxCenter = Math.max(120, half - cardW / 2 - 58);
-          return (2 * maxCenter) / (total - 1);
-        };
-        restX = (i) => (i - center) * stepNow();
-        restRot = (i) => (i - center) * 1.6;
-        // Arco leve: las cartas de los extremos quedan apenas más abajo.
-        restY = (i) => Math.pow(i - center, 2) * 4 - 8;
-      } else {
-        // Mobile/tablet: PILA VERTICAL superpuesta, ANCLADA ARRIBA. Cada carta
-        // queda más abajo que la anterior, con un paso MENOR que su alto → se
-        // superponen (asoma el encabezado de cada una; la última, entera).
-        // Reservamos una BANDA INFERIOR para el CTA "Explorar…": la pila no
-        // llega hasta abajo, así el CTA queda en aire limpio y no compite con
-        // las cartas. El paso se mide para que la pila entre en ese espacio.
-        const cardH = cards[0].offsetHeight || 300;
-        const stageH = stage.clientHeight;
-        const TOP_PAD = 36; // respiro arriba
-        const CTA_BAND = 156; // banda inferior reservada al CTA (con aire)
-        const usable = stageH - TOP_PAD - CTA_BAND;
-        const V_STEP = Math.min(
-          cardH * 0.5,
-          Math.max(34, (usable - cardH) / (total - 1)),
-        );
-        restX = () => 0;
-        restRot = (i) => (i - center) * 0.5; // fan muy sutil (pila vertical)
-        // La carta se centra por CSS → restY es el offset desde el centro del
-        // escenario. Anclamos la carta 0 en TOP_PAD y apilamos hacia abajo.
-        restY = (i) => TOP_PAD + cardH / 2 + i * V_STEP - stageH / 2;
-      }
+      // Posición de reposo de cada carta: ABANICO horizontal. El paso (spread)
+      // se calcula EN VIVO desde el ancho del escenario y de la carta
+      // (responsiva, ver globals.css). Así, al cambiar el ancho de la ventana se
+      // recalcula (ver onResize) y el abanico NO se pasa de la pantalla. Margen
+      // cómodo a los costados.
+      const stepNow = () => {
+        const cardW = cards[0].offsetWidth || CARD_W;
+        const half = stage.clientWidth / 2;
+        const maxCenter = Math.max(120, half - cardW / 2 - 58);
+        return (2 * maxCenter) / (total - 1);
+      };
+      const restX = (i: number) => (i - center) * stepNow();
+      const restRot = (i: number) => (i - center) * 1.6;
+      // Arco leve: las cartas de los extremos quedan apenas más abajo.
+      const restY = (i: number) => Math.pow(i - center, 2) * 4 - 8;
 
       // Estado inicial: cada carta en su columna, fuera de cuadro por abajo.
       cards.forEach((card, i) => {
@@ -232,13 +205,12 @@ export function LineasAccion() {
         );
       }
 
-      // --- Tilt interactivo (solo desktop con puntero fino) ------------
+      // --- Tilt interactivo -----------------------------------------------
       // Al pasar el mouse, la carta sube al frente y se inclina apenas
       // siguiendo el cursor (como una carta física que levantás de la mano),
       // así se lee sin volver a scrollear. GSAP del abanico vive en el <li>;
       // el tilt vive en la capa interna → los transforms se componen sin
-      // pisarse. En mobile (touch) no aplica.
-      if (isDesktop) {
+      // pisarse.
       const TILT_MAX = 9; // grados máximos de inclinación
       const LIFT = -16; // px que "levanta" la carta
       const HOVER_SCALE = 1.05;
@@ -292,15 +264,13 @@ export function LineasAccion() {
           card.removeEventListener("pointerleave", onLeave);
         });
       });
-      } // fin tilt (isDesktop)
 
       // Recalcular el spread del abanico al cambiar el ancho de la ventana: el
       // restX depende del ancho del escenario; sin esto, al achicar la ventana
       // el abanico (calculado con el ancho anterior) se pasa de la pantalla.
-      // Solo toca x (alto/rotación no dependen del ancho). En mobile restX=0.
+      // Solo toca x (alto/rotación no dependen del ancho).
       let resizeRaf = 0;
       const onResize = () => {
-        if (!isDesktop) return;
         cancelAnimationFrame(resizeRaf);
         resizeRaf = requestAnimationFrame(() => {
           cards.forEach((card, i) => gsap.set(card, { x: restX(i) }));
@@ -317,7 +287,6 @@ export function LineasAccion() {
       tiltCleanups.forEach((fn) => fn());
       ctx.revert();
       root.classList.remove("is-live");
-      root.classList.remove("is-stack");
     };
   }, [reduced]);
 

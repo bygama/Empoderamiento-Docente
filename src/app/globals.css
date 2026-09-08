@@ -360,20 +360,6 @@ html {
   will-change: transform;
 }
 
-/* Mobile/tablet: la mano se reparte como PILA VERTICAL superpuesta (no abanico
-   horizontal). La clase `is-stack` la agrega el JS solo por debajo de lg, así
-   que no hace falta media query. Cartas más angostas y centradas; alto FIJO
-   para poder calcular el paso de superposición desde JS. */
-.deck.is-live.is-stack .deck-scroll {
-  height: 500vh;
-}
-.deck.is-live.is-stack .deck-card {
-  width: min(86vw, 20rem);
-  /* Alto responsivo al viewport: en teléfonos bajos las cartas se achican para
-     que la pila + el CTA entren sin pisarse. El JS lee el alto real. */
-  height: min(20rem, 40svh);
-}
-
 /* === Biblioteca y Novedades ====================================== */
 
 /* Radio del realce — registrado para poder transicionarlo (expansión). */
