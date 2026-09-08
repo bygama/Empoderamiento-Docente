@@ -125,45 +125,51 @@ html.has-custom-cursor * {
    gradiente azul-claro → verde (la luz del faro). OJO: el track NO puede
    ser transparente de verdad — mostraría el fondo blanco del documento,
    no el contenido — por eso va sólido. Firefox no soporta gradientes acá:
-   toma azul-claro sólido vía scrollbar-color. */
-html {
-  /* Ancho default del navegador — solo cambian los colores. */
-  scrollbar-color: var(--color-azul-claro) var(--color-azul-principal);
-}
-::-webkit-scrollbar {
-  width: 17px;
-  height: 17px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-azul-principal);
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    180deg,
-    var(--color-azul-claro) 0%,
-    var(--color-azul-medio) 45%,
-    var(--color-verde-concepto) 100%
-  );
-  border-radius: 999px;
-  /* Borde transparente = margen: el pulgar "flota" dentro del riel. */
-  border: 4px solid transparent;
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    180deg,
-    var(--color-azul-claro) 0%,
-    var(--color-verde-concepto) 100%
-  );
-  background-clip: content-box;
-}
-::-webkit-scrollbar-button {
-  display: none;
-  width: 0;
-  height: 0;
-}
-::-webkit-scrollbar-corner {
-  background: var(--color-azul-principal);
+   toma azul-claro sólido vía scrollbar-color.
+   Solo con puntero fino (mouse/trackpad): en celulares y tablets la barra
+   nativa es superpuesta y desaparece sola, pero si se la estiliza Android la
+   dibuja fija, con sus 17px, a un costado de la pantalla y de cualquier
+   panel que scrollee. Ahí queda la nativa. */
+@media (hover: hover) and (pointer: fine) {
+  html {
+    /* Ancho default del navegador — solo cambian los colores. */
+    scrollbar-color: var(--color-azul-claro) var(--color-azul-principal);
+  }
+  ::-webkit-scrollbar {
+    width: 17px;
+    height: 17px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-azul-principal);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      var(--color-azul-claro) 0%,
+      var(--color-azul-medio) 45%,
+      var(--color-verde-concepto) 100%
+    );
+    border-radius: 999px;
+    /* Borde transparente = margen: el pulgar "flota" dentro del riel. */
+    border: 4px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      var(--color-azul-claro) 0%,
+      var(--color-verde-concepto) 100%
+    );
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  ::-webkit-scrollbar-corner {
+    background: var(--color-azul-principal);
+  }
 }
 
 /* Grain sutil para fondos claros — saca el flat plano.
