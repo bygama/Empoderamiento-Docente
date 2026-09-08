@@ -59,7 +59,7 @@ export function CartonExpediente({ caso, oscuro }: Props) {
             data-pieza-parallax
             data-exp-asienta
             data-profundidad="5"
-            className="bg-azul-claro relative rotate-[1.6deg] rounded-lg p-6 pt-8 shadow-[0_18px_40px_-20px_rgb(10_16_30/0.5)] will-change-transform"
+            className="bg-azul-claro relative rotate-[1.6deg] rounded-lg p-6 pt-8 shadow-[0_18px_40px_-20px_rgb(10_16_30/0.5)]"
           >
             <span
               aria-hidden="true"
@@ -104,7 +104,7 @@ export function CartonExpediente({ caso, oscuro }: Props) {
           data-exp-sello
           data-pieza-parallax
           data-profundidad="3"
-          className={`absolute -bottom-8 hidden rotate-[4deg] items-center gap-3.5 rounded-lg border-2 px-5 py-3.5 opacity-75 will-change-transform lg:right-6 lg:flex ${
+          className={`absolute -bottom-8 hidden rotate-[4deg] items-center gap-3.5 rounded-lg border-2 px-5 py-3.5 opacity-75 lg:right-6 lg:flex ${
             oscuro
               ? "border-white/70 text-white/90"
               : "border-azul-principal/70 text-azul-principal/90"

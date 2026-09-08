@@ -85,6 +85,9 @@ export function crearParallax(cuerpo: HTMLElement) {
     cuerpo.querySelectorAll("[data-pieza-parallax]"),
   );
   if (!piezas.length) return;
+  // El hint dura lo que dura el parallax: se pone acá (con el gate de puntero
+  // fino ya pasado) y se limpia en la misma limpieza que devuelve x/y a cero.
+  gsap.set(piezas, { willChange: "transform" });
   const movimientos = piezas.map((el) => ({
     x: gsap.quickTo(el, "x", { duration: 0.7, ease: "power3.out" }),
     y: gsap.quickTo(el, "y", { duration: 0.7, ease: "power3.out" }),
@@ -103,6 +106,6 @@ export function crearParallax(cuerpo: HTMLElement) {
   return () => {
     cuerpo.removeEventListener("mousemove", alMover);
     gsap.killTweensOf(piezas);
-    gsap.set(piezas, { x: 0, y: 0 });
+    gsap.set(piezas, { x: 0, y: 0, clearProps: "willChange" });
   };
 }

@@ -20,6 +20,9 @@ export function useTransicionesExpediente(m: Maquina, cerrar: () => void) {
     const lugar = lugarRef.current;
     const shell = shellRef.current;
     const fase = estadoRef.current;
+    // La carcasa se transforma solo mientras dura la transición: el hint
+    // entra acá y se va en `finalizar` (antes vivía en la clase).
+    if (shell) gsap.set(shell, { willChange: "transform" });
     const finalizar = () => {
       // La página queda CONGELADA debajo del lugar (Lenis detenido): el
       // scroll del expediente vive en su propia capa.
@@ -31,6 +34,7 @@ export function useTransicionesExpediente(m: Maquina, cerrar: () => void) {
       // corrimiento de la página por el índice que se desmonta lo detecta el
       // ResizeObserver de LenisProvider, que refresca cuando el alto se
       // asienta.
+      if (shell) gsap.set(shell, { clearProps: "willChange" });
       tituloRef.current?.focus({ preventScroll: true });
       // Back presionado a mitad de la transición: cerrar recién ahora.
       if (cierrePendienteRef.current) {

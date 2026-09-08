@@ -120,7 +120,7 @@ export function ExpedienteCaso({
         <div className="relative mt-12 lg:mt-14">
           <div
             ref={refShell}
-            className={`${tinte.carpeta} ${tinte.grano} relative rounded-[1.6rem] p-3 pt-12 shadow-[0_44px_110px_-42px_rgb(31_45_77/0.6)] will-change-transform md:p-5 md:pt-14 lg:p-9 lg:pt-16`}
+            className={`${tinte.carpeta} ${tinte.grano} relative rounded-[1.6rem] p-3 pt-12 shadow-[0_44px_110px_-42px_rgb(31_45_77/0.6)] md:p-5 md:pt-14 lg:p-9 lg:pt-16`}
           >
             <PestanasLaterales caso={caso} casos={casos} interactiva={interactiva} onIr={onIr} />
 

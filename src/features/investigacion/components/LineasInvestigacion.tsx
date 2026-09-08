@@ -253,7 +253,7 @@ function CarpetaLineas({
     <div
       ref={refCarpeta}
       data-lineas-carpeta
-      className={`${tinte.fondo} ${tinte.sombra} bg-grain-light relative w-full will-change-transform lg:-ml-[10vw] lg:w-[120vw] ${
+      className={`${tinte.fondo} ${tinte.sombra} bg-grain-light relative w-full lg:-ml-[10vw] lg:w-[120vw] ${
         indice === 0 ? "" : "-mt-28"
       }`}
       style={{ zIndex: 10 + indice }}
@@ -389,6 +389,8 @@ export function LineasInvestigacion() {
     const ctx = gsap.context(() => {
       carpetasRef.current.forEach((carpeta) => {
         if (!carpeta) return;
+        // El hint acompaña al giro por scroll y se va con el contexto.
+        gsap.set(carpeta, { willChange: "transform" });
         // La regla de la referencia: la carpeta está derecha solo cuando está
         // CENTRADA en la ventana. Viene inclinada, se aplana al llegar al
         // medio y se vuelve a inclinar (mismo ángulo, mismo sentido) al irse.
