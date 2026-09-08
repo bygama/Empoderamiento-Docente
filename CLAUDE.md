@@ -1,149 +1,79 @@
 # CLAUDE.md — Adapter para Claude Code
 
-> Adapter delgado. La fuente de verdad sobre cómo opera el sistema vive en
-> `AGENTS.md` (AI-neutral). Este archivo solo mapea esos conceptos a las
-> herramientas concretas de Claude Code.
+> **Esto no es un contrato: es un puntero.** Las reglas del repo viven en
+> [`AGENTS.md`](AGENTS.md) y valen igual con cualquier herramienta. Acá solo
+> está lo que es propio de Claude Code y no se puede decir de forma neutral.
+>
+> Si buscás una regla y no está acá, está en `AGENTS.md`. Si una regla está en
+> los dos lados, la de `AGENTS.md` es la que manda y la de acá sobra: borrala.
 
 ---
 
-## ANTES DE RESPONDER — leer en este orden
+## Antes de responder
 
-1. **`AGENTS.md`** — contrato del sistema, roster de agentes, hard rules,
-   commit protocol, quality standards.
-2. **`DESIGN.md`** — tokens visuales (colores, tipos, espaciado).
-3. **`docs/GLOSSARY.md`** — solo si vas a tocar copy o usar jerga del
-   dominio educativo.
-4. **`docs/COMMITS.md`** — solo si la tarea termina en commits.
+1. **[`AGENTS.md`](AGENTS.md)** — contrato del sistema: reglas duras, el gate
+   de §5.8, quality standards, commit protocol, qué pide confirmación humana.
+2. **[`DESIGN.md`](DESIGN.md)** — tokens visuales, si vas a tocar UI.
+3. **[`docs/GLOSSARY.md`](docs/GLOSSARY.md)** — si vas a tocar copy.
+4. **[`docs/COMMITS.md`](docs/COMMITS.md)** — si la tarea termina en commits.
 
-Si está activo un hook `SessionStart` que auto-inyecta `AGENTS.md`, este
-paso está cubierto. Si no, leerlos explícitamente.
-
----
-
-## Mapeo de conceptos AGENTS.md → Claude Code
-
-| Concepto (AGENTS.md)              | Herramienta Claude                                       |
-| --------------------------------- | -------------------------------------------------------- |
-| Spawn agent / delegar             | `Agent(subagent_type=<rol>)`                             |
-| Workflow / patrón de orquestación | `Skill(<nombre>)` si está registrado, sino prompt manual |
-| Lectura de archivo                | `Read`                                                   |
-| Búsqueda por nombre               | `Glob`                                                   |
-| Búsqueda por contenido            | `Grep`                                                   |
-| Edición de archivo existente      | `Edit`                                                   |
-| Creación / overwrite              | `Write`                                                  |
-| Shell                             | `Bash` (PowerShell en Windows)                           |
-| Trackeo de tareas largas          | `TaskCreate` / `TaskUpdate`                              |
-| Búsqueda exploratoria amplia      | `Agent(subagent_type=Explore)`                           |
-
-### Sub-agentes en este proyecto
-
-**No prescribimos un roster fijo de roles.** Cuando una tarea cumple los
-criterios de delegación de `AGENTS.md` §4 (Cuándo delegar), elegí el
-`subagent_type` apropiado según la tarea y las herramientas disponibles
-en Claude Code. Algunos defaults razonables:
-
-- **`general-purpose`** — la mayoría de tareas multi-archivo o de
-  investigación.
-- **`Explore`** — búsqueda exploratoria amplia (read-only, no edita).
-- **`Plan`** — diseño de plan de implementación antes de codear.
-
-Briefa al sub-agente de forma auto-contenida (no asume contexto previo) y
-verificá el resultado leyendo los archivos modificados, no solo el resumen.
-
-Si en algún momento se materializan sub-agentes específicos del proyecto
-en `.claude/agents/<nombre>.md` (con frontmatter YAML), listarlos acá y
-documentar cuándo invocar cada uno.
+Si hay un hook `SessionStart` que auto-inyecta `AGENTS.md`, el paso 1 ya está
+cubierto.
 
 ---
 
-## Quirks específicos de Claude
+## Mapeo de conceptos `AGENTS.md` → Claude Code
 
-- **Idioma por defecto con el usuario:** español.
-- **OS:** depende del developer (Windows / macOS / Linux). En Windows el
-  shell por defecto es **PowerShell** (sintaxis: `$null` no `/dev/null`;
-  `$env:VAR` no `$VAR`; backtick para line continuation). Bash está
-  disponible vía la herramienta `Bash` para scripts POSIX multiplataforma.
-- **Path style:** rutas absolutas adaptadas al OS de cada uno (no
-  hardcodear rutas específicas de una máquina en código ni en docs).
-- **Memoria persistente de Claude Code** (local por developer, **no se
-  commitea**). Vive en:
-  - macOS / Linux: `~/.claude/projects/<encoded-repo-path>/memory/`
-  - Windows: `%USERPROFILE%\.claude\projects\<encoded-repo-path>\memory\`
+Lo único que este archivo aporta: cómo se llama en Claude Code cada cosa que
+`AGENTS.md` nombra de forma neutral.
 
-  Donde `<encoded-repo-path>` es el path absoluto del repo en esa máquina
-  con `:` y separadores reemplazados por `--`. Cada developer construye
-  y mantiene la suya. Al iniciar sesión, leer `MEMORY.md` (en esa ruta)
-  para recuperar contexto previo entre sesiones.
-- **Ultrareview** disponible vía `/ultrareview` cuando haya PR para
-  revisión multi-agente.
+| Concepto (AGENTS.md)              | Herramienta Claude                    |
+| --------------------------------- | ------------------------------------- |
+| Spawn agent / delegar             | `Agent(subagent_type=<rol>)`          |
+| Workflow / patrón de orquestación | `Skill(<nombre>)`, o prompt manual    |
+| Lectura de archivo                | `Read`                                |
+| Búsqueda por nombre               | `Glob`                                |
+| Búsqueda por contenido            | `Grep`                                |
+| Edición de archivo existente      | `Edit`                                |
+| Creación / overwrite              | `Write`                               |
+| Shell                             | `Bash` (PowerShell en Windows)        |
+| Trackeo de tareas largas          | `TaskCreate` / `TaskUpdate`           |
+| Búsqueda exploratoria amplia      | `Agent(subagent_type=Explore)`        |
 
----
+**Sub-agentes:** no hay roster fijo. Cuando la tarea cumple los criterios de
+delegación de `AGENTS.md` §4, elegí el `subagent_type` que corresponda —
+`general-purpose` para lo multi-archivo, `Explore` para búsqueda read-only,
+`Plan` para diseñar antes de codear. Briefá al sub-agente de forma
+auto-contenida y verificá su resultado leyendo los archivos, no el resumen.
 
-## Cuándo delegar
-
-Resumen del criterio (versión completa en `AGENTS.md` §6):
-
-**Delegar** cuando:
-- Multi-archivo, refactor, debug profundo, review, planning, research,
-  verificación.
-- Búsqueda exploratoria que va a tomar más de 3 reads.
-- Tarea paralelizable.
-
-**Trabajar directo** cuando:
-- 1-2 archivos conocidos.
-- Decisión que requiere conversación con el usuario.
-- Documentación o discusión arquitectónica.
+Si algún día se materializan sub-agentes propios del proyecto en
+`.claude/agents/<nombre>.md`, listalos acá.
 
 ---
 
-## Acciones que requieren confirmación humana (recordatorio)
+## Quirks de esta herramienta
 
-Definidas en `AGENTS.md` §5.6. En Claude Code, esto significa: **antes** de
-ejecutar un `Bash` con cualquiera de estos comandos, mostrar el plan y
-esperar OK:
+- **Idioma con el usuario:** español rioplatense. Los artefactos técnicos
+  (código, comentarios, commits, docs) en el idioma que fija `AGENTS.md`.
+- **OS:** depende del developer. En Windows el shell por defecto es
+  **PowerShell** (`$null`, no `/dev/null`; `$env:VAR`, no `$VAR`; backtick para
+  continuar línea). `Bash` está disponible para scripts POSIX.
+- **Paths:** absolutos y adaptados al OS de cada uno. Nunca hardcodear la ruta
+  de una máquina en código ni en docs.
+- **El repo es CRLF.** Un reemplazo multilínea con `perl`/`node` falla en
+  silencio si no normalizás: leé, pasá a `\n`, editá y devolvé a `\r\n`.
+- **Memoria persistente** (local por developer, **no se commitea**):
+  - macOS / Linux: `~/.claude/projects/<repo-path-codificado>/memory/`
+  - Windows: `%USERPROFILE%\.claude\projects\<repo-path-codificado>\memory\`
 
-- `git commit`, `git push`, `git reset --hard`, force-push.
-- `gh pr create`, `gh pr merge`, `gh issue close`.
-- `pnpm add`, `npm install`, `npm i`.
-- Modificación de `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `GEMINI.md`,
-  `DESIGN.md` (los meta-docs).
-- Migraciones / cambios de schema de **Supabase** (cuando se integre):
-  confirmar el diseño antes de crear o alterar tablas o políticas RLS
-  (ver `AGENTS.md` §12).
-
----
-
-## Project-level Claude config
-
-Cuando se cree:
-
-```
-.claude/
-├── agents/          ← un .md por sub-agente con frontmatter YAML
-├── commands/        ← slash-commands específicos del proyecto
-└── settings.json    ← permisos, hooks, env vars del proyecto
-```
-
-Formato esperado de `.claude/agents/<nombre>.md` (si se decide
-materializar un sub-agente del proyecto):
-
-```yaml
----
-name: <nombre-del-rol>
-description: <cuándo invocar este sub-agente>
-tools: [Read, Write, Edit, Glob, Grep, Bash]
-model: sonnet
----
-<prompt del rol — debe respetar las hard rules de AGENTS.md §5>
-```
+  Donde `<repo-path-codificado>` es la ruta absoluta del repo con `:` y
+  separadores reemplazados por `--`. Al iniciar sesión, leer su `MEMORY.md`.
+- **`/ultrareview`** para review multi-agente cuando hay PR.
 
 ---
 
-## Trabajo en este repo: cheat sheet
+## Config del proyecto
 
-1. Leer `AGENTS.md` (Quickstart + Read Order by Task + §4-§11 son lo más denso).
-2. Identificar dominio → decidir si trabajar directo o delegar.
-3. Si toca diseño → `DESIGN.md`.
-4. Si toca copy → `docs/GLOSSARY.md` + lenguaje inclusivo.
-5. Cambio chico, atómico, alineado a `docs/COMMITS.md`.
-6. Confirmar con el usuario antes de cualquier acción del §5.6 de AGENTS.md.
+Cuando se cree, va en `.claude/`: `agents/` (un `.md` por sub-agente con
+frontmatter YAML), `commands/` (slash-commands del proyecto) y `settings.json`
+(permisos, hooks, env vars).

@@ -82,7 +82,7 @@ futura integración). Los `.env*` reales están git-ignorados.
 ```
 /
 ├── AGENTS.md              ← contrato AI-neutral (fuente de verdad)
-├── CLAUDE.md / CODEX.md / GEMINI.md  ← adapters por herramienta de IA
+├── CLAUDE.md             ← adapter para Claude Code (puntero a AGENTS.md)
 ├── DESIGN.md              ← sistema de diseño (tokens, tipos, reglas)
 ├── docs/                  ← documentación auxiliar (ver docs/README.md)
 ├── public/                ← assets estáticos (brand/, hero/, aliados/, metodo/)
@@ -110,7 +110,7 @@ La fuente de verdad sobre cómo opera el repo son los `.md` de la raíz y de
 | Documento                                                              | Para qué sirve                                                       |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | [`AGENTS.md`](AGENTS.md)                                               | Contrato para agentes IA: hard rules, quality standards, protocolos |
-| [`CLAUDE.md`](CLAUDE.md) · [`CODEX.md`](CODEX.md) · [`GEMINI.md`](GEMINI.md) | Adapters: mapean `AGENTS.md` a cada herramienta de IA         |
+| [`CLAUDE.md`](CLAUDE.md) | Adapter de Claude Code: mapea `AGENTS.md` a sus herramientas, sin reglas propias |
 | [`DESIGN.md`](DESIGN.md)                                               | Tokens visuales: colores, tipografía, espaciado, componentes        |
 | [`docs/README.md`](docs/README.md)                                    | Índice de la documentación auxiliar                                 |
 | [`docs/AI_GUIDELINES.md`](docs/AI_GUIDELINES.md)                      | Reglas de código IA-friendly (naming, TS, Tailwind, GSAP, backend)  |

@@ -15,10 +15,8 @@
 | Área              | Documento                                       | Para qué sirve                                                                |
 | ----------------- | ----------------------------------------------- | ----------------------------------------------------------------------------- |
 | Orquestación IA   | [`../AGENTS.md`](../AGENTS.md)                  | Contrato AI-neutral: hard rules, quality standards, anti-patterns, commit protocol |
-| Adapter Claude    | [`../CLAUDE.md`](../CLAUDE.md)                  | Mapeo de conceptos de `AGENTS.md` a herramientas concretas de Claude Code     |
+| Adapter Claude    | [`../CLAUDE.md`](../CLAUDE.md)                  | Puntero: mapea `AGENTS.md` a las herramientas de Claude Code, sin reglas propias |
 | Sistema de diseño | [`../DESIGN.md`](../DESIGN.md)                  | Tokens visuales: colores, tipografía, espaciado, componentes, iconografía    |
-| Adapter Codex     | [`../CODEX.md`](../CODEX.md)                    | Mapeo de `AGENTS.md` a OpenAI Codex CLI                                       |
-| Adapter Gemini    | [`../GEMINI.md`](../GEMINI.md)                  | Mapeo de `AGENTS.md` a Gemini CLI / Code Assist                              |
 | Commits           | [`COMMITS.md`](COMMITS.md)                      | Conventional Commits + atómicos + ejemplos por categoría                      |
 | Glosario          | [`GLOSSARY.md`](GLOSSARY.md)                    | Jerga del dominio educativo de ED, vocabulario de UI, frases pilares          |
 | Mensajes de marca | [`MESSAGING.md`](MESSAGING.md)                  | Copy canónico: tagline, hero, triángulo de pilares, manifiesto, tono de voz   |
