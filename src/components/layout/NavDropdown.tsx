@@ -25,9 +25,12 @@ import { coincideDestino, irEnPagina, partirDestino } from "@/lib/navegar";
  * Active en dos niveles: la página actual marca el rótulo (píldora tenue);
  * dentro del menú, el destino donde se está lleva un punto verde.
  *
- * Diseño: tarjeta chica colgando del botón, mismo blanco translúcido con
- * blur de la píldora, una columna, kicker mono. Entra en 150 ms con CSS
- * (sin GSAP: no compite con la intro del navbar).
+ * Diseño: tarjeta chica colgando del BORDE de la píldora (no del botón:
+ * si no se superpone con ella), blanco pleno —sin transparencia: con
+ * texto encima del hero se filtraba el título de atrás—, una columna,
+ * sin kicker (el rótulo de arriba ya dice de qué página es y queda
+ * marcado). Entra en 150 ms con CSS (sin GSAP: no compite con la intro
+ * del navbar).
  */
 const DEMORA_ABRIR = 120;
 const GRACIA_CERRAR = 160;
@@ -148,10 +151,16 @@ export function NavDropdown({
             aria-expanded={abierto}
             aria-controls={menuId}
             onClick={() => (abierto ? onCerrar() : onAbrir())}
-            className="rounded-md py-2 pr-2 pl-0.5 text-current/60 transition-transform hover:text-current"
-            style={{ transform: abierto ? "rotate(180deg)" : undefined }}
+            className="rounded-md py-2 pr-2 pl-0.5 text-current/60 hover:text-current"
           >
-            <ChevronDown size={13} strokeWidth={2.4} />
+            {/* Gira el ÍCONO sobre su propio centro (el botón tiene padding
+                desigual: rotarlo entero lo hacía desplazarse). */}
+            <ChevronDown
+              size={13}
+              strokeWidth={2.4}
+              className="transition-transform duration-200 ease-out"
+              style={{ transform: abierto ? "rotate(180deg)" : undefined }}
+            />
           </button>
         )}
       </div>
@@ -162,14 +171,13 @@ export function NavDropdown({
           role="menu"
           aria-label={`Secciones de ${item.label}`}
           hidden={!visible}
-          className={`border-azul-principal/10 absolute top-full left-0 z-10 mt-2 min-w-[14rem] rounded-2xl border bg-white/85 p-1.5 shadow-[0_24px_60px_-28px_rgb(31_45_77/0.45)] backdrop-blur-xl transition-[opacity,transform] duration-150 ease-out ${
+          // top: el borde inferior del botón + el padding de la píldora
+          // (py-3) + su borde + 8px de respiro → cuelga de la píldora.
+          className={`border-azul-principal/10 absolute top-[calc(100%+0.75rem+1px+0.5rem)] left-0 z-10 min-w-[14rem] rounded-2xl border bg-white p-1.5 shadow-[0_24px_60px_-28px_rgb(31_45_77/0.45)] transition-[opacity,transform] duration-150 ease-out ${
             abierto ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
           }`}
         >
-          <p className="text-gris-texto px-3 pt-1.5 pb-1 font-mono text-[0.62rem] font-medium tracking-[0.2em] uppercase">
-            {item.label}
-          </p>
-          <ul className="flex flex-col">
+          <ul className="flex flex-col py-1">
             {submenu.map((sub, i) => {
               const aca = enPagina && coincideDestino(sub.href, seccionActiva, search);
               return (
