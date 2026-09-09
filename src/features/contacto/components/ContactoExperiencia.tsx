@@ -154,12 +154,17 @@ export function ContactoExperiencia() {
             overflow-x-hidden porque overflow-y solo ya hace que overflow-x
             compute a `auto`: en reposo no desborda nada, pero el back.out con
             que entran las tarjetas pasa apenas de scale 1 y eso alcanza para
-            que parpadee un scrollbar horizontal en pleno desarme. */}
+            que parpadee un scrollbar horizontal en pleno desarme.
+            PANTALLAS BAJAS (laptop a 125%, 1366×768): con 112px de padding
+            abajo los cinco temas no entraban y el panel scrolleaba por dentro
+            —doble barra, y un índice que hay que descubrir scrolleando—. En
+            alto ≤ 860px el padding de abajo baja a 32px y las filas se
+            compactan (IndiceTemas), así entra todo en la pantalla. */}
         <div
           data-panel="apertura"
           aria-hidden={vista !== "apertura"}
           inert={vista !== "apertura"}
-          className="absolute inset-x-5 top-0 bottom-0 flex overflow-x-hidden overflow-y-auto pt-24 pb-8 opacity-0 md:inset-x-10 md:pt-28 md:pb-28"
+          className="absolute inset-x-5 top-0 bottom-0 flex overflow-x-hidden overflow-y-auto pt-24 pb-8 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)]:md:pb-8"
         >
           {/* Composición editorial asimétrica (idioma de la home): columna de
               identidad a la izquierda (titular + equipo real) y el ÍNDICE de

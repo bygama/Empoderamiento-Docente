@@ -22,7 +22,7 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, onCambiar, onEnvi
       data-panel="formulario"
       aria-hidden={!activo}
       inert={!activo}
-      className="absolute inset-x-5 top-0 bottom-0 flex overflow-y-auto pt-24 pb-24 opacity-0 md:inset-x-10 md:pt-28 md:pb-28"
+      className="absolute inset-x-5 top-0 bottom-0 flex overflow-y-auto pt-24 pb-24 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)]:md:pb-10"
     >
       {/* my-auto (y no justify-center en el padre): si el contenido no
           entra, se scrollea desde arriba sin que el tope quede recortado

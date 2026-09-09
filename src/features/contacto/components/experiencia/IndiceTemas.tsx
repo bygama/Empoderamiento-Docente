@@ -16,14 +16,16 @@ type Props = {
 export function IndiceTemas({ onElegir }: Props) {
   return (
     <div className="mt-10 lg:mt-0" role="group" aria-label="Tema de la consulta">
-      <div className="flex flex-col gap-2.5">
+      {/* En pantallas bajas (≤ 860px de alto) las filas se compactan para
+          que los cinco temas entren sin scroll interno (ver el panel). */}
+      <div className="flex flex-col gap-2.5 [@media(max-height:860px)]:gap-2">
         {TEMAS.map((t, i) => (
           <button
             key={t.key}
             type="button"
             data-tema-card
             onClick={(e) => onElegir(t.key, e.currentTarget)}
-            className="group border-azul-claro/45 hover:border-verde-concepto/50 focus-visible:outline-verde-concepto flex items-center gap-4 rounded-xl border bg-white/55 px-4 py-3 text-left transition-[border-color,background-color,box-shadow] duration-300 hover:bg-white hover:shadow-[0_16px_36px_-22px_rgb(31_45_77/0.45)] focus-visible:outline-2 focus-visible:-outline-offset-2 md:gap-5 md:px-5 md:py-3.5"
+            className="group border-azul-claro/45 hover:border-verde-concepto/50 focus-visible:outline-verde-concepto flex items-center gap-4 rounded-xl border bg-white/55 px-4 py-3 text-left transition-[border-color,background-color,box-shadow] duration-300 hover:bg-white hover:shadow-[0_16px_36px_-22px_rgb(31_45_77/0.45)] focus-visible:outline-2 focus-visible:-outline-offset-2 md:gap-5 md:px-5 md:py-3.5 [@media(max-height:860px)]:md:py-2.5"
           >
             {/* Baldosa de ícono de marca (identifica el tema). */}
             <span
@@ -62,7 +64,7 @@ export function IndiceTemas({ onElegir }: Props) {
 
       {/* Canal directo (antes en la barra fija): al pie del índice,
           jerarquía menor. Centrado bajo la columna del índice. */}
-      <div data-ap-head className="mt-5 text-center">
+      <div data-ap-head className="mt-5 text-center [@media(max-height:860px)]:mt-3.5">
         <p className="text-gris-texto font-sans text-[0.85rem]">
           ¿Preferís escribir directo?
         </p>
