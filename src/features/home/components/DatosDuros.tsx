@@ -17,15 +17,27 @@ if (typeof window !== "undefined") {
  * (count-up) al entrar al viewport. Respeta prefers-reduced-motion (valores
  * finales, sin animación).
  *
- * OJO: valores PLACEHOLDER — reemplazar por los reales de Empoderamiento Docente.
+ * Las cifras salen de los proyectos documentados en el CV de Daniela, uno por
+ * uno en docs/content/que-hace-ed-fuentes.md §6: los cuatro programas con la
+ * Subsecretaría de Educación Media Superior de México (5.900 + 1.900 + 3.060 +
+ * 3.500), Yucatán (75) y Techint (15) suman 14.450 docentes en cursos propios;
+ * el Plan Nacional Aprender Matemática formó 500 formadores que llegaron a
+ * 75.000 docentes. Los cinco países son los de siteConfig.paises.
+ *
+ * Antes acá había cifras inventadas («+2.000 docentes», «+120 escuelas») que
+ * además quedaban cortas. Falta que Daniela confirme dos cosas: si cuenta la
+ * etapa 2018-2020, hecha desde el Cinvestav con ella como coordinadora (Raquel
+ * ya cuenta «más de 15 años», que la incluye), y cuántas escuelas son, que es
+ * el único dato que no aparece en ningún documento.
+ *
  * Logos de aliados: la lista y sus alturas viven en @/config/aliados y son
  * las mismas que usa el Footer.
  */
 const DATOS = [
   { value: 15, prefix: "+", suffix: "", label: "Años de trayectoria", nota: "Diseñando intervenciones situadas." },
-  { value: 2000, prefix: "+", suffix: "", label: "Docentes", nota: "Acompañados en su práctica." },
-  { value: 120, prefix: "+", suffix: "", label: "Escuelas", nota: "Transformando sus aulas." },
-  { value: 5, prefix: "", suffix: "", label: "Países", nota: "Donde dejamos huella." },
+  { value: 14000, prefix: "+", suffix: "", label: "Docentes", nota: "En programas de desarrollo profesional en Matemáticas." },
+  { value: 500, prefix: "", suffix: "", label: "Formadoras y formadores", nota: "Que llevaron el Plan Nacional Aprender Matemática a 75.000 docentes." },
+  { value: 5, prefix: "", suffix: "", label: "Países", nota: "Argentina, México, Chile, Colombia y Brasil." },
 ] as const;
 
 const fmt = (n: number) => n.toLocaleString("es-AR");
