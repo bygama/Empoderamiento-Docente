@@ -22,7 +22,7 @@ Son copias con nombre legible; los originales siguen en la carpeta de cada perso
 | Publicaciones con PDF en Drive | **16** (4 de Daniela, 2 de Karla, 4 de Judith, 3 de Eduardo, 3 de Luis Cabrera) |
 | Publicaciones referenciadas sin archivo, elegidas por cada persona en su ficha | ~40 (Daniela 6, Karla 8, Iván 10, Pedro 3, Paola 7, Luis López 3, Darly 3, Andrea 4) |
 | Además, en los CV completos | Daniela ~60 ítems más (CV 2025); Luis López ~40; Wendolyne ~12; Cabrera «más de 30 arbitradas» sin listar |
-| En la web hoy | Casos 01 y 02 (reales); producción en 11 perfiles del equipo; **la Biblioteca es un catálogo mock: 0 publicaciones reales** |
+| En la web (2026-09-09) | Casos 01 y 02 (reales); producción en 11 perfiles del equipo; **Biblioteca con 57 publicaciones reales** (16 con PDF + 41 con link verificado); quedan afuera 4 sin página pública |
 
 ## 1. Los 16 archivos
 
@@ -54,9 +54,9 @@ en Quiénes somos, — = en ningún lado.
 
 **Lo que ella priorizó** (ficha de julio, con su comentario de por qué cada una):
 
-1. Reyes-Gasperini, D. y Cantoral, R. (2014). Socioepistemología y empoderamiento docente: acciones para un cambio educativo. *Bolema*, 28(48), 360-382. DOI 10.1590/1980-4415v28n48a14 — «conecta con el nombre y la identidad de ED». En su perfil desde el 2026-09-09.
+1. Reyes-Gasperini, D. y Cantoral, R. (2014). Socioepistemología y empoderamiento: la profesionalización docente desde la problematización del saber matemático. *Bolema*, 28(48), 360-382. DOI 10.1590/1980-4415v28n48a18 — «conecta con el nombre y la identidad de ED». En su perfil desde el 2026-09-09. (La ficha traía otro título, «Socioepistemología y empoderamiento docente: acciones para un cambio educativo», y el DOI …a14, que es de otro artículo del mismo número; verificado en SciELO el 2026-09-09.)
 2. El libro de Gedisa (2016) — «la publicación central para posicionarla como referente». En la web, destacado.
-3. Gómez-Osalde, K. y Reyes-Gasperini, D. *Aprendizaje de las matemáticas: ¿qué, para qué, para quién?* *Propuesta Educativa*, 58, 21-37 — «título cercano, sirve para redes y presentaciones». En la web. **Año en disputa:** 2023 en el CV y la ficha de Daniela, 2022 en el CVU de Karla.
+3. Gómez-Osalde, K. y Reyes-Gasperini, D. *Aprendizaje de las matemáticas: ¿qué, para qué, para quién?* *Propuesta Educativa*, 58, 21-37 — «título cercano, sirve para redes y presentaciones». En la web. Salió en noviembre de 2022 (nº 58), verificado en la revista el 2026-09-09; el CV de Daniela decía 2023.
 4. Báez, M., Flores, R. y Reyes-Gasperini, D. (2025). Problematizar la matemática escolar: ¿cómo contribuye al desarrollo profesional docente? *Bolema*, 39, e2302049. DOI 10.1590/1980-4415v39a230249 — «muy actual y alineada con formación docente». En la web.
 5. Oaxaca (2016), Perfiles Educativos — «comunica escala, territorio y cambio real». Es el caso 01.
 6. Reyes-Gasperini, D. (2013). *La transversalidad de la proporcionalidad.* SEP México. ISBN 978-607-9362-01-0 — «expertise en un contenido clave». En la web.
@@ -113,11 +113,11 @@ de las Ciencias*). La de 2017 con Alamillo (modelación en la formación docente
 
 Eligió las tres que subió (#14, #15, #16). Su CV de una página agrega: «Rúbrica para evaluar el
 desarrollo del pensamiento y lenguaje variacional», en *Perspectivas actuales de la Educación
-Matemática*, SOMIDEM (él lo fecha 2024; la web de SOMIDEM dice 2023) · coautor de *Matemáticas 2,
+Matemática*, SOMIDEM (2024 según la cita oficial del capítulo, DOI 10.24844/SOMIDEM/S3/2024/01-26; la web de SOMIDEM muestra 2023) · coautor de *Matemáticas 2,
 Serie espiral del saber* (Santillana, 2015) y su Libro de Recursos · coautor de la colección
 para el profesor del PNAM (2019) · «más de 30 publicaciones arbitradas» en Bolema, AIEM, ALME,
 IE-REDIECH y Rev. Mex. Fís. E, sin listar · más de 60 ponencias. En la web: las tres con PDF,
-Santillana, PNAM y, desde el 2026-09-09, la Rúbrica (con la fecha de la editorial, 2023).
+Santillana, PNAM y, desde el 2026-09-09, la Rúbrica (2024).
 
 ### Luis López Acosta
 
@@ -146,9 +146,9 @@ Su ficha lista ocho artículos, tres repetidos; siete distintos:
 | año | cita | web |
 |---|---|---|
 | 2026 | Torres, E., Balda, P. y Salazar, C. La formación ciudadana en las prácticas educativas con las matemáticas. *Pedagogía y Saberes* (UPN Colombia). revistas.upn.edu.co/index.php/PYS/article/view/22606 | sí |
-| 2026 | Tuyub, I., Balda, P. y Buendía, G. Contextos de significación como herramienta para la construcción de conocimiento matemático. El caso de la huerta escolar y la maestría en ingeniería. *Tecné, Episteme y Didaxis*, 59, 266-284. DOI 10.17227/ted.num59-222830 | sí |
+| 2026 | Tuyub, I., Balda, P. y Buendía, G. Contextos de significación en la explicación de la construcción del conocimiento matemático. *Tecné, Episteme y Didaxis*, 59, 266-284. DOI 10.17227/ted.num59-22283 (la ficha traía otro título y un DOI con un 0 de más; verificado en la revista el 2026-09-09) | sí |
 | 2026 | Balda, P. y Bohórquez, L. A. Un ejercicio de empoderamiento docente en un curso de formación posgradual. *REVIEM*, 6(1), 1-26. DOI 10.54541/reviem.v6i1.152 | sí |
-| 2026 | Balda, P. y Bussain, R. Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia. *Revista UNO*, 110 | sí (2026-09-09) |
+| 2026 | Balda, P. y Busain, R. Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia. *Números*, 122, febrero 2026 (Sociedad Canaria Isaac Newton de Profesores de Matemáticas; la ficha decía Revista UNO 110 y escribía «Bussain») | sí (2026-09-09) |
 | 2025 | Balda, P. Soacha celebra el saber con el Festival Matemático Santanderista. *Solidario* (Cooperativa de Trabajadores de la Educación de Cundinamarca y Distrito Capital), edición 127, sept-oct 2025. ISSN 1657-9585 (divulgación) | sí (2026-09-09) |
 | 2025 | Sánchez, J. y Balda, P. ¿Es posible formar ciudadanos críticos en las aulas colombianas de matemáticas? *Revista Papeles*, 17(34). DOI 10.54104/papeles.v17n34.2156 | sí |
 | 2024 | Balda, P. y Buendía, G. La periodicidad: significados desde su uso en la huerta escolar para la matemática escolar. *REVIEM* | sí |
@@ -160,7 +160,7 @@ Su CV de 75 mil caracteres (`8062026CVPAOLA BALDA.docx`) tiene muchas más; no s
 Eligió dos (ficha, como links):
 
 1. Páez Murillo, R. E., Hernández Sánchez, J. A. y Ku Euán, D. A. (2023). Significados otorgados a las literales por estudiantes de secundaria y universitarios de nuevo ingreso. *IE REDIECH*, 14, e1787. DOI 10.33010/ie_rie_rediech.v14i0.1787
-2. Hernández Sánchez, J. A., Kú Euán, D. A. y Espino, A. (2023). Las interacciones entre y con profesores de matemáticas como un recurso para la construcción de conocimiento profesional. En *Perspectivas actuales de la Educación Matemática*. SOMIDEM. editorialsomidem.org.mx/?view=capitulo&id=963
+2. Hernández Sánchez, J. A., Kú Euán, D. A. y Espino, A. (2024). Las interacciones entre y con profesores de matemáticas como un recurso para la construcción de conocimiento profesional. En *Perspectivas actuales de la Educación Matemática* (pp. 277-282). SOMIDEM. DOI 10.24844/SOMIDEM/S3/2024/01-31 (la ficha decía 2023 y su link, editorialsomidem.org.mx/?view=capitulo&id=963, da error en el sitio)
 
 Su CVU ejecutivo agrega: Ku (2023) Interpretación del movimiento, ¿gráficas cartesianas o
 trayectorias? Un estudio en estudiantes de nivel medio superior. En *Perspectivas de
@@ -242,15 +242,23 @@ dirigidos. Es el único registro que tenemos de la escala del trabajo de ED y de
   autorías, tema y link a la revista o editorial (DOI cuando hay). El libro de Gedisa va con
   link a la editorial y sin PDF; la tesis se aloja en `public/biblioteca/` hasta que Daniela
   confirme (Facundo: «publicalas todas, después resolvemos esos detalles»). Las portadas son
-  tipográficas (`public/biblioteca/portadas/`), generadas con la ficha de cada una. Faltan
-  cargar las que solo tienen DOI (unas 45).
+  tipográficas (`public/biblioteca/portadas/`), generadas con la ficha de cada una.
+  **Segunda tanda (2026-09-09):** 41 publicaciones más, las que cada persona eligió en su
+  ficha (más las 10 de Iván y 4 de Andrea) y no tienen PDF: ficha por Crossref o por la
+  revista, link al DOI o a la página del artículo, probados uno por uno con curl. Tipos
+  nuevos «Divulgación» y «Materiales»; temas nuevos (proporcional, álgebra y lenguaje,
+  historia y epistemología, ciudadanía, resolución de problemas). Quedaron afuera cuatro sin
+  página pública (Facundo, 2026-09-09): el libro de la SEP de Daniela (2013), *Matemáticas 2*
+  de Santillana, la nota de Paola en *Solidario* y el capítulo de Darly en el libro de
+  Coahuila (solo en ResearchGate). Pedirles PDF o link. Tabla de trabajo de la tanda:
+  `segunda-tanda.md` en el scratchpad de la sesión 59d392bb.
 
 ## 5. Antes de publicar cualquier PDF
 
 - Acceso abierto, se pueden linkear y probablemente alojar: Perfiles Educativos (Redalyc), RELIME, REDIE, IE REDIECH, AIEM, PME-NA, Atena Editora, SOMIDEM, Innovación Educativa (IPN), Revista Mexicana de Física E. Conviene igual linkear al DOI y no alojar el archivo.
 - **El libro de Gedisa NO**: editorial comercial. Va la ficha y el link a la editorial, no el PDF.
 - **La tesis doctoral**: figura como «no publicada» en el CV de Daniela. Antes de subirla a la web, preguntarle.
-- Discrepancias a resolver con el equipo: año de *Propuesta Educativa* (2022 / 2023); año de *Perspectivas actuales de la Educación Matemática* (2023 / 2024); el libro de Gedisa es de 2016 aunque el archivo diga 2019.
+- Discrepancias: *Propuesta Educativa* es de noviembre de 2022 (verificado en la revista el 2026-09-09); *Perspectivas actuales de la Educación Matemática* es de 2024 según la cita oficial de sus capítulos (DOI 10.24844/SOMIDEM/S3/2024/…), aunque la web de SOMIDEM muestre 2023 y la ficha de Darly dijera 2023; el libro de Gedisa es de 2016 aunque el archivo diga 2019.
 
 ## 6. Fuentes
 

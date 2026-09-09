@@ -5,9 +5,11 @@ import {
   ArrowRight,
   BookOpen,
   Compass,
+  LampManual,
   Lightbulb,
   School,
   Target,
+  TrendingUp,
   Users,
   type IconProps,
 } from "@/components/ui/icons";
@@ -27,6 +29,8 @@ const CATEGORIAS: { label: string; Icon: (p: IconProps) => React.JSX.Element }[]
   { label: "Libros", Icon: School },
   { label: "Tesis", Icon: Target },
   { label: "Actas de congreso", Icon: Users },
+  { label: "Divulgación", Icon: TrendingUp },
+  { label: "Materiales", Icon: LampManual },
 ];
 
 const PASO_SCROLL = 280;
