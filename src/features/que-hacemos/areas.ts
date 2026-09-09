@@ -17,6 +17,13 @@ export type Area = {
   id: string;
   /** Nombre tal cual el cartel. */
   nombre: string;
+  /**
+   * Rótulo para el ÍNDICE, cuando el nombre completo se parte en dos
+   * renglones. El artículo sigue mostrando `nombre`: los nombres de las seis
+   * áreas son los del cartel oficial de ED y no se rebautizan para que entren
+   * en una columna.
+   */
+  nombreCorto?: string;
   /** Frase «en verde»: la idea fuerza del área. */
   idea: string;
   /** Qué es, en una o dos oraciones. */
@@ -61,10 +68,10 @@ export const AREAS: readonly Area[] = [
     teLlevas: [
       "Estudios y sistematización de experiencias",
       "Evidencia para tomar decisiones",
-      "Publicaciones y transferencia a la comunidad educativa",
+      "Publicaciones y transferencia",
     ],
     paraQuien:
-      "Ministerios, universidades y redes que necesitan saber qué pasa en sus aulas",
+      "Ministerios, universidades y redes que necesitan evidencia de sus aulas",
     hechos: [
       "Siete líneas de investigación en Matemática Educativa",
       "Artículos en Bolema y RELIME (2025)",
@@ -76,16 +83,17 @@ export const AREAS: readonly Area[] = [
   {
     id: "materiales",
     nombre: "Diseño de materiales didácticos",
+    nombreCorto: "Diseño de materiales",
     idea: "Cada tarea puede transformar la relación con las matemáticas",
     queEs:
       "Diseñamos materiales que median entre el cuerpo docente, las matemáticas y el aprendizaje: tareas que invitan a explorar, argumentar y reconstruir significados.",
     teLlevas: [
       "Colecciones para docentes y estudiantes",
-      "Situaciones de aprendizaje y guías docentes con intencionalidades y errores posibles",
+      "Situaciones de aprendizaje y guías docentes",
       "Recursos digitales",
     ],
     paraQuien:
-      "Sistemas educativos, redes de escuelas y programas que necesitan materiales propios, con sentido para su contexto",
+      "Sistemas y redes que necesitan materiales propios para su contexto",
     hechos: [
       "Colección Matemática en Red (Ministerio de Educación de la Ciudad de Buenos Aires, 2024)",
       "Materiales para primer ciclo y guías de ingreso para escuelas técnicas",
@@ -97,16 +105,17 @@ export const AREAS: readonly Area[] = [
   {
     id: "desarrollo-profesional",
     nombre: "Desarrollo profesional docente",
+    nombreCorto: "Desarrollo profesional",
     idea: "La experiencia como fuente de reflexión",
     queEs:
       "Trayectos, talleres y diplomaturas donde cada docente vive una situación de aprendizaje, la lleva al aula y la analiza en comunidad, con material específico y acompañamiento de especialistas.",
     teLlevas: [
-      "Un dispositivo diseñado para tu contexto: presencial, virtual o mixto",
-      "Formación de líderes y facilitadores",
-      "Seguimiento de la implementación en el aula",
+      "Dispositivo a medida: presencial, virtual o mixto",
+      "Formación de quienes lideran y facilitan",
+      "Seguimiento en el aula",
     ],
     paraQuien:
-      "Ministerios, empresas y fundaciones con programas educativos, redes de escuelas y consultoras que arman dispositivos masivos",
+      "Ministerios, empresas, fundaciones y redes que forman a escala",
     hechos: [
       "Cursos y talleres para más de 11.000 docentes de educación media superior en México",
       "Formación de 500 formadores del Plan Nacional Aprender Matemática (Argentina)",
@@ -122,12 +131,12 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Estamos cerca de equipos técnicos, coordinaciones y líderes pedagógicos mientras las propuestas se implementan: miramos las prácticas, analizamos evidencias y ajustamos el rumbo.",
     teLlevas: [
-      "Encuentros sostenidos a lo largo del año",
+      "Encuentros sostenidos todo el año",
       "Asesoría técnico-pedagógica a equipos",
-      "Acompañamiento a la implementación por escuela o por sede",
+      "Acompañamiento por escuela o por sede",
     ],
     paraQuien:
-      "Equipos que ya tienen materiales o programas en marcha y necesitan sostenerlos",
+      "Equipos con programas en marcha que necesitan sostenerlos",
     hechos: [
       "Encuentros con coordinaciones de primer ciclo de la Ciudad de Buenos Aires",
       "Acompañamiento a la implementación curricular en escuelas técnicas",
@@ -143,12 +152,12 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido para orientar trayectorias de aprendizaje.",
     teLlevas: [
-      "Marcos conceptuales y programas de contenidos",
-      "Homologación entre sedes, niveles o países",
-      "Mapas de progresión y revisión pedagógica de libros de texto",
+      "Marcos conceptuales y programas",
+      "Homologación entre sedes y países",
+      "Mapas de progresión y revisión de libros",
     ],
     paraQuien:
-      "Ministerios, redes de escuelas y sistemas que necesitan coherencia entre qué se enseña, cómo y cuándo",
+      "Ministerios y redes que necesitan coherencia entre qué, cómo y cuándo",
     hechos: [
       "Currícula homologada de Matemáticas para escuelas técnicas de Argentina y México",
       "Orientación conceptual del área de Matemática de la Ciudad de Buenos Aires",
@@ -165,11 +174,11 @@ export const AREAS: readonly Area[] = [
       "Desarrollamos sistemas de evaluación que generan evidencia situada para comprender los aprendizajes y orientar decisiones educativas.",
     teLlevas: [
       "Instrumentos diseñados y validados",
-      "Análisis psicométrico y estudios de ganancia educativa",
+      "Análisis psicométrico y ganancia educativa",
       "Informes para decidir",
     ],
     paraQuien:
-      "Instituciones y sistemas que quieren saber qué pasa con los aprendizajes y decidir con evidencia",
+      "Instituciones que quieren decidir con evidencia sobre los aprendizajes",
     hechos: [
       "Marco de referencia y reactivos de exámenes nacionales (CENEVAL, México)",
       "Evaluaciones de egreso y de ingreso en escuelas técnicas",

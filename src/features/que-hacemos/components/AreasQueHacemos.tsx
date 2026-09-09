@@ -125,7 +125,9 @@ export function AreasQueHacemos() {
                         >
                           0{i + 1}
                         </span>
-                        <span>{a.nombre}</span>
+                        {/* El indice usa el rotulo corto cuando existe; el
+                            articulo sigue con el nombre completo del cartel. */}
+                        <span>{a.nombreCorto ?? a.nombre}</span>
                       </a>
                     </li>
                   );
