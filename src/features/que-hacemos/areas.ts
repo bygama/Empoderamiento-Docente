@@ -66,9 +66,9 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Investigamos las prácticas educativas para producir conocimiento y devolverlo a las aulas en forma de currículo, materiales, formación y evaluación.",
     teLlevas: [
-      "Estudios y sistematización de experiencias",
-      "Evidencia para tomar decisiones",
-      "Publicaciones y transferencia",
+      "Estudios y sistematización",
+      "Evidencia para decidir",
+      "Publicaciones y difusión",
     ],
     paraQuien:
       "Ministerios, universidades y redes que necesitan evidencia de sus aulas",
@@ -88,8 +88,8 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Diseñamos materiales que median entre el cuerpo docente, las matemáticas y el aprendizaje: tareas que invitan a explorar, argumentar y reconstruir significados.",
     teLlevas: [
-      "Colecciones para docentes y estudiantes",
-      "Situaciones de aprendizaje y guías docentes",
+      "Colecciones didácticas",
+      "Situaciones de aprendizaje",
       "Recursos digitales",
     ],
     paraQuien:
@@ -110,8 +110,8 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Trayectos, talleres y diplomaturas donde cada docente vive una situación de aprendizaje, la lleva al aula y la analiza en comunidad, con material específico y acompañamiento de especialistas.",
     teLlevas: [
-      "Dispositivo a medida: presencial, virtual o mixto",
-      "Formación de quienes lideran y facilitan",
+      "Dispositivo a tu medida",
+      "Formación de liderazgos",
       "Seguimiento en el aula",
     ],
     paraQuien:
@@ -131,9 +131,9 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Estamos cerca de equipos técnicos, coordinaciones y líderes pedagógicos mientras las propuestas se implementan: miramos las prácticas, analizamos evidencias y ajustamos el rumbo.",
     teLlevas: [
-      "Encuentros sostenidos todo el año",
-      "Asesoría técnico-pedagógica a equipos",
-      "Acompañamiento por escuela o por sede",
+      "Encuentros todo el año",
+      "Asesoría pedagógica",
+      "Acompañamiento por sede",
     ],
     paraQuien:
       "Equipos con programas en marcha que necesitan sostenerlos",
@@ -152,9 +152,9 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido para orientar trayectorias de aprendizaje.",
     teLlevas: [
-      "Marcos conceptuales y programas",
-      "Homologación entre sedes y países",
-      "Mapas de progresión y revisión de libros",
+      "Marcos y programas",
+      "Homologación entre sedes",
+      "Mapas de progresión",
     ],
     paraQuien:
       "Ministerios y redes que necesitan coherencia entre qué, cómo y cuándo",
@@ -173,8 +173,8 @@ export const AREAS: readonly Area[] = [
     queEs:
       "Desarrollamos sistemas de evaluación que generan evidencia situada para comprender los aprendizajes y orientar decisiones educativas.",
     teLlevas: [
-      "Instrumentos diseñados y validados",
-      "Análisis psicométrico y ganancia educativa",
+      "Instrumentos validados",
+      "Análisis psicométrico",
       "Informes para decidir",
     ],
     paraQuien:
