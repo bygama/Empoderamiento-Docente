@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { AREAS, AREAS_INTRO } from "@/features/que-hacemos/areas";
 
 /**
@@ -52,9 +51,8 @@ export function AreasQueHacemos() {
     >
       <div className="mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
         <header className="max-w-[62ch]">
-          <Eyebrow>Qué hacemos</Eyebrow>
           <h2
-            className="font-display mt-5 text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem]"
+            className="font-display text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem]"
             style={{ lineHeight: 1.1 }}
           >
             Seis áreas de trabajo
