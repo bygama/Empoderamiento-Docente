@@ -376,11 +376,11 @@ export const EQUIPO: Persona[] = [
           publications: [
             { year: "2013", kind: "Libro", title: "La transversalidad de la proporcionalidad", meta: "Secretaría de Educación Pública de México" },
             // La que ella pone primera en su ficha: «conecta con el nombre y la identidad de ED».
-            { year: "2014", kind: "Artículo", title: "Socioepistemología y empoderamiento docente: acciones para un cambio educativo", meta: "Con Ricardo Cantoral · Bolema" },
+            { year: "2014", kind: "Artículo", title: "Socioepistemología y empoderamiento: la profesionalización docente desde la problematización del saber matemático", meta: "Con Ricardo Cantoral · Bolema" },
             { year: "2016", kind: "Libro", title: "Empoderamiento docente y Socioepistemología", meta: "Editorial Gedisa", featured: true },
             // Nota de divulgación que ella misma sumó a su ficha (robertorocca.org, 2022).
             { year: "2022", kind: "Artículo", title: "Nunca recordé la tabla del 7, pero siento que soy buena en matemáticas", meta: "Nota de divulgación · Roberto Rocca, Grupo Techint" },
-            { year: "2023", kind: "Artículo", title: "Aprendizaje de las matemáticas: ¿qué, para qué, para quién?", meta: "Con Karla Gómez-Osalde" },
+            { year: "2022", kind: "Artículo", title: "Aprendizaje de las matemáticas: ¿qué, para qué, para quién?", meta: "Con Karla Gómez-Osalde · Propuesta Educativa" },
             { year: "2024", kind: "Colección", title: "Matemática en Red", meta: "Coordinación de publicaciones · Ministerio de Educación de la Ciudad de Buenos Aires" },
             { year: "2025", kind: "Artículo", title: "Problematizar la matemática escolar: ¿cómo contribuye al desarrollo profesional docente?" },
             {
@@ -533,9 +533,8 @@ export const EQUIPO: Persona[] = [
               featured: true,
             },
             {
-              // El año difiere del que figura en el perfil de Daniela (2023):
-              // acá va el de la ficha y el CVU de Karla. Si se corrige, hay que
-              // corregir los dos lados.
+              // Noviembre de 2022, nº 58 de la revista (verificado el 2026-09-09;
+              // el CV de Daniela decía 2023).
               year: "2022",
               kind: "Artículo",
               title: "Aprendizaje de las matemáticas: ¿qué, para qué, para quién?",
@@ -1955,14 +1954,14 @@ export const EQUIPO: Persona[] = [
             {
               year: "2026",
               kind: "Artículo",
-              title: "Contextos de significación como herramienta para la construcción de conocimiento matemático",
+              title: "Contextos de significación en la explicación de la construcción del conocimiento matemático",
               meta: "Con I. Tuyub y Gabriela Buendía · Tecné, Episteme y Didaxis",
             },
             {
               year: "2026",
               kind: "Artículo",
               title: "Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia",
-              meta: "Con R. Bussain · Revista UNO",
+              meta: "Con Romina Busain · Números, revista de didáctica de las matemáticas",
             },
             {
               year: "2025",
@@ -2098,10 +2097,10 @@ export const EQUIPO: Persona[] = [
           categoryId: "investigacion",
           color: "azul",
           eyebrow: "Producción",
-          period: "2023",
+          period: "2023 – 2024",
           variant: "ramas",
           title: "Las literales, las interacciones entre profesores y las gráficas de movimiento.",
-          body: "Tres piezas de un mismo año: qué significan las literales para estudiantes de secundaria y de nuevo ingreso a la universidad, qué aportan las interacciones entre profesores de matemáticas a su conocimiento profesional, y cómo se interpreta el movimiento en una gráfica.",
+          body: "Tres piezas recientes: qué significan las literales para estudiantes de secundaria y de nuevo ingreso a la universidad, qué aportan las interacciones entre profesores de matemáticas a su conocimiento profesional, y cómo se interpreta el movimiento en una gráfica.",
           // Las dos primeras son las que ella eligió mostrar (ficha de julio de 2026).
           publications: [
             {
@@ -2112,7 +2111,7 @@ export const EQUIPO: Persona[] = [
               featured: true,
             },
             {
-              year: "2023",
+              year: "2024",
               kind: "Libro",
               title: "Las interacciones entre y con profesores de matemáticas como un recurso para la construcción de conocimiento profesional",
               meta: "Capítulo, con Judith Hernández y A. Espino — Perspectivas actuales de la Educación Matemática · Editorial SOMIDEM",
@@ -2276,9 +2275,9 @@ export const EQUIPO: Persona[] = [
           title: "Cómo se desarrolla el pensamiento variacional, y cómo se evalúa.",
           body: "Su aporte teórico es un esquema para el desarrollo del pensamiento y lenguaje variacional: qué se pone en juego cuando alguien piensa el cambio, cómo diseñar situaciones que lo provoquen y con qué criterios evaluarlo.",
           milestones: [
-            // SOMIDEM fecha el libro en 2023 (su CV dice 2024): va la fecha de la editorial,
-            // la misma que usa Darly para su capítulo del mismo libro.
-            { period: "2023", title: "Rúbrica para evaluar el desarrollo del pensamiento y lenguaje variacional" },
+            // 2024 según la cita oficial del capítulo (DOI 10.24844/SOMIDEM/S3/2024/01-26)
+            // y su CV; la web de SOMIDEM muestra 2023.
+            { period: "2024", title: "Rúbrica para evaluar el desarrollo del pensamiento y lenguaje variacional" },
             { period: "2025", title: "Referentes teóricos para el diseño de situaciones variacionales" },
             { title: "Más de 30 publicaciones arbitradas y más de 60 ponencias" },
           ],
@@ -2317,7 +2316,7 @@ export const EQUIPO: Persona[] = [
               meta: "Coautoría, con su Libro de Recursos para el Profesor · Editorial Santillana",
             },
             {
-              year: "2023",
+              year: "2024",
               kind: "Libro",
               title: "Rúbrica para evaluar el desarrollo del pensamiento y lenguaje variacional",
               meta: "Capítulo — Perspectivas actuales de la Educación Matemática · Editorial SOMIDEM",
