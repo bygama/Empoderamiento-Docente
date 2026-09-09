@@ -61,11 +61,21 @@ type Cfg = {
  * en hover. Es lo que mantiene a los líderes por debajo de la Dirección
  * Académica también en el estado base.
  */
+/**
+ * La placa del caption en reposo es un VIDRIO, no un bloque: la foto cubre la
+ * card entera y sigue por debajo (hombros, postura, ambiente), y el texto se
+ * lee sobre un blanco al 84% con blur fuerte, que iguala fondos claros y
+ * oscuros. La transparencia se percibe por el blur y por la foto que continúa,
+ * no por el porcentaje: más abajo de 80% el rol se pierde en fotos claras.
+ * Antes la Dirección llevaba placa opaca (decisión de ED, 2026-09-09).
+ */
+const VIDRIO = "bg-white/84 backdrop-blur-[10px]";
+
 const CFG: Record<Tier, Cfg> = {
-  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", plate: "bg-white", pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, iniciales: "text-[7rem]" },
-  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", plate: "bg-white", pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[5.5rem]" },
-  3: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.35rem]", plate: "bg-white/82 backdrop-blur-[3px]", pad: "p-[1.15rem]", nombre: "text-[1.18rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[4.4rem]" },
-  4: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.15rem]", plate: "bg-white/82 backdrop-blur-[3px]", pad: "p-[0.95rem]", nombre: "text-[1.02rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, iniciales: "text-[3.1rem]" },
+  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", plate: VIDRIO, pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, iniciales: "text-[7rem]" },
+  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", plate: VIDRIO, pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[5.5rem]" },
+  3: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.35rem]", plate: VIDRIO, pad: "p-[1.15rem]", nombre: "text-[1.18rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[4.4rem]" },
+  4: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.15rem]", plate: VIDRIO, pad: "p-[0.95rem]", nombre: "text-[1.02rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, iniciales: "text-[3.1rem]" },
 };
 
 /**
