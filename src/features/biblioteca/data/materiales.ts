@@ -114,7 +114,7 @@ const CATALOGO: Material[] = [
   {
     titulo:
       "Problemas de probabilidad de primero de secundaria resueltos mediante el uso de calculadora para medir el razonamiento estadístico",
-    autores: "Brenda Azucena Rodríguez González, Eduardo Briceño Solís y Judith Alejandra Hernández Sánchez",
+    autores: "Brenda Azucena Rodríguez González, Eduardo Carlos Briceño Solís y Judith Alejandra Hernández Sánchez",
     descripcion:
       "Problemas de probabilidad para primer año de secundaria, resueltos con calculadora, como instrumento para medir el razonamiento estadístico del estudiantado. Capítulo del libro de jóvenes investigadoras e investigadores de SOMIDEM.",
     tipo: "Capítulos de libro",
@@ -131,7 +131,7 @@ const CATALOGO: Material[] = [
   {
     titulo:
       "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
-    autores: "Daniela Reyes-Gasperini y Karla Gómez-Osalde",
+    autores: "Daniela Reyes-Gasperini y Karla Gómez Osalde",
     descripcion:
       "Analiza cómo se resignifica el conocimiento matemático escolar en docentes en servicio durante un programa de desarrollo profesional orientado al empoderamiento docente, con dos episodios de pensamiento algebraico y geométrico. La resignificación aparece como un proceso cíclico, colectivo y progresivo, parte constitutiva de la profesión docente en matemáticas.",
     tipo: "Artículos",
@@ -374,7 +374,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Problematizar la matemática escolar: ¿cómo contribuye al desarrollo profesional docente?",
-    autores: "Mayra Báez Melendres, Rebeca Flores-García, Daniela Reyes-Gasperini",
+    autores: "Mayra Báez Melendres, Rebeca Flores-García y Daniela Reyes-Gasperini",
     descripcion: "Argumenta cómo la problematización de la matemática escolar contribuye al desarrollo profesional docente: un proceso de reflexión que produce confrontaciones, resignificaciones y un cambio de relación con el conocimiento. Analiza dos episodios con el modelo reflexivo de la matemática escolar.",
     tipo: "Artículos",
     tema: "Desarrollo profesional docente",
@@ -402,7 +402,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Reflexive Conversation: Approach to the Professional Learning of Pre-service Mathematics Teachers",
-    autores: "Eddie Aparicio Landa, Landy Sosa Moguel, Guadalupe Cabañas-Sánchez, Karla Gómez Osalde",
+    autores: "Eddie Aparicio Landa, Landy Sosa Moguel, Guadalupe Cabañas-Sánchez y Karla Gómez Osalde",
     descripcion: "Estudia cómo la conversación reflexiva lleva a docentes de matemáticas en formación a un aprendizaje colectivo. Once estudiantes y su formador discutieron la solución de una tarea en dos sesiones; el análisis conversacional muestra que un tema tratado de forma libre y abierta transforma el conocimiento individual en conocimiento común.",
     tipo: "Artículos",
     tema: "Desarrollo profesional docente",
@@ -430,7 +430,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "El uso del conocimiento matemático en las comunidades de ingenieros. Del objeto a la funcionalidad matemática",
-    autores: "Jesús Mendoza, Francisco Cordero, Miguel Solís y Karla Gómez",
+    autores: "Jesús Mendoza, Francisco Cordero, Miguel Solís y Karla Gómez Osalde",
     descripcion: "Desde la Teoría Socioepistemológica, estudia el uso del conocimiento matemático que emerge en comunidades de ingenieros para tender un diálogo entre la matemática escolar y el quehacer de la ingeniería: tres ejemplos que cuestionan el saber escolar y destacan usos como la simbiosis entre predicción y simulación y la modelación de la acumulación y la optimización.",
     tipo: "Artículos",
     tema: "Tecnología y modelación",
@@ -474,7 +474,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Análisis de la resolución de un problema de cinemática mediante el mapa conceptual híbrido",
-    autores: "Moreno Martínez, Hernández Zavala y Briceño Solís",
+    autores: "Nehemías Moreno Martínez, Luis Enrique Hernández Zavala y Eduardo Carlos Briceño Solís",
     descripcion: "Interpreta el mapa conceptual híbrido a partir del enfoque ontosemiótico adaptado a la física escolar y lo usa, en un estudio de caso, para analizar cómo una profesora y dos estudiantes universitarios resuelven un problema de movimiento parabólico: la organización y conexión de los objetos fisicomatemáticos en juego.",
     tipo: "Artículos",
     tema: "Tecnología y modelación",
@@ -504,7 +504,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Plan Nacional Aprender Matemática, colección para el profesor",
-    autores: "Luis Manuel Cabrera Chim y equipo",
+    autores: "Coordinación de Daniela Reyes-Gasperini, con Luis Manuel Cabrera Chim y Diana Wendolyne Ríos Jarquín",
     descripcion: "La colección de cuadernillos del Plan Nacional Aprender Matemática del Ministerio de Educación de Argentina, con propuestas para el aula organizadas por concepto (inferir, medir, aproximar, comparar, equivaler, predecir, visualizar), para descargar gratis. Coordinada por Daniela Reyes-Gasperini, con Luis Cabrera Chim y Wendolyne Ríos Jarquín entre sus autoras y autores.",
     tipo: "Materiales",
     tema: "Desarrollo profesional docente",
@@ -518,7 +518,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Estudios histórico-epistemológicos en matemática educativa: tendencias metodológicas en Latinoamérica",
-    autores: "Fabián Romero Fonseca, Luis López Acosta",
+    autores: "Fabián Romero Fonseca y Luis Alberto López Acosta",
     descripcion: "Describe las tendencias metodológicas de los estudios histórico-epistemológicos hechos desde instituciones latinoamericanas, con un análisis bibliométrico y un análisis de contenido de artículos de revistas de Matemática Educativa publicados entre 2017 y 2022.",
     tipo: "Artículos",
     tema: "Historia y epistemología",
@@ -532,7 +532,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "La Geometría Analítica y su Transposición Didáctica Externa. Algunos ejemplos de México y Costa Rica",
-    autores: "Luis Alberto López-Acosta",
+    autores: "Luis Alberto López Acosta",
     descripcion: "Caracteriza la transposición didáctica externa que sufrió la geometría analítica en la escuela, comparando un estudio histórico-epistemológico sobre la emergencia de las ecuaciones con parámetros y variables con lo que dicen los programas de estudio y los libros de texto de México y Costa Rica.",
     tipo: "Artículos",
     tema: "Geometría",
@@ -546,7 +546,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Lingüística Sistémico-Funcional en el estudio del lenguaje matemático. Aportaciones desde el análisis de algunos textos algebraicos y del cálculo",
-    autores: "Luis Alberto López-Acosta",
+    autores: "Luis Alberto López Acosta",
     descripcion: "Muestra qué aporta la Lingüística Sistémico-Funcional al estudio del lenguaje matemático a partir de tres investigaciones sobre discursos algebraicos: traducciones de textos originales de la historia del álgebra y producciones de estudiantes al resolver problemas del álgebra de Viète y Descartes.",
     tipo: "Artículos",
     tema: "Álgebra y lenguaje matemático",
@@ -561,7 +561,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "La formación ciudadana en las prácticas educativas con las matemáticas",
-    autores: "Elizabeth Torres-Puentes, Claudia Salazar-Amaya y Paola Balda-Álvarez",
+    autores: "Elizabeth Torres-Puentes, Claudia Salazar-Amaya y Paola Alejandra Balda Álvarez",
     descripcion: "Artículo de reflexión sobre la relación entre educación matemática y ciudadanía, nacido de un proyecto de la Universidad Pedagógica Nacional de Colombia: subjetividad, creatividad y ética como categorías que configuran las prácticas educativas con las matemáticas y forman un ciudadano particular.",
     tipo: "Artículos",
     tema: "Ciudadanía y justicia social",
@@ -575,7 +575,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Contextos de significación en la explicación de la construcción del conocimiento matemático",
-    autores: "Isabel Tuyub Sánchez, Paola Balda Álvarez y Gabriela Buendía Abalos",
+    autores: "Isabel Tuyub Sánchez, Paola Alejandra Balda Álvarez y Gabriela Buendía Abalos",
     descripcion: "Presenta dos contextos de significación para la matemática escolar, la huerta escolar y una comunidad universitaria de ingeniería, y analiza cómo la razón matemática y las gráficas cartesianas se resignifican según cómo se usan en cada uno: la siembra y el riego en un caso, las tareas de la ingeniería en el otro.",
     tipo: "Artículos",
     tema: "Pensamiento proporcional",
@@ -590,7 +590,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Un ejercicio de empoderamiento docente en un curso de formación posgradual",
-    autores: "Paola Balda, Luis Ángel Bohórquez Arenas",
+    autores: "Paola Alejandra Balda Álvarez y Luis Ángel Bohórquez Arenas",
     descripcion: "Resultados de un proceso de empoderamiento docente en un curso de posgrado para profesores de matemáticas, en ocho sesiones híbridas: describe cada momento del curso, el proceso vivido y cómo redundó en el rediseño del discurso matemático escolar.",
     tipo: "Artículos",
     tema: "Desarrollo profesional docente",
@@ -604,7 +604,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia",
-    autores: "Paola Balda Álvarez y Romina Busain",
+    autores: "Paola Alejandra Balda Álvarez y Romina Busain",
     descripcion: "Describe la experiencia de dos grupos de estudiantes, uno en Colombia y otro en Argentina, resolviendo problemas con la metodología de los círculos matemáticos. Un estudio de casos con registros en video que identifica racionalidades contextualizadas en las estrategias, enriquecidas por el diálogo entre pares.",
     tipo: "Artículos",
     tema: "Resolución de problemas",
@@ -618,7 +618,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "¿Es posible formar ciudadanos críticos en las aulas colombianas de matemáticas?",
-    autores: "Yessica Paola Sánchez Naranjo, Paola Alejandra Balda Álvarez",
+    autores: "Yessica Paola Sánchez Naranjo y Paola Alejandra Balda Álvarez",
     descripcion: "Analiza tres documentos curriculares del Ministerio de Educación de Colombia para mostrar qué potencial ofrecen, en propósitos, contenidos y metodologías, para formar ciudadanos críticos desde las aulas de matemáticas, según los planteamientos de la educación matemática crítica.",
     tipo: "Artículos",
     tema: "Ciudadanía y justicia social",
@@ -632,7 +632,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "La periodicidad: significados desde su uso en la huerta escolar para la matemática escolar",
-    autores: "Paola Balda Álvarez",
+    autores: "Paola Alejandra Balda Álvarez",
     descripcion: "Ante la poca relación entre la matemática escolar y la de fuera de la escuela, propone descentrar la mirada del objeto matemático hacia las prácticas de las que emerge. Toma el caso de la propiedad periódica y analiza su uso en la huerta escolar como contexto de significación.",
     tipo: "Artículos",
     tema: "Pensamiento variacional",
@@ -646,7 +646,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Significados otorgados a las literales por estudiantes de secundaria y universitarios de nuevo ingreso",
-    autores: "Rosa Elvira Páez Murillo, Judith Alejandra Hernández Sánchez, Darly Alina Ku Euán",
+    autores: "Rosa Elvira Páez Murillo, Judith Alejandra Hernández Sánchez y Darly Alina Ku-Euan",
     descripcion: "Explora los significados que estudiantes de secundaria y de nuevo ingreso a ingeniería y a la licenciatura en matemáticas dan a las literales en una tarea: los roles de constante, número general e incógnita según Küchemann, y cómo inciden en los errores al resolver un ítem algebraico planteado desde un contexto geométrico.",
     tipo: "Artículos",
     tema: "Álgebra y lenguaje matemático",
@@ -660,7 +660,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Las interacciones entre y con profesores de matemáticas como un recurso para la construcción de conocimiento profesional",
-    autores: "Judith Hernández Sánchez, Darly Kú Euán y Angélica Espino",
+    autores: "Judith Alejandra Hernández Sánchez, Darly Alina Ku-Euan y Angélica Espino",
     descripcion: "Dos experiencias con profesores en activo en las que las interacciones son el recurso principal para construir conocimiento profesional, alrededor del concepto de variable y sus tres usos: qué importancia tienen las interacciones en los espacios de desarrollo profesional y qué ponen los profesores en el centro como información relevante.",
     tipo: "Capítulos de libro",
     tema: "Desarrollo profesional docente",
@@ -675,7 +675,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Matemática Educativa, transversalidad y COVID-19",
-    autores: "Ricardo Cantoral, Wendolyne Ríos-Jarquín, Daniela Reyes-Gasperini y otros",
+    autores: "Ricardo Cantoral Uriza, Diana Wendolyne Ríos Jarquín, Daniela Reyes-Gasperini y diez autoras y autores más",
     descripcion: "Relaciona nociones de la Matemática Educativa con la transversalidad de los saberes matemáticos en la pandemia por coronavirus: el papel del pensamiento matemático para comprender la situación y las medidas preventivas, y la noción de aula extendida.",
     tipo: "Artículos",
     tema: "Desarrollo profesional docente",
@@ -689,7 +689,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Articulación del pensamiento y lenguaje variacional en una situación de aprendizaje para la enseñanza de la derivada",
-    autores: "Anaís Espinoza-Salomón, Rodrigo Jorquera-Soto, Thiare Osorio-Gómez, Iván Esteban Pérez Vera",
+    autores: "Anaís Espinoza-Salomón, Rodrigo Jorquera-Soto, Thiare Osorio-Gómez e Iván Esteban Pérez Vera",
     descripcion: "Una situación de aprendizaje para la comprensión conceptual de la derivada en secundaria a partir del enfriamiento de silicona: identificar magnitudes, establecer referencias, analizar registros y aproximarse a la variación instantánea, articulando los estadios del Pensamiento y Lenguaje Variacional con las fases de diseño de situaciones.",
     tipo: "Artículos",
     tema: "Pensamiento variacional",
@@ -703,7 +703,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Análisis de estrategias de resolución en una experiencia de modelación matemática escolar sobre consumo y producción sostenibles",
-    autores: "Santiago Giovanetti, Susana Riquelme, Roberto Vilches, Iván Esteban Pérez Vera",
+    autores: "Santiago Giovanetti, Susana Riquelme, Roberto Vilches e Iván Esteban Pérez Vera",
     descripcion: "Analiza las estrategias de resolución de estudiantes en una experiencia de modelación matemática sobre consumo y producción sostenibles: cómo movilizan sus saberes para cuestionar el impacto ambiental de la industria del fast fashion, articulando la matemática con problemáticas sociales cercanas a su realidad.",
     tipo: "Artículos",
     tema: "Tecnología y modelación",
@@ -717,7 +717,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Modelación matemática escolar de la elipse en contexto astronómico",
-    autores: "Karla Pacheco López, Iván Pérez Vera",
+    autores: "Karla Pacheco López e Iván Esteban Pérez Vera",
     descripcion: "Diseño e implementación de una situación de aprendizaje para enseñar la elipse desde las leyes de Kepler: cómo construyen significados los estudiantes al vincularla con el movimiento planetario, en un estudio de casos con la modelación entendida como práctica social.",
     tipo: "Artículos",
     tema: "Tecnología y modelación",
@@ -745,7 +745,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Integración de modelación matemática, inteligencia artificial generativa y situaciones de aprendizaje para la enseñanza del cálculo escolar",
-    autores: "Sebastián Saavedra Messina, Adiel Silva Riveros, Iván Pérez Vera",
+    autores: "Sebastián Saavedra Messina, Adiel Silva Riveros e Iván Esteban Pérez Vera",
     descripcion: "Una situación de aprendizaje para superar obstáculos en la enseñanza de la derivada en secundaria, basada en el plano inclinado de Galileo: combina el ciclo de modelación de Borromeo y las fases de situaciones de aprendizaje de Balda, con herramientas de inteligencia artificial generativa.",
     tipo: "Artículos",
     tema: "Tecnología y modelación",
@@ -759,7 +759,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Modelación matemática en la formación inicial docente: una experiencia desde la perspectiva feminista",
-    autores: "Paulina Salazar-Cortez, Iván Pérez-Vera",
+    autores: "Paulina Salazar-Cortez e Iván Esteban Pérez Vera",
     descripcion: "Examina la modelación matemática en la formación inicial docente desde una perspectiva feminista, con una situación sobre la variación de la temperatura corporal en el ciclo menstrual: las dinámicas de género que emergen en el proceso y la reflexión crítica sobre los conocimientos matemáticos.",
     tipo: "Artículos",
     tema: "Ciudadanía y justicia social",
@@ -773,7 +773,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Sesgos de género en Modelación Matemática Escolar: impacto en aprendizaje y autopercepción docente en formación",
-    autores: "Paulina Salazar Cortez e Iván Pérez-Vera",
+    autores: "Paulina Salazar Cortez e Iván Esteban Pérez Vera",
     descripcion: "Estudio de caso sobre la experiencia de una profesora en formación en un curso de modelación matemática y tecnología, para identificar posibles sesgos de género: pese a un buen desempeño académico, enfrenta baja autoconfianza y poca participación.",
     tipo: "Artículos",
     tema: "Ciudadanía y justicia social",
@@ -788,7 +788,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Significados de la razón geométrica en la colisión inelástica",
-    autores: "Paulina Salazar Cortez, Iván Esteban Pérez Vera",
+    autores: "Paulina Salazar Cortez e Iván Esteban Pérez Vera",
     descripcion: "Explora la construcción de significados sobre la progresión geométrica en la formación inicial docente mediante ciclos de modelación del fenómeno de la colisión inelástica, con cinco estudiantes de Pedagogía en Matemática de la UMCE que calcularon razones geométricas a partir de datos experimentales.",
     tipo: "Artículos",
     tema: "Pensamiento proporcional",
@@ -802,7 +802,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Diseño de un curso de formación inicial para profesores que integra la modelación matemática escolar con evaluación de tecnologías",
-    autores: "Iván Esteban Pérez Vera, Paulina Salazar Cortez",
+    autores: "Iván Esteban Pérez Vera y Paulina Salazar Cortez",
     descripcion: "Antecedentes y propuesta para incorporar la modelación matemática a la formación inicial docente: un curso semestral que la trabaja primero como objeto matemático y después como estructura para diseñar situaciones de aprendizaje, integrando la evaluación de tecnologías, en una experiencia de investigación-acción.",
     tipo: "Artículos",
     tema: "Desarrollo profesional docente",
@@ -816,7 +816,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Modelación matemática como propuesta de trabajo para superar obstáculos y dificultades en el cálculo escolar. Una experiencia en formación inicial docente",
-    autores: "Iván Pérez Vera y Paulina Salazar Cortez",
+    autores: "Iván Esteban Pérez Vera y Paulina Salazar Cortez",
     descripcion: "Aborda las dificultades para aprender límite, derivada e integral en secundaria y en la formación docente, y propone la modelación mediada por tecnología como alternativa: cinco fases para diseñar situaciones de aprendizaje desde el enfoque socioepistemológico.",
     tipo: "Actas de congreso",
     tema: "Tecnología y modelación",
@@ -830,7 +830,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Modos de pensar el conjunto Z4 en docentes que enseñan álgebra en los primeros años escolares",
-    autores: "Pedro Vidal-Szabó, Marcela Parraguez, Daniela Bonilla, Samuel Campos",
+    autores: "Pedro Vidal-Szabó, Marcela Parraguez, Daniela Bonilla y Samuel Campos",
     descripcion: "Caracteriza modos de pensar el conjunto Z4 en treinta docentes chilenos de primaria en servicio, a partir de un cuestionario y un modelo cognitivo propuesto: muestran más articulación entre los modos sintético-geométrico y analítico-aritmético que con el analítico-estructural, un pensamiento teórico menos privilegiado.",
     tipo: "Artículos",
     tema: "Álgebra y lenguaje matemático",
@@ -844,7 +844,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Análisis cualitativo de un aprendizaje estadístico temprano con la mirada de los Espacios de Trabajo Matemático orientado por el Ciclo Investigativo",
-    autores: "Pedro Vidal-Szabó, Alain Kuzniak, Soledad Estrella, Elizabeth Montoya",
+    autores: "Pedro Vidal-Szabó, Alain Kuzniak, Soledad Estrella y Elizabeth Montoya",
     descripcion: "Describe y caracteriza una lección de estadística temprana de análisis exploratorio de datos en cuarto grado, con las representaciones de datos producidas por tres estudiantes de 9 y 10 años, analizadas según el ciclo investigativo y las génesis de los Espacios de Trabajo Matemático.",
     tipo: "Artículos",
     tema: "Estadística y probabilidad",
@@ -857,8 +857,12 @@ const CATALOGO: Material[] = [
     fuente: "Educación Matemática",
   },
   {
-    titulo: "Conocimiento especializado de profesores sobre las características del aprendizaje de la estadística en educación básica, bajo la taxonomía SOLO",
-    autores: "Pedro Vidal-Szabó, Soledad Estrella",
+    // La ficha de Pedro lo llama «Conocimiento especializado de profesores sobre
+    // las características del aprendizaje de la estadística en educación básica,
+    // bajo la taxonomía SOLO»; el título publicado es este (verificado en la
+    // revista el 2026-09-09).
+    titulo: "Explorando la extensión del modelo MTSK al dominio estadístico: características del aprendizaje desde la taxonomía SOLO",
+    autores: "Pedro Vidal-Szabó y Soledad Estrella",
     descripcion: "Amplía el modelo de Conocimiento Especializado del Profesor de Matemáticas a la estadística: explora, con la taxonomía SOLO, los conocimientos didácticos y los niveles de comprensión de 192 docentes sobre las dificultades de estudiantes de educación básica para interpretar una tabla de datos.",
     tipo: "Artículos",
     tema: "Estadística y probabilidad",
@@ -866,13 +870,13 @@ const CATALOGO: Material[] = [
     anio: 2023,
     fecha: "2023",
     formato: "PDF",
-    portada: `${PORTADAS}/53-conocimiento-especializado-profesores-sobre.webp`,
+    portada: `${PORTADAS}/53-explorando-extension-modelo-mtsk.webp`,
     url: "https://doi.org/10.29035/redes.2.1.3",
     fuente: "Revista de Educación Estadística",
   },
   {
     titulo: "Decision-Making in Situations of Uncertainty as School Mathematical Knowledge",
-    autores: "Andrea Vergara",
+    autores: "Andrea Vergara-Gómez",
     descripcion: "Discute desde la socioepistemología cómo el currículo chileno propone enseñar la toma de decisiones en incertidumbre, un objeto de enseñanza incorporado recientemente en la educación media diferenciada, analizando el programa de estudio y el texto escolar oficial.",
     tipo: "Artículos",
     tema: "Estadística y probabilidad",
@@ -886,7 +890,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Decision-making in contexts of risk and uncertainty: An instrument for secondary education",
-    autores: "Andrea Stephanie Vergara-Gómez, Carolina Andrea Henríquez-Rivas",
+    autores: "Andrea Vergara-Gómez y Carolina Andrea Henríquez-Rivas",
     descripcion: "Formulación y validación de contenido de un cuestionario de respuesta forzada para explorar cómo estudiantes de secundaria toman decisiones en contextos de riesgo e incertidumbre, a partir de seis situaciones cotidianas.",
     tipo: "Artículos",
     tema: "Estadística y probabilidad",
@@ -900,7 +904,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "Pensamiento probabilístico o intuición en el dilema de Monty Hall",
-    autores: "Daniela Belén Fuentes Rodríguez, Jonathan Omar Guajardo Becerra, Andrea Stephanie Vergara-Gómez",
+    autores: "Daniela Belén Fuentes Rodríguez, Jonathan Omar Guajardo Becerra y Andrea Vergara-Gómez",
     descripcion: "Adapta el problema de Monty Hall para jóvenes de enseñanza media, en el marco de la incorporación de la toma de decisiones al currículo chileno: un estudio de caso con dos estudiantes que mira la dimensión cognitiva de la probabilidad y la dimensión intuitivo-afectiva de sesgos y heurísticas.",
     tipo: "Artículos",
     tema: "Estadística y probabilidad",
@@ -914,7 +918,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "¿Juguemos CATAN? Explorando el desarrollo de los pensamientos probabilístico y estratégico",
-    autores: "Vincent Ganga-Cáceres, Eduardo Pérez-Gajardo, Miguel Reyes-Astorga, Andrea Vergara-Gómez",
+    autores: "Vincent Ganga-Cáceres, Eduardo Pérez-Gajardo, Miguel Reyes-Astorga y Andrea Vergara-Gómez",
     descripcion: "Caracteriza el pensamiento estratégico y el pensamiento probabilístico de estudiantes universitarios mientras toman decisiones jugando CATAN, en seis sesiones de juego con seis estudiantes de una universidad chilena.",
     tipo: "Artículos",
     tema: "Estadística y probabilidad",

@@ -153,7 +153,7 @@ export function MaterialesListado() {
       if (filtros.anio && m.anio !== filtros.anio) return false;
       if (!q) return true;
       return normalizar(
-        `${m.titulo} ${m.descripcion} ${m.tema} ${m.tipo}`,
+        `${m.titulo} ${m.autores} ${m.descripcion} ${m.tema} ${m.tipo}`,
       ).includes(q);
     });
   }, [busqueda, filtros]);

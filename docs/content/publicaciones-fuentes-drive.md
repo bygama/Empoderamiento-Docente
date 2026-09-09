@@ -202,7 +202,7 @@ Con recorrido en la web desde el PR #77 (2026-09-07). Su ficha lista tres:
 
 1. Vidal-Szabó, P., Parraguez, M., Bonilla, D. y Campos, S. (2023). Modos de pensar el conjunto Z4 en docentes que enseñan álgebra en los primeros años escolares. *Educación Matemática*, 35(2), 170-195. DOI 10.24844/EM3502.07
 2. Vidal-Szabó, P., Kuzniak, A., Estrella, S. y Montoya, E. (2020). Análisis cualitativo de un aprendizaje estadístico temprano con la mirada de los Espacios de Trabajo Matemático orientado por el Ciclo Investigativo. *Educación Matemática*, 32(2), 216-245. DOI 10.24844/EM3202.09
-3. Vidal-Szabó, P. y Estrella, S. (2023). Conocimiento especializado de profesores sobre las características del aprendizaje de la estadística en educación básica, bajo la taxonomía SOLO. *Revista de Educación Estadística*, 2(1), 1-25. DOI 10.29035/redes.2.1.3
+3. Vidal-Szabó, P. y Estrella, S. (2023). Explorando la extensión del modelo MTSK al dominio estadístico: características del aprendizaje desde la taxonomía SOLO. *Revista de Educación Estadística*, 2(1), 1-25. DOI 10.29035/redes.2.1.3 (su ficha lo titula «Conocimiento especializado de profesores sobre las características del aprendizaje de la estadística en educación básica, bajo la taxonomía SOLO»; el publicado es el de acá, verificado en la revista el 2026-09-09)
 
 ### Andrea Vergara
 
