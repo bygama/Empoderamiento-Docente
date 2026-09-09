@@ -70,10 +70,12 @@ export function ComoTrabajamos() {
             </div>
           </div>
 
-          {/* ── CTA · banda propia, centrada → nunca toca el contenido ───── */}
+          {/* ── CTA · banda propia, centrada → nunca toca el contenido ─────
+              Lleva a Quiénes somos: es la única página del sitio que la home
+              no enlazaba (Gastón, 2026-09-09); antes iba a Qué hacemos. */}
           <div className="relative z-30 flex shrink-0 justify-center px-5 pt-2 pb-10 md:pb-12">
             <Link
-              href="/que-hacemos"
+              href="/quienes-somos"
               className="group focus-visible:outline-naranja-accion inline-flex items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
@@ -83,7 +85,7 @@ export function ComoTrabajamos() {
                 />
               </span>
               <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.9rem] font-medium tracking-wide transition-colors duration-500">
-                Ver cómo trabajamos en detalle
+                Mirá quiénes somos
               </span>
             </Link>
           </div>
