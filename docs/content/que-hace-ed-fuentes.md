@@ -346,10 +346,16 @@ decidir cómo se cuenta esa continuidad (Raquel ya la cuenta como «más de 15 a
 | 2023-2027 | Ministerio de Educación de CABA | Asesoría del área de Matemática del Plan Buenos Aires Aprende; colección Matemática en Red (2024); materiales de 1.º a 3.º; revisión de libros de texto de 1.º a 7.º; encuentros con coordinadores de primer ciclo; kermés y festival de matemáticas; programas Escuela de Maestros, Jornada Extendida, Escuelas en Foco (nombres a validar antes de publicar) | Ciudad de Buenos Aires |
 | 2025-2026 | Bloom | Dispositivos masivos de desarrollo profesional docente; revisión y retroalimentación de propuestas y materiales; festival de matemáticas; cápsulas visuales | A confirmar |
 
-Sumando solo lo documentado con número: más de **14.000 docentes** en cursos directos y
-**500 formadores** que llegaron a **75.000 docentes**. Los «+2.000 docentes» y «+120
-escuelas» que hoy muestra la home son placeholders y quedan cortos; los reales hay que
-pedírselos a Daniela (¿cuentan la etapa Cinvestav? ¿cuántas escuelas? ¿cuántos estudiantes?).
+Sumando solo lo documentado con número: **14.450 docentes** en cursos directos y
+**500 formadores** que llegaron a **75.000 docentes**.
+
+**Desde el 2026-09-09 estas son las cifras del inicio** (`DatosDuros.tsx`), en lugar de los
+«+2.000 docentes» y «+120 escuelas» de relleno, que además quedaban cortos: +15 años,
++14.000 docentes, 500 formadoras y formadores (con los 75.000 en la bajada) y 5 países.
+Queda para preguntarle a Daniela si cuenta la etapa 2018-2020 (hecha desde el Cinvestav con
+ella como coordinadora; Raquel ya cuenta «más de 15 años», que la incluye), cuántas escuelas
+son —el único dato que no está en ningún documento, por eso salió del bloque— y cuántos
+estudiantes.
 
 ## 7. Tono y reglas que el cliente ya fijó
 
