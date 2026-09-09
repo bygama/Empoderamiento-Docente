@@ -7,8 +7,8 @@ import { irASeccion } from "@/lib/indice";
  *
  * - MISMA PÁGINA: no hay navegación. Se actualiza la URL (replaceState, sin
  *   entrada en el historial), se avisa a quien lea la query (EVENTO_URL,
- *   p. ej. el catálogo de Biblioteca con `?tipo=`) y se corta directo a la
- *   sección (irASeccion: sin recorrer las escenas del medio).
+ *   p. ej. el catálogo de Biblioteca con `?tipo=`) y se DESLIZA hasta la
+ *   sección (irASeccion).
  * - OTRA PÁGINA: navega Next (Link con scroll={false}, para que no haga su
  *   propio salto al hash antes de tiempo) y, ya montada la página nueva,
  *   AterrizajePorLink lee el hash y llama a `aterrizarEn`.
@@ -61,11 +61,11 @@ export function irEnPagina(href: string) {
 
 /**
  * onClick para un botón/link de la MISMA página que apunta a `#id` (los CTA
- * de los heros): en vez del ancla nativa —que con Lenis scrollea suave a
- * través de todas las escenas del medio— corta directo, como el navbar.
+ * de los heros): reemplaza al ancla nativa para poder actualizar la URL sin
+ * dejar entrada en el historial, y desliza como el navbar.
  * Con modificadores (nueva pestaña) no interviene.
  */
-export function alClicCortarA(id: string) {
+export function alClicIrA(id: string) {
   return (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
@@ -78,13 +78,15 @@ export function alClicCortarA(id: string) {
   };
 }
 
-/** Página recién montada: refresca los pins y corta a la sección del hash. */
+/** Página recién montada: refresca los pins y CORTA a la sección del hash.
+ *  Corte y no deslizamiento: la persona acaba de llegar desde otra página,
+ *  no pidió un viaje desde el tope de una página que nunca vio. */
 export function aterrizarEn(id: string): () => void {
   let raf = requestAnimationFrame(() => {
     raf = requestAnimationFrame(() => {
       if (!document.getElementById(id)) return;
       ScrollTrigger.refresh();
-      irASeccion(id);
+      irASeccion(id, { corte: true });
     });
   });
   return () => cancelAnimationFrame(raf);

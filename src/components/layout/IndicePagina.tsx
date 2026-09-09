@@ -36,7 +36,8 @@ import { RotulosIndice } from "./indice-pagina/RotulosIndice";
  * de una pantalla y media de scroll.
  *
  * Las secciones se declaran con `data-indice="Rótulo"` + `id` (ver
- * useSeccionesPagina). El salto es instantáneo a propósito (ver irASeccion).
+ * useSeccionesPagina). El salto DESLIZA (ver irASeccion): cortaba de una y
+ * se leía como teletransporte.
  */
 
 const ir = (it: ItemIndice) => (it.id === null ? irArriba() : irASeccion(it.id));

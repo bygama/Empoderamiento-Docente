@@ -18,7 +18,7 @@ import { coincideDestino, irEnPagina, partirDestino } from "@/lib/navegar";
  * - Teclado: flecha abajo abre y pasa el foco al primer ítem; Escape
  *   cierra; el chevron es un botón real (aria-expanded) para quien navega
  *   con teclado o toca.
- * - Ítems: en la misma página cortan directo (irEnPagina); desde otra página
+ * - Ítems: en la misma página deslizan (irEnPagina); desde otra página
  *   navega Next con scroll={false} y aterriza AterrizajePorLink. Con
  *   modificadores (nueva pestaña) no se intercepta nada.
  *

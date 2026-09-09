@@ -84,14 +84,14 @@ export function MobileNav() {
 
   const close = () => setOpen(false);
 
-  // Saltar a una sección de la página actual: cierra el menú y corta
-  // directo (ver irASeccion). La espera deja que el body suelte el lock.
+  // Saltar a una sección de la página actual: cierra el menú y desliza
+  // (ver irASeccion). La espera deja que el body suelte el lock.
   const irA = (id: string) => {
     close();
     window.setTimeout(() => irASeccion(id), 60);
   };
-  // Destino de un submenú: en la misma página corta directo (con la
-  // misma espera); en otra, navega Next y aterriza el layout.
+  // Destino de un submenú: en la misma página desliza (con la misma
+  // espera); en otra, navega Next y aterriza el layout.
   const irADestino = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (partirDestino(href).pathname !== pathname) {
       close();
