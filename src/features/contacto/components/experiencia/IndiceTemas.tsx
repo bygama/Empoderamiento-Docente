@@ -18,16 +18,18 @@ export function IndiceTemas({ onElegir }: Props) {
     <div className="mt-10 lg:mt-0" role="group" aria-label="Tema de la consulta">
       {/* En pantallas bajas (≤ 860px de alto) las filas se compactan para
           que los cinco temas entren sin scroll interno (ver el panel); en
-          las muy bajas (≤ 760px: laptop escalada, 1440×690) además se
-          esconde el detalle de cada tema, como ya pasa en celular. */}
-      <div className="flex flex-col gap-2.5 [@media(max-height:860px)]:gap-2 [@media(max-height:760px)]:gap-1.5">
+          las muy bajas (≤ 760px: laptop escalada, 1440×690) se aprietan
+          un poco más. El CONTENIDO (número, título, detalle) es el mismo en
+          todas: se gana espacio en márgenes e interlineado, nunca sacando
+          información (Gastón, 2026-09-09). */}
+      <div className="flex flex-col gap-2.5 [@media(max-height:860px)_and_(min-height:761px)]:gap-2 [@media(max-height:760px)]:gap-1.5">
         {TEMAS.map((t, i) => (
           <button
             key={t.key}
             type="button"
             data-tema-card
             onClick={(e) => onElegir(t.key, e.currentTarget)}
-            className="group border-azul-claro/45 hover:border-verde-concepto/50 focus-visible:outline-verde-concepto flex items-center gap-4 rounded-xl border bg-white/55 px-4 py-3 text-left transition-[border-color,background-color,box-shadow] duration-300 hover:bg-white hover:shadow-[0_16px_36px_-22px_rgb(31_45_77/0.45)] focus-visible:outline-2 focus-visible:-outline-offset-2 md:gap-5 md:px-5 md:py-3.5 [@media(max-height:860px)]:md:py-2.5"
+            className="group border-azul-claro/45 hover:border-verde-concepto/50 focus-visible:outline-verde-concepto flex items-center gap-4 rounded-xl border bg-white/55 px-4 py-3 text-left transition-[border-color,background-color,box-shadow] duration-300 hover:bg-white hover:shadow-[0_16px_36px_-22px_rgb(31_45_77/0.45)] focus-visible:outline-2 focus-visible:-outline-offset-2 md:gap-5 md:px-5 md:py-3.5 [@media(max-height:860px)_and_(min-height:761px)]:md:py-2.5 [@media(max-height:760px)]:md:py-2"
           >
             {/* Baldosa de ícono de marca (identifica el tema). */}
             <span
@@ -45,11 +47,11 @@ export function IndiceTemas({ onElegir }: Props) {
               </span>
               <span
                 data-row-titulo
-                className="font-display text-azul-principal block text-[1.15rem] leading-snug font-bold tracking-[-0.01em] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 md:text-[1.3rem]"
+                className="font-display text-azul-principal block text-[1.15rem] leading-snug font-bold tracking-[-0.01em] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 md:text-[1.3rem] [@media(max-height:760px)]:leading-tight"
               >
                 {t.titulo}
               </span>
-              <span className="text-gris-texto mt-0.5 hidden font-sans text-[0.83rem] leading-relaxed sm:block [@media(max-height:760px)]:sm:hidden">
+              <span className="text-gris-texto mt-0.5 hidden font-sans text-[0.83rem] leading-relaxed sm:block [@media(max-height:760px)]:mt-0 [@media(max-height:760px)]:leading-snug">
                 {t.detalle}
               </span>
             </span>
@@ -66,7 +68,7 @@ export function IndiceTemas({ onElegir }: Props) {
 
       {/* Canal directo (antes en la barra fija): al pie del índice,
           jerarquía menor. Centrado bajo la columna del índice. */}
-      <div data-ap-head className="mt-5 text-center [@media(max-height:860px)]:mt-3.5 [@media(max-height:760px)]:mt-2.5">
+      <div data-ap-head className="mt-5 text-center [@media(max-height:860px)_and_(min-height:761px)]:mt-3.5 [@media(max-height:760px)]:mt-2.5">
         <p className="text-gris-texto font-sans text-[0.85rem]">
           ¿Preferís escribir directo?
         </p>

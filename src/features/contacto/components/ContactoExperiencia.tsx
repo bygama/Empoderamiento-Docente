@@ -164,7 +164,7 @@ export function ContactoExperiencia() {
           data-panel="apertura"
           aria-hidden={vista !== "apertura"}
           inert={vista !== "apertura"}
-          className="absolute inset-x-5 top-0 bottom-0 flex overflow-x-hidden overflow-y-auto pt-24 pb-8 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)]:md:pt-24 [@media(max-height:860px)]:md:pb-8"
+          className="absolute inset-x-5 top-0 bottom-0 flex overflow-x-hidden overflow-y-auto pt-24 pb-8 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pt-24 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-8 [@media(max-height:760px)]:md:pt-[5.5rem] [@media(max-height:760px)]:md:pb-6"
         >
           {/* Composición editorial asimétrica (idioma de la home): columna de
               identidad a la izquierda (titular + equipo real) y el ÍNDICE de
