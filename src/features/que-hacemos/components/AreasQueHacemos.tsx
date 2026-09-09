@@ -85,14 +85,13 @@ export function AreasQueHacemos() {
             encabezados pierde el bloque entero. Cuesta cero pixeles. */}
         <h2 className="sr-only">Seis áreas de trabajo</h2>
 
-        {/* La columna del índice pasó de 16rem a 19rem y el gap de 16 a 12
-            (2026-09-09): «Diseño de materiales didácticos» y «Desarrollo
-            profesional docente» se partían en dos renglones y estiraban el
-            índice a 302px de alto. El rótulo más largo necesita 241px en una
-            línea y con 16rem quedaban ~198 útiles. El ancho se saca de los dos
-            lados —columna más ancha Y gap más corto— para no comerle 48px de
-            una al bloque de texto. */}
-        <div className="lg:grid lg:grid-cols-[19rem_minmax(0,1fr)] lg:gap-12">
+        {/* La columna del índice vuelve a 16rem. Estuvo un rato en 19rem
+            para que «Diseño de materiales didácticos» y «Desarrollo
+            profesional docente» entraran en un renglón; después el índice pasó
+            a usar un rótulo corto (nombreCorto en areas.ts) y el más largo
+            bajó de 217 a 149px, así que el ancho extra ya no hacía falta y
+            vuelve al bloque de texto. */}
+        <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
           {/* Índice: pegado al costado en desktop, chips deslizables en celular.
               CENTRADO EN EL VIEWPORT, no pegado arriba: el mismo eje que el
               índice decorativo del borde derecho (IndicePagina, que es
@@ -118,7 +117,7 @@ export function AreasQueHacemos() {
                       <a
                         href={`#area-${a.id}`}
                         aria-current={activo ? "true" : undefined}
-                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.9rem] ${clasesDelItem(recorrido, activo)}`}
+                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
                       >
                         <span
                           className={`font-mono text-[0.72rem] tabular-nums transition-opacity duration-300 motion-reduce:transition-none ${recorrido ? "opacity-90" : "opacity-50"}`}
