@@ -31,9 +31,10 @@ export const NAV_LINKS: readonly NavItem[] = [
     // Las secciones reales de la página (ids de sus componentes): el
     // "enfoque" que se pensó primero no existe acá (vive en Quiénes somos).
     submenu: [
+      { label: "Cómo trabajamos", href: "/que-hacemos#como-trabajamos" },
       { label: "Áreas", href: "/que-hacemos#areas" },
       { label: "Niveles", href: "/que-hacemos#niveles" },
-      { label: "Cómo trabajamos", href: "/que-hacemos#como-trabajamos" },
+      { label: "Proyectos", href: "/que-hacemos#proyectos" },
     ],
   },
   {
