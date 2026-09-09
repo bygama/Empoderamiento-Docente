@@ -29,7 +29,9 @@ export const metadata: Metadata = {
 // «Proyectos y aplicaciones» vuelve el 2026-09-09, en texto plano y antes
 // del cierre: es la sección 6 del sitemap, se había mudado a Investigación
 // y ahí se eliminó, así que no vivía en ningún lado. Es la prueba de todo
-// lo anterior, justo antes de invitar a conversar.
+// lo anterior, justo antes de invitar a conversar. El mismo día «Cómo
+// trabajamos» sube a después del faro (Gastón): el método se cuenta antes
+// de la oferta, y Niveles queda seguido de su prueba.
 export default function QueHacemosPage() {
   return (
     <main id="contenido" tabIndex={-1}>
@@ -58,9 +60,9 @@ export default function QueHacemosPage() {
             CTA final («Ver las seis áreas») baja a #areas. */}
         <QueHacemosHeroFaro />
       </div>
+      <MiradaPasos />
       <AreasQueHacemos />
       <NivelesEscala />
-      <MiradaPasos />
       <ProyectosAplicaciones />
       <CierreQueHacemos />
     </main>

@@ -6,13 +6,17 @@ import { MIRADA, MIRADA_INTRO } from "@/features/que-hacemos/areas";
  * Tira estática de seis tarjetas: se lee entera de un vistazo. La versión
  * animada del método (cuatro pasos, scroll-story) sigue viviendo en el
  * Inicio; acá el camino horizontal que había duplicaba eso y se sacó.
+ *
+ * Va justo después del faro (Gastón, 2026-09-09), cuyo final es el velo
+ * blanco del deslumbre: por eso la sección es blanca y las tarjetas grises,
+ * al revés que antes. Con fondo gris había un corte seco en la junta.
  */
 export function MiradaPasos() {
   return (
     <section
       id="como-trabajamos"
       data-indice="Cómo trabajamos"
-      className="bg-gris-fondo text-azul-principal scroll-mt-28"
+      className="text-azul-principal scroll-mt-28 bg-white"
     >
       <div className="mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
         <header className="max-w-[62ch]">
@@ -31,7 +35,7 @@ export function MiradaPasos() {
           {MIRADA.map((p, i) => (
             <li
               key={p.verbo}
-              className="border-azul-principal/8 rounded-[1.25rem] border bg-white p-6 md:p-7"
+              className="bg-gris-fondo rounded-[1.25rem] p-6 md:p-7"
             >
               <p className="text-gris-texto font-mono text-[0.75rem] tracking-[0.18em]">0{i + 1}</p>
               <h3 className="font-display mt-2 text-[1.45rem] font-bold tracking-[-0.01em]">
