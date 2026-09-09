@@ -63,8 +63,17 @@ export function AreasQueHacemos() {
         </header>
 
         <div className="mt-12 lg:mt-16 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
-          {/* Índice: pegado al costado en desktop, chips deslizables en celular. */}
-          <nav aria-label="Áreas de trabajo" className="lg:sticky lg:top-28 lg:self-start">
+          {/* Índice: pegado al costado en desktop, chips deslizables en celular.
+              CENTRADO EN EL VIEWPORT, no pegado arriba: el mismo eje que el
+              índice decorativo del borde derecho (IndicePagina, que es
+              fixed top-1/2 -translate-y-1/2), así los dos costados se leen
+              simétricos. El self-start se queda para que el nav mida lo que
+              mide su contenido: si se estirara a lo alto de la fila, el sticky
+              no tendría recorrido. */}
+          <nav
+            aria-label="Áreas de trabajo"
+            className="lg:sticky lg:top-1/2 lg:-translate-y-1/2 lg:self-start"
+          >
             <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
               {AREAS.map((a, i) => {
                 const activo = i === activa;
