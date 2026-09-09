@@ -26,6 +26,8 @@ const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean
 type Cfg = {
   aspect: string;
   radius: string;
+  /** Radio solo abajo, para el vidrio del caption (ver VIDRIO). */
+  radiusB: string;
   /**
    * Fondo del caption EN REPOSO. Las dos direcciones conservan el plato blanco
    * sólido; de N3 para abajo es vidrio esmerilado, así la foto respira por
@@ -67,15 +69,18 @@ type Cfg = {
  * lee sobre un blanco al 84% con blur fuerte, que iguala fondos claros y
  * oscuros. La transparencia se percibe por el blur y por la foto que continúa,
  * no por el porcentaje: más abajo de 80% el rol se pierde en fotos claras.
+ * El vidrio lleva su propio radio abajo (rounded-b-*): Chrome recorta el
+ * backdrop-filter en un rectángulo aunque la card tenga overflow-hidden y
+ * bordes redondeados, y en las esquinas asomaba el navy de atrás.
  * Antes la Dirección llevaba placa opaca (decisión de ED, 2026-09-09).
  */
-const VIDRIO = "bg-white/84 backdrop-blur-[10px]";
+const VIDRIO = "bg-white/80 backdrop-blur-[10px]";
 
 const CFG: Record<Tier, Cfg> = {
-  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", plate: VIDRIO, pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, iniciales: "text-[7rem]" },
-  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", plate: VIDRIO, pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[5.5rem]" },
-  3: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.35rem]", plate: VIDRIO, pad: "p-[1.15rem]", nombre: "text-[1.18rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[4.4rem]" },
-  4: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.15rem]", plate: VIDRIO, pad: "p-[0.95rem]", nombre: "text-[1.02rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, iniciales: "text-[3.1rem]" },
+  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", radiusB: "rounded-b-[1.5rem]", plate: VIDRIO, pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, iniciales: "text-[7rem]" },
+  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", radiusB: "rounded-b-[1.4rem]", plate: VIDRIO, pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[5.5rem]" },
+  3: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.35rem]", radiusB: "rounded-b-[1.35rem]", plate: VIDRIO, pad: "p-[1.15rem]", nombre: "text-[1.18rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[4.4rem]" },
+  4: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.15rem]", radiusB: "rounded-b-[1.15rem]", plate: VIDRIO, pad: "p-[0.95rem]", nombre: "text-[1.02rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, iniciales: "text-[3.1rem]" },
 };
 
 /**
@@ -130,7 +135,7 @@ function Caption({
         cfg.pad,
         hover
           ? "from-azul-principal/95 via-azul-principal/55 to-transparent bg-gradient-to-t pt-20 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
-          : cx(cfg.plate, "opacity-100 group-hover:opacity-0 group-focus-visible:opacity-0"),
+          : cx(cfg.plate, cfg.radiusB, "opacity-100 group-hover:opacity-0 group-focus-visible:opacity-0"),
       )}
     >
       <span
