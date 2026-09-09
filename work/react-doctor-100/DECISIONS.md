@@ -282,3 +282,25 @@ landmark queda nativo en todo navegador que conozca el elemento —los tres de e
 en 2023— y en los anteriores el buscador sigue siendo un campo con su `<label>`, que es lo que
 era antes de la lane. Lo que NO se hace es dejar el rol y bajar el score, ni suprimir la regla.
 Descartadas: volver a `<div role="search">` (reabre `prefer-tag-over-role`); `react-doctor-disable`.
+
+## 2026-09-09 — La rama se borra por identidad de árbol, no por `--merged`
+
+`git branch -r --merged origin/main` no listaba `refactor/react-doctor-100`, y
+`git log --cherry-pick` daba sus 82 commits como no mergeados. Las dos señales son falsos
+negativos: el PR #91 aterrizó **aplastado en un solo commit** (`eb65729`, un solo padre), así
+que ningún patch-id de la rama coincide con nada de `main`. El criterio que sí decide es la
+identidad de árbol: `git diff origin/refactor/react-doctor-100 eb65729` vacío prueba que el
+squash se llevó el árbol entero, y `merge-base --is-ancestor eb65729 origin/main` que ese
+commit está en `main`. Sumado a cero commits en la rama posteriores al merge, no había trabajo
+que perder y la rama se borró. Descartadas: borrar confiando en el estado MERGED del PR sin
+mirar el contenido; dejarla viva por lo que decía `--merged`.
+
+## 2026-09-09 — La carpeta de la lane sale en un PR propio, no colgada del #91
+
+La receta pide que la carpeta se vaya en el último commit del PR que cierra la lane. Acá no
+pasó: el #91 mergeó el 2026-09-08 con `work/react-doctor-100/` adentro, y ese PR ya no existe
+como lugar donde meter nada. La alternativa —borrarla con un push directo a `main`— la
+prohíbe AGENTS.md §5.7. Así que el cierre va por su propio PR, con los dos commits que pide
+la receta: primero el que deja PROGRESS verdadero y con el bloque PASS del cierre, después el
+que saca la carpeta. El historial conserva los once archivos. Descartadas: push directo a
+`main`; dejar la carpeta y anotar la deuda para después (la sesión de «después» no existe).
