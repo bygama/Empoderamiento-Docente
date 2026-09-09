@@ -1,13 +1,26 @@
 // Qué hace ED, en texto plano. Es lo que la web tiene que decir antes de
 // cualquier animación.
 //
-// Las SEIS áreas son las del cartel oficial de la oficina (2026): ese orden y
-// esos nombres. Cada una lleva la frase «en verde» y la descripción que
-// escribió Raquel en julio de 2026 («cambios en la página»), y lo que hay
-// documentado de entregables y proyectos (docs/content/que-hace-ed-fuentes.md,
-// §3 y §6). Los «hechos» con nombre y número salen del CV de Daniela y del
-// PPTX institucional: VALIDAR con Raquel y Daniela antes del lanzamiento
-// (docs/content/copy-que-hacemos.md es la versión para que corrijan).
+// Las SIETE áreas de especialización, en el orden y con el copy que validó la
+// dirección general (Daniela). Son las mismas que muestra el abanico del
+// Inicio (features/home/components/LineasAccion), así que las dos páginas
+// dicen lo mismo: el nombre, la frase «en verde» y la descripción salen de
+// ahí, textuales.
+//
+// CAMBIO DEL 2026-09-09, y conviene saber por qué. Antes eran SEIS, las del
+// cartel de la oficina (2026), y docs/content/que-hace-ed-fuentes.md §3.7
+// dejaba afuera «Fortalecimiento institucional» y «Transformación de sistemas
+// educativos» por considerarlas escala y no servicio, con la confirmación de
+// Facundo. La dirección general validó las siete, y eso manda: las dos
+// entran. Se cae «Acompañamiento», que estaba en el cartel pero no en las
+// siete; lo que hacía sigue nombrado dentro de Desarrollo profesional, cuya
+// descripción habla de acompañamiento.
+//
+// Lo específico de esta página —teLlevas, paraQuien, hechos— viene de
+// docs/content/que-hace-ed-fuentes.md §3 y §6. Los «hechos» con nombre y
+// número salen del CV de Daniela y del PPTX institucional: VALIDAR con Raquel
+// y Daniela antes del lanzamiento (docs/content/copy-que-hacemos.md es la
+// versión para que corrijan).
 //
 // Copy: sustantivos abarcativos, «Matemáticas» con S cuando es el sustantivo,
 // sin punto final en las líneas cortas (pedido de Raquel).
@@ -60,33 +73,33 @@ export const AREAS_INTRO =
 
 export const AREAS: readonly Area[] = [
   {
-    id: "investigacion",
-    nombre: "Investigación",
-    idea: "La práctica produce conocimiento",
+    id: "desarrollo-profesional",
+    nombre: "Desarrollo profesional docente",
+    nombreCorto: "Desarrollo profesional",
+    idea: "La experiencia como fuente de reflexión",
     queEs:
-      "Investigamos las prácticas educativas para producir conocimiento y devolverlo a las aulas en forma de currículo, materiales, formación y evaluación.",
+      "Impulsamos procesos de desarrollo profesional con sustento vivencial y acompañamiento que fortalecen la práctica, promueven la reflexión y resignifican las matemáticas.",
     teLlevas: [
-      "Estudios y sistematización",
-      "Evidencia para decidir",
-      "Publicaciones y difusión",
+      "Dispositivo a tu medida",
+      "Formación de liderazgos",
+      "Seguimiento en el aula",
     ],
-    paraQuien:
-      "Ministerios, universidades y redes que necesitan evidencia de sus aulas",
+    paraQuien: "Ministerios, empresas, fundaciones y redes que forman a escala",
     hechos: [
-      "Siete líneas de investigación en Matemática Educativa",
-      "Artículos en Bolema y RELIME (2025)",
-      "Libro «Empoderamiento docente y Socioepistemología» (Gedisa)",
+      "Cursos y talleres para más de 11.000 docentes de educación media superior en México",
+      "Formación de 500 formadores del Plan Nacional Aprender Matemática (Argentina)",
+      "Workshops y acompañamiento a líderes en escuelas técnicas de Argentina, México y Brasil",
     ],
-    foto: "/hero/hero-2.webp",
-    alt: "Equipo de ED con una de sus publicaciones",
+    foto: "/metodo/acompanamos.webp",
+    alt: "Docentes trabajando en un taller",
   },
   {
     id: "materiales",
-    nombre: "Diseño de materiales didácticos",
-    nombreCorto: "Diseño de materiales",
+    nombre: "Materiales para la resignificación de las matemáticas",
+    nombreCorto: "Materiales didácticos",
     idea: "Cada tarea puede transformar la relación con las matemáticas",
     queEs:
-      "Diseñamos materiales que median entre el cuerpo docente, las matemáticas y el aprendizaje: tareas que invitan a explorar, argumentar y reconstruir significados.",
+      "Diseñamos materiales que median la relación entre docentes, matemáticas y aprendizaje, generando rupturas productivas que invitan a explorar, argumentar y resignificar.",
     teLlevas: [
       "Colecciones didácticas",
       "Situaciones de aprendizaje",
@@ -103,51 +116,9 @@ export const AREAS: readonly Area[] = [
     alt: "Materiales didácticos sobre una mesa de trabajo",
   },
   {
-    id: "desarrollo-profesional",
-    nombre: "Desarrollo profesional docente",
-    nombreCorto: "Desarrollo profesional",
-    idea: "La experiencia como fuente de reflexión",
-    queEs:
-      "Trayectos, talleres y diplomaturas donde cada docente vive una situación de aprendizaje, la lleva al aula y la analiza en comunidad, con material específico y acompañamiento de especialistas.",
-    teLlevas: [
-      "Dispositivo a tu medida",
-      "Formación de liderazgos",
-      "Seguimiento en el aula",
-    ],
-    paraQuien:
-      "Ministerios, empresas, fundaciones y redes que forman a escala",
-    hechos: [
-      "Cursos y talleres para más de 11.000 docentes de educación media superior en México",
-      "Formación de 500 formadores del Plan Nacional Aprender Matemática (Argentina)",
-      "Workshops y acompañamiento a líderes en escuelas técnicas de Argentina, México y Brasil",
-    ],
-    foto: "/metodo/acompanamos.webp",
-    alt: "Docentes trabajando en un taller",
-  },
-  {
-    id: "acompanamiento",
-    nombre: "Acompañamiento",
-    idea: "Vivimos para hacer vivir",
-    queEs:
-      "Estamos cerca de equipos técnicos, coordinaciones y líderes pedagógicos mientras las propuestas se implementan: miramos las prácticas, analizamos evidencias y ajustamos el rumbo.",
-    teLlevas: [
-      "Encuentros todo el año",
-      "Asesoría pedagógica",
-      "Acompañamiento por sede",
-    ],
-    paraQuien:
-      "Equipos con programas en marcha que necesitan sostenerlos",
-    hechos: [
-      "Encuentros con coordinaciones de primer ciclo de la Ciudad de Buenos Aires",
-      "Acompañamiento a la implementación curricular en escuelas técnicas",
-      "Comunidad virtual para 3.500 docentes (México)",
-    ],
-    foto: "/hero/hero-5.webp",
-    alt: "Taller en un aula",
-  },
-  {
     id: "curriculo",
-    nombre: "Currículo",
+    nombre: "Currículo y arquitectura pedagógica",
+    nombreCorto: "Currículo",
     idea: "La coherencia hace posible el aprendizaje",
     queEs:
       "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido para orientar trayectorias de aprendizaje.",
@@ -168,7 +139,8 @@ export const AREAS: readonly Area[] = [
   },
   {
     id: "evaluacion",
-    nombre: "Evaluación",
+    nombre: "Evaluación para la mejora educativa",
+    nombreCorto: "Evaluación",
     idea: "Comprender permite decidir",
     queEs:
       "Desarrollamos sistemas de evaluación que generan evidencia situada para comprender los aprendizajes y orientar decisiones educativas.",
@@ -185,7 +157,72 @@ export const AREAS: readonly Area[] = [
       "Análisis de ganancia educativa entre generaciones",
     ],
     foto: "/metodo/evaluamos.webp",
-    alt: "Análisis de resultados de evaluación",
+    alt: "Análisis de resultados en pantalla",
+  },
+  {
+    id: "investigacion",
+    nombre: "Investigación en Matemática Educativa",
+    nombreCorto: "Investigación",
+    idea: "La práctica produce conocimiento",
+    queEs:
+      "Investigamos las prácticas educativas para producir conocimiento, compartirlo con la comunidad científica y seguir enriqueciendo el campo de la Matemática Educativa.",
+    teLlevas: [
+      "Estudios y sistematización",
+      "Evidencia para decidir",
+      "Publicaciones y difusión",
+    ],
+    paraQuien:
+      "Ministerios, universidades y redes que necesitan evidencia de sus aulas",
+    hechos: [
+      "Siete líneas de investigación en Matemática Educativa",
+      "Artículos en Bolema y RELIME (2025)",
+      "Libro «Empoderamiento docente y Socioepistemología» (Gedisa)",
+    ],
+    foto: "/hero/hero-2.webp",
+    alt: "Equipo de ED con una de sus publicaciones",
+  },
+  {
+    id: "fortalecimiento",
+    nombre: "Fortalecimiento institucional",
+    nombreCorto: "Fortalecimiento",
+    idea: "La continuidad hace posible las transformaciones",
+    queEs:
+      "Fortalecemos capacidades institucionales mediante el diseño de políticas, estrategias y procesos que favorecen transformaciones coherentes, sostenibles y perdurables.",
+    teLlevas: [
+      "Asesoría a instituciones",
+      "Diseño de políticas",
+      "Gestión del cambio",
+    ],
+    paraQuien:
+      "Instituciones que necesitan sostener sus transformaciones en el tiempo",
+    // Sin proyectos con nombre todavía: el área entró el 2026-09-09 desde la
+    // lista de la directora y las fuentes solo la describen como servicio
+    // («Consultoría estratégica en Matemática Educativa» en la Cartera). No se
+    // inventa ninguno; el campo no se publica.
+    hechos: [],
+    foto: "/metodo/escuchamos.webp",
+    alt: "Una facilitadora conversa con participantes sobre la mesa de trabajo",
+  },
+  {
+    id: "sistemas",
+    nombre: "Transformación de sistemas educativos",
+    nombreCorto: "Sistemas educativos",
+    idea: "La articulación hace posible las transformaciones sistémicas",
+    queEs:
+      "Integramos todas las dimensiones del cambio educativo para construir soluciones coherentes, sostenibles y pertinentes para cada realidad.",
+    teLlevas: [
+      "Diagnóstico y diseño",
+      "Implementación y monitoreo",
+      "Evaluación de impacto",
+    ],
+    paraQuien:
+      "Sistemas educativos que articulan todas las dimensiones del cambio",
+    // Ídem: descrita en la Cartera como «Soluciones institucionales
+    // integrales» (diagnóstico, diseño, implementación, monitoreo, evaluación
+    // de impacto), sin proyectos con nombre.
+    hechos: [],
+    foto: "/hero/hero-5.webp",
+    alt: "Taller en un aula",
   },
 ];
 
