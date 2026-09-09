@@ -36,6 +36,8 @@ export function FiguraPerfil({ profile, figura, modo, refOuter, refMover, refCie
   if (figura === "sin" || !profile.cutout) return null;
   const { cutout, cutoutPosition, fullName } = profile;
   const medidas = profile.cutoutSize ?? { width: 1200, height: 1600 };
+  // Marco apaisado (una lámina): misma altura de referencia, proporción 5:3.
+  const apaisado = figura === "marco" && !!profile.marcoApaisado;
 
   if (modo === "lineal") {
     return figura === "recorte" ? (
@@ -48,7 +50,12 @@ export function FiguraPerfil({ profile, figura, modo, refOuter, refMover, refCie
         style={{ objectPosition: cutoutPosition }}
       />
     ) : (
-      <div className="ring-azul-principal/10 relative mx-auto aspect-[4/5] w-full max-w-[20rem] overflow-hidden rounded-[1.5rem] shadow-[0_30px_70px_-36px_rgb(31_45_77/0.45)] ring-1">
+      <div
+        className={cx(
+          "ring-azul-principal/10 relative mx-auto w-full overflow-hidden rounded-[1.5rem] shadow-[0_30px_70px_-36px_rgb(31_45_77/0.45)] ring-1",
+          apaisado ? "aspect-[5/3] max-w-[28rem]" : "aspect-[4/5] max-w-[20rem]",
+        )}
+      >
         <Image
           src={cutout}
           alt={fullName}
@@ -68,11 +75,20 @@ export function FiguraPerfil({ profile, figura, modo, refOuter, refMover, refCie
         aria-hidden="true"
         className={cx(
           "pointer-events-none absolute right-[3%] hidden lg:block",
-          figura === "marco" ? "bottom-[9%] h-[min(36vh,320px)]" : "bottom-0 h-[min(48vh,440px)]",
+          apaisado
+            ? "bottom-[9%] h-[min(24vh,220px)]"
+            : figura === "marco"
+              ? "bottom-[9%] h-[min(36vh,320px)]"
+              : "bottom-0 h-[min(48vh,440px)]",
         )}
       >
         {figura === "marco" ? (
-          <div className="ring-azul-principal/10 relative h-full w-[calc(min(36vh,320px)*0.8)] overflow-hidden rounded-[1.4rem] opacity-95 shadow-[0_34px_70px_-40px_rgb(31_45_77/0.45)] ring-1">
+          <div
+            className={cx(
+              "ring-azul-principal/10 relative h-full overflow-hidden rounded-[1.4rem] opacity-95 shadow-[0_34px_70px_-40px_rgb(31_45_77/0.45)] ring-1",
+              apaisado ? "w-[calc(min(24vh,220px)*1.667)]" : "w-[calc(min(36vh,320px)*0.8)]",
+            )}
+          >
             <Image
               src={cutout}
               alt=""
@@ -116,12 +132,19 @@ export function FiguraPerfil({ profile, figura, modo, refOuter, refMover, refCie
         )}
       >
         {figura === "marco" ? (
-          <div className="ring-azul-principal/10 relative h-[min(58vh,520px)] w-[clamp(14rem,21vw,19rem)] overflow-hidden rounded-[1.75rem] shadow-[0_44px_90px_-44px_rgb(31_45_77/0.5)] ring-1">
+          <div
+            className={cx(
+              "ring-azul-principal/10 relative overflow-hidden rounded-[1.75rem] shadow-[0_44px_90px_-44px_rgb(31_45_77/0.5)] ring-1",
+              apaisado
+                ? "h-[min(30vh,280px)] w-[calc(min(30vh,280px)*1.667)]"
+                : "h-[min(58vh,520px)] w-[clamp(14rem,21vw,19rem)]",
+            )}
+          >
             <Image
               src={cutout}
               alt=""
               fill
-              sizes="(min-width: 1024px) 19rem, 0px"
+              sizes={apaisado ? "(min-width: 1024px) 30rem, 0px" : "(min-width: 1024px) 19rem, 0px"}
               onLoad={onCargar}
               className="object-cover"
               style={{ objectPosition: cutoutPosition }}
