@@ -30,13 +30,26 @@
  * prometer resultado entregado, que es el riesgo que marca MESSAGING §6
  * («basada en evidencia, sin afirmaciones grandilocuentes»).
  *
- * ACÁ SE FRENA. La bajada arrancó en 152 caracteres, se acortó a 89 para
- * conseguir los dos renglones y volvió a 112 sumando de a una palabra. En
- * desktop el escalón aguanta (625/428), pero se fue achatando en cada paso
- * —era 602/242— y en 390px ya no existe: 305/323/288, con el renglón del
- * medio más ancho que el de arriba. Una palabra más y el escalón de desktop
- * también se pierde. Si hace falta cambiar algo, cambiar palabras, no
- * sumarlas.
+ * «de docentes» cerró la serie: nombra de quién es la relación que ED
+ * transforma, que hasta acá no estaba. Va SIN artículo a propósito. Así
+ * «docentes» es epiceno y no marca género, que es lo que pide AGENTS §5.1;
+ * «los docentes» sí sería masculino genérico y está prohibido. Lo que no
+ * hace es desdoblar («de las y los docentes»), que es lo que prefiere la
+ * tabla de léxico de MESSAGING §6: son cinco palabras y no entraban.
+ *
+ * DÓNDE QUEDÓ LA FORMA. La bajada arrancó en 152 caracteres, se acortó a 89
+ * para conseguir los dos renglones y volvió a 125 sumando de a una palabra.
+ * En desktop siguen siendo dos renglones, pero el escalón se fue achatando
+ * en cada paso: 602/242 → 602/330 → 607/407 → 625/428 → 625/546. De 360px
+ * de diferencia a 79. En 390px son CUATRO renglones, que es lo que se había
+ * pedido evitar: con 125 caracteres en una caja de 335px no entran en menos.
+ * Si hace falta mover algo, cambiar palabras por otras, no sumarlas.
+ *
+ * De ahí `text-pretty`, y no `text-balance`. En 390px el corte natural dejaba
+ * el último renglón en 62px —una palabra huérfana—; con `pretty` pasa a 159.
+ * En desktop no cambia nada: medido, `wrap` y `pretty` dan los mismos 625/546.
+ * `balance` sigue descartado por lo de arriba: empareja los renglones y mata
+ * el escalón.
  */
 export function TitularQH() {
   return (
@@ -75,10 +88,10 @@ export function TitularQH() {
 
       <p
         data-qh-rise
-        className="mt-6 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
+        className="mt-6 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed text-pretty text-white/85 md:text-[1.2rem]"
       >
         Generamos escenarios de aprendizaje situados que transforman hoy la
-        relación cotidiana con la matemática escolar.
+        relación cotidiana de docentes con la matemática escolar.
       </p>
     </>
   );
