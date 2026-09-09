@@ -9,8 +9,8 @@ import { AREAS, AREAS_INTRO } from "@/features/que-hacemos/areas";
  *
  * Raquel y Daniela (2026-09-08): la web se veía espectacular pero no se
  * entendía qué hace ED. Esta sección es la respuesta: nada se esconde
- * detrás de una animación. Cada área dice qué es, qué te llevás, para quién
- * es y qué se hizo ya. A la izquierda (en desktop) un índice pegado que
+ * detrás de una animación. Cada área dice qué es, qué te llevás y para quién
+ * es. A la izquierda (en desktop) un índice pegado que
  * marca el bloque que se está leyendo y sirve para saltar; en celular es una
  * fila de chips deslizable. El único JS es ese resaltado, y sin JS todo se
  * lee igual.
@@ -156,20 +156,6 @@ export function AreasQueHacemos() {
                         {a.paraQuien}
                       </p>
                     </div>
-                  </div>
-
-                  <div className="mt-8">
-                    <p className={rotulo}>Ejemplos de trabajo</p>
-                    <ul className="mt-3 flex flex-wrap gap-2">
-                      {a.hechos.map((h) => (
-                        <li
-                          key={h}
-                          className="border-azul-principal/15 text-azul-principal/80 rounded-full border px-3 py-1 font-sans text-[0.85rem] leading-snug"
-                        >
-                          {h}
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
 

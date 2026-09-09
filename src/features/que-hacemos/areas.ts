@@ -25,7 +25,16 @@ export type Area = {
   teLlevas: readonly string[];
   /** Para quién es esta área. */
   paraQuien: string;
-  /** Proyectos hechos que la ilustran. VALIDAR con ED antes de publicar. */
+  /**
+   * Proyectos hechos que la ilustran.
+   *
+   * NO SE PUBLICAN desde el 2026-09-09: eran chips al pie de cada área y
+   * salieron a pedido del owner. El dato se conserva —está levantado del CV
+   * de Daniela y del PPTX institucional— para cuando se decida dónde va.
+   * Ojo: nunca pasó por la validación que este mismo comentario pedía, así
+   * que republicarlo sin que Raquel y Daniela lo confirmen sería volver al
+   * problema, no arreglarlo.
+   */
   hechos: readonly string[];
   /** Foto del pool de marca (reusa las que ya están en public/). */
   foto: string;
