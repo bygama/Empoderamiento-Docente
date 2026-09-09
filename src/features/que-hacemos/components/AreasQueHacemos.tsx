@@ -158,8 +158,15 @@ export function AreasQueHacemos() {
                       idea, párrafo, bullets y otro párrafo, todo parejo. El
                       panel lo separa del bloque de arriba sin esconder nada
                       —la sección existe justamente para que no se esconda—:
-                      primero se lee QUÉ es el área, después el detalle. */}
-                  <div className="bg-gris-fondo mt-8 rounded-[1.25rem] p-6 md:mt-9 md:p-7">
+                      primero se lee QUÉ es el área, después el detalle.
+
+                      El min-h los empareja: medidos iban de 211 a 254px según
+                      cuánto ocupaba cada lista, y seis cajas del mismo color a
+                      seis alturas distintas se leen como un error de armado,
+                      no como una variación. El piso es el más alto de los
+                      seis; a los cortos les sobra aire adentro, que es
+                      preferible a la escalera. */}
+                  <div className="bg-gris-fondo mt-8 rounded-[1.25rem] p-6 md:mt-9 md:p-7 lg:min-h-[16rem]">
                     <div className="grid gap-8 sm:grid-cols-2">
                       <div>
                         <p className={rotulo}>Qué te llevás</p>
@@ -188,8 +195,8 @@ export function AreasQueHacemos() {
                   </div>
                 </div>
 
-                <div className="mt-8 lg:mt-0">
-                  <div className="relative aspect-[16/9] overflow-hidden rounded-[1.5rem] lg:aspect-[4/5]">
+                <div className="mt-8 lg:mt-0 lg:h-full">
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-[1.5rem] lg:aspect-auto lg:h-full">
                     <Image
                       src={a.foto}
                       alt={a.alt}
