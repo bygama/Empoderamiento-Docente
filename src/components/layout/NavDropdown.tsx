@@ -4,13 +4,16 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown } from "@/components/ui/icons";
 import type { NavItem } from "@/config/nav";
-import { coincideDestino, irEnPagina, partirDestino } from "@/lib/navegar";
+import { alClicSubirEnPagina, coincideDestino, irEnPagina, partirDestino } from "@/lib/navegar";
 
 /**
  * Un ítem del navbar de escritorio con su submenú (ver config/nav.ts).
  *
  * Comportamiento:
  * - El RÓTULO SIEMPRE NAVEGA a la página. Nunca es solo "abrir el menú".
+ *   Y si ya estás EN esa página, sube al principio deslizando: un Link a la
+ *   ruta en la que ya estás no hacía nada, y es el gesto natural para volver
+ *   arriba después de bajar un par de secciones.
  * - Abre con hover, con una demora corta de intención (pasar el mouse por
  *   la píldora no dispara menús) y una gracia al salir (bajar en diagonal
  *   hacia la tarjeta no lo cierra). Un solo menú abierto a la vez lo
@@ -143,6 +146,7 @@ export function NavDropdown({
       >
         <Link
           href={item.href}
+          onClick={alClicSubirEnPagina(enPagina)}
           aria-current={enPagina ? "page" : undefined}
           className={`py-2 pl-3 ${tiene ? "pr-1" : "pr-3"}`}
         >

@@ -10,7 +10,7 @@ import { irEnPagina, partirDestino } from "@/lib/navegar";
 import { Menu, X } from "@/components/ui/icons";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
-import { irASeccion } from "@/lib/indice";
+import { irArriba, irASeccion } from "@/lib/indice";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useMenuAnimado } from "./mobile-nav/useMenuAnimado";
@@ -89,6 +89,12 @@ export function MobileNav() {
   const irA = (id: string) => {
     close();
     window.setTimeout(() => irASeccion(id), 60);
+  };
+  // Tocar el nombre de la página en la que ya estamos: cierra y sube al
+  // principio deslizando. Misma espera de 60ms que arriba, por el lock.
+  const subir = () => {
+    close();
+    window.setTimeout(irArriba, 60);
   };
   // Destino de un submenú: en la misma página desliza (con la misma
   // espera); en otra, navega Next y aterriza el layout.
@@ -174,6 +180,7 @@ export function MobileNav() {
               desplegado={desplegado}
               onDesplegar={setDesplegado}
               onCerrar={close}
+              onSubirEnPagina={subir}
               onIrASeccion={irA}
               onIrADestino={irADestino}
             />

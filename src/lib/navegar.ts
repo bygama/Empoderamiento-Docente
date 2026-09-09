@@ -1,5 +1,5 @@
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { irASeccion } from "@/lib/indice";
+import { irArriba, irASeccion } from "@/lib/indice";
 
 /**
  * Ir a un DESTINO del sitio (`/pagina#seccion`, `/pagina?filtro=x#seccion`)
@@ -75,6 +75,28 @@ export function alClicIrA(id: string) {
       `${window.location.pathname}${window.location.search}#${id}`,
     );
     irASeccion(id);
+  };
+}
+
+/**
+ * onClick del RÓTULO de una página en el navbar. Si ya estás en esa página,
+ * un Link a la misma ruta no hace nada visible: te quedás donde estabas. Acá
+ * pasa a ser el atajo para volver arriba —scrolleaste dos secciones y querés
+ * el principio— deslizando, y de paso saca el hash, que si no seguiría
+ * apuntando a una sección que ya no estás mirando. Desde otra página no
+ * interviene: navega Next como siempre.
+ */
+export function alClicSubirEnPagina(enPagina: boolean) {
+  return (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!enPagina) return;
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}${window.location.search}`,
+    );
+    irArriba();
   };
 }
 
