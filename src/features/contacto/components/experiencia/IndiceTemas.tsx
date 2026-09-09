@@ -17,8 +17,10 @@ export function IndiceTemas({ onElegir }: Props) {
   return (
     <div className="mt-10 lg:mt-0" role="group" aria-label="Tema de la consulta">
       {/* En pantallas bajas (≤ 860px de alto) las filas se compactan para
-          que los cinco temas entren sin scroll interno (ver el panel). */}
-      <div className="flex flex-col gap-2.5 [@media(max-height:860px)]:gap-2">
+          que los cinco temas entren sin scroll interno (ver el panel); en
+          las muy bajas (≤ 760px: laptop escalada, 1440×690) además se
+          esconde el detalle de cada tema, como ya pasa en celular. */}
+      <div className="flex flex-col gap-2.5 [@media(max-height:860px)]:gap-2 [@media(max-height:760px)]:gap-1.5">
         {TEMAS.map((t, i) => (
           <button
             key={t.key}
@@ -47,7 +49,7 @@ export function IndiceTemas({ onElegir }: Props) {
               >
                 {t.titulo}
               </span>
-              <span className="text-gris-texto mt-0.5 hidden font-sans text-[0.83rem] leading-relaxed sm:block">
+              <span className="text-gris-texto mt-0.5 hidden font-sans text-[0.83rem] leading-relaxed sm:block [@media(max-height:760px)]:sm:hidden">
                 {t.detalle}
               </span>
             </span>
@@ -64,7 +66,7 @@ export function IndiceTemas({ onElegir }: Props) {
 
       {/* Canal directo (antes en la barra fija): al pie del índice,
           jerarquía menor. Centrado bajo la columna del índice. */}
-      <div data-ap-head className="mt-5 text-center [@media(max-height:860px)]:mt-3.5">
+      <div data-ap-head className="mt-5 text-center [@media(max-height:860px)]:mt-3.5 [@media(max-height:760px)]:mt-2.5">
         <p className="text-gris-texto font-sans text-[0.85rem]">
           ¿Preferís escribir directo?
         </p>
