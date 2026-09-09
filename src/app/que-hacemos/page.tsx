@@ -4,6 +4,7 @@ import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemos
 import { AreasQueHacemos } from "@/features/que-hacemos/components/AreasQueHacemos";
 import { NivelesEscala } from "@/features/que-hacemos/components/NivelesEscala";
 import { MiradaPasos } from "@/features/que-hacemos/components/MiradaPasos";
+import { ProyectosAplicaciones } from "@/features/que-hacemos/components/ProyectosAplicaciones";
 import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHacemos";
 
 export const metadata: Metadata = {
@@ -25,6 +26,10 @@ export const metadata: Metadata = {
 // el mismo motivo que la torre: alargaba la página sin sumar a la oferta.
 // Su componente queda en components/ para reubicarlo, y los logos de
 // aliados siguen publicados en el pie y en la home (DatosDuros).
+// «Proyectos y aplicaciones» vuelve el 2026-09-09, en texto plano y antes
+// del cierre: es la sección 6 del sitemap, se había mudado a Investigación
+// y ahí se eliminó, así que no vivía en ningún lado. Es la prueba de todo
+// lo anterior, justo antes de invitar a conversar.
 export default function QueHacemosPage() {
   return (
     <main id="contenido" tabIndex={-1}>
@@ -56,6 +61,7 @@ export default function QueHacemosPage() {
       <AreasQueHacemos />
       <NivelesEscala />
       <MiradaPasos />
+      <ProyectosAplicaciones />
       <CierreQueHacemos />
     </main>
   );
