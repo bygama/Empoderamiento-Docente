@@ -375,7 +375,11 @@ export const EQUIPO: Persona[] = [
           body: "Su producción articula investigación, formación docente y materiales destinados a transformar la enseñanza de la Matemática.",
           publications: [
             { year: "2013", kind: "Libro", title: "La transversalidad de la proporcionalidad", meta: "Secretaría de Educación Pública de México" },
+            // La que ella pone primera en su ficha: «conecta con el nombre y la identidad de ED».
+            { year: "2014", kind: "Artículo", title: "Socioepistemología y empoderamiento docente: acciones para un cambio educativo", meta: "Con Ricardo Cantoral · Bolema" },
             { year: "2016", kind: "Libro", title: "Empoderamiento docente y Socioepistemología", meta: "Editorial Gedisa", featured: true },
+            // Nota de divulgación que ella misma sumó a su ficha (robertorocca.org, 2022).
+            { year: "2022", kind: "Artículo", title: "Nunca recordé la tabla del 7, pero siento que soy buena en matemáticas", meta: "Nota de divulgación · Roberto Rocca, Grupo Techint" },
             { year: "2023", kind: "Artículo", title: "Aprendizaje de las matemáticas: ¿qué, para qué, para quién?", meta: "Con Karla Gómez-Osalde" },
             { year: "2024", kind: "Colección", title: "Matemática en Red", meta: "Coordinación de publicaciones · Ministerio de Educación de la Ciudad de Buenos Aires" },
             { year: "2025", kind: "Artículo", title: "Problematizar la matemática escolar: ¿cómo contribuye al desarrollo profesional docente?" },
@@ -542,6 +546,30 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Reflexive Conversation: Approach to the Professional Learning of Pre-service Mathematics Teachers",
               meta: "Universal Journal of Educational Research",
+            },
+            {
+              year: "2020",
+              kind: "Artículo",
+              title: "Conceptual and procedural learning in pre-service mathematics teachers during a conversation",
+              meta: "Con Eddie Aparicio y Landy Sosa · Memorias del PME-NA 42",
+            },
+            {
+              year: "2020",
+              kind: "Libro",
+              title: "Experiencias de aprendizaje y reconceptualización geométrica: una propuesta para la reorganización de la práctica docente",
+              meta: "Capítulo, con Landy Sosa — Prospecção de Problemas e Soluções nas Ciências Matemáticas 3 · Atena Editora",
+            },
+            {
+              year: "2020",
+              kind: "Libro",
+              title: "Reconceptualización de la geometría escolar como medio para la profesionalización docente en matemáticas de educación básica",
+              meta: "Capítulo — Educación Matemática en las Américas 2019 · CIAEM",
+            },
+            {
+              year: "2018",
+              kind: "Artículo",
+              title: "El uso del conocimiento matemático en las comunidades de ingenieros. Del objeto a la funcionalidad matemática",
+              meta: "Bolema",
             },
             {
               year: "2018",
@@ -848,17 +876,29 @@ export const EQUIPO: Persona[] = [
           categoryId: "investigacion",
           color: "azul",
           eyebrow: "Producción reciente",
-          period: "2023 – 2024",
+          period: "2023 – 2026",
           variant: "ramas",
-          title: "Los libros de texto y la planeación de clase.",
-          body: "Dos investigaciones recientes, escritas con colegas de la propia unidad académica, miran de cerca dos objetos cotidianos de la enseñanza: la tarea del libro de texto y la planeación con la que un profesor entra al aula.",
+          title: "Los libros de texto, la planeación de clase y un libro propio.",
+          body: "Dos investigaciones con colegas de la propia unidad académica miran de cerca la tarea del libro de texto y la planeación con la que un profesor entra al aula. Un capítulo lleva GeoGebra al álgebra del bachillerato, y el libro que editó en 2026 reúne investigaciones para la formación docente en matemáticas.",
           publications: [
+            {
+              year: "2026",
+              kind: "Libro",
+              title: "Formación y desarrollo profesional de profesores de matemáticas: implementación de las investigaciones en Educación Matemática",
+              meta: "Edición, con David Alfonso Páez y Lilia Aké · Editorial SOMIDEM",
+            },
             {
               year: "2024",
               kind: "Artículo",
               title: "¿Qué significados de la derivada favorece un profesor en su planeación de clase?",
               meta: "Con Eduardo Briceño · Revista de Investigación Educativa de la REDIECH",
               featured: true,
+            },
+            {
+              year: "2024",
+              kind: "Libro",
+              title: "Implementación del manual «Álgebra dinámica» y el software GeoGebra como recurso didáctico para el aprendizaje de álgebra elemental en el nivel medio superior",
+              meta: "Capítulo, con María Sofía Valero — Intervenciones educativas para la incidencia social · Universidad Autónoma de San Luis Potosí",
             },
             {
               year: "2023",
@@ -1897,7 +1937,7 @@ export const EQUIPO: Persona[] = [
           period: "2025 – 2026",
           variant: "ramas",
           title: "Ciudadanía, contextos y empoderamiento.",
-          body: "Sus publicaciones más recientes cruzan la formación ciudadana, los contextos de significación y el empoderamiento docente en la formación de posgrado.",
+          body: "Sus publicaciones más recientes cruzan la formación ciudadana, los contextos de significación y el empoderamiento docente en la formación de posgrado, y llevan a las revistas la experiencia de los círculos y los festivales matemáticos.",
           publications: [
             {
               year: "2026",
@@ -1919,10 +1959,23 @@ export const EQUIPO: Persona[] = [
               meta: "Con I. Tuyub y Gabriela Buendía · Tecné, Episteme y Didaxis",
             },
             {
+              year: "2026",
+              kind: "Artículo",
+              title: "Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia",
+              meta: "Con R. Bussain · Revista UNO",
+            },
+            {
               year: "2025",
               kind: "Artículo",
               title: "¿Es posible formar ciudadanos críticos en las aulas colombianas de matemáticas?",
               meta: "Con J. Sánchez · Revista Papeles",
+            },
+            {
+              // Revista de la Cooperativa de Trabajadores de la Educación de Cundinamarca (ISSN 1657-9585).
+              year: "2025",
+              kind: "Artículo",
+              title: "Soacha celebra el saber con el Festival Matemático Santanderista",
+              meta: "Nota de divulgación · Solidario, edición 127",
             },
           ],
         },
@@ -2038,19 +2091,43 @@ export const EQUIPO: Persona[] = [
             { period: "2015 – 2017", title: "La cognición y el afecto en la enseñanza y el aprendizaje de la matemática" },
             { period: "2020 – 2022", title: "Estudios sobre y con el profesor de matemáticas" },
           ],
+        },
+        {
+          id: "produccion",
+          n: 4,
+          categoryId: "investigacion",
+          color: "azul",
+          eyebrow: "Producción",
+          period: "2023",
+          variant: "ramas",
+          title: "Las literales, las interacciones entre profesores y las gráficas de movimiento.",
+          body: "Tres piezas de un mismo año: qué significan las literales para estudiantes de secundaria y de nuevo ingreso a la universidad, qué aportan las interacciones entre profesores de matemáticas a su conocimiento profesional, y cómo se interpreta el movimiento en una gráfica.",
+          // Las dos primeras son las que ella eligió mostrar (ficha de julio de 2026).
           publications: [
+            {
+              year: "2023",
+              kind: "Artículo",
+              title: "Significados otorgados a las literales por estudiantes de secundaria y universitarios de nuevo ingreso",
+              meta: "Con R. E. Páez y Judith Hernández · Revista de Investigación Educativa de la REDIECH",
+              featured: true,
+            },
+            {
+              year: "2023",
+              kind: "Libro",
+              title: "Las interacciones entre y con profesores de matemáticas como un recurso para la construcción de conocimiento profesional",
+              meta: "Capítulo, con Judith Hernández y A. Espino — Perspectivas actuales de la Educación Matemática · Editorial SOMIDEM",
+            },
             {
               year: "2023",
               kind: "Libro",
               title: "Interpretación del movimiento, ¿gráficas cartesianas o trayectorias?",
               meta: "Capítulo — Perspectivas de Investigación e Innovación en Matemática Educativa · Universidad Autónoma de Coahuila",
-              featured: true,
             },
           ],
         },
         {
           id: "tesis",
-          n: 4,
+          n: 5,
           categoryId: "desarrollo-profesional",
           color: "naranja",
           eyebrow: "Formar investigadoras e investigadores",
@@ -2072,7 +2149,7 @@ export const EQUIPO: Persona[] = [
         },
         {
           id: "convergencia",
-          n: 5,
+          n: 6,
           categoryId: "pensamiento-matematico",
           color: "verde",
           eyebrow: "La convergencia",
@@ -2199,7 +2276,9 @@ export const EQUIPO: Persona[] = [
           title: "Cómo se desarrolla el pensamiento variacional, y cómo se evalúa.",
           body: "Su aporte teórico es un esquema para el desarrollo del pensamiento y lenguaje variacional: qué se pone en juego cuando alguien piensa el cambio, cómo diseñar situaciones que lo provoquen y con qué criterios evaluarlo.",
           milestones: [
-            { period: "2024", title: "Rúbrica para evaluar el desarrollo del pensamiento y lenguaje variacional" },
+            // SOMIDEM fecha el libro en 2023 (su CV dice 2024): va la fecha de la editorial,
+            // la misma que usa Darly para su capítulo del mismo libro.
+            { period: "2023", title: "Rúbrica para evaluar el desarrollo del pensamiento y lenguaje variacional" },
             { period: "2025", title: "Referentes teóricos para el diseño de situaciones variacionales" },
             { title: "Más de 30 publicaciones arbitradas y más de 60 ponencias" },
           ],
@@ -2236,6 +2315,12 @@ export const EQUIPO: Persona[] = [
               kind: "Libro",
               title: "Matemáticas 2, Serie espiral del saber",
               meta: "Coautoría, con su Libro de Recursos para el Profesor · Editorial Santillana",
+            },
+            {
+              year: "2023",
+              kind: "Libro",
+              title: "Rúbrica para evaluar el desarrollo del pensamiento y lenguaje variacional",
+              meta: "Capítulo — Perspectivas actuales de la Educación Matemática · Editorial SOMIDEM",
             },
             {
               year: "2025",
@@ -2425,7 +2510,7 @@ export const EQUIPO: Persona[] = [
           categoryId: "graficas",
           color: "azul",
           eyebrow: "Producción",
-          period: "2020 – 2024",
+          period: "2017 – 2024",
           variant: "ramas",
           title: "Del teorema de Pitágoras a la planeación de clase.",
           body: "Quince artículos arbitrados, la mitad de ellos destacados. Los más recientes miran de cerca lo que hace el profesorado: qué significados pone en juego al planear y qué tecnología traen las tareas de los libros de texto.",
@@ -2454,6 +2539,12 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Análisis de la resolución de un problema de cinemática mediante el mapa conceptual híbrido",
               meta: "Enseñanza de las Ciencias",
+            },
+            {
+              year: "2017",
+              kind: "Artículo",
+              title: "La modelación matemática en los procesos de formación inicial y continua de docentes",
+              meta: "Con Lizbet Alamillo · Revista de Investigación Educativa de la REDIECH",
             },
           ],
         },

@@ -54,14 +54,14 @@ en Quiénes somos, — = en ningún lado.
 
 **Lo que ella priorizó** (ficha de julio, con su comentario de por qué cada una):
 
-1. Reyes-Gasperini, D. y Cantoral, R. (2014). Socioepistemología y empoderamiento docente: acciones para un cambio educativo. *Bolema*, 28(48), 360-382. DOI 10.1590/1980-4415v28n48a14 — «conecta con el nombre y la identidad de ED». **No está en la web.**
+1. Reyes-Gasperini, D. y Cantoral, R. (2014). Socioepistemología y empoderamiento docente: acciones para un cambio educativo. *Bolema*, 28(48), 360-382. DOI 10.1590/1980-4415v28n48a14 — «conecta con el nombre y la identidad de ED». En su perfil desde el 2026-09-09.
 2. El libro de Gedisa (2016) — «la publicación central para posicionarla como referente». En la web, destacado.
 3. Gómez-Osalde, K. y Reyes-Gasperini, D. *Aprendizaje de las matemáticas: ¿qué, para qué, para quién?* *Propuesta Educativa*, 58, 21-37 — «título cercano, sirve para redes y presentaciones». En la web. **Año en disputa:** 2023 en el CV y la ficha de Daniela, 2022 en el CVU de Karla.
 4. Báez, M., Flores, R. y Reyes-Gasperini, D. (2025). Problematizar la matemática escolar: ¿cómo contribuye al desarrollo profesional docente? *Bolema*, 39, e2302049. DOI 10.1590/1980-4415v39a230249 — «muy actual y alineada con formación docente». En la web.
 5. Oaxaca (2016), Perfiles Educativos — «comunica escala, territorio y cambio real». Es el caso 01.
 6. Reyes-Gasperini, D. (2013). *La transversalidad de la proporcionalidad.* SEP México. ISBN 978-607-9362-01-0 — «expertise en un contenido clave». En la web.
 
-Además, en la ficha pegó una nota de divulgación: **Reyes-Gasperini, D. (2022). «Nunca recordé la tabla del 7, pero siento que soy buena en matemáticas».** Roberto Rocca / Grupo Techint. Propone repensar la enseñanza desde el pensamiento matemático funcional y menciona a ED y a Techint. Sirve para Novedades. **No está en la web.**
+Además, en la ficha pegó una nota de divulgación: **Reyes-Gasperini, D. (2022). «Nunca recordé la tabla del 7, pero siento que soy buena en matemáticas».** Roberto Rocca / Grupo Techint. Propone repensar la enseñanza desde el pensamiento matemático funcional y menciona a ED y a Techint. Sirve para Novedades. En su perfil desde el 2026-09-09; la nota vive en robertorocca.org/es/articulos/2022/nunca-recorde-la-tabla-del-7-pero-siento-que-soy-buena-en-matematicas.
 
 **Lo demás que trae su CV 2025** (`CV DRG202508.docx`, también `CV Daniela Reyes.docx`):
 
@@ -76,7 +76,7 @@ Además, en la ficha pegó una nota de divulgación: **Reyes-Gasperini, D. (2022
 - Coordinación de publicaciones (14): **Matemática en Red** 2024 (Proporcionalidad Directa, Tomo I, Tomo II — Ministerio de Educación de CABA) y los **11 títulos del Plan Nacional Aprender Matemática** 2019 (Ministerio de Educación, Cultura, Ciencia y Tecnología de Argentina), cada uno con su ISBN.
 - Memorias con arbitraje: 12 internacionales (ALME 2011-2019, CERME 9 Praga 2015, SEIEM 2015, UPN Bogotá 2012) y 2 nacionales (EIME 2012, 2013).
 
-En la web hoy: 6 piezas en su perfil (SEP 2013, Gedisa 2016, Propuesta Educativa, Matemática en Red, Bolema 2025, PNAM) más el caso 01.
+En la web (2026-09-09): 8 piezas en su perfil (SEP 2013, Bolema 2014, Gedisa 2016, la nota de Roberto Rocca 2022, Propuesta Educativa, Matemática en Red, Bolema 2025, PNAM) más el caso 01.
 
 ### Karla Gómez Osalde
 
@@ -87,18 +87,18 @@ Su ficha pide mostrar dos: RELIME 2025 y Propuesta Educativa 2022. Su CVU trae 8
 | 2025 | Resignificación… *RELIME* (PDF #2) | sí |
 | 2022 | Aprendizaje de las matemáticas… *Propuesta Educativa* 31(58), 21-37 | sí |
 | 2020 | Reflexive Conversation: Approach to the Professional Learning of Pre-service Mathematics Teachers. *Universal Journal of Educational Research*, 8(5). DOI 10.13189/ujer.2020.080516 | sí |
-| 2020 | Conceptual and procedural learning… PME-NA 42 (PDF #6) | **no** |
-| 2020 | Experiencias de aprendizaje y reconceptualización geométrica… Atena (PDF #5) | **no** |
-| 2020 | Reconceptualización de la geometría escolar como medio para la profesionalización docente en matemáticas de educación básica. *Educación Matemática en las Américas 2019* (CIAEM). ISBN 978-9945-09-413-8 | **no** |
-| 2018 | El uso del conocimiento matemático en las comunidades de ingenieros. Del objeto a la funcionalidad matemática. *Bolema*, 32(62). ISSN 0103-636X | **no** |
+| 2020 | Conceptual and procedural learning… PME-NA 42 (PDF #6) | sí (2026-09-09) |
+| 2020 | Experiencias de aprendizaje y reconceptualización geométrica… Atena (PDF #5) | sí (2026-09-09) |
+| 2020 | Reconceptualización de la geometría escolar como medio para la profesionalización docente en matemáticas de educación básica. *Educación Matemática en las Américas 2019* (CIAEM). ISBN 978-9945-09-413-8 | sí (2026-09-09) |
+| 2018 | El uso del conocimiento matemático en las comunidades de ingenieros. Del objeto a la funcionalidad matemática. *Bolema*, 32(62). ISSN 0103-636X | sí (2026-09-09) |
 | 2018 | *Reconceptualización del saber matemático en educación básica.* Mérida: UADY. ISBN 978-607-8527-55-7 | sí |
 
 ### Judith Hernández Sánchez
 
-Eligió las cuatro que subió en PDF (#7, #8, #9, #10). En la web están las cuatro, pero dos con
-cita corta sin título («Hernández, Páez y Aké (2026)», «Valero y Hernández (2024)») porque el
-2026-09-03 no se habían podido verificar: ahora sí — la primera es un **libro editado** por ella
-y la segunda el capítulo sobre «Álgebra dinámica» y GeoGebra. Su CVU resumen no lista
+Eligió las cuatro que subió en PDF (#7, #8, #9, #10). Desde el 2026-09-09 las cuatro están en su
+recorrido con título completo: el libro que editó con Páez y Aké (2026, SOMIDEM) y el capítulo sobre
+«Álgebra dinámica» y GeoGebra (2024, UASLP) se sumaron a los dos artículos con Briceño. Antes esas
+dos figuraban solo como cita corta en `pubs`, un campo que la web no muestra. Su CVU resumen no lista
 publicaciones (solo líneas de investigación).
 
 ### Eduardo Briceño Solís
@@ -107,7 +107,7 @@ Eligió las tres que subió (#11, #12, #13). Su CVU SECIHTI (76 páginas, en Dri
 producción completa; de ahí la web tomó dos más con título: «¿Qué podemos aprender de nuestros
 estudiantes? Reflexiones en torno al uso de las gráficas» (*Educación Matemática*) y «Análisis
 de la resolución de un problema de cinemática mediante el mapa conceptual híbrido» (*Enseñanza
-de las Ciencias*). Falta en la web la de 2017 con Alamillo (modelación en la formación docente).
+de las Ciencias*). La de 2017 con Alamillo (modelación en la formación docente) se cargó el 2026-09-09.
 
 ### Luis Manuel Cabrera Chim
 
@@ -117,7 +117,7 @@ Matemática*, SOMIDEM (él lo fecha 2024; la web de SOMIDEM dice 2023) · coauto
 Serie espiral del saber* (Santillana, 2015) y su Libro de Recursos · coautor de la colección
 para el profesor del PNAM (2019) · «más de 30 publicaciones arbitradas» en Bolema, AIEM, ALME,
 IE-REDIECH y Rev. Mex. Fís. E, sin listar · más de 60 ponencias. En la web: las tres con PDF,
-Santillana y PNAM. Falta la Rúbrica.
+Santillana, PNAM y, desde el 2026-09-09, la Rúbrica (con la fecha de la editorial, 2023).
 
 ### Luis López Acosta
 
@@ -148,8 +148,8 @@ Su ficha lista ocho artículos, tres repetidos; siete distintos:
 | 2026 | Torres, E., Balda, P. y Salazar, C. La formación ciudadana en las prácticas educativas con las matemáticas. *Pedagogía y Saberes* (UPN Colombia). revistas.upn.edu.co/index.php/PYS/article/view/22606 | sí |
 | 2026 | Tuyub, I., Balda, P. y Buendía, G. Contextos de significación como herramienta para la construcción de conocimiento matemático. El caso de la huerta escolar y la maestría en ingeniería. *Tecné, Episteme y Didaxis*, 59, 266-284. DOI 10.17227/ted.num59-222830 | sí |
 | 2026 | Balda, P. y Bohórquez, L. A. Un ejercicio de empoderamiento docente en un curso de formación posgradual. *REVIEM*, 6(1), 1-26. DOI 10.54541/reviem.v6i1.152 | sí |
-| 2026 | Balda, P. y Bussain, R. Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia. *Revista UNO*, 110 | **no** |
-| 2025 | Balda, P. Soacha celebra el saber con el Festival Matemático Santanderista. ED.127, sept-oct 2025. ISSN 1657-9585 (divulgación) | **no** |
+| 2026 | Balda, P. y Bussain, R. Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia. *Revista UNO*, 110 | sí (2026-09-09) |
+| 2025 | Balda, P. Soacha celebra el saber con el Festival Matemático Santanderista. *Solidario* (Cooperativa de Trabajadores de la Educación de Cundinamarca y Distrito Capital), edición 127, sept-oct 2025. ISSN 1657-9585 (divulgación) | sí (2026-09-09) |
 | 2025 | Sánchez, J. y Balda, P. ¿Es posible formar ciudadanos críticos en las aulas colombianas de matemáticas? *Revista Papeles*, 17(34). DOI 10.54104/papeles.v17n34.2156 | sí |
 | 2024 | Balda, P. y Buendía, G. La periodicidad: significados desde su uso en la huerta escolar para la matemática escolar. *REVIEM* | sí |
 
@@ -165,7 +165,7 @@ Eligió dos (ficha, como links):
 Su CVU ejecutivo agrega: Ku (2023) Interpretación del movimiento, ¿gráficas cartesianas o
 trayectorias? Un estudio en estudiantes de nivel medio superior. En *Perspectivas de
 Investigación e Innovación en Matemática Educativa*, vol. 1 (pp. 96-121). UA de Coahuila.
-**En la web está solo la de Coahuila; faltan las dos que ella eligió.**
+Desde el 2026-09-09 su recorrido tiene las tres en una etapa de producción, con las dos que ella eligió primero (antes estaba solo la de Coahuila).
 
 ### Wendolyne Ríos Jarquín
 
@@ -198,7 +198,7 @@ MATEMÁTICA» (UMCE) lista diez, todas con DOI:
 
 ### Pedro Vidal-Szabó
 
-Sin recorrido en la web. Su ficha lista tres:
+Con recorrido en la web desde el PR #77 (2026-09-07). Su ficha lista tres:
 
 1. Vidal-Szabó, P., Parraguez, M., Bonilla, D. y Campos, S. (2023). Modos de pensar el conjunto Z4 en docentes que enseñan álgebra en los primeros años escolares. *Educación Matemática*, 35(2), 170-195. DOI 10.24844/EM3502.07
 2. Vidal-Szabó, P., Kuzniak, A., Estrella, S. y Montoya, E. (2020). Análisis cualitativo de un aprendizaje estadístico temprano con la mirada de los Espacios de Trabajo Matemático orientado por el Ciclo Investigativo. *Educación Matemática*, 32(2), 216-245. DOI 10.24844/EM3202.09
@@ -237,7 +237,7 @@ dirigidos. Es el único registro que tenemos de la escala del trabajo de ED y de
 ## 4. Qué tiene la web y qué le falta
 
 - **Casos de investigación:** 01 (Oaxaca, PDF #1) y 02 (escuelas técnicas, PDF #2) son reales. Los otros dos son demo. Pendientes con el cliente en `casos/data.ts`.
-- **Perfiles del equipo:** 11 de 15 con producción cargada. Faltan, con los datos ya en mano: Daniela (Bolema 2014 con Cantoral, la que ella pone primera; y la nota de Roberto Rocca), Karla (cuatro de su CVU, dos con PDF), Judith (los títulos completos de #8 y #10), Eduardo (#11), Cabrera (Rúbrica SOMIDEM), Paola (Revista UNO y el Festival), Darly (las dos que eligió). Iván y Pedro no tienen recorrido por falta de CV con fechas, pero sus publicaciones ya se podrían listar.
+- **Perfiles del equipo (2026-09-09):** 11 de 15 con producción cargada, y todo lo que había en mano ya está: Daniela (Bolema 2014 y la nota de Roberto Rocca), Karla (las cuatro de su CVU), Judith (#8 y #10 con título completo), Eduardo (#11), Cabrera (la Rúbrica), Paola (Revista UNO y el Festival), Darly (las dos que eligió). Faltan Iván, que tiene diez publicaciones con DOI pero no un CV con fechas para armar el recorrido, y Raquel, Gabriela y Marcela, sin producción académica en Drive.
 - **Biblioteca (2026-09-09):** `materiales.ts` tiene las 16 publicaciones con PDF, con ficha,
   autorías, tema y link a la revista o editorial (DOI cuando hay). El libro de Gedisa va con
   link a la editorial y sin PDF; la tesis se aloja en `public/biblioteca/` hasta que Daniela
