@@ -66,12 +66,13 @@ export const NAV_LINKS: readonly NavItem[] = [
     // TIPOS en features/biblioteca/data/materiales.ts.
     submenu: [
       { label: "Destacados", href: "/biblioteca#destacados" },
-      { label: "Producción académica", href: "/biblioteca?tipo=Producci%C3%B3n%20acad%C3%A9mica#materiales" },
-      { label: "Recurso didáctico", href: "/biblioteca?tipo=Recurso%20did%C3%A1ctico#materiales" },
-      { label: "Proyectos", href: "/biblioteca?tipo=Proyectos#materiales" },
-      { label: "Guías y cuadernos", href: "/biblioteca?tipo=Gu%C3%ADas%20y%20cuadernos#materiales" },
-      { label: "Evaluación", href: "/biblioteca?tipo=Evaluaci%C3%B3n#materiales" },
-      { label: "Charlas y seminarios", href: "/biblioteca?tipo=Charlas%20y%20seminarios#materiales" },
+      { label: "Artículos", href: "/biblioteca?tipo=Art%C3%ADculos#materiales" },
+      { label: "Capítulos de libro", href: "/biblioteca?tipo=Cap%C3%ADtulos%20de%20libro#materiales" },
+      { label: "Libros", href: "/biblioteca?tipo=Libros#materiales" },
+      { label: "Tesis", href: "/biblioteca?tipo=Tesis#materiales" },
+      { label: "Actas de congreso", href: "/biblioteca?tipo=Actas%20de%20congreso#materiales" },
+      { label: "Divulgación", href: "/biblioteca?tipo=Divulgaci%C3%B3n#materiales" },
+      { label: "Materiales", href: "/biblioteca?tipo=Materiales#materiales" },
     ],
   },
   {
