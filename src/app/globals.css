@@ -52,7 +52,7 @@ body {
      Hero y bloques con composición dots + círculo verde sobre fondo claro. */
   --pattern-dot-blue: rgb(74 111 165 / 0.9);
   /* Radio de las esquinas superiores del footer: el footer lo consume para
-     su redondeo, y el tint "noche" (ver abajo) lo usa como solapa sobre el
+     su redondeo, y el tint "propio" (ver abajo) lo usa como solapa sobre el
      cierre de Investigación, que reserva esa misma franja de cielo bajo su
      piso. Un solo valor para que el redondeo y la solapa no se separen. */
   --footer-radio: 1.5rem;
@@ -477,20 +477,21 @@ html.has-custom-cursor * {
    blancos en las esquinas.
      gris  → cierres que flotan sobre gris-fondo (Novedades, Qué hacemos):
              la muesca toma el mismo gris y el redondeo se lee contra él.
-     medio → cierres que terminan en el mismo navy del footer (Quiénes
-             somos). Sin teñir, la muesca deja dos triángulos blancos en el
-             encuentro; teñida de ese navy desaparece, y con ella el
-             redondeo del footer. azul-medio es la «forma plana azul» que
-             DESIGN.md §6 pide para los bloques de identidad: la esquina
-             queda marcada con color en vez de con un hueco.
-     noche → el cierre de Investigación termina en el cielo de la noche:
-             un degradé con grano que ningún color plano iguala (medio
-             dejaba un parche azul; el navy del piso, un cuadrado más
-             oscuro que el cielo a su alrededor). En vez de teñir, el
-             footer se monta --footer-radio sobre el cierre con la muesca
-             transparente y el redondeo recorta ese cielo real. El cierre
-             deja esa franja de cielo bajo su piso (ver
-             CierreInvestigacion). */
+     medio → NADIE lo usa hoy. Quedó de cuando Quiénes somos teñía la
+             muesca de azul-medio para que el redondeo se leyera contra el
+             navy del footer; el owner pidió el fondo real con sus puntos,
+             así que pasó a "propio". Se conserva porque es el recurso para
+             un cierre de color plano que no sea gris.
+    propio → el cierre tiene textura que ningún color plano iguala: el
+             cielo con grano de Investigación, la lámina de puntos de
+             Quiénes somos. En vez de teñir, el footer se monta
+             --footer-radio sobre el cierre con la muesca TRANSPARENTE, y
+             el redondeo recorta ese fondo real. Así la esquina se sigue
+             leyendo —el footer es navy plano y arriba hay textura— sin
+             meter un color que no pertenece a la página. El cierre deja
+             esa franja bajo su piso (pb-[var(--footer-radio)]), y el dock
+             sube de capa porque alguna lámina se pone por encima (el
+             z-[45] de #equipo). */
 body:has([data-footer-dock-tint="gris"]) [data-footer-dock] {
   background-color: var(--color-gris-fondo);
 }
@@ -499,7 +500,9 @@ body:has([data-footer-dock-tint="medio"]) [data-footer-dock] {
   background-color: var(--color-azul-medio);
 }
 
-body:has([data-footer-dock-tint="noche"]) [data-footer-dock] {
+body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
+  position: relative;
+  z-index: 46;
   background-color: transparent;
   margin-top: calc(-1 * var(--footer-radio));
 }
