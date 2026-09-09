@@ -524,8 +524,9 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 
 ## In progress
 
-- PLAN terminado (36/36). Falta el DoD completo (work-verify, SPEC §6 + §0.1) y los 4 seats
-  de review; después work-handoff y el OK del owner para push y PR.
+- Nada. La lane cerró el 2026-09-09: PR #91 mergeado el 2026-09-08 en `eb65729`, rama remota
+  `refactor/react-doctor-100` borrada, y el bloque PASS del cierre verificado sobre el `main`
+  de hoy (`99a78d8`).
 
 ## Dónde corre
 
@@ -591,13 +592,44 @@ creados quedan bajo 200 líneas. Quedan 59 hallazgos, todos de la fase 2.
 
 ## Next
 
-- PLAN pasos 3-9 (keys, viewport, refs, useEffectEvent, dedupes, código muerto del overlay),
-  después los 17 splits (10-26), después la fase 2 (27-36).
+- Nada pendiente de esta lane. Lo que dejó anotado como deuda ajena —los 5 `eslint-disable` de
+  `react-hooks/exhaustive-deps` que sobreviven en `src/` y los 22 archivos de más de 200 líneas
+  preexistentes— es material para una lane nueva, no para esta.
 
 ## Verification
 
 <!-- Solo evidencia PASS, la escribe work-verify (lo más nuevo arriba). El cierre no
      cierra la lane sin un bloque PASS vigente acá. -->
+
+### 2026-09-09 — Cierre: el 100/100 sigue en pie sobre el `main` mergeado
+
+PR #91 mergeado el 2026-09-08 en `eb65729`, **aplastado en un solo commit** (un solo padre),
+no rebasado. Por eso `git branch --merged` y `git log --cherry-pick` daban los 82 commits
+como no mergeados: el patch-id no coincide con nada. La prueba que sí sirve es el árbol —
+`git diff origin/refactor/react-doctor-100 eb65729` vacío, o sea que el squash capturó el
+árbol entero de la lane— más `git merge-base --is-ancestor eb65729 origin/main` verdadero y
+cero commits en la rama posteriores al merge. Con eso la rama remota se borró el 2026-09-09.
+
+`main` avanzó **13 commits** desde el merge (biblioteca, equipo y `99a78d8`, que actualizó
+dependencias: Next 16.2.6 → 16.3.4, React 19.2.4 → 19.2.8, @types/node ^20 → ^26). El gate se
+volvió a correr sobre ese estado final, no sobre el que dejó la lane:
+
+| Comando | Resultado |
+|---|---|
+| `pnpm typecheck` | limpio |
+| `node scripts/verificar-react-doctor.mjs` | **100/100, sin diagnósticos** (289 archivos) |
+| `pnpm lint` | exit 0 |
+| `pnpm build` | compila, 12 páginas prerenderizadas |
+| `pnpm dev` + las 7 rutas | todas 200 |
+
+El `pre-push` de `.githooks/` —lo que esta lane dejó para sostener el score— corrió de verdad
+en el push del PR #98 y salió en verde por su cuenta.
+
+Deuda que queda anotada y **no es de la lane**: 5 `eslint-disable` de
+`react-hooks/exhaustive-deps` en `src/` (eran 15 antes del merge de la lane: bajó 10), y los
+22 archivos de más de 200 líneas preexistentes del bloque del criterio enmendado.
+
+**Veredicto: PASS.** La lane se cierra y su carpeta sale del árbol; el historial la conserva.
 
 ### 2026-09-08 — main entra a la lane (20 commits) y vuelve a 100/100
 
