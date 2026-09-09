@@ -152,29 +152,38 @@ export function AreasQueHacemos() {
                     {a.queEs}
                   </p>
 
-                  <div className="mt-8 grid gap-8 sm:grid-cols-2">
-                    <div>
-                      <p className={rotulo}>Qué te llevás</p>
-                      <ul className="mt-3 space-y-2">
-                        {a.teLlevas.map((t) => (
-                          <li
-                            key={t}
-                            className="flex gap-3 font-sans text-[0.98rem] leading-snug"
-                          >
-                            <span
-                              aria-hidden="true"
-                              className="bg-verde-concepto mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full"
-                            />
-                            <span>{t}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <p className={rotulo}>Para quién</p>
-                      <p className="mt-3 font-sans text-[0.98rem] leading-snug">
-                        {a.paraQuien}
-                      </p>
+                  {/* TERCER NIVEL DE LECTURA. Antes esto venía suelto abajo
+                      de la descripción y con el mismo peso, así que el área
+                      entera se leía como un solo chorro de texto: titular,
+                      idea, párrafo, bullets y otro párrafo, todo parejo. El
+                      panel lo separa del bloque de arriba sin esconder nada
+                      —la sección existe justamente para que no se esconda—:
+                      primero se lee QUÉ es el área, después el detalle. */}
+                  <div className="bg-gris-fondo mt-8 rounded-[1.25rem] p-6 md:mt-9 md:p-7">
+                    <div className="grid gap-8 sm:grid-cols-2">
+                      <div>
+                        <p className={rotulo}>Qué te llevás</p>
+                        <ul className="mt-3 space-y-2">
+                          {a.teLlevas.map((t) => (
+                            <li
+                              key={t}
+                              className="flex gap-3 font-sans text-[0.98rem] leading-snug"
+                            >
+                              <span
+                                aria-hidden="true"
+                                className="bg-verde-concepto mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full"
+                              />
+                              <span>{t}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <p className={rotulo}>Para quién</p>
+                        <p className="mt-3 font-sans text-[0.98rem] leading-snug">
+                          {a.paraQuien}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
