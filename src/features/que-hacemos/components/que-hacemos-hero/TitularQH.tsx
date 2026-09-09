@@ -15,11 +15,16 @@
  * `max-w` bajó de 56ch a 52ch: es lo que fija dónde cae el corte.
  *
  * «cotidiana» se sumó después, para levantar el renglón de abajo de 242 a
- * 330 sin perder el escalón. Va del lado de «la relación» a propósito: las
- * otras candidatas medidas («situados», «colectivos») caían adentro de
- * «escenarios de aprendizaje» y partían la frase pilar, que MESSAGING §5
- * manda usar literal. Así queda entera y además dice algo: ED cambia el
- * vínculo de todos los días, no una experiencia suelta.
+ * 330 sin perder el escalón. Va del lado de «la relación» a propósito, para
+ * no tocar la frase pilar.
+ *
+ * «situados» se sumó en un segundo paso y SÍ parte la frase pilar
+ * («escenarios de aprendizaje situados»). MESSAGING §5 manda usarla literal
+ * y no parafrasearla sin chequear con Daniela: el owner eligió esta opción
+ * sabiéndolo, con las tres candidatas medidas a la vista, porque devuelve en
+ * una palabra el contexto que se había perdido al acortar («pensados para
+ * cada contexto»). Queda anotado acá para que se pueda revisar con ED; si
+ * Daniela lo objeta, la palabra sale y la frase vuelve a quedar entera.
  */
 export function TitularQH() {
   return (
@@ -60,8 +65,8 @@ export function TitularQH() {
         data-qh-rise
         className="mt-6 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
       >
-        Generamos escenarios de aprendizaje que transforman la relación
-        cotidiana con la matemática escolar.
+        Generamos escenarios de aprendizaje situados que transforman la
+        relación cotidiana con la matemática escolar.
       </p>
     </>
   );
