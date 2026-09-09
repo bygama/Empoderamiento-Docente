@@ -3,13 +3,13 @@ import { getLenis } from "@/lib/lenis";
 /**
  * Duración del viaje, en segundos, acotada a propósito: proporcional a la
  * distancia, ir del hero al cierre de Qué hacemos —15.000px— sería eterno, y
- * un salto corto se sentiría lento. Los números salieron de mirarlo: la
- * primera versión (0,55 a 1,5s) llegaba tan rápido que el viaje casi no se
- * registraba. El techo de 2,2s sigue MUY por debajo del viaje nocturno del
- * portal de Qué hacemos, que dura ~4s a propósito.
+ * un salto corto se sentiría lento. Los números salieron de mirarlo: 0,55 a
+ * 1,5s llegaba tan rápido que el viaje no se registraba, y 2,2s todavía
+ * quedaba corto. Con el techo en 3s, todo salto de más de 5.400px lo usa
+ * entero; sigue por debajo del viaje nocturno del portal de Qué hacemos (~4s).
  */
 function duracionDelViaje(distancia: number) {
-  return Math.min(2.2, Math.max(0.9, distancia / 1800));
+  return Math.min(3, Math.max(0.9, distancia / 1800));
 }
 
 /** easeInOutCubic: arranca despacio, cruza rápido y llega frenando. */
