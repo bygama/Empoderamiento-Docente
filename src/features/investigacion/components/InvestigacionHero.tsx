@@ -8,7 +8,7 @@ import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { alClicCortarA } from "@/lib/navegar";
+import { alClicIrA } from "@/lib/navegar";
 import { FIGURAS } from "./constelacion";
 import { ConstelacionInvestigacion } from "./ConstelacionInvestigacion";
 import {
@@ -159,10 +159,10 @@ export function InvestigacionHero() {
                 los casos, lo que más se vuelve a buscar (decisión de ED,
                 2026-09-08; antes salía a la Biblioteca). */}
             <div data-hero-rise className="mt-9 flex flex-wrap gap-4">
-              <ButtonPrimary href="#lineas" onClick={alClicCortarA("lineas")}>
+              <ButtonPrimary href="#lineas" onClick={alClicIrA("lineas")}>
                 Conocé qué investigamos
               </ButtonPrimary>
-              <ButtonSecondary href="#en-accion" onClick={alClicCortarA("en-accion")}>
+              <ButtonSecondary href="#en-accion" onClick={alClicIrA("en-accion")}>
                 Ver los casos
               </ButtonSecondary>
             </div>

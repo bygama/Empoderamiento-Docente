@@ -160,7 +160,7 @@ export function ImpulsanEd() {
     );
     if (!persona || !el) return;
     const t = window.setTimeout(() => {
-      irAElemento(el, true);
+      irAElemento(el, { centrar: true, corte: true });
       setSelected({ persona, el });
     }, 400);
     return () => window.clearTimeout(t);

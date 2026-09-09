@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MathField } from "@/components/ui/MathField";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
-import { alClicCortarA } from "@/lib/navegar";
+import { alClicIrA } from "@/lib/navegar";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -151,7 +151,7 @@ export function QuienesSomosHero() {
             después de dos escenas largas). Secundario: el naranja es para
             Contacto. Entra con la bajada (data-hero-foot). */}
         <div data-hero-foot>
-          <ButtonSecondary href="#equipo" onClick={alClicCortarA("equipo")}>
+          <ButtonSecondary href="#equipo" onClick={alClicIrA("equipo")}>
             Quiénes sostienen ED
           </ButtonSecondary>
         </div>

@@ -29,7 +29,7 @@ export function useHistorialLugar(m: Maquina, { abrir, cerrar, solicitarCierre }
     if (i < 0) return;
     const t = window.setTimeout(() => {
       const el = botonesRef.current[i];
-      if (el) irAElemento(el, true);
+      if (el) irAElemento(el, { centrar: true, corte: true });
       abrirRef.current(i, true);
     }, 500);
     return () => window.clearTimeout(t);
