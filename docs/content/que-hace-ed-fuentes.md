@@ -89,7 +89,18 @@ aprendizaje matemático». Es la frase que va.
 
 ## 3. Las seis áreas oficiales, con lo que hay adentro de cada una
 
-Las seis del cartel son la lista oficial (Facundo lo confirmó el 2026-09-08). Todo lo
+> **ACTUALIZACIÓN 2026-09-09 — la web publica SIETE, no seis.** La dirección
+> general (Daniela) validó las siete «áreas de especialización», así que son
+> esas las que muestran el Inicio y Qué hacemos. Entran «Fortalecimiento
+> institucional» y «Transformación de sistemas educativos», que §3.7 había
+> dejado afuera por considerarlas escala y no servicio; y sale
+> «Acompañamiento», que estaba en el cartel pero no en la lista de la
+> dirección. Lo que esta sección documenta de cada área SIGUE VALIENDO —es de
+> dónde salen los entregables y los proyectos—, incluido §3.4, por si
+> Acompañamiento vuelve. Lo que caducó es la lista, no el contenido.
+
+Las seis del cartel eran la lista oficial (Facundo lo confirmó el 2026-09-08); la dirección
+general validó después las siete de arriba, que son las que manda la web. Todo lo
 demás que el cliente escribió sobre servicios entra en alguna de las seis. Abajo, para cada
 área: cómo la describe el cliente, qué entrega concreta hay documentada y qué hicieron ya.
 
@@ -219,6 +230,14 @@ demás que el cliente escribió sobre servicios entra en alguna de las seis. Aba
   interno del PPTX: pedir permiso antes de publicarlo).
 
 ### 3.7 Lo que quedó afuera de las seis y dónde entra
+
+> **Caducó el 2026-09-09.** Este análisis dejaba «Fortalecimiento
+> institucional» y «Transformación de sistemas educativos» afuera por
+> considerarlas escala y no servicio. La dirección general validó las siete,
+> así que las dos son áreas publicadas. Se conserva el razonamiento porque
+> explica de dónde salen sus descripciones y por qué la Cartera las nombra
+> «Consultoría estratégica» y «Soluciones institucionales integrales» —de ahí
+> salen sus entregables en la web—.
 
 Raquel escribió en julio siete «áreas de especialización» (son las que hoy están en la torre
 de Qué hacemos). Cinco coinciden con el cartel. Las otras dos no son servicios sino la escala

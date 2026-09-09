@@ -173,7 +173,11 @@ export function QueHacemosHero() {
                 href={`#area-${a.id}`}
                 className="focus-visible:outline-verde-concepto inline-flex min-h-9 items-center rounded-full border border-white/25 px-3.5 font-sans text-[0.85rem] text-white/85 transition-colors hover:border-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
               >
-                {a.nombre}
+                {/* Nombre corto: son siete chips en un hero a pantalla
+                    completa, y con los nombres largos la fila se come el aire
+                    entre la bajada y la capsula. El area completa se lee en su
+                    bloque. */}
+                {a.nombreCorto ?? a.nombre}
               </a>
             </li>
           ))}
