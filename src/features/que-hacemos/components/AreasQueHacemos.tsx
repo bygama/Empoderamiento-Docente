@@ -85,7 +85,14 @@ export function AreasQueHacemos() {
             encabezados pierde el bloque entero. Cuesta cero pixeles. */}
         <h2 className="sr-only">Seis áreas de trabajo</h2>
 
-        <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
+        {/* La columna del índice pasó de 16rem a 19rem y el gap de 16 a 12
+            (2026-09-09): «Diseño de materiales didácticos» y «Desarrollo
+            profesional docente» se partían en dos renglones y estiraban el
+            índice a 302px de alto. El rótulo más largo necesita 241px en una
+            línea y con 16rem quedaban ~198 útiles. El ancho se saca de los dos
+            lados —columna más ancha Y gap más corto— para no comerle 48px de
+            una al bloque de texto. */}
+        <div className="lg:grid lg:grid-cols-[19rem_minmax(0,1fr)] lg:gap-12">
           {/* Índice: pegado al costado en desktop, chips deslizables en celular.
               CENTRADO EN EL VIEWPORT, no pegado arriba: el mismo eje que el
               índice decorativo del borde derecho (IndicePagina, que es
@@ -111,7 +118,7 @@ export function AreasQueHacemos() {
                       <a
                         href={`#area-${a.id}`}
                         aria-current={activo ? "true" : undefined}
-                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
+                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.9rem] ${clasesDelItem(recorrido, activo)}`}
                       >
                         <span
                           className={`font-mono text-[0.72rem] tabular-nums transition-opacity duration-300 motion-reduce:transition-none ${recorrido ? "opacity-90" : "opacity-50"}`}
@@ -133,7 +140,18 @@ export function AreasQueHacemos() {
                 key={a.id}
                 id={`area-${a.id}`}
                 data-area={i}
-                className="border-azul-principal/10 scroll-mt-28 border-t py-12 first:border-t-0 first:pt-0 md:py-16 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12"
+                // Dos columnas recién desde XL, y en PROPORCIONES.
+                //
+                // No desde lg: a 1024px el índice ya se lleva 19rem, así que
+                // al artículo le quedan 592. Partirlos ahí dejaba el texto en
+                // 177px con la foto en un ancho fijo de 22rem, o en 313 con la
+                // foto convertida en una tira de 216x743 —la imagen destrozada
+                // por el recorte—. Entre 1024 y 1279 el artículo va en una
+                // columna: texto ancho y la foto abajo, en 16/9.
+                //
+                // Y en proporciones, no con la foto en un ancho fijo: así las
+                // dos ceden a la vez cuando la ventana se angosta.
+                className="border-azul-principal/10 scroll-mt-28 border-t py-12 first:border-t-0 first:pt-0 md:py-16 xl:grid xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] xl:gap-12"
               >
                 <div>
                   <p className="font-mono text-[0.78rem] tracking-[0.18em] text-gris-texto uppercase">
@@ -195,13 +213,13 @@ export function AreasQueHacemos() {
                   </div>
                 </div>
 
-                <div className="mt-8 lg:mt-0 lg:h-full">
-                  <div className="relative aspect-[16/9] overflow-hidden rounded-[1.5rem] lg:aspect-auto lg:h-full">
+                <div className="mt-8 xl:mt-0 xl:h-full">
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-[1.5rem] xl:aspect-auto xl:h-full">
                     <Image
                       src={a.foto}
                       alt={a.alt}
                       fill
-                      sizes="(min-width: 1024px) 22rem, 100vw"
+                      sizes="(min-width: 1280px) 30vw, 100vw"
                       className="object-cover"
                     />
                   </div>
