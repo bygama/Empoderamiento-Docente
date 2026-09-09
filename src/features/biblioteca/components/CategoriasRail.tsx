@@ -8,7 +8,6 @@ import {
   Lightbulb,
   School,
   Target,
-  TrendingUp,
   Users,
   type IconProps,
 } from "@/components/ui/icons";
@@ -20,13 +19,14 @@ import {
  * esta lista a `features/biblioteca/data/` para compartirla con el listado.
  */
 const CATEGORIAS: { label: string; Icon: (p: IconProps) => React.JSX.Element }[] = [
+  // Los rótulos son los TIPOS de data/materiales.ts, tal cual: el riel
+  // filtra por ese texto.
   { label: "Todo el catálogo", Icon: Compass },
-  { label: "Producción académica", Icon: BookOpen },
-  { label: "Recurso didáctico", Icon: Lightbulb },
-  { label: "Proyectos", Icon: Target },
-  { label: "Guías y cuadernos", Icon: School },
-  { label: "Evaluación", Icon: TrendingUp },
-  { label: "Charlas y seminarios", Icon: Users },
+  { label: "Artículos", Icon: BookOpen },
+  { label: "Capítulos de libro", Icon: Lightbulb },
+  { label: "Libros", Icon: School },
+  { label: "Tesis", Icon: Target },
+  { label: "Actas de congreso", Icon: Users },
 ];
 
 const PASO_SCROLL = 280;

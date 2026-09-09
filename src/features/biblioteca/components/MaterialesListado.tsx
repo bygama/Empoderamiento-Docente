@@ -6,7 +6,7 @@ import { ArrowUpRight, Search } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
 import { EVENTO_URL } from "@/lib/navegar";
 import {
-  ACCION,
+  accionDe,
   ANIOS,
   MATERIALES,
   PUBLICOS,
@@ -351,6 +351,9 @@ function FilaMaterial({ material: m }: { material: Material }) {
         <h3 className="font-display text-azul-principal mt-3 text-[1.3rem] leading-snug font-bold tracking-[-0.01em]">
           {m.titulo}
         </h3>
+        <p className="text-azul-principal/70 mt-1.5 font-sans text-[0.9rem] leading-snug">
+          {m.autores}
+        </p>
         <p className="text-gris-texto mt-2 max-w-[68ch] font-sans text-[0.97rem] leading-relaxed">
           {m.descripcion}
         </p>
@@ -359,12 +362,14 @@ function FilaMaterial({ material: m }: { material: Material }) {
           <p className="text-gris-texto font-mono text-[0.72rem] tracking-[0.08em] uppercase">
             {m.fecha} · {m.paginas ? `${m.paginas} páginas` : m.formato}
           </p>
-          {/* Placeholder hasta tener los archivos reales del catálogo. */}
+          {/* Se abre en otra pestaña: la revista, la editorial o el PDF. */}
           <a
-            href="#materiales"
+            href={m.url}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-naranja-accion group inline-flex items-center gap-1.5 font-sans text-[0.92rem] font-medium"
           >
-            {ACCION[m.formato]}
+            {accionDe(m)}
             <span className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
               <ArrowUpRight size={17} />
             </span>
