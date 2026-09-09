@@ -4,7 +4,6 @@ import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemos
 import { AreasQueHacemos } from "@/features/que-hacemos/components/AreasQueHacemos";
 import { NivelesEscala } from "@/features/que-hacemos/components/NivelesEscala";
 import { MiradaPasos } from "@/features/que-hacemos/components/MiradaPasos";
-import { ConQuienTrabajamos } from "@/features/que-hacemos/components/ConQuienTrabajamos";
 import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHacemos";
 
 export const metadata: Metadata = {
@@ -19,10 +18,13 @@ export const metadata: Metadata = {
 // texto manda y la animación acompaña: Hero (la frase del cartel visible
 // desde el primer segundo + escena del faro) → Áreas (las seis del cartel,
 // en texto plano) → Niveles → Cómo trabajamos (los seis verbos de «La
-// mirada ED», estáticos) → Con quién → Cierre. La torre de líneas y el
-// camino horizontal salen de esta página (los componentes quedan para
+// mirada ED», estáticos) → Cierre. La torre de líneas y el camino
+// horizontal salen de esta página (los componentes quedan para
 // reubicarlos); «Nuestro enfoque» pasó a Quiénes somos, donde es manifiesto
-// y no compite con la oferta.
+// y no compite con la oferta. «Con quién trabajamos» sale el 2026-09-09 por
+// el mismo motivo que la torre: alargaba la página sin sumar a la oferta.
+// Su componente queda en components/ para reubicarlo, y los logos de
+// aliados siguen publicados en el pie y en la home (DatosDuros).
 export default function QueHacemosPage() {
   return (
     <main id="contenido" tabIndex={-1}>
@@ -54,7 +56,6 @@ export default function QueHacemosPage() {
       <AreasQueHacemos />
       <NivelesEscala />
       <MiradaPasos />
-      <ConQuienTrabajamos />
       <CierreQueHacemos />
     </main>
   );
