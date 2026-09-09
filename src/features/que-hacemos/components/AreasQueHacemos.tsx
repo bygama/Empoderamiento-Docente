@@ -113,7 +113,7 @@ export function AreasQueHacemos() {
                 key={a.id}
                 id={`area-${a.id}`}
                 data-area={i}
-                className="border-azul-principal/10 scroll-mt-28 border-t py-12 first:border-t-0 first:pt-0 md:py-16 lg:grid lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-12"
+                className="border-azul-principal/10 scroll-mt-28 border-t py-12 first:border-t-0 first:pt-0 md:py-16 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12"
               >
                 <div>
                   <p className="font-mono text-[0.78rem] tracking-[0.18em] text-gris-texto uppercase">
@@ -165,7 +165,7 @@ export function AreasQueHacemos() {
                       src={a.foto}
                       alt={a.alt}
                       fill
-                      sizes="(min-width: 1024px) 17rem, 100vw"
+                      sizes="(min-width: 1024px) 22rem, 100vw"
                       className="object-cover"
                     />
                   </div>
