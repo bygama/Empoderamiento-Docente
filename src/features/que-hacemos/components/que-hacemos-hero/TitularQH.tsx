@@ -25,6 +25,18 @@
  * una palabra el contexto que se había perdido al acortar («pensados para
  * cada contexto»). Queda anotado acá para que se pueda revisar con ED; si
  * Daniela lo objeta, la palabra sale y la frase vuelve a quedar entera.
+ *
+ * «hoy» cerró la serie. Se eligió sobre «ya» porque dice que pasa ahora sin
+ * prometer resultado entregado, que es el riesgo que marca MESSAGING §6
+ * («basada en evidencia, sin afirmaciones grandilocuentes»).
+ *
+ * ACÁ SE FRENA. La bajada arrancó en 152 caracteres, se acortó a 89 para
+ * conseguir los dos renglones y volvió a 112 sumando de a una palabra. En
+ * desktop el escalón aguanta (625/428), pero se fue achatando en cada paso
+ * —era 602/242— y en 390px ya no existe: 305/323/288, con el renglón del
+ * medio más ancho que el de arriba. Una palabra más y el escalón de desktop
+ * también se pierde. Si hace falta cambiar algo, cambiar palabras, no
+ * sumarlas.
  */
 export function TitularQH() {
   return (
@@ -65,7 +77,7 @@ export function TitularQH() {
         data-qh-rise
         className="mt-6 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
       >
-        Generamos escenarios de aprendizaje situados que transforman la
+        Generamos escenarios de aprendizaje situados que transforman hoy la
         relación cotidiana con la matemática escolar.
       </p>
     </>
