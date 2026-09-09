@@ -105,7 +105,7 @@ export default function RootLayout({
               páginas que terminan en blanco). Si la página termina sobre
               otro color, su última sección se marca con
               [data-footer-dock-tint="<color>"] y una regla de globals.css
-              tiñe la muesca (gris, medio) o, en "noche", la vuelve
+              tiñe la muesca (gris, medio) o, en "propio", la vuelve
               transparente y sube el footer --footer-radio sobre el cierre
               para que el redondeo recorte la escena. */}
           <div data-footer-dock className="bg-white">

@@ -267,11 +267,13 @@ export function ImpulsanEd() {
       data-indice="El equipo"
       aria-label="Quiénes sostienen ED — el equipo"
       // La página termina sobre esta lámina navy y el footer también es
-      // navy. Sin teñir, la muesca del footer deja dos triángulos blancos en
-      // el encuentro; teñida de navy desaparece, y con ella el redondeo del
-      // footer. Va azul-medio: la esquina se marca con color (ver globals.css).
-      data-footer-dock-tint="medio"
-      className="bg-azul-principal relative z-[45] -mt-[4svh] overflow-clip rounded-t-[2.5rem] text-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.45)]"
+      // navy. Con el tint "propio" el footer se monta --footer-radio sobre
+      // ella con la muesca TRANSPARENTE: el redondeo recorta la lámina real,
+      // con sus puntos, en vez de un color plano. Antes iba azul-medio y esa
+      // cuña clara no pertenecía a la página. El pb deja la franja que el
+      // footer se monta, para no comerle contenido (ver globals.css).
+      data-footer-dock-tint="propio"
+      className="bg-azul-principal relative z-[45] -mt-[4svh] overflow-clip rounded-t-[2.5rem] pb-[var(--footer-radio)] text-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.45)]"
     >
       {/* Textura de puntos de marca */}
       <span
