@@ -1,32 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 import { AREAS } from "@/features/que-hacemos/areas";
+import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
 
 /**
- * Las seis áreas de trabajo de ED, en texto plano y legibles de una.
+ * Las siete áreas de especialización de ED, en texto plano y legibles de una.
  *
  * Raquel y Daniela (2026-09-08): la web se veía espectacular pero no se
- * entendía qué hace ED. Esta sección es la respuesta: nada se esconde
- * detrás de una animación. Cada área dice qué es, qué te llevás y para quién
- * es. A la izquierda (en desktop) un índice pegado que se LLENA a medida que
- * se lee —el riel verde cubre lo recorrido, gris lo que falta— y sirve para
- * saltar; en celular es una fila de chips deslizable. El único JS es ese
- * avance, y sin JS todo se lee igual: el índice arranca en la primera área.
+ * entendía qué hace ED. Esta sección es la respuesta y nada se esconde detrás
+ * de una animación. A la izquierda (desktop) un índice que se LLENA a medida
+ * que se lee y sirve para saltar; en celular, chips deslizables. El único JS
+ * es ese avance: sin él todo se lee igual, marcando la primera área.
  */
 /**
- * Clases de un ítem del índice según por dónde va la lectura. El riel se
- * LLENA: el borde izquierdo va verde en todo lo recorrido y gris en lo que
- * falta, así el índice deja de decir solo dónde estás y dice cuánto queda.
- *
- * Va con el borde de cada ítem y no con una barra de altura en porcentaje
- * porque los rótulos no miden todos igual —«Diseño de materiales didácticos»
- * ocupa dos renglones— y un porcentaje sobre el alto total cortaría a mitad
- * de un ítem. Así el llenado cae siempre en el límite exacto.
- *
- * Vive fuera del componente: son tres casos excluyentes y adentro quedaba un
- * ternario anidado en medio del markup.
+ * Clases de un ítem del índice según por dónde va la lectura: el riel se
+ * LLENA —verde lo recorrido, gris lo que falta—, así dice cuánto queda y no
+ * sólo dónde estás. Va con el borde de CADA ítem y no con una barra de
+ * altura en porcentaje: los rótulos no miden todos igual y un porcentaje
+ * cortaría a mitad de uno. Fuera del componente para no anidar ternarios en
+ * medio del markup.
  */
 function clasesDelItem(recorrido: boolean, activo: boolean) {
   const riel = recorrido
@@ -40,38 +33,29 @@ function clasesDelItem(recorrido: boolean, activo: boolean) {
   return `${riel} ${base} ${recorrido ? "lg:text-azul-principal/55" : ""}`;
 }
 
-export function AreasQueHacemos() {
-  const rootRef = useRef<HTMLElement | null>(null);
-  const [activa, setActiva] = useState(0);
+/** Los ids de las anclas, en el orden de la página. */
+const IDS_AREAS = AREAS.map((a) => `area-${a.id}`);
 
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root || !("IntersectionObserver" in window)) return;
-    const bloques = Array.from(
-      root.querySelectorAll<HTMLElement>("[data-area]"),
-    );
-    if (!bloques.length) return;
-    // El bloque que cruza la franja del medio de la pantalla es el activo.
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          const i = Number((e.target as HTMLElement).dataset.area);
-          if (!Number.isNaN(i)) setActiva(i);
-        }
-      },
-      { rootMargin: "-40% 0px -50% 0px", threshold: 0 },
-    );
-    bloques.forEach((b) => io.observe(b));
-    return () => io.disconnect();
-  }, []);
+export function AreasQueHacemos() {
+  // Misma regla que el índice del borde derecho y que el navbar: la última
+  // sección cuya cima ya pasó el 40% de la pantalla. Reusar el hook no es solo
+  // ahorrar código —los tres índices marcan siempre lo mismo, que es para lo
+  // que existe— y encima saca de acá un IntersectionObserver propio que fallaba
+  // de dos maneras: se quedaba con la última entrada de la tanda (con el área 3
+  // cruzando la franja marcaba la 2) y, si el scroll se frenaba sin que nada
+  // entrara ni saliera de esa franja angosta, no volvía a disparar y el índice
+  // quedaba atrasado (medido en la séptima área).
+  //
+  // Antes de la primera, el hook devuelve null: ahí el índice arranca marcando
+  // la primera, que es lo que se ve sin JS.
+  const activaId = useSeccionActiva(IDS_AREAS);
+  const activa = Math.max(0, IDS_AREAS.indexOf(activaId ?? ""));
 
   const rotulo =
     "font-sans text-[0.78rem] font-medium tracking-[0.22em] text-gris-texto uppercase";
 
   return (
     <section
-      ref={rootRef}
       id="areas"
       data-indice="Áreas"
       className="text-azul-principal scroll-mt-28 bg-white"
@@ -85,27 +69,16 @@ export function AreasQueHacemos() {
             encabezados pierde el bloque entero. Cuesta cero pixeles. */}
         <h2 className="sr-only">Seis áreas de trabajo</h2>
 
-        {/* La columna del índice vuelve a 16rem. Estuvo un rato en 19rem
-            para que «Diseño de materiales didácticos» y «Desarrollo
-            profesional docente» entraran en un renglón; después el índice pasó
-            a usar un rótulo corto (nombreCorto en areas.ts) y el más largo
-            bajó de 217 a 149px, así que el ancho extra ya no hacía falta y
-            vuelve al bloque de texto. */}
+        {/* 16rem alcanza porque el índice usa el rótulo corto de areas.ts:
+            con el nombre completo el más largo pedía 241px y se partía. */}
         <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
-          {/* Índice: pegado al costado en desktop, chips deslizables en celular.
-              CENTRADO EN EL VIEWPORT, no pegado arriba: el mismo eje que el
-              índice decorativo del borde derecho (IndicePagina, que es
-              fixed top-1/2 -translate-y-1/2), así los dos costados se leen
-              simétricos.
-
-              El centrado NO va con -translate-y-1/2 sobre el nav. Un translate
-              se aplica después del layout y también mientras el sticky está en
-              flujo normal, así que dibujaba el índice 151px más arriba de donde
-              ocupa: mientras la sección entraba en pantalla, le pisaba por 87px
-              el titular que había arriba (que después salió). En su lugar va
-              alto de viewport que se pega arriba y lo centra con flex: la caja
-              no puede subir por encima de su celda, así que no hay forma de que
-              se escape hacia el header. */}
+          {/* Índice: al costado en desktop, chips deslizables en celular, y
+              CENTRADO en el viewport, el mismo eje que el índice del borde
+              derecho. El centrado va con una caja de alto de viewport que se
+              pega arriba y lo centra con flex, NO con -translate-y-1/2: un
+              translate se aplica después del layout, también mientras el
+              sticky está en flujo normal, y llegó a pisar por 87px lo que
+              había arriba. La caja no puede salirse de su celda. */}
           <div className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:items-center lg:self-start">
             <nav aria-label="Áreas de trabajo" className="lg:w-full">
               <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
@@ -171,25 +144,12 @@ export function AreasQueHacemos() {
                     {a.queEs}
                   </p>
 
-                  {/* TERCER NIVEL DE LECTURA. Antes esto venía suelto abajo
-                      de la descripción y con el mismo peso, así que el área
-                      entera se leía como un solo chorro de texto: titular,
-                      idea, párrafo, bullets y otro párrafo, todo parejo. El
-                      panel lo separa del bloque de arriba sin esconder nada
-                      —la sección existe justamente para que no se esconda—:
-                      primero se lee QUÉ es el área, después el detalle.
-
-                      El min-h los empareja: llegaron a medir de 211 a 254px
-                      según cuánto ocupaba cada lista, y seis cajas del mismo
-                      color a seis alturas distintas se leen como un error de
-                      armado, no como una variación.
-
-                      Con los bullets en un renglón los seis dan 167px NATURALES
-                      —ya son iguales por contenido— así que el piso baja de
-                      16rem a 10,5rem: deja de agregar aire y queda solo como
-                      red, para que un copy más largo no vuelva a la escalera.
-                      De paso el panel encoge 88px y la foto, que sigue el alto
-                      de la columna, baja con él. */}
+                  {/* TERCER NIVEL DE LECTURA: el panel separa el detalle sin
+                      esconder nada —la sección existe para que no se esconda—,
+                      así se lee primero qué es el área. El min-h es una red y
+                      no un relleno: con los bullets en un renglón las siete
+                      dan el mismo alto natural, y el piso sólo evita la
+                      escalera si mañana un copy crece. */}
                   <div className="bg-gris-fondo mt-8 rounded-[1.25rem] p-6 md:mt-9 md:p-7 lg:min-h-[10.5rem]">
                     <div className="grid gap-8 sm:grid-cols-2">
                       <div>
