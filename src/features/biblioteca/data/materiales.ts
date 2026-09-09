@@ -430,7 +430,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "El uso del conocimiento matemático en las comunidades de ingenieros. Del objeto a la funcionalidad matemática",
-    autores: "Jesús Mendoza, Francisco Cordero, Miguel Solís y Karla Gómez Osalde",
+    autores: "E. Johanna Mendoza-Higuera, Francisco Cordero, Miguel Solís y Karla Gómez Osalde",
     descripcion: "Desde la Teoría Socioepistemológica, estudia el uso del conocimiento matemático que emerge en comunidades de ingenieros para tender un diálogo entre la matemática escolar y el quehacer de la ingeniería: tres ejemplos que cuestionan el saber escolar y destacan usos como la simbiosis entre predicción y simulación y la modelación de la acumulación y la optimización.",
     tipo: "Artículos",
     tema: "Tecnología y modelación",
@@ -632,7 +632,7 @@ const CATALOGO: Material[] = [
   },
   {
     titulo: "La periodicidad: significados desde su uso en la huerta escolar para la matemática escolar",
-    autores: "Paola Alejandra Balda Álvarez",
+    autores: "Paola Alejandra Balda Álvarez y Gabriela Buendía Abalos",
     descripcion: "Ante la poca relación entre la matemática escolar y la de fuera de la escuela, propone descentrar la mirada del objeto matemático hacia las prácticas de las que emerge. Toma el caso de la propiedad periódica y analiza su uso en la huerta escolar como contexto de significación.",
     tipo: "Artículos",
     tema: "Pensamiento variacional",
