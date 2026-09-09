@@ -42,14 +42,16 @@ export function IndiceTemas({ onElegir }: Props) {
               />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="text-verde-concepto/80 font-mono text-[0.66rem] font-medium tracking-[0.12em] tabular-nums">
-                0{i + 1}
-              </span>
+              {/* Número a la IZQUIERDA del título, centrado con él en la
+                  misma línea (Gastón, 2026-09-09); antes iba arriba. */}
               <span
                 data-row-titulo
-                className="font-display text-azul-principal block text-[1.15rem] leading-snug font-bold tracking-[-0.01em] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 md:text-[1.3rem] [@media(max-height:760px)]:leading-tight"
+                className="font-display text-azul-principal flex items-center gap-2.5 text-[1.15rem] leading-snug font-bold tracking-[-0.01em] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 md:text-[1.3rem] [@media(max-height:760px)]:leading-tight"
               >
-                {t.titulo}
+                <span className="text-verde-concepto/80 font-mono text-[0.66rem] font-medium tracking-[0.12em] tabular-nums">
+                  0{i + 1}
+                </span>
+                <span>{t.titulo}</span>
               </span>
               <span className="text-gris-texto mt-0.5 hidden font-sans text-[0.83rem] leading-relaxed sm:block [@media(max-height:760px)]:mt-0 [@media(max-height:760px)]:leading-snug">
                 {t.detalle}
