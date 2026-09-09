@@ -13,6 +13,13 @@
  * los renglones salen 388 y 456 —el de abajo más ancho que el de arriba, una
  * V— y sin él salen 602 y 242, que es el diamante que se pidió. Por eso el
  * `max-w` bajó de 56ch a 52ch: es lo que fija dónde cae el corte.
+ *
+ * «cotidiana» se sumó después, para levantar el renglón de abajo de 242 a
+ * 330 sin perder el escalón. Va del lado de «la relación» a propósito: las
+ * otras candidatas medidas («situados», «colectivos») caían adentro de
+ * «escenarios de aprendizaje» y partían la frase pilar, que MESSAGING §5
+ * manda usar literal. Así queda entera y además dice algo: ED cambia el
+ * vínculo de todos los días, no una experiencia suelta.
  */
 export function TitularQH() {
   return (
@@ -53,8 +60,8 @@ export function TitularQH() {
         data-qh-rise
         className="mt-6 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
       >
-        Generamos escenarios de aprendizaje que transforman la relación con
-        la matemática escolar.
+        Generamos escenarios de aprendizaje que transforman la relación
+        cotidiana con la matemática escolar.
       </p>
     </>
   );
