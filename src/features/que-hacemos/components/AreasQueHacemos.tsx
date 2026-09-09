@@ -179,13 +179,18 @@ export function AreasQueHacemos() {
                       —la sección existe justamente para que no se esconda—:
                       primero se lee QUÉ es el área, después el detalle.
 
-                      El min-h los empareja: medidos iban de 211 a 254px según
-                      cuánto ocupaba cada lista, y seis cajas del mismo color a
-                      seis alturas distintas se leen como un error de armado,
-                      no como una variación. El piso es el más alto de los
-                      seis; a los cortos les sobra aire adentro, que es
-                      preferible a la escalera. */}
-                  <div className="bg-gris-fondo mt-8 rounded-[1.25rem] p-6 md:mt-9 md:p-7 lg:min-h-[16rem]">
+                      El min-h los empareja: llegaron a medir de 211 a 254px
+                      según cuánto ocupaba cada lista, y seis cajas del mismo
+                      color a seis alturas distintas se leen como un error de
+                      armado, no como una variación.
+
+                      Con los bullets en un renglón los seis dan 167px NATURALES
+                      —ya son iguales por contenido— así que el piso baja de
+                      16rem a 10,5rem: deja de agregar aire y queda solo como
+                      red, para que un copy más largo no vuelva a la escalera.
+                      De paso el panel encoge 88px y la foto, que sigue el alto
+                      de la columna, baja con él. */}
+                  <div className="bg-gris-fondo mt-8 rounded-[1.25rem] p-6 md:mt-9 md:p-7 lg:min-h-[10.5rem]">
                     <div className="grid gap-8 sm:grid-cols-2">
                       <div>
                         <p className={rotulo}>Qué te llevás</p>
