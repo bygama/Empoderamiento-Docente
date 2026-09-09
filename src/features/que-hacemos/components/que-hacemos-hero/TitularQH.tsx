@@ -2,6 +2,17 @@
  * Titular y bajada del hero (referencia Ink): titular blanco con
  * «transformamos.» teñido de celeste y subrayado verde (el marcador de
  * concepto en versión subrayado). La entrada los mueve por data-attributes.
+ *
+ * La bajada se acortó el 2026-09-09 para que entre en DOS renglones y no en
+ * tres o cuatro: salieron «pensados para cada contexto y sostenidos en
+ * investigación», que la página ya dice —el chip de Investigación está
+ * justo debajo y la frase del cartel va en la escena del faro—. Queda el
+ * mensaje pilar entero («Generar escenarios de aprendizaje», AGENTS §5.5) y
+ * la relación con la matemática escolar, que es lo que ED transforma. El
+ * El corte lo hace el ancho, NO `text-balance`: medido a 1536px, con balance
+ * los renglones salen 388 y 456 —el de abajo más ancho que el de arriba, una
+ * V— y sin él salen 602 y 242, que es el diamante que se pidió. Por eso el
+ * `max-w` bajó de 56ch a 52ch: es lo que fija dónde cae el corte.
  */
 export function TitularQH() {
   return (
@@ -40,11 +51,10 @@ export function TitularQH() {
 
       <p
         data-qh-rise
-        className="mt-6 max-w-[56ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
+        className="mt-6 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
       >
-        Generamos escenarios de aprendizaje pensados para cada contexto y
-        sostenidos en investigación, que transforman la relación con la
-        matemática escolar.
+        Generamos escenarios de aprendizaje que transforman la relación con
+        la matemática escolar.
       </p>
     </>
   );
