@@ -1,9 +1,9 @@
 import type { Ref } from "react";
-import Image from "next/image";
 import type { Profile } from "@/features/quienes-somos/data/equipo";
-import { cx } from "./estilos";
-
-type Figura = NonNullable<Profile["figura"]>;
+import { leerDatosFigura, type Figura } from "./figura-perfil/datos-figura";
+import { FiguraLineal } from "./figura-perfil/FiguraLineal";
+import { FiguraCierre } from "./figura-perfil/FiguraCierre";
+import { FiguraFija } from "./figura-perfil/FiguraFija";
 
 type Props = {
   profile: Profile;
@@ -31,141 +31,30 @@ type Props = {
  * El marco recorta con `object-cover` sobre una caja de proporción fija, así
  * que va con `fill`; el recorte manda el alto por CSS y deja el ancho en
  * `auto`, así que necesita las medidas reales del archivo (`cutoutSize`).
+ *
+ * Acá solo queda el reparto por `modo`: cada aparición vive en
+ * `figura-perfil/`. Estaban las tres en esta función y react-doctor la marcó
+ * por complejidad (17 ciclomática, 27 cognitiva) cuando el marco apaisado
+ * sumó su tercera dimensión de casos; son ramas independientes —nunca se
+ * renderizan juntas— así que se separan sin compartir estado.
  */
 export function FiguraPerfil({ profile, figura, modo, refOuter, refMover, refCierre, onCargar }: Props) {
-  if (figura === "sin" || !profile.cutout) return null;
-  const { cutout, cutoutPosition, fullName } = profile;
-  const medidas = profile.cutoutSize ?? { width: 1200, height: 1600 };
-  // Marco apaisado (una lámina): misma altura de referencia, proporción 5:3.
-  const apaisado = figura === "marco" && !!profile.marcoApaisado;
+  const datos = leerDatosFigura(profile, figura);
+  if (!datos) return null;
 
-  if (modo === "lineal") {
-    return figura === "recorte" ? (
-      <Image
-        src={cutout}
-        alt={fullName}
-        width={medidas.width}
-        height={medidas.height}
-        className="mx-auto max-h-[52vh] w-auto object-contain"
-        style={{ objectPosition: cutoutPosition }}
-      />
-    ) : (
-      <div
-        className={cx(
-          "ring-azul-principal/10 relative mx-auto w-full overflow-hidden rounded-[1.5rem] shadow-[0_30px_70px_-36px_rgb(31_45_77/0.45)] ring-1",
-          apaisado ? "aspect-[5/3] max-w-[28rem]" : "aspect-[4/5] max-w-[20rem]",
-        )}
-      >
-        <Image
-          src={cutout}
-          alt={fullName}
-          fill
-          sizes="(max-width: 768px) 90vw, 20rem"
-          className="object-cover"
-          style={{ objectPosition: cutoutPosition }}
-        />
-      </div>
-    );
-  }
+  if (modo === "lineal") return <FiguraLineal datos={datos} figura={figura} />;
 
   if (modo === "cierre") {
-    return (
-      <div
-        ref={refCierre}
-        aria-hidden="true"
-        className={cx(
-          "pointer-events-none absolute right-[3%] hidden lg:block",
-          apaisado
-            ? "bottom-[9%] h-[min(24vh,220px)]"
-            : figura === "marco"
-              ? "bottom-[9%] h-[min(36vh,320px)]"
-              : "bottom-0 h-[min(48vh,440px)]",
-        )}
-      >
-        {figura === "marco" ? (
-          <div
-            className={cx(
-              "ring-azul-principal/10 relative h-full overflow-hidden rounded-[1.4rem] opacity-95 shadow-[0_34px_70px_-40px_rgb(31_45_77/0.45)] ring-1",
-              apaisado ? "w-[calc(min(24vh,220px)*1.667)]" : "w-[calc(min(36vh,320px)*0.8)]",
-            )}
-          >
-            <Image
-              src={cutout}
-              alt=""
-              fill
-              sizes="256px"
-              className="object-cover"
-              style={{ objectPosition: cutoutPosition }}
-            />
-          </div>
-        ) : (
-          <Image
-            src={cutout}
-            alt=""
-            width={medidas.width}
-            height={medidas.height}
-            className="h-full w-auto object-contain object-bottom opacity-90"
-            style={{
-              maskImage: "linear-gradient(to bottom, #000 84%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, #000 84%, transparent 100%)",
-            }}
-          />
-        )}
-      </div>
-    );
+    return <FiguraCierre datos={datos} figura={figura} refCierre={refCierre} />;
   }
 
   return (
-    <div
-      ref={refOuter}
-      data-portrait-outer
-      aria-hidden="true"
-      className="pointer-events-none fixed bottom-0 z-[5] hidden h-[min(74vh,700px)] w-[30rem] items-end justify-end lg:flex"
-      style={{ right: "max(1.25rem, calc((100vw - 1440px)/2 + 2rem))" }}
-    >
-      <div
-        ref={refMover}
-        data-portrait-mover
-        className={cx(
-          "relative flex h-full w-full items-end justify-end",
-          figura === "marco" && "pb-[9vh]",
-        )}
-      >
-        {figura === "marco" ? (
-          <div
-            className={cx(
-              "ring-azul-principal/10 relative overflow-hidden rounded-[1.75rem] shadow-[0_44px_90px_-44px_rgb(31_45_77/0.5)] ring-1",
-              apaisado
-                ? "h-[min(30vh,280px)] w-[calc(min(30vh,280px)*1.667)]"
-                : "h-[min(58vh,520px)] w-[clamp(14rem,21vw,19rem)]",
-            )}
-          >
-            <Image
-              src={cutout}
-              alt=""
-              fill
-              sizes={apaisado ? "(min-width: 1024px) 30rem, 0px" : "(min-width: 1024px) 19rem, 0px"}
-              onLoad={onCargar}
-              className="object-cover"
-              style={{ objectPosition: cutoutPosition }}
-            />
-          </div>
-        ) : (
-          <Image
-            src={cutout}
-            alt=""
-            width={medidas.width}
-            height={medidas.height}
-            onLoad={onCargar}
-            className="h-full w-auto object-contain object-bottom drop-shadow-[0_18px_44px_rgb(31_45_77/0.12)]"
-            style={{
-              objectPosition: cutoutPosition,
-              maskImage: "linear-gradient(to bottom, #000 86%, rgb(0 0 0 / 0.4) 97%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, #000 86%, rgb(0 0 0 / 0.4) 97%, transparent 100%)",
-            }}
-          />
-        )}
-      </div>
-    </div>
+    <FiguraFija
+      datos={datos}
+      figura={figura}
+      refOuter={refOuter}
+      refMover={refMover}
+      onCargar={onCargar}
+    />
   );
 }
