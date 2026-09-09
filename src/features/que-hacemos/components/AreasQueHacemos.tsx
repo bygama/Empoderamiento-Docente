@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { AREAS, AREAS_INTRO } from "@/features/que-hacemos/areas";
+import { AREAS } from "@/features/que-hacemos/areas";
 
 /**
  * Las seis áreas de trabajo de ED, en texto plano y legibles de una.
@@ -77,19 +77,15 @@ export function AreasQueHacemos() {
       className="text-azul-principal scroll-mt-28 bg-white"
     >
       <div className="mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
-        <header className="max-w-[62ch]">
-          <h2
-            className="font-display text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem]"
-            style={{ lineHeight: 1.1 }}
-          >
-            Seis áreas de trabajo
-          </h2>
-          <p className="text-gris-texto mt-5 font-sans text-[1.05rem] leading-relaxed md:text-[1.15rem]">
-            {AREAS_INTRO}
-          </p>
-        </header>
+        {/* El titular y la bajada salieron a pedido del owner (2026-09-09): la
+            seccion arranca directo en la primera area. El h2 se queda pero
+            invisible, no se borra: es el unico nombre accesible que tiene la
+            seccion —el indice de la pagina la lista como «Areas» leyendo su
+            data-indice, que no es un encabezado— y sin el, quien navega por
+            encabezados pierde el bloque entero. Cuesta cero pixeles. */}
+        <h2 className="sr-only">Seis áreas de trabajo</h2>
 
-        <div className="mt-12 lg:mt-16 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
+        <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
           {/* Índice: pegado al costado en desktop, chips deslizables en celular.
               CENTRADO EN EL VIEWPORT, no pegado arriba: el mismo eje que el
               índice decorativo del borde derecho (IndicePagina, que es
@@ -99,8 +95,8 @@ export function AreasQueHacemos() {
               El centrado NO va con -translate-y-1/2 sobre el nav. Un translate
               se aplica después del layout y también mientras el sticky está en
               flujo normal, así que dibujaba el índice 151px más arriba de donde
-              ocupa: mientras la sección entraba en pantalla, le pisaba la bajada
-              del header por 87px. En su lugar el nav va dentro de una caja de
+              ocupa: mientras la sección entraba en pantalla, le pisaba por 87px
+              el titular que había arriba (que después salió). En su lugar va
               alto de viewport que se pega arriba y lo centra con flex: la caja
               no puede subir por encima de su celda, así que no hay forma de que
               se escape hacia el header. */}
