@@ -792,6 +792,12 @@ export const EQUIPO: Persona[] = [
     },
   },
   {
+    // Fuentes (carpeta «Perez Ivan» del Drive de ED, 2026-09-09): ficha
+    // «Iván Pérez.docx» (rol), «Semblanza Académica» (trayectoria, sin
+    // fechas: por eso las etapas no llevan período) y «Publicaciones Dpto.
+    // de Matemática» (artículos 2024-2026 con DOI; se verificaron todos el
+    // 2026-09-09). No hay CV con títulos e instituciones: la formación va
+    // como la escribe la semblanza.
     key: "ivan-perez",
     nombre: "Iván Pérez",
     rol: "Líder de Modelación y Tecnologías",
@@ -799,6 +805,173 @@ export const EQUIPO: Persona[] = [
     tier: 3,
     imagePosition: "50% 22%",
     bio: "Académico del Departamento de Matemática de la Universidad Metropolitana de Ciencias de la Educación (UMCE), responsable de proyectos de investigación y de vinculación con el medio escolar.",
+    pubs: [
+      {
+        titulo: "Articulación del pensamiento y lenguaje variacional en una situación de aprendizaje para la enseñanza de la derivada (2026)",
+        url: "https://doi.org/10.46618/iime.271",
+      },
+      {
+        titulo: "Modelación matemática escolar de la elipse en contexto astronómico (2026)",
+        url: "https://doi.org/10.46219/rechiem.v18i1.212",
+      },
+      {
+        titulo: "Resignificación colectiva de lo cuadrático en el estudio del plano inclinado (2025)",
+        url: "https://doi.org/10.61174/recacym.v21i2.235",
+      },
+    ],
+    profile: {
+      fullName: "Iván Esteban Pérez Vera",
+      role: "Líder de Modelación y Tecnologías",
+      location: "Santiago, Chile",
+      // Retrato vertical 1200×1600, rostro alto en el cuadro.
+      figura: "marco",
+      cutout: "/equipo/ivan-perez.jpg",
+      cutoutSize: { width: 1200, height: 1600 },
+      cutoutPosition: "50% 22%",
+      headline: "Modelar el mundo para entender la matemática.",
+      intro:
+        "Profesor de matemáticas y académico de la Universidad Metropolitana de Ciencias de la Educación, en Chile. Investiga la modelación matemática escolar y el uso de tecnologías en la enseñanza, y forma a quienes van a enseñar matemática.",
+      formation: [
+        "Profesor de Matemáticas",
+        "Postítulo en Informática Educativa",
+        "Magíster en Educación Matemática",
+        "Candidato a Doctor en Educación",
+      ],
+      categories: [
+        { id: "modelacion", label: "Modelación matemática escolar", color: "verde" },
+        { id: "tecnologias", label: "Tecnologías e informática educativa", color: "azul" },
+        { id: "formacion-inicial", label: "Formación inicial docente", color: "naranja" },
+      ],
+      stages: [
+        {
+          id: "aula",
+          n: 1,
+          categoryId: "formacion-inicial",
+          color: "verde",
+          eyebrow: "El aula como origen",
+          variant: "editorial",
+          title: "Primero, enseñar matemáticas en la escuela.",
+          body: "Antes de la carrera académica trabajó en el sistema escolar chileno como profesor de matemáticas en todos los niveles de secundaria, en escuelas públicas y privadas. Esa experiencia definió lo que vino después: durante el posgrado decidió enfocarse en la formación inicial de profesores y en el uso de tecnologías para enseñar matemática.",
+          milestones: [
+            { title: "Profesor de matemáticas en secundaria", detail: "Escuelas públicas y privadas de Chile" },
+            { title: "Postítulo en Informática Educativa" },
+            { title: "Magíster en Educación Matemática" },
+          ],
+        },
+        {
+          id: "umce",
+          n: 2,
+          categoryId: "tecnologias",
+          color: "azul",
+          eyebrow: "Formar a quienes van a enseñar",
+          variant: "hitos",
+          title: "Informática educativa en la formación de profesores.",
+          body: "En la Universidad Metropolitana de Ciencias de la Educación lidera la mención de Informática Educativa de la Licenciatura en Educación Matemática y dirige proyectos de vinculación con el medio escolar, investigación y tesis de licenciatura y magíster sobre tecnologías y modelación.",
+          milestones: [
+            {
+              title: "Líder de la mención de Informática Educativa — Licenciatura en Educación Matemática",
+              detail: "Universidad Metropolitana de Ciencias de la Educación",
+              primary: true,
+            },
+            {
+              title: "Académico del Departamento de Matemática",
+              detail: "Responsable de proyectos de investigación y de vinculación con el medio escolar · UMCE",
+            },
+            { title: "Dirección de tesis de licenciatura y magíster", detail: "Tecnologías y modelación matemática" },
+            { title: "Candidato a Doctor en Educación" },
+          ],
+        },
+        {
+          id: "modelacion",
+          n: 3,
+          categoryId: "modelacion",
+          color: "verde",
+          eyebrow: "Modelar para aprender",
+          period: "2024 – 2026",
+          variant: "ramas",
+          title: "La elipse, el plano inclinado, el consumo sostenible.",
+          body: "Su investigación reciente estudia la modelación matemática escolar en situaciones reales —una órbita, un plano inclinado, una colisión, la producción sostenible— y cómo se integra con las tecnologías, incluida la inteligencia artificial generativa, en la formación inicial docente. Buena parte la escribe con estudiantes y con profesoras y profesores en formación, y una línea mira los sesgos de género en las experiencias de modelación.",
+          publications: [
+            {
+              year: "2026",
+              kind: "Artículo",
+              title: "Modelación matemática escolar de la elipse en contexto astronómico",
+              meta: "Con K. Pacheco-López · Revista Chilena de Educación Matemática",
+              url: "https://doi.org/10.46219/rechiem.v18i1.212",
+              featured: true,
+            },
+            {
+              year: "2026",
+              kind: "Artículo",
+              title: "Articulación del pensamiento y lenguaje variacional en una situación de aprendizaje para la enseñanza de la derivada",
+              meta: "Con A. Espinoza-Salomón, R. Jorquera-Soto y T. Osorio-Gómez · Investigación e Innovación en Matemática Educativa",
+              url: "https://doi.org/10.46618/iime.271",
+            },
+            {
+              year: "2026",
+              kind: "Artículo",
+              title: "Análisis de estrategias de resolución en una experiencia de modelación matemática escolar sobre consumo y producción sostenibles",
+              meta: "Con S. Giovanetti, S. Riquelme y R. Vilches · Cuadernos de Investigación y Formación en Educación Matemática",
+              url: "https://doi.org/10.15517/v6w6x527",
+            },
+            {
+              year: "2025",
+              kind: "Artículo",
+              title: "Resignificación colectiva de lo cuadrático en el estudio del plano inclinado: una experiencia de modelación y tecnologías en formación inicial docente",
+              meta: "Con P. Salazar-Cortez · El Cálculo y su Enseñanza",
+              url: "https://doi.org/10.61174/recacym.v21i2.235",
+            },
+            {
+              year: "2025",
+              kind: "Artículo",
+              title: "Integración de modelación matemática, inteligencia artificial generativa y situaciones de aprendizaje para la enseñanza del cálculo escolar",
+              meta: "Con S. Saavedra-Messina y A. Silva-Riveros · Cuadernos de Investigación y Formación en Educación Matemática",
+              url: "https://doi.org/10.15517/bh306f78",
+            },
+            {
+              year: "2025",
+              kind: "Artículo",
+              title: "Sesgos de género en modelación matemática escolar: impacto en aprendizaje y autopercepción docente en formación",
+              meta: "Con P. Salazar-Cortez · Revista Chilena de Educación Científica",
+              url: "https://revistas.umce.cl/index.php/RChEC/article/view/3001",
+            },
+            {
+              year: "2024",
+              kind: "Artículo",
+              title: "Diseño de un curso de formación inicial para profesores, que integra la modelación matemática escolar con evaluación de tecnologías",
+              meta: "Con P. Salazar-Cortez · El Cálculo y su Enseñanza",
+              url: "https://doi.org/10.61174/recacym.v20i1.215",
+            },
+          ],
+        },
+        {
+          id: "convergencia",
+          n: 4,
+          categoryId: "modelacion",
+          color: "verde",
+          eyebrow: "La convergencia",
+          period: "actualidad",
+          variant: "sintesis",
+          title: "Modelación y tecnologías en ED.",
+          body: "En Empoderamiento Docente lidera el área de Modelación y Tecnologías: el punto donde su investigación sobre modelación matemática escolar y su trabajo con tecnologías se encuentran con el trabajo con docentes.",
+          milestones: [
+            {
+              title: "Líder de Modelación y Tecnologías — Empoderamiento Docente",
+              primary: true,
+            },
+            {
+              title: "Académico del Departamento de Matemática — UMCE",
+              detail: "Proyectos de investigación y de vinculación con el medio escolar",
+            },
+          ],
+        },
+      ],
+      closing: {
+        title: "De la escuela a la modelación, y de vuelta al aula.",
+        body: "Su recorrido conecta las aulas de secundaria en Chile, la formación inicial de profesores en la UMCE y la investigación sobre modelación matemática escolar y tecnologías.",
+        body2: "En ED esa trayectoria se pone al servicio de una pregunta concreta: cómo modelar situaciones reales, con tecnología, para que la matemática escolar tenga sentido.",
+      },
+    },
   },
   {
     key: "judith-hernandez",
