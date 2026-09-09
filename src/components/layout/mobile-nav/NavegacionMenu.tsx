@@ -12,6 +12,8 @@ type Props = {
   desplegado: string | null;
   onDesplegar: (href: string | null) => void;
   onCerrar: () => void;
+  /** Ya estamos en esa página: cierra y sube al principio deslizando. */
+  onSubirEnPagina: () => void;
   onIrASeccion: (id: string) => void;
   onIrADestino: (e: MouseEvent<HTMLAnchorElement>, href: string) => void;
 };
@@ -30,6 +32,7 @@ type Props = {
  */
 export function NavegacionMenu({
   pathname,
+  onSubirEnPagina,
   secciones,
   desplegado,
   onDesplegar,
@@ -52,7 +55,13 @@ export function NavegacionMenu({
               <div className="flex items-center justify-between">
                 <Link
                   href={link.href}
-                  onClick={onCerrar}
+                  onClick={(e) => {
+                    // Ya estamos acá: el Link no navegaría a ningún lado, así
+                    // que vale como atajo para volver arriba.
+                    if (active) e.preventDefault();
+                    if (active) onSubirEnPagina();
+                    else onCerrar();
+                  }}
                   aria-current={active ? "page" : undefined}
                   className="group flex flex-1 items-center justify-between py-4"
                 >
