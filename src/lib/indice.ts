@@ -3,11 +3,13 @@ import { getLenis } from "@/lib/lenis";
 /**
  * Duración del viaje, en segundos, acotada a propósito: proporcional a la
  * distancia, ir del hero al cierre de Qué hacemos —15.000px— sería eterno, y
- * un salto corto se sentiría lento. El segundo del medio ya lo usaba la guía
- * de Novedades (`FichaNovedad`).
+ * un salto corto se sentiría lento. Los números salieron de mirarlo: la
+ * primera versión (0,55 a 1,5s) llegaba tan rápido que el viaje casi no se
+ * registraba. El techo de 2,2s sigue MUY por debajo del viaje nocturno del
+ * portal de Qué hacemos, que dura ~4s a propósito.
  */
 function duracionDelViaje(distancia: number) {
-  return Math.min(1.5, Math.max(0.55, distancia / 3000));
+  return Math.min(2.2, Math.max(0.9, distancia / 1800));
 }
 
 /** easeInOutCubic: arranca despacio, cruza rápido y llega frenando. */
@@ -20,7 +22,7 @@ const SUAVE = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2,
  * aterrizajes programáticos —llegar desde otra página por el hash, restaurar
  * `?persona=` o un `#slug` del historial—, donde deslizar mostraría un viaje
  * que nadie pidió desde un punto donde nunca se estuvo. Sin Lenis (reduced
- * motion) siempre es corte. Respeta el `scroll-margin-top` de la sección.
+ * motion) siempre corta. Respeta el `scroll-margin-top` de la sección.
  */
 export function irASeccion(id: string, { corte = false } = {}) {
   const el = document.getElementById(id);
@@ -36,8 +38,7 @@ export function irASeccion(id: string, { corte = false } = {}) {
   // cambiar de alto: el borde de la sección se corre unos píxeles. Se vuelve a
   // medir un par de frames después y otra vez más tarde, y se corrige; si
   // mientras tanto la persona ya scrolleó, no se toca nada. Con el viaje suave
-  // esperan a que TERMINE: durante el deslizamiento le arrebatarían la página
-  // a Lenis a mitad de camino.
+  // esperan a que TERMINE: si no, le arrebatan la página a Lenis a mitad de camino.
   let ultimoY = window.scrollY;
   const corregir = () => {
     if (Math.abs(window.scrollY - ultimoY) > 2) return;
