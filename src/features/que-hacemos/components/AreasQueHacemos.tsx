@@ -22,7 +22,9 @@ export function AreasQueHacemos() {
   useEffect(() => {
     const root = rootRef.current;
     if (!root || !("IntersectionObserver" in window)) return;
-    const bloques = Array.from(root.querySelectorAll<HTMLElement>("[data-area]"));
+    const bloques = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-area]"),
+    );
     if (!bloques.length) return;
     // El bloque que cruza la franja del medio de la pantalla es el activo.
     const io = new IntersectionObserver(
@@ -67,37 +69,43 @@ export function AreasQueHacemos() {
               CENTRADO EN EL VIEWPORT, no pegado arriba: el mismo eje que el
               índice decorativo del borde derecho (IndicePagina, que es
               fixed top-1/2 -translate-y-1/2), así los dos costados se leen
-              simétricos. El self-start se queda para que el nav mida lo que
-              mide su contenido: si se estirara a lo alto de la fila, el sticky
-              no tendría recorrido. */}
-          <nav
-            aria-label="Áreas de trabajo"
-            className="lg:sticky lg:top-1/2 lg:-translate-y-1/2 lg:self-start"
-          >
-            <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
-              {AREAS.map((a, i) => {
-                const activo = i === activa;
-                return (
-                  <li key={a.id} className="shrink-0">
-                    <a
-                      href={`#area-${a.id}`}
-                      aria-current={activo ? "true" : undefined}
-                      className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${
-                        activo
-                          ? "border-azul-principal bg-azul-principal lg:text-azul-principal lg:border-verde-concepto text-white lg:bg-transparent"
-                          : "border-azul-principal/15 text-gris-texto hover:border-azul-principal/40 hover:text-azul-principal lg:border-azul-principal/10"
-                      }`}
-                    >
-                      <span className="font-mono text-[0.72rem] tabular-nums opacity-70">
-                        0{i + 1}
-                      </span>
-                      <span>{a.nombre}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ol>
-          </nav>
+              simétricos.
+
+              El centrado NO va con -translate-y-1/2 sobre el nav. Un translate
+              se aplica después del layout y también mientras el sticky está en
+              flujo normal, así que dibujaba el índice 151px más arriba de donde
+              ocupa: mientras la sección entraba en pantalla, le pisaba la bajada
+              del header por 87px. En su lugar el nav va dentro de una caja de
+              alto de viewport que se pega arriba y lo centra con flex: la caja
+              no puede subir por encima de su celda, así que no hay forma de que
+              se escape hacia el header. */}
+          <div className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:items-center lg:self-start">
+            <nav aria-label="Áreas de trabajo" className="lg:w-full">
+              <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
+                {AREAS.map((a, i) => {
+                  const activo = i === activa;
+                  return (
+                    <li key={a.id} className="shrink-0">
+                      <a
+                        href={`#area-${a.id}`}
+                        aria-current={activo ? "true" : undefined}
+                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${
+                          activo
+                            ? "border-azul-principal bg-azul-principal lg:text-azul-principal lg:border-verde-concepto text-white lg:bg-transparent"
+                            : "border-azul-principal/15 text-gris-texto hover:border-azul-principal/40 hover:text-azul-principal lg:border-azul-principal/10"
+                        }`}
+                      >
+                        <span className="font-mono text-[0.72rem] tabular-nums opacity-70">
+                          0{i + 1}
+                        </span>
+                        <span>{a.nombre}</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ol>
+            </nav>
+          </div>
 
           <div className="mt-10 lg:mt-0">
             {AREAS.map((a, i) => (
@@ -129,7 +137,10 @@ export function AreasQueHacemos() {
                       <p className={rotulo}>Qué te llevás</p>
                       <ul className="mt-3 space-y-2">
                         {a.teLlevas.map((t) => (
-                          <li key={t} className="flex gap-3 font-sans text-[0.98rem] leading-snug">
+                          <li
+                            key={t}
+                            className="flex gap-3 font-sans text-[0.98rem] leading-snug"
+                          >
                             <span
                               aria-hidden="true"
                               className="bg-verde-concepto mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full"
@@ -141,7 +152,9 @@ export function AreasQueHacemos() {
                     </div>
                     <div>
                       <p className={rotulo}>Para quién</p>
-                      <p className="mt-3 font-sans text-[0.98rem] leading-snug">{a.paraQuien}</p>
+                      <p className="mt-3 font-sans text-[0.98rem] leading-snug">
+                        {a.paraQuien}
+                      </p>
                     </div>
                   </div>
 
