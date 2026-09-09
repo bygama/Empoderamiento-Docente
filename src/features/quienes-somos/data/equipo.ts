@@ -77,6 +77,14 @@ export type ProfilePublication = {
   /** Conceptos representativos (colección de materiales), no ISBN ni catálogo. */
   concepts?: string[];
   featured?: boolean;
+  /**
+   * Adónde se lee: el mismo link que usa la Biblioteca, el DOI cuando hay, y
+   * si no la página de la revista o la editorial. Se probaron todos el
+   * 2026-09-09. Las seis piezas sin página pública (el libro de la SEP, los de
+   * Santillana y Yucatán, los capítulos de Matemática en Red y de Coahuila, y
+   * la nota en Solidario) quedan sin link, y la card no muestra la acción.
+   */
+  url?: string;
 };
 
 /** Categoría lateral persistente (orientación durante el recorrido). */
@@ -324,6 +332,7 @@ export const EQUIPO: Persona[] = [
               kind: "Libro",
               title: "Empoderamiento docente y Socioepistemología",
               meta: "Un estudio sobre la transformación educativa en Matemáticas · Editorial Gedisa",
+              url: "https://books.google.com/books?vid=ISBN9788416919437",
               featured: true,
             },
           ],
@@ -376,18 +385,19 @@ export const EQUIPO: Persona[] = [
           publications: [
             { year: "2013", kind: "Libro", title: "La transversalidad de la proporcionalidad", meta: "Secretaría de Educación Pública de México" },
             // La que ella pone primera en su ficha: «conecta con el nombre y la identidad de ED».
-            { year: "2014", kind: "Artículo", title: "Socioepistemología y empoderamiento: la profesionalización docente desde la problematización del saber matemático", meta: "Con Ricardo Cantoral · Bolema" },
-            { year: "2016", kind: "Libro", title: "Empoderamiento docente y Socioepistemología", meta: "Editorial Gedisa", featured: true },
+            { year: "2014", kind: "Artículo", title: "Socioepistemología y empoderamiento: la profesionalización docente desde la problematización del saber matemático", meta: "Con Ricardo Cantoral · Bolema", url: "https://doi.org/10.1590/1980-4415v28n48a18" },
+            { year: "2016", kind: "Libro", title: "Empoderamiento docente y Socioepistemología", meta: "Editorial Gedisa", featured: true, url: "https://books.google.com/books?vid=ISBN9788416919437" },
             // Nota de divulgación que ella misma sumó a su ficha (robertorocca.org, 2022).
-            { year: "2022", kind: "Artículo", title: "Nunca recordé la tabla del 7, pero siento que soy buena en matemáticas", meta: "Nota de divulgación · Roberto Rocca, Grupo Techint" },
-            { year: "2022", kind: "Artículo", title: "Aprendizaje de las matemáticas: ¿qué, para qué, para quién?", meta: "Con Karla Gómez-Osalde · Propuesta Educativa" },
-            { year: "2024", kind: "Colección", title: "Matemática en Red", meta: "Coordinación de publicaciones · Ministerio de Educación de la Ciudad de Buenos Aires" },
-            { year: "2025", kind: "Artículo", title: "Problematizar la matemática escolar: ¿cómo contribuye al desarrollo profesional docente?" },
+            { year: "2022", kind: "Artículo", title: "Nunca recordé la tabla del 7, pero siento que soy buena en matemáticas", meta: "Nota de divulgación · Roberto Rocca, Grupo Techint", url: "https://www.robertorocca.org/es/articulos/2022/nunca-recorde-la-tabla-del-7-pero-siento-que-soy-buena-en-matematicas" },
+            { year: "2022", kind: "Artículo", title: "Aprendizaje de las matemáticas: ¿qué, para qué, para quién?", meta: "Con Karla Gómez-Osalde · Propuesta Educativa", url: "https://propuestaeducativa.flacso.org.ar/wp-content/uploads/2023/04/REVISTA-58-Dossier-pag-21-37.pdf" },
+            { year: "2024", kind: "Colección", title: "Matemática en Red", meta: "Coordinación de publicaciones · Ministerio de Educación de la Ciudad de Buenos Aires", url: "https://buenosaires.gob.ar/gcaba_historico/educacion/buenos-aires-aprende/matematica-en-red" },
+            { year: "2025", kind: "Artículo", title: "Problematizar la matemática escolar: ¿cómo contribuye al desarrollo profesional docente?", url: "https://doi.org/10.1590/1980-4415v39a230249" },
             {
               year: "2019",
               kind: "Materiales",
               title: "Plan Nacional Aprender Matemática",
               meta: "Colección de materiales para el desarrollo del pensamiento matemático",
+              url: "https://www.argentina.gob.ar/noticias/plan-nacional-aprender-matematica-materiales-gratis-para-descargar",
               concepts: ["Inferir", "Medir", "Aproximar", "Comparar", "Equivaler", "Predecir", "Visualizar"],
             },
           ],
@@ -530,6 +540,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
               meta: "Revista Latinoamericana de Investigación en Matemática Educativa",
+              url: "https://doi.org/10.12802/relime.2025.28.e805",
               featured: true,
             },
             {
@@ -539,42 +550,49 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Aprendizaje de las matemáticas: ¿qué, para qué, para quién?",
               meta: "Con Daniela Reyes-Gasperini · Propuesta Educativa",
+              url: "https://propuestaeducativa.flacso.org.ar/wp-content/uploads/2023/04/REVISTA-58-Dossier-pag-21-37.pdf",
             },
             {
               year: "2020",
               kind: "Artículo",
               title: "Reflexive Conversation: Approach to the Professional Learning of Pre-service Mathematics Teachers",
               meta: "Universal Journal of Educational Research",
+              url: "https://doi.org/10.13189/ujer.2020.080516",
             },
             {
               year: "2020",
               kind: "Artículo",
               title: "Conceptual and procedural learning in pre-service mathematics teachers during a conversation",
               meta: "Con Eddie Aparicio y Landy Sosa · Memorias del PME-NA 42",
+              url: "https://eric.ed.gov/?id=ED629884",
             },
             {
               year: "2020",
               kind: "Libro",
               title: "Experiencias de aprendizaje y reconceptualización geométrica: una propuesta para la reorganización de la práctica docente",
               meta: "Capítulo, con Landy Sosa — Prospecção de Problemas e Soluções nas Ciências Matemáticas 3 · Atena Editora",
+              url: "https://atenaeditora.com.br/catalogo/ebook/prospeccao-de-problemas-e-solucoes-nas-ciencias-matematicas-3",
             },
             {
               year: "2020",
               kind: "Libro",
               title: "Reconceptualización de la geometría escolar como medio para la profesionalización docente en matemáticas de educación básica",
               meta: "Capítulo — Educación Matemática en las Américas 2019 · CIAEM",
+              url: "https://conferencia.ciaem-redumate.org/index.php/xvciaem/xv/paper/view/331",
             },
             {
               year: "2018",
               kind: "Artículo",
               title: "El uso del conocimiento matemático en las comunidades de ingenieros. Del objeto a la funcionalidad matemática",
               meta: "Bolema",
+              url: "https://doi.org/10.1590/1980-4415v32n62a23",
             },
             {
               year: "2018",
               kind: "Libro",
               title: "Reconceptualización del saber matemático en educación básica",
               meta: "Universidad Autónoma de Yucatán",
+              url: "https://libreria.uady.mx/products/reconceptualizacion-del-saber-matematico-en-educacion-basica",
             },
           ],
         },
@@ -885,12 +903,14 @@ export const EQUIPO: Persona[] = [
               kind: "Libro",
               title: "Formación y desarrollo profesional de profesores de matemáticas: implementación de las investigaciones en Educación Matemática",
               meta: "Edición, con David Alfonso Páez y Lilia Aké · Editorial SOMIDEM",
+              url: "https://editorialsomidem.org.mx/",
             },
             {
               year: "2024",
               kind: "Artículo",
               title: "¿Qué significados de la derivada favorece un profesor en su planeación de clase?",
               meta: "Con Eduardo Briceño · Revista de Investigación Educativa de la REDIECH",
+              url: "https://doi.org/10.33010/ie_rie_rediech.v15i0.1975",
               featured: true,
             },
             {
@@ -898,12 +918,14 @@ export const EQUIPO: Persona[] = [
               kind: "Libro",
               title: "Implementación del manual «Álgebra dinámica» y el software GeoGebra como recurso didáctico para el aprendizaje de álgebra elemental en el nivel medio superior",
               meta: "Capítulo, con María Sofía Valero — Intervenciones educativas para la incidencia social · Universidad Autónoma de San Luis Potosí",
+              url: "https://www.researchgate.net/publication/389785466_INTERVENCIONES_EDUCATIVAS_PARA_LA_INCIDENCIA_SOCIAL",
             },
             {
               year: "2023",
               kind: "Artículo",
               title: "Dimensiones tecnológicas en tareas de libros de texto de matemáticas",
               meta: "Con C. Padilla y Eduardo Briceño · Revista Electrónica de Investigación Educativa",
+              url: "https://doi.org/10.24320/redie.2023.25.e19.4527",
             },
           ],
         },
@@ -1093,24 +1115,28 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Estudios histórico-epistemológicos en matemática educativa: tendencias metodológicas en Latinoamérica",
               meta: "Con F. Romero · Cuadernos de Investigación y Formación en Educación Matemática",
+              url: "https://doi.org/10.15517/sd9nf605",
             },
             {
               year: "2025",
               kind: "Artículo",
               title: "La Geometría Analítica y su Transposición Didáctica Externa",
               meta: "Revista Venezolana de Investigación en Educación Matemática",
+              url: "https://doi.org/10.54541/reviem.v5i1.129",
             },
             {
               year: "2024",
               kind: "Artículo",
               title: "Lingüística Sistémico-Funcional en el estudio del Lenguaje Matemático",
               meta: "Cuadernos de Investigación y Formación en Educación Matemática",
+              url: "https://archivo.revistas.ucr.ac.cr/index.php/cifem/article/view/59706",
             },
             {
               year: "2022",
               kind: "Artículo",
               title: "Emergencia de las ecuaciones paramétricas en Viète y Descartes",
               meta: "Con G. Montiel · Góndola, Enseñanza y Aprendizaje de las Ciencias",
+              url: "https://doi.org/10.14483/23464712.17062",
             },
           ],
         },
@@ -1303,6 +1329,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Decision-Making in Situations of Uncertainty as School Mathematical Knowledge",
               meta: "Acta Scientiae",
+              url: "http://www.periodicos.ulbra.br/index.php/acta/article/view/7705",
               featured: true,
             },
             {
@@ -1310,18 +1337,21 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Decision-making in contexts of risk and uncertainty: An instrument for secondary education",
               meta: "Eurasia Journal of Mathematics, Science and Technology Education",
+              url: "https://doi.org/10.29333/ejmste/17175",
             },
             {
               year: "2025",
               kind: "Artículo",
               title: "Pensamiento probabilístico o intuición en el dilema de Monty Hall",
               meta: "Horizontes. Revista de Investigación en Ciencias de la Educación",
+              url: "https://doi.org/10.33996/revistahorizontes.v9i40.1125",
             },
             {
               year: "2025",
               kind: "Artículo",
               title: "¿Juguemos CATAN? Explorando el desarrollo de los pensamientos probabilístico y estratégico en estudiantes universitarios",
               meta: "Revista de Estudios y Experiencias en Educación",
+              url: "https://doi.org/10.21703/rexe.v24i56.3302",
             },
           ],
         },
@@ -1439,6 +1469,7 @@ export const EQUIPO: Persona[] = [
               kind: "Materiales",
               title: "Plan Nacional Aprender Matemática",
               meta: "Coautoría de la colección · Ministerio de Educación, Cultura, Ciencia y Tecnología de Argentina",
+              url: "https://www.argentina.gob.ar/noticias/plan-nacional-aprender-matematica-materiales-gratis-para-descargar",
               concepts: ["Aproximar y optimizar", "Medir", "Comparar y equivaler", "Inferir"],
               featured: true,
             },
@@ -1447,6 +1478,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Matemática Educativa, transversalidad y COVID-19",
               meta: "Con R. Cantoral y otros · Revista Latinoamericana de Investigación en Matemática Educativa",
+              url: "https://doi.org/10.12802/relime.2020.39",
             },
           ],
         },
@@ -1640,6 +1672,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Análisis cualitativo de un aprendizaje estadístico temprano con la mirada de los Espacios de Trabajo Matemático orientado por el ciclo investigativo",
               meta: "Educación Matemática, 32(2) · con Kuzniak, Estrella y Montoya",
+              url: "https://doi.org/10.24844/EM3202.09",
               featured: true,
             },
             {
@@ -1647,24 +1680,28 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Modos de pensar el conjunto Z4 en docentes que enseñan álgebra en los primeros años escolares",
               meta: "Educación Matemática, 35(2) · con Parraguez, Bonilla y Campos",
+              url: "https://doi.org/10.24844/EM3502.07",
             },
             {
               year: "2023",
               kind: "Artículo",
-              title: "Conocimiento especializado de profesores sobre las características del aprendizaje de la estadística en educación básica, bajo la taxonomía SOLO",
+              title: "Explorando la extensión del modelo MTSK al dominio estadístico: características del aprendizaje desde la taxonomía SOLO",
               meta: "Revista de Educación Estadística, 2(1) · con Estrella",
+              url: "https://doi.org/10.29035/redes.2.1.3",
             },
             {
               year: "2024",
               kind: "Artículo",
               title: "Diseño de una trayectoria hipotética de aprendizaje para introducir la inferencia estadística informal en primaria",
               meta: "RELIME, 27(1) · Estrella, Morales, Méndez-Reina, Vidal-Szabó, Ramírez y Mondaca-Saavedra",
+              url: "https://doi.org/10.12802/relime.24.2711",
             },
             {
               year: "2025",
               kind: "Artículo",
               title: "Secuencia de aprendizaje lúdica que desarrolla el razonamiento estadístico en estudiantes de 8 a 9 años",
               meta: "Educación Matemática, 37(2) · Estrella, Ramírez, Mondaca-Saavedra, Méndez-Reina, Vidal-Szabó y Morales",
+              url: "https://doi.org/10.24844/em3702.09",
             },
           ],
         },
@@ -1875,6 +1912,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "La periodicidad: significados desde su uso en la huerta escolar para la matemática escolar",
               meta: "Con Gabriela Buendía · Revista Venezolana de Investigación en Educación Matemática",
+              url: "https://doi.org/10.54541/reviem.v4i1.101",
               featured: true,
             },
           ],
@@ -1943,6 +1981,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Un ejercicio de empoderamiento docente en un curso de formación posgradual",
               meta: "Con L. A. Bohórquez · Revista Venezolana de Investigación en Educación Matemática",
+              url: "https://doi.org/10.54541/reviem.v6i1.152",
               featured: true,
             },
             {
@@ -1950,24 +1989,28 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "La formación ciudadana en las prácticas educativas con las matemáticas",
               meta: "Con E. Torres y C. Salazar · Revista Pedagogía y Saberes",
+              url: "https://doi.org/10.17227/pys.num65-22606",
             },
             {
               year: "2026",
               kind: "Artículo",
               title: "Contextos de significación en la explicación de la construcción del conocimiento matemático",
               meta: "Con I. Tuyub y Gabriela Buendía · Tecné, Episteme y Didaxis",
+              url: "https://doi.org/10.17227/ted.num59-22283",
             },
             {
               year: "2026",
               kind: "Artículo",
               title: "Resolución de problemas en el marco de los círculos matemáticos. Una experiencia con estudiantes de Argentina y Colombia",
               meta: "Con Romina Busain · Números, revista de didáctica de las matemáticas",
+              url: "https://scpmluisbalbuena.org/publicacion-numeros/articulo-3-122/",
             },
             {
               year: "2025",
               kind: "Artículo",
               title: "¿Es posible formar ciudadanos críticos en las aulas colombianas de matemáticas?",
               meta: "Con J. Sánchez · Revista Papeles",
+              url: "https://doi.org/10.54104/papeles.v17n34.2156",
             },
             {
               // Revista de la Cooperativa de Trabajadores de la Educación de Cundinamarca (ISSN 1657-9585).
@@ -2108,6 +2151,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Significados otorgados a las literales por estudiantes de secundaria y universitarios de nuevo ingreso",
               meta: "Con R. E. Páez y Judith Hernández · Revista de Investigación Educativa de la REDIECH",
+              url: "https://doi.org/10.33010/ie_rie_rediech.v14i0.1787",
               featured: true,
             },
             {
@@ -2115,6 +2159,7 @@ export const EQUIPO: Persona[] = [
               kind: "Libro",
               title: "Las interacciones entre y con profesores de matemáticas como un recurso para la construcción de conocimiento profesional",
               meta: "Capítulo, con Judith Hernández y A. Espino — Perspectivas actuales de la Educación Matemática · Editorial SOMIDEM",
+              url: "https://doi.org/10.24844/SOMIDEM/S3/2024/01-31",
             },
             {
               year: "2023",
@@ -2287,6 +2332,7 @@ export const EQUIPO: Persona[] = [
               kind: "Libro",
               title: "Referentes teóricos para el diseño de situaciones variacionales",
               meta: "Capítulo — Tendencias en la Educación Matemática 2025 · Editorial SOMIDEM",
+              url: "https://editorialsomidem.org.mx/?view=viewpub&id=1048",
               featured: true,
             },
           ],
@@ -2307,6 +2353,7 @@ export const EQUIPO: Persona[] = [
               kind: "Materiales",
               title: "Plan Nacional Aprender Matemática",
               meta: "Coautoría de la colección para el profesor · Ministerio de Educación, Cultura, Ciencia y Tecnología de Argentina",
+              url: "https://www.argentina.gob.ar/noticias/plan-nacional-aprender-matematica-materiales-gratis-para-descargar",
               featured: true,
             },
             {
@@ -2320,18 +2367,21 @@ export const EQUIPO: Persona[] = [
               kind: "Libro",
               title: "Rúbrica para evaluar el desarrollo del pensamiento y lenguaje variacional",
               meta: "Capítulo — Perspectivas actuales de la Educación Matemática · Editorial SOMIDEM",
+              url: "https://doi.org/10.24844/SOMIDEM/S3/2024/01-26",
             },
             {
               year: "2025",
               kind: "Artículo",
               title: "Una aproximación variacional",
               meta: "Avances de Investigación en Educación Matemática",
+              url: "https://doi.org/10.35763/aiem27.6157",
             },
             {
               year: "2026",
               kind: "Artículo",
               title: "Taller del sistema solar",
               meta: "Revista Mexicana de Física E",
+              url: "https://rmf.smf.mx/ojs/index.php/rmf-e/article/view/8047",
             },
           ],
         },
@@ -2499,6 +2549,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "¿Qué podemos aprender de nuestros estudiantes? Reflexiones en torno al uso de las gráficas",
               meta: "Educación Matemática",
+              url: "https://doi.org/10.24844/EM3102.09",
               featured: true,
             },
           ],
@@ -2519,6 +2570,7 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "¿Qué significados de la derivada favorece un profesor en su planeación de clase?",
               meta: "Con Judith Hernández · Revista de Investigación Educativa de la REDIECH",
+              url: "https://doi.org/10.33010/ie_rie_rediech.v15i0.1975",
               featured: true,
             },
             {
@@ -2526,24 +2578,28 @@ export const EQUIPO: Persona[] = [
               kind: "Artículo",
               title: "Dimensiones tecnológicas en tareas de libros de texto de matemáticas",
               meta: "Revista Electrónica de Investigación Educativa",
+              url: "https://doi.org/10.24320/redie.2023.25.e19.4527",
             },
             {
               year: "2022",
               kind: "Artículo",
               title: "Análisis de interpretaciones de gráficas de movimiento y sus implicaciones didácticas",
               meta: "Innovación Educativa",
+              url: "https://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S1665-26732022000200097",
             },
             {
               year: "2021",
               kind: "Artículo",
               title: "Análisis de la resolución de un problema de cinemática mediante el mapa conceptual híbrido",
               meta: "Enseñanza de las Ciencias",
+              url: "https://doi.org/10.5565/rev/ensciencias.3106",
             },
             {
               year: "2017",
               kind: "Artículo",
               title: "La modelación matemática en los procesos de formación inicial y continua de docentes",
               meta: "Con Lizbet Alamillo · Revista de Investigación Educativa de la REDIECH",
+              url: "https://www.redalyc.org/journal/5216/521653370007/html/",
             },
           ],
         },
