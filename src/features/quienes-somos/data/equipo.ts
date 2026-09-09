@@ -167,6 +167,11 @@ export type Profile = {
    */
   cutoutSize?: { width: number; height: number };
   cutoutPosition?: string;
+  /**
+   * Solo con `figura: "marco"`: la imagen es APAISADA (una lámina, no un
+   * retrato) y el marco toma esa proporción en vez de la vertical.
+   */
+  marcoApaisado?: boolean;
   headline: string;
   intro: string;
   formation: string[];
@@ -1208,21 +1213,27 @@ export const EQUIPO: Persona[] = [
   {
     // Fuentes: ficha «Vergara Andrea.docx» (jul 2026) y su ORCID
     // 0000-0001-6388-8412, que ella misma indicó como referencia porque no
-    // maneja redes. En esa misma ficha pidió no publicar foto.
+    // maneja redes. En esa ficha pidió no publicar foto: en su lugar eligió
+    // un dibujo (espiral de Fibonacci a lápiz de color, 2026-09-09), que va
+    // como imagen de la card y del perfil. El dibujo es apaisado: la card
+    // (vertical) lo encuadra hacia la derecha, donde la espiral converge.
     key: "andrea-vergara",
     nombre: "Andrea Vergara",
     rol: "Líder de Pensamiento Estadístico",
     pais: "Chile",
     tier: 3,
-    sinFoto: true,
-    // Sin foto: el valor no se usa, se conserva por contrato del tipo.
-    imagePosition: "50% 50%",
+    imagePosition: "72% 50%",
     bio: "Profesora de Matemática. Magíster y Doctora en Didáctica de la Matemática. Académica e investigadora del CIEMAE, Centro de Investigación en Educación Matemática y Estadística de la Universidad Católica del Maule.",
     profile: {
       fullName: "Andrea Vergara-Gómez",
       role: "Líder de Pensamiento Estadístico",
       location: "Talca, Chile",
-      figura: "sin",
+      // El dibujo completo, enmarcado como las fotos con fondo del resto,
+      // pero en apaisado: es una lámina, no un retrato.
+      figura: "marco",
+      marcoApaisado: true,
+      cutout: "/equipo/andrea-vergara.jpg",
+      cutoutPosition: "50% 50%",
       headline: "Decidir con incertidumbre también se aprende.",
       intro:
         "Profesora de Matemática, magíster y doctora en Didáctica de la Matemática. Investiga la toma de decisiones en contextos de riesgo e incertidumbre como un saber matemático escolar, y forma profesorado en la Universidad Católica del Maule.",
