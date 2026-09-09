@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen } from "@/components/ui/icons";
+import { ArrowUpRight, BookOpen } from "@/components/ui/icons";
 import type {
   Milestone,
   ProfileCategory,
@@ -213,6 +213,11 @@ function ConceptoBlock({ stage }: { stage: ProfileStage }) {
               {featured.title}
             </span>
             {featured.meta && <span className="text-gris-texto mt-0.5 block font-sans text-[0.8rem]">{featured.meta}</span>}
+            {featured.url && (
+              <span className="mt-2 block">
+                <LeerPublicacion url={featured.url} />
+              </span>
+            )}
           </span>
         </div>
       )}
@@ -313,12 +318,38 @@ function PubPiece({
           ))}
         </ul>
       )}
-      {pub.featured && (
-        <span className={cx("mt-3.5 inline-flex items-center gap-1.5 font-sans text-[0.72rem] font-medium", a.text)}>
-          <BookOpen size={14} /> Pieza destacada
-        </span>
+      {(pub.featured || pub.url) && (
+        <div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+          {pub.featured && (
+            <span className={cx("inline-flex items-center gap-1.5 font-sans text-[0.72rem] font-medium", a.text)}>
+              <BookOpen size={14} /> Pieza destacada
+            </span>
+          )}
+          {pub.url && <LeerPublicacion url={pub.url} />}
+        </div>
       )}
     </article>
+  );
+}
+
+/**
+ * Acción de una publicación: abre el DOI o la página de la revista en otra
+ * pestaña. Va en naranja como en la Biblioteca, que es donde vive el mismo
+ * link, y es la única acción de la card.
+ */
+function LeerPublicacion({ url }: { url: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-naranja-accion group inline-flex items-center gap-1.5 font-sans text-[0.72rem] font-medium"
+    >
+      Leer
+      <span className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+        <ArrowUpRight size={13} />
+      </span>
+    </a>
   );
 }
 
