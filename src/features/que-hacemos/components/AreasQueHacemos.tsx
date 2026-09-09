@@ -10,11 +10,36 @@ import { AREAS, AREAS_INTRO } from "@/features/que-hacemos/areas";
  * Raquel y Daniela (2026-09-08): la web se veía espectacular pero no se
  * entendía qué hace ED. Esta sección es la respuesta: nada se esconde
  * detrás de una animación. Cada área dice qué es, qué te llevás y para quién
- * es. A la izquierda (en desktop) un índice pegado que
- * marca el bloque que se está leyendo y sirve para saltar; en celular es una
- * fila de chips deslizable. El único JS es ese resaltado, y sin JS todo se
- * lee igual.
+ * es. A la izquierda (en desktop) un índice pegado que se LLENA a medida que
+ * se lee —el riel verde cubre lo recorrido, gris lo que falta— y sirve para
+ * saltar; en celular es una fila de chips deslizable. El único JS es ese
+ * avance, y sin JS todo se lee igual: el índice arranca en la primera área.
  */
+/**
+ * Clases de un ítem del índice según por dónde va la lectura. El riel se
+ * LLENA: el borde izquierdo va verde en todo lo recorrido y gris en lo que
+ * falta, así el índice deja de decir solo dónde estás y dice cuánto queda.
+ *
+ * Va con el borde de cada ítem y no con una barra de altura en porcentaje
+ * porque los rótulos no miden todos igual —«Diseño de materiales didácticos»
+ * ocupa dos renglones— y un porcentaje sobre el alto total cortaría a mitad
+ * de un ítem. Así el llenado cae siempre en el límite exacto.
+ *
+ * Vive fuera del componente: son tres casos excluyentes y adentro quedaba un
+ * ternario anidado en medio del markup.
+ */
+function clasesDelItem(recorrido: boolean, activo: boolean) {
+  const riel = recorrido
+    ? "lg:border-verde-concepto"
+    : "lg:border-azul-principal/10";
+  if (activo) {
+    return `${riel} border-azul-principal bg-azul-principal text-white lg:bg-transparent lg:font-semibold lg:text-azul-principal`;
+  }
+  const base =
+    "border-azul-principal/15 text-gris-texto hover:border-azul-principal/40 hover:text-azul-principal";
+  return `${riel} ${base} ${recorrido ? "lg:text-azul-principal/55" : ""}`;
+}
+
 export function AreasQueHacemos() {
   const rootRef = useRef<HTMLElement | null>(null);
   const [activa, setActiva] = useState(0);
@@ -84,18 +109,17 @@ export function AreasQueHacemos() {
               <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
                 {AREAS.map((a, i) => {
                   const activo = i === activa;
+                  const recorrido = i <= activa;
                   return (
                     <li key={a.id} className="shrink-0">
                       <a
                         href={`#area-${a.id}`}
                         aria-current={activo ? "true" : undefined}
-                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${
-                          activo
-                            ? "border-azul-principal bg-azul-principal lg:text-azul-principal lg:border-verde-concepto text-white lg:bg-transparent"
-                            : "border-azul-principal/15 text-gris-texto hover:border-azul-principal/40 hover:text-azul-principal lg:border-azul-principal/10"
-                        }`}
+                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
                       >
-                        <span className="font-mono text-[0.72rem] tabular-nums opacity-70">
+                        <span
+                          className={`font-mono text-[0.72rem] tabular-nums transition-opacity duration-300 motion-reduce:transition-none ${recorrido ? "opacity-90" : "opacity-50"}`}
+                        >
                           0{i + 1}
                         </span>
                         <span>{a.nombre}</span>
