@@ -57,7 +57,10 @@ export function ColumnaIdentidad() {
           fondo de la columna (justify-between) para IGUALAR la altura
           del índice. Solo desktop ancho — en mobile la columna ya va
           apilada y la foto empujaría el índice fuera del viewport. */}
-      <div data-ap-head className="mb-16 hidden w-full max-w-[24rem] lg:block">
+      {/* En pantallas muy bajas (≤ 760px) la foto se achica: si la columna
+          es más alta que el índice, el justify-between no deja aire entre
+          titular, frase y foto. */}
+      <div data-ap-head className="mb-16 hidden w-full max-w-[24rem] lg:block [@media(max-height:760px)]:mb-8 [@media(max-height:760px)]:max-w-[17rem]">
         <div className="relative">
           <div className="relative aspect-[7/5] w-full overflow-hidden rounded-2xl shadow-[0_28px_70px_-28px_rgb(31_45_77_/_0.5)] ring-1 ring-white/40">
             <Image
