@@ -238,7 +238,12 @@ dirigidos. Es el único registro que tenemos de la escala del trabajo de ED y de
 
 - **Casos de investigación:** 01 (Oaxaca, PDF #1) y 02 (escuelas técnicas, PDF #2) son reales. Los otros dos son demo. Pendientes con el cliente en `casos/data.ts`.
 - **Perfiles del equipo:** 11 de 15 con producción cargada. Faltan, con los datos ya en mano: Daniela (Bolema 2014 con Cantoral, la que ella pone primera; y la nota de Roberto Rocca), Karla (cuatro de su CVU, dos con PDF), Judith (los títulos completos de #8 y #10), Eduardo (#11), Cabrera (Rúbrica SOMIDEM), Paola (Revista UNO y el Festival), Darly (las dos que eligió). Iván y Pedro no tienen recorrido por falta de CV con fechas, pero sus publicaciones ya se podrían listar.
-- **Biblioteca:** `materiales.ts` es un catálogo mock de 10 ítems inventados con portadas del hero. **No hay una sola publicación real.** Las candidatas inmediatas son las 16 con PDF y todas las que tienen DOI (unas 45).
+- **Biblioteca (2026-09-09):** `materiales.ts` tiene las 16 publicaciones con PDF, con ficha,
+  autorías, tema y link a la revista o editorial (DOI cuando hay). El libro de Gedisa va con
+  link a la editorial y sin PDF; la tesis se aloja en `public/biblioteca/` hasta que Daniela
+  confirme (Facundo: «publicalas todas, después resolvemos esos detalles»). Las portadas son
+  tipográficas (`public/biblioteca/portadas/`), generadas con la ficha de cada una. Faltan
+  cargar las que solo tienen DOI (unas 45).
 
 ## 5. Antes de publicar cualquier PDF
 

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { RefObject } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { ACCION, type ItemDestacado } from "../../data/materiales";
+import { accionDe, type ItemDestacado } from "../../data/materiales";
 
 type ArticuloDestacadoProps = {
   item: ItemDestacado;
@@ -78,17 +78,18 @@ export function ArticuloDestacado({ item, i, activo, reduced, refItem, refSlot }
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 lg:mt-auto lg:pt-8">
           <p className="font-mono text-[0.72rem] tracking-[0.08em] text-white/45 uppercase">
-            {material.tipo} · {material.fecha} ·{" "}
+            {material.autores} · {material.fecha} ·{" "}
             {material.paginas
               ? `${material.paginas} páginas`
               : material.formato}
           </p>
-          {/* Placeholder hasta tener los archivos reales del catálogo. */}
           <a
-            href="#materiales"
+            href={material.url}
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-naranja-accion inline-flex items-center gap-2 rounded-lg px-5 py-2.5 font-sans text-[0.92rem] font-medium text-white transition-opacity hover:opacity-90"
           >
-            {ACCION[material.formato]}
+            {accionDe(material)}
             <ArrowUpRight size={17} />
           </a>
         </div>
