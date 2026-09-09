@@ -957,6 +957,13 @@ export const EQUIPO: Persona[] = [
     },
   },
   {
+    // Fuentes (carpeta «Buendia Gabriela» del Drive de ED, 2026-09-09): ficha
+    // «Buendia Gabriela.docx» (rol y las tres publicaciones que ella eligió,
+    // con DOI), «Resumen 2026.docx» (CV completo: escolaridad, distinciones,
+    // artículos, libros, capítulos, dirección de tesis, conferencias) y las
+    // tapas de tres libros en los que participó. Los links de las
+    // publicaciones son los DOI de la ficha; el resto va sin link (no se
+    // inventan). ORCID: 0000-0002-9456-4469.
     key: "gabriela-buendia",
     nombre: "Gabriela Buendía",
     rol: "Líder de proyecto · Facilitadora",
@@ -965,6 +972,264 @@ export const EQUIPO: Persona[] = [
     imagePosition: "50% 22%",
     imageZoom: 1.1,
     bio: "Doctora en Ciencias con especialidad en Matemática Educativa. Especialista en desarrollo del pensamiento matemático. Facilitadora y diseñadora de material didáctico.",
+    pubs: [
+      {
+        titulo: "Diálogo entre lo comunitario y lo escolar: la cocción de la tortilla de maíz como situación de aprendizaje (2024)",
+        url: "https://doi.org/10.12802/relime.24.2732",
+      },
+      {
+        titulo: "Contextos de significación en la explicación de la construcción del conocimiento matemático (2026)",
+        url: "https://doi.org/10.17227/ted.num59-22283",
+      },
+      {
+        titulo: "La periodicidad: significados desde su uso en la huerta escolar para la matemática escolar (2024)",
+        url: "https://doi.org/10.54541/reviem.v4i1.101",
+      },
+    ],
+    profile: {
+      fullName: "Gabriela Buendía Ábalos",
+      role: "Líder de proyecto · Facilitadora y diseñadora de material didáctico",
+      location: "Ciudad de México",
+      // Foto cuadrada 640×640, rostro alto en el cuadro.
+      figura: "marco",
+      cutout: "/equipo/gabriela-buendia.jpg",
+      cutoutSize: { width: 640, height: 640 },
+      cutoutPosition: "50% 22%",
+      headline: "El saber matemático se construye en lo que la gente hace.",
+      intro:
+        "Doctora en Ciencias con especialidad en Matemática Educativa. Investiga cómo se construye socialmente el conocimiento matemático escolar a partir de sus usos, forma desde hace dos décadas a quienes investigan y enseñan, y edita la revista de la Red de Centros de Investigación en Matemática Educativa.",
+      formation: [
+        "Licenciada en Actuaría — Facultad de Ciencias, UNAM",
+        "Maestra en Ciencias — Matemática Educativa, Cinvestav-IPN",
+        "Doctora en Ciencias — Matemática Educativa, Cinvestav-IPN",
+      ],
+      categories: [
+        { id: "pensamiento-matematico", label: "Desarrollo del pensamiento matemático", color: "verde" },
+        { id: "investigacion", label: "Investigación socioepistemológica", color: "azul" },
+        { id: "formacion", label: "Formación de quienes investigan y enseñan", color: "verde" },
+        { id: "materiales", label: "Libros y materiales para el aula", color: "naranja" },
+      ],
+      stages: [
+        {
+          id: "formacion",
+          n: 1,
+          categoryId: "investigacion",
+          color: "azul",
+          eyebrow: "De la actuaría a la Matemática Educativa",
+          period: "1986 – 2004",
+          variant: "ficha",
+          title: "Una tesis sobre lo periódico.",
+          body: "Estudió Actuaría en la UNAM y se formó como investigadora en el Cinvestav-IPN: una maestría sobre cómo se responde a tareas de probabilidad y un doctorado, dirigido por Francisco Cordero, sobre la periodicidad como construcción social. Esa tesis recibió el Premio Simón Bolívar 2005 del Comité Latinoamericano de Matemática Educativa a la mejor tesis de doctorado.",
+          quote: "Una epistemología de la periodicidad en un marco de prácticas sociales",
+          milestones: [
+            { period: "1993", title: "Licenciatura en Actuaría", detail: "Facultad de Ciencias, UNAM" },
+            { period: "1994", title: "Maestría en Ciencias — Matemática Educativa", detail: "Cinvestav-IPN" },
+            { period: "2004", title: "Doctorado en Ciencias — Matemática Educativa", detail: "Cinvestav-IPN", primary: true },
+          ],
+          branches: [
+            {
+              period: "2005",
+              place: "Comité Latinoamericano de Matemática Educativa",
+              detail: "Premio Simón Bolívar a la mejor tesis de doctorado",
+            },
+          ],
+        },
+        {
+          id: "socioepistemologia",
+          n: 2,
+          categoryId: "investigacion",
+          color: "azul",
+          eyebrow: "Cómo se construye el saber",
+          period: "2005 – 2011",
+          variant: "concepto",
+          title: "La construcción social del conocimiento matemático escolar.",
+          body: "Su investigación es socioepistemológica: estudia cómo se construye socialmente el conocimiento matemático que llega a la escuela, a partir de los usos y las prácticas donde ese saber tiene sentido. Lo periódico, las gráficas y la predicción fueron sus primeros casos. En 2011 reunió ese trabajo en un libro y coordinó un volumen colectivo de reflexión e investigación en Matemática Educativa. En esos años presidió la Red de Centros de Investigación en Matemática Educativa.",
+          quote: "Articulando el saber matemático a través de prácticas sociales.",
+          milestones: [
+            {
+              period: "2011",
+              title: "«La construcción social del conocimiento matemático escolar»",
+              detail: "Un estudio socioepistemológico sobre la periodicidad de las funciones · Díaz de Santos",
+              primary: true,
+            },
+            {
+              period: "2006 – 2009",
+              title: "Presidenta de la Red de Centros de Investigación en Matemática Educativa",
+            },
+            {
+              period: "desde 2004",
+              title: "Sistema Nacional de Investigadoras e Investigadores, nivel I",
+              detail: "Conahcyt, México",
+            },
+          ],
+        },
+        {
+          id: "tesis",
+          n: 3,
+          categoryId: "formacion",
+          color: "verde",
+          eyebrow: "Formar a quienes investigan",
+          period: "2005 – actualidad",
+          variant: "hitos",
+          title: "Casi treinta tesis dirigidas.",
+          body: "Ha dirigido tesis de especialidad, maestría y doctorado en la Universidad Autónoma de Chiapas, el CICATA-IPN, la Universidad Autónoma de Guerrero, la Universidad de Santo Tomás en Colombia y la Universidad Juárez del Estado de Durango. Varias fueron premiadas, y varias de sus tesistas —Paola Balda, hoy parte del equipo de ED; Isabel Tuyub; Fredy de la Cruz— son coautoras y coautores de sus artículos recientes.",
+          milestones: [
+            {
+              period: "2011",
+              title: "Mejor Tesis de Posgrado del IPN",
+              detail: "Como directora de la tesis doctoral de Verónica Molfino sobre la institucionalización del límite",
+              primary: true,
+            },
+            {
+              period: "2019",
+              title: "Tesis laureada con mención especial",
+              detail: "Doctorado de Paola Balda · Universidad de Santo Tomás, Colombia",
+            },
+            {
+              period: "2009",
+              title: "Mención honorífica en el Premio Simón Bolívar",
+              detail: "Tesis de maestría de Rosa Isela Vázquez · Comité Latinoamericano de Matemática Educativa",
+            },
+            {
+              period: "2005 – 2025",
+              title: "Seis tesis doctorales, diecisiete de maestría y cinco de especialidad",
+              detail: "UNACH, CICATA-IPN, UAGro, Santo Tomás, UJED",
+            },
+          ],
+        },
+        {
+          id: "profesores",
+          n: 4,
+          categoryId: "materiales",
+          color: "naranja",
+          eyebrow: "Escribir para quienes enseñan",
+          period: "2011 – 2016",
+          variant: "ramas",
+          title: "Libros pensados para el aula.",
+          body: "Coordinó, con Marcela Ferrari y Gustavo Martínez, «Resignificación de funciones para profesores de matemáticas»: un libro escrito para acercar la investigación al trabajo cotidiano de quienes enseñan, con actividades de reflexión en cada capítulo. Ahí escribió sobre qué ves cuando te presentan una gráfica y, con Gisela Montiel, sobre el pensamiento funcional trigonométrico. Con el mismo espíritu participó en volúmenes sobre metodología de investigación, la dimensión histórica en la educación matemática y el comportamiento con tendencia.",
+          publications: [
+            {
+              year: "2013",
+              kind: "Libro",
+              title: "Resignificación de funciones para profesores de matemáticas",
+              meta: "Coordinación con M. Ferrari y G. Martínez · Díaz de Santos",
+              featured: true,
+            },
+            {
+              year: "2013",
+              kind: "Libro",
+              title: "¿Qué ves cuando te presentan una gráfica y te preguntan si es periódica?",
+              meta: "Capítulo — Resignificación de funciones para profesores de matemáticas · Díaz de Santos",
+            },
+            {
+              year: "2013",
+              kind: "Libro",
+              title: "Desarrollo del pensamiento funcional trigonométrico",
+              meta: "Con G. Montiel · Capítulo — Resignificación de funciones para profesores de matemáticas",
+            },
+            {
+              year: "2012",
+              kind: "Libro",
+              title: "Un esquema metodológico para la investigación socioepistemológica: ejemplos e ilustración",
+              meta: "Con G. Montiel · Capítulo — Metodología en Matemática Educativa: visiones y reflexiones · Lectorum",
+            },
+            {
+              year: "2011",
+              kind: "Libro",
+              title: "From History to Research in Mathematics Education: socio-epistemological elements for trigonometric function",
+              meta: "Con G. Montiel · Capítulo — Recent Developments on Introducing a Historical Dimension in Mathematics Education · Mathematical Association of America",
+            },
+            {
+              year: "2016",
+              kind: "Libro",
+              title: "El comportamiento con tendencia, lo estable y las ecuaciones diferenciales. Una argumentación gráfica",
+              meta: "Con F. Cordero, M. Solís, J. Mendoza y J. D. Zaldívar · Gedisa",
+            },
+          ],
+        },
+        {
+          id: "usos",
+          n: 5,
+          categoryId: "pensamiento-matematico",
+          color: "verde",
+          eyebrow: "El saber en contextos reales",
+          period: "2017 – actualidad",
+          variant: "ramas",
+          title: "La tortilla, la huerta, el telebachillerato.",
+          body: "Sus investigaciones recientes buscan significados para la matemática escolar en los usos del conocimiento fuera de la escuela: la cocción de la tortilla de maíz como situación de aprendizaje, la periodicidad y lo proporcional en la huerta escolar, la enseñanza en zonas indígenas y en el telebachillerato chiapaneco. De ahí sale una propuesta de docencia basada en prácticas y usos del saber matemático, que hoy lleva a seminarios sobre educación matemática para la justicia social.",
+          publications: [
+            {
+              year: "2024",
+              kind: "Artículo",
+              title: "Diálogo entre lo comunitario y lo escolar: la cocción de la tortilla de maíz como situación de aprendizaje",
+              meta: "Con F. de la Cruz · Revista Latinoamericana de Investigación en Matemática Educativa",
+              url: "https://doi.org/10.12802/relime.24.2732",
+              featured: true,
+            },
+            {
+              year: "2026",
+              kind: "Artículo",
+              title: "Contextos de significación en la explicación de la construcción del conocimiento matemático",
+              meta: "Con I. Tuyub y P. Balda · Tecné, Episteme y Didaxis",
+              url: "https://doi.org/10.17227/ted.num59-22283",
+            },
+            {
+              year: "2024",
+              kind: "Artículo",
+              title: "La periodicidad: significados desde su uso en la huerta escolar para la matemática escolar",
+              meta: "Con P. Balda · Revista Venezolana de Investigación en Educación Matemática",
+              url: "https://doi.org/10.54541/reviem.v4i1.101",
+            },
+            {
+              year: "2024",
+              kind: "Artículo",
+              title: "Docencia en matemáticas bajo la perspectiva socioepistemológica: diseños basados en prácticas y usos",
+              meta: "Con J. Lezama y R. Flores · Cuadernos de Investigación y Formación en Educación Matemática",
+            },
+            {
+              year: "2019",
+              kind: "Artículo",
+              title: "¿Ya está el pan? Una propuesta didáctica de variación y cambio para el aula de matemáticas",
+              meta: "Con J. Lezama, A. Mata y T. Romero · Revista Práctica Docente",
+            },
+          ],
+        },
+        {
+          id: "convergencia",
+          n: 6,
+          categoryId: "pensamiento-matematico",
+          color: "verde",
+          eyebrow: "La convergencia",
+          period: "actualidad",
+          variant: "sintesis",
+          title: "Investigar, editar, facilitar.",
+          body: "Es editora responsable de la revista Investigación e Innovación en Matemática Educativa, de la Red de Centros de Investigación en Matemática Educativa, y profesora-investigadora en la Universidad Juárez del Estado de Durango. En Empoderamiento Docente lidera proyectos y diseña y facilita material didáctico: el mismo saber, puesto a trabajar con docentes.",
+          milestones: [
+            {
+              title: "Líder de proyecto, facilitadora y diseñadora de material didáctico — Empoderamiento Docente",
+              primary: true,
+            },
+            {
+              title: "Editora responsable — Investigación e Innovación en Matemática Educativa",
+              detail: "Red de Centros de Investigación en Matemática Educativa",
+            },
+            {
+              title: "Profesora-investigadora — Universidad Juárez del Estado de Durango",
+              detail: "Facultad de Ciencias Exactas · Maestría en Matemática Educativa",
+            },
+            {
+              period: "2024 – 2028",
+              title: "Sistema Nacional de Investigadoras e Investigadores, nivel I",
+            },
+          ],
+        },
+      ],
+      closing: {
+        title: "Del saber que se usa, al saber que se enseña.",
+        body: "Su recorrido va de una tesis sobre lo periódico a veinte años de investigación socioepistemológica, de formar a quienes investigan, de libros escritos para profesores y de estudios en contextos reales como la tortilla o la huerta escolar.",
+        body2: "En ED esa trayectoria se vuelve práctica: proyectos, facilitación y materiales para que el pensamiento matemático se desarrolle en el aula.",
+      },
+    },
   },
   {
     key: "marcela-cano",
