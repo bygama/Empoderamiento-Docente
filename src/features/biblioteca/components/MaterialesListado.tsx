@@ -29,6 +29,9 @@ type Filtros = {
 
 const SIN_FILTROS: Filtros = { tipo: null, publico: null, anio: null };
 
+/** Filas que se muestran de entrada y que suma cada «Ver más». */
+const PASO = 8;
+
 /** `?tipo=` de la URL, si es un tipo real del catálogo. */
 function tipoDeUrl(): string | null {
   const t = new URLSearchParams(window.location.search).get("tipo");
@@ -61,13 +64,18 @@ function escribirTipoEnUrl(tipo: string | null) {
  * descripción, metadata en mono y el link de acción en naranja (única
  * acción por fila, DESIGN §1).
  *
- * Filtros y búsqueda operan de verdad sobre el mock: un valor por grupo
+ * Filtros y búsqueda operan de verdad sobre el catálogo: un valor por grupo
  * (como la referencia), "Todos" lo destilda. Sin animación de entrada — es
- * una sección utilitaria y el contenido cambia con los filtros.
+ * una sección utilitaria y el contenido cambia con los filtros. Se muestra
+ * de a PASO filas con «Ver más»: con 57 piezas la página no puede ser un
+ * rollo.
  */
 export function MaterialesListado() {
   const [busqueda, setBusqueda] = useState("");
   const [filtros, setFiltros] = useState<Filtros>(SIN_FILTROS);
+  // Tramos extra pedidos con «Ver más», atados a la búsqueda con la que se
+  // pidieron: si cambian los filtros dejan de contar, sin efecto que resetee.
+  const [extra, setExtra] = useState({ firma: "", n: 0 });
   const rootRef = useRef<HTMLElement | null>(null);
 
   // El TIPO viaja en la URL (`?tipo=`): así el submenú "Biblioteca" del
@@ -149,6 +157,18 @@ export function MaterialesListado() {
       ).includes(q);
     });
   }, [busqueda, filtros]);
+
+  const firma = `${busqueda}|${filtros.tipo}|${filtros.publico}|${filtros.anio}`;
+  const extraActivo = extra.firma === firma ? extra.n : 0;
+  const visibles = PASO + extraActivo;
+  const restantes = Math.max(0, resultados.length - visibles);
+  const verMas = () => setExtra({ firma, n: extraActivo + PASO });
+  // «Ver menos» vuelve al primer tramo y sube al inicio del listado: si no,
+  // la lista se achica y el scroll queda clavado contra el footer.
+  const verMenos = () => {
+    setExtra({ firma, n: 0 });
+    volverAlListado();
+  };
 
   return (
     <section
@@ -232,13 +252,42 @@ export function MaterialesListado() {
             </p>
 
             {resultados.length > 0 ? (
-              <ul className="divide-azul-principal/10 mt-2 divide-y">
-                {resultados.map((m) => (
-                  <li key={m.titulo}>
-                    <FilaMaterial material={m} />
-                  </li>
-                ))}
-              </ul>
+              <>
+                <ul className="divide-azul-principal/10 mt-2 divide-y">
+                  {resultados.slice(0, visibles).map((m) => (
+                    <li key={m.titulo}>
+                      <FilaMaterial material={m} />
+                    </li>
+                  ))}
+                </ul>
+                {(restantes > 0 || extraActivo > 0) && (
+                  <div className="border-azul-principal/10 flex flex-col items-center gap-3 border-t pt-8">
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                      {restantes > 0 && (
+                        <button
+                          type="button"
+                          onClick={verMas}
+                          className="border-azul-principal text-azul-principal hover:bg-azul-claro/30 rounded-lg border px-6 py-3 font-sans text-[0.95rem] font-medium transition-colors"
+                        >
+                          Ver {Math.min(PASO, restantes)} más
+                        </button>
+                      )}
+                      {extraActivo > 0 && (
+                        <button
+                          type="button"
+                          onClick={verMenos}
+                          className="text-azul-principal hover:bg-azul-claro/30 rounded-lg px-5 py-3 font-sans text-[0.95rem] font-medium transition-colors"
+                        >
+                          Ver menos
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-gris-texto font-mono text-[0.72rem] tracking-[0.08em] uppercase">
+                      {Math.min(visibles, resultados.length)} de {resultados.length}
+                    </p>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="border-azul-principal/15 mt-6 flex flex-col items-start gap-5 rounded-xl border border-dashed px-6 py-10 md:px-8">
                 <p className="text-azul-principal font-sans text-[1.02rem] leading-relaxed">
