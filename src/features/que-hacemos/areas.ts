@@ -174,11 +174,14 @@ export const AREAS: readonly Area[] = [
 // ── Cómo trabajamos: la mirada ED, en seis verbos ─────────────────────────────
 // Son los seis pasos que ED comunica en redes desde agosto de 2026 («La mirada
 // ED»), con la idea fuerza textual de cada uno y la descripción del documento
-// de Raquel (jul 2026). La regla de entrada es textual del PPTX institucional.
+// de Raquel (jul 2026). La entrada («Siempre comenzamos con una
+// conversación», textual del PPTX institucional) se sacó (Gastón,
+// 2026-09-09): la idea ya está dicha en Inicio y en Contacto («Cada
+// propuesta empieza con una conversación») y el primer verbo la repite.
 export const MIRADA_INTRO = {
-  titulo: "Siempre comenzamos con una conversación.",
+  titulo: "Cómo trabajamos",
   texto:
-    "Nos sentamos con vos, escuchamos tus necesidades, comprendemos tus objetivos y exploramos las oportunidades en equipo. Después, el trabajo sigue estos pasos.",
+    "Los seis pasos que sigue cada proyecto, del primer diálogo a la transformación.",
 } as const;
 
 export const MIRADA = [
