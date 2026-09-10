@@ -7,6 +7,18 @@
 > `copy-que-hacemos.md`; el porqué y las fuentes, en `que-hace-ed-fuentes.md`. Lo que
 > sigue es la arquitectura original (siete líneas, torre, camino) y vale como historia.
 
+> **Actualización 2026-09-10.** La escena del faro (entre el hero y «Cómo trabajamos») ocupa el
+> lugar de «Nuestro enfoque» del sitemap y ahora cuenta eso: la frase del cartel y cuatro frases
+> de por qué no es una capacitación tradicional (palabras de Dani, jun 2026), en lugar de las
+> cinco preguntas del método, que repetían «Cómo trabajamos». Las frases viven en
+> `src/features/que-hacemos/components/preguntas-faro.ts`. Las áreas son siete desde el
+> 2026-09-09 (las validó la dirección). El mismo día «Cómo trabajamos» deja el mazo apilado
+> (seis tarjetas superpuestas, una sola a la vista) por UNA tarjeta clavada cuyo contenido
+> cambia con el scroll —las letras del verbo se arman y desarman, la explicación entra y sale
+> palabra por palabra— con el índice de los seis pasos al lado marcando en cuál se está; y
+> cada paso dice lo concreto que pasa en él (documento maestro, §5 de este doc), no solo la
+> idea.
+
 > **Fuente de verdad de contenidos:** `ED_Contenido_Maestro_Que_Hacemos_Investigacion.md`
 > (v1.0, 17-08-2026), Parte II. Este documento la convierte en arquitectura
 > de interfaz: qué se ve, qué se abre bajo interacción, qué deriva a otra
