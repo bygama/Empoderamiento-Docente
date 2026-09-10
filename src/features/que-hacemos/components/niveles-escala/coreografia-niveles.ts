@@ -75,7 +75,6 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
     // offset corrido detrás de la cola, siempre sobre el mismo path.
     const lazo = stage.querySelector<SVGPathElement>("[data-nivel-lazo]");
     const punto = stage.querySelector<SVGPathElement>("[data-nivel-punto]");
-    const cinta = stage.querySelector<SVGSVGElement>("[data-nivel-cinta]");
     if (lazo && punto) {
       const L = lazo.getTotalLength();
       const seg = L * LAZO_SEG;
@@ -87,30 +86,29 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
         strokeDasharray: `${dot} ${L * 2}`,
         strokeDashoffset: seg + corrimiento,
       });
-      // Viaja hasta que la cápsula también salió del todo — y termina
-      // ANTES del fin de la coreografía (FIN): que la última card no
-      // conviva con restos del lazo en escena. Arranca en 0, o sea
-      // ANTES de que el escenario se clave: es lo único que se mueve
-      // durante la entrada.
-      const final = -(L + corrimiento + L * 0.02);
-      const viaje = ENTRADA + FIN - 0.2;
+      // Viaja hasta que la CABEZA llega justo al final del trazo, y llega
+      // UNA UNIDAD ANTES de que la zona se acabe: el scrub va atrasado
+      // respecto del scroll (0,6 s de suavizado) y si llegara justo al
+      // final, en un scroll rápido la sección se soltaría con la cabeza
+      // todavía a mitad de camino, y Proyectos ya estaría dibujando la
+      // suya en el borde: dos cabezas. Ahí se queda quieta, con el
+      // cuerpo asomando por el borde de abajo, y la sección que sigue
+      // (Proyectos) dibuja el mismo cuerpo del otro lado del borde y lo
+      // retoma cuando se clava. Así el animal es uno solo a través de las
+      // dos secciones. Antes salía del todo y se desvanecía antes del
+      // último cierre, y entre el final de esto y el arranque de Proyectos
+      // quedaba un hueco sin víbora y una cabeza que nacía cortada
+      // (Gastón, 2026-09-10). Arranca en 0, o sea ANTES de que el
+      // escenario se clave: es lo único que se mueve durante la entrada.
+      // El final del trazo pasa lejos de la quinta card (queda a la
+      // izquierda de ella), así el último cierre no tiene lazo encima.
+      const final = seg - L;
+      const viaje = ENTRADA + FIN - 0.5;
       tl.to(lazo, { strokeDashoffset: final, ease: "none", duration: viaje }, 0).to(
         punto,
         { strokeDashoffset: final + corrimiento, ease: "none", duration: viaje },
         0,
       );
-      // Seguro definitivo: el tramo de salida por el borde de abajo es
-      // largo y la cápsula ronda ahí un rato — el SVG entero se desvanece
-      // antes del final, así después de este punto no queda tinta en
-      // escena pase lo que pase con la geometría. Termina justo cuando
-      // arranca el último cierre (FIN es el fin de ese cierre, de ahí el
-      // -CIERRE): el remate de la sección se ve sin lazo encima.
-      if (cinta)
-        tl.to(
-          cinta,
-          { autoAlpha: 0, ease: "none", duration: 0.6 },
-          ENTRADA + FIN - CIERRE - 0.6,
-        );
     }
 
     // Cada nivel LLEGA subiendo desde abajo, se PLANTA abierta y se
