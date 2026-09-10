@@ -9,6 +9,13 @@ if (typeof window !== "undefined") {
 }
 
 // Ritmo de la escalada (unidades de la timeline; la zona mide ALTO_SVH).
+// APERTURA: el título grande («Del aula al sistema educativo.») solo en
+// escena, con la víbora entrando, antes de que caiga la primera card
+// (Gastón, 2026-09-10: la primera pantalla era un título chico y un 70 %
+// vacío, y esa frase es la tesis de la sección, no una bajada). Es la
+// misma gramática que abre Proyectos: una frase grande que se lee y se
+// achica al rincón cuando llega la primera pieza.
+const APERTURA = 1.6;
 const PASO = 2.0; // separación entre llegadas
 const SUBIDA = 1.4; // lo que tarda una card en aterrizar
 const CIERRE_TRAS = 0.45; // la card i se cierra este rato después de que aterriza la i+1
@@ -24,9 +31,10 @@ const CIERRE = 0.45; // lo que tarda el cierre (el ícono va un toque más rápi
 // Al tocar PASO, SUBIDA, CIERRE_TRAS o CIERRE hay que rehacer esta cuenta.
 const CIERRE_INICIO = SUBIDA * 0.7 + CIERRE_TRAS;
 // Fin de la coreografía: se cerró la última card, que es la quinta y no
-// tiene ninguna atrás esperando (n·PASO + CIERRE_INICIO + CIERRE = 11,88).
-// De ahí al final de la zona queda un respiro corto y el sticky se suelta.
-const FIN = 11.9;
+// tiene ninguna atrás esperando (APERTURA + n·PASO + CIERRE_INICIO + CIERRE
+// = 13,48). De ahí al final de la zona queda un respiro corto y el sticky
+// se suelta.
+const FIN = APERTURA + 11.9;
 
 // Cuánto scroll corre la timeline ANTES de que el escenario se clave. El
 // sticky se traba cuando el tope de la zona toca el tope del viewport, así
@@ -53,6 +61,8 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
   const ctx = gsap.context(() => {
     const cards = gsap.utils.toArray<HTMLElement>("[data-nivel-card]");
     if (cards.length !== NIVELES.length) return;
+    const tituloGrande = stage.querySelector<HTMLElement>("[data-nivel-titulo-grande]");
+    const encabezado = stage.querySelector<HTMLElement>("[data-nivel-encabezado]");
 
     // Medir las zonas colapsables y fijarles alto para poder animarlo a 0.
     const colapsables = gsap.utils.toArray<HTMLElement>("[data-collapse]");
@@ -111,6 +121,21 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
       );
     }
 
+    // La apertura: el título grande está desde el primer píxel (la sección
+    // llega con él puesto), se va del todo encogiéndose apenas, y recién
+    // después aparece el encabezado chico arriba a la izquierda, justo
+    // cuando cae la primera card. Secuencia, no superposición.
+    if (tituloGrande)
+      tl.to(
+        tituloGrande,
+        { autoAlpha: 0, scale: 0.92, ease: "power2.in", duration: 0.3 },
+        ENTRADA + APERTURA - 0.5,
+      );
+    if (encabezado) {
+      gsap.set(encabezado, { autoAlpha: 0, y: 18 });
+      tl.to(encabezado, { autoAlpha: 1, y: 0, ease: "power2.out", duration: 0.3 }, ENTRADA + APERTURA - 0.15);
+    }
+
     // Cada nivel LLEGA subiendo desde abajo, se PLANTA abierta y se
     // CIERRA recién cuando la siguiente aterrizó. Al aterrizar suelta un
     // ping. LAS CINCO se cierran, la última incluida (Mateo, 2026-09-05):
@@ -119,13 +144,13 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
     // tocaría a la sexta, así conserva exactamente el mismo rato abierta
     // y sola que tuvieron las otras cuatro.
     cards.forEach((card, i) => {
-      const t = ENTRADA + i * PASO;
+      const t = ENTRADA + APERTURA + i * PASO;
       const icono = card.querySelector("[data-collapse-icon]");
       const cuerpo = card.querySelector("[data-collapse]");
       const ping = card.querySelector("[data-nivel-ping]");
       tl.to(card, { y: 0, autoAlpha: 1, ease: "power2.out", duration: SUBIDA }, t);
       {
-        const tc = ENTRADA + (i + 1) * PASO + CIERRE_INICIO;
+        const tc = ENTRADA + APERTURA + (i + 1) * PASO + CIERRE_INICIO;
         if (icono)
           tl.to(
             icono,

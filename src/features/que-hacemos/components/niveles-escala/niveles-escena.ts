@@ -12,9 +12,10 @@ export const POS = [
 ];
 
 // Antes 640 con el remate del titular (13,3 unidades de timeline), 560 con
-// cierres largos (11,3) y 520 sin el cierre de la quinta (10,4). Se sostiene
-// el mismo ritmo de scroll por unidad (~40svh) para las 12,4 que quedan.
-export const ALTO_SVH = 600;
+// cierres largos (11,3), 520 sin el cierre de la quinta (10,4) y 600 con las
+// 12,4 de la escalada sola. Con la apertura (1,6 más: el título grande
+// antes de la primera card) son 14, al mismo ritmo de ~40svh por unidad.
+export const ALTO_SVH = 665;
 
 // Recorrido del lazo viajero (viewBox 1600x900): entra por arriba, serpentea
 // entre las cards y sale por abajo. No se dibuja y queda — VIAJA: la cabeza

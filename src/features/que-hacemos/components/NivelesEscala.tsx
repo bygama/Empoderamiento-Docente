@@ -21,15 +21,19 @@ import { NivelCard } from "./niveles-escala/NivelCard";
  * hueco entre dos llegadas: si se superpone con la card que entra, el ojo
  * se va con la que entra y el cierre no se ve (ver CIERRE_INICIO).
  *
- * En vivo la sección es encabezado + cards y nada más: el cierre de la
- * quinta es lo último que se ve, y el sticky se suelta con los cinco
- * títulos en escena. Hubo dos piezas de titular que ya no están. El remate
- * ("Del aula, / al sistema educativo." en pantalla propia, con las cards
- * cediendo) se sacó (Facundo, 2026-09-03): era una pantalla más que
- * scrollear después de la coreografía, y la animación tiene que ser lo
- * último. La apertura ("Del aula," solo, con la coma en suspenso) se sacó
- * (Mateo, 2026-09-05): sin el remate que la completaba quedaba media frase
- * colgada. La frase entera sigue viva en el fallback sin motion.
+ * En vivo la sección abre con «Del aula al sistema educativo.» EN GRANDE,
+ * solo en escena con la víbora entrando, y la frase se achica al rincón
+ * cuando cae la primera card (Gastón, 2026-09-10): es la tesis de la
+ * sección y merece ser el título; «Niveles en los que intervenimos» pasa
+ * a volanta. Misma gramática que abre Proyectos. El cierre de la quinta
+ * es lo último que se ve, y el sticky se suelta con los cinco títulos en
+ * escena. Historia de la frase: el remate ("Del aula, / al sistema
+ * educativo." en pantalla propia, con las cards cediendo) se sacó
+ * (Facundo, 2026-09-03) porque era una pantalla más que scrollear después
+ * de la coreografía; la apertura ("Del aula," solo, con la coma en
+ * suspenso) se sacó (Mateo, 2026-09-05) porque sin el remate quedaba
+ * media frase colgada. Ahora vuelve entera y al principio, y no cuesta
+ * scroll de más: la víbora ya está entrando mientras se lee.
  *
  * La timeline arranca ENTRADA_SVH de scroll ANTES de que el escenario se
  * clave, así el lazo ya viene entrando cuando la sección se traba (Mateo,
@@ -44,6 +48,18 @@ import { NivelCard } from "./niveles-escala/NivelCard";
  * en `coreografia-niveles.ts` (+ `toggle-nivel.ts`), lazo en `LazoViajero`,
  * cards en `NivelCard`.
  */
+// El final en verde, el acento de los conceptos: la frase grande sobre el
+// gris quedaba plana de un solo color (Gastón, 2026-09-10). Proyectos hace
+// lo opuesto: resalta el principio y en azul medio.
+// «sistema educativo» siempre en el segundo renglón (Gastón, 2026-09-10),
+// por eso el span es bloque y no depende del ancho.
+const TITULO = (
+  <>
+    Del aula al
+    <span className="text-verde-concepto-texto block">sistema educativo.</span>
+  </>
+);
+
 export function NivelesEscala() {
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -98,28 +114,51 @@ export function NivelesEscala() {
         {/* Lazo viajero + cápsula perseguidora (solo live, detrás de las cards). */}
         {live && <LazoViajero />}
 
-        {/* Encabezado (se queda a la vista toda la sección). */}
+        {/* Encabezado chico (en vivo aparece cuando cae la primera card y
+            se queda a la vista toda la sección). */}
         <div
+          data-nivel-encabezado
           className={
             live
               ? "absolute inset-x-0 top-0 z-20 mx-auto w-full max-w-screen-xl px-5 pt-24 md:px-10 md:pt-28"
               : "mx-auto w-full max-w-screen-xl px-5 md:px-10"
           }
         >
-          {/* Título en display: antes era una etiqueta mono de 11px y la
-              sección no tenía ancla hasta el remate (el lazo se llevaba el
-              ojo). Lejos de los 5rem del titular final, que sigue ganando. */}
-          <h2
-            className="font-display text-azul-principal max-w-[16ch] font-extrabold tracking-[-0.02em]"
-            style={{ fontSize: "clamp(1.6rem, 1rem + 1.6vw, 2.15rem)", lineHeight: 1.1 }}
-          >
+          <p className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
             Niveles en los que intervenimos
+          </p>
+          <h2
+            className="font-display text-azul-principal mt-3 max-w-[18ch] font-bold tracking-[-0.02em] text-balance"
+            style={{ fontSize: "clamp(1.4rem, 1rem + 1.2vw, 1.9rem)", lineHeight: 1.1 }}
+          >
+            {TITULO}
           </h2>
           <p className="text-gris-texto mt-3 max-w-[38ch] font-sans text-[1rem] leading-relaxed">
             De lo micro a lo macro: cinco niveles donde la transformación se
             sostiene.
           </p>
         </div>
+
+        {/* El título EN GRANDE de la apertura, a la derecha, lejos de por
+            donde entra la víbora. Duplicado visual (aria-hidden): el h2
+            real es el del encabezado. */}
+        {live && (
+          <div
+            data-nivel-titulo-grande
+            aria-hidden="true"
+            className="text-azul-principal absolute top-1/2 right-5 z-20 w-[min(46vw,40rem)] -translate-y-1/2 md:right-10"
+          >
+            <p className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
+              Niveles en los que intervenimos
+            </p>
+            <p
+              className="font-display mt-5 font-extrabold tracking-[-0.03em] text-balance"
+              style={{ fontSize: "clamp(2.6rem, 1.2rem + 3.2vw, 4.4rem)", lineHeight: 1 }}
+            >
+              {TITULO}
+            </p>
+          </div>
+        )}
 
         {/* Los 5 niveles como cards. */}
         <div
@@ -134,18 +173,6 @@ export function NivelesEscala() {
           ))}
         </div>
 
-        {/* En fallback el titular va al pie, visible. */}
-        {!live && (
-          <div className="mx-auto mt-14 w-full max-w-screen-xl px-5 md:px-10">
-            <p
-              className="font-display text-azul-principal font-extrabold tracking-[-0.03em]"
-              style={{ fontSize: "clamp(2rem, 1rem + 4vw, 3.6rem)", lineHeight: 1.05 }}
-            >
-              Del aula,{" "}
-              <span className="text-verde-concepto-texto">al sistema educativo.</span>
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
