@@ -228,11 +228,16 @@ export const AREAS: readonly Area[] = [
 
 // ── Cómo trabajamos: la mirada ED, en seis verbos ─────────────────────────────
 // Son los seis pasos que ED comunica en redes desde agosto de 2026 («La mirada
-// ED»), con la idea fuerza textual de cada uno y la descripción del documento
-// de Raquel (jul 2026). La entrada («Siempre comenzamos con una
-// conversación», textual del PPTX institucional) se sacó (Gastón,
-// 2026-09-09): la idea ya está dicha en Inicio y en Contacto («Cada
-// propuesta empieza con una conversación») y el primer verbo la repite.
+// ED»), con la idea fuerza textual de cada uno. El texto de cada paso
+// (2026-09-10) es lo concreto que pasa en él, tomado del documento maestro
+// (Parte II, «Cómo trabajamos», CONFIRMADO): la descripción de Raquel (jul
+// 2026) decía la idea pero no qué hace ED («construimos procesos donde la
+// experiencia, la implementación y la práctica reflexiva fortalecen…») y el
+// cliente dijo que no se entendía. VALIDAR con ED; la versión anterior queda
+// en git. La entrada («Siempre comenzamos con una conversación», textual
+// del PPTX institucional) se sacó (Gastón, 2026-09-09): la idea ya está
+// dicha en Inicio y en Contacto («Cada propuesta empieza con una
+// conversación») y el primer verbo la repite.
 export const MIRADA_INTRO = {
   titulo: "Cómo trabajamos",
   texto:
@@ -244,37 +249,37 @@ export const MIRADA = [
     verbo: "Escuchar",
     idea: "Toda solución nace de una realidad comprendida",
     texto:
-      "Dialogamos con las personas, comprendemos los contextos y construimos una lectura compartida que orienta cada decisión.",
+      "Conversamos con la institución o el equipo: necesidades, objetivos, experiencias previas y condiciones reales de implementación.",
   },
   {
     verbo: "Investigar",
     idea: "La práctica también produce conocimiento",
     texto:
-      "Investigamos en diálogo con la práctica para comprender los desafíos de cada realidad y generar evidencia.",
+      "Estudiamos el problema en su contexto: qué dice la evidencia, qué muestra la experiencia previa y qué hay que comprender antes de diseñar.",
   },
   {
     verbo: "Diseñar",
     idea: "Cada realidad inspira una solución distinta",
     texto:
-      "Diseñamos soluciones que integran investigación, currículo, evaluación, materiales y desarrollo profesional docente.",
+      "Definimos la intervención y convocamos las especialidades que hacen falta: currículo, evaluación, materiales o tecnología, según el problema.",
   },
   {
     verbo: "Acompañar",
     idea: "Vivimos para hacer vivir",
     texto:
-      "Construimos procesos donde la experiencia, la implementación y la práctica reflexiva fortalecen el desarrollo profesional.",
+      "Llevamos la propuesta al aula con encuentros, talleres, materiales, trabajo con liderazgos y análisis de clases, y estamos mientras sucede.",
   },
   {
     verbo: "Evaluar",
     idea: "La evidencia orienta cada nuevo paso",
     texto:
-      "Analizamos procesos, interpretamos evidencias y generamos conocimiento para fortalecer decisiones.",
+      "Observamos evidencias, interpretamos resultados y ajustamos junto con los equipos, con informes que sirven para decidir.",
   },
   {
     verbo: "Transformar",
     idea: "Las transformaciones se construyen de manera sistémica",
     texto:
-      "Cada decisión forma parte de un sistema: investigación, currículo, materiales, evaluación, desarrollo profesional e instituciones.",
+      "El aprendizaje queda en la institución: criterios, herramientas y decisiones que el equipo sostiene por sí mismo.",
   },
 ] as const;
 
