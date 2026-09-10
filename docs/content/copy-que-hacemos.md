@@ -27,6 +27,18 @@ Acompañamiento · Currículo · Evaluación
 (En el Inicio, esta misma frase aparece sobre el titular del hero y como título del bloque
 «Qué hacemos».)
 
+## Escena del faro (por qué no es una capacitación tradicional)
+
+Después de la frase central, la luz del faro muestra de a una estas cuatro frases:
+
+1. No capacitamos docentes: **transformamos** la relación con las matemáticas.
+2. Partimos de **lo que hay**, no de lo que falta.
+3. Cada propuesta se diseña para su **contexto**.
+4. Todo lo que hacemos tiene **investigación** detrás.
+
+**[confirmar]** Salen de lo que ustedes escribieron en la devolución de junio, dichas más
+llano. Si alguna no los representa, cámbienla por la que sí.
+
 ---
 
 ## Las seis áreas
@@ -152,14 +164,18 @@ Docentes · Estudiantes · Escuelas · Sistemas educativos · Redes en cinco pa�
 Nos sentamos con vos, escuchamos tus necesidades, comprendemos tus objetivos y exploramos las
 oportunidades en equipo. Después, el trabajo sigue estos pasos.
 
-| Paso | Idea | Qué hacemos |
+| Paso | Idea | Qué pasa en este paso |
 |---|---|---|
-| Escuchar | Toda solución nace de una realidad comprendida | Dialogamos con las personas, comprendemos los contextos y construimos una lectura compartida que orienta cada decisión. |
-| Investigar | La práctica también produce conocimiento | Investigamos en diálogo con la práctica para comprender los desafíos de cada realidad y generar evidencia. |
-| Diseñar | Cada realidad inspira una solución distinta | Diseñamos soluciones que integran investigación, currículo, evaluación, materiales y desarrollo profesional docente. |
-| Acompañar | Vivimos para hacer vivir | Construimos procesos donde la experiencia, la implementación y la práctica reflexiva fortalecen el desarrollo profesional. |
-| Evaluar | La evidencia orienta cada nuevo paso | Analizamos procesos, interpretamos evidencias y generamos conocimiento para fortalecer decisiones. |
-| Transformar | Las transformaciones se construyen de manera sistémica | Cada decisión forma parte de un sistema: investigación, currículo, materiales, evaluación, desarrollo profesional e instituciones. |
+| Escuchar | Toda solución nace de una realidad comprendida | Conversamos con la institución o el equipo: necesidades, objetivos, experiencias previas y condiciones reales de implementación. |
+| Investigar | La práctica también produce conocimiento | Estudiamos el problema en su contexto: qué dice la evidencia, qué muestra la experiencia previa y qué hay que comprender antes de diseñar. |
+| Diseñar | Cada realidad inspira una solución distinta | Definimos la intervención y convocamos las especialidades que hacen falta: currículo, evaluación, materiales o tecnología, según el problema. |
+| Acompañar | Vivimos para hacer vivir | Llevamos la propuesta al aula con encuentros, talleres, materiales, trabajo con liderazgos y análisis de clases, y estamos mientras sucede. |
+| Evaluar | La evidencia orienta cada nuevo paso | Observamos evidencias, interpretamos resultados y ajustamos junto con los equipos, con informes que sirven para decidir. |
+| Transformar | Las transformaciones se construyen de manera sistémica | El aprendizaje queda en la institución: criterios, herramientas y decisiones que el equipo sostiene por sí mismo. |
+
+**[confirmar]** La tercera columna cambió: antes repetía la idea de cada paso con las palabras
+de la serie «La mirada ED» y no se entendía qué hace ED en cada uno; ahora dice qué pasa
+concretamente, con lo que ustedes escribieron en el documento maestro. Confirmen que es así.
 
 ---
 
