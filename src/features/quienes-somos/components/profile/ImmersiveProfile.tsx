@@ -16,6 +16,7 @@ import { IndiceVivo } from "./inmersivo/IndiceVivo";
 import { FiguraPerfil } from "./inmersivo/FiguraPerfil";
 import { HeroPerfil } from "./inmersivo/HeroPerfil";
 import { RecorridoEtapas } from "./inmersivo/RecorridoEtapas";
+import { RielPerfil } from "./inmersivo/RielPerfil";
 import { CierrePerfil } from "./inmersivo/CierrePerfil";
 
 if (typeof window !== "undefined") {
@@ -148,6 +149,9 @@ export function ImmersiveProfile({
         passedIds={passedIds}
         refSidebar={sidebar}
       />
+
+      {/* RIEL de progreso (capa fija, borde derecho): cuánto queda. */}
+      <RielPerfil profile={profile} activeStage={activeStage} refWrap={wrap} />
 
       {/* FIGURA (capa fija): protagonista de la apertura, se retira al
           empezar el recorrido. */}
