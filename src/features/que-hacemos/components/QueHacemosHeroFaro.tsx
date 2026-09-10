@@ -27,16 +27,18 @@ import { CierreFaro } from "./hero-faro/CierreFaro";
  *                            el primer plano ENTRAN por los bordes; a mitad
  *                            de camino la linterna prende (chispa → núcleo →
  *                            halo → haz) y la luz revela el mensaje central.
- *   S2 0.40–1.87  PREGUNTAS  cinco golpes, UNA pregunta por momento; el haz
- *                            dirige la lectura (izq lejos → izq alto → der →
- *                            der cerca → centro), la cámara se desplaza
+ *   S2 0.40–1.33  ENFOQUE    cuatro golpes, UNA frase por momento: por qué
+ *                            esto no es una capacitación tradicional (el
+ *                            lugar de «Nuestro enfoque» en el sitemap). El
+ *                            haz dirige la lectura (izq lejos → izq alto →
+ *                            der → centro), la cámara se desplaza
  *                            lateralmente y sigue avanzando hasta el
  *                            contrapicado (faro ~55% del alto en la última).
- *                            Cada pregunta tocada deja un rastro verde en el
- *                            agua. Un beat por pregunta (PASO_PREGUNTA).
- *   S4 1.90–2.10  CIERRE     la noche no cede: el faro alumbra el titular
+ *                            Cada frase tocada deja un rastro verde en el
+ *                            agua. Un beat por frase (PASO_PREGUNTA).
+ *   S4 1.36–1.56  CIERRE     la noche no cede: el faro alumbra el titular
  *                            final y su CTA; el haz se abre y baña el plano.
- *   S5 2.05–2.14  DESLUMBRE  la linterna crece hasta dejar la pantalla en
+ *   S5 1.51–1.60  DESLUMBRE  la linterna crece hasta dejar la pantalla en
  *                            blanco; la torre de líneas nace de ese blanco.
  *
  * Las posiciones son UNIDADES DE LA LÍNEA DE TIEMPO, no progreso 0–1: la
@@ -44,9 +46,10 @@ import { CierreFaro } from "./hero-faro/CierreFaro";
  * entero entre 0 y ese valor. Con el runway actual 1 unidad ≈ 620vh de
  * scroll. Ver tiempos-faro.ts.
  *
- * Copy: 100% validado (data.ts / arquitectura de la rama de contenido
- * maestro), salvo el titular del cierre, pedido explícitamente por Gastón y
- * marcado VALIDAR con ED. Desktop-first: la coreografía corre en ≥1024px
+ * Copy: la frase central es la del cartel oficial; las cuatro frases del
+ * enfoque son palabras de Dani (devolución de junio de 2026) y del pie del
+ * sitio, marcadas VALIDAR con ED igual que el titular del cierre, pedido
+ * por Gastón. Desktop-first: la coreografía corre en ≥1024px
  * sin reduced-motion (gsap.matchMedia rearma al cruzar el breakpoint); si
  * no, queda la escena estática encendida con el mensaje central (default
  * del JSX) y el runway colapsa a una pantalla (h-svh).
@@ -80,9 +83,9 @@ export function QueHacemosHeroFaro() {
     >
       {/* El runway solo existe donde corre la coreografía: en mobile o con
           reduced-motion colapsa a una pantalla (nada de scroll muerto).
-          Alto = DURACION_RECORRIDO · 620vh + 200vh (2.14 · 620 + 200 ≈ 1527):
+          Alto = DURACION_RECORRIDO · 620vh + 200vh (1.60 · 620 + 200 ≈ 1192):
           si cambia la duración de la línea de tiempo, cambia este número. */}
-      <div ref={altoRef} className="relative h-svh lg:h-[1527vh] lg:motion-reduce:h-svh">
+      <div ref={altoRef} className="relative h-svh lg:h-[1192vh] lg:motion-reduce:h-svh">
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
@@ -149,7 +152,7 @@ export function QueHacemosHeroFaro() {
               arriba de las preguntas; se quitó junto con el de S1 para que
               cada momento tenga UNA sola lectura. */}
 
-          {/* S2 · Los cinco verbos: un golpe narrativo por momento */}
+          {/* S2 · Las cuatro frases del enfoque: un golpe por momento */}
           <PreguntasFaro />
 
           {/* S3 RETIRADO. Mostraba «Niveles en los que intervenimos» + «Del

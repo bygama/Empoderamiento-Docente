@@ -13,9 +13,11 @@ import { PREGUNTAS } from "./preguntas-faro";
  * (los 200 son la pantalla que corre detrás del hero y la del viewport).
  * Si se toca una cosa, se toca la otra. */
 const INICIO_PREGUNTAS = 0.4;
-// 0.30 ≈ 1.8 pantallas por pregunta. Con 0.15 un scroll chico sin querer
-// pasaba dos títulos de largo.
-export const PASO_PREGUNTA = 0.3;
+// 0.24 ≈ 1.5 pantallas por frase. Con 0.15 un scroll chico sin querer
+// pasaba dos títulos de largo; 0.30 era el compás de las cinco preguntas
+// del método. Al cambiarlas por las cuatro frases del enfoque (2026-09-10)
+// se acortó un poco: el cliente pidió llegar antes a lo concreto.
+export const PASO_PREGUNTA = 0.24;
 /** Un beat por pregunta. */
 export const BEATS = PREGUNTAS.map((_, i) => INICIO_PREGUNTAS + i * PASO_PREGUNTA);
 /**

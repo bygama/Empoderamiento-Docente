@@ -41,20 +41,24 @@ export function armarEscenas(tl: gsap.core.Timeline, { cam, entrada }: Camara) {
     .fromTo("[data-mensaje] mark", { backgroundSize: "0% 0.14em" }, { backgroundSize: "100% 0.14em", duration: 0.022, ease: "power1.inOut" }, 0.318)
     .to("[data-mensaje]", { autoAlpha: 0, y: -26, duration: 0.028, ease: "power2.in" }, 0.372);
 
-  /* ── S2 · Método: un verbo por momento ──────────────────────────── */
+  /* ── S2 · Enfoque: una frase por momento ────────────────────────── */
   const beats = BEATS;
+  const ultima = beats.length - 1;
   // Desplazamientos laterales de cámara: el encuadre respira y el faro
   // cambia de lado del cuadro. Van atados a los beats (se mueve justo
-  // antes de la pregunta que cambia de lado) con la misma duración de
+  // antes de la frase que cambia de lado) con la misma duración de
   // siempre: al estirar S2 se alargan las lecturas, no los paneos.
+  // Cuatro frases: dos a la izquierda, una a la derecha y la última al
+  // centro. El paneo a x:60 de la cuarta pregunta («der cerca») se fue
+  // con ella.
   tl.to(cam, { x: -70, duration: 0.06, ease: "power1.inOut" }, beats[0] - 0.005)
     .to(cam, { x: 120, duration: 0.08, ease: "power1.inOut" }, beats[2] - 0.024)
-    .to(cam, { x: 60, duration: 0.06, ease: "power1.inOut" }, beats[3] + 0.002)
-    .to(cam, { x: 0, duration: 0.06, ease: "power1.inOut" }, beats[4] + 0.005)
+    .to(cam, { x: 0, duration: 0.06, ease: "power1.inOut" }, beats[ultima] + 0.005)
     // …y sigue avanzando, repartido a lo largo del tramo, hasta el
-    // contrapicado que llega con la última pregunta.
-    .to(cam, { z: 380, duration: beats[3] - beats[0] - 0.06, ease: "power1.inOut" }, beats[0] + 0.04)
-    .to(cam, { z: 600, duration: PASO_PREGUNTA + 0.03, ease: "power1.inOut" }, beats[3] + 0.002);
+    // contrapicado que arranca con la frase de la derecha y llega con la
+    // última.
+    .to(cam, { z: 380, duration: beats[2] - beats[0] - 0.06, ease: "power1.inOut" }, beats[0] + 0.04)
+    .to(cam, { z: 600, duration: PASO_PREGUNTA + 0.03, ease: "power1.inOut" }, beats[2] + 0.002);
 
   // La rotación del haz hacia cada pregunta vive en haz-faro.ts.
   beats.forEach((t, i) => {
@@ -77,7 +81,7 @@ export function armarEscenas(tl: gsap.core.Timeline, { cam, entrada }: Camara) {
       // 74vh de scroll): con 0.04 se pintaba en un parpadeo.
       .fromTo(`[data-verbo-txt='${i}'] mark`, { backgroundSize: "0% 0.12em" }, { backgroundSize: "100% 0.12em", duration: 0.12, ease: "sine.inOut" }, t + 0.05);
     // …y al ceder deja una idea encendida (rastro verde) en el agua.
-    const fin = i < 4 ? beats[i + 1] - 0.03 : FIN_PREGUNTAS;
+    const fin = i < ultima ? beats[i + 1] - 0.03 : FIN_PREGUNTAS;
     tl.to(`[data-verbo-txt='${i}'] [data-v]`, { autoAlpha: 0, y: -16, duration: 0.03, ease: "sine.in" }, fin)
       .to(`[data-verbo-punto='${i}']`, { autoAlpha: 0.22, duration: 0.02 }, fin)
       .to(`[data-rastro='${i}']`, { autoAlpha: 0.6, duration: 0.014 }, fin + 0.004);

@@ -25,10 +25,10 @@ export const FOCO_X = FUGA_X;
 export const FOCO_Y = 388;
 
 /**
- * Puntos del mar que el haz "toca" en el método (escena 2), en coordenadas
- * de la capa marMedio. El orden acompaña la coreografía de verbos: izquierda
- * lejos → izquierda alta → derecha → derecha cerca → centro (el camino).
+ * Puntos del mar que el haz "toca" en el enfoque (escena 2), en coordenadas
+ * de la capa marMedio. El orden acompaña la coreografía de las frases:
+ * izquierda lejos → izquierda alta → derecha → centro (el camino).
  */
 export const PUNTOS_VERBO: ReadonlyArray<readonly [number, number]> = [
-  [270, 700], [180, 620], [1230, 680], [1150, 780], [720, 820],
+  [270, 700], [180, 620], [1230, 680], [720, 820],
 ] as const;

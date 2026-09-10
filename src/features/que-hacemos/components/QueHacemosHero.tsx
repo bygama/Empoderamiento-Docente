@@ -160,7 +160,7 @@ export function QueHacemosHero() {
       >
         <TitularQH />
 
-        {/* Las seis áreas del cartel, como chips: se leen de una y bajan a
+        {/* Las siete áreas, como chips: se leen de una y bajan a
             su bloque en #areas. */}
         <ul
           data-qh-rise
