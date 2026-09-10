@@ -31,7 +31,11 @@ export const metadata: Metadata = {
 // y ahí se eliminó, así que no vivía en ningún lado. Es la prueba de todo
 // lo anterior, justo antes de invitar a conversar. El mismo día «Cómo
 // trabajamos» sube a después del faro (Gastón): el método se cuenta antes
-// de la oferta, y Niveles queda seguido de su prueba.
+// de la oferta, y Niveles queda seguido de su prueba. El 2026-09-10 la
+// escena del faro pasa a contar «Nuestro enfoque», que es lo que el
+// sitemap pone después del hero: cuatro frases de por qué esto no es una
+// capacitación tradicional (palabras de Dani), en lugar de las cinco
+// preguntas del método, que repetían «Cómo trabajamos».
 export default function QueHacemosPage() {
   return (
     <main id="contenido" tabIndex={-1}>
@@ -57,7 +61,7 @@ export default function QueHacemosPage() {
       >
         <QueHacemosHero />
         {/* Escena del faro por capas de profundidad (cámara scrubbed). Su
-            CTA final («Ver las seis áreas») baja a #areas. */}
+            CTA final («Ver las siete áreas») baja a #areas. */}
         <QueHacemosHeroFaro />
       </div>
       <MiradaPasos />

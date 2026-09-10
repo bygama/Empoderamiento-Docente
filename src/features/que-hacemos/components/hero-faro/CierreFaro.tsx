@@ -1,7 +1,7 @@
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { getLenis } from "@/lib/lenis";
 
-// «Ver las seis áreas» viaja con Lenis hasta el arranque de las áreas.
+// «Ver las siete áreas» viaja con Lenis hasta el arranque de las áreas.
 // El salto nativo a #areas "no llevaba a ningún lado": caía 112px antes
 // del arranque (scroll-mt del ancla, pensado para el listado plano) sobre
 // el faro casi blanco, y Lenis, si todavía estaba deslizando, lo pisaba
@@ -32,12 +32,16 @@ export function CierreFaro() {
       <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
         {/* Blanco, no navy: el cierre ya no ocurre sobre el amanecer
             sino sobre la noche iluminada por el faro. */}
-        {/* Angosto y en tres líneas parejas (text-balance): a 19ch y
-            4rem el titular cruzaba el cuadro entero y, con el naranja
-            abajo, el cierre pesaba de más (pedido de Mateo,
-            2026-09-02). */}
+        {/* Dos renglones parejos (text-balance), no tres: a 16ch caía en
+            tres y se leía cortado («La transformación / queda encendida /
+            en cada equipo.»); a 25ch cierra en dos (Facundo, 2026-09-10).
+            Antes, a 19ch y 4rem, cruzaba el cuadro entero y pesaba de más
+            (Mateo, 2026-09-02): sube el ancho, no el cuerpo.
+            `data-cierre-titular`: el haz lo mide para apuntarle
+            (haz-faro.ts). */}
         <p
-          className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em] text-balance text-white"
+          data-cierre-titular
+          className="font-display max-w-[25ch] font-extrabold tracking-[-0.025em] text-balance text-white"
           style={{
             fontSize: "clamp(2.2rem, 1rem + 2.8vw, 3.5rem)",
             lineHeight: 1.08,
@@ -51,7 +55,7 @@ export function CierreFaro() {
             competía con el titular. Sigue siendo la única acción. */}
         <div data-cta className="pointer-events-auto mt-9" style={{ opacity: 0 }}>
           <ButtonSecondary href="#areas" variant="dark" withArrow onClick={irALineas}>
-            Ver las seis áreas
+            Ver las siete áreas
           </ButtonSecondary>
         </div>
       </div>
