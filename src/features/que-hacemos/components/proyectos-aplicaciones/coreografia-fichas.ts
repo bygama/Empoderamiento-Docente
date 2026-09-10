@@ -164,8 +164,10 @@ export function crearFichas(zone: HTMLElement, stage: HTMLElement, capInicio: re
 
     if (contador) {
       tl.eventCallback("onUpdate", () => {
-        // Cambia cuando la ficha que llega ya asomó más de la mitad.
-        const i = gsap.utils.clamp(0, total - 1, Math.floor((tl.time() - INICIO) / PASO - 0.4) + 1);
+        // Cambia cuando la ficha que llega ya asomó más de la mitad (con
+        // su ease, a 0.2 del paso ya subió dos tercios). Sin el «+ 1» que
+        // había: mostraba 03 con la ficha 02 recién apoyada.
+        const i = gsap.utils.clamp(0, total - 1, Math.floor((tl.time() - INICIO) / PASO - 0.2));
         const texto = `${String(i + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
         if (contador.textContent !== texto) contador.textContent = texto;
       });
