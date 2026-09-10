@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import { HAZ_VERBO } from "../preguntas-faro";
 import { FOCO_X, FOCO_Y } from "../faro-geometria";
-import { BEATS, despues, FIN_PREGUNTAS } from "../tiempos-faro";
+import { BEATS, FIN_PREGUNTAS } from "../tiempos-faro";
 
 // Giros LARGOS (0.12–0.13 ≈ 75vh de scroll, el doble que antes) con
 // arranque y frenada en quíntica (ver «suave»): a 0.06 y en coseno el
@@ -21,11 +21,16 @@ export const GIRO = {
 } as const;
 
 // Encendido (S1): la óptica izquierda se asienta de −8 a −2 mientras
-// prende. Cierre (S4): desde la última pregunta al ángulo que baña el
-// titular. Mismos tiempos que sus tweens de opacidad.
+// prende. Mismos tiempos que su tween de opacidad.
 const ENCENDIDO = { desde: 0.226, dur: 0.035, rotDesde: -8 } as const;
 const REPOSO_S1 = -2; // el haz izq al final del encendido (S1)
-const CIERRE = { desde: despues(0.862), dur: 0.1, rot: -46 } as const;
+// Cierre (S4): desde la última frase hasta el titular del cierre, que se
+// mide en vivo igual que las frases (`rot` es solo el respaldo si no se
+// puede medir). Arranca apenas se va la última frase y dura lo que un giro
+// normal: antes arrancaba 0.1 después de que entraba el titular y el haz se
+// apagaba a mitad de camino, así que el titular se leía con la luz todavía
+// abajo, sobre la última frase (Facundo, 2026-09-10).
+const CIERRE = { desde: FIN_PREGUNTAS, dur: GIRO.mismo, rot: -46 } as const;
 // Quíntica (smootherstep): velocidad Y aceleración nulas en las dos
 // puntas, así el haz ni arranca ni frena de golpe. El coseno de antes
 // tenía aceleración máxima justo en las puntas: ese era el tirón.
@@ -80,7 +85,8 @@ const REPOSO = { izq: 176.42, der: 3.41 } as const;
  */
 export function crearHaces(root: HTMLElement) {
   /**
-   * Rotación que hace que el haz APUNTE al bloque de texto i.
+   * Rotación que hace que el haz APUNTE a un bloque de texto: cada frase y
+   * el titular del cierre.
    *
    * Antes los ángulos estaban a mano (HAZ_VERBO), calibrados para el copy
    * anterior: al cambiar las frases por preguntas los bloques cambiaron de
@@ -90,12 +96,11 @@ export function crearHaces(root: HTMLElement) {
    * el ángulo desde el foco de la linterna. La evalúa `girar` en cada
    * frame, así sigue a la cámara mientras se mueve.
    */
-  const anguloHacia = (i: number, lado: "izq" | "der") => {
-    const el = root.querySelector<HTMLElement>(`[data-verbo-txt='${i}']`);
+  const anguloA = (el: HTMLElement | null, lado: "izq" | "der", respaldo: number) => {
     const svg = root.querySelector("svg");
-    if (!el || !svg) return HAZ_VERBO[i].rot;
+    if (!el || !svg) return respaldo;
     const ctm = (svg as SVGSVGElement).getScreenCTM();
-    if (!ctm) return HAZ_VERBO[i].rot;
+    if (!ctm) return respaldo;
     const r = el.getBoundingClientRect();
     const pt = new DOMPoint(r.left + r.width / 2, r.top + r.height / 2)
       .matrixTransform(ctm.inverse());
@@ -106,6 +111,13 @@ export function crearHaces(root: HTMLElement) {
     while (delta < -180) delta += 360;
     return delta;
   };
+  const anguloHacia = (i: number, lado: "izq" | "der") =>
+    anguloA(root.querySelector<HTMLElement>(`[data-verbo-txt='${i}']`), lado, HAZ_VERBO[i].rot);
+  // El titular del cierre también se apunta en vivo. Antes iba a un ángulo
+  // fijo (−46°) calibrado para un titular que después cambió de tamaño, y
+  // la luz le pasaba por debajo (Facundo, 2026-09-10).
+  const anguloCierre = () =>
+    anguloA(root.querySelector<HTMLElement>("[data-cierre-titular]"), "izq", CIERRE.rot);
 
   const setters = {
     izq: gsap.quickSetter("[data-haz='izq']", "rotation", "deg"),
@@ -128,8 +140,9 @@ export function crearHaces(root: HTMLElement) {
     if (ahora > FIN_PREGUNTAS) {
       const ultimo = HAZ_VERBO.length - 1;
       const desde = anguloHacia(ultimo, "izq");
+      const hasta = anguloCierre();
       const p = clamp01((ahora - CIERRE.desde) / CIERRE.dur);
-      setRot("izq", desde + (CIERRE.rot - desde) * suave(p));
+      setRot("izq", desde + (hasta - desde) * suave(p));
       return;
     }
     let i = 0;
