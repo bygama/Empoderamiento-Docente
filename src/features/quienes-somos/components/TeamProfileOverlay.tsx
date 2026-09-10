@@ -132,10 +132,21 @@ export function TeamProfileOverlay({
         (immersive ? " overflow-x-hidden overflow-y-auto overscroll-contain" : "")
       }
     >
-      {/* Lienzo claro (nunca negro) — fijo al viewport. En el inmersivo es
-          BLANCO y limpio (el patrón de marca vive localizado dentro del hero
-          y el cierre, no en toda la experiencia); en el shell, marfil + patrón. */}
-      <div ref={backdropRef} className={immersive ? "fixed inset-0 bg-white" : "bg-gris-fondo fixed inset-0"} />
+      {/* Lienzo claro (nunca negro). En el inmersivo es BLANCO y limpio (el
+          patrón de marca vive localizado dentro del hero y el cierre, no en
+          toda la experiencia); en el shell, marfil + patrón. En el inmersivo
+          va STICKY y no fixed: un fixed cubre el viewport entero, incluida
+          la franja de la barra de scroll del diálogo, y la barra de marca
+          quedaba tapada (Gastón, 2026-09-10: que se vea desde el primer
+          momento). El sticky vive dentro del área que scrollea, que termina
+          donde empieza la barra. El margen negativo deja que el contenido
+          fluya encima. */}
+      <div
+        ref={backdropRef}
+        className={
+          immersive ? "sticky top-0 -mb-[100svh] h-svh w-full bg-white" : "bg-gris-fondo fixed inset-0"
+        }
+      />
       {!immersive && (
         <div ref={patronRef} aria-hidden="true" className="pattern-dots pointer-events-none fixed inset-0 opacity-[0.35]" />
       )}
