@@ -68,6 +68,8 @@ export type Capitulo = {
 export const PROYECTOS_INTRO = {
   volanta: "Proyectos y aplicaciones",
   titulo: "Así se ve en la práctica.",
+  /** El arranque del título va en azul medio (`TituloPractica`). */
+  resaltado: "Así se ve",
 } as const;
 
 export const CAPITULOS: readonly Capitulo[] = [

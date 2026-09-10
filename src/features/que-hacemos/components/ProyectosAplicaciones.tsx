@@ -10,25 +10,27 @@ import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { EscenarioFichas } from "./proyectos-aplicaciones/EscenarioFichas";
 import { FichaProyecto } from "./proyectos-aplicaciones/FichaProyecto";
+import { TituloPractica } from "./proyectos-aplicaciones/TituloPractica";
 
-// Las dos mitades del archivo: el capítulo de desarrollo profesional, y
+// Los dos lados del archivo: el capítulo de desarrollo profesional, y
 // currículo con el remate. El doblez es el de los capítulos (4 + 3 + 1).
-const MITADES = [CAPITULOS.slice(0, 1), CAPITULOS.slice(1)];
-const DESDE = [0, CAPITULOS[0].fichas.length];
+const LADOS = [CAPITULOS.slice(0, 1), CAPITULOS.slice(1)] as const;
 
 /**
  * «Así se ve en la práctica»: la prueba de Qué hacemos, como un ARCHIVO DE
  * FICHAS (sitemap §6; Gastón, 2026-09-09, sobre la referencia de
- * assistantly.com), en DOS MITADES ESPEJADAS (2026-09-10). En cada una, un
- * escenario clavado: de un lado queda fijo el título del capítulo; del
- * otro las fichas caen una por una sobre una pila y las anteriores se
- * hunden atrás, como hojas apoyadas. Cada ficha dice UNA cosa —el número,
- * el nombre, una frase— para que se lea entera. Es el mismo lenguaje de
- * los expedientes de Investigación: allá casos, acá proyectos. Detrás, la
- * víbora de Niveles sigue: cruza en solitario con la cámara siguiéndola,
- * se va por abajo de la primera mitad, reaparece por arriba de la segunda
- * y termina debajo del remate. Antes era una sola pila de ocho: a la
- * quinta ficha cansaba, y la víbora dejaba cuatro huérfanas.
+ * assistantly.com), en un solo escenario clavado con DOS LADOS espejados
+ * (2026-09-10): de un lado queda fijo el título del capítulo; del otro las
+ * fichas caen una por una sobre una pila y las anteriores se hunden atrás,
+ * como hojas apoyadas. A mitad del archivo, el giro: el lado se da vuelta.
+ * Cada ficha dice UNA cosa —el número, el nombre, una frase— para que se
+ * lea entera. Es el mismo lenguaje de los expedientes de Investigación:
+ * allá casos, acá proyectos. Detrás, la víbora de Niveles sigue por un
+ * único trazo: cruza en solitario con la cámara siguiéndola, repta bajo
+ * las fichas, sube y vuelve a bajar en el giro, y se va por abajo hacia el
+ * cierre. Antes era una sola pila de ocho: a la quinta ficha cansaba, y la
+ * víbora dejaba cuatro huérfanas. Y antes de esto, dos zonas clavadas con
+ * una costura donde la víbora nacía cortada.
  *
  * Solo desktop con mouse y con motion (celular: fallback estático, sin
  * más trabajo por ahora). Piezas: datos en `proyectos.ts`; el resto en
@@ -57,15 +59,7 @@ export function ProyectosAplicaciones() {
       aria-label="Proyectos y aplicaciones"
     >
       {live ? (
-        MITADES.map((caps, m) => (
-          <EscenarioFichas
-            key={caps[0].id}
-            capitulos={caps}
-            desde={DESDE[m]}
-            total={FICHAS.length}
-            espejo={m % 2 === 1}
-          />
-        ))
+        <EscenarioFichas lados={LADOS} total={FICHAS.length} />
       ) : (
         <div className="relative mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
           <header className="max-w-[62ch]">
@@ -76,7 +70,7 @@ export function ProyectosAplicaciones() {
               className="font-display mt-3 font-bold tracking-[-0.02em] text-balance"
               style={{ fontSize: "2.75rem", lineHeight: 1.1 }}
             >
-              {PROYECTOS_INTRO.titulo}
+              <TituloPractica />
             </h2>
           </header>
 

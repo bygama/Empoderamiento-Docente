@@ -1,4 +1,5 @@
 import { PROYECTOS_INTRO } from "@/features/que-hacemos/proyectos";
+import { TituloPractica } from "./TituloPractica";
 
 /**
  * El título de la sección EN GRANDE durante el solo de la víbora, en el
@@ -27,7 +28,7 @@ export function TituloGrande() {
           lineHeight: 1,
         }}
       >
-        {PROYECTOS_INTRO.titulo}
+        <TituloPractica />
       </p>
     </div>
   );
