@@ -14,7 +14,7 @@ type Props = {
 /** CIERRE — la convergencia: escala, aire y ceremonia. */
 export function CierrePerfil({ profile, figura, onClose, refClosing, refClosingFig }: Props) {
   return (
-    <section ref={refClosing} className="relative flex min-h-[96svh] flex-col items-center justify-center pb-24 text-center">
+    <section ref={refClosing} data-cierre-perfil className="relative flex min-h-[96svh] flex-col items-center justify-center pb-24 text-center">
       <span
         aria-hidden="true"
         className="pattern-dots absolute inset-x-[22%] top-[8%] h-[52%] opacity-[0.04]"
