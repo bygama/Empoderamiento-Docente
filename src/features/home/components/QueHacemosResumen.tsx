@@ -6,7 +6,7 @@ import { AREAS, DESCRIPTOR } from "@/features/que-hacemos/areas";
 
 /**
  * Qué hace ED, dicho en la home apenas termina el hero y sin animación: la
- * frase del cartel oficial y las seis áreas como tarjetas que llevan a su
+ * frase del cartel oficial y las siete áreas como tarjetas que llevan a su
  * bloque en /que-hacemos. Reemplaza al abanico de siete líneas que estaba
  * cinco pantallas más abajo (Raquel y Daniela, 2026-09-08: la web se veía
  * espectacular pero no se entendía qué hace ED).
@@ -30,7 +30,7 @@ export function QueHacemosResumen() {
             </h2>
             <p className="text-gris-texto mt-5 max-w-[48ch] font-sans text-[1.05rem] leading-relaxed">
               Investigamos, diseñamos e implementamos soluciones para la
-              transformación educativa en Matemáticas, en seis áreas. No
+              transformación educativa en Matemáticas, en siete áreas. No
               capacitamos docentes: transformamos la relación con las
               matemáticas.
             </p>
