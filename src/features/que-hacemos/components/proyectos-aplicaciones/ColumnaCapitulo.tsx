@@ -1,19 +1,35 @@
-import { CAPITULOS, FICHAS } from "@/features/que-hacemos/proyectos";
+import type { Capitulo } from "@/features/que-hacemos/proyectos";
+
+const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
- * La columna de la izquierda del escenario en vivo: el título grande del
- * capítulo (uno por capítulo, apilados; la coreografía muestra uno solo),
- * su bajada y el contador de fichas. `[data-texto]`: no aparece hasta que
- * termina el solo de la víbora.
+ * La columna del capítulo de una mitad del escenario en vivo: el título
+ * grande del capítulo (uno por capítulo, apilados; la coreografía muestra
+ * uno solo), su bajada y el contador de fichas, que sigue la cuenta del
+ * archivo entero («05 / 08» en el espejo). `[data-columna]`: la
+ * coreografía decide cuándo aparece.
  */
-export function ColumnaCapitulo() {
+export function ColumnaCapitulo({
+  capitulos,
+  desde,
+  total,
+  espejo,
+}: {
+  capitulos: readonly Capitulo[];
+  desde: number;
+  total: number;
+  espejo: boolean;
+}) {
   return (
     <div
-      data-texto
-      className="absolute top-1/2 left-5 w-[min(38vw,34rem)] -translate-y-1/2 md:left-10"
+      data-columna
+      className={
+        "absolute top-1/2 w-[min(38vw,34rem)] -translate-y-1/2 " +
+        (espejo ? "right-5 md:right-10" : "left-5 md:left-10")
+      }
     >
       <div className="relative h-[13rem]">
-        {CAPITULOS.map((cap) => (
+        {capitulos.map((cap) => (
           <div
             key={cap.id}
             data-cap-titulo
@@ -38,7 +54,7 @@ export function ColumnaCapitulo() {
         data-contador
         className="text-verde-concepto-texto mt-8 font-mono text-[0.8rem] tracking-[0.18em]"
       >
-        01 / {String(FICHAS.length).padStart(2, "0")}
+        {pad(desde + 1)} / {pad(total)}
       </p>
     </div>
   );

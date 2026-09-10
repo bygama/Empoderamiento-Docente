@@ -1,7 +1,5 @@
-import type { FICHAS } from "@/features/que-hacemos/proyectos";
+import type { Ficha } from "@/features/que-hacemos/proyectos";
 import { Pictograma } from "./Pictograma";
-
-type Ficha = (typeof FICHAS)[number];
 
 /**
  * Una ficha del archivo, con las proporciones y el orden de la tarjeta de
@@ -26,7 +24,7 @@ export function FichaProyecto({
     <article
       data-ficha
       className={
-        live ? "absolute top-0 right-0 w-[clamp(380px,34vw,40rem)]" : "relative"
+        live ? "absolute inset-x-0 top-0" : "relative"
       }
       style={live ? { opacity: 0 } : undefined}
     >
