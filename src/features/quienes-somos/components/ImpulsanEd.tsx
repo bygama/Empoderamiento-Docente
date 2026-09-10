@@ -64,7 +64,7 @@ function KickerRotulo({ children }: { children: React.ReactNode }) {
  * así que la vertebral se lee como UNA línea continua.
  */
 function Nivel({
-  n,
+  volanta,
   titulo,
   spine,
   revealY,
@@ -72,7 +72,10 @@ function Nivel({
   revealStagger,
   children,
 }: {
-  n: string;
+  /** Qué hace el grupo (mono, arriba). Antes decía «Nivel 0N»: con número
+   *  se leía como pirámide, y esto es una red (Gastón, 2026-09-10). */
+  volanta: string;
+  /** Quiénes son, en horizontal: «Quienes lideran…», «Quienes facilitan…». */
   titulo: string;
   spine: "entra" | "sale";
   revealY: string;
@@ -115,7 +118,7 @@ function Nivel({
           <span className="bg-verde-concepto col-start-1 row-start-1 block h-1.5 w-1.5 rounded-full" />
         </span>
         <p className="text-verde-concepto font-mono text-[0.68rem] font-medium tracking-[0.24em] uppercase">
-          Nivel {n}
+          {volanta}
         </p>
         <h4 className="font-display mt-2.5 text-[1.32rem] leading-[1.2] font-bold text-white">
           {titulo}
@@ -359,8 +362,8 @@ export function ImpulsanEd() {
 
         {/* ── N3 — Líderes de área y proyecto: 2×2, cuatro pares ─────────── */}
         <Nivel
-          n="03"
-          titulo="Líderes de área y proyecto"
+          volanta="Áreas y proyectos"
+          titulo="Quienes lideran áreas y proyectos"
           spine="entra"
           revealY="30"
           revealDur="0.62"
@@ -380,8 +383,8 @@ export function ImpulsanEd() {
 
         {/* ── N4 — Facilitación y diseño de materiales: 3×2 ──────────────── */}
         <Nivel
-          n="04"
-          titulo="Facilitación y diseño de materiales"
+          volanta="Facilitación y materiales"
+          titulo="Quienes facilitan y diseñan"
           spine="sale"
           revealY="24"
           revealDur="0.52"
