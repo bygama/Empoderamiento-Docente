@@ -1,4 +1,4 @@
-import { CINTA, GROSOR } from "./proyectos-escena";
+import { GROSOR } from "./proyectos-escena";
 
 /**
  * La víbora de Niveles siguiendo por Proyectos (solo live, detrás de
@@ -6,7 +6,8 @@ import { CINTA, GROSOR } from "./proyectos-escena";
  * cápsula verde perseguidora— sobre el recorrido de este escenario, más
  * una ESTELA: un trazo ancho y tenue que corre atrasado detrás de la cola
  * solo durante el tramo en solitario, como un desenfoque de movimiento. La
- * coreografía la hace viajar por dashoffset.
+ * coreografía la hace viajar por dashoffset. `d`: el recorrido de esta
+ * mitad (el derecho o el espejado).
  */
 const TRAZO = {
   fill: "none",
@@ -16,7 +17,7 @@ const TRAZO = {
   vectorEffect: "non-scaling-stroke",
 } as const;
 
-export function CintaProyectos() {
+export function CintaProyectos({ d }: { d: string }) {
   return (
     <svg
       data-cinta-svg
@@ -27,7 +28,7 @@ export function CintaProyectos() {
     >
       <path
         data-estela
-        d={CINTA}
+        d={d}
         stroke="var(--color-azul-medio)"
         {...TRAZO}
         strokeWidth={GROSOR * 2.4}
@@ -35,14 +36,14 @@ export function CintaProyectos() {
       />
       <path
         data-cinta
-        d={CINTA}
+        d={d}
         stroke="var(--color-azul-medio)"
         style={{ filter: "drop-shadow(0 20px 30px rgb(74 111 165 / 0.25))" }}
         {...TRAZO}
       />
       <path
         data-capsula
-        d={CINTA}
+        d={d}
         stroke="var(--color-verde-concepto)"
         {...TRAZO}
       />
