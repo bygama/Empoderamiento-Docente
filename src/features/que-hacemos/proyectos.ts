@@ -25,10 +25,30 @@ export type PictoKey =
   | "curricula"
   | "paises";
 
+export type PaisKey = "ar" | "mx" | "br" | "cl";
+
+/** Los países donde ED trabajó, con su bandera (`Bandera.tsx`). */
+export const PAISES: Record<PaisKey, string> = {
+  ar: "Argentina",
+  mx: "México",
+  br: "Brasil",
+  cl: "Chile",
+};
+
+/** «México», «Argentina y México», «Argentina, México y Brasil». */
+export function nombrarPaises(paises: readonly PaisKey[]) {
+  const nombres = paises.map((p) => PAISES[p]);
+  if (nombres.length <= 1) return nombres.join("");
+  return `${nombres.slice(0, -1).join(", ")} y ${nombres[nombres.length - 1]}`;
+}
+
 export type Ficha = {
   id: string;
-  /** Con quién, dónde y cuándo: va en el rótulo mono. */
-  lugar: string;
+  /** Dónde: la bandera con el nombre del país encabeza la ficha (Gastón,
+   *  2026-09-10: que lo internacional tome protagonismo). */
+  paises: readonly PaisKey[];
+  /** Con quién y cuándo: el sello mono al pie. */
+  sello: string;
   /** El número que prueba el proyecto, en display grande. */
   cifra: string;
   unidad: string;
@@ -58,7 +78,8 @@ export const CAPITULOS: readonly Capitulo[] = [
     fichas: [
       {
         id: "aprender-matematica",
-        lugar: "Argentina · 2019",
+        paises: ["ar"],
+        sello: "Plan nacional · 2019",
         cifra: "75.000",
         unidad: "docentes",
         nombre: "Plan Nacional Aprender Matemática",
@@ -68,7 +89,8 @@ export const CAPITULOS: readonly Capitulo[] = [
       },
       {
         id: "media-superior",
-        lugar: "México · 2018 – 2020",
+        paises: ["mx"],
+        sello: "2018 – 2020",
         cifra: "11.000",
         unidad: "docentes",
         nombre: "Cursos para docentes de educación media superior",
@@ -78,7 +100,8 @@ export const CAPITULOS: readonly Capitulo[] = [
       },
       {
         id: "comunidad",
-        lugar: "México · 2018 – 2020",
+        paises: ["mx"],
+        sello: "2018 – 2020",
         cifra: "3.500",
         unidad: "docentes",
         nombre: "Comunidad de acompañamiento en Matemáticas",
@@ -87,7 +110,8 @@ export const CAPITULOS: readonly Capitulo[] = [
       },
       {
         id: "lideres",
-        lugar: "Pesquería, México · 2020",
+        paises: ["mx"],
+        sello: "Pesquería · 2020",
         cifra: "300",
         unidad: "horas",
         nombre: "Líderes de Fortalecimiento",
@@ -104,7 +128,8 @@ export const CAPITULOS: readonly Capitulo[] = [
     fichas: [
       {
         id: "exani",
-        lugar: "CENEVAL, México · 2020",
+        paises: ["mx"],
+        sello: "CENEVAL · 2020",
         cifra: "3",
         unidad: "niveles educativos",
         nombre: "Exámenes Nacionales de Matemáticas (EXANI)",
@@ -114,7 +139,8 @@ export const CAPITULOS: readonly Capitulo[] = [
       },
       {
         id: "buenos-aires-aprende",
-        lugar: "Ciudad de Buenos Aires · 2023 – 2027",
+        paises: ["ar"],
+        sello: "Ciudad de Buenos Aires · 2023 – 2027",
         cifra: "1.º a 7.º",
         unidad: "grado",
         nombre: "Asesoría en Matemáticas del Plan Buenos Aires Aprende",
@@ -124,7 +150,8 @@ export const CAPITULOS: readonly Capitulo[] = [
       },
       {
         id: "curricula-homologada",
-        lugar: "Escuelas técnicas Techint · desde 2020",
+        paises: ["ar", "mx"],
+        sello: "Escuelas Techint · desde 2020",
         cifra: "2",
         unidad: "países, una currícula",
         nombre: "Currícula homologada de Matemáticas",
@@ -142,7 +169,8 @@ export const CAPITULOS: readonly Capitulo[] = [
     fichas: [
       {
         id: "techint",
-        lugar: "Techint Group · Argentina, México y Brasil · desde 2020",
+        paises: ["ar", "mx", "br"],
+        sello: "Techint Group · desde 2020",
         cifra: "3",
         unidad: "países",
         nombre: "Asesoría general en Matemáticas",
