@@ -1,10 +1,13 @@
 // Contenido de Novedades.
 //
-// OJO: todo esto es PLACEHOLDER anclado en producción real de ED (RELIME 2025,
-// Bolema 2025, el libro de Socioepistemología, los 5 países, los aliados) para
-// que se vea creíble mientras no haya CMS. Las fechas, bajadas y algunos
-// títulos son tentativos → PENDIENTE de reemplazar por el material real del
-// cliente. No inventar links a papers ni datos que no tengamos.
+// Hechos reales, nada más: las publicaciones recientes del equipo (las mismas
+// del catálogo de la Biblioteca, con su DOI) y la alianza con UNESCO (carta
+// de la Oficina Regional de Montevideo, docs/content/aliados-fuentes-drive.md).
+// Reemplaza al listado inventado de eventos, convocatorias y prensa
+// (Gastón, 2026-09-11): esas categorías quedan vacías hasta que el cliente
+// mande material real; el filtro ya tiene su estado vacío. Las fotos son
+// las del sitio, no de cada nota. Cuando haya CMS, esto se reemplaza por el
+// fetch.
 
 import type { ReactElement } from "react";
 import {
@@ -29,12 +32,14 @@ export type Categoria = {
   Icon: (props: IconProps) => ReactElement;
 };
 
-// Fecha ISO → "15 jul 2026" (sin arrastrar libs de fecha ni depender del locale
-// del navegador, que rompería la hidratación).
+// Fecha ISO → "15 jul 2026". Acepta también "2026-07" ("jul 2026") y "2026"
+// cuando la fuente no da el día (una revista dice el mes; un libro, el año).
+// Sin libs de fecha ni locale del navegador, que rompería la hidratación.
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 export function fechaCorta(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
-  return `${d} ${MESES[m - 1]} ${y}`;
+  if (!m) return `${y}`;
+  return d ? `${d} ${MESES[m - 1]} ${y}` : `${MESES[m - 1]} ${y}`;
 }
 
 // El orden acá manda el orden de los chips de filtro.
@@ -52,7 +57,7 @@ export const CATEGORIA_LABEL: Record<CategoriaKey, string> = Object.fromEntries(
 
 export type Novedad = {
   id: string;
-  /** ISO (YYYY-MM-DD) — se formatea a mano para no arrastrar libs de fecha. */
+  /** ISO: YYYY-MM-DD, YYYY-MM o YYYY, según la precisión de la fuente. */
   fecha: string;
   categoria: CategoriaKey;
   titulo: string;
@@ -63,10 +68,17 @@ export type Novedad = {
   /**
    * Cuerpo de la nota en secciones tituladas: alimentan la "guía de la nota"
    * (índice lateral de la ficha). Solo las novedades con cuerpo tienen ficha
-   * propia en /novedades/[id] y card clickeable. Piloto: el libro.
-   * PENDIENTE: reemplazar por el texto real del cliente.
+   * propia en /novedades/[id] y card clickeable. Piloto: el artículo de
+   * RELIME, escrito a partir de su resumen; el cliente lo valida.
    */
   cuerpo?: NovedadSeccion[];
+  /**
+   * Título exacto de la publicación en el catálogo de la Biblioteca
+   * (`biblioteca/data/materiales`): la ficha cierra con el botón que lleva
+   * al archivo (DOI, revista o PDF), sin obligar a buscarlo (Gastón,
+   * 2026-09-11).
+   */
+  publicacion?: string;
 };
 
 export type NovedadSeccion = {
@@ -76,122 +88,135 @@ export type NovedadSeccion = {
   parrafos: string[];
 };
 
-// Listado de novedades. La primera con destacada:true es la "nota de tapa".
+// Listado de novedades, de la más nueva a la más vieja. La `destacada: true`
+// es la nota de tapa.
 export const NOVEDADES: Novedad[] = [
   {
-    id: "libro-socioepistemologia",
-    fecha: "2026-07-15",
-    categoria: "publicaciones",
-    // "el libro" era redundante: la categoría ya dice PUBLICACIONES y la bajada
-    // arranca contando que es un libro.
-    titulo: "Sale «Empoderamiento docente y Socioepistemología»",
+    id: "unesco-montevideo",
+    fecha: "2026-08-26",
+    categoria: "alianzas",
+    titulo: "UNESCO Montevideo se suma a las alianzas de ED",
     bajada:
-      "Reunimos años de investigación y trabajo con escuelas en un libro que piensa la matemática escolar desde sus usos, sus prácticas y quienes la enseñan.",
-    imagen: "/hero/hero-2.webp",
-    destacada: true,
+      "La Oficina Regional de UNESCO en Montevideo autorizó el uso de su logo en los materiales de difusión de la colaboración con Empoderamiento Docente. Ya acompaña a Techint, Bloom, la UCSH y Science Up en nuestra tira de aliados.",
+    // El logo blanco sobre el navy de marca: la carta autoriza el logo en los
+    // materiales de difusión de la colaboración, y una foto de aula no decía
+    // nada de UNESCO (Gastón, 2026-09-11).
+    imagen: "/novedades/alianza-unesco.webp",
     cuerpo: [
       {
-        id: "por-que-este-libro",
-        titulo: "Por qué este libro",
+        id: "que-dice-la-carta",
+        titulo: "Qué dice la carta",
         parrafos: [
-          "«Empoderamiento docente y Socioepistemología» reúne más de una década de trabajo entre aulas, escuelas y equipos de investigación. No es un balance: es una apuesta por mirar la matemática escolar desde otro lugar — desde sus usos, sus prácticas y las personas que la enseñan.",
+          "El 26 de agosto de 2026 la Oficina Regional de UNESCO en Montevideo autorizó por carta a Empoderamiento Docente a usar su logo en los materiales informativos y de difusión vinculados a esta colaboración.",
         ],
       },
       {
-        id: "la-mirada",
-        titulo: "La mirada socioepistemológica",
+        id: "donde-se-ve",
+        titulo: "Dónde se ve",
         parrafos: [
-          "La pregunta que recorre el libro es simple de enunciar y difícil de responder: ¿qué pasa cuando dejamos de preguntarnos cómo enseñar mejor una lista de temas y empezamos a preguntarnos para qué sirve ese saber, quién lo usa y en qué situaciones cobra sentido? Esa es la mirada socioepistemológica: el conocimiento matemático se resignifica cuando se lo pone en situación.",
-        ],
-      },
-      {
-        id: "que-van-a-encontrar",
-        titulo: "Qué van a encontrar",
-        parrafos: [
-          "No van a encontrar acá un recetario. El libro invita a problematizar la matemática que la escuela decidió enseñar y a diseñar tareas donde el saber funcione: situaciones con más de una estrategia posible, donde estudiantes argumentan, comparan caminos y defienden decisiones — y donde cada docente recupera el poder sobre su propia práctica.",
-          "Los capítulos alternan marco teórico con episodios de aula documentados en el trabajo con escuelas: qué pasó cuando una tarea rompió con la matemática de reglas, cómo se sostiene el debate sin perder el rumbo matemático, qué señales muestran que un proceso de empoderamiento está en marcha.",
-        ],
-      },
-      {
-        id: "donde-sigue",
-        titulo: "Dónde sigue",
-        parrafos: [
-          "El libro se suma al catálogo de nuestra Biblioteca y va a acompañar los próximos encuentros con equipos docentes. En las próximas semanas vamos a compartir por acá las presentaciones abiertas.",
+          "Desde entonces el logo acompaña a los de Techint, Bloom, la Universidad Católica Silva Henríquez y Science Up en la tira de aliados del sitio. Solo publicamos los logos con autorización expresa de cada organización.",
         ],
       },
     ],
   },
   {
-    id: "relime-2025",
-    fecha: "2026-06-02",
+    id: "pedagogia-y-saberes-2026",
+    fecha: "2026-07",
     categoria: "publicaciones",
-    titulo: "Nuevo artículo en RELIME sobre resignificación del saber escolar",
+    titulo: "Educación matemática y ciudadanía, en Pedagogía y Saberes",
     bajada:
-      "Publicamos en la Revista Latinoamericana de Investigación en Matemática Educativa un estudio sobre cómo se resignifica el conocimiento matemático en el aula.",
-    imagen: "/quienes-somos/origen-03-pregunta.webp",
-  },
-  {
-    id: "congreso-2026",
-    fecha: "2026-05-20",
-    categoria: "eventos",
-    titulo: "ED en el encuentro regional de educación matemática",
-    bajada:
-      "Compartimos hallazgos y talleres junto a docentes de la región: tres días de matemática funcional, tareas disruptivas y práctica reflexiva.",
-    imagen: "/hero/hero-6.webp",
-  },
-  {
-    id: "bolema-2025",
-    fecha: "2026-04-11",
-    categoria: "publicaciones",
-    titulo: "Capítulo en Bolema: matemática funcional y tareas disruptivas",
-    bajada:
-      "Un recorrido por las tareas que rompen con la matemática de reglas y ponen el saber a funcionar en situaciones reales.",
-    imagen: "/metodo/disenamos.webp",
-  },
-  {
-    id: "alianza-nueva",
-    fecha: "2026-03-28",
-    categoria: "alianzas",
-    titulo: "Sumamos una nueva alianza institucional",
-    bajada:
-      "Ampliamos la red que sostiene el desarrollo profesional docente: más escuelas, más territorios, la misma apuesta situada.",
-    imagen: "/hero/hero-9.webp",
-  },
-  {
-    id: "convocatoria-red",
-    fecha: "2026-03-05",
-    categoria: "convocatorias",
-    titulo: "Abrimos la convocatoria a la red docente",
-    bajada:
-      "Buscamos docentes que quieran investigar su propia práctica y llevar la matemática funcional a sus aulas. No es una capacitación: es una comunidad.",
-    imagen: "/metodo/acompanamos.webp",
-  },
-  {
-    id: "prensa-nota",
-    fecha: "2026-02-18",
-    categoria: "prensa",
-    titulo: "ED en los medios: «enseñar matemática de otra manera»",
-    bajada:
-      "Una nota sobre por qué el problema no son los chicos ni los docentes, sino la matemática que la escuela decidió enseñar.",
+      "Paola Balda, con Elizabeth Torres-Puentes y Claudia Salazar-Amaya, publica un artículo de reflexión sobre subjetividad, creatividad y ética como categorías que configuran las prácticas educativas con las matemáticas.",
     imagen: "/quienes-somos/origen-01-aulas.webp",
   },
   {
-    id: "taller-2025",
-    fecha: "2025-11-22",
-    categoria: "eventos",
-    titulo: "Cerramos el ciclo de talleres 2025",
+    id: "numeros-circulos-matematicos",
+    fecha: "2026-02",
+    categoria: "publicaciones",
+    titulo: "Círculos matemáticos con estudiantes de Argentina y Colombia",
     bajada:
-      "Un año de encuentros con equipos docentes en cinco países, poniendo a prueba en el aula lo que investigamos.",
+      "Paola Balda y Romina Busain describen en la revista Números la experiencia de dos grupos resolviendo problemas con la metodología de los círculos matemáticos: un estudio de casos con registros en video.",
+    imagen: "/metodo/acompanamos.webp",
+  },
+  {
+    id: "rmf-sistema-solar",
+    fecha: "2026-01",
+    categoria: "publicaciones",
+    titulo: "Un taller sobre el Sistema Solar para chicas y chicos de 8 a 13 años",
+    bajada:
+      "Luis Cabrera firma, en la Revista Mexicana de Física E, el diseño y la evaluación de un taller semanal con historietas, modelos de bajo costo y juegos de mesa. En más del 90 % de las sesiones, más de la mitad del grupo alcanzó los aprendizajes esperados.",
+    imagen: "/hero/hero-10.webp",
+  },
+  {
+    id: "somidem-formacion-2026",
+    fecha: "2026",
+    categoria: "publicaciones",
+    titulo: "Judith Hernández coedita un libro sobre formación de profesores de matemáticas",
+    bajada:
+      "Editado por SOMIDEM junto a David Páez y Lilia Aké: cómo llevar las investigaciones en Educación Matemática a la formación inicial y continua del profesorado.",
+    imagen: "/metodo/disenamos.webp",
+  },
+  {
+    id: "relime-2025",
+    fecha: "2025-12",
+    categoria: "publicaciones",
+    titulo: "Resignificar el saber matemático escolar: nuevo artículo en RELIME",
+    bajada:
+      "Daniela Reyes-Gasperini y Karla Gómez Osalde publican en la Revista Latinoamericana de Investigación en Matemática Educativa cómo se resignifica el conocimiento matemático escolar dentro de un programa de desarrollo profesional docente.",
+    imagen: "/quienes-somos/origen-03-pregunta.webp",
+    publicacion:
+      "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
+    destacada: true,
+    cuerpo: [
+      {
+        id: "que-estudia",
+        titulo: "Qué estudia",
+        parrafos: [
+          "El artículo sigue a docentes en servicio durante un programa de desarrollo profesional orientado al empoderamiento docente, y mira qué pasa con el conocimiento matemático escolar cuando se lo pone en discusión. Las dos autoras firman con filiación Empoderamiento Docente: es la investigación más reciente del equipo.",
+          "El análisis se apoya en dos episodios, uno de pensamiento algebraico y otro de pensamiento geométrico, tomados del trabajo con el grupo.",
+        ],
+      },
+      {
+        id: "que-encuentra",
+        titulo: "Qué encuentra",
+        parrafos: [
+          "La resignificación aparece como un proceso cíclico, colectivo y progresivo: no ocurre de una vez ni en soledad, y se vuelve parte constitutiva de la profesión docente en matemáticas. Es la idea que sostiene cómo trabajamos: el cambio de relación con la matemática escolar se construye con otras y otros, en el tiempo.",
+        ],
+      },
+      {
+        id: "donde-leerlo",
+        titulo: "Dónde leerlo",
+        parrafos: [
+          "Es de acceso abierto en RELIME y está en nuestra Biblioteca, entre los destacados.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "bolema-2025",
+    fecha: "2025",
+    categoria: "publicaciones",
+    titulo: "Problematizar la matemática escolar, en Bolema",
+    bajada:
+      "Mayra Báez, Rebeca Flores-García y Daniela Reyes-Gasperini argumentan cómo la problematización de la matemática escolar contribuye al desarrollo profesional docente, con dos episodios analizados con el modelo reflexivo de la matemática escolar.",
     imagen: "/metodo/escuchamos.webp",
   },
   {
-    id: "recurso-guias",
-    fecha: "2025-09-10",
+    id: "aiem-derivada-2025",
+    fecha: "2025-05",
     categoria: "publicaciones",
-    titulo: "Nuevas guías para el desarrollo del pensamiento matemático",
+    titulo: "Los criterios de la derivada desde la variación, en AIEM",
     bajada:
-      "Materiales abiertos para llevar directo al aula, pensados con y para docentes.",
+      "José David Zaldívar, Luis Cabrera y Alma Jiménez proponen situaciones donde el cambio y la variación son el objeto de estudio, para darle significado a los criterios de la derivada más allá de su aplicación algorítmica.",
     imagen: "/metodo/evaluamos.webp",
+  },
+  {
+    id: "somidem-rubrica-2024",
+    fecha: "2024",
+    categoria: "publicaciones",
+    titulo: "Una rúbrica para evaluar el pensamiento y lenguaje variacional",
+    bajada:
+      "Luis Cabrera presenta, en un capítulo editado por SOMIDEM, un esquema y una rúbrica analítica validada por expertos para promover y evaluar el desarrollo del pensamiento y lenguaje variacional.",
+    imagen: "/hero/hero-9.webp",
   },
 ];
 
@@ -230,10 +255,11 @@ export type Lanzamiento = {
   imagen: string;
 };
 
+// Los mismos destacados de la Biblioteca (publicaciones reales).
 export const LANZAMIENTOS: Lanzamiento[] = [
-  { id: "l-libro", tipo: "Libro", titulo: "Empoderamiento docente y Socioepistemología", imagen: "/hero/hero-2.webp" },
+  { id: "l-libro", tipo: "Libro · Gedisa 2016", titulo: "Empoderamiento docente y Socioepistemología", imagen: "/hero/hero-2.webp" },
   { id: "l-relime", tipo: "Artículo · RELIME 2025", titulo: "Resignificación del conocimiento matemático escolar", imagen: "/quienes-somos/origen-03-pregunta.webp" },
-  { id: "l-bolema", tipo: "Capítulo · Bolema 2025", titulo: "Matemática funcional y tareas disruptivas", imagen: "/metodo/disenamos.webp" },
-  { id: "l-guias", tipo: "Guías", titulo: "Desarrollo del pensamiento matemático", imagen: "/metodo/evaluamos.webp" },
-  { id: "l-taller", tipo: "Materiales", titulo: "Del ciclo de talleres 2025", imagen: "/metodo/acompanamos.webp" },
+  { id: "l-bolema", tipo: "Artículo · Bolema 2025", titulo: "Problematizar la matemática escolar", imagen: "/metodo/disenamos.webp" },
+  { id: "l-oaxaca", tipo: "Artículo · Redalyc 2016", titulo: "Oaxaca: una transformación colectiva", imagen: "/quienes-somos/origen-01-aulas.webp" },
+  { id: "l-derivada", tipo: "Artículo · IE REDIECH 2024", titulo: "¿Qué significados de la derivada favorece un profesor?", imagen: "/metodo/evaluamos.webp" },
 ];

@@ -7,6 +7,7 @@ import { RotadorPalabras } from "./RotadorPalabras";
 import { SplitFlap } from "./SplitFlap";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { NOVEDADES } from "../data";
 
 /**
  * Hero de Novedades — comparte la BASE de marca con Biblioteca (patrón §6
@@ -30,6 +31,11 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * Biblioteca. Sin motion / prefers-reduced-motion: todo visible y quieto,
  * rotador fijo en "novedades.".
  */
+// La fecha del tablero es la de la novedad más nueva, con la precisión que
+// trae (día·mes·año, mes·año o solo año): antes era un string fijo y quedó
+// mostrando la fecha de una nota inventada (Gastón, 2026-09-11).
+const ULTIMA = NOVEDADES[0].fecha.split("-").reverse().join("·");
+
 export function NovedadesHero() {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -132,7 +138,7 @@ export function NovedadesHero() {
             Última actualización
           </span>
           <SplitFlap
-            text="15·07·2026"
+            text={ULTIMA}
             charset="digits"
             trigger="mount"
             className="text-white"
