@@ -66,14 +66,6 @@ export function AreasQueHacemos() {
       className="text-azul-principal relative z-30 scroll-mt-28 bg-white"
     >
       <div className="mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
-        {/* El titular y la bajada salieron a pedido del owner (2026-09-09): la
-            seccion arranca directo en la primera area. El h2 se queda pero
-            invisible, no se borra: es el unico nombre accesible que tiene la
-            seccion —el indice de la pagina la lista como «Areas» leyendo su
-            data-indice, que no es un encabezado— y sin el, quien navega por
-            encabezados pierde el bloque entero. Cuesta cero pixeles. */}
-        <h2 className="sr-only">Seis áreas de trabajo</h2>
-
         {/* 16rem alcanza porque el índice usa el rótulo corto de areas.ts:
             con el nombre completo el más largo pedía 241px y se partía. */}
         <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
@@ -84,8 +76,26 @@ export function AreasQueHacemos() {
               translate se aplica después del layout, también mientras el
               sticky está en flujo normal, y llegó a pisar por 87px lo que
               había arriba. La caja no puede salirse de su celda. */}
-          <div className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:items-center lg:self-start">
-            <nav aria-label="Áreas de trabajo" className="lg:w-full">
+          <div className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col lg:justify-center lg:self-start">
+            {/* El titular volvió el 2026-09-11 (el usuario: «falta el título a
+                la izquierda antes de las áreas»). El owner lo había sacado con
+                la bajada el 2026-09-09 y quedaba un h2 invisible, que además
+                seguía diciendo «seis» cuando ya son siete. Va en la columna
+                del índice, trabado con él, como RÓTULO de la lista y no como
+                título de sección: en la escala del índice y en el gris
+                secundario, para no competir con los h3 de las áreas (a 2rem y
+                trabado competía; en flujo arriba de la grilla, al usuario le
+                quedaba mal). «especialización» en azul-medio (el usuario:
+                celeste, no resaltada): azul-claro, el celeste del sistema,
+                sobre blanco da 1,8:1 y no pasa; azul-medio sí (5,1:1). La
+                bajada no vuelve. */}
+            <h2
+              className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance lg:text-[1.5rem]"
+              style={{ lineHeight: 1.2 }}
+            >
+              Áreas de <span className="text-azul-medio">especialización</span>
+            </h2>
+            <nav aria-label="Áreas de especialización" className="mt-5 lg:mt-6 lg:w-full">
               <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
                 {AREAS.map((a, i) => {
                   const activo = i === activa;
