@@ -4,30 +4,13 @@ import { type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen } from "@/components/ui/icons";
+import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
 
-// Biblioteca: recursos descargables (archivos). Cada ítem lleva su formato.
-const BIBLIOTECA = [
-  {
-    titulo: "Pensamiento matemático en el aula",
-    meta: "Guía",
-    formato: "PDF",
-  },
-  {
-    titulo: "Marco de evaluación situada",
-    meta: "Documento",
-    formato: "PDF",
-  },
-  {
-    titulo: "Secuencias didácticas abiertas",
-    meta: "Material",
-    formato: "ZIP",
-  },
-  {
-    titulo: "Cuaderno de exploración matemática",
-    meta: "Cuaderno",
-    formato: "PDF",
-  },
-] as const;
+// Biblioteca: los mismos cuatro destacados que abren la página Biblioteca
+// (publicaciones reales, curadas en `biblioteca/data/materiales`), y cada
+// fila lleva a la publicación, como allá. Antes era un mock de recursos
+// inventados (Gastón, 2026-09-11).
+const BIBLIOTECA = ITEMS_DESTACADOS.map(({ material }) => material);
 
 // Novedades: siempre con imagen (reusamos fotos reales del hero como mock).
 const NOVEDADES = [
@@ -63,8 +46,8 @@ function trackPointer(e: MouseEvent<HTMLElement>) {
 
 /**
  * Biblioteca y Novedades — dos columnas divididas por el patrón de puntos de
- * marca (con nodo verde al centro). Izquierda: recursos descargables como
- * archivos; derecha: novedades con imagen. Cada fila tiene un realce verde
+ * marca (con nodo verde al centro). Izquierda: las publicaciones destacadas
+ * como archivos; derecha: novedades con imagen. Cada fila tiene un realce verde
  * que nace en el cursor, lo sigue y se expande SIN mover el contenido. La
  * flecha diagonal ↗ junto a cada título lleva a su página.
  *
@@ -109,10 +92,12 @@ export function BibliotecaNovedades() {
             </header>
 
             <ul className="mt-9 flex flex-col gap-3">
-              {BIBLIOTECA.map(({ titulo, meta, formato }) => (
+              {BIBLIOTECA.map(({ titulo, fuente, fecha, formato, url }) => (
                 <li key={titulo}>
-                  <Link
-                    href="/biblioteca"
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onMouseMove={trackPointer}
                     className="bn-row block"
                   >
@@ -126,18 +111,18 @@ export function BibliotecaNovedades() {
                         </span>
                       </span>
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-display text-azul-principal text-[1.02rem] leading-snug font-bold">
+                        <h4 className="font-display text-azul-principal line-clamp-2 text-[1.02rem] leading-snug font-bold">
                           {titulo}
                         </h4>
                         <p className="text-gris-texto mt-1 font-mono text-[0.72rem] tracking-[0.08em] uppercase">
-                          {meta} · {formato}
+                          {fuente} · {fecha}
                         </p>
                       </div>
                       <span className="text-azul-principal/25 group-hover:text-naranja-accion shrink-0">
                         <ArrowRight size={18} />
                       </span>
                     </div>
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
