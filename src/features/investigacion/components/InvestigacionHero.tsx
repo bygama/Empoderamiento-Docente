@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Highlight } from "@/components/ui/Highlight";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
@@ -77,6 +78,19 @@ export function InvestigacionHero() {
         lineas: q<SVGLineElement>("[data-hero-arista]"),
         encendido,
       }).limpiar;
+
+      // Las esquinas de abajo se redondean recién cuando el hero se despega
+      // (el usuario, 2026-09-11): clavado, su pie coincide con el borde del
+      // viewport y unas esquinas fijas se veían todo el recorrido. Son dos
+      // tapas del gris de la página que dibujan la esquina y se prenden por
+      // opacidad mientras la sección sale: «bottom bottom» es el fin del pin
+      // (ScrollTrigger mide sobre el spacer, no sobre el elemento clavado).
+      ScrollTrigger.create({
+        trigger: zona,
+        start: "bottom bottom",
+        end: "bottom top",
+        toggleClass: { targets: q("[data-hero-esquina]"), className: "opacity-100" },
+      });
     }, zona);
     return () => {
       ctx.revert();
@@ -92,6 +106,25 @@ export function InvestigacionHero() {
       className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden text-white"
     >
       <CieloNocturno />
+
+      {/* ── Las esquinas del pie, redondeadas con el radio de la hoja. Dos
+          tapas del gris de la página, cada una un cuadrado con el cuarto de
+          círculo navy recortado por gradiente radial, que aparecen por
+          opacidad cuando el hero se despega (ver el trigger del efecto) para
+          que el borde recto del navy no choque con el gris de «Nacimos de una
+          pregunta». Nacen invisibles por clase y sin JS quedan así: en
+          celular no hay historia ni pin, y el hero termina recto. */}
+      {(["left", "right"] as const).map((lado) => (
+        <span
+          key={lado}
+          aria-hidden="true"
+          data-hero-esquina
+          className={`pointer-events-none absolute bottom-0 z-50 hidden h-5 w-5 opacity-0 transition-opacity duration-300 motion-reduce:transition-none lg:block ${lado === "left" ? "left-0" : "right-0"}`}
+          style={{
+            background: `radial-gradient(circle at top ${lado === "left" ? "right" : "left"}, transparent calc(1.25rem - 0.5px), var(--color-gris-fondo) 1.25rem)`,
+          }}
+        />
+      ))}
 
       {/* ── La linterna, plantada en el piso a la derecha y saliéndose del
           cuadro por arriba: objeto, no paisaje. El haz nace de acá. */}
