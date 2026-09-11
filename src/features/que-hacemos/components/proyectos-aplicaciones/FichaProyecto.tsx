@@ -41,17 +41,23 @@ export function FichaProyecto({
           <Pictograma tipo={ficha.picto} className="h-36 w-36" />
         </span>
 
-        {/* El país manda en el ancho: el sello se acomoda a la derecha en
-            dos renglones si hace falta, antes que partir el nombre en tres. */}
-        <div className="relative flex items-center justify-between gap-5">
+        {/* Encabezado en fila: banderas con el país a la izquierda, y arriba
+            a la derecha SIEMPRE el sello, en mono y en dos renglones, con
+            quién arriba y los años abajo (Gastón, 2026-09-11). El país cede
+            el ancho: se parte antes que el sello. */}
+        <div className="relative flex items-start justify-between gap-5">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <Banderas paises={ficha.paises} />
             <p className="font-display text-azul-principal text-[1.05rem] leading-tight font-semibold tracking-[-0.01em]">
               {nombrarPaises(ficha.paises)}
             </p>
           </div>
-          <p className="text-gris-texto max-w-[38%] shrink-0 text-right font-mono text-[0.72rem] leading-relaxed tracking-[0.18em] uppercase">
-            {ficha.sello}
+          <p className="text-gris-texto shrink-0 text-right font-mono text-[0.72rem] leading-relaxed tracking-[0.18em] uppercase">
+            {ficha.sello.split(" · ").map((parte) => (
+              <span key={parte} className="block">
+                {parte}
+              </span>
+            ))}
           </p>
         </div>
 
