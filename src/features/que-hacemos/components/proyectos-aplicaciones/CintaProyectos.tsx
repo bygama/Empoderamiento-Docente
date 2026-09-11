@@ -27,14 +27,6 @@ export function CintaProyectos({ d }: { d: string }) {
       className="pointer-events-none absolute inset-0 z-0 h-full w-full"
     >
       <path
-        data-estela
-        d={d}
-        stroke="var(--color-azul-medio)"
-        {...TRAZO}
-        strokeWidth={GROSOR * 2.4}
-        style={{ opacity: 0 }}
-      />
-      <path
         data-cinta
         d={d}
         stroke="var(--color-azul-medio)"

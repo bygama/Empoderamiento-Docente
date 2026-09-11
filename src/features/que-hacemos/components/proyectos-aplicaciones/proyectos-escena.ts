@@ -104,11 +104,6 @@ export const GROSOR = 54;
 export const LAZO_PX = 620; // largo de la víbora
 export const PUNTO_PX = 72; // largo de la cápsula perseguidora
 export const GAP_PX = 103; // aire entre la cola y la cápsula
-// La estela del solo: un trazo ancho y tenue que arranca casi en la cola y
-// se extiende bastante hacia atrás, como un halo que la víbora deja.
-export const ESTELA_PX = 660;
-export const ESTELA_ATRASO_PX = 40;
-export const ESTELA_ALPHA = 0.08;
 
 /**
  * Los hitos del escenario, en unidades de la timeline, y el alto de la

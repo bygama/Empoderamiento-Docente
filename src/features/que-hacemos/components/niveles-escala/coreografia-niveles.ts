@@ -97,11 +97,12 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
         strokeDashoffset: seg + corrimiento,
       });
       // Viaja hasta que la CABEZA llega justo al final del trazo, y llega
-      // UNA UNIDAD ANTES de que la zona se acabe: el scrub va atrasado
+      // apenas antes de que la zona se acabe: el scrub va atrasado
       // respecto del scroll (0,6 s de suavizado) y si llegara justo al
       // final, en un scroll rápido la sección se soltaría con la cabeza
       // todavía a mitad de camino, y Proyectos ya estaría dibujando la
-      // suya en el borde: dos cabezas. Ahí se queda quieta, con el
+      // suya en el borde: dos cabezas. El margen es el mínimo (Gastón,
+      // 2026-09-10: que no se quede quieta). Ahí se queda quieta, con el
       // cuerpo asomando por el borde de abajo, y la sección que sigue
       // (Proyectos) dibuja el mismo cuerpo del otro lado del borde y lo
       // retoma cuando se clava. Así el animal es uno solo a través de las
@@ -113,7 +114,7 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
       // El final del trazo pasa lejos de la quinta card (queda a la
       // izquierda de ella), así el último cierre no tiene lazo encima.
       const final = seg - L;
-      const viaje = ENTRADA + FIN - 0.5;
+      const viaje = ENTRADA + FIN + 0.25;
       tl.to(lazo, { strokeDashoffset: final, ease: "none", duration: viaje }, 0).to(
         punto,
         { strokeDashoffset: final + corrimiento, ease: "none", duration: viaje },
