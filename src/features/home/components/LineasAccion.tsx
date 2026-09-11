@@ -379,8 +379,10 @@ export function LineasAccion() {
             })}
           </ul>
 
-          {/* Salida → Investigación (no Contacto). CTA de cierre: en live
-              aparece abajo-centro cuando ya salieron todas las cartas. */}
+          {/* Salida → Investigación, que es el archivo de casos: las áreas
+              puestas en práctica. El copy lo dice, si no el salto no se
+              entendía (Gastón, 2026-09-11). En live aparece abajo-centro
+              cuando ya salieron todas las cartas. */}
           <div
             data-deck-cta
             className="deck-cta mt-12 flex justify-center md:justify-start"
@@ -393,7 +395,7 @@ export function LineasAccion() {
                 <ArrowRight size={17} />
               </span>
               <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.93rem] font-medium tracking-wide transition-colors duration-500">
-                Explorar nuestra investigación
+                Mirá los casos donde lo aplicamos
               </span>
             </Link>
           </div>

@@ -4,9 +4,13 @@
  * título da la jerarquía; el cuerpo (más chico) se rellena con el scroll. La
  * Misión es el espejo (texto derecha / imagen izquierda). El barrido verde lo
  * "borra" y revela la Misión en el mismo lugar — lo orquesta HeroQuienes.
+ * Debajo del cuerpo, la salida a Quiénes somos: cada bloque del inicio tiene
+ * una sola salida, hacia la página que lo amplía (Gastón, 2026-09-11).
  * NO parafrasear. Respeta prefers-reduced-motion (capas apiladas, sin animación).
  */
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "@/components/ui/icons";
 import { ScrollFillText, type FillSeg } from "./ScrollFillText";
 
 // Acentos en AZUL: conceptos clave; el resto se rellena en verde. Copy del
@@ -64,6 +68,21 @@ export function Manifiesto() {
             paragraphs={QS_PARAGRAPHS}
             className="font-sans text-verde-concepto font-medium leading-relaxed [font-size:clamp(0.92rem,1.1vw,1.15rem)]"
           />
+
+          <Link
+            href="/quienes-somos"
+            className="group focus-visible:outline-naranja-accion mt-2 inline-flex w-fit items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4"
+          >
+            <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
+              <ArrowRight
+                size={17}
+                className="transition-transform duration-300 group-hover:translate-x-0.5"
+              />
+            </span>
+            <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.9rem] font-medium tracking-wide transition-colors duration-500">
+              Conocé al equipo
+            </span>
+          </Link>
         </div>
 
         {/* Imagen (derecha) */}
