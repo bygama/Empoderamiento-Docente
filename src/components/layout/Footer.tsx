@@ -4,6 +4,7 @@ import { Instagram, Linkedin, Facebook } from "@/components/ui/icons";
 import { siteConfig } from "@/config/site";
 import { ALIADOS } from "@/config/aliados";
 import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
+import { CreditoSitio } from "./footer/CreditoSitio";
 
 /**
  * Footer institucional de Empoderamiento Docente.
@@ -54,7 +55,7 @@ export function Footer() {
       className="bg-azul-principal relative isolate overflow-hidden rounded-t-[var(--footer-radio)] text-white"
     >
       {/* ── Bloque principal ─────────────────────────────────────────── */}
-      <div className="mx-auto grid max-w-screen-xl gap-x-10 gap-y-8 px-5 pt-11 pb-8 md:grid-cols-12 md:px-10 md:pt-14">
+      <div className="mx-auto grid max-w-screen-xl gap-x-10 gap-y-8 px-5 pt-11 pb-0 md:grid-cols-12 md:px-10 md:pt-14">
         {/* Columna marca */}
         <div className="flex flex-col gap-8 md:col-span-5 md:gap-0 lg:col-span-4">
           <Link
@@ -176,15 +177,19 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Barra legal */}
-        <div className="border-azul-medio/15 text-azul-claro/55 flex flex-col gap-2 border-t pt-5 font-mono text-[0.72rem] tracking-[0.14em] uppercase md:col-span-12 md:flex-row md:items-center md:justify-between">
-          <p>
-            © {year} {name}
-          </p>
-          <p>{paises.join(" · ")}</p>
-          <p className="font-sans normal-case tracking-normal italic">
-            Investigamos lo que hacemos, hacemos lo que investigamos.
-          </p>
+        {/* Barra legal: dos renglones. Arriba ©, países y lema; abajo el
+            crédito del sitio (`footer/CreditoSitio`). */}
+        <div className="border-azul-medio/15 flex flex-col gap-4 border-t pt-5 md:col-span-12">
+          <div className="text-azul-claro/55 flex flex-col gap-2 font-mono text-[0.72rem] tracking-[0.14em] uppercase md:flex-row md:items-center md:justify-between">
+            <p>
+              © {year} {name}
+            </p>
+            <p>{paises.join(" · ")}</p>
+            <p className="font-sans normal-case tracking-normal italic">
+              Investigamos lo que hacemos, hacemos lo que investigamos.
+            </p>
+          </div>
+          <CreditoSitio />
         </div>
       </div>
 
