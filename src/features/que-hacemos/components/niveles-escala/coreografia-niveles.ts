@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { NIVELES } from "../../data";
-import { ALTO_SVH, LAZO_SEG, PUNTO_GAP, PUNTO_SEG } from "./niveles-escena";
+import { ALTO_SVH, ENTRADA_SVH } from "./niveles-escena";
 import { instalarToggle } from "./toggle-nivel";
 
 if (typeof window !== "undefined") {
@@ -36,12 +36,6 @@ const CIERRE_INICIO = SUBIDA * 0.7 + CIERRE_TRAS;
 // se suelta.
 const FIN = APERTURA + 11.9;
 
-// Cuánto scroll corre la timeline ANTES de que el escenario se clave. El
-// sticky se traba cuando el tope de la zona toca el tope del viewport, así
-// que basta con arrancar el ScrollTrigger a `top ENTRADA_SVH%`.
-// Apenas un anticipo: con 30 el lazo entraba de más y se comía el arranque
-// (Mateo, 2026-09-05).
-const ENTRADA_SVH = 10;
 // Unidades de timeline que se consumen con el escenario ya clavado: la zona
 // clava durante (ALTO_SVH - 100)svh, que es exactamente el tramo del
 // ScrollTrigger sin la entrada.
@@ -79,48 +73,8 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
       },
     });
 
-    // El lazo viajero + su cápsula: ventana visible que se desliza a lo
-    // largo del recorrido vía dashoffset — entra, serpentea entre las
-    // cards y SALE (no queda estático de fondo). La cápsula corre con un
-    // offset corrido detrás de la cola, siempre sobre el mismo path.
-    const lazo = stage.querySelector<SVGPathElement>("[data-nivel-lazo]");
-    const punto = stage.querySelector<SVGPathElement>("[data-nivel-punto]");
-    if (lazo && punto) {
-      const L = lazo.getTotalLength();
-      const seg = L * LAZO_SEG;
-      const dot = L * PUNTO_SEG;
-      const gap = L * PUNTO_GAP;
-      const corrimiento = gap + dot;
-      gsap.set(lazo, { strokeDasharray: `${seg} ${L * 2}`, strokeDashoffset: seg });
-      gsap.set(punto, {
-        strokeDasharray: `${dot} ${L * 2}`,
-        strokeDashoffset: seg + corrimiento,
-      });
-      // Viaja hasta que la CABEZA llega justo al final del trazo, y llega
-      // apenas antes de que la zona se acabe: el scrub va atrasado
-      // respecto del scroll (0,6 s de suavizado) y si llegara justo al
-      // final, en un scroll rápido la sección se soltaría con la cabeza
-      // todavía a mitad de camino, y Proyectos ya estaría dibujando la
-      // suya en el borde: dos cabezas. El margen es el mínimo (Gastón,
-      // 2026-09-10: que no se quede quieta). Ahí se queda quieta, con el
-      // cuerpo asomando por el borde de abajo, y la sección que sigue
-      // (Proyectos) dibuja el mismo cuerpo del otro lado del borde y lo
-      // retoma cuando se clava. Así el animal es uno solo a través de las
-      // dos secciones. Antes salía del todo y se desvanecía antes del
-      // último cierre, y entre el final de esto y el arranque de Proyectos
-      // quedaba un hueco sin víbora y una cabeza que nacía cortada
-      // (Gastón, 2026-09-10). Arranca en 0, o sea ANTES de que el
-      // escenario se clave: es lo único que se mueve durante la entrada.
-      // El final del trazo pasa lejos de la quinta card (queda a la
-      // izquierda de ella), así el último cierre no tiene lazo encima.
-      const final = seg - L;
-      const viaje = ENTRADA + FIN + 0.25;
-      tl.to(lazo, { strokeDashoffset: final, ease: "none", duration: viaje }, 0).to(
-        punto,
-        { strokeDashoffset: final + corrimiento, ease: "none", duration: viaje },
-        0,
-      );
-    }
+    // La víbora ya no se anima acá: vive en la capa fija de la página
+    // (`../vibora/`), con un solo trazo de Niveles al cierre.
 
     // La apertura: el título grande está desde el primer píxel (la sección
     // llega con él puesto), se va del todo encogiéndose apenas, y recién

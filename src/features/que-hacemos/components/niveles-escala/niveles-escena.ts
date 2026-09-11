@@ -17,14 +17,12 @@ export const POS = [
 // antes de la primera card) son 14, al mismo ritmo de ~40svh por unidad.
 export const ALTO_SVH = 665;
 
-// Recorrido del lazo viajero (viewBox 1600x900): entra por arriba, serpentea
-// entre las cards y sale por abajo. No se dibuja y queda — VIAJA: la cabeza
-// avanza mientras la cola se borra, y al final sale de escena (referencia
-// Assistantly). Lo persigue una cápsula corta por detrás. El primer tramo
-// entra a la derecha del título (que ocupa hasta ~35% del ancho): antes
-// le pasaba por detrás y lo ensuciaba.
-export const LAZO =
-  "M 820 -80 C 780 150 500 260 380 430 C 330 560 420 640 620 560 C 800 490 700 220 860 140 C 1020 60 1200 140 1240 300 C 1280 470 1140 560 980 640 C 820 720 640 780 560 950";
-export const LAZO_SEG = 0.3; // largo de la serpiente (fracción del recorrido)
-export const PUNTO_SEG = 0.035; // largo de la cápsula perseguidora
-export const PUNTO_GAP = 0.05; // aire entre la cola del lazo y la cápsula
+// Cuánto scroll corre la timeline ANTES de que el escenario se clave. El
+// sticky se traba cuando el tope de la zona toca el tope del viewport, así
+// que basta con arrancar el ScrollTrigger a `top ENTRADA_SVH%`. Apenas un
+// anticipo: con 30 el lazo entraba de más y se comía el arranque (Mateo,
+// 2026-09-05). La capa fija de la víbora arranca en el mismo punto.
+export const ENTRADA_SVH = 10;
+
+// El recorrido de la víbora ya no vive acá: es uno solo, de Niveles al
+// cierre, en `../vibora/vibora-escena.ts`.
