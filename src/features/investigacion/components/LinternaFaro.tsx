@@ -39,8 +39,41 @@ const MARFIL_SOMBRA = mezcla(AZUL_MEDIO, 42, "white");
 /** Semiancho del fuste a la altura y (se abre apenas hacia el piso). */
 const fuste = (y: number) => 13.6 + (y - 430) * 0.06;
 
-export function LinternaFaro({ className = "" }: { className?: string }) {
+/** Hasta dónde llega el haz de siempre (x del viewBox), el del cierre. */
+const LARGO_HAZ_BASE = 1300;
+
+type Props = {
+  className?: string;
+  /**
+   * Prefijo de los ids de gradientes y máscara. La linterna vive dos veces
+   * en Investigación (hero y cierre) y los ids de un SVG son globales al
+   * documento: sin prefijo propio, `url(#…)` de una resuelve a la otra.
+   */
+  prefijo?: string;
+  /** Hasta qué x del viewBox llega el haz (el hero lo tiene que posar sobre
+   *  el titular, más lejos que el cierre). La punta conserva su semialtura:
+   *  un haz más largo es un cono más CERRADO, no una inundación. */
+  largoHaz?: number;
+  /**
+   * Ángulo del haz en el frame ESTÁTICO (0 = derecha, −90 = cielo, −180 =
+   * izquierda). Va en un grupo propio, fuera del que anima la coreografía:
+   * un `rotate()` previo en el mismo elemento que GSAP rota lo descompone
+   * en traslación y corre el haz de lugar. La coreografía lo anula.
+   */
+  hazPose?: number;
+};
+
+export function LinternaFaro({
+  className = "",
+  prefijo = "inv",
+  largoHaz = LARGO_HAZ_BASE,
+  hazPose = 0,
+}: Props) {
   const lente = proyectarLente(0);
+  const id = (nombre: string) => `${prefijo}-${nombre}`;
+  /** Un cono del haz: semialtura en el arranque (el cristal) y en la punta. */
+  const cono = (arranque: number, punta: number) =>
+    `954,${FOCO.y - arranque} ${largoHaz},${FOCO.y - punta} ${largoHaz},${FOCO.y + punta} 954,${FOCO.y + arranque}`;
   return (
     <svg
       data-linterna
@@ -49,49 +82,49 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="inv-fuste" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id={id("fuste")} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" style={{ stopColor: mezcla(AZUL_CLARO, 18, "white") }} />
           <stop offset="0.55" style={{ stopColor: MARFIL_SOMBRA }} />
           <stop offset="1" style={{ stopColor: mezcla(AZUL_MEDIO, 62, "black") }} />
         </linearGradient>
-        <linearGradient id="inv-cupula" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id={id("cupula")} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" style={{ stopColor: mezcla(AZUL, 60, "white") }} />
           <stop offset="0.52" style={{ stopColor: AZUL }} />
           <stop offset="1" style={{ stopColor: mezcla(AZUL, 58, "black") }} />
         </linearGradient>
-        <radialGradient id="inv-vidrio">
+        <radialGradient id={id("vidrio")}>
           <stop offset="0" stopColor="white" stopOpacity="0.98" />
           <stop offset="1" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.45" />
         </radialGradient>
-        <radialGradient id="inv-lente">
+        <radialGradient id={id("lente")}>
           <stop offset="0" stopColor="white" stopOpacity="0.95" />
           <stop offset="0.6" stopColor="white" stopOpacity="0.55" />
           <stop offset="1" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.25" />
         </radialGradient>
-        <radialGradient id="inv-nucleo">
+        <radialGradient id={id("nucleo")}>
           <stop offset="0" stopColor="white" stopOpacity="0.95" />
           <stop offset="0.45" stopColor="white" stopOpacity="0.5" />
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id="inv-halo">
+        <radialGradient id={id("halo")}>
           <stop offset="0" stopColor="white" stopOpacity="0.85" />
           <stop offset="0.45" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.26" />
           <stop offset="1" style={{ stopColor: AZUL_CLARO }} stopOpacity="0" />
         </radialGradient>
         {/* El haz: gradiente a lo largo (denso en el foco → nada al final)
             multiplicado por uno lateral (borde suave → centro → borde). */}
-        <linearGradient id="inv-haz-largo" gradientUnits="userSpaceOnUse" x1={FOCO.x} y1={FOCO.y} x2="1300" y2={FOCO.y}>
+        <linearGradient id={id("haz-largo")} gradientUnits="userSpaceOnUse" x1={FOCO.x} y1={FOCO.y} x2={largoHaz} y2={FOCO.y}>
           <stop offset="0" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.55" />
           <stop offset="0.35" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.22" />
           <stop offset="1" style={{ stopColor: AZUL_CLARO }} stopOpacity="0" />
         </linearGradient>
-        <linearGradient id="inv-haz-lat" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={id("haz-lat")} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="white" stopOpacity="0" />
           <stop offset="0.5" stopColor="white" stopOpacity="1" />
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
-        <mask id="inv-haz-mask">
-          <polygon points="954,372 1300,250 1300,520 954,398" fill="url(#inv-haz-lat)" />
+        <mask id={id("haz-mask")}>
+          <polygon points={cono(13, 135)} fill={`url(#${id("haz-lat")})`} />
         </mask>
       </defs>
 
@@ -99,17 +132,19 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
           solo haz, en un grupo que GIRA alrededor del foco: rotación 0 =
           apunta a la derecha, −90 = al cielo, −180 = a la izquierda. */}
       <g data-linterna-luz>
-        <g data-linterna-haces mask="url(#inv-haz-mask)">
-          <polygon points="954,376 1300,290 1300,480 954,394" fill="url(#inv-haz-largo)" />
-          <polygon points="954,380 1300,345 1300,425 954,390" fill="url(#inv-haz-largo)" opacity="0.85" />
+        <g data-linterna-pose transform={`rotate(${hazPose} ${FOCO.x} ${FOCO.y})`}>
+          <g data-linterna-haces mask={`url(#${id("haz-mask")})`}>
+            <polygon points={cono(9, 95)} fill={`url(#${id("haz-largo")})`} />
+            <polygon points={cono(5, 40)} fill={`url(#${id("haz-largo")})`} opacity="0.85" />
+          </g>
         </g>
-        <circle data-linterna-halo cx={FOCO.x} cy={FOCO.y} r="72" fill="url(#inv-halo)" />
+        <circle data-linterna-halo cx={FOCO.x} cy={FOCO.y} r="72" fill={`url(#${id("halo")})`} />
       </g>
 
       {/* ── El fuste, plantado hasta el piso de la hoja. */}
       <polygon
         points={`${950 - fuste(430)},430 ${950 + fuste(430)},430 ${950 + fuste(578)},578 ${950 - fuste(578)},578`}
-        fill="url(#inv-fuste)"
+        fill={`url(#${id("fuste")})`}
       />
       {/* Sombra de la galería sobre el arranque del fuste. */}
       <polygon
@@ -182,7 +217,7 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
 
       {/* ── El cristal: vidrio + la óptica (que gira con el tambor) + reflejo. */}
       <g data-linterna-vidrio>
-        <rect x="935.5" y="371.5" width="29" height="27.5" fill="url(#inv-vidrio)" />
+        <rect x="935.5" y="371.5" width="29" height="27.5" fill={`url(#${id("vidrio")})`} />
         <rect
           data-linterna-lente
           x={lente.x}
@@ -190,7 +225,7 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
           width={lente.ancho}
           height={LENTE.alto}
           rx="1.4"
-          fill="url(#inv-lente)"
+          fill={`url(#${id("lente")})`}
           opacity={lente.opacity}
         />
         {[381.5, 388, 394.5].map((y) => (
@@ -201,7 +236,7 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
       </g>
       {/* La lámpara, FUERA del grupo del cristal: su chispa no debe heredar la
           opacidad del vidrio apagado (la secuencia es chispa → cristal). */}
-      <circle data-linterna-nucleo cx={FOCO.x} cy={FOCO.y} r="12" fill="url(#inv-nucleo)" />
+      <circle data-linterna-nucleo cx={FOCO.x} cy={FOCO.y} r="12" fill={`url(#${id("nucleo")})`} />
 
       {/* ── Estructura: marcos horizontales + parantes proyectados. */}
       <line x1="934.4" y1="371.6" x2="965.6" y2="371.6" style={{ stroke: AZUL }} strokeWidth="1.6" />
@@ -227,7 +262,7 @@ export function LinternaFaro({ className = "" }: { className?: string }) {
       {/* ── Cornisa, techo a dos aguas con alero (como el isotipo), remate. */}
       <rect x="932.8" y="368.4" width="34.4" height="3.1" rx="1.3" style={{ fill: AZUL }} />
       <rect x="932.8" y="368.4" width="34.4" height="1.1" rx="0.55" style={{ fill: AZUL_CLARO }} opacity="0.35" />
-      <polygon points="930.5,368.4 950,348.8 969.5,368.4" fill="url(#inv-cupula)" />
+      <polygon points="930.5,368.4 950,348.8 969.5,368.4" fill={`url(#${id("cupula")})`} />
       <path d="M950,349.6 L950,368" stroke="white" strokeOpacity="0.16" strokeWidth="0.9" />
       <path d="M933.2,367.2 L950,350.4" fill="none" style={{ stroke: AZUL_CLARO }} strokeOpacity="0.32" strokeWidth="1" />
       <path d="M950,350.4 L966.8,367.2" fill="none" style={{ stroke: AZUL_CLARO }} strokeOpacity="0.18" strokeWidth="1" />
