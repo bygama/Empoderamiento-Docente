@@ -2,14 +2,10 @@ import gsap from "gsap";
 import { CustomEase } from "gsap/CustomEase";
 import {
   CINTA_INICIO,
-  ESTELA_ALPHA,
-  ESTELA_ATRASO_PX,
-  ESTELA_PX,
   GAP_PX,
   GIRO,
   LAZO_PX,
   PUNTO_PX,
-  SOLO,
   TRAMOS,
   type Ritmo,
 } from "./proyectos-escena";
@@ -81,7 +77,6 @@ function easePorHitos(puntos: [number, number][]) {
 export function animarVibora(tl: gsap.core.Timeline, stage: HTMLElement, r: Ritmo) {
   const cinta = stage.querySelector<SVGPathElement>("[data-cinta]");
   const capsula = stage.querySelector<SVGPathElement>("[data-capsula]");
-  const estela = stage.querySelector<SVGPathElement>("[data-estela]");
   const svg = cinta?.ownerSVGElement;
   if (!cinta || !capsula || !svg) return;
 
@@ -90,12 +85,10 @@ export function animarVibora(tl: gsap.core.Timeline, stage: HTMLElement, r: Ritm
   const corrimiento = GAP_PX + PUNTO_PX;
   gsap.set(cinta, { strokeDasharray: `${seg} ${L * 2}` });
   gsap.set(capsula, { strokeDasharray: `${PUNTO_PX} ${L * 2}` });
-  if (estela) gsap.set(estela, { strokeDasharray: `${ESTELA_PX} ${L * 2}` });
   const st = { c: hP };
   const colocar = () => {
     gsap.set(cinta, { strokeDashoffset: seg - st.c });
     gsap.set(capsula, { strokeDashoffset: seg + corrimiento - st.c });
-    if (estela) gsap.set(estela, { strokeDashoffset: seg * 2 - st.c - ESTELA_PX + ESTELA_ATRASO_PX });
   };
   colocar();
 
@@ -115,12 +108,4 @@ export function animarVibora(tl: gsap.core.Timeline, stage: HTMLElement, r: Ritm
     [fin + 0.6, L + seg + corrimiento + 40],
   ]);
   tl.to(st, { c: cFin, ease, duration: T, onUpdate: colocar }, 0);
-
-  // La estela solo existe en los dos solos.
-  if (estela) {
-    tl.to(estela, { autoAlpha: ESTELA_ALPHA, duration: SOLO * 0.25 }, entrada);
-    tl.to(estela, { autoAlpha: 0, duration: SOLO * 0.3 }, inicio - SOLO * 0.3);
-    tl.to(estela, { autoAlpha: ESTELA_ALPHA, duration: GIRO * 0.2 }, giro + GIRO * 0.1);
-    tl.to(estela, { autoAlpha: 0, duration: GIRO * 0.2 }, inicio2 - GIRO * 0.2);
-  }
 }

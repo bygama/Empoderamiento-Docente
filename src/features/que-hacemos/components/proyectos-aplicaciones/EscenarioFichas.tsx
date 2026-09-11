@@ -43,13 +43,23 @@ export function EscenarioFichas({
     const zone = zoneRef.current;
     const stage = stageRef.current;
     if (!zone || !stage) return;
+    // Con la tipografía definitiva. Si el efecto se limpia antes de que
+    // carguen (el doble montaje del modo estricto en dev), la coreografía
+    // NO se crea igual: quedaban dos timelines sobre los mismos elementos y,
+    // al volver a subir, los textos del lado B se quedaban a medio fundir
+    // sobre el lado A (Gastón, 2026-09-11).
     let cleanup: (() => void) | undefined;
-    const run = () =>
-      crearFichas(zone, stage, { capInicioA: capInicio(capsA), capInicioB: capInicio(capsB) });
-    if (document.fonts?.ready)
-      document.fonts.ready.then(() => (cleanup = run()));
-    else cleanup = run();
-    return () => cleanup?.();
+    let cancelado = false;
+    const arrancar = () => {
+      if (!cancelado)
+        cleanup = crearFichas(zone, stage, { capInicioA: capInicio(capsA), capInicioB: capInicio(capsB) });
+    };
+    if (document.fonts?.ready) document.fonts.ready.then(arrancar);
+    else arrancar();
+    return () => {
+      cancelado = true;
+      cleanup?.();
+    };
   }, [capsA, capsB]);
 
   return (
@@ -63,8 +73,10 @@ export function EscenarioFichas({
           víbora tiene que poder dibujarse más allá de sus bordes, para que
           sea el mismo cuerpo que el de Niveles arriba y para meterse
           debajo del cartel del cierre abajo. Las fichas que esperan abajo
-          van con autoAlpha 0, no dependen del recorte. */}
-      <div ref={stageRef} className="isolate sticky top-0 h-[100svh]">
+          van con autoAlpha 0, no dependen del recorte. A lo ANCHO sí se
+          recorta: el zoom de la cámara desbordaba y aparecía una barra
+          horizontal. */}
+      <div ref={stageRef} className="isolate sticky top-0 h-[100svh] overflow-x-clip">
         {/* La misma grilla de puntos de Niveles: la víbora cruza de una
             sección a la otra y el fondo no puede cambiar en la costura. */}
         <span
