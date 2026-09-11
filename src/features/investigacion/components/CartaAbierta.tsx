@@ -1,67 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import type { Figura } from "./constelacion";
-import { FiguraConstelacion } from "./FiguraConstelacion";
+import { LaPostura, LaPregunta } from "./NotasCarta";
 import { PuntosCampo } from "./PuntosCampo";
 import { crearCarta } from "./coreografia-carta";
-
-/**
- * Los cuatro fundamentos, cada uno con la figura de la constelación que lo
- * dice: la socioepistemología es la red (conocimiento como construcción
- * social), problematizar es la pregunta, el empoderamiento es la espiral
- * (proceso progresivo) y el pensamiento matemático es la lupa (analizar).
- *
- * El texto canónico de estos conceptos
- * (docs/content/arquitectura-investigacion.md §4) es una sola parrafada por
- * concepto, y de golpe no se lee: acá se parte en sus dos mitades naturales
- * —la que está antes de los dos puntos es la DEFINICIÓN, el resto es el
- * DESARROLLO— y las colas se recortan para que las cuatro fichas pesen
- * parecido (28–29 palabras cada una) y midan lo mismo en la grilla.
- */
-const FUNDAMENTOS: ReadonlyArray<{
-  titulo: string;
-  figura: Figura["id"];
-  /** Qué es, en un renglón: el nivel que se lee de un vistazo. */
-  definicion: string;
-  /** Cómo se despliega: el nivel que se lee si el concepto interesa. */
-  texto: string;
-}> = [
-  {
-    titulo: "Socioepistemología",
-    figura: "red",
-    definicion: "El conocimiento matemático como una construcción social.",
-    texto:
-      "Estudia cómo adquiere sentido en contextos, usos, decisiones e interacciones concretas, en lugar de separarlo de las personas y de sus prácticas.",
-  },
-  {
-    titulo: "Problematización de la matemática escolar",
-    figura: "pregunta",
-    definicion: "Revisar lo que suele darse por sentado.",
-    texto:
-      "Por qué se enseña un contenido así, qué sentido tiene una tarea y cómo se relaciona con la vida de quienes aprenden.",
-  },
-  {
-    titulo: "Empoderamiento docente desde el saber",
-    figura: "espiral",
-    definicion: "Un proceso progresivo y colectivo.",
-    texto:
-      "Las y los docentes fortalecen su autonomía, cuestionan prácticas naturalizadas, toman decisiones con fundamento y reconocen su capacidad de transformar desde el conocimiento.",
-  },
-  {
-    titulo: "Desarrollo del pensamiento matemático",
-    figura: "lupa",
-    definicion: "Una forma de analizar y actuar.",
-    texto:
-      "Buscar estrategias, formular hipótesis, argumentar, anticipar y decidir. Los contenidos escolares funcionan como herramientas de ese trabajo, no como un fin aislado.",
-  },
-];
 
 /** El título. Dos copias superpuestas en la coreografía (ver abajo). */
 function Titulo({ tono }: { tono: "tinta" | "luz" }) {
@@ -81,75 +27,18 @@ function Titulo({ tono }: { tono: "tinta" | "luz" }) {
 }
 
 /**
- * La hoja de la carta: apertura, idea central y posdata transversal.
- *
- * Tres pesos bien separados —apertura al cuerpo, idea central grande y
- * posdata chica en gris— porque la carta se lee de una sola pasada, sin
- * scroll propio: si los tres párrafos pesan igual no se sabe cuál es el
- * que importa. El texto es el del §4 recortado a la mitad por lo mismo.
- */
-function Hoja({ live }: { live: boolean }) {
-  return (
-    <article
-      data-carta-hoja
-      className={`bg-grain-light text-azul-principal rounded-[3px] bg-white px-10 py-10 shadow-[0_30px_70px_-30px_rgb(0_0_0/0.55)] lg:px-14 lg:py-12 ${
-        live
-          ? "absolute top-5 left-1/2 z-10 w-[calc(100%-3.5rem)] -translate-x-1/2"
-          : "relative mx-auto mt-14 max-w-3xl"
-      }`}
-    >
-      <span className="text-gris-texto/70 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
-        Archivo ED · Hoja 02
-      </span>
-      <p className="text-azul-principal/85 mt-6 text-[0.98rem] leading-[1.7] lg:text-[1.02rem]">
-        Empoderamiento Docente nació de una pregunta: ¿qué sucede cuando las y
-        los docentes transforman su relación con el saber matemático escolar
-        y reconocen su capacidad de intervenir en la realidad? Esa pregunta
-        sigue orientando todo lo que hacemos.
-      </p>
-      <p className="font-display mt-7 text-[1.42rem] leading-[1.32] font-semibold lg:text-[1.62rem]">
-        No investigamos para observar la escuela desde afuera.{" "}
-        <Highlight>Investigamos con los contextos educativos</Highlight> para
-        comprender lo que ocurre, construir alternativas y aprender de su
-        implementación.
-      </p>
-      <p className="text-gris-texto mt-7 text-[0.86rem] leading-[1.6]">
-        <span className="text-azul-principal/70 mr-2 font-mono text-[0.7rem] tracking-[0.16em] uppercase">
-          P. D.
-        </span>
-        Género, inclusión, derechos humanos, ciudadanía y justicia social no
-        son un capítulo aparte: son criterios con los que investigamos.
-      </p>
-      <div className="mt-8 flex items-center justify-between">
-        <Image
-          src="/brand/logotipo-principal-ed.png"
-          alt="Empoderamiento Docente"
-          width={160}
-          height={40}
-          className="h-7 w-auto opacity-90"
-        />
-        <span className="text-gris-texto/60 font-mono text-[0.66rem] tracking-[0.18em] uppercase">
-          Investigar para transformar
-        </span>
-      </div>
-    </article>
-  );
-}
-
-/**
- * Sección 2 — Por qué investigamos (`#sentido`): la CARTA ABIERTA.
+ * Sección 2 — Por qué investigamos (`#sentido`): las NOTAS DEL SOBRE.
  *
  * El copy es una carta en primera persona («nació de una pregunta», «no
  * investigamos desde afuera»), así que se presenta como tal: sobre el navy
- * que llega desde abajo, un sobre en el borde inferior del que sale la hoja
- * al ritmo del scroll, y las cuatro fichas de los fundamentos —cada una con
- * su figura de la constelación— que esperan en las esquinas y se ordenan en
- * grilla cuando la carta se va. Coreografía en coreografia-carta.ts.
+ * que llega desde abajo, un sobre en el borde inferior del que salen dos
+ * notas al ritmo del scroll y se apilan con un giro leve. Un solo gesto,
+ * repetido, y nada más en pantalla. Coreografía en coreografia-carta.ts.
  *
  * Sin JS, en touch o con reduced-motion se muestra el estado final en
- * flujo: título, carta como bloque y grilla 2×2 abierta. Con puntero y
- * desde 1024px (`live`) el markup pasa a escenario de una pantalla antes
- * del primer paint (layout effect) y la coreografía toma el control.
+ * flujo: título y las dos notas una bajo la otra. Con puntero y desde
+ * 1024px (`live`) el markup pasa a escenario de una pantalla antes del
+ * primer paint (layout effect) y la coreografía toma el control.
  */
 export function CartaAbierta() {
   const zonaRef = useRef<HTMLElement | null>(null);
@@ -221,8 +110,9 @@ export function CartaAbierta() {
               <Titulo tono="tinta" />
             </div>
 
-            {/* ── El sobre, en el borde inferior. La hoja va entre la solapa
-                (atrás) y el cuerpo (adelante), y sale por la boca. */}
+            {/* ── El sobre, en el borde inferior. Las notas van entre la
+                solapa (atrás) y el cuerpo (adelante), y salen por la boca;
+                la segunda va después en el DOM: al salir se apila encima. */}
             <div
               data-carta-sobre
               className="absolute bottom-0 left-1/2 z-20 h-[36svh] w-[min(46rem,54vw)] -translate-x-1/2"
@@ -236,7 +126,8 @@ export function CartaAbierta() {
                     "color-mix(in srgb, var(--color-azul-claro) 82%, var(--color-azul-principal))",
                 }}
               />
-              <Hoja live />
+              <LaPregunta live />
+              <LaPostura live />
               <div
                 aria-hidden="true"
                 className="bg-azul-claro bg-grain-light border-azul-principal/20 absolute inset-0 z-20 rounded-t-md border-t shadow-[0_-18px_50px_-24px_rgb(0_0_0/0.6)]"
@@ -247,59 +138,14 @@ export function CartaAbierta() {
               </div>
             </div>
           </>
-        ) : null}
-
-        {/* ── Contenido en flujo (estático) / actores del escenario (live). */}
-        <div
-          className={
-            live
-              ? "contents"
-              : "relative z-10 mx-auto max-w-screen-xl px-8 pt-28 pb-24"
-          }
-        >
-          {!live && <Titulo tono="luz" />}
-          {!live && <Hoja live={false} />}
-
-          <ul
-            data-carta-fichas
-            className={`grid gap-6 ${
-              live
-                ? "absolute inset-0 z-10 mx-auto max-w-[62rem] grid-cols-2 content-center px-8"
-                : "mt-16 md:grid-cols-2"
-            }`}
-          >
-            {FUNDAMENTOS.map((f) => (
-              <li
-                key={f.titulo}
-                data-ficha
-                className="bg-grain-light text-azul-principal relative rounded-lg bg-white p-7 shadow-[0_24px_50px_-28px_rgb(0_0_0/0.55)]"
-              >
-                {/* Tres pesos, de mayor a menor: nombre del concepto,
-                    definición de un renglón y desarrollo. */}
-                <div className="flex items-center gap-5">
-                  <FiguraConstelacion id={f.figura} className="w-14 shrink-0" />
-                  <h3 className="font-display text-[1.2rem] leading-[1.2] font-bold tracking-[-0.01em] text-balance">
-                    {f.titulo}
-                  </h3>
-                </div>
-                <div
-                  data-ficha-texto
-                  className="grid"
-                  style={{ gridTemplateRows: "1fr" }}
-                >
-                  <div className="min-h-0 overflow-hidden">
-                    <p className="font-display mt-5 text-[1.02rem] leading-[1.4] font-semibold">
-                      {f.definicion}
-                    </p>
-                    <p className="text-gris-texto mt-2.5 text-[0.88rem] leading-[1.65]">
-                      {f.texto}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        ) : (
+          /* ── Contenido en flujo (estático): título y las dos notas. */
+          <div className="relative z-10 mx-auto max-w-screen-xl px-8 pt-28 pb-24">
+            <Titulo tono="luz" />
+            <LaPregunta live={false} />
+            <LaPostura live={false} />
+          </div>
+        )}
       </div>
     </section>
   );
