@@ -55,10 +55,15 @@ export function AreasQueHacemos() {
     "font-sans text-[0.78rem] font-medium tracking-[0.22em] text-gris-texto uppercase";
 
   return (
+    // z-30: «Cómo trabajamos» (z-20, por su relevo con el faro) termina con
+    // la pila de cards trabada mientras su banda de aliados sube por encima,
+    // y esta sección viene pegada detrás de la banda: tiene que pintar por
+    // encima de esa pila para taparla al subir, y para eso es `relative` y
+    // le gana en z. El fondo blanco es el que tapa.
     <section
       id="areas"
       data-indice="Áreas"
-      className="text-azul-principal scroll-mt-28 bg-white"
+      className="text-azul-principal relative z-30 scroll-mt-28 bg-white"
     >
       <div className="mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
         {/* El titular y la bajada salieron a pedido del owner (2026-09-09): la
