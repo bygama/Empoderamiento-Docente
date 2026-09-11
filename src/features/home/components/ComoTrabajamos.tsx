@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
-import { ArrowRight } from "@/components/ui/icons";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { PASOS } from "@/features/home/data";
 import { crearMetodo } from "./como-trabajamos/coreografia-metodo";
@@ -70,25 +68,10 @@ export function ComoTrabajamos() {
             </div>
           </div>
 
-          {/* ── CTA · banda propia, centrada → nunca toca el contenido ─────
-              Lleva a Quiénes somos: es la única página del sitio que la home
-              no enlazaba (Gastón, 2026-09-09); antes iba a Qué hacemos. */}
-          <div className="relative z-30 flex shrink-0 justify-center px-5 pt-2 pb-10 md:pb-12">
-            <Link
-              href="/quienes-somos"
-              className="group focus-visible:outline-naranja-accion inline-flex items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4"
-            >
-              <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
-                <ArrowRight
-                  size={17}
-                  className="transition-transform duration-300 group-hover:translate-x-0.5"
-                />
-              </span>
-              <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.9rem] font-medium tracking-wide transition-colors duration-500">
-                Mirá quiénes somos
-              </span>
-            </Link>
-          </div>
+          {/* Sin salida propia: es un tramo del recorrido, y termina en
+              «Evaluamos» para pasar limpio a las Áreas. El botón a Quiénes
+              somos que había acá vive ahora en el panel «¿Quiénes somos?»
+              (Gastón, 2026-09-11). */}
         </div>
       </div>
     </section>

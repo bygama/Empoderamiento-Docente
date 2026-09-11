@@ -60,8 +60,10 @@ export function HeroCopy() {
           data-hero-actions
           className="mt-8 flex flex-wrap items-center justify-center gap-4"
         >
-          <ButtonPrimary href="/contacto">Contactanos</ButtonPrimary>
+          {/* La acción principal al final del recorrido del ojo, y del lado
+              en que el navbar tiene Contacto (Gastón, 2026-09-11). */}
           <ButtonSecondary href="/que-hacemos">Qué hacemos</ButtonSecondary>
+          <ButtonPrimary href="/contacto">Contactanos</ButtonPrimary>
         </div>
       </div>
     </div>
