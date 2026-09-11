@@ -6,7 +6,6 @@ import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ALTO_SVH } from "./niveles-escala/niveles-escena";
 import { crearNiveles } from "./niveles-escala/coreografia-niveles";
-import { LazoViajero } from "./niveles-escala/LazoViajero";
 import { NivelCard } from "./niveles-escala/NivelCard";
 
 /**
@@ -36,16 +35,15 @@ import { NivelCard } from "./niveles-escala/NivelCard";
  * scroll de más: la víbora ya está entrando mientras se lee.
  *
  * La timeline arranca ENTRADA_SVH de scroll ANTES de que el escenario se
- * clave, así el lazo ya viene entrando cuando la sección se traba (Mateo,
- * 2026-09-05). Las cards NO se corrieron: siguen arrancando con el
- * escenario ya clavado — por eso todo lo que no es el lazo va desplazado
- * ENTRADA unidades.
+ * clave (Mateo, 2026-09-05); las cards arrancan con el escenario ya
+ * clavado, por eso van desplazadas ENTRADA unidades.
  *
  * Sin motion / touch / pantalla chica: no clava; grilla legible + titular.
  * `live` arranca en false (coincide con SSR).
  *
  * Piezas: geometría en `niveles-escala/niveles-escena.ts`, ritmo y timeline
- * en `coreografia-niveles.ts` (+ `toggle-nivel.ts`), lazo en `LazoViajero`,
+ * en `coreografia-niveles.ts` (+ `toggle-nivel.ts`), la víbora en la capa
+ * fija de la página (`vibora/`, compartida con Proyectos),
  * cards en `NivelCard`.
  */
 // El final en verde, el acento de los conceptos: la frase grande sobre el
@@ -103,8 +101,10 @@ export function NivelesEscala() {
       // Mismo gris que trae la página desde la torre: con fondo blanco, la
       // cola de Qué hacemos alternaba gris / blanco / blanco / gris y cada
       // cambio era un corte seco (Facundo, 2026-09-03). Las cards son
-      // blancas y sobre el gris se leen mejor como piezas.
-      className={live ? "bg-gris-fondo relative" : "bg-gris-fondo"}
+      // blancas y sobre el gris se leen mejor como piezas. En vivo el gris
+      // lo pone el body: la zona va TRANSPARENTE para que la víbora, que
+      // vive en una capa fija por debajo, se vea.
+      className={live ? "relative" : "bg-gris-fondo"}
       style={live ? { height: `${ALTO_SVH}svh` } : undefined}
       aria-label="Niveles en los que intervenimos"
     >
@@ -115,15 +115,13 @@ export function NivelesEscala() {
           (live ? "sticky top-0 h-[100svh]" : "relative flex min-h-[70svh] flex-col py-24")
         }
       >
-        {/* Grilla de puntos §6: textura de base para que el escenario no
-            quede pelado entre las cards. */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,color-mix(in_srgb,var(--color-azul-principal)_22%,transparent)_1.1px,transparent_1.6px)] [background-size:22px_22px]"
-        />
-
-        {/* Lazo viajero + cápsula perseguidora (solo live, detrás de las cards). */}
-        {live && <LazoViajero />}
+        {/* Grilla de puntos §6 (en vivo la pone la capa fija). */}
+        {!live && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,color-mix(in_srgb,var(--color-azul-principal)_22%,transparent)_1.1px,transparent_1.6px)] [background-size:22px_22px]"
+          />
+        )}
 
         {/* Encabezado chico (en vivo aparece cuando cae la primera card y
             se queda a la vista toda la sección). */}
@@ -135,10 +133,9 @@ export function NivelesEscala() {
               : "mx-auto w-full max-w-screen-xl px-5 md:px-10"
           }
         >
-          {/* Acá NO se repite «Del aula al sistema educativo»: la apertura ya
-              lo dijo en grande, y en el rincón lo que hace falta es el nombre
-              de la sección (Gastón, 2026-09-10). En el fallback, sin apertura,
-              la frase va debajo del nombre. */}
+          {/* El rincón dice el nombre de la sección, no repite la frase que
+              la apertura ya dijo en grande (Gastón, 2026-09-10). En el
+              fallback, sin apertura, la frase va debajo del nombre. */}
           <h2
             className="font-display text-azul-principal max-w-[16ch] font-bold tracking-[-0.02em] text-balance"
             style={{ fontSize: "clamp(1.4rem, 1rem + 1.2vw, 1.9rem)", lineHeight: 1.1 }}

@@ -13,7 +13,6 @@ import {
   ZOOM_GIRO,
   ritmo,
 } from "./proyectos-escena";
-import { animarVibora } from "./coreografia-vibora";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -129,8 +128,6 @@ export function crearFichas(zone: HTMLElement, stage: HTMLElement, e: Escena) {
     tl.to(A.columna ? [...A.textos, A.columna] : A.textos, { autoAlpha: 0, y: -18, ease: "power2.in", duration: 0.3 }, giro);
     if (B.columna) tl.to(B.columna, { autoAlpha: 1, y: 0, ease: "power2.out", duration: 0.4 }, giro + GIRO * 0.8);
     tl.to(B.textos, { autoAlpha: 1, y: 0, ease: "power2.out", duration: 0.3 }, inicio2 - 0.3);
-
-    animarVibora(tl, stage, r);
 
     const caer = (lado: typeof A, desde: number, arranque: number, capInicio: readonly number[]) => {
       lado.fichas.forEach((ficha, i) => {

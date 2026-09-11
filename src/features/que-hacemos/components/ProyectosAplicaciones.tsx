@@ -54,8 +54,10 @@ export function ProyectosAplicaciones() {
       id="proyectos"
       data-indice="Proyectos"
       className={
-        "bg-gris-fondo text-azul-principal " +
-        (live ? "relative" : "scroll-mt-28")
+        // En vivo va transparente: el gris lo pone el body y la víbora, en
+        // una capa fija por debajo, tiene que verse.
+        "text-azul-principal " +
+        (live ? "relative" : "bg-gris-fondo scroll-mt-28")
       }
       aria-label="Proyectos y aplicaciones"
     >

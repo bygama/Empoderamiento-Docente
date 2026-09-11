@@ -3,6 +3,7 @@ import { QueHacemosHero } from "@/features/que-hacemos/components/QueHacemosHero
 import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemosHeroFaro";
 import { AreasQueHacemos } from "@/features/que-hacemos/components/AreasQueHacemos";
 import { NivelesEscala } from "@/features/que-hacemos/components/NivelesEscala";
+import { ViboraQueHacemos } from "@/features/que-hacemos/components/vibora/ViboraQueHacemos";
 import { MiradaPasos } from "@/features/que-hacemos/components/MiradaPasos";
 import { ProyectosAplicaciones } from "@/features/que-hacemos/components/ProyectosAplicaciones";
 import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHacemos";
@@ -66,6 +67,9 @@ export default function QueHacemosPage() {
       </div>
       <MiradaPasos />
       <AreasQueHacemos />
+      {/* La víbora: una sola, en una capa fija por debajo de Niveles y
+          Proyectos, que van transparentes en vivo. */}
+      <ViboraQueHacemos />
       <NivelesEscala />
       <ProyectosAplicaciones />
       <CierreQueHacemos />
