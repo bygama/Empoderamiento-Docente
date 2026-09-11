@@ -1,12 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  aspectoBarra,
-  proyectar,
-  proyectarLente,
-  RADIO_CRISTAL,
-  RADIO_GALERIA,
-} from "./linterna-geometria";
+import { crearGirador } from "./linterna-giro";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -95,9 +89,6 @@ const RESPLANDOR_OFF = "0 0 0px rgba(169, 197, 232, 0)";
 export function crearAscenso({ zona, hoja }: Escena) {
   const q = gsap.utils.selector(hoja);
   const linterna = q<HTMLElement>("[data-cierre-linterna]")[0];
-  const parantes = q<SVGLineElement>("[data-linterna-parante]");
-  const montantes = q<SVGLineElement>("[data-linterna-montante]");
-  const lente = q<SVGRectElement>("[data-linterna-lente]")[0];
   const vidrio = q<SVGGElement>("[data-linterna-vidrio]")[0];
   const nucleo = q<SVGCircleElement>("[data-linterna-nucleo]")[0];
   const halo = q<SVGCircleElement>("[data-linterna-halo]")[0];
@@ -109,32 +100,9 @@ export function crearAscenso({ zona, hoja }: Escena) {
   const capaNubes = q<HTMLElement>("[data-cierre-nubes]")[0];
   const nubes = q<HTMLElement>("[data-cierre-nube]");
 
-  // ── El giro: proyectar las barras y la óptica para el θ actual.
-  const giro = { theta: 360 };
-  const girar = () => {
-    parantes.forEach((l) => {
-      const phi = Number(l.dataset.linternaParante);
-      const { x, frente } = proyectar(phi, giro.theta, RADIO_CRISTAL);
-      const { opacity, grosor } = aspectoBarra(frente, x, RADIO_CRISTAL);
-      l.setAttribute("x1", String(x));
-      l.setAttribute("x2", String(x));
-      l.setAttribute("stroke-opacity", String(opacity));
-      l.setAttribute("stroke-width", String(grosor));
-    });
-    montantes.forEach((l) => {
-      const phi = Number(l.dataset.linternaMontante);
-      const { x, frente } = proyectar(phi, giro.theta, RADIO_GALERIA);
-      const { opacity, grosor } = aspectoBarra(frente, x, RADIO_GALERIA);
-      l.setAttribute("x1", String(x));
-      l.setAttribute("x2", String(x));
-      l.setAttribute("stroke-opacity", String(0.5 * opacity));
-      l.setAttribute("stroke-width", String(0.55 + grosor * 0.35));
-    });
-    const optica = proyectarLente(giro.theta);
-    lente.setAttribute("x", String(optica.x));
-    lente.setAttribute("width", String(optica.ancho));
-    lente.setAttribute("opacity", String(optica.opacity));
-  };
+  // ── El giro: proyectar las barras y la óptica para el θ actual
+  //    (linterna-giro.ts, compartido con el hero).
+  const { giro, girar } = crearGirador(hoja, 360);
 
   const altoOculto = () => linterna.offsetHeight + AIRE_OCULTO;
   /** Franja de cielo reservada bajo el piso para la solapa del footer (pb). */
