@@ -62,6 +62,8 @@ export type Capitulo = {
   id: string;
   titulo: string;
   bajada: string;
+  /** Tramo literal de la bajada que va en negrita: la idea que ordena. */
+  resaltado?: string;
   fichas: readonly Ficha[];
 };
 
@@ -70,6 +72,8 @@ export const PROYECTOS_INTRO = {
   titulo: "Así se ve en la práctica.",
   /** El arranque del título va en azul medio (`TituloPractica`). */
   resaltado: "Así se ve",
+  /** Y en la volanta del rincón, la palabra que enlaza con la práctica. */
+  volantaResaltada: "aplicaciones",
 } as const;
 
 export const CAPITULOS: readonly Capitulo[] = [
@@ -77,6 +81,7 @@ export const CAPITULOS: readonly Capitulo[] = [
     id: "desarrollo-profesional",
     titulo: "Desarrollo profesional y acompañamiento",
     bajada: "Procesos sostenidos que dejan capacidad instalada en los equipos docentes.",
+    resaltado: "capacidad instalada",
     fichas: [
       {
         id: "aprender-matematica",
@@ -127,6 +132,7 @@ export const CAPITULOS: readonly Capitulo[] = [
     id: "curriculo-evaluacion-materiales",
     titulo: "Currículo, evaluación y materiales",
     bajada: "Qué se enseña, cómo se evalúa y con qué materiales, con investigación detrás.",
+    resaltado: "con investigación detrás",
     fichas: [
       {
         id: "exani",
@@ -168,6 +174,7 @@ export const CAPITULOS: readonly Capitulo[] = [
     titulo: "Y a veces, todo junto.",
     bajada:
       "Cuando un mismo proceso articula currículo, evaluación, materiales y desarrollo profesional.",
+    resaltado: "un mismo proceso",
     fichas: [
       {
         id: "techint",

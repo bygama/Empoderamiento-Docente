@@ -1,4 +1,5 @@
 import type { Capitulo } from "@/features/que-hacemos/proyectos";
+import { Bajada } from "./Bajada";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -44,9 +45,10 @@ export function ColumnaCapitulo({
             >
               {cap.titulo}
             </h3>
-            <p className="text-gris-texto mt-5 max-w-[34ch] font-sans text-[1.05rem] leading-relaxed">
-              {cap.bajada}
-            </p>
+            <Bajada
+              cap={cap}
+              className="text-gris-texto mt-5 max-w-[34ch] font-sans text-[1.05rem] leading-relaxed"
+            />
           </div>
         ))}
       </div>
