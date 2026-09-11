@@ -204,7 +204,14 @@ export function crearHistoria({
   gsap.set(lineas, { autoAlpha: 0 });
   gsap.set(chispa, { autoAlpha: 0, scale: 0.4, transformOrigin: "50% 50%" });
   gsap.set(q("[data-riel]"), { autoAlpha: 0 });
-  gsap.set(verbos, { yPercent: 110 });
+  // `y: 0` explícito, y no es redundante: si la coreografía se monta dos
+  // veces sobre el mismo DOM (StrictMode en desarrollo, o un cambio de
+  // `live`), el revert deja el transform en píxeles y GSAP, al releer el
+  // elemento, lo guarda como `y: 66px` ADEMÁS del `yPercent`. Cada verbo
+  // quedaba corrido un alto entero: los que salían a -110% volvían a 0 y se
+  // pisaban, y el último entraba a 0% pero quedaba escondido (el usuario,
+  // 2026-09-11: «se pegan»). Con `y: 0` la caché arranca limpia.
+  gsap.set(verbos, { yPercent: 110, y: 0 });
   gsap.set(frases, { autoAlpha: 0 });
   gsap.set(rellenos, { scaleX: 0 });
 
