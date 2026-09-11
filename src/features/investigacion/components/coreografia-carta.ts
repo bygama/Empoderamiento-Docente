@@ -1,41 +1,34 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { DISPERSION, FIGURAS, PUNTOS } from "./constelacion";
-import { RADIO_ESTAMPA } from "./FiguraConstelacion";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 /**
- * Coreografía de «Nacimos de una pregunta» — la carta abierta.
+ * Coreografía de «Nacimos de una pregunta» — las notas del sobre.
  *
- * Un escenario pinneado de una pantalla, en cuatro beats:
+ * Un escenario pinneado de una pantalla, en tres beats:
  *
  * 1. EL WIPE. La hoja llega gris como el marco del hero, con un semicírculo
  *    navy asomando del borde inferior (la forma plana azul del manual §6) y
  *    el título en tinta arriba. Al pinnearse, el círculo crece hasta cubrir
  *    la pantalla: es la noche que llega desde abajo. El título tiene dos
  *    copias superpuestas —tinta navy fuera del campo, blanca adentro—, así
- *    el borde del círculo lo invierte a su paso sin ningún fade.
- * 2. LA CARTA SALE DEL SOBRE. El sobre sube al borde inferior y la hoja
- *    emerge de su boca, lineal con el scroll, hasta el centro de lectura,
- *    tapando el título. Las cuatro fichas esperan en las esquinas,
- *    inclinadas, cerradas (solo figura + nombre), con una deriva leve.
- * 3. LA CARTA VUELVE. Sube alto —hasta que el pie se despega del sobre y
- *    se lee entera—, el sobre se hunde debajo suyo, y recién ahí la carta
- *    BAJA al centro del campo vacío y se queda quieta un respiro. No se va
- *    de una: se deja leer sin nada encima.
- * 4. LA CARTA SE VA POR ARRIBA y las fichas viajan de las esquinas a una
- *    grilla 2×2 en el centro y se enderezan.
- * 5. LAS FICHAS SE ABREN: la definición se despliega y la figura de cada
- *    una se forma (los puntos caen en su lugar, las aristas se trazan).
- *    Respiro y el pin suelta.
+ *    el borde del círculo lo invierte a su paso sin ningún fade. El sobre
+ *    sube al borde inferior y ahí se queda: es el ancla de la escena.
+ * 2. SALE LA PRIMERA NOTA (la pregunta), lineal con el scroll, hasta que su
+ *    pie se despega de la boca del sobre y se lee entera, con un giro leve.
+ *    Respiro para leerla.
+ * 3. SALE LA SEGUNDA (la postura) y se apila encima con el giro contrario:
+ *    la primera asoma por los bordes —ya se leyó, pero sigue ahí—. Respiro
+ *    y el pin suelta con las dos notas apiladas sobre el sobre.
  *
- * Todo scrubbeado, con fromTo explícitos y valores en función (se remiden
- * en cada refresh). Patrón: igual que coreografia-hero.ts y
- * coreografia-cierre.ts, acá solo se construye la timeline; el componente
- * es dueño del gsap.context y del cleanup.
+ * Un solo gesto, repetido, y nada más en pantalla: título atrás, sobre
+ * abajo, notas cortas (decisión 2026-09-11: menos es más). Todo scrubbeado,
+ * con fromTo explícitos y valores en función (se remiden en cada refresh).
+ * Patrón: acá solo se construye la timeline; el componente es dueño del
+ * gsap.context y del cleanup.
  */
 
 type Escena = {
@@ -48,68 +41,35 @@ type Escena = {
 /** Radio del semicírculo inicial, como fracción de la altura del escenario. */
 const RADIO_INICIAL = 0.26;
 
-/** Tamaño de los puntos de una figura desarmada (factor sobre el radio final). */
-const SUELTO = 0.45;
-
-/** Las fichas en reposo: esquinas del escenario, más chicas e inclinadas. */
-const ESQUINA = {
-  margenX: 0.045,
-  margenArriba: 0.1,
-  margenAbajo: 0.09,
-  escala: 0.74,
-  giros: [-5, 4, 3.5, -4],
-  /** Deriva vertical mientras la carta se lee (parallax leve, scrubbeado). */
-  deriva: -18,
+/** Las notas apiladas: giro y corrimiento lateral de cada una (px). */
+const PILA = {
+  giros: [-2.2, 2.4],
+  corrimientos: [-12, 14],
 } as const;
 
 /** Tiempos (unidades del timeline). 1 unidad = 1000px de scroll. */
 const T = {
   wipe: { desde: 0, hasta: 0.7 },
   sobreEntra: { desde: 0.45, hasta: 0.95 },
-  fichasEntran: { desde: 0.6, cada: 0.08 },
-  cartaSube: { desde: 1.0, hasta: 2.05 },
-  tituloSeVa: { desde: 1.5, hasta: 1.85 },
-  // El sobre se hunde mientras la carta se queda arriba: la carta es hija
-  // del sobre, así que compensa el hundimiento en la misma ventana y con
-  // el mismo ease para no moverse ni un píxel en pantalla.
-  sobreSale: { desde: 2.05, hasta: 2.75 },
-  // Ahora sí: campo vacío y la carta baja al centro, entera.
-  cartaVuelve: { desde: 2.75, hasta: 3.35 },
-  // El respiro que pidió la escena: quieta, sin nada encima, para leerla.
-  cartaSeQueda: { hasta: 3.95 },
-  // Y recién entonces se va, LINEAL y del todo ANTES de que las fichas
-  // viajen: nunca se pisan.
-  cartaSale: { desde: 3.95, hasta: 4.85 },
-  fichasViajan: { desde: 4.85, dura: 0.8, cada: 0.1 },
-  fichasAbren: { desde: 5.6, dura: 0.35, cada: 0.06 },
-  figurasForman: { desde: 5.65, dura: 0.5, cada: 0.06 },
-  fin: 6.45,
+  notas: [
+    { desde: 1.0, hasta: 1.8 },
+    { desde: 2.3, hasta: 3.1 },
+  ],
+  /** El título se apaga cuando la primera nota lo alcanza: ya se leyó
+   *  durante el wipe, y una nota que lo tapa a medias se ve rota. */
+  tituloSeVa: { desde: 1.35, hasta: 1.7 },
+  fin: 3.7,
 } as const;
 
 /** Alto del recorrido pinneado en px de scroll. */
-export const RECORRIDO_CARTA = 6450;
-
-/** Largo de la arista j de una figura (para el trazado con dash). */
-function largoArista(figura: (typeof FIGURAS)[number], j: number) {
-  const [a, b] = figura.aristas[j];
-  return Math.hypot(
-    figura.puntos[b][0] - figura.puntos[a][0],
-    figura.puntos[b][1] - figura.puntos[a][1],
-  );
-}
+export const RECORRIDO_CARTA = 3700;
 
 export function crearCarta({ zona, hoja }: Escena) {
   const q = gsap.utils.selector(hoja);
   const campo = q<HTMLElement>("[data-carta-campo]")[0];
   const tituloLuz = q<HTMLElement>("[data-carta-titulo-luz]")[0];
   const sobre = q<HTMLElement>("[data-carta-sobre]")[0];
-  const carta = q<HTMLElement>("[data-carta-hoja]")[0];
-  const grilla = q<HTMLElement>("[data-carta-fichas]")[0];
-  const fichas = q<HTMLElement>("[data-ficha]");
-  const textos = q<HTMLElement>("[data-ficha-texto]");
-  // Las fichas viajan con scrub SOLO cuando la escena está viva: el hint
-  // viene con la coreografía y se va con su contexto.
-  gsap.set(fichas, { willChange: "transform" });
+  const notas = q<HTMLElement>("[data-carta-nota]");
 
   const alto = () => hoja.clientHeight;
   const ancho = () => hoja.clientWidth;
@@ -117,98 +77,27 @@ export function crearCarta({ zona, hoja }: Escena) {
   const radioInicial = () => alto() * RADIO_INICIAL;
   const radioTotal = () => Math.hypot(ancho() / 2, alto()) + 4;
 
-  // ── Geometría de la carta, sin transforms (offsets de layout): el sobre
-  //    es hijo posicionado de la hoja y la carta, hija posicionada del sobre.
-  const topCarta = () => sobre.offsetTop + carta.offsetTop;
-  /** El sobre se hunde bajo el piso con solapa y todo (la solapa asoma
-   *  9rem por arriba de su caja). */
+  // ── Geometría, sin transforms (offsets de layout): el sobre es hijo
+  //    posicionado de la hoja y cada nota, hija posicionada del sobre.
+  /** El sobre espera bajo el piso con solapa y todo (la solapa asoma 9rem
+   *  por arriba de su caja). */
   const hundidoSobre = () => sobre.offsetHeight + 200;
-  /** Arriba del todo: la carta sube hasta que su pie se despega del borde
-   *  superior del sobre y se puede leer entera. Si la carta es más alta
-   *  que ese hueco, el techo manda y el pie queda tapado hasta que el
-   *  sobre se hunda. */
-  const yAlto = () =>
-    Math.max(
-      alto() * 0.03 - topCarta(),
-      alto() - sobre.offsetHeight - 12 - carta.offsetHeight - topCarta(),
+  /** Arriba: la nota sube hasta que su pie se despega de la boca del sobre
+   *  y se lee entera. Si es más alta que ese hueco, el techo manda. */
+  const yArriba = (nota: HTMLElement) => () => {
+    const top = sobre.offsetTop + nota.offsetTop;
+    return Math.max(
+      alto() * 0.03 - top,
+      alto() - sobre.offsetHeight - 12 - nota.offsetHeight - top,
     );
-  /** La vuelta: centrada en el escenario, ya sin sobre que le tape el pie. */
-  const yEntera = () =>
-    Math.max((alto() - carta.offsetHeight) / 2, alto() * 0.05) - topCarta();
-  /** La carta es hija del sobre: si el sobre baja hundidoSobre px, la
-   *  carta baja con él. Para quedarse donde está tiene que restar lo mismo
-   *  (es lo que ya hace ySalida). */
-  const conSobreHundido = (y: () => number) => () => y() - hundidoSobre();
-  const ySalida = () => -(topCarta() + carta.offsetHeight + 40 + hundidoSobre());
-
-  // ── Geometría de las fichas: de su celda en la grilla a su esquina. La
-  //    caja escalada queda centrada en la caja de layout, así que el borde
-  //    visible se corrige por (1 − escala) / 2.
-  const layoutFicha = (li: HTMLElement) => ({
-    left: grilla.offsetLeft + li.offsetLeft,
-    top: grilla.offsetTop + li.offsetTop,
-    w: li.offsetWidth,
-    h: li.offsetHeight,
-  });
-  const esquinaX = (i: number) => {
-    const { left, w } = layoutFicha(fichas[i]);
-    const margen = ancho() * ESQUINA.margenX;
-    const sangria = (w * (1 - ESQUINA.escala)) / 2;
-    const derecha = i % 2 === 1;
-    const visibleLeft = derecha ? ancho() - margen - w * ESQUINA.escala : margen;
-    return visibleLeft - sangria - left;
   };
-  const esquinaY = (i: number) => {
-    const { top, h } = layoutFicha(fichas[i]);
-    const sangria = (h * (1 - ESQUINA.escala)) / 2;
-    const abajo = i >= 2;
-    const visibleTop = abajo
-      ? alto() - alto() * ESQUINA.margenAbajo - h * ESQUINA.escala
-      : alto() * ESQUINA.margenArriba;
-    return visibleTop - sangria - top;
-  };
-
-  // ── Las figuras de cada ficha: puntos y aristas por estampa.
-  const estampas = fichas.map((li) => {
-    const svg = li.querySelector<SVGSVGElement>("[data-figura]")!;
-    const figura = FIGURAS.find((f) => f.id === svg.dataset.figura) ?? FIGURAS[0];
-    return {
-      figura,
-      puntos: Array.from(svg.querySelectorAll<SVGCircleElement>("[data-figura-punto]")),
-      aristas: Array.from(svg.querySelectorAll<SVGLineElement>("[data-figura-arista]")),
-    };
-  });
 
   // ── Estado pre-paint: semicírculo asomando, título en tinta, sobre bajo
-  //    el piso, carta adentro, fichas en sus esquinas y cerradas, figuras
-  //    desarmadas.
+  //    el piso, notas adentro y derechas.
   gsap.set(campo, { clipPath: circulo(radioInicial()) });
   gsap.set(tituloLuz, { autoAlpha: 1 });
   gsap.set(sobre, { y: hundidoSobre });
-  gsap.set(carta, { y: 0 });
-  fichas.forEach((li, i) => {
-    gsap.set(li, {
-      x: esquinaX(i),
-      y: esquinaY(i) + 30,
-      rotation: ESQUINA.giros[i],
-      scale: ESQUINA.escala,
-      autoAlpha: 0,
-      transformOrigin: "50% 50%",
-    });
-  });
-  gsap.set(textos, { gridTemplateRows: "0fr" });
-  estampas.forEach(({ figura, puntos, aristas }) => {
-    // Desarmada: puntos sueltos y chicos (datos antes de formar figura).
-    puntos.forEach((c, i) => {
-      gsap.set(c, {
-        attr: { cx: DISPERSION[i][0], cy: DISPERSION[i][1], r: PUNTOS[i].r * RADIO_ESTAMPA * SUELTO },
-      });
-    });
-    aristas.forEach((l, j) => {
-      const largo = largoArista(figura, j);
-      gsap.set(l, { strokeDasharray: largo, strokeDashoffset: largo });
-    });
-  });
+  gsap.set(notas, { x: 0, y: 0, rotation: 0, transformOrigin: "50% 100%" });
 
   const sinRender = { immediateRender: false } as const;
 
@@ -236,7 +125,8 @@ export function crearCarta({ zona, hoja }: Escena) {
     },
   });
 
-  // ── 1. El wipe: la noche llega desde abajo y el título se invierte a su paso.
+  // ── 1. El wipe: la noche llega desde abajo y el título se invierte a su
+  //    paso; el sobre sube al borde inferior y se queda.
   tl.fromTo(
     campo,
     { clipPath: () => circulo(radioInicial()) },
@@ -248,8 +138,6 @@ export function crearCarta({ zona, hoja }: Escena) {
     },
     T.wipe.desde,
   );
-
-  // El sobre sube al borde inferior.
   tl.fromTo(
     sobre,
     { y: hundidoSobre },
@@ -262,138 +150,31 @@ export function crearCarta({ zona, hoja }: Escena) {
     T.sobreEntra.desde,
   );
 
-  // Las fichas aparecen en sus esquinas, subiendo apenas.
-  fichas.forEach((li, i) => {
-    tl.fromTo(
-      li,
-      { y: () => esquinaY(i) + 30, autoAlpha: 0 },
-      { y: () => esquinaY(i), autoAlpha: 1, duration: 0.35, ease: "power2.out", ...sinRender },
-      T.fichasEntran.desde + i * T.fichasEntran.cada,
-    );
-  });
-
-  // ── 2. La carta sale del sobre hasta el centro de lectura (lineal: es el
-  //    scroll el que la saca) y tapa el título, que se apaga a su paso.
-  //    Las fichas derivan un poco mientras tanto.
   tl.fromTo(
-    carta,
-    { y: 0 },
-    { y: yAlto, duration: T.cartaSube.hasta - T.cartaSube.desde, ...sinRender },
-    T.cartaSube.desde,
-  );
-  tl.to(
     tituloLuz,
-    { autoAlpha: 0, duration: T.tituloSeVa.hasta - T.tituloSeVa.desde },
+    { autoAlpha: 1 },
+    { autoAlpha: 0, duration: T.tituloSeVa.hasta - T.tituloSeVa.desde, ...sinRender },
     T.tituloSeVa.desde,
   );
-  fichas.forEach((li, i) => {
+
+  // ── 2 y 3. Cada nota sale del sobre (lineal: es el scroll el que la saca)
+  //    y se apila con su giro. La segunda va encima de la primera en el DOM,
+  //    así al salir la tapa y deja asomar sus bordes.
+  notas.forEach((nota, i) => {
+    const ventana = T.notas[i];
+    if (!ventana) return;
     tl.fromTo(
-      li,
-      { y: () => esquinaY(i) },
+      nota,
+      { x: 0, y: 0, rotation: 0 },
       {
-        y: () => esquinaY(i) + ESQUINA.deriva,
-        duration: T.fichasViajan.desde - T.cartaSube.desde,
+        x: PILA.corrimientos[i],
+        y: yArriba(nota),
+        rotation: PILA.giros[i],
+        duration: ventana.hasta - ventana.desde,
         ...sinRender,
       },
-      T.cartaSube.desde,
+      ventana.desde,
     );
-  });
-
-  // ── 3. El sobre se hunde bajo la carta, que se queda clavada arriba; y
-  //    con el campo vacío la carta baja al centro y descansa.
-  tl.fromTo(
-    sobre,
-    { y: 0 },
-    { y: hundidoSobre, duration: T.sobreSale.hasta - T.sobreSale.desde, ease: "power1.in", ...sinRender },
-    T.sobreSale.desde,
-  );
-  // Misma ventana y mismo ease que el sobre: se anulan y la carta no se mueve.
-  tl.fromTo(
-    carta,
-    { y: yAlto },
-    {
-      y: conSobreHundido(yAlto),
-      duration: T.sobreSale.hasta - T.sobreSale.desde,
-      ease: "power1.in",
-      ...sinRender,
-    },
-    T.sobreSale.desde,
-  );
-  tl.fromTo(
-    carta,
-    { y: conSobreHundido(yAlto) },
-    {
-      y: conSobreHundido(yEntera),
-      duration: T.cartaVuelve.hasta - T.cartaVuelve.desde,
-      ease: "power2.out",
-      ...sinRender,
-    },
-    T.cartaVuelve.desde,
-  );
-
-  // ── 4. La carta se va por arriba (después del respiro) y las fichas
-  //    viajan de las esquinas a la grilla.
-  tl.fromTo(
-    carta,
-    { y: conSobreHundido(yEntera) },
-    { y: ySalida, duration: T.cartaSale.hasta - T.cartaSale.desde, ...sinRender },
-    T.cartaSale.desde,
-  );
-  fichas.forEach((li, i) => {
-    tl.fromTo(
-      li,
-      {
-        x: () => esquinaX(i),
-        y: () => esquinaY(i) + ESQUINA.deriva,
-        rotation: ESQUINA.giros[i],
-        scale: ESQUINA.escala,
-      },
-      {
-        x: 0,
-        y: 0,
-        rotation: 0,
-        scale: 1,
-        duration: T.fichasViajan.dura,
-        ease: "power2.inOut",
-        ...sinRender,
-      },
-      T.fichasViajan.desde + i * T.fichasViajan.cada,
-    );
-  });
-
-  // ── 5. Las fichas se abren y sus figuras se forman.
-  textos.forEach((texto, i) => {
-    tl.fromTo(
-      texto,
-      { gridTemplateRows: "0fr" },
-      { gridTemplateRows: "1fr", duration: T.fichasAbren.dura, ease: "power2.out", ...sinRender },
-      T.fichasAbren.desde + i * T.fichasAbren.cada,
-    );
-  });
-  estampas.forEach(({ figura, puntos, aristas }, k) => {
-    const inicio = T.figurasForman.desde + k * T.figurasForman.cada;
-    puntos.forEach((c, i) => {
-      tl.fromTo(
-        c,
-        { attr: { cx: DISPERSION[i][0], cy: DISPERSION[i][1], r: PUNTOS[i].r * RADIO_ESTAMPA * SUELTO } },
-        {
-          attr: { cx: figura.puntos[i][0], cy: figura.puntos[i][1], r: PUNTOS[i].r * RADIO_ESTAMPA },
-          duration: T.figurasForman.dura * 0.7,
-          ease: "power3.out",
-          ...sinRender,
-        },
-        inicio + i * 0.012,
-      );
-    });
-    aristas.forEach((l, j) => {
-      const largo = largoArista(figura, j);
-      tl.fromTo(
-        l,
-        { strokeDashoffset: largo },
-        { strokeDashoffset: 0, duration: T.figurasForman.dura * 0.5, ease: "power2.out", ...sinRender },
-        inicio + T.figurasForman.dura * 0.45 + j * 0.02,
-      );
-    });
   });
 
   // Respiro final antes de soltar el pin (fija el largo total del timeline).
