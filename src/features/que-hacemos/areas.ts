@@ -238,48 +238,65 @@ export const AREAS: readonly Area[] = [
 // del PPTX institucional) se sacó (Gastón, 2026-09-09): la idea ya está
 // dicha en Inicio y en Contacto («Cada propuesta empieza con una
 // conversación») y el primer verbo la repite.
+// La bajada («Los seis pasos que sigue cada proyecto…») se sacó el 2026-09-11:
+// con el título trabado arriba de la pila de paneles, los seis verbos ya se
+// ven y la frase no sumaba.
 export const MIRADA_INTRO = {
   titulo: "Cómo trabajamos",
-  texto:
-    "Los seis pasos que sigue cada proyecto, del primer diálogo a la transformación.",
 } as const;
 
+// Cada paso lleva foto desde el 2026-09-11, cuando la sección pasó a paneles
+// apilados con imagen a la derecha. Son las mismas del método (`public/
+// metodo/`) que usa el home, y para los dos verbos sin foto propia, dos del
+// hero que ya tienen ese sentido en `hero-cards.ts`.
 export const MIRADA = [
   {
     verbo: "Escuchar",
     idea: "Toda solución nace de una realidad comprendida",
     texto:
       "Conversamos con la institución o el equipo: necesidades, objetivos, experiencias previas y condiciones reales de implementación.",
+    foto: "/metodo/escuchamos.webp",
+    fotoAlt: "Docentes en conversación durante la etapa de escucha",
   },
   {
     verbo: "Investigar",
     idea: "La práctica también produce conocimiento",
     texto:
       "Estudiamos el problema en su contexto: qué dice la evidencia, qué muestra la experiencia previa y qué hay que comprender antes de diseñar.",
+    foto: "/hero/hero-3.webp",
+    fotoAlt: "Dos integrantes del equipo revisan materiales en una biblioteca",
   },
   {
     verbo: "Diseñar",
     idea: "Cada realidad inspira una solución distinta",
     texto:
       "Definimos la intervención y convocamos las especialidades que hacen falta: currículo, evaluación, materiales o tecnología, según el problema.",
+    foto: "/metodo/disenamos.webp",
+    fotoAlt: "Selección de materiales educativos durante la etapa de diseño",
   },
   {
     verbo: "Acompañar",
     idea: "Vivimos para hacer vivir",
     texto:
       "Llevamos la propuesta al aula con encuentros, talleres, materiales, trabajo con liderazgos y análisis de clases, y estamos mientras sucede.",
+    foto: "/metodo/acompanamos.webp",
+    fotoAlt: "Trabajo situado junto a docentes durante el acompañamiento",
   },
   {
     verbo: "Evaluar",
     idea: "La evidencia orienta cada nuevo paso",
     texto:
       "Observamos evidencias, interpretamos resultados y ajustamos junto con los equipos, con informes que sirven para decidir.",
+    foto: "/metodo/evaluamos.webp",
+    fotoAlt: "Revisión de materiales y avances durante la evaluación",
   },
   {
     verbo: "Transformar",
     idea: "Las transformaciones se construyen de manera sistémica",
     texto:
       "El aprendizaje queda en la institución: criterios, herramientas y decisiones que el equipo sostiene por sí mismo.",
+    foto: "/hero/hero-6.webp",
+    fotoAlt: "Taller con docentes en un aula, con materiales sobre las mesas",
   },
 ] as const;
 
