@@ -24,8 +24,8 @@ import { NivelCard } from "./niveles-escala/NivelCard";
  * En vivo la sección abre con «Del aula al sistema educativo.» EN GRANDE,
  * solo en escena con la víbora entrando, y la frase se achica al rincón
  * cuando cae la primera card (Gastón, 2026-09-10): es la tesis de la
- * sección y merece ser el título; «Niveles en los que intervenimos» pasa
- * a volanta. Misma gramática que abre Proyectos. El cierre de la quinta
+ * sección. En el rincón queda solo «Niveles en los que intervenimos», sin
+ * repetir la frase. Misma gramática que abre Proyectos. El cierre de la quinta
  * es lo último que se ve, y el sticky se suelta con los cinco títulos en
  * escena. Historia de la frase: el remate ("Del aula, / al sistema
  * educativo." en pantalla propia, con las cards cediendo) se sacó
@@ -77,11 +77,22 @@ export function NivelesEscala() {
 
     const run = () => crearNiveles(zone, stage);
 
-    // Los colapsables se miden con la tipografía definitiva.
+    // Los colapsables se miden con la tipografía definitiva. Si el efecto
+    // se limpia antes de que carguen (el doble montaje del modo estricto en
+    // dev), la coreografía NO tiene que crearse igual: quedaban dos
+    // timelines peleando por los mismos elementos y, al volver a subir, los
+    // textos se quedaban a medio fundir (Gastón, 2026-09-11).
     let cleanup: (() => void) | undefined;
-    if (document.fonts?.ready) document.fonts.ready.then(() => (cleanup = run()));
-    else cleanup = run();
-    return () => cleanup?.();
+    let cancelado = false;
+    const arrancar = () => {
+      if (!cancelado) cleanup = run();
+    };
+    if (document.fonts?.ready) document.fonts.ready.then(arrancar);
+    else arrancar();
+    return () => {
+      cancelado = true;
+      cleanup?.();
+    };
   }, [reduced]);
 
   return (
@@ -124,24 +135,37 @@ export function NivelesEscala() {
               : "mx-auto w-full max-w-screen-xl px-5 md:px-10"
           }
         >
-          <p className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
-            Niveles en los que intervenimos
-          </p>
+          {/* Acá NO se repite «Del aula al sistema educativo»: la apertura ya
+              lo dijo en grande, y en el rincón lo que hace falta es el nombre
+              de la sección (Gastón, 2026-09-10). En el fallback, sin apertura,
+              la frase va debajo del nombre. */}
           <h2
-            className="font-display text-azul-principal mt-3 max-w-[18ch] font-bold tracking-[-0.02em] text-balance"
+            className="font-display text-azul-principal max-w-[16ch] font-bold tracking-[-0.02em] text-balance"
             style={{ fontSize: "clamp(1.4rem, 1rem + 1.2vw, 1.9rem)", lineHeight: 1.1 }}
           >
-            {TITULO}
+            Niveles en los que{" "}
+            <span className="text-verde-concepto-texto">intervenimos</span>
           </h2>
+          {!live && (
+            <p
+              className="font-display text-azul-principal mt-5 font-extrabold tracking-[-0.03em]"
+              style={{ fontSize: "clamp(2rem, 1rem + 3vw, 3.4rem)", lineHeight: 1.02 }}
+            >
+              {TITULO}
+            </p>
+          )}
+          {/* El verbo en verde y la idea que ordena en negrita (Gastón,
+              2026-09-11): «intervenimos» es lo que ED hace, «de lo micro a
+              lo macro» es lo que ordena los cinco niveles. */}
           <p className="text-gris-texto mt-3 max-w-[38ch] font-sans text-[1rem] leading-relaxed">
-            De lo micro a lo macro: cinco niveles donde la transformación se
-            sostiene.
+            <strong className="text-azul-principal font-semibold">De lo micro a lo macro:</strong>{" "}
+            cinco niveles donde la transformación se sostiene.
           </p>
         </div>
 
-        {/* El título EN GRANDE de la apertura, a la derecha, lejos de por
-            donde entra la víbora. Duplicado visual (aria-hidden): el h2
-            real es el del encabezado. */}
+        {/* La frase EN GRANDE de la apertura, a la derecha, lejos de por
+            donde entra la víbora. Es decorativa (aria-hidden): el h2 real es
+            el nombre de la sección, en el encabezado. */}
         {live && (
           <div
             data-nivel-titulo-grande

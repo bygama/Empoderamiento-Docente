@@ -11,6 +11,7 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { EscenarioFichas } from "./proyectos-aplicaciones/EscenarioFichas";
 import { FichaProyecto } from "./proyectos-aplicaciones/FichaProyecto";
 import { TituloPractica } from "./proyectos-aplicaciones/TituloPractica";
+import { Bajada } from "./proyectos-aplicaciones/Bajada";
 
 // Los dos lados del archivo: el capítulo de desarrollo profesional, y
 // currículo con el remate. El doblez es el de los capítulos (4 + 3 + 1).
@@ -80,9 +81,10 @@ export function ProyectosAplicaciones() {
                 <h3 className="font-display text-[1.75rem] leading-tight font-extrabold tracking-[-0.02em]">
                   {cap.titulo}
                 </h3>
-                <p className="text-gris-texto mt-3 max-w-[48ch] font-sans text-[1.05rem] leading-relaxed">
-                  {cap.bajada}
-                </p>
+                <Bajada
+                  cap={cap}
+                  className="text-gris-texto mt-3 max-w-[48ch] font-sans text-[1.05rem] leading-relaxed"
+                />
                 <div className="mt-8 grid gap-5 sm:grid-cols-2">
                   {FICHAS.map((f, i) =>
                     f.cap === c ? (
