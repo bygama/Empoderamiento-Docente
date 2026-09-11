@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen } from "@/components/ui/icons";
 import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
+import { CATEGORIA_LABEL, fechaCorta, NOVEDADES } from "@/features/novedades/data";
 
 // Biblioteca: los mismos cuatro destacados que abren la página Biblioteca
 // (publicaciones reales, curadas en `biblioteca/data/materiales`), y cada
@@ -12,29 +13,10 @@ import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
 // inventados (Gastón, 2026-09-11).
 const BIBLIOTECA = ITEMS_DESTACADOS.map(({ material }) => material);
 
-// Novedades: siempre con imagen (reusamos fotos reales del hero como mock).
-const NOVEDADES = [
-  {
-    titulo: "Encuentro docente en torno a la matemática educativa",
-    meta: "Evento · Jun 2026",
-    img: "/hero/hero-3.webp",
-  },
-  {
-    titulo: "Nueva investigación sobre el aprendizaje matemático",
-    meta: "Investigación · May 2026",
-    img: "/hero/hero-5.webp",
-  },
-  {
-    titulo: "ED amplía su presencia en Chile, México, Argentina, Colombia y Brasil",
-    meta: "Institucional · Abr 2026",
-    img: "/hero/hero-7.webp",
-  },
-  {
-    titulo: "Conversatorio: las matemáticas más allá del cálculo",
-    meta: "Charla · Mar 2026",
-    img: "/hero/hero-9.webp",
-  },
-] as const;
+// Novedades: las cuatro más nuevas de la página Novedades (hechos reales,
+// `novedades/data`). La que tiene ficha propia lleva a su ficha; el resto,
+// al listado.
+const NOVEDADES_INICIO = NOVEDADES.slice(0, 4);
 
 /** Realce que sigue al cursor: guarda la posición del mouse en CSS vars. */
 function trackPointer(e: MouseEvent<HTMLElement>) {
@@ -159,10 +141,10 @@ export function BibliotecaNovedades() {
             </header>
 
             <ul className="mt-9 flex flex-col gap-3">
-              {NOVEDADES.map(({ titulo, meta, img }) => (
-                <li key={titulo}>
+              {NOVEDADES_INICIO.map(({ id, titulo, categoria, fecha, imagen, cuerpo }) => (
+                <li key={id}>
                   <Link
-                    href="/novedades"
+                    href={cuerpo ? `/novedades/${id}` : "/novedades"}
                     onMouseMove={trackPointer}
                     className="bn-row block"
                   >
@@ -171,7 +153,7 @@ export function BibliotecaNovedades() {
                       {/* Miniatura (imagen real) */}
                       <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
                         <Image
-                          src={img}
+                          src={imagen}
                           alt=""
                           fill
                           sizes="64px"
@@ -179,11 +161,11 @@ export function BibliotecaNovedades() {
                         />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-display text-azul-principal text-[1.02rem] leading-snug font-bold">
+                        <h4 className="font-display text-azul-principal line-clamp-2 text-[1.02rem] leading-snug font-bold">
                           {titulo}
                         </h4>
                         <p className="text-gris-texto mt-1 font-mono text-[0.72rem] tracking-[0.08em] uppercase">
-                          {meta}
+                          {CATEGORIA_LABEL[categoria]} · {fechaCorta(fecha)}
                         </p>
                       </div>
                       <span className="text-azul-principal/25 group-hover:text-naranja-accion shrink-0">
