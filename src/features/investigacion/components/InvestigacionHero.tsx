@@ -1,247 +1,163 @@
 "use client";
 
-import { Fragment, useRef, useState } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { Highlight } from "@/components/ui/Highlight";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
-import { RevealLines } from "@/components/ui/RevealLines";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { alClicIrA } from "@/lib/navegar";
-import { FIGURAS } from "./constelacion";
-import { ConstelacionInvestigacion } from "./ConstelacionInvestigacion";
-import {
-  crearHistoria,
-  crearIntroConstelacion,
-  crearLoopConstelacion,
-  crearRespiracion,
-  crearVigiaVisibilidad,
-  estadoInicialConstelacion,
-  reagruparConstelacion,
-  soltarConstelacion,
-} from "./coreografia-hero";
+import { LinternaFaro } from "./LinternaFaro";
+import { Bandada } from "./hero/Bandada";
+import { CieloNocturno } from "./hero/CieloNocturno";
+import { HojaHistoria } from "./hero/HojaHistoria";
+import { crearEncendido } from "./hero/coreografia-encendido";
+import { crearHistoria } from "./hero/coreografia-historia";
+
+/** Ángulo del haz en el frame estático: posado hacia el titular. */
+const HAZ_REPOSO = -168;
 
 /**
- * Sección 1 — Hero. Copy según docs/content/arquitectura-investigacion.md §3;
- * la bajada no se muestra entera: vive repartida en los cuatro beats de la
- * historia (constelacion.ts → frase).
+ * Sección 1 — Hero: «la luz abre el archivo», en dos vidas sobre la misma
+ * sección pinneada. Copy según docs/content/arquitectura-investigacion.md
+ * §3; la bajada no se muestra entera: vive repartida en los cuatro beats
+ * de la historia (constelacion.ts → frase).
  *
- * «La primera hoja del archivo», en dos actos sobre la misma hoja de papel:
+ * - **Encendido (autónomo, al cargar):** de noche, la linterna del faro
+ *   plantada abajo a la derecha (el mismo faro de la marca, recortado y
+ *   grande, como en el cierre) y el titular a la izquierda en penumbra. La
+ *   lámpara se enciende, el haz baja del cielo y se posa sobre el titular,
+ *   que se enciende con él: investigar es alumbrar lo que no se ve. Unos
+ *   2.5 s, sin bloquear el scroll (hero/coreografia-encendido.ts).
+ * - **Historia (scrubbeada):** al scrollear la sección se pinnea, el
+ *   titular cede y la luz lo suelta, el faro se apaga y baja girando (el
+ *   cierre lo sube girando y lo enciende: mismo gesto, espejado), la hoja
+ *   01 sube sobre la noche y las 13 estrellas que la luz tocó bajan en
+ *   bandada sobre ella y se arman en la pregunta; después corren los cuatro
+ *   beats, riel 01–04, verbo que se releva y frase que se pinta palabra por
+ *   palabra (pregunta → lupa → red → espiral)
+ *   (hero/coreografia-historia.ts).
  *
- * - **Acto 1 (reposo):** titular en tinta navy a la izquierda, constelación
- *   loopeando a la derecha. Único hero del sitio que abre en claro. El loop
- *   nunca muere: si el scroll vuelve al tope, lo retoma.
- * - **Acto 2 (la historia):** al scrollear, la hoja se pinnea; el titular
- *   cede y la figura se DESARMA — los puntos vuelan sueltos hacia la
- *   izquierda como bandada y se REARMAN en la pregunta, con las líneas
- *   redibujándose. Después corren los cuatro beats — riel 01–04 con línea
- *   verde viajera, verbo que se releva y frase que se pinta palabra por
- *   palabra al ritmo del scroll (pregunta → lupa → red → espiral).
- *   Desktop con puntero por ahora; touch/mobile ven el acto 1 estático.
+ * Las estrellas y los puntos de la constelación son los mismos 13 círculos
+ * (hero/Bandada.tsx), en una capa que cubre la sección por encima de la
+ * hoja: no hay relevo entre dos dibujos.
+ *
+ * El SSR renderiza el frame final del encendido (todo encendido, haz
+ * posado, cielo estrellado): es lo que ven touch, reduced-motion y las
+ * pantallas sin `lg`, donde la linterna no existe y queda el titular sobre
+ * la noche. La historia solo existe con la coreografía (desktop con
+ * puntero).
  */
 export function InvestigacionHero() {
-  const zoneRef = useRef<HTMLElement | null>(null);
-  const viajeroRef = useRef<HTMLDivElement | null>(null);
+  const zonaRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
-  const [figuraActiva, setFiguraActiva] = useState(0);
 
   useIsomorphicLayoutEffect(() => {
     if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches)
+    // 64rem = el `lg:` de Tailwind v4 (la linterna solo existe desde lg).
+    if (!window.matchMedia("(hover: hover) and (min-width: 64rem)").matches)
       return;
+    const zona = zonaRef.current;
+    if (!zona) return;
 
-    const zona = zoneRef.current;
-    const viajero = viajeroRef.current;
-    if (!zona || !viajero) return;
-
+    let restaurar = () => {};
+    let limpiar = () => {};
     const ctx = gsap.context(() => {
-      const kit = {
-        circulos: gsap.utils.toArray<SVGCircleElement>("[data-punto]"),
-        lineas: gsap.utils.toArray<SVGLineElement>("[data-arista]"),
-      };
-
-      // Estados pre-paint: constelación dispersa, historia oculta.
-      estadoInicialConstelacion(kit);
-      gsap.set("[data-verbo]", { yPercent: 110 });
-      gsap.set("[data-frase]", { autoAlpha: 0 });
-      gsap.set("[data-riel-relleno]", { scaleX: 0 });
-
-      // Entrada de las piezas que no maneja RevealLines.
-      gsap.fromTo(
-        "[data-hero-rise]",
-        { autoAlpha: 0, y: 18 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.9,
-          ease: "power3.out",
-          stagger: 0.12,
-          delay: 0.55,
-        },
-      );
-
-      // Acto 1: intro autónoma; al terminar arranca el loop contemplativo
-      // (salvo que el scroll ya haya tomado el control).
-      const enHistoria = { actual: false };
-      const loop = crearLoopConstelacion(kit, setFiguraActiva);
-      const intro = crearIntroConstelacion(kit);
-      intro.eventCallback("onComplete", () => {
-        if (!enHistoria.actual) loop.play(0);
-      });
-
-      const respiracion = crearRespiracion(
-        zona.querySelector("[data-constelacion-svg]")!,
-      );
-
-      // Acto 2: la historia scrubbeada. El control de la constelación se
-      // presta con tweens autónomos cortos: al scrollear se SUELTA (bandada
-      // dispersa), al volver al tope se REAGRUPA y el loop retoma su ciclo.
-      let pase: gsap.core.Timeline | null = null;
-      crearHistoria({
+      const q = gsap.utils.selector(zona);
+      const encendido = crearEncendido(zona);
+      restaurar = encendido.restaurar;
+      limpiar = crearHistoria({
         zona,
-        viajero,
-        ...kit,
-        onTomaControl: () => {
-          enHistoria.actual = true;
-          intro.pause();
-          loop.pause();
-          pase?.kill();
-          pase = soltarConstelacion(kit);
-        },
-        onVueltaAlReposo: () => {
-          enHistoria.actual = false;
-          pase?.kill();
-          pase = reagruparConstelacion(kit, () => {
-            if (!enHistoria.actual) loop.play(0);
-          });
-          setFiguraActiva(0);
-        },
-      });
-
-      // Play/pausa según visibilidad (no quemar batería fuera de viewport).
-      crearVigiaVisibilidad(viajero, () => [respiracion]);
+        hoja: q<HTMLElement>("[data-hero-hoja]")[0],
+        linterna: q<HTMLElement>("[data-hero-linterna]")[0],
+        bandada: q<SVGSVGElement>("[data-hero-bandada]")[0],
+        destino: q<HTMLElement>("[data-historia-destino]")[0],
+        circulos: q<SVGCircleElement>("[data-hero-estrella]"),
+        lineas: q<SVGLineElement>("[data-hero-arista]"),
+        encendido,
+      }).limpiar;
     }, zona);
-
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      limpiar();
+      restaurar();
+    };
   }, [reduced]);
 
   return (
-    <section ref={zoneRef} aria-label="Investigar para transformar" className="bg-gris-fondo p-2.5">
-      {/* La hoja: único hero del sitio que abre en claro. La sombra es corta a
-          propósito: la sección solo deja 10px de canaleta (p-2.5) y la de
-          abajo pinta su fondo encima, así que una sombra larga se ve cortada. */}
-      <div className="ring-azul-principal/10 relative isolate flex min-h-[calc(100svh-1.25rem)] overflow-hidden rounded-xl bg-white bg-grain-light shadow-[0_4px_12px_-8px_rgb(31_45_77/0.35)] ring-1">
-        {/* Folio de archivo (guiño al remate de la pila de expedientes). */}
-        <span
-          data-hero-rise
-          className="text-gris-texto/70 absolute top-7 right-8 z-10 hidden font-mono text-[0.68rem] tracking-[0.2em] uppercase lg:block"
-        >
-          Archivo ED · Hoja 01
-        </span>
+    <section
+      ref={zonaRef}
+      aria-label="Investigar para transformar"
+      className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden text-white"
+    >
+      <CieloNocturno />
 
-        {/* Acto 1 — reposo: titular a la izquierda, constelación a la derecha. */}
-        <div className="relative z-10 mx-auto my-auto grid w-full max-w-screen-xl items-center gap-x-16 gap-y-10 px-6 pt-28 pb-12 md:px-12 lg:grid-cols-[1.1fr_0.9fr]">
-          <div data-acto-hero>
-            <RevealLines
-              as="h1"
-              className="font-display text-azul-principal max-w-[16ch] font-extrabold tracking-[-0.025em]"
-              style={{
-                fontSize: "clamp(2.4rem, 1rem + 2.9vw, 3.9rem)",
-                lineHeight: 1.06,
-              }}
+      {/* ── La linterna, plantada en el piso a la derecha y saliéndose del
+          cuadro por arriba: objeto, no paisaje. El haz nace de acá. */}
+      <div
+        data-hero-linterna
+        className="pointer-events-none absolute right-[5vw] bottom-0 z-20 hidden w-[clamp(200px,32svh,300px)] lg:block"
+      >
+        <LinternaFaro prefijo="hero" largoHaz={1500} hazPose={HAZ_REPOSO} className="block h-auto w-full" />
+      </div>
+
+      {/* ── El titular y los dos caminos. `data-hero-acto` es lo que la
+          historia hace subir y salir; adentro, `data-hero-rise` es lo que el
+          encendido hace aparecer: dos capas, así ninguna coreografía pisa
+          los valores de la otra. */}
+      <div className="relative z-30 mx-auto grid w-full max-w-screen-xl items-center gap-x-16 px-6 pt-28 pb-24 md:px-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div data-hero-acto>
+          <h1
+            data-hero-titulo
+            className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em] text-white"
+            style={{
+              fontSize: "clamp(2.4rem, 1rem + 2.9vw, 3.9rem)",
+              lineHeight: 1.06,
+            }}
+          >
+            <Highlight>Investigamos</Highlight> para transformar la matemática
+            escolar.
+          </h1>
+          {/* Los dos CTA cortan directo a su sección (sin recorrer las
+              escenas del medio), igual que el navbar. El secundario va a
+              los casos, lo que más se vuelve a buscar (decisión de ED,
+              2026-09-08; antes salía a la Biblioteca). */}
+          <div data-hero-rise className="mt-9 flex flex-wrap gap-4">
+            <ButtonPrimary href="#lineas" onClick={alClicIrA("lineas")}>
+              Conocé qué investigamos
+            </ButtonPrimary>
+            <ButtonSecondary
+              href="#en-accion"
+              variant="dark"
+              withArrow
+              onClick={alClicIrA("en-accion")}
             >
-              <Highlight>Investigamos</Highlight> para transformar la
-              matemática escolar.
-            </RevealLines>
-            {/* Los dos CTA cortan directo a su sección (sin recorrer las
-                escenas del medio), igual que el navbar. El secundario va a
-                los casos, lo que más se vuelve a buscar (decisión de ED,
-                2026-09-08; antes salía a la Biblioteca). */}
-            <div data-hero-rise className="mt-9 flex flex-wrap gap-4">
-              <ButtonPrimary href="#lineas" onClick={alClicIrA("lineas")}>
-                Conocé qué investigamos
-              </ButtonPrimary>
-              <ButtonSecondary href="#en-accion" onClick={alClicIrA("en-accion")}>
-                Ver los casos
-              </ButtonSecondary>
-            </div>
+              Ver los casos
+            </ButtonSecondary>
           </div>
-
-          <ConstelacionInvestigacion
-            ref={viajeroRef}
-            figuraActiva={figuraActiva}
-            className="mx-auto w-full max-w-[300px] lg:ml-auto lg:max-w-[min(420px,52svh)]"
-          />
         </div>
+        {/* El hueco de la linterna. */}
+        <div aria-hidden="true" className="hidden lg:block" />
+      </div>
 
-        {/* Acto 2 — la historia: destino de la constelación a la izquierda,
-            riel + verbo + frase a la derecha. Invisible hasta que el scroll
-            la revela (y siempre, si no corre la coreografía). */}
+      {/* ── Cue de scroll: la página sigue abajo. */}
+      <div
+        data-hero-acto
+        aria-hidden="true"
+        className="absolute bottom-8 left-6 z-30 hidden md:left-12 lg:block"
+      >
         <div
-          data-historia
-          aria-hidden="true"
-          className="pointer-events-none invisible absolute inset-0 z-10 mx-auto grid w-full max-w-screen-xl items-center gap-x-16 px-6 opacity-0 md:px-12 lg:grid-cols-[0.95fr_1.05fr]"
+          data-hero-rise
+          className="text-azul-claro/70 flex items-center gap-3 font-mono text-[0.68rem] tracking-[0.2em] uppercase"
         >
-          <div>
-            <div
-              data-historia-destino
-              className="mx-auto aspect-[400/480] w-full max-w-[min(460px,54svh)]"
-            />
-          </div>
-
-          <div className="max-w-[44ch]">
-            {/* Riel 01–04: la brújula de la historia. */}
-            <div
-              data-riel
-              className="flex items-center gap-3 font-mono text-[0.7rem] tracking-[0.22em] uppercase"
-            >
-              {FIGURAS.map((f, i) => (
-                <Fragment key={f.id}>
-                  <span
-                    data-riel-numero
-                    className="text-gris-texto/80 tabular-nums"
-                  >
-                    0{i + 1}
-                  </span>
-                  {i < FIGURAS.length - 1 && (
-                    <span className="bg-azul-principal/15 relative h-px w-12 overflow-hidden">
-                      <span
-                        data-riel-relleno
-                        className="bg-verde-concepto absolute inset-0 origin-left"
-                      />
-                    </span>
-                  )}
-                </Fragment>
-              ))}
-            </div>
-
-            {/* El verbo que se releva (empujado hacia arriba por el nuevo). */}
-            {/* h holgada para los descendentes (la «g» de Preguntar) sin
-                soltar el overflow-hidden que necesita el relevo. */}
-            <div className="font-display text-azul-principal relative mt-8 h-[1.5em] overflow-hidden text-[2.1rem] leading-[1.35] font-extrabold tracking-[-0.02em] lg:text-[2.5rem]">
-              {FIGURAS.map((f) => (
-                <span key={f.id} data-verbo className="absolute inset-0">
-                  {f.etiqueta}
-                </span>
-              ))}
-            </div>
-
-            {/* La frase que se pinta palabra por palabra. */}
-            <div className="text-azul-principal/15 mt-5 grid max-w-[38ch] text-[1.05rem] leading-relaxed lg:text-[1.15rem]">
-              {FIGURAS.map((f) => (
-                <p key={f.id} data-frase className="col-start-1 row-start-1">
-                  {f.frase.split(" ").map((palabra, k) => (
-                    <span key={k} data-palabra>
-                      {palabra}{" "}
-                    </span>
-                  ))}
-                </p>
-              ))}
-            </div>
-          </div>
+          <span className="bg-azul-claro/50 block h-10 w-px" />
+          Seguí bajando
         </div>
       </div>
+
+      <HojaHistoria />
+      <Bandada />
     </section>
   );
 }

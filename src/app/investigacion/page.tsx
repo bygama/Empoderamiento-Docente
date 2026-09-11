@@ -24,6 +24,12 @@ export const metadata: Metadata = {
  * «Ciclo de investigación aplicada» y «Volvemos a investigar» se cuentan
  * en un solo escenario (la espiral doble): `#ciclo` es la sección y
  * `#evidencia` un ancla interna que aterriza en la segunda vuelta.
+ *
+ * Rearmado (2026-09-11): la página abre con el faro —la luz que abre el
+ * archivo— y la historia de la constelación (los cuatro beats) corre en la
+ * misma sección pinneada, sobre la hoja 01 que sube sobre la noche. El
+ * acto de reposo del hero viejo (titular claro + constelación loopeando)
+ * se fue: el faro es ahora la apertura. El cierre queda como está.
  */
 export default function InvestigacionPage() {
   return (
