@@ -9,7 +9,9 @@ import { RevealLines } from "@/components/ui/RevealLines";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
 import { ArrowUpRight } from "@/components/ui/icons";
 import { ScrambleText } from "./ScrambleText";
-import { NOVEDADES, CATEGORIA_LABEL, fechaCorta } from "../data";
+import { RevealFoco } from "./RevealFoco";
+import { useTransicionFaro } from "./TransicionFaro";
+import { NOVEDADES, CATEGORIA_LABEL, fechaCorta, type Novedad } from "../data";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -18,60 +20,43 @@ if (typeof window !== "undefined") {
 }
 
 /**
- * Reveal de foto "la señal se enfoca": la imagen llega desenfocada, desaturada
- * y un toque apagada, y se ENFOCA al entrar al viewport — el mismo idioma del
- * faro que el ScrambleText (una señal que se aclara), en vez del wipe de
- * clip-path que usa el resto del sitio. Play-once; al terminar limpia filter y
- * transform para no dejar costo de compositing. Con prefers-reduced-motion la
- * foto queda estática y nítida.
+ * «Leer la nota» de la tapa: abre la ficha con la misma transición del faro
+ * que las cards del listado (y calienta la ruta al primer hover, por el
+ * compile en dev). Sin cuerpo, baja al listado. Nueva pestaña (ctrl, cmd,
+ * shift, rueda): navegación normal, sin telón.
  */
-function RevealFoco({
+function LinkNota({
+  n,
+  className,
   children,
-  delay = 0,
-  className = "",
 }: {
+  n: Novedad;
+  className: string;
   children: ReactNode;
-  delay?: number;
-  className?: string;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const reduced = useReducedMotion();
-
-  useIsomorphicLayoutEffect(() => {
-    const el = ref.current;
-    if (!el || reduced) return;
-    const inner = el.firstElementChild as HTMLElement | null;
-    if (!inner) return;
-    const ctx = gsap.context(() => {
-      gsap.set(inner, {
-        autoAlpha: 0,
-        scale: 1.1,
-        filter: "blur(18px) saturate(0.3) brightness(0.85)",
-      });
-      const tl = gsap.timeline({
-        delay,
-        scrollTrigger: { trigger: el, start: "top 85%", once: true },
-      });
-      tl.to(inner, { autoAlpha: 1, duration: 0.45, ease: "power1.out" }, 0).to(
-        inner,
-        {
-          filter: "blur(0px) saturate(1) brightness(1)",
-          scale: 1,
-          duration: 1.25,
-          ease: "power2.out",
-          clearProps: "filter,transform",
-        },
-        0.05,
-      );
-    }, el);
-    return () => ctx.revert();
-  }, [reduced, delay]);
-
+  const abrir = useTransicionFaro();
+  const calentado = useRef(false);
+  const href = n.cuerpo ? `/novedades/${n.id}` : "#ultimas";
+  const calentar = () => {
+    if (calentado.current || !n.cuerpo) return;
+    calentado.current = true;
+    fetch(href).catch(() => {});
+  };
   return (
-    <div ref={ref} className={`overflow-hidden ${className}`}>
-      {/* El overscale 1.1 cubre el sangrado de bordes que produce el blur. */}
-      <div className="h-full w-full">{children}</div>
-    </div>
+    <Link
+      href={href}
+      className={className}
+      onMouseEnter={calentar}
+      onFocus={calentar}
+      onClick={(e) => {
+        if (!n.cuerpo || !abrir || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0)
+          return;
+        e.preventDefault();
+        abrir(href);
+      }}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -219,9 +204,11 @@ export function NovedadDestacada() {
               </p>
 
               {/* El chip de la flecha se enciende naranja con el hover de TODA
-                  la card (group): naranja = acción, ganado por interacción. */}
-              <Link
-                href="#ultimas"
+                  la card (group): naranja = acción, ganado por interacción.
+                  «Leer la nota» abre la ficha; si la nota no tiene cuerpo, baja
+                  al listado (Gastón, 2026-09-11). */}
+              <LinkNota
+                n={principal}
                 className="mt-7 inline-flex w-fit items-center gap-3 font-sans text-[0.95rem] font-medium text-white"
               >
                 Leer la nota
@@ -231,7 +218,7 @@ export function NovedadDestacada() {
                     className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
                 </span>
-              </Link>
+              </LinkNota>
             </div>
 
             {/* Foto a sangre contra el borde derecho; llega desenfocada y se
@@ -288,8 +275,8 @@ export function NovedadDestacada() {
                   {segunda.titulo}
                 </h3>
 
-                <Link
-                  href="#ultimas"
+                <LinkNota
+                  n={segunda}
                   className="text-azul-claro mt-4 inline-flex w-fit items-center gap-2.5 font-sans text-[0.88rem] font-medium"
                 >
                   Leer la nota
@@ -299,7 +286,7 @@ export function NovedadDestacada() {
                       className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                     />
                   </span>
-                </Link>
+                </LinkNota>
               </div>
             </article>
           )}

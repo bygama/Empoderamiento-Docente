@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { RevealLines } from "@/components/ui/RevealLines";
-import { RevealImage } from "@/components/ui/RevealImage";
 import { ArrowRight } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
 import { CATEGORIA_LABEL, fechaCorta, type Novedad } from "../data";
 import { useTransicionFaro, FLAG_ENTRADA_FARO } from "./TransicionFaro";
 import { GuiaNota } from "./GuiaNota";
+import { RevealFoco } from "./RevealFoco";
+import { AccionPublicacion } from "./AccionPublicacion";
 
 /**
  * Ficha de una novedad (/novedades/[slug]), con el layout del artículo de
@@ -122,14 +123,14 @@ export function FichaNovedad({ n }: { n: Novedad }) {
             </RevealLines>
 
             {/* Foto en mobile: bajo el titular (en lg vive en la columna derecha). */}
-            <RevealImage
+            <RevealFoco
               delay={espera}
               className="mt-8 aspect-[16/10] w-full overflow-hidden rounded-2xl lg:hidden"
             >
               <div className="relative h-full w-full">
                 <Image src={n.imagen} alt="" fill sizes="100vw" className="object-cover" priority />
               </div>
-            </RevealImage>
+            </RevealFoco>
 
             <p className="text-azul-principal mt-8 font-sans text-[1.15rem] leading-relaxed font-medium">
               {n.bajada}
@@ -148,6 +149,8 @@ export function FichaNovedad({ n }: { n: Novedad }) {
               </section>
             ))}
 
+            {n.publicacion && <AccionPublicacion titulo={n.publicacion} />}
+
             <div className="border-azul-principal/10 mt-14 border-t pt-8">
               <Link
                 href="/novedades"
@@ -163,14 +166,14 @@ export function FichaNovedad({ n }: { n: Novedad }) {
           {/* Columna derecha: foto + guía, sticky (solo lg). */}
           <aside className="hidden lg:block">
             <div className="sticky top-28 space-y-6">
-              <RevealImage
+              <RevealFoco
                 delay={espera + 0.1}
                 className="aspect-[4/3] w-full overflow-hidden rounded-2xl"
               >
                 <div className="relative h-full w-full">
                   <Image src={n.imagen} alt="" fill sizes="340px" className="object-cover" priority />
                 </div>
-              </RevealImage>
+              </RevealFoco>
               {secciones.length > 1 && (
                 <GuiaNota secciones={secciones} activa={activa} onIr={irASeccion} />
               )}
