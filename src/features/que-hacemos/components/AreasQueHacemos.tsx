@@ -5,7 +5,7 @@ import { AREAS } from "@/features/que-hacemos/areas";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
 
 /**
- * Las siete áreas de especialización de ED, en texto plano y legibles de una.
+ * Las siete áreas de desarrollo de ED, en texto plano y legibles de una.
  *
  * Raquel y Daniela (2026-09-08): la web se veía espectacular pero no se
  * entendía qué hace ED. Esta sección es la respuesta y nada se esconde detrás
@@ -93,9 +93,9 @@ export function AreasQueHacemos() {
               className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance lg:text-[1.5rem]"
               style={{ lineHeight: 1.2 }}
             >
-              Áreas de <span className="text-azul-medio">especialización</span>
+              Áreas de <span className="text-azul-medio">desarrollo</span>
             </h2>
-            <nav aria-label="Áreas de especialización" className="mt-5 lg:mt-6 lg:w-full">
+            <nav aria-label="Áreas de desarrollo" className="mt-5 lg:mt-6 lg:w-full">
               <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
                 {AREAS.map((a, i) => {
                   const activo = i === activa;

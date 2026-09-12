@@ -30,7 +30,7 @@ type Area = {
   Icon: ComponentType<IconProps>;
 };
 
-// Las 7 áreas de especialización de ED. Copy oficial del cliente
+// Las 7 áreas de desarrollo de ED. Copy oficial del cliente
 // [[ed-copy-oficial]]: `frase` = la línea destacada (verde); `detalle` = la
 // descripción. Frases sin punto final (queda más limpio en la carta); los
 // párrafos descriptivos sí lo llevan.
@@ -297,7 +297,7 @@ export function LineasAccion() {
       data-indice="Áreas"
       data-section="lineas"
       className="deck from-white to-gris-fondo relative bg-gradient-to-b"
-      aria-label="Áreas de especialización"
+      aria-label="Áreas de desarrollo"
     >
       <div data-deck-scroll className="deck-scroll">
         <div
@@ -314,7 +314,7 @@ export function LineasAccion() {
                 lineHeight: 1.03,
               }}
             >
-              Áreas de especialización
+              Áreas de desarrollo
             </h2>
             <p className="deck-caption text-gris-texto mx-auto mt-5 max-w-xl font-sans text-[0.97rem] leading-relaxed">
               Los ámbitos desde los cuales diseñamos soluciones educativas
