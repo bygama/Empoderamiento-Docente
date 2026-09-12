@@ -93,7 +93,7 @@ export function CartaAbierta() {
             // Copia en luz del título: vive ADENTRO del campo para que el
             // borde del círculo la revele (la copia en tinta queda DEBAJO del
             // campo, tapada por el navy) — inversión sin fade ni contorno.
-            <div data-carta-titulo-luz className="absolute inset-x-0 top-[14svh] z-10 px-8">
+            <div data-carta-titulo-luz className="absolute inset-x-0 top-[20svh] z-10 px-8">
               <Titulo tono="luz" />
             </div>
           )}
@@ -103,9 +103,13 @@ export function CartaAbierta() {
           <>
             {/* Copia en tinta del título: bajo el campo, visible solo donde
                 el círculo todavía no llegó. */}
+            {/* A 20svh (antes 14): pegado al header quedaba alto y el
+                espacio hasta el sobre, vacío (Facundo, 2026-09-12). Las dos
+                copias van a la misma altura, es lo que hace posible la
+                inversión. */}
             <div
               data-carta-titulo-tinta
-              className="absolute inset-x-0 top-[14svh] -z-20 px-8"
+              className="absolute inset-x-0 top-[20svh] -z-20 px-8"
             >
               <Titulo tono="tinta" />
             </div>

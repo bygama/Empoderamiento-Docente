@@ -37,14 +37,16 @@ function Nota({
   );
 }
 
-/** Nota 1 — la pregunta. Copy del doc maestro §4, recortado a la pregunta. */
+/** Nota 1 — la pregunta. Copy del doc maestro §4, recortado a la pregunta
+ *  sola: el título de la sección ya dice «Nacimos de una pregunta», y la
+ *  nota lo repetía («Empoderamiento Docente nació de una pregunta:») antes
+ *  de hacerla (Facundo, 2026-09-12). */
 export function LaPregunta({ live }: { live: boolean }) {
   return (
     <Nota folio="Archivo ED · Hoja 02" live={live}>
       <p className="font-display mt-6 text-[1.42rem] leading-[1.32] font-semibold lg:text-[1.62rem]">
-        Empoderamiento Docente nació de una pregunta: ¿qué sucede cuando las
-        y los docentes transforman su relación con el saber matemático
-        escolar?
+        ¿Qué sucede cuando las y los docentes transforman su relación con el
+        saber matemático escolar?
       </p>
       <p className="text-azul-principal/85 mt-6 text-[0.98rem] leading-[1.7] lg:text-[1.02rem]">
         Esa pregunta sigue orientando todo lo que hacemos.
