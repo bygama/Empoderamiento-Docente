@@ -18,7 +18,7 @@ export default function Home() {
           componente sigue en features/home por si se reincorpora. */}
       <DatosDuros />
       <ComoTrabajamos />
-      {/* Áreas de especialización (el abanico de siete cartas). Había salido
+      {/* Áreas de desarrollo (el abanico de siete cartas). Había salido
           de la home junto con la llegada del bloque plano y vuelve a su lugar
           original, después de «Cómo trabajamos» (2026-09-09). */}
       <LineasAccion />

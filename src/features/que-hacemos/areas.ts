@@ -1,7 +1,8 @@
 // Qué hace ED, en texto plano. Es lo que la web tiene que decir antes de
 // cualquier animación.
 //
-// Las SIETE áreas de especialización, en el orden y con el copy que validó la
+// Las SIETE áreas de desarrollo («de especialización» hasta el 2026-09-12,
+// Facundo pidió el cambio de nombre), en el orden y con el copy que validó la
 // dirección general (Daniela). Son las mismas que muestra el abanico del
 // Inicio (features/home/components/LineasAccion), así que las dos páginas
 // dicen lo mismo: el nombre, la frase «en verde» y la descripción salen de
