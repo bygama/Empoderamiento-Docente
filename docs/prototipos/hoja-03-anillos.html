@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Prototipo · Hoja 03 · anillos concéntricos</title>
+<!--
+  Prototipo suelto de la hoja 03 de Investigación (el ciclo), para decidir la
+  figura antes de tocar la coreografía real. Se abre desde el disco: usa las
+  fuentes de Google y GSAP desde cdnjs.
+
+  Qué muestra (Facundo, 2026-09-12): dos anillos concéntricos —el chico es el
+  ciclo pedagógico (01–04), el grande el de evidencia (05–08)—, un punto que
+  los recorre con el scroll, la cámara en primer plano sobre el chico hasta la
+  cuarta etapa y abierta después. Sin nombres alrededor de la figura ni guías:
+  la etapa actual se lee en la ficha de la derecha, que copia la del archivo de
+  «Proyectos y aplicaciones» (FichaProyecto: hoja blanca sobre una pila, cabecera
+  con la vuelta y el sello mono, el número grande en navy y el nombre en verde,
+  el texto, el rótulo al pie y una marca de agua). Cada etapa cae sobre la pila
+  y las anteriores se hunden atrás, como hojas apoyadas.
+
+  Los textos de las fichas son una PROPUESTA en llano (Facundo, 2026-09-12:
+  «exijo claridad en lo que se muestra»): dicen qué pasa y quién lo hace, sin
+  la jerga. Los nombres oficiales de cada etapa (estaciones.ts) quedan al pie
+  de la ficha. VALIDAR con ED antes de llevarlos al sitio.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root {
+    --navy: #1f2d4d; --azul-medio: #4a6fa5; --azul-claro: #a9c5e8;
+    --verde: #1f9a78; --verde-texto: #177a5f; --naranja: #e07a2f;
+    --gris-fondo: #f2f4f7; --gris-texto: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--gris-fondo); color: var(--navy); font-family: Inter, system-ui, sans-serif; }
+  .antes, .despues { height: 60vh; display: grid; place-items: center; color: var(--gris-texto); font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .runway { position: relative; height: calc(100vh + 4300px); }
+  .hoja { position: sticky; top: 10px; height: calc(100vh - 20px); margin: 0 10px; background: #fff; border-radius: 12px;
+    box-shadow: 0 0 0 1px rgb(31 45 77 / .1), 0 4px 12px -8px rgb(31 45 77 / .35); padding: 44px 48px; overflow: hidden;
+    display: grid; grid-template-columns: 22% 1fr 34%; gap: 28px; align-items: center; }
+  .rotulo { position: absolute; top: 26px; right: 32px; font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: rgb(107 114 128 / .7); }
+  .variante { position: absolute; top: 26px; left: 48px; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--naranja); }
+  .titulo { align-self: start; margin-top: 56px; position: relative; min-height: 260px; }
+  .voz { position: absolute; inset: 0 auto auto 0; width: 100%; opacity: 0; }
+  .voz h2 { font-family: Manrope, sans-serif; font-weight: 800; font-size: 40px; line-height: 1.06; letter-spacing: -.025em; margin: 0; max-width: 16ch; }
+  .voz h2 u { text-decoration: none; background: linear-gradient(var(--verde), var(--verde)) no-repeat 0 96% / 100% .14em; }
+  .voz p.nota { font-family: Manrope, sans-serif; font-weight: 500; font-size: 24px; line-height: 1.3; margin: 0; max-width: 22ch; }
+  .voz p.bajada { margin: 22px 0 0; font-size: 15px; line-height: 1.55; color: var(--gris-texto); max-width: 30ch; }
+  .voz p.bajada b { color: var(--navy); font-weight: 600; }
+  .figura { position: relative; align-self: center; }
+  .figura svg { width: 100%; height: auto; display: block; overflow: hidden; }
+  .anillo { fill: none; stroke: var(--azul-claro); }
+  .recorrido { fill: none; stroke: var(--navy); stroke-linecap: round; }
+  .recorrido.verde { stroke: var(--verde); }
+  .nodo { fill: var(--azul-claro); transition: fill .3s; }
+  .nodo.pasado { fill: var(--navy); }
+  .nodo.actual { fill: var(--naranja); }
+  .punto { fill: var(--naranja); }
+  .halo { fill: var(--naranja); opacity: .18; }
+  .numero-nodo { font-family: "JetBrains Mono", monospace; letter-spacing: .12em; fill: var(--gris-texto); transition: fill .3s; }
+  .numero-nodo.actual { fill: var(--verde-texto); }
+  .numero-nodo.pasado { fill: var(--navy); }
+
+  /* La pila de fichas, como FichaProyecto: hoja blanca, sombra larga, y las
+     anteriores hundidas atrás. */
+  .pila { position: relative; align-self: center; height: 500px; }
+  .ficha { position: absolute; inset: 0 0 auto 0; min-height: 460px; background: #fff; border: 1px solid rgb(31 45 77 / .08); border-radius: 28px; padding: 36px 40px 32px; overflow: hidden;
+    box-shadow: 0 1px 2px rgb(31 45 77 / .05), 0 34px 70px -30px rgb(31 45 77 / .3); transform-origin: 50% 100%; display: flex; flex-direction: column; }
+  .ficha .cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+  .ficha .vuelta { display: flex; align-items: center; gap: 12px; font-family: Manrope, sans-serif; font-weight: 600; font-size: 16px; line-height: 1.2; color: var(--navy); letter-spacing: -.01em; }
+  .ficha .vuelta svg { width: 30px; height: 30px; flex: none; }
+  .ficha .sello { margin: 0; text-align: right; font-family: "JetBrains Mono", monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--gris-texto); line-height: 1.6; white-space: nowrap; }
+  .ficha .sello span { display: block; }
+  .ficha .cifra { margin: 34px 0 0; font-family: Manrope, sans-serif; font-weight: 800; letter-spacing: -.03em; font-size: clamp(2.2rem, 1.4rem + 1.4vw, 3.1rem); line-height: 1; }
+  .ficha .cifra .n { display: block; color: var(--navy); }
+  .ficha .cifra .u { display: block; color: var(--verde-texto); font-size: .82em; line-height: 1.05; margin-top: .12em; letter-spacing: -.025em; }
+  .ficha .texto { margin: 22px 0 0; max-width: 40ch; font-size: 16px; line-height: 1.6; color: var(--gris-texto); }
+  .ficha .texto mark { background: none; color: var(--navy); font-weight: 500; text-decoration: underline; text-decoration-color: var(--verde); text-decoration-thickness: .12em; text-underline-offset: .18em; }
+  .ficha .pie { margin: auto 0 0; padding-top: 28px; max-width: 30ch; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .14em; line-height: 1.6; text-transform: uppercase; color: var(--verde-texto); }
+  .ficha .marca { position: absolute; right: -14px; bottom: -18px; width: 150px; height: 150px; pointer-events: none; }
+  .ficha .marca .anillo-m { fill: none; stroke: var(--navy); stroke-width: 2.4; opacity: .09; }
+  .ficha .marca .nodo-m { fill: var(--navy); opacity: .09; }
+  .ficha .marca .nodo-m.actual { fill: var(--verde); opacity: .55; }
+
+  .hint { position: absolute; left: 48px; bottom: 26px; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--gris-texto); transition: opacity .3s; }
+  .progreso { position: absolute; right: 32px; bottom: 26px; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .12em; color: rgb(107 114 128 / .6); }
+</style>
+</head>
+<body>
+
+<div class="antes">↓ scrolleá · la hoja se clava y la escena corre con el scroll</div>
+
+<div class="runway">
+  <section class="hoja">
+    <span class="variante">Prototipo · anillos concéntricos · fichas del archivo</span>
+    <span class="rotulo">Archivo ED · Hoja 03</span>
+
+    <div class="titulo">
+      <div class="voz" data-voz="0"><h2>Cómo una <u>experiencia</u> se convierte en transformación.</h2><p class="bajada">Primero, las <b>cuatro etapas que viven las y los docentes</b> en un proceso con ED.</p></div>
+      <div class="voz" data-voz="1"><p class="nota">La cuarta etapa no cierra el ciclo: abre nuevas preguntas. Por eso volvemos a investigar.</p></div>
+      <div class="voz" data-voz="2"><h2>Implementar no es <u>terminar</u>.</h2><p class="bajada">Después, las <b>cuatro etapas con las que esa experiencia se vuelve evidencia</b> y mejora el proceso.</p></div>
+    </div>
+
+    <div class="figura" id="figura">
+      <svg id="svg" viewBox="0 0 800 600"></svg>
+    </div>
+
+    <aside class="pila" id="pila" aria-live="polite"></aside>
+
+    <span class="hint" id="hint">↓ scroll</span>
+    <span class="progreso" id="progreso">t 0.00</span>
+  </section>
+</div>
+
+<div class="despues">fin de la hoja · (sigue la página)</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Contenido: las ocho estaciones (estaciones.ts) + bisagra + remate.
+const ESTACIONES = [
+  { nombre: "Fase experiencial", titulo: "Vivir la experiencia", clave: "como si fueran estudiantes", texto: "Las y los docentes resuelven situaciones de matemática pensadas para ellos, como si fueran estudiantes: exploran, discuten y se preguntan por qué la matemática escolar es como es." },
+  { nombre: "Implementación en contexto", titulo: "Llevarlo al aula", clave: "no se aplica una receta", texto: "Cada docente lleva la propuesta a su aula o a su institución y la adapta a su realidad: no se aplica una receta, se decide con criterio profesional." },
+  { nombre: "Práctica reflexiva", titulo: "Mirar lo que pasó", clave: "qué cambiaría la próxima vez", texto: "Después, el grupo analiza qué ocurrió: qué hicieron las y los estudiantes, qué decisiones se tomaron y qué cambiaría la próxima vez." },
+  { nombre: "Resignificación del conocimiento matemático escolar", titulo: "Cambiar la relación con el saber", clave: "una herramienta para comprender y actuar", texto: "La matemática deja de ser un contenido que se transmite y pasa a ser una herramienta para comprender y actuar. Ahí empieza la transformación." },
+  { nombre: "Registrar evidencias", titulo: "Guardar lo que pasó", clave: "resguardo ético", texto: "Recuperamos producciones de estudiantes, decisiones docentes, resultados y testimonios, siempre con el resguardo ético de las personas y las instituciones." },
+  { nombre: "Analizar e interpretar", titulo: "Entender los datos", clave: "Una cifra sola no explica", texto: "Leemos esas evidencias junto con las preguntas y el contexto de cada lugar. Una cifra sola no explica qué ocurrió ni por qué." },
+  { nombre: "Sistematizar y producir conocimiento", titulo: "Convertirlo en conocimiento", clave: "usar en otros contextos", texto: "Encontramos patrones y armamos explicaciones que se pueden comunicar, discutir y usar en otros contextos: artículos, informes, materiales." },
+  { nombre: "Retroalimentar y ajustar", titulo: "Ajustar y volver a empezar", clave: "abrimos otro ciclo", texto: "Con lo aprendido volvemos sobre el diseño, acompañamos las nuevas decisiones del equipo y abrimos otro ciclo." },
+];
+const BISAGRA = { n: "04 → 05", titulo: "No termina ahí", clave: "volvemos a investigar", texto: "Lo que pasó en las aulas abre preguntas nuevas. Por eso no cerramos el ciclo: volvemos a investigar sobre esa misma experiencia." };
+const REMATE = { n: "08 → 01", titulo: "La evidencia vuelve al proceso", clave: "deja más capacidad en los equipos", texto: "Cada implementación es una nueva oportunidad para observar, comprender y decidir. Lo que se aprende mejora la intervención y deja más capacidad en los equipos." };
+
+// ── Geometría (unidades del viewBox) ─────────────────────────────────────
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v)); return e; };
+const pad = (n) => String(n).padStart(2, "0");
+const K = Math.SQRT1_2;
+const cx = 400, cy = 300, r1 = 80, r2 = 200;
+const inner = [[cx + K * r1, cy - K * r1], [cx + K * r1, cy + K * r1], [cx - K * r1, cy + K * r1], [cx - K * r1, cy - K * r1]];
+const outer = [[cx, cy - r2], [cx + r2, cy], [cx, cy + r2], [cx - r2, cy]];
+const P = (p) => `${p[0]} ${p[1]}`;
+const dInner = `M ${P(inner[0])} A ${r1} ${r1} 0 0 1 ${P(inner[1])} A ${r1} ${r1} 0 0 1 ${P(inner[2])} A ${r1} ${r1} 0 0 1 ${P(inner[3])}`;
+const dPuente = `M ${P(inner[3])} C ${cx - 150} ${cy - 130}, ${cx - 90} ${cy - r2}, ${P(outer[0])}`;
+const dOuter = `M ${P(outer[0])} A ${r2} ${r2} 0 0 1 ${P(outer[1])} A ${r2} ${r2} 0 0 1 ${P(outer[2])} A ${r2} ${r2} 0 0 1 ${P(outer[3])}`;
+const dLazo = `M ${P(outer[3])} C ${cx - r2} ${cy - 110}, ${cx - 20} ${cy - r1 - 60}, ${P(inner[0])}`;
+
+const svg = document.getElementById("svg");
+svg.appendChild(el("circle", { cx, cy, r: r1, class: "anillo" }));
+const tramosPath = [dInner, dPuente, dOuter, dLazo].map((d, i) => { const p = el("path", { d, class: `recorrido ${i % 2 ? "verde" : ""}` }); svg.appendChild(p); return p; });
+const L = tramosPath.map((p) => p.getTotalLength());
+const acumulado = L.reduce((acc, l) => { acc.push(acc[acc.length - 1] + l); return acc; }, [0]);
+tramosPath.forEach((p, i) => { p.style.strokeDasharray = `${L[i]}`; p.style.strokeDashoffset = `${L[i]}`; });
+const nodosXY = [...inner, ...outer];
+const nodos = nodosXY.map((p) => { const c = el("circle", { cx: p[0], cy: p[1], r: 6, class: "nodo" }); svg.appendChild(c); return c; });
+// Solo el número, pegado al nodo, hacia afuera. Sin nombres ni guías: el nombre va en la card.
+const dirs = [[1, -1], [1, 1], [-1, 1], [-1, -1], [0, -1], [1, 0], [0, 1], [-1, 0]].map(([x, y]) => (x && y ? [x * K, y * K] : [x, y]));
+const numeros = nodosXY.map((p, i) => {
+  const t = el("text", { class: "numero-nodo", "text-anchor": dirs[i][0] > 0.1 ? "start" : dirs[i][0] < -0.1 ? "end" : "middle", "dominant-baseline": "middle" });
+  t.textContent = pad(i + 1);
+  svg.appendChild(t);
+  return t;
+});
+const halo = el("circle", { cx: inner[0][0], cy: inner[0][1], r: 20, class: "halo" });
+const punto = el("circle", { cx: inner[0][0], cy: inner[0][1], r: 8, class: "punto" });
+svg.appendChild(halo); svg.appendChild(punto);
+
+// ── Tiempos (unidades) ───────────────────────────────────────────────────
+const INTRO = 0.4, MOV = 0.55, PAUSA = 0.35;
+const ABRE0 = 3.1, ABRE1 = 4.3;
+const PUENTE0 = 3.5, PUENTE1 = 4.4;
+const LAZO0 = 7.6, LAZO1 = 8.4;
+const FIN = 9.0;
+const llegada = [0, 0.95, 1.85, 2.75, PUENTE1, 5.45, 6.35, 7.25];
+const frac = (i) => i / 3;
+const tramos = [];
+for (let i = 0; i < 3; i++) tramos.push([INTRO + i * (MOV + PAUSA), INTRO + i * (MOV + PAUSA) + MOV, acumulado[0] + L[0] * frac(i), acumulado[0] + L[0] * frac(i + 1)]);
+tramos.push([PUENTE0, PUENTE1, acumulado[1], acumulado[2]]);
+for (let i = 0; i < 3; i++) tramos.push([PUENTE1 + PAUSA + 0.15 + i * (MOV + PAUSA), PUENTE1 + PAUSA + 0.15 + i * (MOV + PAUSA) + MOV, acumulado[2] + L[2] * frac(i), acumulado[2] + L[2] * frac(i + 1)]);
+tramos.push([LAZO0, LAZO1, acumulado[3], acumulado[4]]);
+const suave = gsap.parseEase("power1.inOut");
+const longitudEn = (t) => {
+  let l = 0;
+  for (const [t0, t1, l0, l1] of tramos) {
+    if (t <= t0) break;
+    const u = Math.min(1, (t - t0) / (t1 - t0));
+    l = l0 + (l1 - l0) * suave(u);
+  }
+  return l;
+};
+const puntoEn = (l) => {
+  for (let i = 0; i < 4; i++) {
+    if (l <= acumulado[i + 1] || i === 3) return tramosPath[i].getPointAtLength(Math.max(0, Math.min(L[i], l - acumulado[i])));
+  }
+};
+
+// ── Cámara: viewBox interpolado (4:3 en las dos puntas) ──────────────────
+const ZOOM = { x: 262, y: 180, w: 320, h: 240 };
+const ABIERTO = { x: 40, y: 30, w: 720, h: 540 };
+const lerp = (u, p, q) => p + (q - p) * u;
+const camaraEn = (t) => {
+  const u = t <= ABRE0 ? 0 : t >= ABRE1 ? 1 : suave((t - ABRE0) / (ABRE1 - ABRE0));
+  return { u, x: lerp(u, ZOOM.x, ABIERTO.x), y: lerp(u, ZOOM.y, ABIERTO.y), w: lerp(u, ZOOM.w, ABIERTO.w), h: lerp(u, ZOOM.h, ABIERTO.h) };
+};
+
+// ── La pila de fichas ────────────────────────────────────────────────────
+const pila = document.getElementById("pila");
+let fichaActual = null;
+let fichas = [];
+// Inclinación con la que cada ficha se planta sobre la pila, como en el archivo.
+const ROT = [-1.6, 1.4, -1.2, 1.5, -1.4, 1.2, -1.5, 1.3];
+const activoEn = (t) => {
+  if (t >= LAZO0 + 0.55) return "remate";
+  for (let j = 7; j >= 4; j--) if (t >= llegada[j] - 0.12) return j;
+  if (t >= ABRE0 + 0.1) return "bisagra";
+  for (let i = 3; i >= 0; i--) if (t >= llegada[i] - 0.12) return i;
+  return 0;
+};
+/** La marca de agua: la figura en chiquito, con el nodo de la etapa en verde. */
+function marcaDeAgua(activo) {
+  const c = 75, ra = 24, rb = 60, k = Math.SQRT1_2;
+  const nodos = [[c + k * ra, c - k * ra], [c + k * ra, c + k * ra], [c - k * ra, c + k * ra], [c - k * ra, c - k * ra], [c, c - rb], [c + rb, c], [c, c + rb], [c - rb, c]];
+  const puntos = nodos.map((p, i) => `<circle class="nodo-m ${i === activo ? "actual" : ""}" cx="${p[0]}" cy="${p[1]}" r="${i === activo ? 5 : 3.5}" />`).join("");
+  return `<svg class="marca" viewBox="0 0 150 150" aria-hidden="true"><circle class="anillo-m" cx="${c}" cy="${c}" r="${ra}" /><circle class="anillo-m" cx="${c}" cy="${c}" r="${rb}" />${puntos}</svg>`;
+}
+const iconoVuelta = (grande) => `<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="5.5" fill="none" stroke="${grande ? "#a9c5e8" : "#1f2d4d"}" stroke-width="2"/><circle cx="15" cy="15" r="12" fill="none" stroke="${grande ? "#1f2d4d" : "#a9c5e8"}" stroke-width="2"/></svg>`;
+function crearFicha(activo) {
+  const esEstacion = typeof activo === "number";
+  const d = esEstacion ? ESTACIONES[activo] : activo === "bisagra" ? BISAGRA : REMATE;
+  const vuelta2 = esEstacion ? activo >= 4 : activo === "remate";
+  const n = esEstacion ? pad(activo + 1) : d.n;
+  const texto = d.clave && d.texto.includes(d.clave) ? d.texto.replace(d.clave, `<mark>${d.clave}</mark>`) : d.texto;
+  const sello = esEstacion ? `<span>Etapa ${pad(activo + 1)}</span><span>de 08</span>` : activo === "bisagra" ? `<span>Bisagra</span><span>04 → 05</span>` : `<span>Cierre</span><span>08 → 01</span>`;
+  const pie = esEstacion ? `Etapa ${pad(activo + 1)} · ${d.nombre}` : activo === "bisagra" ? "Por eso volvemos a investigar" : "Implementar no es terminar";
+  const el = document.createElement("article");
+  el.className = "ficha";
+  el.innerHTML = `
+    <div class="cabecera">
+      <div class="vuelta">${iconoVuelta(vuelta2)}<span>${vuelta2 ? "Con la evidencia" : "Con las y los docentes"}</span></div>
+      <p class="sello">${sello}</p>
+    </div>
+    <p class="cifra"><span class="n">${n}</span><span class="u">${d.titulo}</span></p>
+    <p class="texto">${texto}</p>
+    <p class="pie">${pie}</p>
+    ${marcaDeAgua(esEstacion ? activo : -1)}`;
+  return el;
+}
+function pintarCard(activo) {
+  if (activo === fichaActual) return;
+  fichaActual = activo;
+  const ficha = crearFicha(activo);
+  pila.appendChild(ficha);
+  fichas.push(ficha);
+  const rot = typeof activo === "number" ? ROT[activo] : 0;
+  // cae sobre la pila: sube desde abajo, se endereza y se planta
+  gsap.fromTo(ficha, { y: 90, rotation: -7, autoAlpha: 0 }, { y: 0, rotation: rot, autoAlpha: 1, duration: 0.55, ease: "power3.out" });
+  // las anteriores se hunden atrás, cada vez más chicas; la tercera ya no se ve
+  fichas.slice(0, -1).forEach((f, i) => {
+    const prof = fichas.length - 1 - i;
+    gsap.to(f, { y: -14 * prof, scale: 1 - 0.045 * prof, duration: 0.5, ease: "power2.out" });
+  });
+  while (fichas.length > 3) fichas.shift().remove();
+}
+const voces = [...document.querySelectorAll(".voz")];
+const fade = (a, b, x) => Math.max(0, Math.min(1, (x - a) / (b - a)));
+const vozOpacidad = (t) => [1 - fade(3.2, 3.45, t), fade(3.45, 3.7, t) * (1 - fade(4.45, 4.7, t)), fade(4.7, 4.95, t)];
+
+// ── Render ───────────────────────────────────────────────────────────────
+const figura = document.getElementById("figura");
+const hint = document.getElementById("hint");
+const progreso = document.getElementById("progreso");
+const estado = { t: 0 };
+function render() {
+  const t = estado.t;
+  const cam = camaraEn(t);
+  svg.setAttribute("viewBox", `${cam.x} ${cam.y} ${cam.w} ${cam.h}`);
+  const s = figura.clientWidth / cam.w;
+  svg.querySelectorAll(".anillo").forEach((e) => (e.style.strokeWidth = 2.5 / s));
+  svg.querySelectorAll(".recorrido").forEach((e) => (e.style.strokeWidth = 3 / s));
+  const aparece = Math.max(0, Math.min(1, (cam.u - 0.35) / 0.4));
+
+  const l = longitudEn(t);
+  const p = puntoEn(l);
+  punto.setAttribute("cx", p.x); punto.setAttribute("cy", p.y); punto.setAttribute("r", 8 / s);
+  halo.setAttribute("cx", p.x); halo.setAttribute("cy", p.y); halo.setAttribute("r", 22 / s);
+  tramosPath.forEach((path, i) => {
+    const hecho = Math.max(0, Math.min(L[i], l - acumulado[i]));
+    path.style.strokeDashoffset = `${L[i] - hecho}`;
+  });
+
+  const activo = activoEn(t);
+  nodos.forEach((n, i) => {
+    n.setAttribute("r", (i === activo ? 8 : 6.5) / s);
+    n.setAttribute("class", `nodo ${t >= llegada[i] - 0.02 ? (i === activo ? "actual" : "pasado") : ""}`);
+    if (i >= 4) n.style.opacity = aparece;
+  });
+  numeros.forEach((n, i) => {
+    const [dx, dy] = dirs[i];
+    const [x, y] = nodosXY[i];
+    n.setAttribute("x", x + dx * (20 / s)); n.setAttribute("y", y + dy * (20 / s));
+    n.setAttribute("font-size", 11 / s);
+    n.setAttribute("class", `numero-nodo ${t >= llegada[i] - 0.02 ? (i === activo ? "actual" : "pasado") : ""}`);
+    // los del anillo grande aparecen con la cámara abierta
+    n.setAttribute("opacity", i < 4 ? 1 : aparece);
+  });
+
+  pintarCard(activo);
+  vozOpacidad(t).forEach((o, i) => { voces[i].style.opacity = o; voces[i].style.transform = `translateY(${(1 - o) * 10}px)`; });
+  hint.style.opacity = t < 0.15 ? 1 : 0;
+  progreso.textContent = `t ${t.toFixed(2)}`;
+}
+
+gsap.to(estado, {
+  t: FIN, ease: "none",
+  scrollTrigger: { trigger: ".runway", start: "top top", end: "bottom bottom", scrub: 0.6 },
+  onUpdate: render,
+});
+window.addEventListener("resize", render);
+render();
+</script>
+</body>
+</html>

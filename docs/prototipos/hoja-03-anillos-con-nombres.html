@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Prototipo · Hoja 03 · B · anillos concéntricos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root {
+    --navy: #1f2d4d; --azul-medio: #4a6fa5; --azul-claro: #a9c5e8;
+    --verde: #1f9a78; --verde-texto: #177a5f; --naranja: #e07a2f;
+    --gris-fondo: #f2f4f7; --gris-texto: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body { margin: 0; background: var(--gris-fondo); color: var(--navy); font-family: Inter, system-ui, sans-serif; }
+  .antes, .despues { height: 60vh; display: grid; place-items: center; color: var(--gris-texto); font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .runway { position: relative; height: calc(100vh + 4300px); }
+  .hoja { position: sticky; top: 10px; height: calc(100vh - 20px); margin: 0 10px; background: #fff; border-radius: 12px;
+    box-shadow: 0 0 0 1px rgb(31 45 77 / .1), 0 4px 12px -8px rgb(31 45 77 / .35); padding: 44px 48px; overflow: hidden;
+    display: grid; grid-template-columns: 24% 1fr 26%; gap: 28px; align-items: center; }
+  .rotulo { position: absolute; top: 26px; right: 32px; font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: rgb(107 114 128 / .7); }
+  .variante { position: absolute; top: 26px; left: 48px; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--naranja); }
+  .titulo { align-self: start; margin-top: 56px; position: relative; min-height: 260px; }
+  .voz { position: absolute; inset: 0 auto auto 0; width: 100%; opacity: 0; }
+  .voz h2 { font-family: Manrope, sans-serif; font-weight: 800; font-size: 42px; line-height: 1.06; letter-spacing: -.025em; margin: 0; max-width: 16ch; }
+  .voz h2 u { text-decoration: none; background: linear-gradient(var(--verde), var(--verde)) no-repeat 0 96% / 100% .14em; }
+  .voz p.nota { font-family: Manrope, sans-serif; font-weight: 500; font-size: 26px; line-height: 1.3; margin: 0; max-width: 22ch; }
+  .figura { position: relative; align-self: center; }
+  .figura svg { width: 100%; height: auto; display: block; overflow: hidden; }
+  .anillo { fill: none; stroke: var(--azul-claro); }
+  .anillo.tenue { stroke-dasharray: 5 7; opacity: .75; }
+  .recorrido { fill: none; stroke: var(--navy); stroke-linecap: round; }
+  .recorrido.verde { stroke: var(--verde); }
+  .guia { stroke: var(--azul-claro); }
+  .nodo { fill: var(--azul-claro); transition: fill .3s; }
+  .nodo.pasado { fill: var(--navy); }
+  .nodo.actual { fill: var(--naranja); }
+  .punto { fill: var(--naranja); }
+  .halo { fill: var(--naranja); opacity: .18; }
+  .etiqueta { position: absolute; top: 0; left: 0; pointer-events: none; white-space: nowrap; transition: opacity .25s; }
+  .etiqueta .num { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .12em; color: var(--gris-texto); display: block; line-height: 1.2; }
+  .etiqueta .nombre { font-family: Manrope, sans-serif; font-weight: 700; font-size: 14px; color: rgb(107 114 128 / .85); display: block; line-height: 1.2; transition: color .3s; }
+  .etiqueta.pasado .nombre, .etiqueta.actual .nombre { color: var(--navy); }
+  .etiqueta.actual .num { color: var(--verde-texto); }
+  .etiqueta.end { text-align: right; }
+  .etiqueta.middle { text-align: center; }
+  .panel { align-self: center; border: 1px solid rgb(31 45 77 / .08); background: var(--gris-fondo); border-radius: 20px; padding: 30px 30px 26px; min-height: 330px; }
+  .panel > div { transition: opacity .22s; }
+  .panel .paso { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--gris-texto); }
+  .panel h3 { font-family: Manrope, sans-serif; font-weight: 800; font-size: 29px; line-height: 1.08; letter-spacing: -.02em; margin: 12px 0 0; }
+  .panel .clave { font-family: Manrope, sans-serif; font-weight: 600; font-size: 16px; color: var(--verde-texto); margin: 12px 0 0; min-height: 1.2em; }
+  .panel p.texto { margin: 14px 0 0; font-size: 16px; line-height: 1.55; color: rgb(31 45 77 / .8); }
+  .panel p.texto mark { background: none; color: var(--navy); font-weight: 500; text-decoration: underline; text-decoration-color: var(--verde); text-decoration-thickness: .12em; text-underline-offset: .18em; }
+  .panel .sig { margin-top: 22px; padding-top: 16px; border-top: 1px solid rgb(31 45 77 / .1); font-size: 13px; color: var(--gris-texto); min-height: 1.4em; }
+  .panel .sig b { color: var(--navy); font-weight: 600; }
+  .hint { position: absolute; left: 48px; bottom: 26px; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--gris-texto); transition: opacity .3s; }
+  .progreso { position: absolute; right: 32px; bottom: 26px; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .12em; color: rgb(107 114 128 / .6); }
+</style>
+</head>
+<body>
+
+<div class="antes">↓ scrolleá · la hoja se clava y la escena corre con el scroll</div>
+
+<div class="runway">
+  <section class="hoja">
+    <span class="variante">Prototipo · B · dos anillos concéntricos</span>
+    <span class="rotulo">Archivo ED · Hoja 03</span>
+
+    <div class="titulo">
+      <div class="voz" data-voz="0"><h2>Cómo una <u>experiencia</u> se convierte en transformación.</h2></div>
+      <div class="voz" data-voz="1"><p class="nota">La cuarta etapa no cierra el ciclo: abre nuevas preguntas. Por eso volvemos a investigar.</p></div>
+      <div class="voz" data-voz="2"><h2>Implementar no es <u>terminar</u>.</h2></div>
+    </div>
+
+    <div class="figura" id="figura">
+      <svg id="svg" viewBox="0 0 800 600"></svg>
+      <div id="etiquetas"></div>
+    </div>
+
+    <aside class="panel" id="panel">
+      <div id="panel-cuerpo">
+        <div class="paso"></div>
+        <h3></h3>
+        <div class="clave"></div>
+        <p class="texto"></p>
+        <div class="sig"></div>
+      </div>
+    </aside>
+
+    <span class="hint" id="hint">↓ scroll</span>
+    <span class="progreso" id="progreso">t 0.00</span>
+  </section>
+</div>
+
+<div class="despues">fin de la hoja · (sigue la página)</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Contenido ────────────────────────────────────────────────────────────
+const ESTACIONES = [
+  { nombre: "Fase experiencial", clave: "viven situaciones", texto: "Las y los participantes viven situaciones para cuestionar sentidos, explorar estrategias y problematizar la matemática escolar desde su propia experiencia." },
+  { nombre: "Implementación en contexto", clave: "programas reales", texto: "Las propuestas se llevan a aulas, instituciones o programas reales, contextualizadas desde el conocimiento profesional de quienes las implementan." },
+  { nombre: "Práctica reflexiva", clave: "confrontan decisiones", texto: "Se analiza lo ocurrido, se intercambian experiencias y se confrontan decisiones a partir de lo que produjo la situación." },
+  { nombre: "Resignificación del conocimiento", clave: "comprender y actuar", texto: "El conocimiento deja de ser solo un contenido a transmitir: se convierte en una herramienta para comprender y actuar." },
+  { nombre: "Registrar evidencias", clave: "resguardo ético", texto: "Recuperamos producciones, decisiones, resultados y testimonios, con resguardo ético de docentes, estudiantes e instituciones." },
+  { nombre: "Analizar e interpretar", clave: "Una cifra aislada", texto: "Leemos las evidencias en relación con las preguntas, el contexto y los objetivos. Una cifra aislada no explica qué ocurrió." },
+  { nombre: "Sistematizar y producir conocimiento", clave: "puede comunicarse", texto: "Reconocemos patrones y elaboramos explicaciones: la experiencia se convierte en conocimiento que puede comunicarse y transferirse." },
+  { nombre: "Retroalimentar y ajustar", clave: "abrimos otro ciclo", texto: "Volvemos sobre el diseño, acompañamos nuevas decisiones y abrimos otro ciclo de investigación y acción." },
+];
+const BISAGRA = { paso: "Bisagra", nombre: "La cuarta etapa no cierra el ciclo.", clave: "", texto: "Abre nuevas preguntas. Por eso volvemos a investigar: registrar evidencias, analizar, sistematizar y ajustar.", sig: "Sigue: <b>05 · Registrar evidencias</b>" };
+const REMATE = { paso: "La evidencia vuelve al proceso", nombre: "Implementar no es terminar.", clave: "", texto: "Implementar es generar una nueva oportunidad para observar, comprender y decidir. La evidencia vuelve al proceso: mejora la intervención y fortalece la capacidad de los equipos.", sig: "" };
+
+// ── Geometría de la escena (unidades del viewBox 800×600) ────────────────
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v)); return e; };
+const pad = (n) => String(n).padStart(2, "0");
+const K = Math.SQRT1_2;
+const cx = 400, cy = 300, r1 = 80, r2 = 200;
+const inner = [[cx + K * r1, cy - K * r1], [cx + K * r1, cy + K * r1], [cx - K * r1, cy + K * r1], [cx - K * r1, cy - K * r1]];
+const outer = [[cx, cy - r2], [cx + r2, cy], [cx, cy + r2], [cx - r2, cy]];
+const dirsInner = [[1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, y]) => [x * K, y * K]);
+const dirsOuter = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+const P = (p) => `${p[0]} ${p[1]}`;
+const dInner = `M ${P(inner[0])} A ${r1} ${r1} 0 0 1 ${P(inner[1])} A ${r1} ${r1} 0 0 1 ${P(inner[2])} A ${r1} ${r1} 0 0 1 ${P(inner[3])}`;
+const dPuente = `M ${P(inner[3])} C ${cx - 150} ${cy - 130}, ${cx - 90} ${cy - r2}, ${P(outer[0])}`;
+const dOuter = `M ${P(outer[0])} A ${r2} ${r2} 0 0 1 ${P(outer[1])} A ${r2} ${r2} 0 0 1 ${P(outer[2])} A ${r2} ${r2} 0 0 1 ${P(outer[3])}`;
+const dLazo = `M ${P(outer[3])} C ${cx - r2} ${cy - 110}, ${cx - 20} ${cy - r1 - 60}, ${P(inner[0])}`;
+
+const svg = document.getElementById("svg");
+// base
+svg.appendChild(el("circle", { cx, cy, r: r1, class: "anillo" }));
+svg.appendChild(el("circle", { cx, cy, r: r2, class: "anillo" }));
+svg.appendChild(el("path", { d: dPuente, class: "anillo tenue" }));
+svg.appendChild(el("path", { d: dLazo, class: "anillo tenue" }));
+// guías del anillo chico (se prenden cuando la cámara se abre)
+const guias = inner.map((p, i) => { const g = el("line", { x1: p[0], y1: p[1], x2: p[0], y2: p[1], class: "guia", opacity: 0 }); svg.appendChild(g); return g; });
+// recorridos
+const rInner = el("path", { d: dInner, class: "recorrido" });
+const rPuente = el("path", { d: dPuente, class: "recorrido verde" });
+const rOuter = el("path", { d: dOuter, class: "recorrido" });
+const rLazo = el("path", { d: dLazo, class: "recorrido verde" });
+[rInner, rPuente, rOuter, rLazo].forEach((p) => svg.appendChild(p));
+const tramosPath = [rInner, rPuente, rOuter, rLazo];
+const L = tramosPath.map((p) => p.getTotalLength());
+const acumulado = L.reduce((acc, l) => { acc.push(acc[acc.length - 1] + l); return acc; }, [0]);
+tramosPath.forEach((p, i) => { p.style.strokeDasharray = `${L[i]}`; p.style.strokeDashoffset = `${L[i]}`; });
+// nodos
+const nodos = [...inner, ...outer].map((p) => { const c = el("circle", { cx: p[0], cy: p[1], r: 6, class: "nodo" }); svg.appendChild(c); return c; });
+// el punto
+const halo = el("circle", { cx: inner[0][0], cy: inner[0][1], r: 20, class: "halo" });
+const punto = el("circle", { cx: inner[0][0], cy: inner[0][1], r: 8, class: "punto" });
+svg.appendChild(halo); svg.appendChild(punto);
+
+// etiquetas HTML
+const cont = document.getElementById("etiquetas");
+const etiquetas = ESTACIONES.map((e, i) => {
+  const d = document.createElement("div");
+  const esInner = i < 4;
+  const dir = esInner ? dirsInner[i] : dirsOuter[i - 4];
+  const align = Math.abs(dir[0]) < 0.01 ? "middle" : dir[0] > 0 ? "start" : "end";
+  d.className = `etiqueta ${align}`;
+  d.innerHTML = `<span class="num">${pad(i + 1)}</span><span class="nombre">${e.nombre}</span>`;
+  cont.appendChild(d);
+  return d;
+});
+
+// ── Tiempos (unidades) ───────────────────────────────────────────────────
+const INTRO = 0.4, MOV = 0.55, PAUSA = 0.35;
+const ABRE0 = 3.1, ABRE1 = 4.3;         // cámara
+const PUENTE0 = 3.5, PUENTE1 = 4.4;     // el punto cruza
+const LAZO0 = 7.6, LAZO1 = 8.4;
+const FIN = 9.0;
+// estación i se alcanza en:
+const llegada = [0, 0.95, 1.85, 2.75, PUENTE1, 5.45, 6.35, 7.25];
+// tramos del punto: [t0, t1, L0, L1] en longitud global
+const frac = (i) => i / 3;
+const tramos = [];
+for (let i = 0; i < 3; i++) tramos.push([INTRO + i * (MOV + PAUSA), INTRO + i * (MOV + PAUSA) + MOV, acumulado[0] + L[0] * frac(i), acumulado[0] + L[0] * frac(i + 1)]);
+tramos.push([PUENTE0, PUENTE1, acumulado[1], acumulado[2]]);
+for (let i = 0; i < 3; i++) tramos.push([PUENTE1 + PAUSA + 0.15 + i * (MOV + PAUSA), PUENTE1 + PAUSA + 0.15 + i * (MOV + PAUSA) + MOV, acumulado[2] + L[2] * frac(i), acumulado[2] + L[2] * frac(i + 1)]);
+tramos.push([LAZO0, LAZO1, acumulado[3], acumulado[4]]);
+const suave = gsap.parseEase("power1.inOut");
+const longitudEn = (t) => {
+  let l = 0;
+  for (const [t0, t1, l0, l1] of tramos) {
+    if (t <= t0) break;
+    const u = Math.min(1, (t - t0) / (t1 - t0));
+    l = l0 + (l1 - l0) * suave(u);
+  }
+  return l;
+};
+const puntoEn = (l) => {
+  for (let i = 0; i < 4; i++) {
+    if (l <= acumulado[i + 1] || i === 3) return tramosPath[i].getPointAtLength(Math.max(0, Math.min(L[i], l - acumulado[i])));
+  }
+};
+
+// ── Cámara: viewBox interpolado ──────────────────────────────────────────
+const ZOOM = { x: 262, y: 180, w: 320, h: 240 };
+const ABIERTO = { x: 40, y: 30, w: 720, h: 540 };
+const lerp = (a, b, u) => a + (b - a) * u;
+const camaraEn = (t) => {
+  const u = t <= ABRE0 ? 0 : t >= ABRE1 ? 1 : suave((t - ABRE0) / (ABRE1 - ABRE0));
+  return { u, x: lerp(ZOOM.x, ABIERTO.x, u), y: lerp(ZOOM.y, ABIERTO.y, u), w: lerp(ZOOM.w, ABIERTO.w, u), h: lerp(ZOOM.h, ABIERTO.h, u) };
+};
+
+// ── Panel y voces ────────────────────────────────────────────────────────
+const panel = document.getElementById("panel-cuerpo");
+let panelActual = null;
+const activoEn = (t) => {
+  if (t >= LAZO0 + 0.55) return "remate";
+  for (let j = 7; j >= 4; j--) if (t >= llegada[j] - 0.12) return j;
+  if (t >= ABRE0 + 0.1) return "bisagra";
+  for (let i = 3; i >= 0; i--) if (t >= llegada[i] - 0.12) return i;
+  return 0;
+};
+function pintarPanel(activo) {
+  if (activo === panelActual) return;
+  panelActual = activo;
+  const datos = activo === "bisagra" ? BISAGRA : activo === "remate" ? REMATE : {
+    paso: `Etapa ${pad(activo + 1)} · de 08`, ...ESTACIONES[activo],
+    sig: activo < 7 ? `Sigue: <b>${pad(activo + 2)} · ${ESTACIONES[activo + 1].nombre}</b>` : "Sigue: <b>vuelve al 01</b>",
+  };
+  panel.style.opacity = 0;
+  setTimeout(() => {
+    const texto = datos.clave ? datos.texto.replace(datos.clave, `<mark>${datos.clave}</mark>`) : datos.texto;
+    panel.querySelector(".paso").textContent = datos.paso;
+    panel.querySelector("h3").textContent = datos.nombre;
+    panel.querySelector(".clave").textContent = datos.clave ? datos.clave[0].toUpperCase() + datos.clave.slice(1) : "";
+    panel.querySelector(".texto").innerHTML = texto;
+    panel.querySelector(".sig").innerHTML = datos.sig;
+    panel.style.opacity = 1;
+  }, 120);
+}
+const voces = [...document.querySelectorAll(".voz")];
+const vozOpacidad = (t) => {
+  // título 1 hasta 3.3 · nota 3.4–4.5 · título 2 desde 4.6
+  const fade = (a, b, x) => Math.max(0, Math.min(1, (x - a) / (b - a)));
+  return [1 - fade(3.2, 3.45, t), fade(3.45, 3.7, t) * (1 - fade(4.45, 4.7, t)), fade(4.7, 4.95, t)];
+};
+
+// ── Render ───────────────────────────────────────────────────────────────
+const figura = document.getElementById("figura");
+const hint = document.getElementById("hint");
+const progreso = document.getElementById("progreso");
+const estado = { t: 0 };
+function render() {
+  const t = estado.t;
+  const cam = camaraEn(t);
+  svg.setAttribute("viewBox", `${cam.x} ${cam.y} ${cam.w} ${cam.h}`);
+  const anchoPx = figura.clientWidth;
+  const s = anchoPx / cam.w; // px por unidad
+  const proyectar = (x, y) => [(x - cam.x) * s, (y - cam.y) * s];
+  svg.querySelectorAll(".anillo").forEach((e) => (e.style.strokeWidth = 2.5 / s));
+  svg.querySelectorAll(".recorrido").forEach((e) => (e.style.strokeWidth = 3 / s));
+  svg.querySelectorAll(".guia").forEach((e) => (e.style.strokeWidth = 1.5 / s));
+  svg.querySelectorAll(".anillo.tenue").forEach((e) => (e.style.opacity = 0.75 * cam.u));
+
+  // el punto y lo recorrido
+  const l = longitudEn(t);
+  const p = puntoEn(l);
+  punto.setAttribute("cx", p.x); punto.setAttribute("cy", p.y); punto.setAttribute("r", 8 / s);
+  halo.setAttribute("cx", p.x); halo.setAttribute("cy", p.y); halo.setAttribute("r", 22 / s);
+  tramosPath.forEach((path, i) => {
+    const hecho = Math.max(0, Math.min(L[i], l - acumulado[i]));
+    path.style.strokeDashoffset = `${L[i] - hecho}`;
+  });
+
+  // nodos y etiquetas
+  const activo = activoEn(t);
+  nodos.forEach((n, i) => {
+    n.setAttribute("r", (i === activo ? 8 : 6.5) / s);
+    n.setAttribute("class", `nodo ${t >= llegada[i] - 0.02 ? (i === activo ? "actual" : "pasado") : ""}`);
+  });
+  etiquetas.forEach((d, i) => {
+    const esInner = i < 4;
+    const nodo = esInner ? inner[i] : outer[i - 4];
+    const dir = esInner ? dirsInner[i] : dirsOuter[i - 4];
+    let ax, ay, op = 1;
+    if (esInner) {
+      const cerca = [nodo[0] + dir[0] * 16, nodo[1] + dir[1] * 16];
+      const lejos = [cx + dir[0] * (r2 + 34), cy + dir[1] * (r2 + 34)];
+      ax = lerp(cerca[0], lejos[0], cam.u); ay = lerp(cerca[1], lejos[1], cam.u);
+      const g = guias[i];
+      g.setAttribute("x2", lerp(cerca[0], cx + dir[0] * (r2 + 22), cam.u)); g.setAttribute("y2", lerp(cerca[1], cy + dir[1] * (r2 + 22), cam.u));
+      g.setAttribute("opacity", cam.u);
+    } else {
+      ax = nodo[0] + dir[0] * 22; ay = nodo[1] + dir[1] * 22;
+      op = Math.max(0, Math.min(1, (cam.u - 0.45) / 0.35));
+    }
+    const [px, py] = proyectar(ax, ay);
+    const align = Math.abs(dir[0]) < 0.01 ? "middle" : dir[0] > 0 ? "start" : "end";
+    const tx = align === "middle" ? "-50%" : align === "end" ? "-100%" : "0";
+    const ty = align === "middle" ? (dir[1] < 0 ? "-100%" : "0") : "-50%";
+    d.style.transform = `translate(${px}px, ${py}px) translate(${tx}, ${ty})`;
+    d.style.opacity = op;
+    d.className = `etiqueta ${align} ${t >= llegada[i] - 0.02 ? (i === activo ? "actual" : "pasado") : ""}`;
+  });
+
+  pintarPanel(activo);
+  vozOpacidad(t).forEach((o, i) => { voces[i].style.opacity = o; voces[i].style.transform = `translateY(${(1 - o) * 10}px)`; });
+  hint.style.opacity = t < 0.15 ? 1 : 0;
+  progreso.textContent = `t ${t.toFixed(2)} · l ${Math.round(l)}`;
+}
+
+gsap.to(estado, {
+  t: FIN, ease: "none",
+  scrollTrigger: { trigger: ".runway", start: "top top", end: "bottom bottom", scrub: 0.6 },
+  onUpdate: render,
+});
+window.addEventListener("resize", render);
+render();
+</script>
+</body>
+</html>
