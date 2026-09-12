@@ -16,13 +16,13 @@ import { EspiralLamina } from "./EspiralLamina";
  *
  * Los dos ciclos de cuatro pasos se cuentan como una sola figura: la
  * espiral de «Transformar» del hero, agrandada a dos vueltas. La escena
- * arranca en primer plano: el personaje recorre la vuelta interior (el
- * ciclo pedagógico) y cada estación se anota sobre la figura. En la cuarta
- * etapa no se va —«no cierra el ciclo»— y la cámara se aleja: lo que
- * parecía la figura entera era la vuelta interior de algo más grande. Ahí
- * cambia el título: «Implementar no es terminar», y recorre la segunda
- * vuelta (la evidencia). Al final un lazo lo devuelve al primer nodo, donde
- * aterriza el remate: la evidencia vuelve al proceso. Hoja 03 del archivo,
+ * arranca en primer plano con el título de la hoja, que vuela en cuanto el
+ * personaje arranca: recorre la vuelta interior (el ciclo pedagógico) y
+ * cada estación se anota sobre la figura. En la cuarta etapa no se va —«no
+ * cierra el ciclo»— y la cámara se aleja: lo que parecía la figura entera
+ * era la vuelta interior de algo más grande. Recorre la segunda vuelta (la
+ * evidencia) y al final un lazo lo devuelve al primer nodo, donde aterriza
+ * el remate: la evidencia vuelve al proceso. Hoja 03 del archivo,
  * sobre el mismo papel que el hero. Escena en EspiralLamina.tsx,
  * coreografía en coreografia-espiral.ts, geometría de la lámina en
  * lamina-espiral.ts, copy en estaciones.ts.
