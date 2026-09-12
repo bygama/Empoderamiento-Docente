@@ -3,14 +3,19 @@ import { LARGO_GUIA } from "./lamina-espiral";
 
 /**
  * Los gestos de una anotación de la lámina: cómo se despliega desde su
- * nodo y cómo se retira. La entrada es escalonada —la guía se dibuja, el
- * bloque asoma desde el nodo, el nombre entra, después el texto, y al final
- * se subraya en verde la frase clave— para que la lectura tenga un orden.
- * Todo fromTo explícito (ver coreografia-espiral.ts) y solo transform y
- * opacity.
+ * nodo, cómo se atenúa cuando entra la siguiente y cómo se retira. La
+ * entrada es escalonada —la guía se dibuja, el bloque asoma desde el nodo,
+ * el nombre entra, después el texto, y al final se subraya en verde la
+ * frase clave— para que la lectura tenga un orden. Lo ya leído no se borra:
+ * baja a ATENUADA y queda para releer (Facundo, 2026-09-12); solo se va del
+ * todo cuando la cámara se abre o al lazo final. Todo fromTo explícito (ver
+ * coreografia-espiral.ts) y solo transform y opacity.
  */
 
 const sinRender = { immediateRender: false } as const;
+
+/** Opacidad de una anotación ya leída. */
+export const ATENUADA = 0.4;
 
 export function gestosAnotacion(
   tl: gsap.core.Timeline,
@@ -48,10 +53,17 @@ export function gestosAnotacion(
     }
   };
 
-  const sale = (at: number) => {
-    tl.fromTo(bloque, { autoAlpha: 1, x: 0, y: 0 }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
-    tl.fromTo(guia, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
+  const atenua = (at: number) => {
+    tl.fromTo(bloque, { autoAlpha: 1 }, { autoAlpha: ATENUADA, duration: 0.25, ease: "power1.inOut", ...sinRender }, at);
+    tl.fromTo(guia, { autoAlpha: 1 }, { autoAlpha: ATENUADA, duration: 0.25, ease: "power1.inOut", ...sinRender }, at);
   };
 
-  return { reposo, entra, sale };
+  /** `desde` es la opacidad con la que llega: 1 si es la última de su
+   *  vuelta (nadie la atenuó), ATENUADA si ya se leyó. */
+  const sale = (at: number, desde = 1) => {
+    tl.fromTo(bloque, { autoAlpha: desde, x: 0, y: 0 }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
+    tl.fromTo(guia, { autoAlpha: desde }, { autoAlpha: 0, duration: 0.2, ease: "power1.in", ...sinRender }, at);
+  };
+
+  return { reposo, entra, atenua, sale };
 }
