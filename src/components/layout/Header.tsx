@@ -9,7 +9,7 @@ import { NavDropdown } from "./NavDropdown";
 import { crearIntroNavbar } from "./header/coreografia-intro";
 import { crearAutoHide } from "./header/auto-hide";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
-import { EVENTO_URL, partirDestino } from "@/lib/navegar";
+import { EVENTO_URL, alClicSubirEnPagina, partirDestino } from "@/lib/navegar";
 import { MobileNav } from "./MobileNav";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -105,8 +105,10 @@ export function Header() {
     >
       {/* Grupo logo + wordmark. El wordmark colapsa (width + marginLeft → 0) sin
           dejar gap residual: la separación con los links la da el gap-3 del nav. */}
+      {/* En el Inicio, un Link a "/" no navegaría: pasa a subir al hero. */}
       <Link
         href={HOME_LINK.href}
+        onClick={alClicSubirEnPagina(isHome)}
         aria-label="Empoderamiento Docente — Inicio"
         className="flex shrink-0 items-center"
       >
@@ -155,6 +157,7 @@ export function Header() {
         </ul>
         <Link
           href={CTA_LINK.href}
+          onClick={alClicSubirEnPagina(pathname === CTA_LINK.href)}
           data-nav-item
           className="bg-naranja-accion rounded-xl px-5 py-2.5 font-sans text-[14px] font-medium text-white transition-opacity hover:opacity-90"
         >

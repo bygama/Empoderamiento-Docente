@@ -185,7 +185,7 @@ export function MobileNav() {
               onIrADestino={irADestino}
             />
 
-            <PieMenu onCerrar={close} />
+            <PieMenu pathname={pathname} onCerrar={close} onSubirEnPagina={subir} />
           </dialog>,
           document.body,
         )}
