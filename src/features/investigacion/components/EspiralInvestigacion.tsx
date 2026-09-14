@@ -16,9 +16,13 @@ import { EspiralLamina } from "./EspiralLamina";
  *
  * Los dos ciclos de cuatro pasos se cuentan como una sola figura: la
  * espiral de «Transformar» del hero, agrandada a dos vueltas. La escena
- * arranca en primer plano con el título de la hoja, que vuela en cuanto el
- * personaje arranca: recorre la vuelta interior (el ciclo pedagógico) y
- * cada estación se anota sobre la figura. En la cuarta etapa no se va —«no
+ * arranca en primer plano con el título de la hoja y el papel vacío: los
+ * nodos bajan en bandada, como las estrellas del hero sobre la hoja 01 (el
+ * personaje primero, que aterriza en la 01; los demás caen sueltos), y el
+ * título vuela en cuanto el personaje arranca: recorre la vuelta interior
+ * (el ciclo pedagógico), cada nodo vuela a su lugar justo antes de que
+ * llegue y cada estación se anota sobre la figura (la bandada,
+ * 2026-09-14: bandada-espiral.ts). En la cuarta etapa no se va —«no
  * cierra el ciclo»— y la cámara se aleja: lo que parecía la figura entera
  * era la vuelta interior de algo más grande. Recorre la segunda vuelta (la
  * evidencia) y al final un lazo lo devuelve al primer nodo, donde aterriza
