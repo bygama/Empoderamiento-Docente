@@ -60,15 +60,29 @@ export function irASeccion(id: string, { corte = false } = {}) {
   deslizarA(destino, corregirDesdeAca);
 }
 
+type OpcionesViaje = { corte?: boolean; alTerminar?: () => void };
+
 /** Va hasta un elemento; con `centrar`, lo deja al medio de la pantalla. */
-export function irAElemento(el: HTMLElement, { centrar = false, corte = false } = {}) {
+export function irAElemento(
+  el: HTMLElement,
+  { centrar = false, corte = false, alTerminar }: OpcionesViaje & { centrar?: boolean } = {},
+) {
   const r = el.getBoundingClientRect();
   const destino = Math.max(
     0,
     r.top + window.scrollY - (centrar ? (window.innerHeight - r.height) / 2 : 0),
   );
-  if (corte) saltarA(destino);
-  else deslizarA(destino);
+  irAPosicion(destino, { corte, alTerminar });
+}
+
+/** Va hasta una posición de la página y avisa al llegar (con corte, enseguida). */
+export function irAPosicion(y: number, { corte = false, alTerminar }: OpcionesViaje = {}) {
+  if (corte) {
+    saltarA(y);
+    alTerminar?.();
+    return;
+  }
+  deslizarA(y, alTerminar);
 }
 
 export function irArriba() {

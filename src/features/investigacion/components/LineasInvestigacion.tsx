@@ -9,6 +9,7 @@ import { Highlight } from "@/components/ui/Highlight";
 import { Search } from "@/components/ui/icons";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { alClicVerCaso } from "../casos/abrir-caso";
 import { ClipPapel, FlechaManuscrita, Pestana } from "../casos/Garabatos";
 import { PuntosCampo } from "./PuntosCampo";
 import { ROTULO_MICRO, ROTULO_TAB } from "../casos/tintes";
@@ -33,6 +34,11 @@ type Linea = {
   pregunta: string;
   buscamos: string;
   temas: readonly [string, string, string];
+  /** Slug del caso del archivo (casos/data.ts) que la muestra en acción:
+   *  «Ver en acción» desliza hasta la pila y abre ese expediente. El cruce
+   *  línea → caso es editorial (2026-09-14) y hay que validarlo con ED; las
+   *  líneas 03 y 05 caen en el caso 04 y la 02 y la 04 en el 01. */
+  caso: string;
 };
 
 type Carpeta = {
@@ -64,6 +70,7 @@ const CARPETAS: readonly Carpeta[] = [
         buscamos:
           "cómo el conocimiento matemático toma sentido en las prácticas de quienes lo usan.",
         temas: ["prácticas sociales", "matemática y realidad", "exclusión y participación"],
+        caso: "resignificacion-escuelas-tecnicas",
       },
       {
         nombre: "Discurso y problematización de la matemática escolar",
@@ -72,6 +79,7 @@ const CARPETAS: readonly Carpeta[] = [
         buscamos:
           "qué se da por sentado en la matemática escolar y qué se abre al revisarlo.",
         temas: ["libros de texto", "tareas", "argumentación"],
+        caso: "oaxaca-transformacion-colectiva",
       },
       {
         nombre: "Desarrollo y funcionalidad del pensamiento matemático",
@@ -80,6 +88,7 @@ const CARPETAS: readonly Carpeta[] = [
         buscamos:
           "cómo los contenidos se vuelven herramientas para pensar y decidir.",
         temas: ["estrategias", "toma de decisiones", "ciudadanía"],
+        caso: "contenido-curricular-herramienta-pensamiento",
       },
     ],
   },
@@ -98,6 +107,7 @@ const CARPETAS: readonly Carpeta[] = [
         buscamos:
           "cómo una comunidad docente gana autonomía para decidir sobre su práctica.",
         temas: ["liderazgo", "comunidades de aprendizaje", "reflexión sobre la práctica"],
+        caso: "oaxaca-transformacion-colectiva",
       },
       {
         nombre: "Escenarios, currículum y recursos para el aprendizaje",
@@ -106,6 +116,7 @@ const CARPETAS: readonly Carpeta[] = [
         buscamos:
           "qué condiciones y materiales habilitan participación y debate en el aula.",
         temas: ["situaciones de aprendizaje", "tareas disruptivas", "voz estudiantil"],
+        caso: "contenido-curricular-herramienta-pensamiento",
       },
       {
         nombre: "Evidencia, evaluación y mejora educativa",
@@ -114,6 +125,7 @@ const CARPETAS: readonly Carpeta[] = [
         buscamos:
           "qué evidencia explica una intervención más allá de una cifra.",
         temas: ["diseño de instrumentos", "estudios de impacto", "sistematización"],
+        caso: "evaluacion-mas-alla-del-puntaje",
       },
     ],
   },
@@ -195,8 +207,12 @@ function Hoja({
         <span className="text-azul-principal/70 max-w-[20ch] font-sans text-[0.78rem] leading-[1.4] font-medium">
           {linea.nombre}
         </span>
+        {/* Al caso que la muestra en acción: en la misma página desliza
+            hasta la pila y abre el expediente (abrir-caso.ts); el href es
+            el link directo del caso, por si se abre en otra pestaña. */}
         <Link
-          href="#en-accion"
+          href={`#${linea.caso}`}
+          onClick={alClicVerCaso(linea.caso)}
           aria-label={`Ver en acción: ${linea.nombre}`}
           className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto inline-flex shrink-0 items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
         >
