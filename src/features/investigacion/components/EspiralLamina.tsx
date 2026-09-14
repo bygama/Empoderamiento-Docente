@@ -29,27 +29,35 @@ function cajaDeAncla(lado: Lado, { left, top }: { left: number; top: number }): 
   }
 }
 
-/** Respiro entre la guía y el texto, y ancho de la caja: las de arriba y
- *  abajo van más anchas para gastar menos alto. Se ensancharon el
- *  2026-09-12 junto con el cuerpo: el texto tiene que mandar sobre la
- *  figura, no colgar de ella en letra chica. */
+/** Respiro entre la guía y el texto, por lado. */
 const CAJA: Record<Lado, string> = {
-  arriba: "w-[46ch] pb-3 -ml-3",
-  abajo: "w-[42ch] pt-3 -ml-3",
-  derecha: "w-[38ch] pl-3",
-  izquierda: "w-[38ch] pr-3",
-  "arriba-derecha": "w-[40ch] pb-2 pl-1",
+  arriba: "pb-3 -ml-3",
+  abajo: "pt-3 -ml-3",
+  derecha: "pl-3",
+  izquierda: "pr-3",
+  "arriba-derecha": "pb-2 pl-1",
 };
+
+/** Ancho de la caja de cada anotación, en ch DEL CUERPO DEL TEXTO (índice
+ *  de ANOTACIONES; la última es el remate): la caja lleva la letra del
+ *  texto y escala con ella, así los cortes de renglón no cambian con el
+ *  alto de pantalla. Facundo (2026-09-14): el nombre en UN renglón y el
+ *  texto en TRES, sin excepción. Cada ancho está afinado para eso con
+ *  estos textos (medido a 1280×720, 1366×768, 1440×900, 1536×864 y
+ *  1920×1080): si cambia el copy, se reafina. Las laterales tienen tope: la caja de la 02 y la 06 no puede
+ *  pasar del borde derecho de la hoja, ni la de la 04 y la 08 del
+ *  izquierdo. */
+const ANCHO_CH: ReadonlyArray<number> = [46, 39, 36, 37, 46, 40, 49, 37, 44];
 
 /** Jerarquía: nombre en Manrope, grande y apretado; cuerpo en Inter, un
  *  tono más bajo; la frase clave en peso medio con el subrayado verde.
  *  Cuerpos de lectura, no de rótulo (Facundo, 2026-09-12: «que los textos
- *  predominen e inviten a leer»): el nombre pasó de 1.1 a 1.4 rem y el
- *  texto de 0.9 a 1.05, con más interlineado. */
+ *  predominen e inviten a leer»), y un poco más grandes desde el
+ *  2026-09-14: el nombre pasó de 1.4 a 1.6 rem y el texto de 1.05 a 1.18. */
 const TIPO = {
-  nombre: { fontSize: "clamp(1.3rem, 2.6svh, 1.5rem)", lineHeight: 1.15 } satisfies CSSProperties,
-  texto: { fontSize: "clamp(1rem, 1.9svh, 1.1rem)", lineHeight: 1.6 } satisfies CSSProperties,
-  remate: { fontSize: "clamp(1.15rem, 2.2svh, 1.4rem)", lineHeight: 1.45 } satisfies CSSProperties,
+  nombre: { fontSize: "clamp(1.45rem, 2.85svh, 1.65rem)", lineHeight: 1.15 } satisfies CSSProperties,
+  texto: { fontSize: "clamp(1.1rem, 2.1svh, 1.2rem)", lineHeight: 1.6 } satisfies CSSProperties,
+  remate: { fontSize: "clamp(1.25rem, 2.4svh, 1.5rem)", lineHeight: 1.45 } satisfies CSSProperties,
   titulo: { fontSize: "clamp(1.9rem, 0.9rem + 2.2vw, 3rem)", lineHeight: 1.06 } satisfies CSSProperties,
 } as const;
 
@@ -82,7 +90,12 @@ function Anotacion({ indice, children }: { indice: number; children: ReactNode }
   const { lado } = ANOTACIONES[indice];
   return (
     <div className="absolute" style={cajaDeAncla(lado, posicionAnotacion(indice))}>
-      <div data-espiral-anotacion="" data-lado={lado} className={`text-left ${CAJA[lado]}`}>
+      <div
+        data-espiral-anotacion=""
+        data-lado={lado}
+        className={`text-left ${CAJA[lado]}`}
+        style={{ width: `${ANCHO_CH[indice]}ch`, fontSize: TIPO.texto.fontSize }}
+      >
         {children}
       </div>
     </div>
