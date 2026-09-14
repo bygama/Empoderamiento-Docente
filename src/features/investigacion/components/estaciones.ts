@@ -32,8 +32,10 @@ export const VUELTA_1: ReadonlyArray<Estacion> = [
     nombre: "Implementación en contexto",
     texto:
       "Las propuestas se interpretan y se llevan a aulas, instituciones o programas reales. No se reproducen mecánicamente: se contextualizan desde el conocimiento profesional de quienes las implementan.",
+    // «saber profesional» en vez de «conocimiento profesional» (2026-09-14):
+    // con el cuerpo nuevo, la caja lateral no da para un renglón más.
     breve:
-      "Las propuestas se llevan a aulas, instituciones o programas reales, contextualizadas desde el conocimiento profesional de quienes las implementan.",
+      "Las propuestas se llevan a aulas, instituciones o programas reales, contextualizadas desde el saber profesional de quienes las implementan.",
     clave: "programas reales",
   },
   {
@@ -45,7 +47,11 @@ export const VUELTA_1: ReadonlyArray<Estacion> = [
     clave: "confrontan decisiones",
   },
   {
-    nombre: "Resignificación del conocimiento matemático escolar",
+    // 2026-09-14: el nombre oficial es «Resignificación del
+    // conocimiento matemático escolar»; en la lámina el nombre va en un
+    // renglón sin excepción y ese no entra en ninguna caja lateral. A
+    // validar con ED.
+    nombre: "Resignificación del saber",
     texto:
       "La experiencia permite revisar sentidos, usos y formas de participación. El conocimiento deja de ser solo un contenido a transmitir: se convierte en una herramienta para comprender y actuar.",
     breve:
