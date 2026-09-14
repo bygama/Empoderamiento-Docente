@@ -1,7 +1,8 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { BISAGRA, ESTACIONES, LARGO_ESPIRAL, LONGITUD_NODO, RADIO_NODO } from "./espiral";
 import { ATENUADA, gestosAnotacion } from "./anotacion-espiral";
+import { BANDADA, ESCALON, RADIO_SUELTO, VUELO, asienta, crearVuelos } from "./bandada-espiral";
+import { BISAGRA, ESTACIONES, LARGO_ESPIRAL, LONGITUD_NODO, RADIO_NODO } from "./espiral";
 import { ANOTACIONES, INDICE_REMATE } from "./lamina-espiral";
 import { crearCamara, crearRecorrido } from "./recorrido-espiral";
 
@@ -10,35 +11,46 @@ if (typeof window !== "undefined") {
 }
 
 /**
- * Coreografía de la lámina (Hoja 03), en tres movimientos: la vuelta 1 en
- * primer plano (el título se va en cuanto el personaje arranca, y de ahí
- * recorre 01→04 de un gesto con cada nodo brotando y anotando al paso); la
- * bisagra (cruza 04→05 mientras la cámara se aleja); la vuelta 2 y el lazo
- * (05→08, las anotaciones se retiran, el lazo verde lo devuelve al 01 y ahí
- * aterriza el remate). El rincón ya no releva títulos: antes pasaba de
- * título 1 → nota → «Implementar no es terminar», y Facundo (2026-09-12)
- * pidió que al empezar el recorrido vuelen todos. La escena completa está
- * contada en EspiralInvestigacion.tsx. Personaje y cámara salen del TIEMPO
- * de la timeline (recorrido-espiral.ts); acá solo se construye la timeline.
+ * Coreografía de la lámina (Hoja 03), en cuatro movimientos: la bandada
+ * (el personaje baja del cielo y aterriza en la 01, que brota bajo él y se
+ * anota; los tres nodos de la vuelta caen sueltos sobre el papel); la
+ * vuelta 1 en primer plano (el título vuela en cuanto el personaje arranca;
+ * cada nodo suelto vuela a su lugar y llega justo antes que él, con el
+ * trazo detrás y la anotación al paso); la bisagra (cruza 04→05 mientras la
+ * cámara se aleja y baja la segunda bandada, la de la evidencia); la vuelta
+ * 2 y el lazo (05→08, las anotaciones se retiran, el lazo verde lo devuelve
+ * al 01 y ahí aterriza el remate). Nada está pretrazado: el camino existe
+ * hasta donde llegó el personaje.
+ *
+ * Facundo (2026-09-14): la bandada es la de las estrellas del
+ * hero sobre la hoja 01, traída a la hoja 03 (bandada-espiral.ts); antes
+ * los nodos brotaban en su lugar sobre una espiral que ya estaba. La escena
+ * completa está contada en EspiralInvestigacion.tsx. Personaje, cámara y
+ * nodos salen del TIEMPO de la timeline (recorrido-espiral.ts,
+ * bandada-espiral.ts); acá solo se construye la timeline.
  */
 
-/** Tiempos (unidades del timeline). */
+/** Tiempos (unidades del timeline; unos 380 px de scroll cada una). */
 const T = {
-  intro: 0.3,
-  /** 2.4 (antes 1.6) con el recorrido en 3800 px: cada etapa se lee con
-   *  unos 230 px de scroll en vez de 145. Antes se iba en una muesca y
-   *  media de rueda, antes de terminar la frase. */
+  /** El personaje despega enseguida; los nodos, escalonados detrás. */
+  salida: 0.04,
+  /** La caminata arranca, y el título vuela, con la 01 ya leída. */
+  intro: 1.9,
+  /** Cada etapa se lee con unos 230 px de scroll. Antes se iba en una
+   *  muesca y media de rueda. */
   vuelta: 2.4,
   /** Al fin de cada vuelta: la última anotación termina de entrar en ~0.56
    *  (guía, bloque, nombre, texto, subrayado) y hay que poder leerla. */
   pausa: 0.8,
   bisagra: 1.0,
+  /** Cuánto después de empezar a abrirse el plano baja la segunda bandada. */
+  segundaBandada: 0.35,
   lazo: 0.8,
   remate: 0.6,
 } as const;
 
-/** Alto del recorrido pinneado en px de scroll. */
-export const RECORRIDO_ESPIRAL = 3800;
+/** Alto del recorrido pinneado en px de scroll (3800 más la bandada). */
+export const RECORRIDO_ESPIRAL = 4400;
 
 /** `zona` es lo que se pinnea: la hoja de una pantalla. */
 export function crearEspiral({ zona }: { zona: HTMLElement }) {
@@ -55,21 +67,23 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
 
   const recorrido = crearRecorrido(espiral, lazo, q<SVGGElement>("[data-espiral-personaje]")[0]);
   const camara = crearCamara(q<SVGGElement>("[data-espiral-camara]")[0]);
+  const vuelos = crearVuelos(nodos);
   const { tramos, largoLazo } = recorrido;
   const suave = gsap.parseEase("power1.inOut");
   const lineal = (u: number) => u;
 
-  // ── Estado pre-paint: cámara en primer plano, espiral sin trazar, solo
-  //    el primer nodo con su anotación, el personaje en él, título 1.
-  gsap.set(espiral, { strokeDasharray: LARGO_ESPIRAL, strokeDashoffset: LARGO_ESPIRAL });
-  // El lazo arranca invisible: con linecap redondo, un dash de largo cero
-  // igual pinta un punto en el nodo de salida.
+  // ── Estado pre-paint: cámara en primer plano, espiral sin trazar, los
+  //    nodos que bajan con radio de sueltos (su lugar lo pone el tiempo) y
+  //    los que brotan a radio cero, ninguna anotación, el título.
+  // Trazo y lazo arrancan invisibles: con linecap redondo, un dash de largo
+  // cero igual pinta un punto en el nodo de salida, y hasta que el personaje
+  // aterriza no hay nodo que lo tape.
+  gsap.set(espiral, { strokeDasharray: LARGO_ESPIRAL, strokeDashoffset: LARGO_ESPIRAL, autoAlpha: 0 });
   gsap.set(lazo, { strokeDasharray: largoLazo, strokeDashoffset: largoLazo, autoAlpha: 0 });
-  nodos.forEach((n, k) => gsap.set(n, { attr: { r: k === 0 ? RADIO_NODO : 0 } }));
-  rotulos.forEach((r, k) => gsap.set(r, { autoAlpha: k === 0 ? 1 : 0 }));
+  nodos.forEach((n, k) => gsap.set(n, { attr: { r: BANDADA[k] ? RADIO_SUELTO : 0 } }));
+  gsap.set(rotulos, { autoAlpha: 0 });
   gsap.set(titulo, { autoAlpha: 1, y: 0 });
-  recorrido.enTiempo(0);
-  camara.enTiempo(0);
+  recorrido.programarVuelo(T.salida);
 
   const sinRender = { immediateRender: false } as const;
 
@@ -79,7 +93,10 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
       trigger: zona,
       start: "top top",
       end: `+=${RECORRIDO_ESPIRAL}`,
-      scrub: true,
+      // 0.6, como en el resto del sitio: el timeline alcanza al scroll en
+      // poco más de medio segundo. Con `true` saltaba con cada muesca de la
+      // rueda y los vuelos se veían a los tirones (Facundo, 2026-09-14).
+      scrub: 0.6,
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
@@ -88,26 +105,38 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
       refreshPriority: 0,
       onUpdate: (self) => {
         zona.dataset.progreso = self.progress.toFixed(3);
-        recorrido.enTiempo(tl.time());
-        camara.enTiempo(tl.time());
       },
     },
   });
+  // Lo que se escribe a mano va en el onUpdate del TIMELINE, no del
+  // trigger: con el scrub suavizado el timeline sigue moviéndose después
+  // del último evento de scroll, y personaje, cámara y nodos lo acompañan.
+  tl.eventCallback("onUpdate", () => {
+    const time = tl.time();
+    recorrido.enTiempo(time);
+    camara.enTiempo(time);
+    vuelos.enTiempo(time);
+  });
 
-  // Los gestos de cada anotación (anotacion-espiral.ts); solo la primera
-  // arranca a la vista.
+  // Los gestos de cada anotación (anotacion-espiral.ts); ninguna a la vista
+  // hasta que el personaje aterriza.
   const gestos = ANOTACIONES.map((a, i) => gestosAnotacion(tl, anotaciones[i], guias[i], a.normal));
-  gestos.forEach((g, i) => g.reposo(i === 0));
+  gestos.forEach((g) => g.reposo(false));
 
   // ── Gestos. Todo fromTo explícito: con scrub e invalidateOnRefresh, un
   //    .to() captura como inicio lo que encuentre y deja estados fantasma.
+  const rotula = (k: number, at: number) => {
+    tl.fromTo(rotulos[k], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15, ...sinRender }, at);
+  };
+  /** El nodo que abre una vuelta brota en su estación, bajo el personaje. */
   const brotaNodo = (k: number, at: number) => {
     tl.fromTo(nodos[k], { attr: { r: 0 } }, { attr: { r: RADIO_NODO }, duration: 0.18, ease: "back.out(2)", ...sinRender }, at);
-    tl.fromTo(rotulos[k], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15, ...sinRender }, at + 0.05);
+    rotula(k, at + 0.05);
   };
   /** Una vuelta: un solo tramo del nodo `a` al `b` a velocidad constante,
-   *  con el trazo detrás; cada nodo brota y anota al paso, y la anotación
-   *  anterior se atenúa en vez de irse: lo leído queda para releer. */
+   *  con el trazo detrás; cada nodo suelto vuela a su lugar y llega justo
+   *  antes que el personaje, se asienta y se anota, y la anotación anterior
+   *  se atenúa en vez de irse: lo leído queda para releer. */
   const vuelta = (a: number, b: number, t0: number) => {
     const l0 = LONGITUD_NODO[a];
     const l1 = LONGITUD_NODO[b];
@@ -120,19 +149,32 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
     );
     for (let k = a + 1; k <= b; k++) {
       const tk = t0 + T.vuelta * ((LONGITUD_NODO[k] - l0) / (l1 - l0));
-      brotaNodo(k, tk - 0.04);
+      vuelos.acomoda(k, tk, t0 + 0.1);
+      asienta(tl, nodos[k], tk - 0.06);
+      rotula(k, tk + 0.05);
       gestos[k - 1].atenua(tk);
       gestos[k].entra(tk);
     }
     return t0 + T.vuelta;
   };
 
+  // ── 0. La bandada: el personaje baja primero (su vuelo lo lleva el
+  //    recorrido) y aterriza en la 01, que brota bajo él y se anota; los
+  //    tres nodos de la vuelta caen sueltos, escalonados detrás.
+  for (let k = 1; k < BISAGRA; k++) vuelos.baja(k, T.salida + k * ESCALON);
+  const tAterriza = T.salida + VUELO.bajada;
+  brotaNodo(0, tAterriza - 0.04);
+  tl.fromTo(espiral, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.02, ...sinRender }, tAterriza - 0.04);
+  gestos[0].entra(tAterriza);
+
   // ── 1. Vuelta 1, en primer plano. El título vuela en cuanto el personaje
   //    arranca: de acá en adelante la hoja es la figura y sus anotaciones.
   tl.fromTo(titulo, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -28, duration: 0.3, ease: "power2.in", ...sinRender }, T.intro);
   let t = vuelta(0, BISAGRA - 1, T.intro) + T.pausa;
 
-  // ── 2. La bisagra: 04→05 mientras la cámara se aleja.
+  // ── 2. La bisagra: 04→05 mientras la cámara se aleja, y en el plano que
+  //    se abre baja la segunda bandada: los tres de la evidencia caen
+  //    sueltos alrededor de la vuelta de afuera.
   tramos.push({ t0: t, t1: t + T.bisagra, l0: LONGITUD_NODO[BISAGRA - 1], l1: LONGITUD_NODO[BISAGRA], ease: suave });
   camara.programar(t, t + T.bisagra, gsap.parseEase("power2.inOut"));
   tl.fromTo(
@@ -143,6 +185,9 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
   );
   // Las cuatro de adentro sí se van: no entran en el plano general.
   for (let k = 0; k < BISAGRA; k++) gestos[k].sale(t, k === BISAGRA - 1 ? 1 : ATENUADA);
+  for (let k = BISAGRA + 1; k < ESTACIONES; k++) {
+    vuelos.baja(k, t + T.segundaBandada + (k - BISAGRA - 1) * ESCALON);
+  }
   brotaNodo(BISAGRA, t + T.bisagra - 0.04);
   gestos[BISAGRA].entra(t + T.bisagra);
   const tLlegadaBisagra = t + T.bisagra;
@@ -167,13 +212,20 @@ export function crearEspiral({ zona }: { zona: HTMLElement }) {
   // Respiro final antes de soltar el pin (fija el largo total del timeline).
   tl.to({}, { duration: 0.01 }, t);
 
+  // Con todo programado, el instante cero: personaje y nodos en el cielo,
+  // cámara en primer plano.
+  recorrido.enTiempo(0);
+  camara.enTiempo(0);
+  vuelos.enTiempo(0);
+
   /** Progreso (0–1) en el que el personaje llega a 05: destino de #evidencia. */
   const progresoBisagra = tLlegadaBisagra / tl.duration();
 
-  /** Personaje y cámara se escriben a mano: ctx.revert() no los conoce. */
+  /** Personaje, cámara y nodos se escriben a mano: ctx.revert() no los conoce. */
   const restaurar = () => {
     recorrido.restaurar();
     camara.restaurar();
+    vuelos.restaurar();
   };
 
   return { tl, progresoBisagra, restaurar };

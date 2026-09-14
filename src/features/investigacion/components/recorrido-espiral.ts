@@ -1,3 +1,4 @@
+import { VUELO, VUELO_PERSONAJE, controlDe, puntoDeVuelo } from "./bandada-espiral";
 import { LARGO_ESPIRAL } from "./espiral";
 import { ENCUADRE_GENERAL, ENCUADRE_INTERIOR, transformDeEncuadre } from "./lamina-espiral";
 
@@ -27,18 +28,37 @@ export function crearRecorrido(espiral: SVGPathElement, lazo: SVGPathElement, pe
     }
     return l;
   };
+  const colocarEn = (x: number, y: number) => personaje.setAttribute("transform", `translate(${x} ${y})`);
   /** Longitudes mayores que la espiral siguen por el lazo. */
   const colocar = (l: number) => {
     const p =
       l <= LARGO_ESPIRAL
         ? espiral.getPointAtLength(l)
         : lazo.getPointAtLength(Math.min(l - LARGO_ESPIRAL, largoLazo));
-    personaje.setAttribute("transform", `translate(${p.x} ${p.y})`);
+    colocarEn(p.x, p.y);
+  };
+  /** El vuelo de entrada (bandada-espiral.ts): antes de recorrer nada, el
+   *  personaje baja del cielo a la estación 01, con la misma curva que los
+   *  nodos. Hasta el despegue espera en el cielo. */
+  let salidaVuelo: number | null = null;
+  const { cielo, hasta } = VUELO_PERSONAJE;
+  const control = controlDe(cielo, hasta, 8);
+  const enTiempo = (time: number) => {
+    if (salidaVuelo !== null && time < salidaVuelo + VUELO.bajada) {
+      const [x, y] = puntoDeVuelo(cielo, control, hasta, (time - salidaVuelo) / VUELO.bajada);
+      colocarEn(x, y);
+      return;
+    }
+    colocar(longitudEn(time));
   };
   return {
     tramos,
     largoLazo,
-    enTiempo: (time: number) => colocar(longitudEn(time)),
+    enTiempo,
+    /** Programa el vuelo de entrada: despega en `t0`. */
+    programarVuelo: (t0: number) => {
+      salidaVuelo = t0;
+    },
     /** Al nodo 0, que es lo que dibuja el SSR. */
     restaurar: () => colocar(0),
   };
