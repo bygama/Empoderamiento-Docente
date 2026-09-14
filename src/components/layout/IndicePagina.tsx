@@ -36,11 +36,13 @@ import { RotulosIndice } from "./indice-pagina/RotulosIndice";
  * de una pantalla y media de scroll.
  *
  * Las secciones se declaran con `data-indice="Rótulo"` + `id` (ver
- * useSeccionesPagina). El salto DESLIZA (ver irASeccion): cortaba de una y
- * se leía como teletransporte.
+ * useSeccionesPagina). El salto CORTA y aterriza donde las animaciones de
+ * la sección ya terminaron (ver irASeccion): deslizar hacía recorrer todas
+ * las escenas del medio.
  */
 
-const ir = (it: ItemIndice) => (it.id === null ? irArriba() : irASeccion(it.id));
+const ir = (it: ItemIndice) =>
+  it.id === null ? irArriba() : irASeccion(it.id, { corte: true, alFinal: true });
 
 export function IndicePagina() {
   const secciones = useSeccionesPagina();

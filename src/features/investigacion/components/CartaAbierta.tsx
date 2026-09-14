@@ -74,6 +74,8 @@ export function CartaAbierta() {
       ref={zonaRef}
       id="sentido"
       data-indice="Sentido"
+      // Desde el navbar se aterriza al final de la escena (ver irASeccion).
+      data-aterrizaje="fin"
       aria-label="Por qué investigamos"
       className="bg-gris-fondo"
     >

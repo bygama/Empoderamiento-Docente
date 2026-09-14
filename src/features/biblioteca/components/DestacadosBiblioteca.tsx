@@ -76,6 +76,8 @@ export function DestacadosBiblioteca() {
       ref={rootRef}
       id="destacados"
       data-indice="Destacados"
+      // Desde el navbar se aterriza al final de la escena (ver irASeccion).
+      data-aterrizaje="fin"
       aria-label="Material destacado"
     >
       {/* ── Fase 1: intro con pantalla propia ───────────────────────────── */}

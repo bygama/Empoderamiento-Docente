@@ -158,7 +158,14 @@ export function crearMirada(root: HTMLElement) {
           mostrar(true);
           completar();
         },
-        onLeave: () => mostrar(true),
+        // Un salto que cruza la sección entera (el navbar yendo a una
+        // sección de más abajo) pasa por onEnter y onLeave en el mismo
+        // update: sin completar acá, el bloqueo que armó onEnter clavaba
+        // la página al principio de esta sección y el salto se perdía.
+        onLeave: () => {
+          mostrar(true);
+          completar();
+        },
         onRefresh: (self) => {
           if (self.isActive) {
             mostrar(true);

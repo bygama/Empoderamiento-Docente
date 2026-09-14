@@ -58,6 +58,8 @@ export function CasosInvestigacion() {
       ref={sectionRef}
       id="en-accion"
       data-indice="Casos"
+      // Desde el navbar se aterriza al final de la escena (ver irASeccion).
+      data-aterrizaje="fin"
       aria-label="Investigación en acción"
       // overflow-clip y no hidden: hidden haría de la sección un contenedor
       // de scroll y el sticky de la pantalla del título no pegaría.
