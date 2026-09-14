@@ -63,7 +63,8 @@ export function crearCamara(camara: SVGGElement) {
       viaje = { t0, t1, ease };
     },
     enTiempo,
-    /** Sin transform: el plano general, que es lo que dibuja el SSR. */
+    /** Sin transform: el viewBox tal cual, que es lo que dibuja el SSR (el
+     *  plano general vivo está apenas corrido; ver ENCUADRE_GENERAL). */
     restaurar: () => camara.removeAttribute("transform"),
   };
 }
