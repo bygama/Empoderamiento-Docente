@@ -93,7 +93,7 @@ export function CartaAbierta() {
             // Copia en luz del título: vive ADENTRO del campo para que el
             // borde del círculo la revele (la copia en tinta queda DEBAJO del
             // campo, tapada por el navy) — inversión sin fade ni contorno.
-            <div data-carta-titulo-luz className="absolute inset-x-0 top-[20svh] z-10 px-8">
+            <div data-carta-titulo-luz className="absolute inset-x-0 top-[26svh] z-10 px-8">
               <Titulo tono="luz" />
             </div>
           )}
@@ -103,23 +103,26 @@ export function CartaAbierta() {
           <>
             {/* Copia en tinta del título: bajo el campo, visible solo donde
                 el círculo todavía no llegó. */}
-            {/* A 20svh (antes 14): pegado al header quedaba alto y el
-                espacio hasta el sobre, vacío (Facundo, 2026-09-12). Las dos
-                copias van a la misma altura, es lo que hace posible la
-                inversión. */}
+            {/* A 26svh (antes 14, después 20): pegado al header quedaba
+                alto y el espacio hasta el sobre, vacío (Facundo, 2026-09-12
+                y 2026-09-14: «bajá un poco más este título»). Las dos copias
+                van a la misma altura, es lo que hace posible la inversión. */}
             <div
               data-carta-titulo-tinta
-              className="absolute inset-x-0 top-[20svh] -z-20 px-8"
+              className="absolute inset-x-0 top-[26svh] -z-20 px-8"
             >
               <Titulo tono="tinta" />
             </div>
 
             {/* ── El sobre, en el borde inferior. Las notas van entre la
                 solapa (atrás) y el cuerpo (adelante), y salen por la boca;
-                la segunda va después en el DOM: al salir se apila encima. */}
+                la segunda va después en el DOM: al salir se apila encima.
+                26svh de alto (antes 36, después 30): la boca queda más abajo y las
+                notas, que suben hasta despegar de ella, aterrizan 10svh más
+                abajo también (Facundo, 2026-09-14). */}
             <div
               data-carta-sobre
-              className="absolute bottom-0 left-1/2 z-20 h-[36svh] w-[min(46rem,54vw)] -translate-x-1/2"
+              className="absolute bottom-0 left-1/2 z-20 h-[26svh] w-[min(46rem,54vw)] -translate-x-1/2"
             >
               <div
                 aria-hidden="true"
