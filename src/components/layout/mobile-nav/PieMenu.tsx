@@ -15,13 +15,31 @@ const REDES = [
   Icon: typeof Instagram;
 }>;
 
-/** Pie del menú: acción focal (Contacto), mail real y redes. */
-export function PieMenu({ onCerrar }: { onCerrar: () => void }) {
+/** Pie del menú: acción focal (Contacto), mail real y redes. Ya en
+ *  Contacto, el CTA no navegaría: cierra y sube al hero, como el nombre
+ *  de la página actual en el menú. */
+export function PieMenu({
+  pathname,
+  onCerrar,
+  onSubirEnPagina,
+}: {
+  pathname: string;
+  onCerrar: () => void;
+  onSubirEnPagina: () => void;
+}) {
+  const enContacto = pathname === CTA_LINK.href;
   return (
     <div data-mnav-cta className="flex flex-col gap-5 px-6 pt-4 pb-10 sm:px-8">
       <Link
         href={CTA_LINK.href}
-        onClick={onCerrar}
+        onClick={(e) => {
+          if (!enContacto) {
+            onCerrar();
+            return;
+          }
+          e.preventDefault();
+          onSubirEnPagina();
+        }}
         className="bg-naranja-accion inline-flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 font-medium text-white transition-opacity hover:opacity-90"
       >
         {CTA_LINK.label}

@@ -1,10 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Instagram, Linkedin, Facebook } from "@/components/ui/icons";
 import { siteConfig } from "@/config/site";
 import { ALIADOS } from "@/config/aliados";
 import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
 import { CreditoSitio } from "./footer/CreditoSitio";
+import { LinkPie } from "./footer/LinkPie";
 
 /**
  * Footer institucional de Empoderamiento Docente.
@@ -58,7 +58,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-screen-xl gap-x-10 gap-y-8 px-5 pt-11 pb-0 md:grid-cols-12 md:px-10 md:pt-14">
         {/* Columna marca */}
         <div className="flex flex-col gap-8 md:col-span-5 md:gap-0 lg:col-span-4">
-          <Link
+          <LinkPie
             href={HOME_LINK.href}
             aria-label={name}
             className="focus-visible:outline-azul-claro inline-flex w-fit rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 md:mt-10 lg:mt-14"
@@ -76,7 +76,7 @@ export function Footer() {
                 className="h-20 w-auto md:h-24 lg:h-28"
               />
             </span>
-          </Link>
+          </LinkPie>
 
           {/* Descripción centrada verticalmente (al medio de la columna),
               alineada a la izquierda. */}
@@ -121,7 +121,9 @@ export function Footer() {
                 const esAccion = link.href === CTA_LINK.href;
                 return (
                   <li key={link.href}>
-                    <Link
+                    {/* LinkPie: desde otra página navega y aterriza en el
+                        hero; en la misma, sube al hero deslizando. */}
+                    <LinkPie
                       href={link.href}
                       className="group border-azul-medio/30 hover:text-azul-claro focus-visible:outline-azul-claro flex items-center justify-between border-t py-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:py-3"
                     >
@@ -145,7 +147,7 @@ export function Footer() {
                         <path d="M7 17 17 7" />
                         <path d="M7 7h10v10" />
                       </svg>
-                    </Link>
+                    </LinkPie>
                   </li>
                 );
               })}
