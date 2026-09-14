@@ -90,10 +90,12 @@ function Anotacion({ indice, children }: { indice: number; children: ReactNode }
 }
 
 /**
- * La lámina: la escena live de la hoja 03. Figura bajo la cámara, un poco
- * arriba del centro para que las anotaciones de abajo tengan lugar;
- * anotaciones colgadas de los nodos; y el rincón narrador arriba a la
- * izquierda, por debajo del header flotante, con UNA sola voz: el título
+ * La lámina: la escena live de la hoja 03. Figura bajo la cámara, centrada
+ * en la hoja (las anotaciones de la vuelta interior cuelgan parejo arriba y
+ * abajo; el desbalance del plano general lo absorbe la cámara, ver
+ * ENCUADRE_GENERAL); anotaciones colgadas de los nodos; y el rincón
+ * narrador arriba a la izquierda, por debajo del header flotante, con UNA
+ * sola voz: el título
  * de la hoja, que se va cuando el personaje arranca. Antes tenía tres
  * (título, nota de la bisagra, «Implementar no es terminar»); Facundo
  * (2026-09-12) pidió que al empezar el recorrido vuelen todos los títulos
@@ -102,7 +104,7 @@ function Anotacion({ indice, children }: { indice: number; children: ReactNode }
  */
 export function EspiralLamina() {
   return (
-    <div className="relative flex flex-1 flex-col items-center">
+    <div className="relative flex flex-1 flex-col items-center justify-center">
       {/* El rincón narrador. */}
       <div className="absolute top-[5.5rem] left-8 z-10 w-[min(34rem,40vw)]">
         <h2
@@ -118,10 +120,13 @@ export function EspiralLamina() {
           posicionan en % de este cuadro. Presupuesto vertical: la
           anotación 01 necesita ~130 px sobre su ancla y quedar bajo el
           header flotante; la 07, ~130 px bajo la suya. La figura cedió
-          alto (de 62 a 54 svh) para dárselo al texto. */}
+          alto (de 62 a 54 svh) para dárselo al texto. Antes iba 15 svh más
+          arriba del centro, guardándole lugar al título: con el título en
+          el rincón y las notas parejas, el conjunto quedaba 62 px alto
+          (Facundo, 2026-09-14: «más centrado en la pantalla»). */}
       <div
         data-espiral-figura
-        className="relative mt-[clamp(8rem,15svh,9.5rem)] aspect-[400/480] overflow-visible"
+        className="relative aspect-[400/480] overflow-visible"
         style={{ height: "clamp(340px, 54svh, 560px)" }}
       >
         <EspiralSvg lamina />

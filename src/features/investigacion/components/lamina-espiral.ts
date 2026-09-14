@@ -18,12 +18,24 @@ export type Encuadre = {
   readonly alto: number;
 };
 
-/** Plano general: el viewBox entero, que es lo que dibuja el SSR. */
-export const ENCUADRE_GENERAL: Encuadre = {
-  cx: VIEWBOX_ESPIRAL.w / 2,
-  cy: VIEWBOX_ESPIRAL.h / 2,
-  alto: VIEWBOX_ESPIRAL.h,
-};
+/** Las anotaciones de afuera no son simétricas: la 07 (abajo) es la más
+ *  larga y cuelga del nodo más lejano del centro, así que en plano general
+ *  el contenido pesa hacia abajo. El encuadre baja su centro para
+ *  compensarlo (medido a 1440×900: el conjunto quedaba 45 px bajo). */
+const LASTRE_GENERAL = 44;
+
+/** Plano general: la figura entera, con la espiral centrada en ancho (la
+ *  vuelta de afuera se abre hacia la izquierda) y el centro bajado por el
+ *  lastre de las notas. El SSR dibuja el viewBox sin cámara: casi lo mismo,
+ *  corrido unos 20 y 44. */
+export const ENCUADRE_GENERAL: Encuadre = (() => {
+  const xs = NODOS.map(([x]) => x);
+  return {
+    cx: (Math.min(...xs) + Math.max(...xs)) / 2,
+    cy: VIEWBOX_ESPIRAL.h / 2 + LASTRE_GENERAL,
+    alto: VIEWBOX_ESPIRAL.h,
+  };
+})();
 
 /** Primer plano: la vuelta interior (nodos 01-04) centrada en su caja. */
 export const ENCUADRE_INTERIOR: Encuadre = (() => {
