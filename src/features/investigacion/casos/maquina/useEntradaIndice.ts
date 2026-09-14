@@ -14,6 +14,12 @@ export function useEntradaIndice(m: Maquina) {
     const section = sectionRef.current;
     if (!section || activo !== null) return;
     if (reduced || entradaHechaRef.current) return;
+    // En desktop con puntero la entrada es la escena del índice (título
+    // grande y barrido doble, useEscenaIndice); el cajón queda para touch.
+    if (window.matchMedia("(hover: hover) and (min-width: 64rem)").matches) {
+      entradaHechaRef.current = true;
+      return;
+    }
     const ctx = gsap.context(() => {
       // Entrada tipo cajón: las carpetas caen desde arriba y se asientan
       // una sobre otra, la del fondo primero (from: "end").
