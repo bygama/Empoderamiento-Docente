@@ -1,3 +1,4 @@
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/lib/lenis";
 
 /**
@@ -16,22 +17,48 @@ function duracionDelViaje(distancia: number) {
 const SUAVE = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 /**
- * Ir a una sección de la página. Por defecto DESLIZA; antes cortaba de una,
- * para no pasar por las escenas del medio, pero se leía como teletransporte.
- * `corte: true` va instantáneo, y no es cuestión de gusto: lo necesitan los
- * aterrizajes programáticos —llegar desde otra página por el hash, restaurar
- * `?persona=` o un `#slug` del historial—, donde deslizar mostraría un viaje
- * que nadie pidió desde un punto donde nunca se estuvo. Sin Lenis (reduced
- * motion) siempre corta. Respeta el `scroll-margin-top` de la sección.
+ * Dónde termina la escena de una sección: el final del ScrollTrigger más
+ * largo (pin o scrub, no los reveals cortos ni los toggles) que vive
+ * adentro. Solo para secciones marcadas `data-aterrizaje="fin"`: las que
+ * cuentan una historia con el scroll (la carta, el ciclo, los casos, los
+ * destacados…), donde llegar al borde de arriba es caer en el primer
+ * fotograma y tener que recorrerla entera. Las demás aterrizan arriba.
  */
-export function irASeccion(id: string, { corte = false } = {}) {
+function finDeEscena(seccion: HTMLElement): number | null {
+  if (seccion.getAttribute("data-aterrizaje") !== "fin") return null;
+  const minimo = window.innerHeight * 0.5;
+  let fin = -Infinity;
+  for (const st of ScrollTrigger.getAll()) {
+    if (!st.pin && !st.vars.scrub) continue;
+    const trigger = st.trigger as Element | null;
+    const pin = st.pin as Element | null;
+    const adentro = (trigger && seccion.contains(trigger)) || (pin && seccion.contains(pin));
+    if (!adentro || st.end - st.start < minimo) continue;
+    fin = Math.max(fin, st.end);
+  }
+  return Number.isFinite(fin) ? Math.max(0, fin - 1) : null;
+}
+
+/**
+ * Ir a una sección de la página. Por defecto DESLIZA (los CTA de los heros
+ * son parte de la lectura y el viaje se entiende). `corte: true` va
+ * instantáneo: lo necesitan los aterrizajes programáticos —llegar desde
+ * otra página por el hash, restaurar `?persona=` o un `#slug` del
+ * historial— y, desde el 2026-09-14, también la navegación por secciones
+ * (submenús del navbar, índice del borde, chips del menú de celular):
+ * Facundo, «cada vez que apretás te comés todo el scroll y las animaciones,
+ * queda rarísimo». `alFinal: true` aterriza donde las animaciones de la
+ * sección ya terminaron (finDeEscena), «ya para consumir el material».
+ * Sin Lenis (reduced motion) siempre corta. Respeta el `scroll-margin-top`
+ * de la sección.
+ */
+export function irASeccion(id: string, { corte = false, alFinal = false } = {}) {
   const el = document.getElementById(id);
   if (!el) return;
   const margen = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
-  const destino = Math.max(
-    0,
-    el.getBoundingClientRect().top + window.scrollY - margen,
-  );
+  const arriba = Math.max(0, el.getBoundingClientRect().top + window.scrollY - margen);
+  const destino = (alFinal && finDeEscena(el)) || arriba;
+  const enElFin = destino !== arriba;
 
   // Al aterrizar se disparan los triggers de todo lo que quedó arriba (escenas
   // que se pinnean o sueltan, imágenes que recién cargan) y la página puede
@@ -39,10 +66,18 @@ export function irASeccion(id: string, { corte = false } = {}) {
   // medir un par de frames después y otra vez más tarde, y se corrige; si
   // mientras tanto la persona ya scrolleó, no se toca nada. Con el viaje suave
   // esperan a que TERMINE: si no, le arrebatan la página a Lenis a mitad de camino.
+  // Dónde tendría que estar la página ahora: el borde de la sección, o el
+  // final de su escena si se aterrizó ahí (se vuelve a calcular: el borde
+  // no sirve, porque con la sección pinneada mide 0 y la corrección la
+  // empujaba una escena entera más abajo).
+  const objetivo = () => {
+    const bordeAhora = Math.max(0, el.getBoundingClientRect().top + window.scrollY - margen);
+    return (enElFin && finDeEscena(el)) || bordeAhora;
+  };
   let ultimoY = window.scrollY;
   const corregir = () => {
     if (Math.abs(window.scrollY - ultimoY) > 2) return;
-    const desvio = el.getBoundingClientRect().top - margen;
+    const desvio = objetivo() - ultimoY;
     if (Math.abs(desvio) > 2) ultimoY = saltarA(Math.max(0, ultimoY + desvio));
   };
   const corregirDesdeAca = () => {

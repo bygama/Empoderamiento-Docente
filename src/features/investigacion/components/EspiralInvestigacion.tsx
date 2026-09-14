@@ -77,6 +77,8 @@ export function EspiralInvestigacion() {
     <section
       id="ciclo"
       data-indice="Ciclo"
+      // Desde el navbar se aterriza al final de la escena (ver irASeccion).
+      data-aterrizaje="fin"
       aria-label="Ciclo de investigación aplicada y evidencia"
       className="bg-gris-fondo"
     >

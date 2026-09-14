@@ -88,7 +88,7 @@ export function MobileNav() {
   // (ver irASeccion). La espera deja que el body suelte el lock.
   const irA = (id: string) => {
     close();
-    window.setTimeout(() => irASeccion(id), 60);
+    window.setTimeout(() => irASeccion(id, { corte: true, alFinal: true }), 60);
   };
   // Tocar el nombre de la página en la que ya estamos: cierra y sube al
   // principio deslizando. Misma espera de 60ms que arriba, por el lock.

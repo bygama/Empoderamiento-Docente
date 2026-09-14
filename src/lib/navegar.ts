@@ -47,7 +47,8 @@ export function coincideDestino(
   return true;
 }
 
-/** Misma página: URL + aviso + corte a la sección. */
+/** Misma página: URL + aviso + corte a la sección, donde sus animaciones
+ *  ya terminaron. */
 export function irEnPagina(href: string) {
   const d = partirDestino(href);
   window.history.replaceState(
@@ -56,7 +57,7 @@ export function irEnPagina(href: string) {
     `${window.location.pathname}${d.search}${d.hash ? `#${d.hash}` : ""}`,
   );
   window.dispatchEvent(new Event(EVENTO_URL));
-  if (d.hash) irASeccion(d.hash);
+  if (d.hash) irASeccion(d.hash, { corte: true, alFinal: true });
 }
 
 /**
@@ -108,7 +109,7 @@ export function aterrizarEn(id: string): () => void {
     raf = requestAnimationFrame(() => {
       if (!document.getElementById(id)) return;
       ScrollTrigger.refresh();
-      irASeccion(id, { corte: true });
+      irASeccion(id, { corte: true, alFinal: true });
     });
   });
   return () => cancelAnimationFrame(raf);
