@@ -4,26 +4,13 @@ import { MIRADA } from "@/features/que-hacemos/areas";
 
 type Paso = (typeof MIRADA)[number];
 
-/** Alto de la cabecera que queda a la vista cuando el panel siguiente lo tapa. */
-export const SOLAPA_REM = 4;
-
-/** Alto del último panel: el que se ve entero cuando están todos trabados. */
-export const ALTO_REM = 22;
-
-/** Distancia entre el borde superior del viewport y lo que se traba arriba:
- *  deja pasar la barra de navegación fija (1rem de margen + 4.25rem de alto). */
-export const TOPE_REM = 6;
-
-/** Lo que la franja del título reserva arriba de la pila: sus 4rem de banda
- *  más 1.5rem de aire hasta la primera card (el usuario, 2026-09-11: «un poco
- *  más de espaciado sobre las cards»). La pinta `MiradaPasos`. */
-export const TITULO_REM = 5.5;
-
-/** Alto de la pila trabada, medido desde la franja del título hasta el pie
- *  de los paneles: franja + una solapa por cada panel menos el último + el
- *  último entero. Es el alto de la franja (para que se despegue con la pila)
- *  y lo que la banda de aliados retrocede para subir hasta el título. */
-export const ALTO_PILA_REM = TITULO_REM + (MIRADA.length - 1) * SOLAPA_REM + ALTO_REM;
+/**
+ * LAS MEDIDAS DE LA PILA NO ESTÁN ACÁ: viven en `globals.css`, como custom
+ * properties de `[data-mirada]` —`--mirada-tope`, `--mirada-franja`,
+ * `--mirada-solapa`, `--mirada-alto`, `--mirada-pila`—. Las leen el CSS de
+ * este archivo y también las coreografías, así que las manda un solo lugar.
+ * Eran constantes de este archivo hasta el 2026-09-15.
+ */
 
 /**
  * Fondos OPACOS y alternados. Cada panel se apoya sobre el anterior, así que
@@ -47,9 +34,9 @@ const PALETA = [
 /**
  * Un paso de «Cómo trabajamos» como panel apilable.
  *
- * En desktop cada panel es `sticky` con un `top` que crece `SOLAPA_REM` por
+ * En desktop cada panel es `sticky` con un `top` que crece una solapa por
  * paso: cuando el siguiente sube y lo tapa, le deja a la vista justo esa
- * franja, la cabecera con el número y el verbo. Las cabeceras se acumulan
+ * franja, la cabecera con el número y el verbo, que mide lo mismo. Las cabeceras se acumulan
  * arriba como pestañas de una carpeta y cuentan el recorrido; al terminar la
  * lista, la pila se despega entera y el scroll sigue normal. El apilado es
  * CSS puro; la llegada de cada card (fade y subida) la pone la coreografía
@@ -89,13 +76,13 @@ export function PanelMirada({
       data-mirada-card
       style={
         {
-          top: `${TOPE_REM + TITULO_REM + indice * SOLAPA_REM}rem`,
-          "--alto": `${ALTO_REM + solapasDebajo * SOLAPA_REM}rem`,
+          top: `calc(var(--mirada-tope) + var(--mirada-franja) + ${indice} * var(--mirada-solapa))`,
+          "--alto": `calc(var(--mirada-alto) + ${solapasDebajo} * var(--mirada-solapa))`,
         } as CSSProperties
       }
       className={`${tono.fondo} border-azul-principal/10 flex flex-col rounded-[1.25rem] border lg:sticky lg:h-[var(--alto)]`}
     >
-      <div className="flex shrink-0 items-center gap-5 px-6 py-5 md:px-8 lg:h-16 lg:py-0">
+      <div className="flex shrink-0 items-center gap-5 px-6 py-5 md:px-8 lg:h-[var(--mirada-solapa)] lg:py-0">
         <p className={`${tono.numero} font-mono text-[0.8rem] tracking-[0.18em]`}>
           0{indice + 1}
         </p>

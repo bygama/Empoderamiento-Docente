@@ -1,6 +1,5 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SOLAPA_REM, TITULO_REM, TOPE_REM } from "./PanelMirada";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,6 +26,10 @@ gsap.registerPlugin(ScrollTrigger);
  * corrimiento de cada card se suma a mano, y la posición de reposo del
  * bloque se mide del layout, así que un cambio de copy o de alto se
  * recalcula solo en el refresh.
+ *
+ * Y se MIDEN, nunca se rearman con las medidas de la pila (globals.css): una
+ * copia acá se desincroniza sin avisar y el achicado termina apuntando a
+ * donde la card ya no está.
  *
  * Sin nada de esto en celular ni con reduced-motion: el bloque queda en
  * reposo, abajo. El `will-change` lo pone y lo saca esta coreografía, nunca
@@ -81,9 +84,11 @@ export function crearAchicado(root: HTMLElement) {
 
         const siguienteDesdeSeccion = () =>
           i + 1 < cards.length ? cardDesdeSeccion(i + 1) : banda.offsetTop;
-        /** Borde de arriba del bloque en reposo, con la card trabada. */
+        /** Borde de arriba del bloque en reposo, con la card trabada: el
+         *  `top` con el que la card se traba —que el CSS ya calculó con las
+         *  medidas de la pila— más lo que el bloque baja dentro de ella. */
         const reposoEnPantalla = () =>
-          (TOPE_REM + TITULO_REM + i * SOLAPA_REM) * rem + bloque.offsetTop;
+          (parseFloat(getComputedStyle(card).top) || 0) + bloque.offsetTop;
         /** Cuánto sube para quedar pegado a la cabecera. */
         const subida = () => -(bloque.offsetTop - (cabecera.offsetHeight + AIRE_REM * rem));
 
