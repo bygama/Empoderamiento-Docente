@@ -27,9 +27,11 @@ gsap.registerPlugin(ScrollTrigger);
  * bloque se mide del layout, así que un cambio de copy o de alto se
  * recalcula solo en el refresh.
  *
- * Y se MIDEN, nunca se rearman con las medidas de la pila (globals.css): una
- * copia acá se desincroniza sin avisar y el achicado termina apuntando a
- * donde la card ya no está.
+ * Y se MIDEN, nunca se rearman con las medidas de la pila: esas dependen del
+ * alto de la pantalla (globals.css) y una copia acá se desincroniza sin
+ * avisar. Pasó: con las constantes de 53.5rem en la mano, en una notebook el
+ * final del tramo caía abajo del borde del viewport, el tramo se invertía y
+ * los cinco bloques se achicaban todos juntos (el usuario, 2026-09-15).
  *
  * Sin nada de esto en celular ni con reduced-motion: el bloque queda en
  * reposo, abajo. El `will-change` lo pone y lo saca esta coreografía, nunca

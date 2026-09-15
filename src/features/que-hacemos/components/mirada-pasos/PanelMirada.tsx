@@ -7,9 +7,10 @@ type Paso = (typeof MIRADA)[number];
 /**
  * LAS MEDIDAS DE LA PILA NO ESTÁN ACÁ: viven en `globals.css`, como custom
  * properties de `[data-mirada]` —`--mirada-tope`, `--mirada-franja`,
- * `--mirada-solapa`, `--mirada-alto`, `--mirada-pila`—. Las leen el CSS de
- * este archivo y también las coreografías, así que las manda un solo lugar.
- * Eran constantes de este archivo hasta el 2026-09-15.
+ * `--mirada-solapa`, `--mirada-alto`, `--mirada-pila`—. Tienen que cambiar con
+ * el alto de la pantalla (la pila trabada entra en el viewport o no se ve) y
+ * las coreografías las leen del DOM, así que las manda un solo lugar. Eran
+ * constantes de este archivo hasta el 2026-09-15.
  */
 
 /**
@@ -50,9 +51,9 @@ const PALETA = [
  * fondo de la lista los empuja a todos a la vez y se van juntos.
  *
  * Los seis van en UNA pila (el usuario, 2026-09-11: «así se ven las 6»), y
- * la pila entera tiene que entrar en pantalla trabada: tope + franja del
- * título + cinco solapas + el último panel = 53.5rem, que son 856px. Por eso
- * la solapa y el alto base son más chicos que cuando eran dos pilas de tres.
+ * la pila entera tiene que entrar en pantalla trabada. Eso ya no depende de
+ * que los números den: `--mirada-alto` se calcula contra `100svh`, así que en
+ * una pantalla baja las cards se achican justo lo que falta (globals.css).
  *
  * `indice` numera el paso (rótulo, color y cuánto baja el `top`); `total`
  * dice cuántos vienen después, que es lo que le suma alto.
@@ -86,7 +87,7 @@ export function PanelMirada({
         <p className={`${tono.numero} font-mono text-[0.8rem] tracking-[0.18em]`}>
           0{indice + 1}
         </p>
-        <h3 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] lg:text-[2.1rem]">
+        <h3 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] lg:pantalla-baja:text-[1.8rem] lg:text-[2.1rem]">
           {paso.verbo}
         </h3>
       </div>
@@ -101,10 +102,10 @@ export function PanelMirada({
           desde ahí: sin JS el bloque queda en reposo, abajo. */}
       <div className="grid flex-1 gap-8 px-6 pb-6 md:px-8 md:pb-8 lg:min-h-0 lg:grid-cols-2 lg:gap-10">
         <div data-mirada-texto className="lg:self-end">
-          <p className={`${tono.idea} font-display text-[1.15rem] font-semibold lg:text-[1.5rem] lg:leading-snug`}>
+          <p className={`${tono.idea} font-display text-[1.15rem] font-semibold lg:pantalla-baja:text-[1.25rem] lg:text-[1.5rem] lg:leading-snug`}>
             {paso.idea}
           </p>
-          <p className={`${tono.texto} mt-4 font-sans text-[1rem] leading-relaxed lg:mt-7 lg:text-[1.15rem]`}>
+          <p className={`${tono.texto} mt-4 font-sans text-[1rem] leading-relaxed lg:pantalla-baja:mt-4 lg:pantalla-baja:text-[1rem] lg:mt-7 lg:text-[1.15rem]`}>
             {paso.texto}
           </p>
         </div>
