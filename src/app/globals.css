@@ -644,12 +644,12 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
   }
 }
 
-/* Derivadas: no se editan, salen de las de arriba. `--mirada-pasos` lo pone
-   el compositor con la cantidad de verbos, así que un séptimo paso recalcula
-   todo solo. */
+/* Derivadas: no se editan, salen de las de arriba. `--mirada-solapas` —lo que
+   suman las solapas de todos los paneles menos el último— la pone el
+   compositor, que es el que sabe cuántos son, así que un séptimo paso
+   recalcula todo solo. */
 [data-mirada] {
   --mirada-franja: calc(var(--mirada-titulo) + var(--mirada-aire));
-  --mirada-solapas: calc((var(--mirada-pasos) - 1) * var(--mirada-solapa));
   --mirada-alto: min(
     var(--mirada-alto-max),
     100svh - var(--mirada-tope) - var(--mirada-franja) - var(--mirada-solapas) -
