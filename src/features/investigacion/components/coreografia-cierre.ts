@@ -52,9 +52,10 @@ const VIDRIO_APAGADO = 0.38;
  * no mueve nada de lo suyo.
  */
 const DESCENSO = 1;
-/** Alto del recorrido pinneado en px. 2800 era el de la escena del faro
- *  sola (~870 px por unidad); el descenso suma lo suyo al mismo ritmo. */
-const RECORRIDO = 2800 + Math.round(870 * DESCENSO);
+/** Alto del recorrido pinneado en px (~870 px por unidad de la escena del
+ *  faro: ascenso, luz y el barrido hasta el cierre, unas 2.4 unidades con
+ *  el respiro); el descenso suma lo suyo al mismo ritmo. */
+const RECORRIDO = 2100 + Math.round(870 * DESCENSO);
 /**
  * Las nubes. Es un campo fijo que la cámara atraviesa: todas se mueven el
  * mismo TIEMPO (`viaje`: el descenso y, encima, el ascenso del faro hasta
@@ -70,13 +71,14 @@ const NUBES = { recorridoCerca: 1.4, recorridoLejos: 0.45, viaje: DESCENSO + 1 }
 const ORIGEN_HAZ = "950 385";
 /** Semiángulo del cono de luz (grados): lo que el haz "toca" a su paso. */
 const CONO = 12;
-/** Ángulos del haz: 0 = derecha (cierre), −90 = cielo, −180 = izquierda (Biblioteca). */
+/** Ángulos del haz: 0 = derecha (cierre), −90 = cielo. Hasta el 2026-09-14
+ *  había un primer barrido a la izquierda (−180, la Biblioteca); la
+ *  Biblioteca tiene ahora su propia sección y el haz baja del cielo
+ *  directo al cierre. */
 const HAZ_CIELO = -90;
-const HAZ_BIBLIOTECA = -180;
 const HAZ_CIERRE = 0;
-/** Ventanas de tiempo (unidades del timeline) de los dos barridos. */
-const BARRIDO_1 = { desde: 1.3, hasta: 1.78 };
-const BARRIDO_2 = { desde: 2.1, hasta: 2.78 };
+/** Ventana de tiempo (unidades del timeline) del barrido. */
+const BARRIDO = { desde: 1.3, hasta: 1.95 };
 /** Tamaño de estrella por estado (factor sobre PUNTOS[i].r). */
 const ESTRELLA = { sinTocar: 0.8, tocada: 0.95, iluminada: 1.35 } as const;
 const BRILLO = { sinTocar: 0.72, tocada: 1, iluminada: 1 } as const;
@@ -151,7 +153,7 @@ export function crearAscenso({ zona, hoja }: Escena) {
   const distanciaAngular = (a: number, b: number) =>
     Math.abs(((((a - b) % 360) + 540) % 360) - 180);
   const pintarEstrellas = (t: number) => {
-    if (t < BARRIDO_1.desde) {
+    if (t < BARRIDO.desde) {
       estrellas.forEach((e, i) => {
         e.setAttribute("r", String(radios[i] * ESTRELLA.sinTocar));
         e.setAttribute("fill-opacity", String(BRILLO.sinTocar));
@@ -160,11 +162,9 @@ export function crearAscenso({ zona, hoja }: Escena) {
     }
     if (!angulos) medirAngulos();
     const beta = haz.beta;
-    // Cobertura acumulada del barrido (determinista por tiempo): el 1º va del
-    // cielo a la izquierda; el 2º vuelve por arriba hasta la derecha.
-    const enSegundo = t >= BARRIDO_2.desde;
-    const lo = enSegundo ? HAZ_BIBLIOTECA : Math.min(HAZ_CIELO, beta);
-    const hi = enSegundo ? beta : HAZ_CIELO;
+    // Cobertura acumulada del barrido: del cielo hacia la derecha.
+    const lo = Math.min(HAZ_CIELO, beta);
+    const hi = Math.max(HAZ_CIELO, beta);
     estrellas.forEach((e, i) => {
       const a = angulos![i];
       const iluminada = distanciaAngular(a, beta) <= CONO;
@@ -307,63 +307,31 @@ export function crearAscenso({ zona, hoja }: Escena) {
     { autoAlpha: 1, duration: 0.15, ...sinRender },
     1.2,
   );
-  // ...gira y se posa sobre la Biblioteca (primer barrido).
+  // ...baja del cielo y se posa sobre el cierre.
   escena.fromTo(
     haz,
     { beta: HAZ_CIELO },
     {
-      beta: HAZ_BIBLIOTECA,
-      duration: BARRIDO_1.hasta - BARRIDO_1.desde,
+      beta: HAZ_CIERRE,
+      duration: BARRIDO.hasta - BARRIDO.desde,
       ease: "power2.inOut",
       onUpdate: apuntar,
       ...sinRender,
     },
-    BARRIDO_1.desde,
+    BARRIDO.desde,
   );
-  // El bloque izquierdo llega con la luz y su título se enciende.
+  // El bloque llega con la luz —el único naranja— y su título se enciende.
   escena.fromTo(
     bloques[0],
     { autoAlpha: 0, y: 18 },
     { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out", ...sinRender },
-    1.55,
+    BARRIDO.hasta - 0.22,
   );
   escena.fromTo(
     titulos[0],
     { color: TITULO_PENUMBRA, textShadow: RESPLANDOR_OFF },
     { color: TITULO_ENCENDIDO, textShadow: RESPLANDOR_ON, duration: 0.22, ...sinRender },
-    1.62,
-  );
-  // Pausa de lectura, y el haz vuelve por arriba hasta el cierre (segundo barrido).
-  escena.fromTo(
-    haz,
-    { beta: HAZ_BIBLIOTECA },
-    {
-      beta: HAZ_CIERRE,
-      duration: BARRIDO_2.hasta - BARRIDO_2.desde,
-      ease: "power2.inOut",
-      onUpdate: apuntar,
-      ...sinRender,
-    },
-    BARRIDO_2.desde,
-  );
-  // La luz se va de la Biblioteca: el título vuelve a la penumbra, leído.
-  escena.to(
-    titulos[0],
-    { color: TITULO_PENUMBRA, textShadow: RESPLANDOR_OFF, duration: 0.3 },
-    2.22,
-  );
-  // ...y llega al cierre: el bloque derecho, con el único naranja, se enciende.
-  escena.fromTo(
-    bloques[1],
-    { autoAlpha: 0, y: 18 },
-    { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out", ...sinRender },
-    2.55,
-  );
-  escena.fromTo(
-    titulos[1],
-    { color: TITULO_PENUMBRA, textShadow: RESPLANDOR_OFF },
-    { color: TITULO_ENCENDIDO, textShadow: RESPLANDOR_ON, duration: 0.22, ...sinRender },
-    2.66,
+    BARRIDO.hasta - 0.1,
   );
 
   tl.add(escena, DESCENSO);
