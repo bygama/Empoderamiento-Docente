@@ -133,7 +133,7 @@ export function QueHacemosHero() {
           "--qhx": "0",
           "--qhy": "0",
           // Sin fondo propio: lo pone el envoltorio compartido con la
-          // escena del faro (ver app/que-hacemos/page.tsx), para que no haya
+          // escena del faro (ver app/(sitio)/que-hacemos/page.tsx), para que no haya
           // costura entre los dos cielos.
         } as CSSProperties
       }
@@ -142,7 +142,7 @@ export function QueHacemosHero() {
           resplandor de horizonte, cielo estrellado y un haz girando— que la
           hacían distinta de la escena del faro que viene abajo y marcaban
           una línea horizontal en la junta. Ahora el cielo lo pone
-          únicamente el envoltorio compartido (app/que-hacemos/page.tsx) y
+          únicamente el envoltorio compartido (app/(sitio)/que-hacemos/page.tsx) y
           las dos secciones se leen como una sola.
           Se conserva el glow verde del botón: es respuesta a la interacción,
           no decorado de fondo. */}

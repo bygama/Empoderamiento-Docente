@@ -89,7 +89,7 @@ export function QueHacemosHeroFaro() {
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
-          // (ver app/que-hacemos/page.tsx). El cielo es uno solo para las dos
+          // (ver app/(sitio)/que-hacemos/page.tsx). El cielo es uno solo para las dos
           // secciones, así no hay junta posible.
           className="sticky top-0 isolate h-svh overflow-hidden"
         >

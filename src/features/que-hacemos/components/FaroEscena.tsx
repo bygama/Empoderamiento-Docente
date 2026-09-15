@@ -109,7 +109,7 @@ function CapaCielo() {
         {/* Fondo único cielo+mar profundo: evita costuras entre capas.
             El tramo superior entra TRANSPARENTE y se hace opaco recién a la
             altura del horizonte: arriba manda el fondo compartido con el hero
-            (ver app/que-hacemos/page.tsx), así el cielo es continuo entre las
+            (ver app/(sitio)/que-hacemos/page.tsx), así el cielo es continuo entre las
             dos secciones. Sin esto, este rect pintaba su propio cielo encima
             y volvía a marcar la junta — y como la cámara lo escala, el tono
             que asomaba arriba ni siquiera era constante. */}
