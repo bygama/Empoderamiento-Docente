@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
+import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { PUNTOS } from "./constelacion";
 import { LinternaFaro } from "./LinternaFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -163,18 +164,17 @@ function fondoNube(n: Nube) {
 }
 
 /**
- * Sección 8 — Cierre (§10 de docs/content/arquitectura-investigacion.md).
- * Es una INVITACIÓN, no una lectura: eyebrow + título + el único naranja, y
- * la luz haciendo el resto. (Hasta el 2026-09-14 absorbía la Conexión con
- * Biblioteca como segundo bloque; el 2026-09-15 esa conexión salió de la
- * página y el cierre queda solo con la conversación.)
+ * Sección 8 — Cierre, absorbiendo la Conexión con Biblioteca (§9 y §10 de
+ * docs/content/arquitectura-investigacion.md). Es una INVITACIÓN, no una
+ * lectura: eyebrow + título + botón de cada lado, y la luz haciendo el resto.
  *
  * «Cae la noche sobre el archivo»: la hoja llega enmarcada como la hoja 01
  * del hero, metida entre nubes, y al pinnearse el marco se disuelve y el
  * navy se expande hasta los bordes. La cámara baja: las nubes del primer
  * plano suben y se van (ver NUBES) y el faro sube a su encuentro —el mismo
  * de Qué hacemos, recortado y grande— plantado en el piso. Gira, se
- * enciende arriba y el haz baja del cielo y se posa sobre el cierre.
+ * enciende arriba y el haz lee de costado: primero se posa sobre la
+ * Biblioteca, después sobre el cierre.
  * Los 13 puntos del hero vuelven como estrellas y la luz los va tocando.
  *
  * El SSR renderiza el último frame (todo encendido y en su lugar): es lo que
@@ -199,6 +199,12 @@ export function CierreInvestigacion() {
     const ctx = gsap.context(() => {
       const escena = crearAscenso({ zona, hoja });
       restaurar = escena.restaurar;
+      // Llegar por el ancla #biblioteca no puede aterrizar en la hoja a
+      // oscuras: saltar al final del pin, con la historia ya contada.
+      if (window.location.hash === "#biblioteca") {
+        const st = escena.tl.scrollTrigger;
+        if (st) requestAnimationFrame(() => window.scrollTo(0, st.end));
+      }
     }, zona);
     return () => {
       ctx.revert();
@@ -311,18 +317,28 @@ export function CierreInvestigacion() {
           </div>
         </div>
 
-        {/* ── El mensaje que la luz lee de costado: la invitación a conversar.
-            Hasta el 2026-09-14 había un segundo bloque a la izquierda con la
-            Biblioteca; salió de la página el 2026-09-15, y la grilla
-            conserva las tres columnas para que el faro y el mensaje no se
-            muevan de lugar. */}
+        {/* ── Los dos mensajes que la luz lee de costado: invitaciones. */}
         <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(200px,17vw)_1fr] lg:gap-x-6">
-          <div aria-hidden="true" className="hidden lg:block" />
+          {/* Primera parada del haz: dónde vive lo que investigamos. */}
+          <div id="biblioteca" data-cierre-bloque className="max-w-[30rem] lg:max-w-none lg:justify-self-end">
+            <h2
+              data-cierre-titulo
+              className="font-display text-azul-claro font-extrabold tracking-[-0.02em] text-balance"
+              style={{ fontSize: "clamp(1.6rem, 0.8rem + 1.5vw, 2.1rem)", lineHeight: 1.08 }}
+            >
+              La investigación también se comparte.
+            </h2>
+            <div className="mt-7">
+              <ButtonSecondary href="/biblioteca" variant="dark" withArrow>
+                Explorá la Biblioteca
+              </ButtonSecondary>
+            </div>
+          </div>
 
           {/* El hueco del faro. */}
           <div aria-hidden="true" className="hidden lg:block" />
 
-          {/* La parada del haz: el camino. */}
+          {/* Última parada del haz: el camino. */}
           <div data-cierre-bloque className="max-w-[30rem] lg:max-w-none">
             <p className="text-azul-claro/70 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
               Investigar para transformar

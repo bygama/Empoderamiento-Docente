@@ -32,11 +32,11 @@ export const metadata: Metadata = {
  *
  * Consistencia con el sitemap (2026-09-14): el orden es el del sitemap y
  * cada hoja del archivo lleva en su folio el nombre de su sección. La
- * Hoja 01 (los cuatro beats del hero) ES «Por qué investigamos» y el
- * cierre queda solo con la conversación. El sobre se fue entero: primero
- * «Nacimos de una pregunta» (el origen ya vive en Quiénes somos y su
- * postura la decía el beat 3, palabra por palabra) y el 2026-09-15 también
- * «La investigación también se comparte» (decisión de Gastón).
+ * Hoja 01 (los cuatro beats del hero) ES «Por qué investigamos». El sobre
+ * se fue entero: primero «Nacimos de una pregunta» (el origen ya vive en
+ * Quiénes somos y su postura la decía el beat 3, palabra por palabra) y el
+ * 2026-09-15 también su versión de Biblioteca; la invitación a la
+ * Biblioteca sigue en el cierre, del lado izquierdo (decisión de Gastón).
  */
 export default function InvestigacionPage() {
   return (
