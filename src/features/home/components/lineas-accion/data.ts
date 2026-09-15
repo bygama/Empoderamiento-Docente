@@ -19,7 +19,7 @@ export type Area = {
   Icon: ComponentType<IconProps>;
 };
 
-// Las 7 áreas de desarrollo de ED. Copy oficial del cliente
+// Las 7 áreas de especialización de ED. Copy oficial del cliente
 // [[ed-copy-oficial]]: `frase` = la línea destacada (verde); `detalle` = la
 // descripción. Frases sin punto final (queda más limpio en la carta); los
 // párrafos descriptivos sí lo llevan. En cada detalle va en negrita UNA sola
