@@ -53,3 +53,6 @@ docs/superpowers/
 
 # playwright mcp (local screenshots / console artifacts)
 .playwright-mcp/
+
+# fotos subidas al panel cuando no hay Vercel Blob (desarrollo)
+fotos-local/
