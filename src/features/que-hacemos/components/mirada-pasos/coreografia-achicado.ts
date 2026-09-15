@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { flujoDesdeSeccion, topeDeCard } from "./medidas";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,17 +22,11 @@ gsap.registerPlugin(ScrollTrigger);
  * relevo con el faro —y la primera se vea en reposo— lo garantiza el aire
  * entre cards que pone la pila (ver MiradaPasos).
  *
- * Las posiciones se calculan desde la SECCIÓN, no desde los elementos
- * sticky, que trabados le mienten a ScrollTrigger sobre dónde están: el
- * corrimiento de cada card se suma a mano, y la posición de reposo del
- * bloque se mide del layout, así que un cambio de copy o de alto se
- * recalcula solo en el refresh.
- *
- * Y se MIDEN, nunca se rearman con las medidas de la pila: esas dependen del
- * alto de la pantalla (globals.css) y una copia acá se desincroniza sin
- * avisar. Pasó: con las constantes de 53.5rem en la mano, en una notebook el
- * final del tramo caía abajo del borde del viewport, el tramo se invertía y
- * los cinco bloques se achicaban todos juntos (el usuario, 2026-09-15).
+ * Las posiciones salen de `medidas.ts`, que explica por qué se miden desde la
+ * sección y por qué no se rearman con constantes. Para la última card de un
+ * grupo, la «siguiente» es la primera del grupo que viene —que sube por
+ * encima de todo el grupo y la tapa—, y para la última de todas, la banda de
+ * aliados.
  *
  * Sin nada de esto en celular ni con reduced-motion: el bloque queda en
  * reposo, abajo. El `will-change` lo pone y lo saca esta coreografía, nunca
@@ -58,26 +53,11 @@ export function crearAchicado(root: HTMLElement) {
       };
       if (!desktop || reducido) return;
 
-      const pila = root.querySelector<HTMLElement>("[data-mirada-pila]");
       const banda = root.querySelector<HTMLElement>("[data-mirada-banda]");
       const cards = gsap.utils.toArray<HTMLElement>("[data-mirada-card]", root);
-      if (!pila || !banda || !cards.length) return;
+      if (!banda || !cards.length) return;
 
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-
-      /** Dónde arranca la card `i`, medida desde el borde de la sección: las
-       *  anteriores más el aire (`gap`) que la pila pone entre ellas. Sumado
-       *  a mano y no leído del `offsetTop` de la card, que trabada ya viene
-       *  corrido. */
-      const cardDesdeSeccion = (i: number) => {
-        const estilo = getComputedStyle(pila);
-        const aire = parseFloat(estilo.rowGap) || 0;
-        return (
-          pila.offsetTop +
-          parseFloat(estilo.paddingTop) +
-          cards.slice(0, i).reduce((suma, c) => suma + c.offsetHeight + aire, 0)
-        );
-      };
 
       const bloques = cards.flatMap((card, i) => {
         const bloque = card.querySelector<HTMLElement>("[data-mirada-texto]");
@@ -85,12 +65,9 @@ export function crearAchicado(root: HTMLElement) {
         if (!bloque || !cabecera) return [];
 
         const siguienteDesdeSeccion = () =>
-          i + 1 < cards.length ? cardDesdeSeccion(i + 1) : banda.offsetTop;
-        /** Borde de arriba del bloque en reposo, con la card trabada: el
-         *  `top` con el que la card se traba —que el CSS ya calculó con las
-         *  medidas de la pila— más lo que el bloque baja dentro de ella. */
-        const reposoEnPantalla = () =>
-          (parseFloat(getComputedStyle(card).top) || 0) + bloque.offsetTop;
+          i + 1 < cards.length ? flujoDesdeSeccion(cards[i + 1]) : banda.offsetTop;
+        /** Borde de arriba del bloque en reposo, con la card trabada. */
+        const reposoEnPantalla = () => topeDeCard(card) + bloque.offsetTop;
         /** Cuánto sube para quedar pegado a la cabecera. */
         const subida = () => -(bloque.offsetTop - (cabecera.offsetHeight + AIRE_REM * rem));
 

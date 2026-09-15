@@ -36,8 +36,11 @@ const PALETA = [
  * Un paso de «Cómo trabajamos» como panel apilable.
  *
  * En desktop cada panel es `sticky` con un `top` que crece una solapa por
- * paso: cuando el siguiente sube y lo tapa, le deja a la vista justo esa
- * franja, la cabecera con el número y el verbo, que mide lo mismo. Las cabeceras se acumulan
+ * paso DENTRO DE SU GRUPO: cuando el siguiente sube y lo tapa, le deja a la
+ * vista justo esa franja, la cabecera con el número y el verbo, que mide lo
+ * mismo. Los dos grupos usan los mismos `top`, así que el primer panel del
+ * segundo grupo se traba donde se trabó el primero del primero, después de
+ * haber subido por encima de todo el grupo anterior (ver GrupoMirada). Las cabeceras se acumulan
  * arriba como pestañas de una carpeta y cuentan el recorrido; al terminar la
  * lista, la pila se despega entera y el scroll sigue normal. El apilado es
  * CSS puro; la llegada de cada card (fade y subida) la pone la coreografía
@@ -50,52 +53,67 @@ const PALETA = [
  * 2026-09-11: «que ninguna se coma a ninguna»). Con los pies parejos, el
  * fondo de la lista los empuja a todos a la vez y se van juntos.
  *
- * Los seis van en UNA pila (el usuario, 2026-09-11: «así se ven las 6»), y
- * la pila entera tiene que entrar en pantalla trabada. Eso ya no depende de
- * que los números den: `--mirada-alto` se calcula contra `100svh`, así que en
- * una pantalla baja las cards se achican justo lo que falta (globals.css).
+ * Van en DOS GRUPOS DE TRES (el usuario, 2026-09-15), y a cada grupo se le
+ * reinicia el presupuesto de alto: por eso las seis cards miden lo mismo y en
+ * una notebook entran enteras, que con los seis en una sola pila no pasaba
+ * (globals.css lo explica con los números).
  *
- * `indice` numera el paso (rótulo, color y cuánto baja el `top`); `total`
- * dice cuántos vienen después, que es lo que le suma alto.
+ * `numero` es el paso en el recorrido, de 1 a 6: lo usa el rótulo y el color.
+ * `enGrupo` es su lugar dentro del grupo —de eso sale el `top`— y `porGrupo`
+ * cuántos son, para saber cuántas solapas le quedan debajo, que es lo que le
+ * suma alto.
  *
  * En celular el panel va en flujo normal, con la foto debajo del texto.
  */
 export function PanelMirada({
   paso,
-  indice,
+  numero,
   total,
+  enGrupo,
+  porGrupo,
 }: {
   paso: Paso;
-  indice: number;
+  numero: number;
   total: number;
+  enGrupo: number;
+  porGrupo: number;
 }) {
-  const tono = PALETA[indice % PALETA.length];
-  const solapasDebajo = total - 1 - indice;
+  const tono = PALETA[(numero - 1) % PALETA.length];
+  /** Una solapa por cada panel que le queda debajo: con los pies parejos, la
+   *  pila entera termina en la misma línea y se despegan todos juntos. */
+  const solapa = (n: number) => `${n} * var(--mirada-solapa, 4rem)`;
+  const desdeArriba = "var(--mirada-tope, 6rem) + var(--mirada-franja, 5.5rem)";
 
   return (
     <li
       data-mirada-card
+      // LAS CUATRO CUENTAS, ya resueltas: dónde se traba y cuánto mide en cada
+      // una de las dos variantes —los seis en una pila, o en grupos de tres—.
+      // Cuál se usa lo decide el alto de la pantalla, y eso vive en
+      // globals.css, que es donde puede haber una media query.
+      //
       // CADA var LLEVA SU RESPALDO, y no por prolijidad: si las medidas no
       // llegan —una hoja vieja en caché, un motor que no resuelve algún
       // calc—, `top` y `height` quedan inválidos, y eso no degrada, MATA: sin
       // `top` el sticky no se traba nunca y sin `height` las seis cards caen a
       // su alto natural, todas iguales y chatas, sin escalera y sin apilado
       // (el usuario, 2026-09-15, con un video donde pasaba justo eso). Con el
-      // respaldo, el peor caso es la geometría fija de antes del 2026-09-15:
-      // la pila anda, y en una pantalla baja se corta como se cortaba.
+      // respaldo, el peor caso es la geometría fija de siempre: la pila anda.
       style={
         {
-          top: `calc(var(--mirada-tope, 6rem) + var(--mirada-franja, 5.5rem) + ${indice} * var(--mirada-solapa, 4rem))`,
-          "--alto": `calc(var(--mirada-alto, 22rem) + ${solapasDebajo} * var(--mirada-solapa, 4rem))`,
+          "--mirada-card-top-pila": `calc(${desdeArriba} + ${solapa(numero - 1)})`,
+          "--mirada-card-top-grupo": `calc(${desdeArriba} + ${solapa(enGrupo)})`,
+          "--mirada-card-alto-pila": `calc(var(--mirada-alto, 22rem) + ${solapa(total - numero)})`,
+          "--mirada-card-alto-grupo": `calc(var(--mirada-alto, 22rem) + ${solapa(porGrupo - 1 - enGrupo)})`,
         } as CSSProperties
       }
-      className={`${tono.fondo} border-azul-principal/10 flex flex-col rounded-[1.25rem] border lg:sticky lg:h-[var(--alto)]`}
+      className={`${tono.fondo} border-azul-principal/10 flex flex-col rounded-[1.25rem] border lg:sticky`}
     >
       <div className="flex shrink-0 items-center gap-5 px-6 py-5 md:px-8 lg:h-[var(--mirada-solapa,4rem)] lg:py-0">
         <p className={`${tono.numero} font-mono text-[0.8rem] tracking-[0.18em]`}>
-          0{indice + 1}
+          0{numero}
         </p>
-        <h3 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] lg:pantalla-baja:text-[1.8rem] lg:text-[2.1rem]">
+        <h3 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] lg:text-[2.1rem]">
           {paso.verbo}
         </h3>
       </div>
@@ -110,10 +128,10 @@ export function PanelMirada({
           desde ahí: sin JS el bloque queda en reposo, abajo. */}
       <div className="grid flex-1 gap-8 px-6 pb-6 md:px-8 md:pb-8 lg:min-h-0 lg:grid-cols-2 lg:gap-10">
         <div data-mirada-texto className="lg:self-end">
-          <p className={`${tono.idea} font-display text-[1.15rem] font-semibold lg:pantalla-baja:text-[1.25rem] lg:text-[1.5rem] lg:leading-snug`}>
+          <p className={`${tono.idea} font-display text-[1.15rem] font-semibold lg:text-[1.5rem] lg:leading-snug`}>
             {paso.idea}
           </p>
-          <p className={`${tono.texto} mt-4 font-sans text-[1rem] leading-relaxed lg:pantalla-baja:mt-4 lg:pantalla-baja:text-[1rem] lg:mt-7 lg:text-[1.15rem]`}>
+          <p className={`${tono.texto} mt-4 font-sans text-[1rem] leading-relaxed lg:mt-7 lg:text-[1.15rem]`}>
             {paso.texto}
           </p>
         </div>

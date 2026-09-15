@@ -594,32 +594,37 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
 
 /* === «Cómo trabajamos» — las medidas de la pila ========================== */
 
-/* La pila trabada TIENE QUE ENTRAR EN LA PANTALLA (el usuario, 2026-09-15:
-   «en pantallas de notebook se bugea todo y no se llega a ver bien»).
-   Medía 53,5rem fijos —tope + franja + cinco solapas + la última card— y una
-   1366x768 con el navegador maximizado deja 640px de viewport: la última card
-   quedaba 216px abajo del borde, con su texto invisible. Y arrastraba un
-   segundo defecto: el achicado de cada bloque termina donde el bloque
-   descansa, entre 668 y 701px, o sea abajo del borde, así que el tramo se
-   invertía y los cinco textos se achicaban todos juntos en vez de uno por
-   turno.
-
+/* SEIS EN UNA PILA ARRIBA DE 872px DE ALTO, DOS GRUPOS DE TRES ABAJO.
+ 
+   Desktop queda EXACTAMENTE como se aprobó y no se mueve nada (el usuario,
+   2026-09-15): seis paneles en una pila, solapa de 4rem, la última card de
+   22rem. Lo que cambia es sólo lo que no entra en una notebook.
+ 
+   El problema nunca fue el alto de las cards: son las solapas. Los seis
+   trabados necesitan tope + franja + CINCO solapas + la card, o sea 53,5rem =
+   856px, y una 1366x768 con el navegador maximizado deja 640px de viewport: la
+   última card quedaba 216px abajo del borde. De a tres son DOS solapas, y la
+   cuenta se da vuelta.
+ 
+   El corte está en 54,5rem (872px) porque es justo donde la fórmula deja de
+   poder dar los 22rem: arriba de ahí los seis entran con la card entera, así
+   que la pila larga nunca se achica; abajo, entran los grupos.
+ 
+   UN SOLO JUEGO DE MEDIDAS para las dos: tope, franja, solapa y el máximo de
+   alto son los mismos en toda pantalla. Lo único que el corte cambia es
+   CUÁNTAS solapas se apilan juntas (`--mirada-solapas`), y de ahí salen solas
+   el alto de la última card y el de la pila. La versión anterior tenía medio
+   juego de medidas aparte y tres tamaños de tipografía para pantallas bajas;
+   no hacía falta, y el usuario lo marcó: «en notebook no había que reducir
+   tanto la altura». Así, en una 1440x675 la card mide 21,7rem contra 22, y en
+   una 1366x768 mide 19,5rem.
+ 
    Las medidas viven ACÁ, en un solo lugar, y de acá las leen tanto el CSS de
    los componentes (`var()`) como las coreografías (`getComputedStyle`). Antes
    estaban en constantes de PanelMirada que dos coreografías volvían a sumar
-   por su cuenta: con medidas que dependen de la pantalla, esa copia se
-   desincroniza sin avisar y el achicado apunta a donde la card ya no está.
-
-   Dos juegos de números, no una escala continua: una tipografía que se
-   desliza de a un pixel se ve peor que dos tamaños limpios. `--mirada-alto`
-   sí es continuo, porque es el que cierra la cuenta: en una pantalla alta
-   gana el máximo de 22rem y no cambia nada de lo aprobado; en una baja se
-   achica exactamente lo que falta, sin escalón a los 900px. Abajo de ~520px
-   de alto la card queda impracticable, y no se pone piso: un viewport de
-   1024px de ancho y menos de 520 de alto no existe, y un piso volvería a
-   dejar la pila cortada, que es el defecto que esto arregla. */
-
-@custom-variant pantalla-baja (@media (max-height: 56.25rem));
+   por su cuenta, y esa copia se desincroniza sin avisar. Cada consumidor lleva
+   además su valor de respaldo, porque si una medida no llega el `sticky` se
+   queda sin `top` y la sección muere en vez de degradarse (ver PanelMirada). */
 
 [data-mirada] {
   /* Lo que se deja pasar arriba: la barra de navegación fija (1rem de margen
@@ -631,23 +636,23 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
   /* Lo que cada card deja ver cuando la tapan: su cabecera, que mide lo
      mismo. */
   --mirada-solapa: 4rem;
-  /* Alto de la última card cuando la pantalla da de sobra. */
+  /* Alto de la última card de la pila cuando la pantalla da de sobra. */
   --mirada-alto-max: 22rem;
+  /* Cuántas solapas se apilan: todas menos la última card. Los dos valores los
+     pasa el compositor, que es el que sabe cuántos pasos son y de a cuántos se
+     agrupan. */
+  --mirada-solapas: var(--mirada-solapas-pila);
 }
 
-@media (max-height: 56.25rem) {
+/* La notebook: la pila pasa a grupos de tres y con ella la cuenta. Lo de cada
+   card —su `top` y su alto— está más abajo. */
+@media (max-height: 54.5rem) {
   [data-mirada] {
-    --mirada-tope: 5.5rem;
-    --mirada-titulo: 3.5rem;
-    --mirada-aire: 1rem;
-    --mirada-solapa: 3rem;
+    --mirada-solapas: var(--mirada-solapas-grupo);
   }
 }
 
-/* Derivadas: no se editan, salen de las de arriba. `--mirada-solapas` —lo que
-   suman las solapas de todos los paneles menos el último— la pone el
-   compositor, que es el que sabe cuántos son, así que un séptimo paso
-   recalcula todo solo. */
+/* Derivadas: no se editan, salen de las de arriba. */
 [data-mirada] {
   --mirada-franja: calc(var(--mirada-titulo) + var(--mirada-aire));
   --mirada-alto: min(
@@ -655,7 +660,30 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
     100svh - var(--mirada-tope) - var(--mirada-franja) - var(--mirada-solapas) -
       1rem
   );
+  /* Alto de la pila trabada, franja incluida: lo que mide el header (para
+     despegarse con los paneles) y lo que retrocede la banda de aliados para
+     subir hasta el título. */
   --mirada-pila: calc(
     var(--mirada-franja) + var(--mirada-solapas) + var(--mirada-alto)
   );
+}
+
+/* DÓNDE SE TRABA CADA PANEL Y CUÁNTO MIDE, las dos variantes. Van acá y no en
+   clases de Tailwind porque el corte es por ALTO de pantalla y las dos
+   variantes tienen que convivir; cada panel trae las cuatro cuentas ya
+   resueltas desde React (PanelMirada), con su número de solapas como literal.
+   Sólo en desktop: abajo de 1024px no hay apilado y los paneles van en flujo,
+   con su alto natural. */
+@media (min-width: 64rem) {
+  [data-mirada-card] {
+    top: var(--mirada-card-top-pila);
+    height: var(--mirada-card-alto-pila);
+  }
+
+  @media (max-height: 54.5rem) {
+    [data-mirada-card] {
+      top: var(--mirada-card-top-grupo);
+      height: var(--mirada-card-alto-grupo);
+    }
+  }
 }
