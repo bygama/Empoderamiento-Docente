@@ -116,12 +116,18 @@ export interface UsuarioAuthOperations {
   };
 }
 /**
+ * Quiénes pueden entrar al panel. Las altas y bajas las hace quien administra.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "usuarios".
  */
 export interface Usuario {
   id: number;
   nombre: string;
+  /**
+   * Quien edita también publica: no hay paso de aprobación.
+   */
+  rol: 'administrador' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -216,6 +222,7 @@ export interface PayloadMigration {
  */
 export interface UsuariosSelect<T extends boolean = true> {
   nombre?: T;
+  rol?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
