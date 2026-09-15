@@ -2,12 +2,10 @@ import type { Access, FieldAccess, PayloadRequest } from "payload";
 
 // Dos roles y nada más (spec §6): administrador (todo, incluidos usuarios) y
 // editor (contenido). Se lee del JWT (saveToJWT en el campo rol), sin ir a
-// la base en cada chequeo.
-type Rol = "administrador" | "editor";
-
-function rolDe(req: PayloadRequest): Rol | undefined {
-  const usuario = req.user as { rol?: Rol } | null;
-  return usuario?.rol;
+// la base en cada chequeo. El tipo de "rol" sale de Usuario (payload-types.ts),
+// generado por Payload: no hace falta nombrarlo acá.
+function rolDe(req: PayloadRequest) {
+  return req.user?.rol ?? undefined;
 }
 
 export const soloAdministrador: Access = ({ req }) => rolDe(req) === "administrador";

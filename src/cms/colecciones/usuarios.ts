@@ -11,7 +11,7 @@ const QUINCE_MINUTOS = 15 * 60 * 1000;
 // contraseña» (spec §6).
 export const Usuarios: CollectionConfig = {
   slug: "usuarios",
-  labels: { singular: "Usuario", plural: "Usuarios" },
+  labels: { singular: "Cuenta", plural: "Cuentas" },
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "email", "rol"],
@@ -28,7 +28,7 @@ export const Usuarios: CollectionConfig = {
       generateEmailHTML: (args) =>
         correoDeContrasena({
           enlace: `${urlDelSitio()}/admin/reset/${args?.token ?? ""}`,
-          nombre: (args?.user as { nombre?: string } | undefined)?.nombre,
+          nombre: args?.user?.nombre,
         }),
     },
   },
