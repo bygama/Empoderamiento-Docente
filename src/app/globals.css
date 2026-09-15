@@ -594,13 +594,32 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
 
 /* === «Cómo trabajamos» — las medidas de la pila ========================== */
 
-/* Las medidas de la pila trabada viven ACÁ, en un solo lugar, y de acá las
-   leen tanto el CSS de los componentes (`var()`) como las coreografías
-   (`getComputedStyle`). Estaban en constantes de PanelMirada que dos
-   coreografías volvían a sumar por su cuenta —el mismo número escrito tres
-   veces—, y ese es justo el tipo de copia que se desincroniza sin avisar: si
-   una medida cambia y la coreografía sigue con la vieja, el achicado apunta a
-   donde la card ya no está. */
+/* La pila trabada TIENE QUE ENTRAR EN LA PANTALLA (el usuario, 2026-09-15:
+   «en pantallas de notebook se bugea todo y no se llega a ver bien»).
+   Medía 53,5rem fijos —tope + franja + cinco solapas + la última card— y una
+   1366x768 con el navegador maximizado deja 640px de viewport: la última card
+   quedaba 216px abajo del borde, con su texto invisible. Y arrastraba un
+   segundo defecto: el achicado de cada bloque termina donde el bloque
+   descansa, entre 668 y 701px, o sea abajo del borde, así que el tramo se
+   invertía y los cinco textos se achicaban todos juntos en vez de uno por
+   turno.
+
+   Las medidas viven ACÁ, en un solo lugar, y de acá las leen tanto el CSS de
+   los componentes (`var()`) como las coreografías (`getComputedStyle`). Antes
+   estaban en constantes de PanelMirada que dos coreografías volvían a sumar
+   por su cuenta: con medidas que dependen de la pantalla, esa copia se
+   desincroniza sin avisar y el achicado apunta a donde la card ya no está.
+
+   Dos juegos de números, no una escala continua: una tipografía que se
+   desliza de a un pixel se ve peor que dos tamaños limpios. `--mirada-alto`
+   sí es continuo, porque es el que cierra la cuenta: en una pantalla alta
+   gana el máximo de 22rem y no cambia nada de lo aprobado; en una baja se
+   achica exactamente lo que falta, sin escalón a los 900px. Abajo de ~520px
+   de alto la card queda impracticable, y no se pone piso: un viewport de
+   1024px de ancho y menos de 520 de alto no existe, y un piso volvería a
+   dejar la pila cortada, que es el defecto que esto arregla. */
+
+@custom-variant pantalla-baja (@media (max-height: 56.25rem));
 
 [data-mirada] {
   /* Lo que se deja pasar arriba: la barra de navegación fija (1rem de margen
@@ -612,8 +631,17 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
   /* Lo que cada card deja ver cuando la tapan: su cabecera, que mide lo
      mismo. */
   --mirada-solapa: 4rem;
-  /* Alto de la última card, la que se ve entera con la pila completa. */
-  --mirada-alto: 22rem;
+  /* Alto de la última card cuando la pantalla da de sobra. */
+  --mirada-alto-max: 22rem;
+}
+
+@media (max-height: 56.25rem) {
+  [data-mirada] {
+    --mirada-tope: 5.5rem;
+    --mirada-titulo: 3.5rem;
+    --mirada-aire: 1rem;
+    --mirada-solapa: 3rem;
+  }
 }
 
 /* Derivadas: no se editan, salen de las de arriba. `--mirada-pasos` lo pone
@@ -622,6 +650,11 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
 [data-mirada] {
   --mirada-franja: calc(var(--mirada-titulo) + var(--mirada-aire));
   --mirada-solapas: calc((var(--mirada-pasos) - 1) * var(--mirada-solapa));
+  --mirada-alto: min(
+    var(--mirada-alto-max),
+    100svh - var(--mirada-tope) - var(--mirada-franja) - var(--mirada-solapas) -
+      1rem
+  );
   --mirada-pila: calc(
     var(--mirada-franja) + var(--mirada-solapas) + var(--mirada-alto)
   );

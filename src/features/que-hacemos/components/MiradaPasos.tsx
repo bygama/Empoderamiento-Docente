@@ -107,7 +107,7 @@ export function MiradaPasos() {
             >
               <h2
                 data-mirada-titulo
-                className="font-display text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem] lg:text-[2.1rem]"
+                className="font-display text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem] lg:pantalla-baja:text-[1.8rem] lg:text-[2.1rem]"
                 style={{ lineHeight: 1.1 }}
               >
                 {MIRADA_INTRO.titulo}
