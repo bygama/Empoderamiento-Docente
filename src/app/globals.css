@@ -344,21 +344,37 @@ html.has-custom-cursor * {
   justify-content: center;
   z-index: 30;
 }
+/* Las siete cartas comparten una sola celda de grilla: la franja entre el
+   menú flotante (padding de arriba) y el CTA (padding de abajo). Cada carta
+   ocupa esa franja entera, con dos topes: nunca menos que el texto de la carta
+   más larga (la fila no baja de max-content) y nunca más de 28rem, para que en
+   pantallas altas no quede un hueco vacío. Antes medían 33rem fijos centradas
+   en la pantalla, y en pantallas bajas el pie tapaba el CTA. Si el texto no
+   entra en la franja, `align-content: end` hace que la carta crezca hacia
+   arriba (bajo el menú, que al bajar se esconde) y nunca sobre el CTA. */
 .deck.is-live .deck-cards {
-  display: block;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: minmax(max-content, 1fr);
+  justify-content: center;
+  align-content: end;
+  gap: 0;
   position: absolute;
   inset: 0;
+  margin: 0;
+  padding: 6.5rem 0 8.5rem;
 }
 .deck.is-live .deck-card {
-  position: absolute;
-  inset: 0;
-  margin: auto;
+  grid-area: 1 / 1;
+  align-self: center;
   /* Ancho responsivo: en desktop angosto (≈1024–1280) las cartas se achican un
      poco para que el abanico no se apriete tanto ni corte los títulos. El JS
      lee el ancho real para calcular el spread, así las proporciones del abanico
      se mantienen parejas al angostarse. */
   width: clamp(18rem, 25vw, 22.5rem);
-  height: 33rem;
+  height: 100%;
+  min-height: max-content;
+  max-height: 28rem;
   will-change: transform, opacity;
 }
 /* En el abanico, el tilt 3D por hover lo maneja GSAP sobre la capa interna. */
