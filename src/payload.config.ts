@@ -10,6 +10,9 @@ import { Fotos } from "@/cms/colecciones/fotos";
 import { Usuarios } from "@/cms/colecciones/usuarios";
 import { urlDeLaBase } from "@/cms/base";
 import { urlDelSitio } from "@/cms/url";
+import { exigirVariablesEnVercel } from "@/cms/entorno";
+
+exigirVariablesEnVercel();
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
