@@ -9,6 +9,7 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { CartaArea } from "./lineas-accion/CartaArea";
 import { AREAS } from "./lineas-accion/data";
+import { crearManoCartas } from "./lineas-accion/mano-cartas";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -51,8 +52,8 @@ export function LineasAccion() {
 
     root.classList.add("is-live");
 
-    // Limpieza de listeners del tilt interactivo (se llenan dentro del ctx).
-    const tiltCleanups: Array<() => void> = [];
+    // Limpiezas que no pasan por el revert del contexto (listeners, hover).
+    const limpiezas: Array<() => void> = [];
 
     const ctx = gsap.context(() => {
       const total = cards.length;
@@ -89,7 +90,11 @@ export function LineasAccion() {
       if (cta) gsap.set(cta, { opacity: 0, y: 24 });
 
       const seg = 1 / total;
+      // A cada paso del scroll la mano revisa si la carta elegida se volvió a
+      // mover (ver mano-cartas.ts).
+      let revisarMano = () => {};
       const tl = gsap.timeline({
+        onUpdate: () => revisarMano(),
         scrollTrigger: {
           trigger: scroll,
           start: "top top",
@@ -126,65 +131,19 @@ export function LineasAccion() {
         );
       }
 
-      // --- Tilt interactivo -----------------------------------------------
-      // Al pasar el mouse, la carta sube al frente y se inclina apenas
-      // siguiendo el cursor (como una carta física que levantás de la mano),
-      // así se lee sin volver a scrollear. GSAP del abanico vive en el <li>;
-      // el tilt vive en la capa interna → los transforms se componen sin
-      // pisarse.
-      const TILT_MAX = 9; // grados máximos de inclinación
-      const LIFT = -16; // px que "levanta" la carta
-      const HOVER_SCALE = 1.05;
-
-      cards.forEach((card) => {
-        const inner = card.querySelector<HTMLElement>("[data-deck-inner]");
-        if (!inner) return;
-
-        gsap.set(inner, { transformPerspective: 900, transformOrigin: "center" });
-
-        const tween = { duration: 0.5, ease: "power3.out" } as const;
-        const rotX = gsap.quickTo(inner, "rotationX", tween);
-        const rotY = gsap.quickTo(inner, "rotationY", tween);
-        const moveY = gsap.quickTo(inner, "y", tween);
-        // "scale" como atajo no es válido en quickTo → se separa por eje.
-        const scaleX = gsap.quickTo(inner, "scaleX", tween);
-        const scaleY = gsap.quickTo(inner, "scaleY", tween);
-        const setScale = (v: number) => {
-          scaleX(v);
-          scaleY(v);
-        };
-
-        const baseZ = card.style.zIndex; // z del abanico fijado por GSAP
-
-        const onEnter = () => {
-          card.style.zIndex = "100";
-          moveY(LIFT);
-          setScale(HOVER_SCALE);
-        };
-        const onMove = (e: PointerEvent) => {
-          const r = card.getBoundingClientRect();
-          const px = (e.clientX - r.left) / r.width - 0.5; // -0.5 … 0.5
-          const py = (e.clientY - r.top) / r.height - 0.5;
-          rotY(px * TILT_MAX * 2);
-          rotX(-py * TILT_MAX * 2);
-        };
-        const onLeave = () => {
-          card.style.zIndex = baseZ;
-          rotX(0);
-          rotY(0);
-          moveY(0);
-          setScale(1);
-        };
-
-        card.addEventListener("pointerenter", onEnter);
-        card.addEventListener("pointermove", onMove);
-        card.addEventListener("pointerleave", onLeave);
-        tiltCleanups.push(() => {
-          card.removeEventListener("pointerenter", onEnter);
-          card.removeEventListener("pointermove", onMove);
-          card.removeEventListener("pointerleave", onLeave);
-        });
+      // --- Mano de cartas ---------------------------------------------------
+      // Al recorrer el abanico con el mouse, la carta más cercana se saca del
+      // mazo y pasa al frente; las vecinas le abren lugar. La coreografía
+      // entera vive en lineas-accion/mano-cartas.ts.
+      const mano = crearManoCartas({
+        escenario: stage,
+        cartas: cards,
+        giroReposo: restRot,
+        // La carta i termina de aterrizar en (i + 0.85) · seg del timeline.
+        aterrizada: (i) => tl.progress() >= (i + 0.85) * seg - 0.005,
       });
+      revisarMano = mano.revisar;
+      limpiezas.push(mano.limpiar);
 
       // Recalcular el spread del abanico al cambiar el ancho de la ventana: el
       // restX depende del ancho del escenario; sin esto, al achicar la ventana
@@ -198,14 +157,14 @@ export function LineasAccion() {
         });
       };
       window.addEventListener("resize", onResize);
-      tiltCleanups.push(() => {
+      limpiezas.push(() => {
         cancelAnimationFrame(resizeRaf);
         window.removeEventListener("resize", onResize);
       });
     }, root);
 
     return () => {
-      tiltCleanups.forEach((fn) => fn());
+      limpiezas.forEach((fn) => fn());
       ctx.revert();
       root.classList.remove("is-live");
     };
@@ -247,7 +206,7 @@ export function LineasAccion() {
           <ul className="deck-cards mt-14 md:mt-16">
             {AREAS.map((area, i) => (
               <li key={area.n} data-deck-card className="deck-card">
-                <CartaArea area={area} azulBase={i % 2 === 1} />
+                <CartaArea area={area} total={AREAS.length} azulBase={i % 2 === 1} />
               </li>
             ))}
           </ul>
