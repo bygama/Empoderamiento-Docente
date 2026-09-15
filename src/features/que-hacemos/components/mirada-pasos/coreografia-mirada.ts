@@ -1,7 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { crearBloqueoScroll } from "./bloqueo-scroll";
-import { TOPE_REM } from "./PanelMirada";
 import { crearVisibilidadSeccion } from "./visibilidad-seccion";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -72,8 +71,12 @@ export function crearMirada(root: HTMLElement) {
       const cards = gsap.utils.toArray<HTMLElement>("[data-mirada-card]", root);
       if (!franja || !titulo || !cards.length) return;
 
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const tope = TOPE_REM * rem;
+      // El tope es el `top` del sticky de la franja, y lo pone globals.css
+      // con las demás medidas de la pila: cambia con el alto de la pantalla,
+      // así que se lee y no se recalcula (ver PanelMirada).
+      const cajaTope = root.querySelector<HTMLElement>("[data-mirada-tope]");
+      const tope = () =>
+        cajaTope ? parseFloat(getComputedStyle(cajaTope).top) || 0 : 0;
 
       const { mostrar, apagarSuave, limpiar } = crearVisibilidadSeccion(root);
       mostrar(false);
@@ -84,7 +87,7 @@ export function crearMirada(root: HTMLElement) {
       const alCentroX = () =>
         window.innerWidth / 2 -
         (franja.getBoundingClientRect().left + titulo.offsetLeft + titulo.offsetWidth / 2);
-      const alCentroY = () => window.innerHeight / 2 - (tope + franja.offsetHeight / 2);
+      const alCentroY = () => window.innerHeight / 2 - (tope() + franja.offsetHeight / 2);
 
       gsap.set(titulo, { transformOrigin: "50% 50%" });
       gsap.set(cards, { autoAlpha: 0, y: 26 });

@@ -1,7 +1,5 @@
 import Image from "next/image";
-import type { CSSProperties } from "react";
 import { ALIADOS } from "@/config/aliados";
-import { ALTO_PILA_REM } from "./PanelMirada";
 
 /**
  * «Nos acompañan», la banda que cierra «Cómo trabajamos».
@@ -35,8 +33,7 @@ export function BandaAliados() {
   return (
     <div
       data-mirada-banda
-      style={{ "--pila": `${ALTO_PILA_REM}rem` } as CSSProperties}
-      className="mt-14 lg:relative lg:-mt-[var(--pila)]"
+      className="mt-14 lg:relative lg:-mt-[var(--mirada-pila)]"
     >
       <span
         aria-hidden="true"

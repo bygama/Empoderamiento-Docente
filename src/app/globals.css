@@ -591,3 +591,38 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
     opacity: 0.85;
   }
 }
+
+/* === «Cómo trabajamos» — las medidas de la pila ========================== */
+
+/* Las medidas de la pila trabada viven ACÁ, en un solo lugar, y de acá las
+   leen tanto el CSS de los componentes (`var()`) como las coreografías
+   (`getComputedStyle`). Estaban en constantes de PanelMirada que dos
+   coreografías volvían a sumar por su cuenta —el mismo número escrito tres
+   veces—, y ese es justo el tipo de copia que se desincroniza sin avisar: si
+   una medida cambia y la coreografía sigue con la vieja, el achicado apunta a
+   donde la card ya no está. */
+
+[data-mirada] {
+  /* Lo que se deja pasar arriba: la barra de navegación fija (1rem de margen
+     y 4,25rem de alto). */
+  --mirada-tope: 6rem;
+  /* La banda blanca del título, y el aire de ahí a la primera card. */
+  --mirada-titulo: 4rem;
+  --mirada-aire: 1.5rem;
+  /* Lo que cada card deja ver cuando la tapan: su cabecera, que mide lo
+     mismo. */
+  --mirada-solapa: 4rem;
+  /* Alto de la última card, la que se ve entera con la pila completa. */
+  --mirada-alto: 22rem;
+}
+
+/* Derivadas: no se editan, salen de las de arriba. `--mirada-pasos` lo pone
+   el compositor con la cantidad de verbos, así que un séptimo paso recalcula
+   todo solo. */
+[data-mirada] {
+  --mirada-franja: calc(var(--mirada-titulo) + var(--mirada-aire));
+  --mirada-solapas: calc((var(--mirada-pasos) - 1) * var(--mirada-solapa));
+  --mirada-pila: calc(
+    var(--mirada-franja) + var(--mirada-solapas) + var(--mirada-alto)
+  );
+}
