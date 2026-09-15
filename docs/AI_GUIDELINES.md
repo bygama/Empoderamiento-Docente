@@ -171,10 +171,11 @@ Comentar solo cuando:
 
 ## 8. Manejo de errores
 
-> Hoy el sitio corre 100% frontend (sin API routes ni backend integrado). El
-> backend elegido a futuro es **Supabase** (ver §12). Cuando se sumen
-> formularios u operaciones contra Supabase, validar input con **Zod**,
-> capturar excepciones y devolver un mensaje genérico al cliente (sin filtrar
+> El backend es **Neon + Payload** (ver §12). Lo que entra por el panel
+> (`/admin`) lo valida Payload según el schema de cada colección. Para
+> código nuevo que reciba input fuera del panel (API routes propias,
+> formularios que no pasen por Payload), validar con **Zod**, capturar
+> excepciones y devolver un mensaje genérico al cliente (sin filtrar
 > detalles internos).
 
 - **Componentes:** usar `error.tsx` y `not-found.tsx` de Next.js para
@@ -237,30 +238,30 @@ Comentar solo cuando:
 
 ## 12. Backend y persistencia
 
-**Backend elegido: [Supabase](https://supabase.com) (Postgres gestionado +
-Auth + Storage). Todavía NO está integrado.** Hoy el sitio corre 100%
-frontend: no hay `@supabase/supabase-js` en `package.json`, ni cliente
-(`src/lib/supabase/`), ni tablas, ni env vars, ni `src/app/api/`. Los datos
-institucionales son estáticos y viven en `src/config/` (§13). La decisión
-está registrada en
-[`architecture/adrs/0002-adoptar-supabase-persistencia.md`](architecture/adrs/0002-adoptar-supabase-persistencia.md).
+**Backend elegido: Neon (Postgres) + Payload (panel de contenido en `/admin`),
+fotos en Vercel Blob y correos por Resend.** Decisión en
+[`architecture/adrs/0003-adoptar-neon-y-payload.md`](architecture/adrs/0003-adoptar-neon-y-payload.md)
+y diseño en
+[`architecture/specs/2026-09-15-panel-admin-diseno.md`](architecture/specs/2026-09-15-panel-admin-diseno.md).
+La definición del panel vive en `src/cms/` y `src/payload.config.ts`; lo que
+Payload genera (`src/app/(payload)/`, `src/payload-types.ts`,
+`src/cms/migraciones/`) no se edita a mano. Lo que sigue de esta sección
+(Zod en los bordes, secretos solo server-side, migraciones acordadas con el
+humano) vale igual con Neon.
 
-Cuando se integre (p. ej. al sumar un formulario de inscripción o de envío de
-CV) — **no antes, y confirmando con el usuario**:
-
-- **SDK oficial `@supabase/supabase-js`** para el acceso a datos; schema,
-  queries y políticas de seguridad definidas en Supabase.
-- **RLS (Row Level Security) activada** en toda tabla con datos sensibles;
-  la autorización no se delega solo a la capa de aplicación.
-- **Validar los bordes con Zod** antes de leer/escribir cualquier input.
-- **Env vars por contexto:** `NEXT_PUBLIC_SUPABASE_URL` y
-  `NEXT_PUBLIC_SUPABASE_ANON_KEY` son públicas (se exponen al cliente); la
-  `SUPABASE_SERVICE_ROLE_KEY` es secreta y **solo server-side** — nunca
-  prefijada con `NEXT_PUBLIC_` ni usada en el browser. Placeholders en
-  `.env.example`.
+- **Validar los bordes con Zod** en cualquier código nuevo que reciba input
+  fuera del panel (API routes propias, formularios que no pasen por
+  Payload). Lo que entra por `/admin` lo valida Payload según el schema de
+  cada colección.
+- **Secretos solo server-side:** ni las variables de conexión a la base
+  (`DATABASE_URL`, `DATABASE_URL_UNPOOLED`) ni las claves de proveedor
+  (`PAYLOAD_SECRET`, `VISTA_PREVIA_SECRET`, `BLOB_READ_WRITE_TOKEN`,
+  `RESEND_API_KEY`) se prefijan con `NEXT_PUBLIC_` ni se usan en el browser.
+  Placeholders en `.env.example`.
 - **No exponer detalles internos** en los mensajes de error al cliente.
-- **Migraciones / schema:** confirmar el diseño de tablas y políticas con el
-  humano antes de crearlas. No inventar tablas ni columnas no acordadas.
+- **Migraciones / schema:** confirmar el diseño de colecciones y campos con
+  el humano antes de crearlos, y generarlos con `pnpm migrate:create`. No
+  inventar colecciones ni campos no acordados.
 
 ---
 
