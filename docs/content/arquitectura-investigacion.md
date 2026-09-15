@@ -77,11 +77,11 @@ problematizar, interpretar, resignificar, producir evidencia, sistematizar).
 >   preguntas en el orden de este documento —número, nombre, pregunta— y un
 >   solo CTA al pie hacia los casos. Sin las dos carpetas «saber/práctica»,
 >   sin la síntesis «buscamos», sin chips ni botón por línea.
-> - **§9 Conexión con Biblioteca se quita de la página** (Gastón,
->   15-09-2026): sale del cierre y el sobre de «La investigación también se
->   comparte» se eliminó entero, sin reubicarlo.
-> - **§10 Cierre** queda solo con la conversación: el haz baja del cielo y
->   se posa sobre «Investigar permite hacer mejores preguntas».
+> - **§9 Conexión con Biblioteca vive en el cierre** (Gastón, 15-09-2026):
+>   el sobre de «La investigación también se comparte» se eliminó entero y
+>   la invitación a la Biblioteca queda como bloque izquierdo del cierre.
+> - **§10 Cierre** con sus dos paradas: el haz se posa primero sobre la
+>   Biblioteca y después sobre «Investigar permite hacer mejores preguntas».
 >
 > **Decisión tomada (usuario, 04-09-2026):** «Proyectos y aplicaciones»
 > (traída de Qué hacemos el 02-09-2026) **se quita de esta página**: eran
