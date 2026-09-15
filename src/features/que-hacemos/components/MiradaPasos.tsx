@@ -6,8 +6,10 @@ import { MIRADA, MIRADA_INTRO } from "@/features/que-hacemos/areas";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { BandaAliados } from "./mirada-pasos/BandaAliados";
 import { crearAchicado } from "./mirada-pasos/coreografia-achicado";
+import { crearIndicador } from "./mirada-pasos/coreografia-indicador";
 import { crearMirada } from "./mirada-pasos/coreografia-mirada";
 import { lugarEnGrupo, POR_GRUPO } from "./mirada-pasos/grupos";
+import { IndicadorPasos } from "./mirada-pasos/IndicadorPasos";
 import { PanelMirada } from "./mirada-pasos/PanelMirada";
 
 /**
@@ -37,6 +39,8 @@ import { PanelMirada } from "./mirada-pasos/PanelMirada";
  * alto —no la lista, que sigue siendo una—, así que el cuarto panel se apoya
  * donde se apoyó el primero y lo tapa, y los tres comidos se quedan trabados
  * detrás en vez de subir (ver `grupos.ts` y las medidas en globals.css).
+ * Lo que el apilado de seis daba y esto no —ver el recorrido completo— lo
+ * devuelve el paso a paso de la franja (`IndicadorPasos`).
  *
  * LA ENTRADA (el usuario, 2026-09-11) sí es coreografía, y vive en
  * `mirada-pasos/coreografia-mirada.ts`: apenas se prende la luz el título
@@ -66,7 +70,9 @@ export function MiradaPasos() {
     if (!root) return;
     const limpiarMirada = crearMirada(root);
     const limpiarAchicado = crearAchicado(root);
+    const limpiarIndicador = crearIndicador(root);
     return () => {
+      limpiarIndicador();
       limpiarAchicado();
       limpiarMirada();
     };
@@ -130,6 +136,7 @@ export function MiradaPasos() {
               >
                 {MIRADA_INTRO.titulo}
               </h2>
+              <IndicadorPasos />
             </div>
           </header>
 

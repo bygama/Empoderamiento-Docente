@@ -9,32 +9,28 @@ gsap.registerPlugin(ScrollTrigger);
  * La entrada de «Cómo trabajamos» (el usuario, 2026-09-11): apenas se prende
  * la luz del faro, el título aparece en el medio del blanco, se queda un
  * momento, viaja a su lugar arriba a la izquierda achicándose, y mientras
- * viaja las cards entran en cascada debajo. Es la intro de Contacto
- * («Hablemos.» viaja y las filas del índice se arman alrededor), y como
- * ella corre SOLA, POR TIEMPO: nadie tiene que scrollear para verla.
+ * viaja las cards entran en cascada debajo y el paso a paso aparece en la
+ * franja. Es la intro de Contacto, y como ella corre SOLA, POR TIEMPO: nadie
+ * tiene que scrollear para verla.
  *
- * EL RELEVO CON EL FARO es el de la torre de líneas (TorreLineas, que sigue
- * en components/): la sección se mete una pantalla debajo del final del faro
- * y pinta por encima (z-20 contra su z-10), pero NACE APAGADA y se prende
- * cuando su borde llega arriba, que es exactamente donde el faro termina en
- * blanco pleno (`visibilidad-seccion.ts`). Así no queda la pantalla de
- * blanco muerto que había antes entre la luz y el título. Al salir por
+ * EL RELEVO CON EL FARO es el de la torre de líneas (TorreLineas): la sección
+ * se mete una pantalla debajo del final del faro y pinta por encima (z-20
+ * contra su z-10), pero NACE APAGADA y se prende cuando su borde llega arriba,
+ * donde el faro termina en blanco pleno (`visibilidad-seccion.ts`); si no,
+ * quedaba una pantalla de blanco muerto entre la luz y el título. Al salir por
  * arriba se apaga con un fundido y la entrada se rebobina; desde abajo se
  * completa de golpe, sin repetir.
  *
  * MIENTRAS CORRE, EL SCROLL HACIA ABAJO QUEDA FRENADO (`bloqueo-scroll.ts`):
- * si no, quien seguía empujando la rueda apilaba las cards invisibles y las
- * veía aparecer ya apiladas. Vuelve al terminar la cascada.
+ * si no, quien seguía empujando la rueda veía las cards ya apiladas.
  *
- * El título es sticky —lo ubica el CSS en la franja— y acá solo se le SUMA
- * un desplazamiento hasta el centro, que el viaje saca. Las cards nacen
- * invisibles solo desde acá, nunca por CSS: si el JS no corre, se ven.
+ * El título es sticky —lo ubica el CSS en la franja— y acá sólo se le SUMA un
+ * desplazamiento hasta el centro, que el viaje saca. Las cards y el indicador
+ * nacen invisibles sólo desde acá, nunca por CSS: si el JS no corre, se ven.
  *
- * Todo sobre `transform` y `opacity`. Sin nada de esto en celular ni con
- * reduced-motion: ahí no hay solape y la sección se lee quieta y completa.
- *
- * El `will-change` lo pone y lo saca esta coreografía, nunca un className
- * (AI_GUIDELINES §11): dura lo que dura la entrada.
+ * Todo sobre `transform` y `opacity`, y el `will-change` lo pone y lo saca
+ * esta coreografía, nunca un className (AI_GUIDELINES §11). Nada de esto en
+ * celular ni con reduced-motion: ahí la sección se lee quieta y completa.
  */
 
 /** Cuánto más grande se ve el título en el centro que en la franja. */
@@ -68,6 +64,7 @@ export function crearMirada(root: HTMLElement) {
 
       const franja = root.querySelector<HTMLElement>("[data-mirada-franja]");
       const titulo = root.querySelector<HTMLElement>("[data-mirada-titulo]");
+      const indicador = gsap.utils.toArray<HTMLElement>("[data-mirada-indicador]", root);
       const cards = gsap.utils.toArray<HTMLElement>("[data-mirada-card]", root);
       if (!franja || !titulo || !cards.length) return;
 
@@ -91,6 +88,9 @@ export function crearMirada(root: HTMLElement) {
 
       gsap.set(titulo, { transformOrigin: "50% 50%" });
       gsap.set(cards, { autoAlpha: 0, y: 26 });
+      // El indicador aparece cuando el título ya atracó: desde el arranque, la
+      // franja se vería a medio armar mientras el título viaja por el centro.
+      gsap.set(indicador, { autoAlpha: 0 });
 
       const bloqueo = crearBloqueoScroll(root);
 
@@ -124,7 +124,8 @@ export function crearMirada(root: HTMLElement) {
             immediateRender: false,
           },
           `<${TIEMPOS.cardsDesde}`,
-        );
+        )
+        .to(indicador, { autoAlpha: 1, duration: TIEMPOS.card }, "-=0.3");
 
       const arrancar = () => {
         if (entrada.progress() !== 0 || entrada.isActive()) return;
@@ -187,7 +188,7 @@ export function crearMirada(root: HTMLElement) {
         bloqueo.liberar();
         limpiar();
         entrada.kill();
-        gsap.set([titulo, ...cards], { clearProps: "opacity,visibility,transform,willChange" });
+        gsap.set([titulo, ...indicador, ...cards], { clearProps: "opacity,visibility,transform,willChange" });
       };
     },
   );
