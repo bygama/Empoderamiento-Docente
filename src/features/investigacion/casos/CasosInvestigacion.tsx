@@ -57,7 +57,7 @@ export function CasosInvestigacion() {
     <section
       ref={sectionRef}
       id="en-accion"
-      data-indice="Casos"
+      data-indice="Investigación en acción"
       // Desde el navbar se aterriza al final de la escena (ver irASeccion).
       data-aterrizaje="fin"
       aria-label="Investigación en acción"
@@ -67,6 +67,13 @@ export function CasosInvestigacion() {
         activo !== null ? "z-40" : ""
       }`}
     >
+      {/* Folio de archivo: número de hoja + nombre de la sección en el
+          sitemap, como en todas las hojas de la página. */}
+      {indiceVisible && (
+        <span className="text-gris-texto/70 absolute top-7 right-8 z-10 hidden font-mono text-[0.68rem] tracking-[0.2em] uppercase lg:block">
+          Archivo ED · Hoja 04 · Investigación en acción
+        </span>
+      )}
       <div className="mx-auto w-full max-w-screen-xl px-5 py-20 md:px-10 md:py-28">
         <p aria-live="polite" className="sr-only">
           {anuncio}
