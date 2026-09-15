@@ -177,7 +177,7 @@ export function LineasAccion() {
       data-indice="Áreas"
       data-section="lineas"
       className="deck from-white to-gris-fondo relative bg-gradient-to-b"
-      aria-label="Áreas de desarrollo"
+      aria-label="Áreas de especialización"
     >
       <div data-deck-scroll className="deck-scroll">
         <div
@@ -194,7 +194,7 @@ export function LineasAccion() {
                 lineHeight: 1.03,
               }}
             >
-              Áreas de desarrollo
+              Áreas de especialización
             </h2>
             <p className="deck-caption text-gris-texto mx-auto mt-5 max-w-xl font-sans text-[0.97rem] leading-relaxed">
               Los ámbitos desde los cuales diseñamos soluciones educativas

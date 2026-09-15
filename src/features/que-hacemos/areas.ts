@@ -1,9 +1,11 @@
 // Qué hace ED, en texto plano. Es lo que la web tiene que decir antes de
 // cualquier animación.
 //
-// Las SIETE áreas de desarrollo («de especialización» hasta el 2026-09-12,
-// Facundo pidió el cambio de nombre), en el orden y con el copy que validó la
-// dirección general (Daniela). Son las mismas que muestra el abanico del
+// Las SIETE áreas de especialización, en el orden y con el copy que validó la
+// dirección general (Daniela). Se llaman así y no «de desarrollo»: es el nombre
+// de las fuentes —lo que escribió Raquel en julio y lo que validó Daniela, en
+// docs/content/que-hace-ed-fuentes.md— y el rename del 2026-09-12 quedó
+// descartado (Mateo, 2026-09-15). Son las mismas que muestra el abanico del
 // Inicio (features/home/components/LineasAccion), así que las dos páginas
 // dicen lo mismo: el nombre, la frase «en verde» y la descripción salen de
 // ahí, textuales.
