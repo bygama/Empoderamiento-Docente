@@ -42,7 +42,7 @@ export const TAMBORES: Tambor[] = [
     frase: "Reflexionar desde la experiencia",
     detalle:
       "Acompañamos procesos que fortalecen la práctica y resignifican las matemáticas.",
-    foto: "/metodo/acompanamos.webp",
+    foto: "/fotos/formadora-mesas-redondas.webp",
     acento: "var(--color-azul-principal)",
   },
   {
@@ -52,7 +52,7 @@ export const TAMBORES: Tambor[] = [
     frase: "Cada tarea transforma la relación",
     detalle:
       "Materiales que invitan a explorar, argumentar y resignificar las matemáticas.",
-    foto: "/metodo/disenamos.webp",
+    foto: "/fotos/cubos-mano.webp",
     acento: "var(--color-verde-concepto-texto)",
   },
   {
@@ -62,7 +62,7 @@ export const TAMBORES: Tambor[] = [
     frase: "La coherencia hace posible aprender",
     detalle:
       "Arquitecturas curriculares que articulan conocimiento, progresión y sentido.",
-    foto: "/quienes-somos/origen-03-pregunta.webp",
+    foto: "/fotos/planilla-proyectada.webp",
     acento: "var(--color-azul-medio)",
   },
   {
@@ -72,7 +72,7 @@ export const TAMBORES: Tambor[] = [
     frase: "Comprender permite decidir",
     detalle:
       "Evaluaciones que generan evidencia situada para orientar decisiones educativas.",
-    foto: "/metodo/evaluamos.webp",
+    foto: "/fotos/comparar-tareas-ronda.webp",
     acento: "var(--color-azul-principal)",
   },
   {
@@ -82,7 +82,7 @@ export const TAMBORES: Tambor[] = [
     frase: "La práctica produce conocimiento",
     detalle:
       "Investigamos la práctica y compartimos lo aprendido con la comunidad científica.",
-    foto: "/hero/hero-2.webp",
+    foto: "/fotos/contexto-significacion.webp",
     acento: "var(--color-verde-concepto-texto)",
   },
   {
@@ -92,7 +92,7 @@ export const TAMBORES: Tambor[] = [
     frase: "La continuidad sostiene el cambio",
     detalle:
       "Políticas, estrategias y procesos para transformaciones coherentes y sostenibles.",
-    foto: "/hero/hero-6.webp",
+    foto: "/fotos/encuentro-institucional.webp",
     acento: "var(--color-azul-medio)",
   },
   {
@@ -102,7 +102,7 @@ export const TAMBORES: Tambor[] = [
     frase: "La articulación transforma sistemas",
     detalle:
       "Integramos las dimensiones del cambio educativo en soluciones para cada realidad.",
-    foto: "/hero/hero-9.webp",
+    foto: "/fotos/salon-mesas-redondas.webp",
     acento: "var(--color-azul-principal)",
   },
 ];
@@ -145,28 +145,28 @@ export const PASOS_TRABAJO = [
     verbo: "Dialogamos",
     texto:
       "Escuchamos tu contexto: qué pasa en tus aulas, qué buscás, desde dónde partimos.",
-    foto: "/metodo/escuchamos.webp",
+    foto: "/fotos/grupos-conversan.webp",
   },
   {
     n: "02",
     verbo: "Diseñamos",
     texto:
       "Armamos una propuesta a medida para ese contexto, con sustento en investigación.",
-    foto: "/metodo/disenamos.webp",
+    foto: "/fotos/pizarra-reparto-justo.webp",
   },
   {
     n: "03",
     verbo: "Acompañamos",
     texto:
       "Trabajamos junto a docentes y equipos, en el aula y en el territorio.",
-    foto: "/metodo/acompanamos.webp",
+    foto: "/fotos/formadora-acompana-grupo.webp",
   },
   {
     n: "04",
     verbo: "Evaluamos",
     texto:
       "Generamos evidencia del proceso; los hallazgos orientan el paso siguiente.",
-    foto: "/metodo/evaluamos.webp",
+    foto: "/fotos/producciones-geometricas.webp",
   },
 ] as const;
 

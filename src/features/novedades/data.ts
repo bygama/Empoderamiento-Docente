@@ -126,7 +126,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Educación matemática y ciudadanía, en Pedagogía y Saberes",
     bajada:
       "Paola Balda, con Elizabeth Torres-Puentes y Claudia Salazar-Amaya, publica un artículo de reflexión sobre subjetividad, creatividad y ética como categorías que configuran las prácticas educativas con las matemáticas.",
-    imagen: "/quienes-somos/origen-01-aulas.webp",
+    imagen: "/fotos/aula-consigna-proyectada.webp",
   },
   {
     id: "numeros-circulos-matematicos",
@@ -135,7 +135,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Círculos matemáticos con estudiantes de Argentina y Colombia",
     bajada:
       "Paola Balda y Romina Busain describen en la revista Números la experiencia de dos grupos resolviendo problemas con la metodología de los círculos matemáticos: un estudio de casos con registros en video.",
-    imagen: "/metodo/acompanamos.webp",
+    imagen: "/fotos/estudiantes-desde-arriba.webp",
   },
   {
     id: "rmf-sistema-solar",
@@ -144,7 +144,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Un taller sobre el Sistema Solar para chicas y chicos de 8 a 13 años",
     bajada:
       "Luis Cabrera firma, en la Revista Mexicana de Física E, el diseño y la evaluación de un taller semanal con historietas, modelos de bajo costo y juegos de mesa. En más del 90 % de las sesiones, más de la mitad del grupo alcanzó los aprendizajes esperados.",
-    imagen: "/hero/hero-10.webp",
+    imagen: "/fotos/materiales-sobre-la-mesa.webp",
   },
   {
     id: "somidem-formacion-2026",
@@ -153,7 +153,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Judith Hernández coedita un libro sobre formación de profesores de matemáticas",
     bajada:
       "Editado por SOMIDEM junto a David Páez y Lilia Aké: cómo llevar las investigaciones en Educación Matemática a la formación inicial y continua del profesorado.",
-    imagen: "/metodo/disenamos.webp",
+    imagen: "/fotos/exposicion-salon.webp",
   },
   {
     id: "relime-2025",
@@ -162,7 +162,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Resignificar el saber matemático escolar: nuevo artículo en RELIME",
     bajada:
       "Daniela Reyes-Gasperini y Karla Gómez Osalde publican en la Revista Latinoamericana de Investigación en Matemática Educativa cómo se resignifica el conocimiento matemático escolar dentro de un programa de desarrollo profesional docente.",
-    imagen: "/quienes-somos/origen-03-pregunta.webp",
+    imagen: "/fotos/contexto-significacion.webp",
     publicacion:
       "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
     destacada: true,
@@ -198,7 +198,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Problematizar la matemática escolar, en Bolema",
     bajada:
       "Mayra Báez, Rebeca Flores-García y Daniela Reyes-Gasperini argumentan cómo la problematización de la matemática escolar contribuye al desarrollo profesional docente, con dos episodios analizados con el modelo reflexivo de la matemática escolar.",
-    imagen: "/metodo/escuchamos.webp",
+    imagen: "/fotos/formadora-explica.webp",
   },
   {
     id: "aiem-derivada-2025",
@@ -207,7 +207,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Los criterios de la derivada desde la variación, en AIEM",
     bajada:
       "José David Zaldívar, Luis Cabrera y Alma Jiménez proponen situaciones donde el cambio y la variación son el objeto de estudio, para darle significado a los criterios de la derivada más allá de su aplicación algorítmica.",
-    imagen: "/metodo/evaluamos.webp",
+    imagen: "/fotos/que-cambia-como-cambia.webp",
   },
   {
     id: "somidem-rubrica-2024",
@@ -216,7 +216,7 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Una rúbrica para evaluar el pensamiento y lenguaje variacional",
     bajada:
       "Luis Cabrera presenta, en un capítulo editado por SOMIDEM, un esquema y una rúbrica analítica validada por expertos para promover y evaluar el desarrollo del pensamiento y lenguaje variacional.",
-    imagen: "/hero/hero-9.webp",
+    imagen: "/fotos/pizarra-reparto-justo.webp",
   },
 ];
 
@@ -239,12 +239,12 @@ export type MomentoMovimiento = {
 };
 
 export const MOVIMIENTO: MomentoMovimiento[] = [
-  { id: "aulas", etiqueta: "EN LAS AULAS", frase: "Empieza en el aula.", acento: "el aula.", imagen: "/quienes-somos/origen-01-aulas.webp" },
-  { id: "docentes", etiqueta: "CON DOCENTES", frase: "Junto a quienes enseñan.", acento: "quienes enseñan.", imagen: "/metodo/escuchamos.webp" },
-  { id: "investigacion", etiqueta: "INVESTIGACIÓN", frase: "Investigamos lo que hacemos.", acento: "lo que hacemos.", imagen: "/quienes-somos/origen-03-pregunta.webp" },
-  { id: "diseno", etiqueta: "DISEÑO", frase: "Diseñamos tareas que importan.", acento: "tareas que importan.", imagen: "/metodo/disenamos.webp" },
-  { id: "congresos", etiqueta: "CONGRESOS", frase: "Lo llevamos a la región.", acento: "a la región.", imagen: "/hero/hero-6.webp" },
-  { id: "paises", etiqueta: "CINCO PAÍSES", frase: "En cinco países, a la vez.", acento: "cinco países", imagen: "/hero/hero-9.webp" },
+  { id: "aulas", etiqueta: "EN LAS AULAS", frase: "Empieza en el aula.", acento: "el aula.", imagen: "/fotos/docentes-trabajan-aula.webp" },
+  { id: "docentes", etiqueta: "CON DOCENTES", frase: "Junto a quienes enseñan.", acento: "quienes enseñan.", imagen: "/fotos/formadora-guia-taller.webp" },
+  { id: "investigacion", etiqueta: "INVESTIGACIÓN", frase: "Investigamos lo que hacemos.", acento: "lo que hacemos.", imagen: "/fotos/pizarra-umce.webp" },
+  { id: "diseno", etiqueta: "DISEÑO", frase: "Diseñamos tareas que importan.", acento: "tareas que importan.", imagen: "/fotos/cubos-mano.webp" },
+  { id: "congresos", etiqueta: "CONGRESOS", frase: "Lo llevamos a la región.", acento: "a la región.", imagen: "/fotos/encuentro-mesas-rojas.webp" },
+  { id: "paises", etiqueta: "CINCO PAÍSES", frase: "En cinco países, a la vez.", acento: "cinco países", imagen: "/fotos/grupo-al-aire-libre.webp" },
 ];
 
 // ── Lanzamientos y recursos recientes (puente a Biblioteca) ───────────────────
@@ -257,9 +257,9 @@ export type Lanzamiento = {
 
 // Los mismos destacados de la Biblioteca (publicaciones reales).
 export const LANZAMIENTOS: Lanzamiento[] = [
-  { id: "l-libro", tipo: "Libro · Gedisa 2016", titulo: "Empoderamiento docente y Socioepistemología", imagen: "/hero/hero-2.webp" },
+  { id: "l-libro", tipo: "Libro · Gedisa 2016", titulo: "Empoderamiento docente y Socioepistemología", imagen: "/fotos/conferencia-problematizacion.webp" },
   { id: "l-relime", tipo: "Artículo · RELIME 2025", titulo: "Resignificación del conocimiento matemático escolar", imagen: "/quienes-somos/origen-03-pregunta.webp" },
-  { id: "l-bolema", tipo: "Artículo · Bolema 2025", titulo: "Problematizar la matemática escolar", imagen: "/metodo/disenamos.webp" },
-  { id: "l-oaxaca", tipo: "Artículo · Redalyc 2016", titulo: "Oaxaca: una transformación colectiva", imagen: "/quienes-somos/origen-01-aulas.webp" },
-  { id: "l-derivada", tipo: "Artículo · IE REDIECH 2024", titulo: "¿Qué significados de la derivada favorece un profesor?", imagen: "/metodo/evaluamos.webp" },
+  { id: "l-bolema", tipo: "Artículo · Bolema 2025", titulo: "Problematizar la matemática escolar", imagen: "/fotos/grupo-en-ronda.webp" },
+  { id: "l-oaxaca", tipo: "Artículo · Redalyc 2016", titulo: "Oaxaca: una transformación colectiva", imagen: "/fotos/cierre-encuentro-grupo.webp" },
+  { id: "l-derivada", tipo: "Artículo · IE REDIECH 2024", titulo: "¿Qué significados de la derivada favorece un profesor?", imagen: "/fotos/graficas-de-datos.webp" },
 ];

@@ -41,8 +41,8 @@ export const PILARES = [
 // reduced-motion el panel no se muestra (la experiencia actual se preserva).
 export const FOTOS = [
   {
-    src: "/quienes-somos/origen-01-aulas.webp",
-    alt: "Trabajo con estudiantes en el patio de una escuela",
+    src: "/fotos/docentes-trabajan-aula.webp",
+    alt: "Docentes resuelven una tarea en un aula",
   },
   {
     src: "/quienes-somos/origen-02-inflexion.webp",

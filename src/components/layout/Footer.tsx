@@ -201,7 +201,7 @@ export function Footer() {
       <div className="bg-azul-principal w-full px-3 pt-3 md:px-5 md:pt-5">
         <div className="relative h-[clamp(190px,26vw,360px)] w-full overflow-hidden rounded-t-[1.25rem] md:rounded-t-[2rem]">
           <Image
-            src="/hero/hero-5.webp"
+            src="/fotos/auditorio-panoramica.webp"
             alt=""
             fill
             sizes="100vw"

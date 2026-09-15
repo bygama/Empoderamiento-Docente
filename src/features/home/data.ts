@@ -12,8 +12,8 @@ export const PASOS = [
     resumen: "Toda solución nace de una realidad comprendida",
     detalle:
       "Dialogamos con las personas, comprendemos los contextos y analizamos la realidad para construir una lectura compartida que oriente cada decisión.",
-    foto: "/metodo/escuchamos.webp",
-    fotoAlt: "Docentes en conversación — etapa de diálogo",
+    foto: "/fotos/grupos-conversan.webp",
+    fotoAlt: "Grupos conversan sentados en ronda — etapa de diálogo",
   },
   {
     n: "02",
@@ -22,8 +22,8 @@ export const PASOS = [
     resumen: "La práctica también produce conocimiento",
     detalle:
       "Investigamos en diálogo permanente con la práctica para comprender los desafíos de cada realidad, generar evidencia y construir soluciones educativas que transformen la enseñanza y el aprendizaje de las matemáticas.",
-    foto: "/hero/hero-3.webp",
-    fotoAlt: "Equipo investigando en conjunto — etapa de investigación",
+    foto: "/fotos/conferencia-problematizacion.webp",
+    fotoAlt: "Exposición sobre la problematización de la matemática escolar — etapa de investigación",
   },
   {
     n: "03",
@@ -32,8 +32,8 @@ export const PASOS = [
     resumen: "Cada realidad inspira una solución distinta",
     detalle:
       "Diseñamos soluciones educativas que integran investigación, currículo, evaluación, materiales didácticos y desarrollo profesional docente para responder a los desafíos de cada contexto.",
-    foto: "/metodo/disenamos.webp",
-    fotoAlt: "Selección de materiales educativos — etapa de diseño",
+    foto: "/fotos/pizarra-reparto-justo.webp",
+    fotoAlt: "Pizarra con los casos de un problema de reparto — etapa de diseño",
   },
   {
     n: "04",
@@ -42,8 +42,8 @@ export const PASOS = [
     resumen: "Vivimos para hacer vivir",
     detalle:
       "Construimos procesos donde la experiencia, la implementación y la práctica reflexiva fortalecen el desarrollo profesional y generan nuevas formas de relacionarse con las matemáticas y de fortalecer las decisiones pedagógicas.",
-    foto: "/metodo/acompanamos.webp",
-    fotoAlt: "Trabajo situado junto a docentes — etapa de implementación",
+    foto: "/fotos/formadora-acompana-grupo.webp",
+    fotoAlt: "Una formadora acompaña a un grupo mientras trabaja — etapa de implementación",
   },
   {
     n: "05",
@@ -52,8 +52,8 @@ export const PASOS = [
     resumen: "La evidencia orienta cada nuevo paso",
     detalle:
       "Analizamos procesos, interpretamos evidencias y generamos conocimiento para fortalecer decisiones, consolidar aprendizajes y potenciar nuevas transformaciones.",
-    foto: "/metodo/evaluamos.webp",
-    fotoAlt: "Revisión de materiales y avances — etapa de evaluación",
+    foto: "/fotos/producciones-geometricas.webp",
+    fotoAlt: "Producciones de estudiantes expuestas para analizarlas — etapa de evaluación",
   },
 ] as const;
 

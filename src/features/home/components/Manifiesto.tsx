@@ -88,8 +88,8 @@ export function Manifiesto() {
         {/* Imagen (derecha) */}
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-[0_24px_60px_-28px_rgba(15,32,64,0.4)] lg:aspect-[5/4]">
           <Image
-            src="/hero/hero-3.webp"
-            alt="Equipo de Empoderamiento Docente en un encuentro de trabajo"
+            src="/fotos/formadoras-pizarra-umce.webp"
+            alt="Tres formadoras junto a la pizarra de una sesión en la Universidad Metropolitana de Ciencias de la Educación"
             fill
             sizes="(max-width: 1024px) 100vw, 44vw"
             className="object-cover"
