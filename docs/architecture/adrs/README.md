@@ -30,7 +30,8 @@ internos (refactors).
 | #     | Título                                        | Status   |
 | ----- | --------------------------------------------- | -------- |
 | 0001  | [Stack base del sitio](0001-stack-base.md)    | Accepted (persistencia superseded por 0002) |
-| 0002  | [Adoptar Supabase para backend y persistencia](0002-adoptar-supabase-persistencia.md) | Accepted (reemplaza MongoDB de 0001) |
+| 0002  | [Adoptar Supabase para backend y persistencia](0002-adoptar-supabase-persistencia.md) | Superseded by ADR-0003 |
+| 0003  | [Adoptar Neon y Payload para el panel de contenido](0003-adoptar-neon-y-payload.md) | Accepted (reemplaza Supabase de 0002) |
 
 ---
 
