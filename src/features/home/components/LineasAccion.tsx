@@ -1,97 +1,18 @@
 "use client";
 
-import { useRef, type ComponentType } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  ArrowRight,
-  BookOpen,
-  Compass,
-  Lightbulb,
-  School,
-  Target,
-  TrendingUp,
-  Users,
-  type IconProps,
-} from "@/components/ui/icons";
+import { ArrowRight } from "@/components/ui/icons";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
+import { CartaArea } from "./lineas-accion/CartaArea";
+import { AREAS } from "./lineas-accion/data";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
-
-type Area = {
-  n: string;
-  titulo: string;
-  frase: string;
-  detalle: string;
-  Icon: ComponentType<IconProps>;
-};
-
-// Las 7 áreas de desarrollo de ED. Copy oficial del cliente
-// [[ed-copy-oficial]]: `frase` = la línea destacada (verde); `detalle` = la
-// descripción. Frases sin punto final (queda más limpio en la carta); los
-// párrafos descriptivos sí lo llevan.
-const AREAS: readonly Area[] = [
-  {
-    n: "01",
-    titulo: "Desarrollo profesional docente",
-    frase: "La experiencia como fuente de reflexión",
-    detalle:
-      "Impulsamos procesos de desarrollo profesional con sustento vivencial y acompañamiento que fortalecen la práctica, promueven la reflexión y resignifican las matemáticas.",
-    Icon: Users,
-  },
-  {
-    n: "02",
-    titulo: "Materiales para la resignificación de las matemáticas",
-    frase: "Cada tarea puede transformar la relación con las matemáticas",
-    detalle:
-      "Diseñamos materiales que median la relación entre docentes, matemáticas y aprendizaje, generando rupturas productivas que invitan a explorar, argumentar y resignificar.",
-    Icon: Lightbulb,
-  },
-  {
-    n: "03",
-    titulo: "Currículo y arquitectura pedagógica",
-    frase: "La coherencia hace posible el aprendizaje",
-    detalle:
-      "Diseñamos arquitecturas curriculares que articulan conocimiento, progresión y sentido para orientar trayectorias de aprendizaje.",
-    Icon: Compass,
-  },
-  {
-    n: "04",
-    titulo: "Evaluación para la mejora educativa",
-    frase: "Comprender permite decidir",
-    detalle:
-      "Desarrollamos sistemas de evaluación que generan evidencia situada para comprender los aprendizajes y orientar decisiones educativas.",
-    Icon: TrendingUp,
-  },
-  {
-    n: "05",
-    titulo: "Investigación en Matemática Educativa",
-    frase: "La práctica produce conocimiento",
-    detalle:
-      "Investigamos las prácticas educativas para producir conocimiento, compartirlo con la comunidad científica y seguir enriqueciendo el campo de la Matemática Educativa.",
-    Icon: BookOpen,
-  },
-  {
-    n: "06",
-    titulo: "Fortalecimiento institucional",
-    frase: "La continuidad hace posible las transformaciones",
-    detalle:
-      "Fortalecemos capacidades institucionales mediante el diseño de políticas, estrategias y procesos que favorecen transformaciones coherentes, sostenibles y perdurables.",
-    Icon: School,
-  },
-  {
-    n: "07",
-    titulo: "Transformación de sistemas educativos",
-    frase: "La articulación hace posible las transformaciones sistémicas",
-    detalle:
-      "Integramos todas las dimensiones del cambio educativo para construir soluciones coherentes, sostenibles y pertinentes para cada realidad.",
-    Icon: Target,
-  },
-];
 
 const CARD_W = 360; // px — fallback del ancho de carta (el real se mide en runtime)
 
@@ -324,59 +245,11 @@ export function LineasAccion() {
 
           {/* Las cartas. */}
           <ul className="deck-cards mt-14 md:mt-16">
-            {AREAS.map(({ n, titulo, frase, detalle, Icon }, i) => {
-              const azulBase = i % 2 === 1;
-              return (
-                <li key={n} data-deck-card className="deck-card">
-                  <div
-                    data-deck-inner
-                    className="deck-card-inner flex h-full flex-col overflow-hidden"
-                  >
-                  {/* Encabezado de la carta: etiqueta de área + paginado. */}
-                  <div className="flex items-start justify-between px-7 pt-6">
-                    <span className="text-naranja-accion font-mono inline-flex items-center gap-2 text-[0.72rem] font-medium tracking-[0.26em] uppercase">
-                      <span
-                        aria-hidden="true"
-                        className="bg-naranja-accion block h-px w-5"
-                      />
-                      Área {n}
-                    </span>
-                    <span className="text-azul-principal/20 font-mono text-[0.72rem] font-medium tabular-nums">
-                      {n} / 07
-                    </span>
-                  </div>
-
-                  {/* Título (héroe de la carta) + frase destacada + detalle. */}
-                  <div className="flex flex-1 flex-col px-7 pt-5">
-                    <h3 className="font-display text-azul-principal text-[1.18rem] leading-[1.16] font-bold tracking-[-0.012em]">
-                      {titulo}
-                    </h3>
-                    <p className="text-verde-concepto mt-2.5 font-sans text-[0.9rem] font-semibold leading-snug">
-                      {frase}
-                    </p>
-                    <p className="text-gris-texto mt-2 font-sans text-[0.85rem] leading-relaxed">
-                      {detalle}
-                    </p>
-                  </div>
-
-                  {/* Base con el ícono de marca — identidad propia por área. */}
-                  <div
-                    className={`relative mt-5 flex h-[4.25rem] items-center justify-center overflow-hidden lg:h-[6rem] ${
-                      azulBase
-                        ? "bg-azul-claro/25 text-azul-medio"
-                        : "bg-verde-concepto/[0.12] text-verde-concepto"
-                    }`}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -right-3 -bottom-3 h-24 w-24 opacity-50 [background-image:radial-gradient(circle,rgb(74_111_165/0.22)_2px,transparent_2.5px)] [background-size:14px_14px]"
-                    />
-                    <Icon size={44} strokeWidth={1.4} />
-                  </div>
-                  </div>
-                </li>
-              );
-            })}
+            {AREAS.map((area, i) => (
+              <li key={area.n} data-deck-card className="deck-card">
+                <CartaArea area={area} azulBase={i % 2 === 1} />
+              </li>
+            ))}
           </ul>
 
           {/* Salida → Investigación, que es el archivo de casos: las áreas
