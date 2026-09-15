@@ -85,7 +85,7 @@ futura integración). Los `.env*` reales están git-ignorados.
 ├── CLAUDE.md             ← adapter para Claude Code (puntero a AGENTS.md)
 ├── DESIGN.md              ← sistema de diseño (tokens, tipos, reglas)
 ├── docs/                  ← documentación auxiliar (ver docs/README.md)
-├── public/                ← assets estáticos (brand/, hero/, aliados/, metodo/)
+├── public/                ← assets estáticos (brand/, fotos/, aliados/, equipo/)
 ├── src/
 │   ├── app/               ← App Router: layout.tsx, page.tsx, globals.css
 │   ├── components/        ← UI reutilizable (brand/, layout/, providers/, ui/)

@@ -21,21 +21,21 @@ export type Card = {
   label?: { title: string; desc?: string };
 };
 
-// Orden, cantidad (9) y métricas EXACTAS del hero de referencia. Slots 1, 3 y 8
-// usan cuadrado de marca hasta tener las fotos (los más chicos / sin label).
+// Orden, cantidad (9) y métricas EXACTAS del hero de referencia. Las fotos son
+// de la carpeta que aprobó ED (`public/fotos/`).
 export const CARDS: Card[] = [
-  { w: 17.36, ar: "300 / 250", cx: 31.25, cy: 7.1, par: 1.027, img: "/hero/hero-1.webp", alt: "Equipo en reunión de trabajo", label: { title: "En el aula", desc: "Acompañamos el aprendizaje donde sucede" } },
-  { w: 12.73, ar: "220 / 280", cx: 81.6, cy: 16.07, par: 1.108, img: "/hero/hero-7.webp", alt: "Encuentro de trabajo en equipo" },
-  { w: 13.89, ar: "240 / 320", cx: 93.75, cy: 26.85, par: 1.014, img: "/hero/hero-3.webp", alt: "Investigación en equipo", label: { title: "Investigación aplicada", desc: "Conocimiento que vuelve al aula" } },
-  { w: 12.73, ar: "220 / 260", cx: 5.21, cy: 25.01, par: 1.068, img: "/hero/hero-8.webp", alt: "Materiales educativos" },
-  { w: 16.2, ar: "280 / 240", cx: 16.2, cy: 44.61, par: 1.034, img: "/hero/hero-5.webp", alt: "Taller en aula", label: { title: "Acompañamiento situado", desc: "Junto a cada docente y escuela" } },
-  { w: 19.68, ar: "340 / 260", cx: 72.92, cy: 55.71, par: 1.007, img: "/hero/hero-6.webp", alt: "Encuentro de trabajo", label: { title: "Formación docente", desc: "Trayectos para docentes de matemáticas" } },
-  { w: 14.47, ar: "250 / 320", cx: 24.59, cy: 71.16, par: 1.088, img: "/hero/hero-4.webp", alt: "Equipo de Empoderamiento Docente" },
-  { w: 19.68, ar: "340 / 250", cx: 53.24, cy: 84.82, par: 1.024, img: "/hero/hero-2.webp", alt: "Equipo con su publicación", label: { title: "Presencia regional", desc: "Chile · México · Argentina · Colombia · Brasil" } },
-  { w: 9.84, ar: "170 / 230", cx: 85.94, cy: 93.84, par: 1.068, img: "/hero/hero-9.webp", alt: "Lectura de material didáctico" },
+  { w: 17.36, ar: "300 / 250", cx: 31.25, cy: 7.1, par: 1.027, img: "/fotos/docentes-trabajan-aula.webp", alt: "Docentes resuelven una tarea en un aula", label: { title: "En el aula", desc: "Acompañamos el aprendizaje donde sucede" } },
+  { w: 12.73, ar: "220 / 280", cx: 81.6, cy: 16.07, par: 1.108, img: "/fotos/globos-medicion.webp", alt: "Docentes miden alturas con globos durante un taller" },
+  { w: 13.89, ar: "240 / 320", cx: 93.75, cy: 26.85, par: 1.014, img: "/fotos/exposicion-grafica.webp", alt: "Una formadora señala una gráfica durante una clase", label: { title: "Investigación aplicada", desc: "Conocimiento que vuelve al aula" } },
+  { w: 12.73, ar: "220 / 260", cx: 5.21, cy: 25.01, par: 1.068, img: "/fotos/materiales-sobre-la-mesa.webp", alt: "Estudiantes trabajan con papeles de colores sobre una mesa" },
+  { w: 16.2, ar: "280 / 240", cx: 16.2, cy: 44.61, par: 1.034, img: "/fotos/formadora-guia-taller.webp", alt: "Una formadora guía a docentes durante un taller", label: { title: "Acompañamiento situado", desc: "Junto a cada docente y escuela" } },
+  { w: 19.68, ar: "340 / 260", cx: 72.92, cy: 55.71, par: 1.007, img: "/fotos/encuentro-mesas-rojas.webp", alt: "Encuentro de formación docente con mesas de trabajo", label: { title: "Formación docente", desc: "Trayectos para docentes de matemáticas" } },
+  { w: 14.47, ar: "250 / 320", cx: 24.59, cy: 71.16, par: 1.088, img: "/fotos/grupo-en-ronda.webp", alt: "Un grupo discute una tarea sentado en ronda" },
+  { w: 19.68, ar: "340 / 250", cx: 53.24, cy: 84.82, par: 1.024, img: "/fotos/encuentro-institucional.webp", alt: "Docentes e instituciones reunidas en un encuentro en México", label: { title: "Presencia regional", desc: "Chile · México · Argentina · Colombia · Brasil" } },
+  { w: 9.84, ar: "170 / 230", cx: 85.94, cy: 93.84, par: 1.068, img: "/fotos/formadora-sentada-grupo.webp", alt: "Una formadora trabaja sentada junto a un grupo" },
   // Sumadas para llenar el vacío de la parte de abajo y "bajar" hacia Acerca de.
-  { w: 14, ar: "300 / 210", cx: 50, cy: 64, par: 1.04, img: "/hero/hero-10.webp", alt: "Materiales de geometría en una actividad de aula" },
-  { w: 13, ar: "240 / 300", cx: 11, cy: 84, par: 1.07, img: "/hero/hero-11.webp", alt: "Cuadernillo de matemática con representación de números", label: { title: "Materiales propios", desc: "Recursos listos para llevar al aula" } },
+  { w: 14, ar: "300 / 210", cx: 50, cy: 64, par: 1.04, img: "/fotos/mesa-con-materiales.webp", alt: "Docentes trabajan con materiales alrededor de una mesa" },
+  { w: 13, ar: "240 / 300", cx: 11, cy: 84, par: 1.07, img: "/fotos/cubos-dos-manos.webp", alt: "Dos cubos de papel armados, uno en cada mano", label: { title: "Materiales propios", desc: "Recursos listos para llevar al aula" } },
 ];
 
 // Campo CURADO para mobile/tablet (< lg). Fotos clave alrededor del texto, pero
@@ -48,16 +48,16 @@ export const CARDS: Card[] = [
 // centro y se acomodan a su lugar. Las 4 primeras quedan en el primer pantallazo
 // (en las BANDAS LIBRES: entre navbar y texto, y entre texto y fold — sin pisar
 // nada); las 4 de más abajo se despliegan hacia abajo y se ven al scrollear, ya
-// asentadas. La portrait (hero-3) va landscape para entrar en la banda superior.
+// asentadas. La segunda es apaisada para entrar en la banda superior.
 export const MOBILE_CARDS: Card[] = [
   // Primer pantallazo.
-  { w: 38, ar: "300 / 250", cx: 25, cy: 22, par: 1, img: "/hero/hero-1.webp", alt: "Equipo en reunión de trabajo" },
-  { w: 34, ar: "300 / 230", cx: 75, cy: 22, par: 1, img: "/hero/hero-3.webp", alt: "Investigación en equipo" },
-  { w: 38, ar: "280 / 240", cx: 25, cy: 87, par: 1, img: "/hero/hero-5.webp", alt: "Taller en aula" },
-  { w: 40, ar: "340 / 260", cx: 75, cy: 87, par: 1, img: "/hero/hero-6.webp", alt: "Encuentro de trabajo" },
+  { w: 38, ar: "300 / 250", cx: 25, cy: 22, par: 1, img: "/fotos/docentes-trabajan-aula.webp", alt: "Docentes resuelven una tarea en un aula" },
+  { w: 34, ar: "300 / 230", cx: 75, cy: 22, par: 1, img: "/fotos/comparar-tareas-ronda.webp", alt: "Docentes en ronda comparan dos tareas" },
+  { w: 38, ar: "280 / 240", cx: 25, cy: 87, par: 1, img: "/fotos/formadora-guia-taller.webp", alt: "Una formadora guía a docentes durante un taller" },
+  { w: 40, ar: "340 / 260", cx: 75, cy: 87, par: 1, img: "/fotos/encuentro-mesas-rojas.webp", alt: "Encuentro de formación docente con mesas de trabajo" },
   // Más abajo (se ven al scrollear, ya asentadas tras el deploy).
-  { w: 42, ar: "340 / 250", cx: 31, cy: 112, par: 1, img: "/hero/hero-2.webp", alt: "Equipo con su publicación" },
-  { w: 34, ar: "250 / 320", cx: 73, cy: 117, par: 1, img: "/hero/hero-4.webp", alt: "Equipo de Empoderamiento Docente" },
-  { w: 38, ar: "240 / 300", cx: 28, cy: 139, par: 1, img: "/hero/hero-11.webp", alt: "Cuadernillo de matemática" },
-  { w: 42, ar: "300 / 210", cx: 72, cy: 143, par: 1, img: "/hero/hero-10.webp", alt: "Materiales de geometría en una actividad de aula" },
+  { w: 42, ar: "340 / 250", cx: 31, cy: 112, par: 1, img: "/fotos/encuentro-institucional.webp", alt: "Docentes e instituciones reunidas en un encuentro en México" },
+  { w: 34, ar: "250 / 320", cx: 73, cy: 117, par: 1, img: "/fotos/grupo-en-ronda.webp", alt: "Un grupo discute una tarea sentado en ronda" },
+  { w: 38, ar: "240 / 300", cx: 28, cy: 139, par: 1, img: "/fotos/cubos-dos-manos.webp", alt: "Dos cubos de papel armados" },
+  { w: 42, ar: "300 / 210", cx: 72, cy: 143, par: 1, img: "/fotos/mesa-con-materiales.webp", alt: "Docentes trabajan con materiales alrededor de una mesa" },
 ];

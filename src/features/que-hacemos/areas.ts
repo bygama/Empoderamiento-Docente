@@ -91,8 +91,8 @@ export const AREAS: readonly Area[] = [
       "Formación de 500 formadores del Plan Nacional Aprender Matemática (Argentina)",
       "Workshops y acompañamiento a líderes en escuelas técnicas de Argentina, México y Brasil",
     ],
-    foto: "/metodo/acompanamos.webp",
-    alt: "Docentes trabajando en un taller",
+    foto: "/fotos/formadora-mesas-redondas.webp",
+    alt: "Una formadora conversa con docentes sentados en mesas redondas",
   },
   {
     id: "materiales",
@@ -113,8 +113,8 @@ export const AREAS: readonly Area[] = [
       "Materiales para primer ciclo y guías de ingreso para escuelas técnicas",
       "Cuadernillos del Plan Nacional Aprender Matemática (Argentina, 2019)",
     ],
-    foto: "/metodo/disenamos.webp",
-    alt: "Materiales didácticos sobre una mesa de trabajo",
+    foto: "/fotos/cubos-mano.webp",
+    alt: "Cubos de papel armados en la palma de una mano",
   },
   {
     id: "curriculo",
@@ -135,8 +135,8 @@ export const AREAS: readonly Area[] = [
       "Orientación conceptual del área de Matemática de la Ciudad de Buenos Aires",
       "Participación en el diseño del currículo de Matemáticas de la educación media superior de México",
     ],
-    foto: "/quienes-somos/origen-03-pregunta.webp",
-    alt: "Planificación curricular en equipo",
+    foto: "/fotos/planilla-proyectada.webp",
+    alt: "Docentes trabajan en una mesa frente a una planilla proyectada",
   },
   {
     id: "evaluacion",
@@ -157,8 +157,8 @@ export const AREAS: readonly Area[] = [
       "Evaluaciones de egreso y de ingreso en escuelas técnicas",
       "Análisis de ganancia educativa entre generaciones",
     ],
-    foto: "/metodo/evaluamos.webp",
-    alt: "Análisis de resultados en pantalla",
+    foto: "/fotos/comparar-tareas-ronda.webp",
+    alt: "Docentes en ronda durante la actividad «Comparar tareas: ¿A o B?»",
   },
   {
     id: "investigacion",
@@ -179,8 +179,8 @@ export const AREAS: readonly Area[] = [
       "Artículos en Bolema y RELIME (2025)",
       "Libro «Empoderamiento docente y Socioepistemología» (Gedisa)",
     ],
-    foto: "/hero/hero-2.webp",
-    alt: "Equipo de ED con una de sus publicaciones",
+    foto: "/fotos/contexto-significacion.webp",
+    alt: "Una formadora presenta un cuadro sobre contextos de significación",
   },
   {
     id: "fortalecimiento",
@@ -201,8 +201,8 @@ export const AREAS: readonly Area[] = [
     // («Consultoría estratégica en Matemática Educativa» en la Cartera). No se
     // inventa ninguno; el campo no se publica.
     hechos: [],
-    foto: "/metodo/escuchamos.webp",
-    alt: "Una facilitadora conversa con participantes sobre la mesa de trabajo",
+    foto: "/fotos/encuentro-institucional.webp",
+    alt: "Docentes e instituciones reunidas en un encuentro en México",
   },
   {
     id: "sistemas",
@@ -222,8 +222,8 @@ export const AREAS: readonly Area[] = [
     // integrales» (diagnóstico, diseño, implementación, monitoreo, evaluación
     // de impacto), sin proyectos con nombre.
     hechos: [],
-    foto: "/hero/hero-5.webp",
-    alt: "Taller en un aula",
+    foto: "/fotos/salon-mesas-redondas.webp",
+    alt: "Docentes trabajan en mesas redondas en un salón de encuentros",
   },
 ];
 
@@ -247,57 +247,57 @@ export const MIRADA_INTRO = {
 } as const;
 
 // Cada paso lleva foto desde el 2026-09-11, cuando la sección pasó a paneles
-// apilados con imagen a la derecha. Son las mismas del método (`public/
-// metodo/`) que usa el home, y para los dos verbos sin foto propia, dos del
-// hero que ya tienen ese sentido en `hero-cards.ts`.
+// apilados con imagen a la derecha. Son las mismas del método que usa el
+// home (`home/data.ts`), y los dos verbos que el home no tiene (Escuchar y
+// Transformar) suman una propia.
 export const MIRADA = [
   {
     verbo: "Escuchar",
     idea: "Toda solución nace de una realidad comprendida",
     texto:
       "Conversamos con la institución o el equipo: necesidades, objetivos, experiencias previas y condiciones reales de implementación.",
-    foto: "/metodo/escuchamos.webp",
-    fotoAlt: "Docentes en conversación durante la etapa de escucha",
+    foto: "/fotos/grupos-conversan.webp",
+    fotoAlt: "Grupos conversan sentados en ronda durante la etapa de escucha",
   },
   {
     verbo: "Investigar",
     idea: "La práctica también produce conocimiento",
     texto:
       "Estudiamos el problema en su contexto: qué dice la evidencia, qué muestra la experiencia previa y qué hay que comprender antes de diseñar.",
-    foto: "/hero/hero-3.webp",
-    fotoAlt: "Dos integrantes del equipo revisan materiales en una biblioteca",
+    foto: "/fotos/conferencia-problematizacion.webp",
+    fotoAlt: "Exposición sobre la problematización de la matemática escolar",
   },
   {
     verbo: "Diseñar",
     idea: "Cada realidad inspira una solución distinta",
     texto:
       "Definimos la intervención y convocamos las especialidades que hacen falta: currículo, evaluación, materiales o tecnología, según el problema.",
-    foto: "/metodo/disenamos.webp",
-    fotoAlt: "Selección de materiales educativos durante la etapa de diseño",
+    foto: "/fotos/pizarra-reparto-justo.webp",
+    fotoAlt: "Pizarra con los casos de un problema de reparto durante la etapa de diseño",
   },
   {
     verbo: "Acompañar",
     idea: "Vivimos para hacer vivir",
     texto:
       "Llevamos la propuesta al aula con encuentros, talleres, materiales, trabajo con liderazgos y análisis de clases, y estamos mientras sucede.",
-    foto: "/metodo/acompanamos.webp",
-    fotoAlt: "Trabajo situado junto a docentes durante el acompañamiento",
+    foto: "/fotos/formadora-acompana-grupo.webp",
+    fotoAlt: "Una formadora acompaña a un grupo mientras trabaja",
   },
   {
     verbo: "Evaluar",
     idea: "La evidencia orienta cada nuevo paso",
     texto:
       "Observamos evidencias, interpretamos resultados y ajustamos junto con los equipos, con informes que sirven para decidir.",
-    foto: "/metodo/evaluamos.webp",
-    fotoAlt: "Revisión de materiales y avances durante la evaluación",
+    foto: "/fotos/producciones-geometricas.webp",
+    fotoAlt: "Producciones de estudiantes expuestas para analizarlas durante la evaluación",
   },
   {
     verbo: "Transformar",
     idea: "Las transformaciones se construyen de manera sistémica",
     texto:
       "El aprendizaje queda en la institución: criterios, herramientas y decisiones que el equipo sostiene por sí mismo.",
-    foto: "/hero/hero-6.webp",
-    fotoAlt: "Taller con docentes en un aula, con materiales sobre las mesas",
+    foto: "/fotos/equipo-docente-escuela.webp",
+    fotoAlt: "Un equipo docente reunido frente a la pizarra de su escuela",
   },
 ] as const;
 

@@ -42,7 +42,7 @@ export function MisionPanel() {
         {/* Imagen (izquierda) — en mobile va debajo del texto */}
         <div className="relative order-last aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-[0_24px_60px_-28px_rgba(15,32,64,0.4)] lg:order-first lg:aspect-[5/4]">
           <Image
-            src="/hero/hero-6.webp"
+            src="/fotos/docentes-encuentro-formacion.webp"
             alt="Docentes participando de una propuesta de Empoderamiento Docente"
             fill
             sizes="(max-width: 1024px) 100vw, 44vw"

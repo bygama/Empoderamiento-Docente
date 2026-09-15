@@ -65,8 +65,8 @@ export function ColumnaIdentidad() {
         <div className="relative">
           <div className="relative aspect-[7/5] w-full overflow-hidden rounded-2xl shadow-[0_28px_70px_-28px_rgb(31_45_77_/_0.5)] ring-1 ring-white/40 [@media(max-height:760px)]:aspect-[7/4]">
             <Image
-              src="/metodo/escuchamos.webp"
-              alt="Sesión de trabajo con docentes"
+              src="/fotos/docentes-mesa-redonda.webp"
+              alt="Docentes conversan alrededor de una mesa de trabajo"
               fill
               sizes="(min-width: 1024px) 24rem, 0px"
               className="object-cover"
