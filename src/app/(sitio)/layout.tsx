@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Caveat, Courier_Prime, Inter, Manrope, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { IndicePagina } from "@/components/layout/IndicePagina";
