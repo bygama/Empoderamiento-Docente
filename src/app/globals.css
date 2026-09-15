@@ -377,6 +377,20 @@ html.has-custom-cursor * {
   max-height: 28rem;
   will-change: transform, opacity;
 }
+/* Canto de la carta elegida: el foco de luz que sigue al cursor se recorta a
+   un anillo fino sobre el borde (la máscara saca el centro). Lo enciende
+   mano-cartas.ts por opacidad. */
+.deck-borde-luz {
+  padding: 1.5px;
+  border-radius: 1.35rem;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
 /* En el abanico, el tilt 3D por hover lo maneja GSAP sobre la capa interna. */
 .deck.is-live .deck-card-inner {
   will-change: transform;
