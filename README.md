@@ -161,6 +161,8 @@ y un `.env.local` según `.env.example`. La primera vez, `/admin` pide crear
 el primer usuario. Sin token de Blob las fotos se guardan en `fotos-local/`;
 sin clave de Resend los correos salen por la consola. Diseño y decisiones:
 `docs/architecture/specs/2026-09-15-panel-admin-diseno.md` y el ADR-0003.
+Sin `.env.local` el sitio compila y corre igual; el panel avisa por consola
+que falta `DATABASE_URL` y no se conecta hasta tenerla.
 
 Tres cosas que aprendimos hoy armando el panel: cada vez que se suma un
 plugin o un componente propio, hay que correr `pnpm generate:importmap` (sin
