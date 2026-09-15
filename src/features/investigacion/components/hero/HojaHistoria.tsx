@@ -23,9 +23,11 @@ export function HojaHistoria() {
       aria-hidden="true"
       className="bg-grain-light text-azul-principal pointer-events-none invisible absolute inset-2.5 z-40 overflow-hidden rounded-xl bg-white shadow-[0_-24px_60px_-28px_rgb(0_0_0/0.7)]"
     >
-      {/* Folio de archivo (guiño al remate de la pila de expedientes). */}
+      {/* Folio de archivo: número de hoja + nombre de la sección en el
+          sitemap. El folio es el índice literal del archivo: cada hoja dice
+          qué sección del sitemap es (decisión 2026-09-14). */}
       <span className="text-gris-texto/70 absolute top-7 right-8 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
-        Archivo ED · Hoja 01
+        Archivo ED · Hoja 01 · Por qué investigamos
       </span>
 
       <div className="mx-auto grid h-full w-full max-w-screen-xl items-center gap-x-16 px-6 md:px-12 lg:grid-cols-[0.95fr_1.05fr]">

@@ -50,13 +50,15 @@ export const NAV_LINKS: readonly NavItem[] = [
   {
     label: "Investigación",
     href: "/investigacion",
-    // Por secciones, y al final los casos (la página va a cambiar: esta
-    // lista se ajusta con ella, es solo data).
+    // Los nombres son los del sitemap, iguales a los folios de cada hoja y
+    // al índice lateral: una sola forma de llamar a cada sección.
+    // «Por qué investigamos» es la hoja 01, dentro del hero pinneado: su
+    // ancla es el hero mismo (#sentido), y la historia arranca al scrollear.
     submenu: [
       { label: "Por qué investigamos", href: "/investigacion#sentido" },
       { label: "Líneas de investigación", href: "/investigacion#lineas" },
-      { label: "Ciclo y evidencia", href: "/investigacion#ciclo" },
-      { label: "Casos de investigación", href: "/investigacion#en-accion" },
+      { label: "Ciclo de investigación aplicada", href: "/investigacion#ciclo" },
+      { label: "Investigación en acción", href: "/investigacion#en-accion" },
     ],
   },
   {

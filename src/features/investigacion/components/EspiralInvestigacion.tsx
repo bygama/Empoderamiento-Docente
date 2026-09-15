@@ -76,7 +76,7 @@ export function EspiralInvestigacion() {
   return (
     <section
       id="ciclo"
-      data-indice="Ciclo"
+      data-indice="Ciclo de investigación aplicada"
       // Desde el navbar se aterriza al final de la escena (ver irASeccion).
       data-aterrizaje="fin"
       aria-label="Ciclo de investigación aplicada y evidencia"
@@ -93,7 +93,7 @@ export function EspiralInvestigacion() {
           }`}
         >
           <span className="text-gris-texto/70 absolute top-7 right-8 z-10 hidden font-mono text-[0.68rem] tracking-[0.2em] uppercase lg:block">
-            Archivo ED · Hoja 03
+            Archivo ED · Hoja 03 · Ciclo de investigación aplicada
           </span>
 
           {live ? <EspiralLamina /> : <EspiralEstatica />}
