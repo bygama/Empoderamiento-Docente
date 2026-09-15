@@ -33,7 +33,7 @@ export function BandaAliados() {
   return (
     <div
       data-mirada-banda
-      className="mt-14 lg:relative lg:-mt-[var(--mirada-pila)]"
+      className="mt-14 lg:relative lg:-mt-[var(--mirada-pila,47.5rem)]"
     >
       <span
         aria-hidden="true"

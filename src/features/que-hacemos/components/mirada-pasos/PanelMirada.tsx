@@ -75,15 +75,23 @@ export function PanelMirada({
   return (
     <li
       data-mirada-card
+      // CADA var LLEVA SU RESPALDO, y no por prolijidad: si las medidas no
+      // llegan —una hoja vieja en caché, un motor que no resuelve algún
+      // calc—, `top` y `height` quedan inválidos, y eso no degrada, MATA: sin
+      // `top` el sticky no se traba nunca y sin `height` las seis cards caen a
+      // su alto natural, todas iguales y chatas, sin escalera y sin apilado
+      // (el usuario, 2026-09-15, con un video donde pasaba justo eso). Con el
+      // respaldo, el peor caso es la geometría fija de antes del 2026-09-15:
+      // la pila anda, y en una pantalla baja se corta como se cortaba.
       style={
         {
-          top: `calc(var(--mirada-tope) + var(--mirada-franja) + ${indice} * var(--mirada-solapa))`,
-          "--alto": `calc(var(--mirada-alto) + ${solapasDebajo} * var(--mirada-solapa))`,
+          top: `calc(var(--mirada-tope, 6rem) + var(--mirada-franja, 5.5rem) + ${indice} * var(--mirada-solapa, 4rem))`,
+          "--alto": `calc(var(--mirada-alto, 22rem) + ${solapasDebajo} * var(--mirada-solapa, 4rem))`,
         } as CSSProperties
       }
       className={`${tono.fondo} border-azul-principal/10 flex flex-col rounded-[1.25rem] border lg:sticky lg:h-[var(--alto)]`}
     >
-      <div className="flex shrink-0 items-center gap-5 px-6 py-5 md:px-8 lg:h-[var(--mirada-solapa)] lg:py-0">
+      <div className="flex shrink-0 items-center gap-5 px-6 py-5 md:px-8 lg:h-[var(--mirada-solapa,4rem)] lg:py-0">
         <p className={`${tono.numero} font-mono text-[0.8rem] tracking-[0.18em]`}>
           0{indice + 1}
         </p>

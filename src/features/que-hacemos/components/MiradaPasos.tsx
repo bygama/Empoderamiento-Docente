@@ -76,10 +76,21 @@ export function MiradaPasos() {
       id="como-trabajamos"
       data-indice="Cómo trabajamos"
       // `data-mirada` es a quien globals.css le cuelga las medidas de la pila,
-      // y `--mirada-pasos` las cierra con la cantidad de verbos: todo lo que
-      // depende de cuántos son (las solapas, el alto, la franja) sale de ahí.
+      // y esta variable las cierra con la cantidad de verbos: lo que suman las
+      // solapas de todos menos el último, que es de lo que dependen el alto de
+      // la última card y el de la pila entera.
+      //
+      // Se multiplica ACÁ, con el número ya resuelto, y no en el CSS con
+      // `calc((var(--pasos) - 1) * var(--solapa))`: multiplicar una var por
+      // otra var es el único patrón de calc que el sitio no usa en ningún otro
+      // lado, y si un motor no lo soporta se cae toda la cadena de medidas de
+      // una vez (y con ella el apilado, ver los respaldos de PanelMirada).
       data-mirada
-      style={{ "--mirada-pasos": MIRADA.length } as CSSProperties}
+      style={
+        {
+          "--mirada-solapas": `calc(${MIRADA.length - 1} * var(--mirada-solapa))`,
+        } as CSSProperties
+      }
       className="text-azul-principal relative z-20 scroll-mt-28 bg-white lg:-mt-[100svh] lg:-scroll-mt-1 lg:motion-reduce:mt-0 lg:motion-reduce:scroll-mt-28"
     >
       <div className="mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-24 lg:pb-0">
@@ -98,12 +109,12 @@ export function MiradaPasos() {
               parte transparente no atrapa el mouse. */}
           <header
             data-mirada-tope
-            style={{ top: "var(--mirada-tope)" }}
-            className="lg:pointer-events-none lg:sticky lg:col-start-1 lg:row-start-1 lg:h-[var(--mirada-pila)] lg:self-start"
+            style={{ top: "var(--mirada-tope, 6rem)" }}
+            className="lg:pointer-events-none lg:sticky lg:col-start-1 lg:row-start-1 lg:h-[var(--mirada-pila,47.5rem)] lg:self-start"
           >
             <div
               data-mirada-franja
-              className="lg:pointer-events-auto lg:flex lg:h-[var(--mirada-titulo)] lg:items-center lg:bg-white"
+              className="lg:pointer-events-auto lg:flex lg:h-[var(--mirada-titulo,4rem)] lg:items-center lg:bg-white"
             >
               <h2
                 data-mirada-titulo
@@ -140,7 +151,7 @@ export function MiradaPasos() {
               colchón con su margen negativo (ver abajo). */}
           <ol
             data-mirada-pila
-            className="mt-12 space-y-4 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:grid lg:gap-y-40 lg:space-y-0 lg:pt-[var(--mirada-franja)] lg:after:block lg:after:h-[calc(100svh-var(--mirada-tope)-var(--mirada-franja)+8rem)] lg:after:content-['']"
+            className="mt-12 space-y-4 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:grid lg:gap-y-40 lg:space-y-0 lg:pt-[var(--mirada-franja,5.5rem)] lg:after:block lg:after:h-[calc(100svh-var(--mirada-tope,6rem)-var(--mirada-franja,5.5rem)+8rem)] lg:after:content-['']"
           >
             {MIRADA.map((paso, i) => (
               <PanelMirada key={paso.verbo} paso={paso} indice={i} total={MIRADA.length} />
