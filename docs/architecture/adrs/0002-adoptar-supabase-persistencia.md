@@ -1,6 +1,6 @@
 # ADR-0002: Adoptar Supabase para backend y persistencia (reemplaza MongoDB)
 
-- **Status:** Accepted
+- **Status:** Superseded by ADR-0003
 - **Date:** 2026-06-28
 - **Decision-makers:** @bygama
 - **Supersedes:** ADR-0001 (solo la capa de persistencia / base de datos)
