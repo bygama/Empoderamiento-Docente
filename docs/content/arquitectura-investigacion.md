@@ -60,6 +60,29 @@ problematizar, interpretar, resignificar, producir evidencia, sistematizar).
 | 7 | Conexión con Biblioteca | `#biblioteca` | Dónde vive la producción académica |
 | 8 | Cierre | — | Acción clara hacia Contacto |
 
+> **Decisión tomada (Gastón, 14-09-2026) — consistencia con el sitemap.**
+> El sitemap manda y cada hoja del archivo lleva en su folio el nombre de
+> su sección («Archivo ED · Hoja 01 · Por qué investigamos», …); el índice
+> lateral y el submenú del header usan esos mismos nombres. Cambios de
+> estructura respecto de esta tabla:
+>
+> - **§4 «Por qué investigamos» ES la Hoja 01 del hero** (los cuatro beats
+>   de la constelación, copy aprobado por ED el 31-08): ancla `#sentido`
+>   sobre el hero. Las cuatro fichas de fundamentos se quitaron el
+>   11-09-2026 (Daniela no les dio importancia: la página muestra las
+>   investigaciones; menos es más) y «Nacimos de una pregunta» se quitó el
+>   14-09: el origen ya vive en Quiénes somos y su postura la decía el beat 3
+>   palabra por palabra.
+> - **§5 Líneas:** una sola carpeta (Hoja 02) con la lista de las seis
+>   preguntas en el orden de este documento —número, nombre, pregunta— y un
+>   solo CTA al pie hacia los casos. Sin las dos carpetas «saber/práctica»,
+>   sin la síntesis «buscamos», sin chips ni botón por línea.
+> - **§9 Conexión con Biblioteca se quita de la página** (Gastón,
+>   15-09-2026): sale del cierre y el sobre de «La investigación también se
+>   comparte» se eliminó entero, sin reubicarlo.
+> - **§10 Cierre** queda solo con la conversación: el haz baja del cielo y
+>   se posa sobre «Investigar permite hacer mejores preguntas».
+>
 > **Decisión tomada (usuario, 04-09-2026):** «Proyectos y aplicaciones»
 > (traída de Qué hacemos el 02-09-2026) **se quita de esta página**: eran
 > cinco áreas del modelo conceptual sin proyectos reales, y su función la
