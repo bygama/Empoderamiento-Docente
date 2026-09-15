@@ -3,8 +3,10 @@ import { fileURLToPath } from "node:url";
 import { buildConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { resendAdapter } from "@payloadcms/email-resend";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { es } from "@payloadcms/translations/languages/es";
 import sharp from "sharp";
+import { Fotos } from "@/cms/colecciones/fotos";
 import { Usuarios } from "@/cms/colecciones/usuarios";
 import { urlDeLaBase } from "@/cms/base";
 import { urlDelSitio } from "@/cms/url";
@@ -31,7 +33,8 @@ export default buildConfig({
     dateFormat: "dd/MM/yyyy HH:mm",
   },
   i18n: { supportedLanguages: { es }, fallbackLanguage: "es" },
-  collections: [Usuarios],
+  collections: [Usuarios, Fotos],
+  upload: { limits: { fileSize: 8 * 1024 * 1024 } },
   db: postgresAdapter({
     pool: { connectionString: urlDeLaBase() },
     migrationDir: path.resolve(dirname, "cms/migraciones"),
@@ -40,4 +43,11 @@ export default buildConfig({
   sharp,
   graphQL: { disable: true },
   typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },
+  plugins: [
+    vercelBlobStorage({
+      enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+      collections: { fotos: true },
+      token: process.env.BLOB_READ_WRITE_TOKEN ?? "",
+    }),
+  ],
 });
