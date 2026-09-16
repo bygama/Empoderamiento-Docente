@@ -23,6 +23,17 @@ if (typeof window !== "undefined") {
  * fija adentro de esta sección y un pin (position fixed más spacer) se le
  * cruzaría; el sticky no le molesta. El hook (maquina/useEscenaIndice.ts)
  * la crea en un gsap.context y la revierte al desmontar el índice.
+ *
+ * LA PANTALLA MIDE LO QUE NECESITA, con la ventana como mínimo (Gastón,
+ * 2026-09-16). Medía exactamente una ventana, y aire + título + pila suman
+ * ~900 px: en ventanas más bajas la carpeta 04 se salía por el pie y la
+ * sección la recortaba contra el cierre. Ahora, si el contenido no entra,
+ * la pantalla es más alta que la ventana: se pega arriba mientras dura la
+ * pista y, cuando la escena termina, se despega y las carpetas terminan de
+ * entrar completas antes del aire de abajo. La pista es siempre la
+ * pantalla más los dos tramos, así el achique dura lo mismo. En ventanas
+ * bajas además se quita aire (arriba y entre título y pila) para que entre
+ * sin crecer.
  */
 
 /** Tramos de la pista, en pantallas de scroll: el achique y la aparición. */
@@ -32,6 +43,8 @@ const TRAMO_APARICION = 0.25;
 const ESCALA_MAX = 2.6;
 /** Aire a cada lado del título grande, en px. */
 const MARGEN = 72;
+/** Por debajo de este alto de ventana (px) la pantalla achica sus aires. */
+const VENTANA_BAJA = 900;
 
 export function escenaIndice({
   pista,
@@ -44,10 +57,26 @@ export function escenaIndice({
   titulo: HTMLElement;
   pila: HTMLElement;
 }) {
-  gsap.set(pista, { height: `${(1 + TRAMO_TITULO + TRAMO_APARICION) * 100}svh` });
   // El mismo aire arriba que la sección (py-28): el título queda en su
-  // esquina de siempre, no pegado al borde ni bajo el header flotante.
-  gsap.set(escena, { position: "sticky", top: 0, height: "100svh", paddingTop: "7rem" });
+  // esquina de siempre, no pegado al borde ni bajo el header flotante. En
+  // ventanas bajas, menos: 5rem arriba y 3rem entre título y pila (el
+  // `mt-20` de la lista), lo justo para pasar por debajo del header.
+  const lista = pila.firstElementChild as HTMLElement | null;
+  const dimensionar = () => {
+    const baja = window.innerHeight < VENTANA_BAJA;
+    gsap.set(escena, {
+      position: "sticky",
+      top: 0,
+      height: "auto",
+      minHeight: "100svh",
+      paddingTop: baja ? "5rem" : "7rem",
+    });
+    if (lista) gsap.set(lista, { marginTop: baja ? "3rem" : "5rem" });
+    gsap.set(pista, {
+      height: escena.offsetHeight + (TRAMO_TITULO + TRAMO_APARICION) * window.innerHeight,
+    });
+  };
+  dimensionar();
   gsap.set(titulo, { transformOrigin: "50% 50%", willChange: "transform" });
   gsap.set(pila, { autoAlpha: 0 });
 
@@ -72,6 +101,9 @@ export function escenaIndice({
       end: "bottom bottom",
       scrub: 0.6,
       invalidateOnRefresh: true,
+      // La ventana cambió: la pantalla y la pista se vuelven a medir antes
+      // de que ScrollTrigger tome sus posiciones.
+      onRefreshInit: dimensionar,
     },
   });
   const parteTitulo = TRAMO_TITULO / (TRAMO_TITULO + TRAMO_APARICION);
