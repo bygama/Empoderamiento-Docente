@@ -1,9 +1,15 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
+import gsap from "gsap";
 import { AREAS } from "@/features/que-hacemos/areas";
+import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
+import { IndiceAreas } from "./areas/IndiceAreas";
 import { PanelArea } from "./areas/PanelArea";
+import { crearAterrizaje } from "./areas/coreografia-titulo";
 
 /**
  * Las siete áreas de especialización de ED, en texto plano y legibles de una.
@@ -14,26 +20,6 @@ import { PanelArea } from "./areas/PanelArea";
  * que se lee y sirve para saltar; en celular, chips deslizables. El único JS
  * es ese avance: sin él todo se lee igual, marcando la primera área.
  */
-/**
- * Clases de un ítem del índice según por dónde va la lectura: el riel se
- * LLENA —verde lo recorrido, gris lo que falta—, así dice cuánto queda y no
- * sólo dónde estás. Va con el borde de CADA ítem y no con una barra de
- * altura en porcentaje: los rótulos no miden todos igual y un porcentaje
- * cortaría a mitad de uno. Fuera del componente para no anidar ternarios en
- * medio del markup.
- */
-function clasesDelItem(recorrido: boolean, activo: boolean) {
-  const riel = recorrido
-    ? "lg:border-verde-concepto"
-    : "lg:border-azul-principal/10";
-  if (activo) {
-    return `${riel} border-azul-principal bg-azul-principal text-white lg:bg-transparent lg:font-semibold lg:text-azul-principal`;
-  }
-  const base =
-    "border-azul-principal/15 text-gris-texto hover:border-azul-principal/40 hover:text-azul-principal";
-  return `${riel} ${base} ${recorrido ? "lg:text-azul-principal/55" : ""}`;
-}
-
 /** Los ids de las anclas, en el orden de la página. */
 const IDS_AREAS = AREAS.map((a) => `area-${a.id}`);
 
@@ -52,6 +38,40 @@ export function AreasQueHacemos() {
   const activaId = useSeccionActiva(IDS_AREAS);
   const activa = Math.max(0, IDS_AREAS.indexOf(activaId ?? ""));
 
+  const zonaRef = useRef<HTMLElement | null>(null);
+  const reduced = useReducedMotion();
+
+  // El aterrizaje del título (areas/coreografia-titulo.ts): solo en desktop,
+  // donde el índice va al costado; en celular y con reduced motion el título
+  // está en su lugar desde el SSR y no hay nada que mover.
+  useIsomorphicLayoutEffect(() => {
+    if (reduced) return;
+    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) return;
+    const zona = zonaRef.current;
+    if (!zona) return;
+    const q = <T extends HTMLElement>(sel: string) => Array.from(zona.querySelectorAll<T>(sel));
+    const uno = <T extends HTMLElement>(sel: string) => zona.querySelector<T>(sel);
+    const titulo = uno("[data-areas-titulo]");
+    const celda = uno("[data-areas-celda]");
+    const caja = uno("[data-areas-caja]");
+    const articulos = uno("[data-areas-articulos]");
+    const riel = uno("[data-areas-riel]");
+    if (!titulo || !celda || !caja || !articulos || !riel) return;
+
+    const ctx = gsap.context(() => {
+      crearAterrizaje({
+        titulo,
+        celda,
+        caja,
+        articulos,
+        piezas: q("[data-area]"),
+        riel,
+        items: q("[data-areas-item]"),
+      });
+    }, zona);
+    return () => ctx.revert();
+  }, [reduced]);
+
   return (
     // z-30: «Cómo trabajamos» (z-20, por su relevo con el faro) termina con
     // la pila de cards trabada mientras su banda de aliados sube por encima,
@@ -59,8 +79,12 @@ export function AreasQueHacemos() {
     // encima de esa pila para taparla al subir, y para eso es `relative` y
     // le gana en z. El fondo blanco es el que tapa.
     <section
+      ref={zonaRef}
       id="areas"
       data-indice="Áreas"
+      // Desde el navbar se aterriza al final del pin, con el título ya en su
+      // lugar (ver irASeccion): llegar al borde de arriba es caer en la puerta.
+      data-aterrizaje="fin"
       className="text-azul-principal relative z-30 scroll-mt-28 bg-white"
     >
       <div className="mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
@@ -74,54 +98,26 @@ export function AreasQueHacemos() {
               translate se aplica después del layout, también mientras el
               sticky está en flujo normal, y llegó a pisar por 87px lo que
               había arriba. La caja no puede salirse de su celda. */}
-          <div className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col lg:justify-center lg:self-start">
-            {/* El titular volvió el 2026-09-11 (el usuario: «falta el título a
-                la izquierda antes de las áreas»). El owner lo había sacado con
-                la bajada el 2026-09-09 y quedaba un h2 invisible, que además
-                seguía diciendo «seis» cuando ya son siete. Va en la columna
-                del índice, trabado con él, como RÓTULO de la lista y no como
-                título de sección: en la escala del índice y en el gris
-                secundario, para no competir con los h3 de las áreas (a 2rem y
-                trabado competía; en flujo arriba de la grilla, al usuario le
-                quedaba mal). «especialización» en azul-medio (el usuario:
-                celeste, no resaltada): azul-claro, el celeste del sistema,
-                sobre blanco da 1,8:1 y no pasa; azul-medio sí (5,1:1). La
-                bajada no vuelve. */}
-            <h2
-              className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance lg:text-[1.5rem]"
-              style={{ lineHeight: 1.2 }}
+          {/* La celda es estática y la caja de adentro es la sticky: la
+              coreografía mide la posición natural del título con la celda
+              (que no se mueve) y no con la caja (que sí). */}
+          <div data-areas-celda>
+            <div
+              data-areas-caja
+              className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col lg:justify-center"
             >
-              Áreas de <span className="text-azul-medio">especialización</span>
-            </h2>
-            <nav aria-label="Áreas de especialización" className="mt-5 lg:mt-6 lg:w-full">
-              <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
-                {AREAS.map((a, i) => {
-                  const activo = i === activa;
-                  const recorrido = i <= activa;
-                  return (
-                    <li key={a.id} className="shrink-0">
-                      <a
-                        href={`#area-${a.id}`}
-                        aria-current={activo ? "true" : undefined}
-                        className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
-                      >
-                        <span
-                          className={`font-mono text-[0.72rem] tabular-nums transition-opacity duration-300 motion-reduce:transition-none ${recorrido ? "opacity-90" : "opacity-50"}`}
-                        >
-                          0{i + 1}
-                        </span>
-                        {/* El indice usa el rotulo corto cuando existe; el
-                            articulo sigue con el nombre completo del cartel. */}
-                        <span>{a.nombreCorto ?? a.nombre}</span>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ol>
-            </nav>
+              <IndiceAreas activa={activa} />
+            </div>
           </div>
 
-          <div className="mt-10 lg:mt-0">
+          {/* La columna que se pinnea durante el aterrizaje del título y sube
+              entera cuando aterrizó (ver coreografia-titulo.ts: por qué esta
+              y no la sección). El aire de arriba (desktop) es para que, al
+              soltarse el pin, el Área 01 no quede pegada al borde de la
+              pantalla, debajo del navbar (el usuario, 2026-09-16): la columna
+              se clava al ras y el primer artículo aterriza esos 8rem más
+              abajo. */}
+          <div data-areas-articulos className="mt-10 lg:mt-0 lg:pt-32">
             {AREAS.map((a, i) => (
               <article
                 key={a.id}
