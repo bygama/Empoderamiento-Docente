@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { AREAS } from "@/features/que-hacemos/areas";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
+import { PanelArea } from "./areas/PanelArea";
 
 /**
  * Las siete áreas de especialización de ED, en texto plano y legibles de una.
@@ -50,9 +51,6 @@ export function AreasQueHacemos() {
   // la primera, que es lo que se ve sin JS.
   const activaId = useSeccionActiva(IDS_AREAS);
   const activa = Math.max(0, IDS_AREAS.indexOf(activaId ?? ""));
-
-  const rotulo =
-    "font-sans text-[0.78rem] font-medium tracking-[0.22em] text-gris-texto uppercase";
 
   return (
     // z-30: «Cómo trabajamos» (z-20, por su relevo con el faro) termina con
@@ -161,37 +159,8 @@ export function AreasQueHacemos() {
 
                   {/* TERCER NIVEL DE LECTURA: el panel separa el detalle sin
                       esconder nada —la sección existe para que no se esconda—,
-                      así se lee primero qué es el área. El min-h es una red y
-                      no un relleno: con los bullets en un renglón las siete
-                      dan el mismo alto natural, y el piso sólo evita la
-                      escalera si mañana un copy crece. */}
-                  <div className="bg-gris-fondo mt-8 rounded-[1.25rem] p-6 md:mt-9 md:p-7 lg:min-h-[10.5rem]">
-                    <div className="grid gap-8 sm:grid-cols-2">
-                      <div>
-                        <p className={rotulo}>Qué te llevás</p>
-                        <ul className="mt-3 space-y-2">
-                          {a.teLlevas.map((t) => (
-                            <li
-                              key={t}
-                              className="flex gap-3 font-sans text-[0.98rem] leading-snug"
-                            >
-                              <span
-                                aria-hidden="true"
-                                className="bg-verde-concepto mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full"
-                              />
-                              <span>{t}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <p className={rotulo}>Para quién</p>
-                        <p className="mt-3 font-sans text-[0.98rem] leading-snug">
-                          {a.paraQuien}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                      así se lee primero qué es el área. */}
+                  <PanelArea area={a} />
                 </div>
 
                 <div className="mt-8 xl:mt-0 xl:h-full">
