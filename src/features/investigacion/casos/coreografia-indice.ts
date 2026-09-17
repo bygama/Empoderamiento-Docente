@@ -95,7 +95,13 @@ export function escenaIndice({
   const observador = new ResizeObserver(ajustarPista);
   observador.observe(escena);
   dimensionar();
-  gsap.set(titulo, { transformOrigin: "50% 50%", willChange: "transform" });
+  // Sin will-change a propósito, como el título de Áreas
+  // (que-hacemos/areas/coreografia-titulo.ts): promueve el título a capa y
+  // Chrome la rasteriza una sola vez al tamaño de layout (36 px), después
+  // estira esa textura con la matriz. Arrancando en scale 2.6 se veía un
+  // upscale del 260 % —texto pixelado hasta que el achique lo limpiaba
+  // (medido 2026-09-17)—. Sin él vuelve a rasterizar en la escala grande.
+  gsap.set(titulo, { transformOrigin: "50% 50%" });
   const carpetas = Array.from(pila.querySelectorAll<HTMLElement>("[data-carpeta-item]"));
   // Nacen escondidas y abajo: el fromTo no aplica su «from» hasta que
   // arranca (immediateRender false, por el scrub), y sin esto las que
