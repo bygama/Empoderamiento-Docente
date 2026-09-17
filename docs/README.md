@@ -26,6 +26,7 @@
 | Código IA-friendly| [`AI_GUIDELINES.md`](AI_GUIDELINES.md)          | Reglas detalladas: naming, archivos chicos, TS, Tailwind v4, GSAP            |
 | ADRs              | [`architecture/adrs/`](architecture/adrs/README.md) | Decisiones arquitectónicas (stack base, Neon y Payload para el panel, etc.)   |
 | Diseño del panel  | [`architecture/specs/2026-09-15-panel-admin-diseno.md`](architecture/specs/2026-09-15-panel-admin-diseno.md) | Panel de administración con Payload sobre Neon: alcance, modelo de contenido, acceso, fases y riesgos |
+| Monorepo          | [`architecture/specs/2026-09-17-monorepo-apps-diseno.md`](architecture/specs/2026-09-17-monorepo-apps-diseno.md) | El repo pasa a `apps/`: por qué una app y no dos, cómo queda el gate multi-proyecto, qué se muda y en qué orden |
 
 ---
 
