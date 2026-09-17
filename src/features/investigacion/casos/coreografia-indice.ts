@@ -13,11 +13,14 @@ if (typeof window !== "undefined") {
  * 1. EL TÍTULO llega grande y centrado en la pantalla y, en el primer
  *    tramo de la pista, se achica y va directo a su lugar: arriba a la
  *    izquierda, con la pila todavía invisible debajo.
- * 2. LA PILA APARECE, sin más efecto, cuando el título ya está quieto en
- *    su esquina. (Hubo un barrido doble de líneas verdes descubriéndola
- *    desde el centro, como el de «Quiénes somos» del inicio; Facundo lo
- *    sacó: «que aparezcan después de que se mueve el título, sin ningún
- *    efecto».)
+ * 2. LAS CARPETAS SE APILAN (Gastón, 2026-09-17): mientras el título
+ *    termina su viaje —desde el 70 %— entran una por una desde abajo, con
+ *    un recorrido corto, en orden: 01 apoya, 02 apoya encima, 03, 04. Se
+ *    lee como alguien armando la pila sobre el escritorio. Solo posición y
+ *    opacidad, escalonadas; nada encima. (Antes aparecían las cuatro a la
+ *    vez con un fundido plano —Facundo, 14-09, que había sacado un barrido
+ *    doble de líneas verdes: «sin ningún efecto»—; a Gastón el fundido
+ *    plano no le gustó.)
  *
  * Sin pin de ScrollTrigger a propósito: el expediente abierto es una capa
  * fija adentro de esta sección y un pin (position fixed más spacer) se le
@@ -43,6 +46,8 @@ const TRAMO_APARICION = 0.25;
 const ESCALA_MAX = 2.6;
 /** Aire a cada lado del título grande, en px. */
 const MARGEN = 72;
+/** Desde cuánto más abajo entra cada carpeta al apilarse, en px. */
+const DESDE_ABAJO = 40;
 /** Por debajo de este alto de ventana (px) la pantalla achica sus aires. */
 const VENTANA_BAJA = 900;
 
@@ -72,13 +77,30 @@ export function escenaIndice({
       paddingTop: baja ? "5rem" : "7rem",
     });
     if (lista) gsap.set(lista, { marginTop: baja ? "3rem" : "5rem" });
+    ajustarPista();
+  };
+  // La pista es siempre la pantalla más los dos tramos. Y se RE-AJUSTA cada
+  // vez que la pantalla cambia de alto —desplegar la anticipación de una
+  // carpeta la estira ~170 px—: si la pista quedara fija, al final de la
+  // pista el sticky tiene que meter la pantalla entera antes del borde y
+  // la corre hacia arriba lo que creció; al cerrarse vuelve a bajar, y el
+  // cursor quedaba sobre otra carpeta (loop medido 2026-09-17). Con la
+  // pista creciendo lo mismo, la pantalla no se mueve y lo que se empuja
+  // es lo que sigue, como en cualquier acordeón.
+  function ajustarPista() {
     gsap.set(pista, {
       height: escena.offsetHeight + (TRAMO_TITULO + TRAMO_APARICION) * window.innerHeight,
     });
-  };
+  }
+  const observador = new ResizeObserver(ajustarPista);
+  observador.observe(escena);
   dimensionar();
   gsap.set(titulo, { transformOrigin: "50% 50%", willChange: "transform" });
-  gsap.set(pila, { autoAlpha: 0 });
+  const carpetas = Array.from(pila.querySelectorAll<HTMLElement>("[data-carpeta-item]"));
+  // Nacen escondidas y abajo: el fromTo no aplica su «from» hasta que
+  // arranca (immediateRender false, por el scrub), y sin esto las que
+  // todavía no entraron se veían desde el principio.
+  gsap.set(carpetas, { autoAlpha: 0, y: DESDE_ABAJO });
 
   // De dónde parte el título: centrado en la pantalla y grande. Se mide
   // con la geometría de layout (offset*), que no ve el transform que el
@@ -113,11 +135,20 @@ export function escenaIndice({
     { scale: 1, x: 0, y: 0, duration: parteTitulo, ease: "power2.inOut" },
     0,
   );
+  // Cada carpeta: 22 % del recorrido, escalonadas 8 %, arrancando cuando
+  // el título va por el 70 % de su viaje; la última termina antes del fin.
   tl.fromTo(
-    pila,
-    { autoAlpha: 0 },
-    { autoAlpha: 1, duration: 1 - parteTitulo, ease: "power1.out", immediateRender: false },
-    parteTitulo,
+    carpetas,
+    { autoAlpha: 0, y: DESDE_ABAJO },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.22,
+      ease: "power2.out",
+      stagger: 0.08,
+      immediateRender: false,
+    },
+    parteTitulo * 0.7,
   );
-  return tl;
+  return { tl, limpiar: () => observador.disconnect() };
 }
