@@ -5,10 +5,11 @@
  * arbitraje de ED (ver `produccionRelacionada` de cada uno). Todo dato de
  * esos dos sale de los papers: si algo no está publicado, no está acá.
  *
- * Los casos 03 y 04 son DEMO (`esDemo: true`): cubren las dos aplicaciones
- * que todavía no tienen caso real —evaluación y currículum— y llevan la
- * marca DEMO adentro del expediente (cabecera, lámina y aclaración al
- * pie). En la tapa de la carpeta ya no (Gastón, 2026-09-17).
+ * Los casos 03 y 04 son provisionales: cubren las dos aplicaciones que
+ * todavía no tienen caso real —evaluación y currículum—. Llevaban la marca
+ * DEMO (tapa, cabecera, lámina y aclaración al pie); Gastón la sacó entera
+ * el 2026-09-17 (`esDemo: false`), así que hoy se ven como los reales. El
+ * mecanismo sigue: `esDemo: true` vuelve a prender las marcas.
  *
  * Para sumar un caso: editar este archivo (textos, evidencias, lámina y
  * recursos), sin tocar componentes ni animaciones. Las láminas viven en
@@ -244,7 +245,7 @@ export const CASOS: readonly CasoInvestigacion[] = [
     id: "caso-03",
     slug: "evaluacion-mas-alla-del-puntaje",
     numero: "03",
-    esDemo: true,
+    esDemo: false,
     pregunta: "¿Qué nos dice una evaluación más allá del puntaje?",
     eje: "Evaluación y evidencia educativa",
     indicio: "Lo que un 72 no cuenta",
@@ -309,7 +310,7 @@ export const CASOS: readonly CasoInvestigacion[] = [
     id: "caso-04",
     slug: "contenido-curricular-herramienta-pensamiento",
     numero: "04",
-    esDemo: true,
+    esDemo: false,
     pregunta:
       "¿Cómo puede un contenido curricular convertirse en una herramienta de pensamiento?",
     eje: "Currículum y pensamiento matemático",
