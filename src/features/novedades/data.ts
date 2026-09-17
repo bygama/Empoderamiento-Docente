@@ -261,7 +261,10 @@ export type Lanzamiento = {
 // Los mismos destacados de la Biblioteca (publicaciones reales).
 export const LANZAMIENTOS: Lanzamiento[] = [
   { id: "l-libro", tipo: "Libro · Gedisa 2016", titulo: "Empoderamiento docente y Socioepistemología", imagen: "/fotos/conferencia-problematizacion.webp" },
-  { id: "l-relime", tipo: "Artículo · RELIME 2025", titulo: "Resignificación del conocimiento matemático escolar", imagen: "/quienes-somos/origen-03-pregunta.webp" },
+  // contexto-significacion: la lámina que se ve es literalmente sobre
+  // resignificación, y no se repite en la página (la destacada del mismo
+  // artículo lleva la foto de Daniela exponiendo).
+  { id: "l-relime", tipo: "Artículo · RELIME 2025", titulo: "Resignificación del conocimiento matemático escolar", imagen: "/fotos/contexto-significacion.webp" },
   { id: "l-bolema", tipo: "Artículo · Bolema 2025", titulo: "Problematizar la matemática escolar", imagen: "/fotos/grupo-en-ronda.webp" },
   { id: "l-oaxaca", tipo: "Artículo · Redalyc 2016", titulo: "Oaxaca: una transformación colectiva", imagen: "/fotos/cierre-encuentro-grupo.webp" },
   { id: "l-derivada", tipo: "Artículo · IE REDIECH 2024", titulo: "¿Qué significados de la derivada favorece un profesor?", imagen: "/fotos/graficas-de-datos.webp" },
