@@ -1,9 +1,10 @@
 /**
- * Verifica que react-doctor dé 100/100 sin diagnósticos.
+ * Verifica que react-doctor dé 100/100 sin diagnósticos, en TODOS los
+ * proyectos del workspace.
  *
  * Se usa desde `.githooks/pre-push`, y distingue tres desenlaces:
  *
- *  - 100/100 y cero diagnósticos → exit 0, el push sigue.
+ *  - 100/100 y cero diagnósticos en cada proyecto → exit 0, el push sigue.
  *  - Hay hallazgos, o la medición vino incompleta → exit 1, el push se frena
  *    con la lista en pantalla.
  *  - No se pudo correr (npm caído, sin red, pnpm ausente) → exit 0 con aviso.
@@ -15,18 +16,30 @@
  * largo. Acá el criterio es el del proyecto: score 100 y CERO diagnósticos.
  */
 import { execFileSync } from "node:child_process";
+import path from "node:path";
 
-const AZUL = "[1m";
-const GRIS = "[2m";
-const ROJO = "[31m";
-const VERDE = "[32m";
-const FIN = "[0m";
+/**
+ * Los proyectos que el gate TIENE que medir; crece con cada app nueva.
+ *
+ * No está solo para armar el comando: si uno no aparece en el informe, la
+ * medición está incompleta y el push se frena. Sin eso, un informe con un
+ * proyecto de menos se leería igual que «cero hallazgos». El alcance vive
+ * acá y en el script del package.json, a la vista, nunca en un
+ * `doctor.config.*` (AGENTS.md §5.8).
+ */
+const PROYECTOS = ["apps/sitio/src"];
+
+const AZUL = "\x1b[1m";
+const GRIS = "\x1b[2m";
+const ROJO = "\x1b[31m";
+const VERDE = "\x1b[32m";
+const FIN = "\x1b[0m";
 
 let salida;
 try {
   salida = execFileSync(
     "pnpm",
-    ["dlx", "react-doctor", "--no-supply-chain", "--json", "src"],
+    ["dlx", "react-doctor", "--no-supply-chain", "--json", "--project", PROYECTOS.join(",")],
     { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], shell: process.platform === "win32" },
   );
 } catch (e) {
@@ -45,20 +58,42 @@ try {
   process.exit(0);
 }
 
-const proyecto = informe.projects?.[0] ?? {};
 const resumen = informe.summary ?? {};
-const diagnosticos = proyecto.diagnostics ?? [];
-const salteados = proyecto.skippedChecks ?? [];
+const raiz = informe.directory ?? process.cwd();
+
+// react-doctor devuelve rutas absolutas; el gate razona en rutas del repo.
+const porProyecto = new Map();
+for (const p of informe.projects ?? []) {
+  const relativo = path.relative(raiz, p.directory ?? "").split(path.sep).join("/");
+  porProyecto.set(relativo, p);
+}
+
+const faltantes = PROYECTOS.filter((nombre) => !porProyecto.has(nombre));
+const incompletos = [...porProyecto].filter(
+  ([, p]) => p.complete === false || (p.skippedChecks ?? []).length > 0,
+);
 
 // Una medición incompleta NO es un aprobado: react-doctor arma su lista de
 // archivos con el índice de git, así que un borrado sin commitear le hace
-// fallar el análisis de mantenibilidad y ESCONDER el score. Sin esta rama, esa
-// salida se leería como «cero hallazgos».
-if (salteados.length > 0 || proyecto.complete === false || resumen.score == null) {
+// fallar el análisis de mantenibilidad y ESCONDER el score. Y un proyecto que
+// no vino en el informe es lo mismo, pero más silencioso.
+if (faltantes.length > 0 || incompletos.length > 0 || resumen.score == null) {
   console.log(`\n${ROJO}${AZUL}  react-doctor no pudo completar la medición.${FIN}`);
-  if (salteados.length) console.log(`  Chequeos salteados: ${salteados.join(", ")}`);
-  for (const [check, razon] of Object.entries(proyecto.skippedCheckReasons ?? {})) {
-    console.log(`${GRIS}  ${check}: ${String(razon).split("\n")[0]}${FIN}`);
+  // Cuando la herramienta misma rechaza la corrida (una ruta que no existe,
+  // un nombre de proyecto mal escrito) el motivo viene acá y es la pista.
+  if (informe.error?.message) console.log(`  ${informe.error.message}`);
+  if (faltantes.length) {
+    console.log(`  Proyectos que no vinieron en el informe: ${faltantes.join(", ")}`);
+    console.log(
+      `${GRIS}  Revisá que sigan existiendo y que estén en PROYECTOS, acá arriba.${FIN}`,
+    );
+  }
+  for (const [nombre, p] of incompletos) {
+    const salteados = p.skippedChecks ?? [];
+    if (salteados.length) console.log(`  ${nombre} — chequeos salteados: ${salteados.join(", ")}`);
+    for (const [check, razon] of Object.entries(p.skippedCheckReasons ?? {})) {
+      console.log(`${GRIS}  ${check}: ${String(razon).split("\n")[0]}${FIN}`);
+    }
   }
   console.log(
     `${GRIS}  Suele ser un archivo borrado y todavía no commiteado: react-doctor lo busca\n  porque sigue en el índice de git. Commiteá el borrado y volvé a probar.${FIN}\n`,
@@ -66,10 +101,15 @@ if (salteados.length > 0 || proyecto.complete === false || resumen.score == null
   process.exit(1);
 }
 
-if (resumen.score === 100 && resumen.totalDiagnosticCount === 0) {
-  console.log(
-    `\n${VERDE}  react-doctor: 100/100, sin diagnósticos${FIN} ${GRIS}(${proyecto.analyzedFileCount} archivos)${FIN}\n`,
-  );
+// El score del proyecto es un objeto; el del resumen, un número.
+const puntaje = (p) => (typeof p.score === "number" ? p.score : p.score?.score);
+const bajos = PROYECTOS.filter((nombre) => puntaje(porProyecto.get(nombre)) !== 100);
+
+if (bajos.length === 0 && resumen.totalDiagnosticCount === 0) {
+  const detalle = PROYECTOS.map(
+    (nombre) => `${nombre}: ${porProyecto.get(nombre).analyzedFileCount} archivos`,
+  ).join(" · ");
+  console.log(`\n${VERDE}  react-doctor: 100/100, sin diagnósticos${FIN} ${GRIS}(${detalle})${FIN}\n`);
   process.exit(0);
 }
 
@@ -79,14 +119,16 @@ console.log(
 console.log(`${GRIS}  El push se frena hasta que vuelva a 100. Qué hay:${FIN}\n`);
 
 const porRegla = new Map();
-for (const d of diagnosticos) {
-  if (!porRegla.has(d.rule)) porRegla.set(d.rule, []);
-  porRegla.get(d.rule).push(d);
+for (const [nombre, p] of porProyecto) {
+  for (const d of p.diagnostics ?? []) {
+    if (!porRegla.has(d.rule)) porRegla.set(d.rule, []);
+    porRegla.get(d.rule).push({ ...d, proyecto: nombre });
+  }
 }
 for (const [regla, ds] of porRegla) {
   console.log(`  ${AZUL}${regla}${FIN} ${GRIS}×${ds.length}${FIN}`);
   console.log(`${GRIS}    ${ds[0].message}${FIN}`);
-  for (const d of ds) console.log(`    src/${d.filePath}:${d.line}`);
+  for (const d of ds) console.log(`    ${d.proyecto}/${d.filePath}:${d.line}`);
   console.log("");
 }
 console.log(

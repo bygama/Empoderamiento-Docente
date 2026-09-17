@@ -12,7 +12,7 @@
     "start": "pnpm --filter sitio start",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
-    "react-doctor": "pnpm dlx react-doctor --no-supply-chain src",
+    "react-doctor": "pnpm dlx react-doctor --no-supply-chain --project apps/sitio/src",
     "prepare": "node scripts/instalar-hooks.mjs"
   }
 }
