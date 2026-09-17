@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  apps/sitio:
     dependencies:
       gsap:
         specifier: ^3.15.0

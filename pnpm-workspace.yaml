@@ -1,5 +1,20 @@
 packages:
-  - "."
+  - "apps/*"
+
+# eslint-config-next hace `require("next/dist/compiled/babel/eslint-parser")`
+# sin declarar `next` ni en dependencies ni en peerDependencies: se apoya en
+# encontrarlo en un node_modules de arriba. Cuando el sitio vivía en la raíz
+# lo encontraba ahí; con el monorepo `next` es dependencia de apps/sitio y el
+# require sale desde el store de pnpm, que no lo ve. Publicarlo en la raíz es
+# lo más chico que arregla eso: no afloja el layout para el resto del árbol,
+# como harían nodeLinker: hoisted o un patrón amplio.
+#
+# Los dos primeros son los que pnpm trae por defecto: declarar la lista la
+# reemplaza entera, así que hay que repetirlos.
+publicHoistPattern:
+  - "*eslint*"
+  - "*prettier*"
+  - "next"
 
 allowBuilds:
   sharp: true
