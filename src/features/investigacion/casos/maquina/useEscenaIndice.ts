@@ -32,7 +32,7 @@ export function useEscenaIndice(m: Maquina, indiceVisible: boolean) {
     if (!pista || !escena || !titulo || !pila) return;
 
     const ctx = gsap.context(() => {
-      const tl = escenaIndice({ pista, escena, titulo, pila });
+      const { tl, limpiar } = escenaIndice({ pista, escena, titulo, pila });
       // La pista cambió de alto: lo de abajo se reubica. Y la escena
       // arranca ya en su progreso (al remontar, el lector suele estar
       // sobre la pila): sin esto el scrub suavizado la tweenearía desde
@@ -40,6 +40,8 @@ export function useEscenaIndice(m: Maquina, indiceVisible: boolean) {
       ScrollTrigger.refresh();
       const st = tl.scrollTrigger;
       if (st) tl.progress(st.progress);
+      // Lo que devuelve la función del contexto corre al revertirlo.
+      return limpiar;
     }, section);
     return () => ctx.revert();
   }, [reduced, indiceVisible]);
