@@ -162,7 +162,10 @@ export const NOVEDADES: Novedad[] = [
     titulo: "Resignificar el saber matemático escolar: nuevo artículo en RELIME",
     bajada:
       "Daniela Reyes-Gasperini y Karla Gómez Osalde publican en la Revista Latinoamericana de Investigación en Matemática Educativa cómo se resignifica el conocimiento matemático escolar dentro de un programa de desarrollo profesional docente.",
-    imagen: "/fotos/contexto-significacion.webp",
+    // La destacada vuelve a la foto de Daniela exponiendo (Gastón,
+    // 2026-09-17): el 14-09 había pasado a contexto-significacion con el
+    // resto de las fotos aprobadas y así no le gustó.
+    imagen: "/quienes-somos/origen-03-pregunta.webp",
     publicacion:
       "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
     destacada: true,
