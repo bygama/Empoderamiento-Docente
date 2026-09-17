@@ -16,10 +16,9 @@
 - **Qué es:** sitio web institucional de **Empoderamiento Docente (ED)**.
 - **Stack:** Next.js 16 (App Router) + React 19 + TypeScript strict +
   Tailwind CSS v4 (theming en CSS) + GSAP + Lenis + Zod.
-- **Backend/persistencia:** **Supabase** (Postgres + Auth + Storage), a
-  integrar cuando haya formularios (inscripción, CV); **hoy el sitio corre
-  100% frontend** (Supabase todavía no está en el repo). Ver
-  [ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md).
+- **Backend/persistencia:** **Neon** (Postgres) + **Payload** (panel de
+  contenido en `/admin`), fotos en Vercel Blob, correos por Resend. Ver
+  [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md).
 - **Onboarding humano:** [`README.md`](README.md) (instalación, scripts, estructura).
 - **Lanzamiento:** **junio 2026** (estimado).
 - **Reglas duras** (no negociables):
@@ -55,7 +54,7 @@
 | Hacer **commits**                           | `docs/COMMITS.md` → §9 commit protocol                                                      |
 | Hacer **review** antes de PR                | §6 quality standards → §10 pre-PR checklist                                                 |
 | Entender la **arquitectura del repo**       | §1 purpose → §3 project structure → `docs/architecture/adrs/0001-stack-base.md`             |
-| **Backend / datos** (Supabase, a futuro)    | §2 stack → §12 backend/datos → `docs/architecture/adrs/0002-adoptar-supabase-persistencia.md` → `docs/AI_GUIDELINES.md` §12 |
+| **Backend / datos / panel** (Neon + Payload) | §2 stack → §12 backend/datos → `docs/architecture/adrs/0003-adoptar-neon-y-payload.md` → `docs/architecture/specs/2026-09-15-panel-admin-diseno.md` → `docs/AI_GUIDELINES.md` §12 |
 | **Instalar y correr local**                 | `README.md` (getting started) → `package.json` scripts (`pnpm dev` / `build` / `start` / `lint` / `typecheck`) |
 
 > Si tu tarea no entra en la tabla, pedile al usuario que la describa y
@@ -88,17 +87,17 @@ ED a definir con el cliente).
   en `src/app/globals.css`, no en un `tailwind.config.js`)
 - **GSAP 3** + **Lenis** (animaciones, smooth scroll)
 - **Zod 4** (validación de datos en bordes; se usará cuando se sumen formularios)
-- **Supabase** (backend/persistencia elegido: Postgres + Auth + Storage) —
-  **a integrar a futuro**, todavía no está en el repo
+- **Payload 3** sobre **Neon** (Postgres): panel de contenido en `/admin`,
+  fotos en Vercel Blob, correos por Resend (ver ADR-0003)
 - **pnpm 11** (pinned vía `packageManager`), **Node ≥ 22**
 
-**Backend/persistencia: Supabase (a integrar).** Se eligió **Supabase**
-(Postgres gestionado + Auth + Storage, BaaS) como backend para cuando aparezcan
-formularios (inscripción, envío de CV). **Hoy el sitio corre 100% frontend:**
-no hay `@supabase/supabase-js` en `package.json`, ni cliente, ni tablas, ni env
-vars, ni API routes (`src/app/api/`). Detalle y alternativas en
-[ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md);
-guías de código en §12 y en `docs/AI_GUIDELINES.md` §12.
+**Backend/persistencia: Neon + Payload.** La base es Postgres en Neon (Docker
+en local); el panel de contenido es Payload 3 montado en `/admin` dentro de
+esta app, con fotos en Vercel Blob y correos por Resend. Definición en
+`src/cms/` y `src/payload.config.ts`; lo generado por Payload no se edita.
+Detalle y alternativas en
+[ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md); guías en
+§12 y en `docs/AI_GUIDELINES.md` §12.
 
 Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 
@@ -144,10 +143,10 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en `src/app/globals.css` (bloque
-> `@theme`), no en `src/styles/` ni en un `tailwind.config.js`. Todavía **no
-> hay** `src/lib/supabase/` (cliente), ni tablas, ni `src/app/api/`: el backend
-> con **Supabase** es la dirección elegida pero está **por integrar** (ver
-> [ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md)).
+> `@theme`), no en `src/styles/` ni en un `tailwind.config.js`. El panel de
+> contenido (Payload) vive en `src/app/(payload)/` (generado) y su definición
+> en `src/cms/` + `src/payload.config.ts`; el sitio, en `src/app/(sitio)/`
+> (ver [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md)).
 
 **Golden rule:** los `.md` raíz y `docs/` son la fuente de verdad. El
 adapter (`CLAUDE.md`, y un futuro folder `.claude/`) solo mapea ese contrato
@@ -355,9 +354,9 @@ esa misma guía).
 - **Imágenes:** `next/image` con `alt`, `width`, `height`, `loading="lazy"`
   excepto LCP.
 - **Fonts:** `next/font/google` con `display: 'swap'` y subset `latin`.
-- **Validación:** cuando se sumen formularios o datos de entrada, validar
-  los bordes con **Zod** antes de tocar Supabase. (Hoy el sitio corre 100%
-  frontend; Supabase es el backend elegido a integrar — ver §12.)
+- **Validación:** todo dato de entrada (formularios, payloads) se valida en
+  el borde con **Zod** antes de tocar la base; el contenido del panel lo
+  valida Payload con las reglas de cada campo (ver §12).
 - **Imports:** orden framework → externos → internos (`@/...`).
 - **Naming:** PascalCase componentes/tipos, camelCase utils/hooks
   (con prefijo `use`), SCREAMING_SNAKE_CASE constantes, kebab-case carpetas.
@@ -459,27 +458,29 @@ Antes de pedir merge a `main`:
 
 ---
 
-## 12. Backend y datos (Supabase)
+## 12. Backend y datos (Neon + Payload)
 
-**El backend/persistencia elegido es [Supabase](https://supabase.com)** (BaaS
-sobre Postgres gestionado + Auth + Storage). **Todavía no está integrado:** hoy
-el sitio corre 100% frontend (sin `@supabase/supabase-js`, sin cliente, sin
-tablas, sin env vars, sin `src/app/api/`). Decisión completa, consecuencias y
-alternativas en
-[ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md).
+**El backend es Neon (Postgres) y el panel de contenido es Payload**, adentro
+de esta app en `/admin`. Decisión y alternativas en
+[ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md); diseño del
+panel en `docs/architecture/specs/2026-09-15-panel-admin-diseno.md`.
 
-Enfoque para cuando se integre (no implementar antes de que aparezcan los
-formularios y el usuario lo confirme):
+Reglas para el panel y sus datos:
 
-- **Acceso a datos** vía el SDK oficial **`@supabase/supabase-js`**; schema,
-  queries y políticas **RLS** definidas en Supabase.
+- **Definición en código:** colecciones, páginas y accesos en `src/cms/`,
+  juntados en `src/payload.config.ts`. Lo que Payload genera
+  (`src/app/(payload)/`, `src/payload-types.ts`, `src/cms/migraciones/`) no
+  se edita a mano; al sumar un plugin o componente propio, `pnpm
+  generate:importmap`.
 - **Validar todos los bordes con Zod** antes de escribir/leer (formularios,
   payloads). Nunca confiar en input externo.
-- **Env vars por contexto:** `NEXT_PUBLIC_SUPABASE_URL` y
-  `NEXT_PUBLIC_SUPABASE_ANON_KEY` son públicas (cliente); la
-  `SUPABASE_SERVICE_ROLE_KEY` es secreta y **solo server-side** (nunca
-  `NEXT_PUBLIC_`, nunca expuesta al browser). Placeholders en `.env.example`.
-- **RLS activada** en toda tabla con datos sensibles desde el día uno.
+- **Secretos solo server-side:** `DATABASE_URL`, `PAYLOAD_SECRET`,
+  `VISTA_PREVIA_SECRET`, `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca
+  llevan `NEXT_PUBLIC_` ni llegan al browser. Placeholders en `.env.example`;
+  en Vercel, el build corta si falta alguna (`src/cms/entorno.ts`).
+- **Acceso por rol** en cada colección (`src/cms/acceso.ts`): dos roles,
+  administra y edita; nada es público salvo lo que la spec marca de lectura
+  pública (las fotos).
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
   tablas o políticas. No inventar tablas ni columnas que no estén acordadas.
 
@@ -501,6 +502,8 @@ implementar (y, si amerita, en un ADR de implementación).
 - [x] `src/config/site.ts` con datos institucionales + `src/config/nav.ts`
 - [x] Home real (`src/app/page.tsx` + `src/features/home/`)
 - [x] Crear `README.md` de onboarding humano en la raíz
-- [ ] Integrar **Supabase** (cliente, schema, RLS, env vars) cuando haya formularios
+- [x] Panel de contenido: Payload sobre Neon montado en `/admin` (fase 0)
+- [ ] Panel: fases 1 a 4 del spec (novedades y biblioteca, casos y equipo,
+      páginas y ajustes, fotos y guía de uso)
 - [ ] Sitemap definitivo
 - [ ] CI/CD
