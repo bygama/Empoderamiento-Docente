@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef } from "react";
 import type { CasoInvestigacion } from "./data";
 import { OFFSET_PESTANA, ROTULO_TAB, TINTES } from "./tintes";
 import { Pestana } from "./Garabatos";
@@ -17,6 +17,10 @@ type Props = {
   /** false durante transiciones: ignora clics sin deshabilitar el foco. */
   interactiva: boolean;
   onAbrir: (indice: number) => void;
+  /** true si ESTA carpeta tiene la anticipación desplegada: una sola a la vez (el padre). */
+  desplegada: boolean;
+  /** Desplegar esta carpeta (su índice) o cerrar la que esté abierta (null). */
+  onDesplegar: (indice: number | null) => void;
   refItem: (el: HTMLLIElement | null) => void;
   refBoton: (el: HTMLButtonElement | null) => void;
 };
@@ -51,10 +55,19 @@ type Props = {
  * - Tocar la carpeta en cualquier parte ABRE el expediente. Ese botón es
  *   una capa `absolute inset-0` y se lleva la pestaña adentro para que
  *   tocarla también abra, aunque caiga fuera de su caja.
- * - Tocar el rótulo del eje —el título chico de la derecha, con su
- *   flechita— DESPLIEGA la anticipación: el acordeón (grid-rows 0fr→1fr)
- *   con el indicio, la pregunta y el pie. Es un toggle con estado, no un
- *   hover: se queda abierto hasta que lo cierren.
+ * - El rótulo del eje —el título chico de la derecha, con su flechita—
+ *   DESPLIEGA la anticipación: el acordeón (grid-rows 0fr→1fr) con el
+ *   indicio, la pregunta y el pie. Con mouse basta PASAR por el rótulo
+ *   (Gastón, 2026-09-17: «derecha = leer», pero con un borde que se ve y
+ *   no un corte invisible por la mitad), tras 120 ms para que cruzarlo de
+ *   paso no abra. Tocarlo sigue siendo un toggle, para celular y teclado.
+ *   UNA sola carpeta desplegada a la vez: el estado vive en el padre
+ *   (CasosInvestigacion), desplegar una cierra la otra, y se cierra al
+ *   salir de la PILA entera, no de la carpeta: el acordeón empuja lo de
+ *   abajo, y si cerrara al salir de la carpeta lo de abajo subiría bajo el
+ *   cursor y caería sobre otro rótulo (medido: bajar de la 01 a la 02
+ *   desplegaba la 03). Cambiar de una a otra no mueve la que se está
+ *   mirando: la de arriba se cierra y la nueva crece hacia abajo.
  *
  * Para que el rótulo gane el clic estando la capa de abrir por encima en
  * el orden del DOM, toda la anatomía va en pointer-events-none y solo el
@@ -79,13 +92,23 @@ export function CarpetaCaso({
   esUltima,
   interactiva,
   onAbrir,
+  desplegada,
+  onDesplegar,
   refItem,
   refBoton,
 }: Props) {
   const tinte = TINTES[caso.tinte];
   const peso = PESO_TAPA[indice] ?? PESO_TAPA[PESO_TAPA.length - 1];
-  const [desplegada, setDesplegada] = useState(false);
   const idPanel = useId();
+
+  // La demora del hover sobre el rótulo: se arma al entrar y se cancela al
+  // salir del rótulo, así pasar de largo no despliega.
+  const demora = useRef(0);
+  const alEntrarRotulo = () => {
+    window.clearTimeout(demora.current);
+    demora.current = window.setTimeout(() => onDesplegar(indice), 120);
+  };
+  const alSalirRotulo = () => window.clearTimeout(demora.current);
 
   // Redondeo de la base. Abajo de md la pila no existe —las carpetas van
   // sueltas, separadas— así que TODAS cierran redondeadas; con la base
@@ -150,7 +173,9 @@ export function CarpetaCaso({
           esUltima={esUltima}
           interactiva={interactiva}
           desplegada={desplegada}
-          onToggle={() => setDesplegada((v) => !v)}
+          onToggle={() => onDesplegar(desplegada ? null : indice)}
+          onHoverRotulo={alEntrarRotulo}
+          onSalirRotulo={alSalirRotulo}
           idPanel={idPanel}
           baseRedondeada={baseRedondeada}
         />

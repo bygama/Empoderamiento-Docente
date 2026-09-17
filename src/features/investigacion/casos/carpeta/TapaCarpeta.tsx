@@ -11,6 +11,10 @@ type Props = {
   interactiva: boolean;
   desplegada: boolean;
   onToggle: () => void;
+  /** El mouse entró al rótulo: el padre despliega (con su demora). */
+  onHoverRotulo: () => void;
+  /** El mouse salió del rótulo antes de la demora: no desplegar. */
+  onSalirRotulo: () => void;
   idPanel: string;
   /** Redondeo de la base, decidido por el padre (ver CarpetaCaso). */
   baseRedondeada: string;
@@ -37,6 +41,8 @@ export function TapaCarpeta({
   interactiva,
   desplegada,
   onToggle,
+  onHoverRotulo,
+  onSalirRotulo,
   idPanel,
   baseRedondeada,
 }: Props) {
@@ -109,6 +115,9 @@ export function TapaCarpeta({
               aria-expanded={desplegada}
               aria-controls={idPanel}
               onClick={() => interactiva && onToggle()}
+              // Solo con mouse: en touch no hay hover y el toggle manda.
+              onPointerEnter={(e) => e.pointerType === "mouse" && interactiva && onHoverRotulo()}
+              onPointerLeave={(e) => e.pointerType === "mouse" && onSalirRotulo()}
               className={`-mx-2 -my-1 inline-block cursor-pointer rounded-sm px-2 py-1 text-right focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${ROTULO_MICRO} ${
                 interactiva ? "pointer-events-auto" : "pointer-events-none"
               }`}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { CASOS } from "./data";
 import { CarpetaCaso } from "./CarpetaCaso";
@@ -37,6 +38,9 @@ export function CasosInvestigacion() {
   useHistorialLugar(m, { abrir, cerrar, solicitarCierre });
   const { estado, activo, anuncio, introRevelado } = m;
   const { sectionRef, introRef, itemsRef, botonesRef, lugarRef, shellRef, tituloRef } = m;
+
+  // La carpeta con la anticipación desplegada: una sola a la vez.
+  const [desplegada, setDesplegada] = useState<number | null>(null);
 
   const casoActivo = activo !== null ? CASOS[activo] : null;
   const indiceVisible = activo === null || estado === "opening" || estado === "closing";
@@ -118,6 +122,10 @@ export function CasosInvestigacion() {
                       className={`mt-20 flex flex-col gap-5 md:block ${
                         estado === "index" ? "" : "pointer-events-none"
                       }`}
+                      // Al salir de la pila con el mouse se cierra la
+                      // anticipación que estuviera desplegada (CarpetaCaso
+                      // explica por qué de la pila y no de cada carpeta).
+                      onPointerLeave={(e) => e.pointerType === "mouse" && setDesplegada(null)}
                     >
                       {CASOS.map((caso, i) => (
                         <CarpetaCaso
@@ -127,6 +135,8 @@ export function CasosInvestigacion() {
                           esUltima={i === CASOS.length - 1}
                           interactiva={estado === "index"}
                           onAbrir={abrir}
+                          desplegada={desplegada === i}
+                          onDesplegar={setDesplegada}
                           refItem={(el) => {
                             itemsRef.current[i] = el;
                           }}
