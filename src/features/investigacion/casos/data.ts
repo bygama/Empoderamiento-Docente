@@ -6,8 +6,9 @@
  * esos dos sale de los papers: si algo no está publicado, no está acá.
  *
  * Los casos 03 y 04 son DEMO (`esDemo: true`): cubren las dos aplicaciones
- * que todavía no tienen caso real —evaluación y currículum— y llevan a la
- * vista la etiqueta «DEMO · PROVISIONAL» y la aclaración al pie.
+ * que todavía no tienen caso real —evaluación y currículum— y llevan la
+ * marca DEMO adentro del expediente (cabecera, lámina y aclaración al
+ * pie). En la tapa de la carpeta ya no (Gastón, 2026-09-17).
  *
  * Para sumar un caso: editar este archivo (textos, evidencias, lámina y
  * recursos), sin tocar componentes ni animaciones. Las láminas viven en

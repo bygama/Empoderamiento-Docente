@@ -183,12 +183,12 @@ export function TapaCarpeta({
                   desplegada ? "opacity-100 delay-[250ms]" : "opacity-0"
                 }`}
               >
+                {/* La etiqueta «DEMO · PROVISIONAL» de los casos demo se
+                    fue de la tapa (Gastón, 2026-09-17); la marca sigue
+                    adentro del expediente. */}
                 <span className={`inline-flex items-center gap-2 ${ROTULO_MICRO} underline-offset-4 group-hover:underline`}>
                   ABRIR EXPEDIENTE ↗
                 </span>
-                {caso.esDemo && (
-                  <span className={ROTULO_MICRO}>DEMO · PROVISIONAL</span>
-                )}
               </span>
             </span>
           </span>
