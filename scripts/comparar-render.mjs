@@ -42,8 +42,8 @@ function paginas(app) {
   return salida.sort();
 }
 
-// El <script> se saca entero: adentro viaja el payload de React, que lleva
-// ids de módulo y de build distintos en cada corrida y no es contenido.
+// El <script> se saca entero: adentro viaja el payload de React, con ids de
+// módulo y de build distintos en cada corrida, que no son contenido.
 const DIMENSIONES = {
   texto: (h) =>
     h.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]*>/g, "\n").replace(/\s+/g, " ").trim(),
@@ -66,8 +66,7 @@ function js(app, html) {
   const chunks = new Set([...html.matchAll(/\/_next\/(static\/chunks\/[^"]+)/g)].map((m) => m[1]));
   let bytes = 0;
   for (const c of chunks) {
-    const ruta = join(app, ".next", c);
-    if (existsSync(ruta)) bytes += statSync(ruta).size;
+    if (existsSync(join(app, ".next", c))) bytes += statSync(join(app, ".next", c)).size;
   }
   return { cuantos: chunks.size, bytes };
 }
