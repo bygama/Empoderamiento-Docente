@@ -1,4 +1,4 @@
-import { TAMBORES } from "../../data";
+import { TAMBORES } from "@/features/que-hacemos/data/secciones";
 import { NUMEROS, type Geo } from "./geometria-torre";
 import type { RefsTorre } from "./refs-torre";
 import { RielEstaciones } from "./RielEstaciones";

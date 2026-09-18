@@ -413,7 +413,7 @@ estudiantes.
 
 La regla que se aplicó: el texto manda y la animación acompaña. El texto de todo esto, en
 la versión para que Raquel y Daniela corrijan, está en `copy-que-hacemos.md`; los datos
-viven en `apps/sitio/src/features/que-hacemos/areas.ts`.
+viven en `apps/sitio/src/features/que-hacemos/data/areas.ts`.
 
 - **Qué hacemos, hero:** queda como estaba («Generamos y transformamos.» y su bajada) y suma
   las seis áreas como chips que bajan a su bloque. La frase del cartel es el mensaje central

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { RefObject } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { accionDe, type ItemDestacado } from "../../data/materiales";
+import { accionDe, type ItemDestacado } from "@/features/biblioteca/data/materiales";
 
 type ArticuloDestacadoProps = {
   item: ItemDestacado;

@@ -11,7 +11,7 @@ import { ArrowUpRight } from "@/components/ui/icons";
 import { ScrambleText } from "./ScrambleText";
 import { RevealFoco } from "./RevealFoco";
 import { useTransicionFaro } from "./TransicionFaro";
-import { NOVEDADES, CATEGORIA_LABEL, fechaCorta, type Novedad } from "../data";
+import { NOVEDADES, CATEGORIA_LABEL, fechaCorta, type Novedad } from "@/features/novedades/data/novedades";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 

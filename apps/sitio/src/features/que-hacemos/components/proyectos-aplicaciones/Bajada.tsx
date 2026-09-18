@@ -1,4 +1,4 @@
-import type { Capitulo } from "@/features/que-hacemos/proyectos";
+import type { Capitulo } from "@/features/que-hacemos/data/proyectos";
 
 /**
  * La bajada de un capítulo con su idea que ordena en negrita navy

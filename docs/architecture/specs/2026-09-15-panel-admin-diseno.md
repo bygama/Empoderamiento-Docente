@@ -121,9 +121,9 @@ src/
 | Colección    | Qué guarda                                                                                         | Origen hoy                                   |
 | ------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `fotos`      | Imagen + alt obligatorio + punto focal. Solo imágenes, hasta 8 MB.                                 | `public/**`                                  |
-| `novedades`  | Fecha, categoría, título, bajada, imagen, destacada, cuerpo (secciones con párrafos), publicación. | `features/novedades/data.ts` (NOVEDADES)     |
+| `novedades`  | Fecha, categoría, título, bajada, imagen, destacada, cuerpo (secciones con párrafos), publicación. | `features/novedades/data/novedades.ts`       |
 | `materiales` | Título, autores, descripción, tipo, tema, público, año, fecha, formato, páginas, portada, URL.     | `features/biblioteca/data/materiales.ts`     |
-| `casos`      | Número, pregunta, eje, indicio, ficha, tinte, contexto, lámina, evidencias, análisis, aprendizaje… | `features/investigacion/casos/data.ts`       |
+| `casos`      | Número, pregunta, eje, indicio, ficha, tinte, contexto, lámina, evidencias, análisis, aprendizaje… | `features/investigacion/data/casos.ts`       |
 | `equipo`     | Perfil completo: nombre, rol, lugar, figura, etapas con hitos y publicaciones, categorías.         | `features/quienes-somos/data/equipo.ts`      |
 | `aliados`    | Nombre, logo, URL, **autorizado** (sin marcar no se publica: AGENTS.md §5.4).                      | `config/aliados.ts`                          |
 | `usuarios`   | Mail, nombre, rol. Con auth de Payload.                                                            | no existe                                    |

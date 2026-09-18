@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import { CASOS } from "../data";
+import { CASOS } from "@/features/investigacion/data/casos";
 import { switchSalida } from "../coreografia";
 import type { Maquina } from "./useLugarExpediente";
 

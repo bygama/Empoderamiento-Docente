@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { NIVELES } from "../data";
+import { NIVELES } from "@/features/que-hacemos/data/secciones";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ALTO_SVH } from "./niveles-escala/niveles-escena";

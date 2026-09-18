@@ -1,4 +1,4 @@
-import type { Capitulo } from "@/features/que-hacemos/proyectos";
+import type { Capitulo } from "@/features/que-hacemos/data/proyectos";
 import { Bajada } from "./Bajada";
 
 const pad = (n: number) => String(n).padStart(2, "0");

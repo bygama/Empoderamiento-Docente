@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { AREAS, DESCRIPTOR } from "@/features/que-hacemos/areas";
+import { AREAS, DESCRIPTOR } from "@/features/que-hacemos/data/areas";
 
 /**
  * Qué hace ED, dicho en la home apenas termina el hero y sin animación: la

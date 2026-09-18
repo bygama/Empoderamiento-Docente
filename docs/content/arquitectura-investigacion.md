@@ -518,7 +518,7 @@ arrastrables en desktop—, análisis, aprendizaje, qué cambió, producción
 relacionada) → navegación persistente «Volver a los casos» / «Siguiente
 caso», pestañas laterales, Escape, foco gestionado y reduced-motion.
 Contenido actual: **3 casos demo marcados «CASO DEMO — CONTENIDO
-PROVISIONAL»** en `apps/sitio/src/features/investigacion/casos/data.ts`, reemplazables
+PROVISIONAL»** en `apps/sitio/src/features/investigacion/data/casos.ts`, reemplazables
 por casos reales sin tocar diseño ni animaciones.
 
 ---

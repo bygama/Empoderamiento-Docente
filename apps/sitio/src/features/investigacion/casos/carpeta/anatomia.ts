@@ -1,4 +1,4 @@
-import type { TinteCarpeta } from "../data";
+import type { TinteCarpeta } from "@/features/investigacion/data/casos";
 import type { TINTES } from "../tintes";
 
 /** Clases de un tinte de carpeta (ver `tintes.ts`). */

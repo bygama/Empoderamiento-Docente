@@ -1,5 +1,5 @@
-import type { Ficha } from "@/features/que-hacemos/proyectos";
-import { nombrarPaises } from "@/features/que-hacemos/proyectos";
+import type { Ficha } from "@/features/que-hacemos/data/proyectos";
+import { nombrarPaises } from "@/features/que-hacemos/data/proyectos";
 import { Banderas } from "./Bandera";
 import { Pictograma } from "./Pictograma";
 

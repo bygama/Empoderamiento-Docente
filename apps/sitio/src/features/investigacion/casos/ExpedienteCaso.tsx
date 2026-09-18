@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type Ref } from "react";
-import type { CasoInvestigacion } from "./data";
+import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
 import { ROTULO_MICRO, TINTES } from "./tintes";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";

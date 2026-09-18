@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import type { Capitulo } from "@/features/que-hacemos/proyectos";
+import type { Capitulo } from "@/features/que-hacemos/data/proyectos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { ritmo } from "./proyectos-escena";
 import { crearFichas } from "./coreografia-fichas";

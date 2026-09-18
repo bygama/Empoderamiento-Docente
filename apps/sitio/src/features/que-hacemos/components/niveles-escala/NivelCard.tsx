@@ -1,4 +1,4 @@
-import type { NIVELES } from "../../data";
+import type { NIVELES } from "@/features/que-hacemos/data/secciones";
 import { POS } from "./niveles-escena";
 
 type Nivel = (typeof NIVELES)[number];

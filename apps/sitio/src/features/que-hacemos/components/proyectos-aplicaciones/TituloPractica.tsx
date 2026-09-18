@@ -1,4 +1,4 @@
-import { PROYECTOS_INTRO } from "@/features/que-hacemos/proyectos";
+import { PROYECTOS_INTRO } from "@/features/que-hacemos/data/proyectos";
 
 /**
  * «Así se ve en la práctica.» con el arranque en azul medio: el título

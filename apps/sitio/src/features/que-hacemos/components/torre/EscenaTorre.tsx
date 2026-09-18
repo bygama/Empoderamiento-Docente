@@ -1,4 +1,4 @@
-import { TAMBORES } from "../../data";
+import { TAMBORES } from "@/features/que-hacemos/data/secciones";
 import type { Geo } from "./geometria-torre";
 import { FotoTambor } from "./FotoTambor";
 import { TamborTorre } from "./TamborTorre";

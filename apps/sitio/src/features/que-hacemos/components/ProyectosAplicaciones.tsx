@@ -5,7 +5,7 @@ import {
   CAPITULOS,
   FICHAS,
   PROYECTOS_INTRO,
-} from "@/features/que-hacemos/proyectos";
+} from "@/features/que-hacemos/data/proyectos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { EscenarioFichas } from "./proyectos-aplicaciones/EscenarioFichas";

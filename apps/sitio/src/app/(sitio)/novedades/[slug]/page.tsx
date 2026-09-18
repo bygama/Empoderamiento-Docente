@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { NOVEDADES } from "@/features/novedades/data";
+import { NOVEDADES } from "@/features/novedades/data/novedades";
 import { FichaNovedad } from "@/features/novedades/components/FichaNovedad";
 
 // Solo las novedades con cuerpo tienen ficha (piloto: el libro). El resto

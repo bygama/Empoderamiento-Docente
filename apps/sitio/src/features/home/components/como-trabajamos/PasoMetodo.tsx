@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { Paso } from "@/features/home/data";
+import type { Paso } from "@/features/home/components/como-trabajamos/data";
 
 /**
  * Un paso del recorrido: foto real a un lado del eje central y texto al otro,

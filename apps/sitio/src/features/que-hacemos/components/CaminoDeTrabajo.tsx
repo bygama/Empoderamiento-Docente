@@ -4,7 +4,7 @@ import { Fragment, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { PASOS_TRABAJO } from "../data";
+import { PASOS_TRABAJO } from "@/features/que-hacemos/data/secciones";
 import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";

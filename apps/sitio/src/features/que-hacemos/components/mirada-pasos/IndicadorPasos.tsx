@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import { MIRADA } from "@/features/que-hacemos/areas";
+import { MIRADA } from "@/features/que-hacemos/data/areas";
 import { irAPosicion } from "@/lib/indice";
 import { flujoDesdeSeccion, topeDeCard } from "./medidas";
 

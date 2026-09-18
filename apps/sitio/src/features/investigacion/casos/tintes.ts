@@ -1,4 +1,4 @@
-import type { TinteCarpeta } from "./data";
+import type { TinteCarpeta } from "@/features/investigacion/data/casos";
 
 /**
  * Mapeo de tintes de carpeta a clases del design system (tokens, no

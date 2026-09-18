@@ -6,7 +6,7 @@ import Link from "next/link";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { ArrowRight } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
-import { CATEGORIA_LABEL, fechaCorta, type Novedad } from "../data";
+import { CATEGORIA_LABEL, fechaCorta, type Novedad } from "@/features/novedades/data/novedades";
 import { useTransicionFaro, FLAG_ENTRADA_FARO } from "./TransicionFaro";
 import { GuiaNota } from "./GuiaNota";
 import { RevealFoco } from "./RevealFoco";

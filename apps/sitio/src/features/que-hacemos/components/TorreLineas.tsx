@@ -1,6 +1,6 @@
 "use client";
 
-import { TAMBORES } from "../data";
+import { TAMBORES } from "@/features/que-hacemos/data/secciones";
 import { ZONA_SVH } from "./torre/geometria-torre";
 import { useRefsTorre } from "./torre/refs-torre";
 import { useTorreViva } from "./torre/useTorreViva";

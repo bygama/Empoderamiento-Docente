@@ -7,7 +7,7 @@ import { RotadorPalabras } from "./RotadorPalabras";
 import { SplitFlap } from "./SplitFlap";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { NOVEDADES } from "../data";
+import { NOVEDADES } from "@/features/novedades/data/novedades";
 
 /**
  * Hero de Novedades — comparte la BASE de marca con Biblioteca (patrón §6

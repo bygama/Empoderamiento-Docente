@@ -1,4 +1,4 @@
-import type { CasoInvestigacion } from "../data";
+import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
 import { ROTULO_MICRO, ROTULO_TAB, TINTES } from "../tintes";
 import { Pestana } from "../Garabatos";
 import { ArrowRight } from "@/components/ui/icons";

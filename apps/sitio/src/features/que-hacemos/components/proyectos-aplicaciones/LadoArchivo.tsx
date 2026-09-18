@@ -1,5 +1,5 @@
-import type { Capitulo } from "@/features/que-hacemos/proyectos";
-import { PROYECTOS_INTRO } from "@/features/que-hacemos/proyectos";
+import type { Capitulo } from "@/features/que-hacemos/data/proyectos";
+import { PROYECTOS_INTRO } from "@/features/que-hacemos/data/proyectos";
 import { ColumnaCapitulo } from "./ColumnaCapitulo";
 import { FichaProyecto } from "./FichaProyecto";
 import { TituloGrande } from "./TituloGrande";

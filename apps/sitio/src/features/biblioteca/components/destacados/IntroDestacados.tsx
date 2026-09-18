@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { RefObject } from "react";
-import type { ItemDestacado } from "../../data/materiales";
+import type { ItemDestacado } from "@/features/biblioteca/data/materiales";
 
 /**
  * Fase 1: intro con pantalla propia — eyebrow, titular a dos azules, párrafo

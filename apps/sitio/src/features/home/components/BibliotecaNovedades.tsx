@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen } from "@/components/ui/icons";
 import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
-import { CATEGORIA_LABEL, fechaCorta, NOVEDADES } from "@/features/novedades/data";
+import { CATEGORIA_LABEL, fechaCorta, NOVEDADES } from "@/features/novedades/data/novedades";
 
 // Biblioteca: los mismos cuatro destacados que abren la página Biblioteca
 // (publicaciones reales, curadas en `biblioteca/data/materiales`), y cada

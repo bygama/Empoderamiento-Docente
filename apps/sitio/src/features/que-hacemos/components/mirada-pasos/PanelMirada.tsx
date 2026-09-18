@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { MIRADA } from "@/features/que-hacemos/areas";
+import { MIRADA } from "@/features/que-hacemos/data/areas";
 
 type Paso = (typeof MIRADA)[number];
 

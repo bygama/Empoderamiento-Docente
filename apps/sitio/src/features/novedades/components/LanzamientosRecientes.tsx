@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "@/components/ui/icons";
-import { LANZAMIENTOS } from "../data";
+import { LANZAMIENTOS } from "@/features/novedades/data/novedades";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 /**

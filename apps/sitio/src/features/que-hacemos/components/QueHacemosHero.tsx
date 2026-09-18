@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { AREAS } from "@/features/que-hacemos/areas";
+import { AREAS } from "@/features/que-hacemos/data/areas";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMouseParallax } from "@/lib/hooks/useMouseParallax";

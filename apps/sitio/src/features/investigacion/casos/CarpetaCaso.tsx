@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef } from "react";
-import type { CasoInvestigacion } from "./data";
+import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
 import { OFFSET_PESTANA, ROTULO_TAB, TINTES } from "./tintes";
 import { Pestana } from "./Garabatos";
 import { PESO_TAPA } from "./carpeta/anatomia";

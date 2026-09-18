@@ -1,4 +1,4 @@
-import { PROYECTOS_INTRO } from "@/features/que-hacemos/proyectos";
+import { PROYECTOS_INTRO } from "@/features/que-hacemos/data/proyectos";
 import { TituloPractica } from "./TituloPractica";
 
 /**

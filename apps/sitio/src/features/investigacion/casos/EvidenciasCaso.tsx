@@ -3,8 +3,8 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { Draggable } from "gsap/Draggable";
-import type { EvidenciaCaso } from "./data";
-import type { TinteCarpeta } from "./data";
+import type { EvidenciaCaso } from "@/features/investigacion/data/casos";
+import type { TinteCarpeta } from "@/features/investigacion/data/casos";
 import { ROTULO_MICRO, TINTES } from "./tintes";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";

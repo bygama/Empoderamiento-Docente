@@ -1,5 +1,5 @@
 import type { Ref } from "react";
-import { TAMBORES } from "../../data";
+import { TAMBORES } from "@/features/que-hacemos/data/secciones";
 
 type Props = {
   refNav: Ref<HTMLElement>;
