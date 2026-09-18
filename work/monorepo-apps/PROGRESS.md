@@ -63,16 +63,76 @@ Payload **no** baja el score.
 | Documentación | detector de prefijo repetido sobre todos los `.md` | limpio |
 | Documentación | resolución de links relativos | todos resuelven |
 
-**Falta:** la prueba de comportamiento (dev server, las siete rutas en 200) y
-la close review. Ninguna corrió todavía en esta rama.
+La prueba de comportamiento corrió después: las siete rutas públicas en
+**200** por `localhost`, `/que-es-ed` en 307 y `/robots.txt` en 200. `/admin`
+da 500 sin Postgres —el demonio de Docker no está levantado en esta máquina—
+y el sitio sigue en 200 después, que es lo que promete `src/cms/base.ts`. **El
+panel andando queda sin verificar.**
+
+## Close review
+
+Tres seats frescas, sin historial de esta sesión, sobre `b0ec070..e20b4a6`.
+Modelo: Sonnet. Solo la de correctness corrió build y dev server, para que
+dos builds no se pisaran en el mismo checkout.
+
+### Correctness contra el SPEC — **PASS**
+
+> **PASS** — Los siete comandos de la DoD que me tocó correr salieron con el
+> resultado que PROGRESS afirma (typecheck/lint/build en 0, react-doctor
+> 100/100 con 356 archivos igual al baseline de `main`, prueba negativa en 1,
+> las siete rutas públicas en 200 por `localhost`), y el constraint duro se
+> sostiene con evidencia de hash: los 504 renombres son reales y ni un archivo
+> de `src/` —panel incluido— cambió de contenido, solo `next.config.ts` (fuera
+> de `src/`, cambio declarado en el propio PLAN paso 3).
+
+### Fallas silenciosas — **PASS**
+
+> **PASS** — los tres comandos del gate corren limpios y medí
+> `scripts/verificar-react-doctor.mjs` contra 8 escenarios de falla (proyecto
+> faltante, JSON roto, stdout vacío, `complete:false`, `skippedChecks`,
+> `summary` ausente, error real de react-doctor) y todos frenan correctamente
+> salvo el caso pre-existente de stdout vacío, que no es de este diff. El
+> único hallazgo con dientes propios del lane es el blind spot de "cero
+> paquetes matcheados" en `pnpm -r`/`--filter` que reemplazó a los comandos
+> directos en `package.json`: no rompe nada hoy (verificado), pero es un hueco
+> real y barato de tapar en el único gate que existe.
+
+### Impacto en documentación — **FAIL**
+
+> **FAIL** — no por regresión de la lógica ni por nada roto en build/gate
+> (typecheck, lint y react-doctor corren en 0 con evidencia real), sino porque
+> el spec que este PR editó específicamente para corregir el §4.4 quedó
+> contradiciéndose a sí mismo en tres lugares (§3 ×2, §12), y `DESIGN.md` —un
+> documento "hard rule" del contrato— tiene una ruta de `public/brand/` sin el
+> prefijo `apps/sitio/` que las otras 7 rutas del mismo archivo sí recibieron
+> en este mismo PR. Son arreglos chicos (4 líneas en total) pero caen
+> exactamente en la categoría de barrido incompleto que esta lente existe para
+> atrapar.
+
+### Qué se hizo con cada hallazgo
+
+| Hallazgo | Seat | Qué se hizo |
+| --- | --- | --- |
+| `pnpm -r` / `--filter` salen 0 sin matchear nada: el `pre-push` diría «todo en verde» sin chequear | silencio (Importante) | `--fail-if-no-match` en los cinco scripts. Verificado en un workspace vacío: sin guarda 0, con guarda 1 |
+| El spec se contradice: §3 y §12 dicen «fuera de `src/`», §4.4 dice lo contrario | docs (Importante) | Corregidos los tres lugares |
+| `DESIGN.md:312` con `public/brand/` sin prefijo | docs (Importante) | Prefijado, junto con todo lo que el barrido de `src/` no miraba |
+| `docs/conventions/CODE-STYLE.md` apuntaba a las cuatro configs como si estuvieran en la raíz | docs (encontrado al barrer) | Prefijado. No había entrado en ningún barrido |
+| `docs/content/publicaciones-fuentes-drive.md` con rutas de `public/` | docs (Menor) | Prefijado |
+| El verificador tira stderr: «¿sin red?» ante cualquier causa | silencio (Menor) | Captura stderr y lo imprime |
+| El criterio de aceptación del paso 4 no pasa literal | correctness (Menor) | Los carve-outs, documentados en el PLAN, más la regla de mirar el `diff --stat` |
+| `turbopack.root` sin chequeo de sanidad | silencio (Menor) | **No implementado.** La prueba de comportamiento cubre el caso; agregar lógica al config de Next por un escenario hipotético es la especulación que el propio spec desaconseja |
+
+El loop de arreglo corresponde a la lente que falló (documentación). El
+arreglo del gate no venía de un FAIL pero toca el artefacto de más riesgo
+después de revisado, así que va a la misma seat fresca.
 
 ## Abierto
 
-1. **Correr el dev server y las siete rutas** por `localhost`, como en la
-   rama anterior.
-2. **Close review** — la ola de la rama anterior no vale acá: el diff es otro.
-3. **Cerrar el PR #155** sin mergear, explicando que lo reemplaza esta rama.
-4. **Vercel:** cuando exista el proyecto, Root Directory = `apps/sitio`.
+1. **El panel andando.** `/admin` da 500 sin Postgres y el demonio de Docker
+   no está levantado acá. Falta el `docker run` del README y entrar a
+   `/admin`.
+2. **Re-review** del diff de arreglo, sobre la lente que falló.
+3. **Vercel:** cuando exista el proyecto, Root Directory = `apps/sitio`.
 5. **Preguntarle a facundo** por la ruta de vista previa: quedó en
    `app/(sitio)/vista-previa/route.ts`, o sea la URL pública
    `/vista-previa`; el spec del panel decía `api/vista-previa`. Funciona
