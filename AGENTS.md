@@ -612,8 +612,10 @@ define al implementar cada fase.
 - [x] **Payload afuera** (fase 0 del ADR-0005): su código, sus 7 dependencias y
       su spec salieron del repo, y el sitio quedó idéntico — comprobado con el
       diff del HTML prerenderizado de las **11** páginas contra `d452e61`.
-- [ ] **Admin, fase 1 — cimientos:** `packages/db` + `packages/auth`,
-      `middleware.ts` con cabeceras y rate limit, login en `/admin`.
+- [x] **Admin, fase 1 — cimientos:** `packages/db` y `packages/auth`, el esquema
+      de Prisma con sus migraciones, `middleware.ts` con las cabeceras de
+      seguridad y el rate limit por IP, y entrar / salir / elegir contraseña en
+      `/admin`. Sin contenido: eso es la fase 2.
 - [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
       novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`.
 - [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
