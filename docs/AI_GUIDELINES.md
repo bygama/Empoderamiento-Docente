@@ -116,7 +116,8 @@ import { siteConfig } from "@/config/site";
 Nunca rutas relativas largas (`../../../`) — son ilegibles y frágiles al
 mover archivos.
 
-Configurar en `tsconfig.json`:
+Configurar en el `tsconfig.json` de la app (`apps/sitio/tsconfig.json`); el
+`./src/*` es relativo a ese archivo, así que no lleva el prefijo de la app:
 
 ```json
 {
@@ -239,9 +240,10 @@ Comentar solo cuando:
 
 **Backend elegido: [Supabase](https://supabase.com) (Postgres gestionado +
 Auth + Storage). Todavía NO está integrado.** Hoy el sitio corre 100%
-frontend: no hay `@supabase/supabase-js` en `package.json`, ni cliente
-(`src/lib/supabase/`), ni tablas, ni env vars, ni `src/app/api/`. Los datos
-institucionales son estáticos y viven en `src/config/` (§13). La decisión
+frontend: no hay `@supabase/supabase-js` en `apps/sitio/package.json`, ni
+cliente (`apps/sitio/src/lib/supabase/`), ni tablas, ni env vars, ni
+`apps/sitio/src/app/api/`. Los datos institucionales son estáticos y viven en
+`apps/sitio/src/config/` (§13). La decisión
 está registrada en
 [`architecture/adrs/0002-adoptar-supabase-persistencia.md`](architecture/adrs/0002-adoptar-supabase-persistencia.md).
 
@@ -266,7 +268,7 @@ CV) — **no antes, y confirmando con el usuario**:
 
 ## 13. Configuración centralizada
 
-`src/config/site.ts` exporta la config institucional (forma real):
+`apps/sitio/src/config/site.ts` exporta la config institucional (forma real):
 
 ```ts
 export const siteConfig = {

@@ -14,6 +14,9 @@
 ## Quickstart (30 segundos)
 
 - **Qué es:** sitio web institucional de **Empoderamiento Docente (ED)**.
+- **Forma del repo:** **monorepo** (workspace pnpm). El sitio vive en
+  `apps/sitio/`; la raíz es del repo, no de una app. Por qué y hasta dónde,
+  en [el diseño del monorepo](docs/architecture/specs/2026-09-17-monorepo-apps-diseno.md).
 - **Stack:** Next.js 16 (App Router) + React 19 + TypeScript strict +
   Tailwind CSS v4 (theming en CSS) + GSAP + Lenis + Zod.
 - **Backend/persistencia:** **Supabase** (Postgres + Auth + Storage), a
@@ -85,7 +88,7 @@ ED a definir con el cliente).
 - **Next.js 16** (App Router) + **React 19**
 - **TypeScript 5** (strict, sin `any` salvo justificación)
 - **Tailwind CSS v4** (vía `@tailwindcss/postcss`; el tema vive en CSS,
-  en `src/app/globals.css`, no en un `tailwind.config.js`)
+  en `apps/sitio/src/app/globals.css`, no en un `tailwind.config.js`)
 - **GSAP 3** + **Lenis** (animaciones, smooth scroll)
 - **Zod 4** (validación de datos en bordes; se usará cuando se sumen formularios)
 - **Supabase** (backend/persistencia elegido: Postgres + Auth + Storage) —
@@ -95,12 +98,13 @@ ED a definir con el cliente).
 **Backend/persistencia: Supabase (a integrar).** Se eligió **Supabase**
 (Postgres gestionado + Auth + Storage, BaaS) como backend para cuando aparezcan
 formularios (inscripción, envío de CV). **Hoy el sitio corre 100% frontend:**
-no hay `@supabase/supabase-js` en `package.json`, ni cliente, ni tablas, ni env
-vars, ni API routes (`src/app/api/`). Detalle y alternativas en
+no hay `@supabase/supabase-js` en `apps/sitio/package.json`, ni cliente, ni
+tablas, ni env vars, ni API routes (`apps/sitio/src/app/api/`). Detalle y
+alternativas en
 [ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md);
 guías de código en §12 y en `docs/AI_GUIDELINES.md` §12.
 
-Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
+Versiones exactas → `apps/sitio/package.json`. Fijar majors, minors flotando (`^`).
 
 ---
 
@@ -122,32 +126,51 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 │   ├── conventions/       ← CODE-STYLE.md
 │   └── architecture/adrs/ ← decisiones arquitectónicas (ADRs)
 ├── skills/                ← workflows estables (adr-create, pr-review)
+├── work/                  ← lanes de trabajo: SPEC, PLAN, PROGRESS y
+│                             DECISIONS de cada cambio grande en curso
 ├── .githooks/             ← pre-push: el gate de §5.8 (se instala solo)
 ├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
-├── public/                ← assets estáticos (brand/, imágenes)
-├── src/
-│   ├── app/               ← App Router: layout.tsx, page.tsx, globals.css
-│   ├── components/        ← UI reutilizable
-│   │   ├── brand/         ← logotipo / marca
-│   │   ├── layout/        ← Header, Footer, MobileNav, etc.
-│   │   ├── providers/     ← LenisProvider (smooth scroll)
-│   │   └── ui/            ← botones, reveals, íconos (ui/icons/)
-│   ├── features/          ← módulos por dominio
-│   │   └── home/components/ ← secciones del home (Hero, LineasAccion, …)
-│   │       └── hero/        ← al partir un componente, sus piezas van a una
-│   │                           subcarpeta con su nombre y el compositor se
-│   │                           queda en su ruta (AI_GUIDELINES §2)
-│   ├── config/            ← site.ts (datos institucionales) + nav.ts
-│   └── lib/               ← hooks/ y utilidades (intro-signal.ts)
-└── (config raíz)          ← tsconfig.json, eslint.config.mjs, next.config.ts,
-                              postcss.config.mjs, pnpm-workspace.yaml, .npmrc
+├── package.json           ← raíz del workspace: delega en las apps + el gate
+├── pnpm-workspace.yaml    ← packages: ["apps/*"] + publicHoistPattern
+├── pnpm-lock.yaml         ← uno solo, de todo el workspace
+├── .npmrc
+└── apps/
+    └── sitio/             ← el sitio (por ahora, la única app)
+        ├── package.json   ← las dependencias viven acá, no en la raíz
+        ├── public/        ← assets estáticos (brand/, imágenes)
+        ├── (config)       ← tsconfig.json, eslint.config.mjs,
+        │                     next.config.ts, postcss.config.mjs
+        └── src/
+            ├── app/       ← App Router: layout.tsx, page.tsx, globals.css
+            ├── components/ ← UI reutilizable
+            │   ├── brand/      ← logotipo / marca
+            │   ├── layout/     ← Header, Footer, MobileNav, etc.
+            │   ├── providers/  ← LenisProvider (smooth scroll)
+            │   └── ui/         ← botones, reveals, íconos (ui/icons/)
+            ├── features/  ← módulos por dominio
+            │   └── home/components/ ← secciones del home (Hero, …)
+            │       └── hero/  ← al partir un componente, sus piezas van a
+            │                     una subcarpeta con su nombre y el
+            │                     compositor se queda en su ruta
+            │                     (AI_GUIDELINES §2)
+            ├── config/    ← site.ts (datos institucionales) + nav.ts
+            └── lib/       ← hooks/ y utilidades (intro-signal.ts)
 ```
 
-> **Nota:** el theming de Tailwind v4 vive en `src/app/globals.css` (bloque
-> `@theme`), no en `src/styles/` ni en un `tailwind.config.js`. Todavía **no
-> hay** `src/lib/supabase/` (cliente), ni tablas, ni `src/app/api/`: el backend
-> con **Supabase** es la dirección elegida pero está **por integrar** (ver
+> **Nota:** el theming de Tailwind v4 vive en
+> `apps/sitio/src/app/globals.css` (bloque `@theme`), no en `src/styles/` ni
+> en un `tailwind.config.js`. Todavía **no hay**
+> `apps/sitio/src/lib/supabase/` (cliente), ni tablas, ni
+> `apps/sitio/src/app/api/`: el backend con **Supabase** es la dirección
+> elegida pero está **por integrar** (ver
 > [ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md)).
+
+> **Por qué `apps/`:** el layout es lo que hace barato crecer; partir el
+> deployable es lo que hace caro operar. Hoy hay una sola app y el panel de
+> administración va a vivir adentro de ella, en un route group. `packages/`
+> aparece recién cuando haya un segundo consumidor. Todo el razonamiento, con
+> las señales que dispararían cada cambio, en
+> [el diseño del monorepo](docs/architecture/specs/2026-09-17-monorepo-apps-diseno.md).
 
 **Golden rule:** los `.md` raíz y `docs/` son la fuente de verdad. El
 adapter (`CLAUDE.md`, y un futuro folder `.claude/`) solo mapea ese contrato
@@ -215,7 +238,7 @@ usa lenguaje inclusivo:
 
 ### 5.3. Datos institucionales centralizados
 
-- Email, dirección, teléfono, URLs de redes → `src/config/site.ts`.
+- Email, dirección, teléfono, URLs de redes → `apps/sitio/src/config/site.ts`.
 - Nunca hardcodear datos institucionales en JSX.
 
 ### 5.4. Logos de aliados
@@ -223,7 +246,7 @@ usa lenguaje inclusivo:
 Solo publicar con autorización confirmada por el usuario. Por defecto, NO
 publicar. Los autorizados son exactamente los de la carpeta «LOGOS ALIANZAS»
 de ED (hoy: Techint, UNESCO, Bloom/ser+, UCSH, Science Up); la lista única
-vive en `src/config/aliados.ts` y el detalle en
+vive en `apps/sitio/src/config/aliados.ts` y el detalle en
 `docs/content/aliados-fuentes-drive.md`. Ministerio de Educación: no se
 puede por contrato. OEI, SEMS-SEP, CENEVAL: sin autorización, no van.
 
@@ -282,6 +305,13 @@ y **frena el push** si alguno falla. Se instala solo con `pnpm install`.
   `eslint-disable` de reglas del gate. Si una regla parece un falso positivo,
   se arregla igual con un cambio que preserve el comportamiento, o se discute
   con el owner y queda escrito — nunca se apaga en silencio.
+- **El gate mide por proyecto, y los proyectos están declarados.** Desde el
+  monorepo, el alcance vive en dos lugares a la vista: el script
+  `react-doctor` del `package.json` de la raíz y la lista `PROYECTOS` de
+  `scripts/verificar-react-doctor.mjs`. El verificador recorre todos y exige
+  100 en cada uno — y **frena si alguno no aparece en el informe**, porque un
+  proyecto ausente se lee igual que «cero hallazgos». Cuando se sume una app,
+  se suma a las dos listas.
 - **Una medición incompleta no es un aprobado.** react-doctor arma su lista de
   archivos con el índice de git: un borrado sin commitear le hace fallar el
   análisis de mantenibilidad y **esconder el score**, con una salida que se
@@ -332,7 +362,12 @@ esa misma guía).
       partió la migración quedaron todos por debajo.
 - [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
       partir un hook por debajo de 80 suele separar el efecto de su limpieza,
-      que es justo lo que hay que evitar. Ahí manda el tope de 200.
+      que es justo lo que hay que evitar. Ahí manda el tope de 200. La otra
+      excepción es `scripts/verificar-react-doctor.mjs` (137 líneas, 89 sin
+      comentarios): partir el script del gate en dos archivos lo vuelve más
+      difícil de auditar de una lectura, que es exactamente para lo que
+      existe, y sus comentarios son el «nunca se apaga en silencio» de §5.8
+      escrito donde se lee.
 - [ ] Cero `any` sin comentario justificando.
 - [ ] Cero rutas relativas largas (`../../..`) — usar `@/` alias.
 
@@ -464,8 +499,8 @@ Antes de pedir merge a `main`:
 **El backend/persistencia elegido es [Supabase](https://supabase.com)** (BaaS
 sobre Postgres gestionado + Auth + Storage). **Todavía no está integrado:** hoy
 el sitio corre 100% frontend (sin `@supabase/supabase-js`, sin cliente, sin
-tablas, sin env vars, sin `src/app/api/`). Decisión completa, consecuencias y
-alternativas en
+tablas, sin env vars, sin `apps/sitio/src/app/api/`). Decisión completa,
+consecuencias y alternativas en
 [ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md).
 
 Enfoque para cuando se integre (no implementar antes de que aparezcan los
@@ -498,8 +533,8 @@ implementar (y, si amerita, en un ADR de implementación).
 - [x] Mapear tokens de `DESIGN.md` al Tailwind v4 (`globals.css` con `@theme`)
 - [x] Cargar fuentes Manrope + Inter (+ JetBrains Mono) vía `next/font/google`
 - [x] Configurar metadata base + `lang="es"` en root layout
-- [x] `src/config/site.ts` con datos institucionales + `src/config/nav.ts`
-- [x] Home real (`src/app/page.tsx` + `src/features/home/`)
+- [x] `apps/sitio/src/config/site.ts` con datos institucionales + `nav.ts`
+- [x] Home real (`apps/sitio/src/app/page.tsx` + `apps/sitio/src/features/home/`)
 - [x] Crear `README.md` de onboarding humano en la raíz
 - [ ] Integrar **Supabase** (cliente, schema, RLS, env vars) cuando haya formularios
 - [ ] Sitemap definitivo

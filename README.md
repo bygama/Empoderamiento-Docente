@@ -16,8 +16,9 @@ de envío de CV.
 
 - **Next.js 16** (App Router) + **React 19**
 - **TypeScript 5** (strict)
-- **Tailwind CSS v4** (CSS-first: el tema vive en `src/app/globals.css` con
-  bloque `@theme`, sin `tailwind.config.js`)
+- **Tailwind CSS v4** (CSS-first: el tema vive en
+  `apps/sitio/src/app/globals.css` con bloque `@theme`, sin
+  `tailwind.config.js`)
 - **GSAP 3** + **Lenis** (animaciones y smooth scroll)
 - **Zod 4** (validación de bordes; se usa cuando aparezcan formularios)
 - **pnpm 11** (pinned vía `packageManager`), **Node ≥ 22**
@@ -28,7 +29,9 @@ envío de CV). **Todavía no está integrado:** hoy el sitio corre 100% frontend
 sin `@supabase/supabase-js`, sin cliente, sin tablas ni env vars. Ver
 [ADR-0002](docs/architecture/adrs/0002-adoptar-supabase-persistencia.md).
 
-Versiones exactas en [`package.json`](package.json).
+Versiones exactas en [`apps/sitio/package.json`](apps/sitio/package.json): el
+repo es un workspace pnpm y las dependencias viven en la app, no en la raíz
+(ver [el diseño del monorepo](docs/architecture/specs/2026-09-17-monorepo-apps-diseno.md)).
 
 ---
 
@@ -85,20 +88,27 @@ futura integración). Los `.env*` reales están git-ignorados.
 ├── CLAUDE.md             ← adapter para Claude Code (puntero a AGENTS.md)
 ├── DESIGN.md              ← sistema de diseño (tokens, tipos, reglas)
 ├── docs/                  ← documentación auxiliar (ver docs/README.md)
-├── public/                ← assets estáticos (brand/, fotos/, aliados/, equipo/)
-├── src/
-│   ├── app/               ← App Router: layout.tsx, page.tsx, globals.css
-│   ├── components/        ← UI reutilizable (brand/, layout/, providers/, ui/)
-│   ├── features/home/     ← secciones del home (Hero, LineasAccion, …)
-│   ├── config/            ← site.ts (datos institucionales) + nav.ts
-│   └── lib/               ← hooks/ y utilidades
-└── (config raíz)          ← tsconfig.json, eslint.config.mjs, next.config.ts,
-                              postcss.config.mjs, pnpm-workspace.yaml, .npmrc
+├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
+├── package.json           ← raíz del workspace: delega en las apps + el gate
+├── pnpm-workspace.yaml    ← packages: ["apps/*"]
+└── apps/
+    └── sitio/             ← el sitio (por ahora, la única app)
+        ├── public/        ← assets estáticos (brand/, fotos/, aliados/, equipo/)
+        ├── src/
+        │   ├── app/       ← App Router: layout.tsx, page.tsx, globals.css
+        │   ├── components/ ← UI reutilizable (brand/, layout/, providers/, ui/)
+        │   ├── features/  ← secciones por dominio (home, novedades, …)
+        │   ├── config/    ← site.ts (datos institucionales) + nav.ts
+        │   └── lib/       ← hooks/ y utilidades
+        └── (config)       ← tsconfig.json, eslint.config.mjs, next.config.ts,
+                              postcss.config.mjs
 ```
 
-El theming de Tailwind v4 vive en `src/app/globals.css` (bloque `@theme`), no
-en `tailwind.config.js`. Los datos institucionales (mail, dirección, redes)
-están centralizados en `src/config/site.ts`.
+Los scripts se corren desde la raíz (`pnpm dev`, `pnpm build`, `pnpm lint`,
+`pnpm typecheck`): la raíz delega en la app. El theming de Tailwind v4 vive en
+`apps/sitio/src/app/globals.css` (bloque `@theme`), no en
+`tailwind.config.js`. Los datos institucionales (mail, dirección, redes) están
+centralizados en `apps/sitio/src/config/site.ts`.
 
 ---
 
