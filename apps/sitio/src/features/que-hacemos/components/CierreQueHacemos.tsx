@@ -96,7 +96,6 @@ export function CierreQueHacemos() {
           <PuntosFaro />
         </div>
 
-        {/* La firma de la última hoja (SelloED). */}
         <SelloED className="absolute top-7 left-7 z-20 md:top-9 md:left-9" />
 
         <div className="relative z-10 flex min-h-[58svh] flex-col items-center justify-center px-5 py-24 text-center md:px-10 md:py-28">
