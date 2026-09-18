@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { ROL_POR_DEFECTO, ROLES } from "./permisos";
+import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
 
 /**
  * Arma la sesión. Este paquete **no importa el cliente generado de Prisma**:
@@ -12,7 +12,15 @@ const UNA_HORA = 60 * 60;
 const UNA_SEMANA = 7 * 24 * 60 * 60;
 const UN_DIA = 24 * 60 * 60;
 
-/** Lo mínimo que un cliente de Prisma tiene que parecer para servir de base. */
+/**
+ * El cliente de Prisma que recibe `crearAuth`.
+ *
+ * **No restringe nada, y conviene saberlo**: se deriva del tipo de better-auth,
+ * que declara `interface PrismaClient {}` —una interfaz vacía—, así que acepta
+ * cualquier valor no nulo. Es una debilidad de tipado de la librería, no algo
+ * que esta frontera verifique. Se deriva igual en vez de inventar una forma
+ * propia para no quedar desincronizado cuando la librería la complete.
+ */
 type ClienteDeBase = Parameters<typeof prismaAdapter>[0];
 
 export type OpcionesDeAuth = {
@@ -63,7 +71,7 @@ export function crearAuth({
       // **No hay registro público.** Las cuentas las crea quien administra;
       // cada persona elige su contraseña por «olvidé mi contraseña».
       disableSignUp: true,
-      minPasswordLength: 12,
+      minPasswordLength: LARGO_MINIMO_CONTRASENA,
       maxPasswordLength: 128,
       resetPasswordTokenExpiresIn: UNA_HORA,
       sendResetPassword: async ({ user, url }) => {
@@ -115,7 +123,10 @@ export function crearAuth({
     user: {
       additionalFields: {
         rol: {
-          type: ROLES as unknown as string[],
+          // `[...ROLES]` satisface el `DBFieldType` de better-auth sin ninguna
+          // aserción: el doble cast por `unknown` que había acá apagaba TODA
+          // la verificación, y era la causa de que el layout necesitara otro.
+          type: [...ROLES],
           required: false,
           defaultValue: ROL_POR_DEFECTO,
           // **Lo decide el servidor, no el cliente.** Sin esto, alguien podría

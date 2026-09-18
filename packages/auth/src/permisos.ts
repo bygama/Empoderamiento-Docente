@@ -6,6 +6,15 @@
  * distingue a quien administra es dar de alta y de baja cuentas.
  */
 
+/**
+ * El largo mínimo de una contraseña. Vive acá y no en la config porque lo usan
+ * los dos lados: el servidor para rechazar, y el formulario para avisar antes
+ * de mandar. Duplicarlo hacía que un cambio de política dejara al formulario
+ * mintiendo, y peor: su error genérico habría reportado «el enlace no sirve»
+ * ante un rechazo por largo.
+ */
+export const LARGO_MINIMO_CONTRASENA = 12;
+
 export const ROLES = ["administra", "edita"] as const;
 export type Rol = (typeof ROLES)[number];
 
