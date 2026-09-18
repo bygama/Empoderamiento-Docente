@@ -25,10 +25,23 @@ const argumentos = process.argv.slice(2);
 // apunte al lugar correcto sin pasárselo.
 const APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "apps", "sitio");
 
-/** `db push` en cualquiera de sus formas, con flags antes o después. */
+/**
+ * `db push` en cualquiera de sus formas.
+ *
+ * Filtrar los tokens que empiezan con `-` y mirar los dos primeros NO alcanza:
+ * un flag con valor separado deja su valor en la lista, y
+ * `--schema ./x db push` corría igual porque el primer «verbo» pasaba a ser
+ * `./x`. Lo encontró la review de cierre de esta lane.
+ *
+ * Acá se busca `db` y `push` como tokens sueltos, en ese orden, en cualquier
+ * posición. Bloquea de más en un caso imaginable —un `--file push` junto a un
+ * `db execute`— y eso está bien: ante un comando que cambia la base sin dejar
+ * migración, el error que conviene es el que frena.
+ */
 function esDbPush(args) {
-  const verbos = args.filter((a) => !a.startsWith("-"));
-  return verbos[0] === "db" && verbos[1] === "push";
+  const db = args.indexOf("db");
+  const push = args.indexOf("push");
+  return db !== -1 && push > db;
 }
 
 if (esDbPush(argumentos)) {
