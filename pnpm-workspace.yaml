@@ -1,5 +1,6 @@
 packages:
   - "apps/*"
+  - "packages/*"
 
 # eslint-config-next hace `require("next/dist/compiled/babel/eslint-parser")`
 # sin declarar `next` ni en dependencies ni en peerDependencies: se apoya en

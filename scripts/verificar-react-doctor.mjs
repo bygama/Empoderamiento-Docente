@@ -19,15 +19,20 @@ import { execFileSync } from "node:child_process";
 import path from "node:path";
 
 /**
- * Los proyectos que el gate TIENE que medir; crece con cada app nueva.
+ * Los proyectos que el gate TIENE que medir; crece con cada app y cada
+ * package nuevo.
  *
  * No está solo para armar el comando: si uno no aparece en el informe, la
  * medición está incompleta y el push se frena. Sin eso, un informe con un
  * proyecto de menos se leería igual que «cero hallazgos». El alcance vive
  * acá y en el script del package.json, a la vista, nunca en un
  * `doctor.config.*` (AGENTS.md §5.8).
+ *
+ * Se listan uno por uno y no con un glob: un glob que no matchea nada no
+ * falla, y un package que se cae de la medición en silencio es exactamente
+ * lo que este archivo existe para impedir.
  */
-const PROYECTOS = ["apps/sitio/src"];
+const PROYECTOS = ["apps/sitio/src", "packages/db/src"];
 
 const AZUL = "\x1b[1m";
 const GRIS = "\x1b[2m";
