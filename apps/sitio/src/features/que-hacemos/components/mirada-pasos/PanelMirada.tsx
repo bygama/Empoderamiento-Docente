@@ -142,7 +142,9 @@ export function PanelMirada({
             alt={paso.fotoAlt}
             fill
             sizes="(min-width: 1024px) 45vw, 100vw"
-            className="object-cover"
+            // `fotoPos`: dónde anclar el recorte cuando la foto no es apaisada
+            // (ver areas.ts); sin él, centrado.
+            className={`object-cover ${"fotoPos" in paso ? paso.fotoPos : ""}`}
           />
         </div>
       </div>

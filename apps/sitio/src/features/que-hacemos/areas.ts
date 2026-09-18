@@ -268,6 +268,10 @@ export const MIRADA = [
       "Estudiamos el problema en su contexto: qué dice la evidencia, qué muestra la experiencia previa y qué hay que comprender antes de diseñar.",
     foto: "/fotos/conferencia-problematizacion.webp",
     fotoAlt: "Exposición sobre la problematización de la matemática escolar",
+    // La foto es vertical y el panel apaisado: centrada, el recorte dejaba a
+    // Daniela sin la cabeza (Gastón, 2026-09-18). Anclada abajo entra entera
+    // y el lado inferior de la lámina, que es el que dice «problematización».
+    fotoPos: "object-[50%_82%]",
   },
   {
     verbo: "Diseñar",
