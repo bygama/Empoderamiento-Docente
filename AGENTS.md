@@ -374,8 +374,13 @@ esa misma guía).
       verifica; no hay forma de "casi".
 - [ ] Componentes **≤ 200 líneas**, y cuando se parten, sus piezas van a una
       subcarpeta (`docs/AI_GUIDELINES.md` §2). react-doctor recién frena a las
-      300; el tope del proyecto es 200 y se cumple: los 17 componentes que
-      partió la migración quedaron todos por debajo.
+      300; el tope del proyecto es 200, y **hoy lo pasan 17 de 210** —contando
+      código, sin comentarios—: `profileParts.tsx` (428), `FaroEscena.tsx`
+      (377), `MaterialesListado.tsx` (348) y catorce más, casi todos de las
+      páginas que crecieron después de la migración. Medido el 2026-09-18; este
+      apartado decía que el tope «se cumple» y hacía rato que no. La dirección
+      es que no se sumen: un componente nuevo por encima de 200 se parte antes
+      del PR, y los 17 bajan cuando se toque la página que los usa.
 - [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
       partir un hook por debajo de 80 suele separar el efecto de su limpieza,
       que es justo lo que hay que evitar. Ahí manda el tope de 200. La otra
@@ -561,7 +566,15 @@ implementar (y, si amerita, en un ADR de implementación).
 - [x] Crear `README.md` de onboarding humano en la raíz
 - [x] Panel de contenido: Payload sobre Neon montado en `/admin` (fase 0)
 - [x] El repo pasa a monorepo: el sitio y su panel, en `apps/sitio/`
+- [ ] Panel: la ida y vuelta contra una base de verdad — el `docker run` del
+      README, entrar a `/admin` y crear el primer usuario. Es lo único de la
+      fase 0 que quedó sin verificar, y es entorno, no código: la config, el
+      init de Payload y el adaptador de Postgres ya se comprobaron.
 - [ ] Panel: fases 1 a 4 del spec (novedades y biblioteca, casos y equipo,
       páginas y ajustes, fotos y guía de uso)
+- [ ] Vercel: Root Directory = `apps/sitio` cuando exista el proyecto
+- [ ] Decidir dónde vive la vista previa: quedó en `app/(sitio)/vista-previa/`,
+      o sea la URL pública `/vista-previa`, y el spec del panel decía
+      `api/vista-previa`. Funciona igual, pero es un handler entre páginas.
 - [ ] Sitemap definitivo
 - [ ] CI/CD
