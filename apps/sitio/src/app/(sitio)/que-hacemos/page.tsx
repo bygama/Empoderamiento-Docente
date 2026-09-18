@@ -60,6 +60,9 @@ export default async function QueHacemosPage() {
           transparentes encima. */}
       <div
         className="relative"
+        // Un degradé no se puede medir: le dice al Header que acá es de noche
+        // (ver components/layout/header/tema-fondo.ts).
+        data-nav-tema="noche"
         style={{
           background:
             // MONÓTONO: oscurece siempre, sin picos. Antes subía de tono

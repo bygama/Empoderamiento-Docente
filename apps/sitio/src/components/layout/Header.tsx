@@ -9,6 +9,7 @@ import { NAV_LINKS, CTA_LINK, HOME_LINK, esPaginaActiva } from "@/config/nav";
 import { NavDropdown } from "./NavDropdown";
 import { crearIntroNavbar } from "./header/coreografia-intro";
 import { crearAutoHide } from "./header/auto-hide";
+import { crearTemaSegunFondo } from "./header/tema-fondo";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
 import { EVENTO_URL, alClicSubirEnPagina, partirDestino } from "@/lib/navegar";
 import { MobileNav } from "./MobileNav";
@@ -103,11 +104,21 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
     return crearAutoHide(nav);
   }, [reducedMotion]);
 
+  // El logo suelto (< lg) pasa a negativo sobre fondos oscuros: quién mide y
+  // cómo, en `header/tema-fondo.ts`. Se rearma por página: cambia el fondo.
+  useEffect(() => {
+    const nav = ref.current;
+    if (!nav) return;
+    return crearTemaSegunFondo(nav);
+  }, [pathname]);
+
   return (
     <nav
       ref={ref}
       data-bp-nav
-      className="border-azul-principal/10 fixed top-4 right-4 left-4 z-50 flex items-center justify-between gap-3 rounded-[1.25rem] border bg-white/70 px-4 py-3 backdrop-blur-xl lg:right-auto lg:left-1/2 lg:w-max lg:max-w-[calc(100vw-2rem)] lg:-translate-x-1/2 lg:justify-start"
+      // La píldora es de escritorio (todo lo `lg:`). Por debajo de lg el nav es
+      // solo el renglón: el logo va suelto y el botón es una isla (MobileNav).
+      className="group/nav lg:border-azul-principal/10 fixed top-4 right-4 left-4 z-50 flex items-center justify-between gap-3 lg:right-auto lg:left-1/2 lg:w-max lg:max-w-[calc(100vw-2rem)] lg:-translate-x-1/2 lg:justify-start lg:rounded-[1.25rem] lg:border lg:bg-white/70 lg:px-4 lg:py-3 lg:backdrop-blur-xl"
     >
       {/* Grupo logo + wordmark. El wordmark colapsa (width + marginLeft → 0) sin
           dejar gap residual: la separación con los links la da el gap-3 del nav. */}
@@ -126,7 +137,20 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
           height={467}
           priority
           unoptimized
-          className="h-11 w-auto shrink-0"
+          data-nav-logo
+          className="h-11 w-auto shrink-0 transition-opacity duration-300 max-lg:group-data-[tema=noche]/nav:opacity-0"
+        />
+        {/* El mismo logo en negativo, encimado: sobre un fondo oscuro se funde
+            con el azul (< lg; en escritorio el logo vive adentro de la píldora
+            clara y no cambia). Decorativo: el nombre ya lo dice el de arriba. */}
+        <Image
+          src="/brand/logotipo-principal-ed-negativo.png"
+          alt=""
+          aria-hidden="true"
+          width={425}
+          height={467}
+          unoptimized
+          className="pointer-events-none absolute h-11 w-auto opacity-0 transition-opacity duration-300 max-lg:group-data-[tema=noche]/nav:opacity-100 lg:hidden"
         />
         {/* Wordmark que se colapsa. Aparece también en mobile (navbar full-width):
             arranca visible "Empoderamiento Docente" y, tras el hold, colapsa —
@@ -134,7 +158,7 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
             que entre junto al logo + hamburguesa en pantallas chicas. */}
         <span
           data-nav-word
-          className="font-display overflow-hidden text-[0.95rem] font-extrabold tracking-tight whitespace-nowrap lg:text-[1.05rem]"
+          className="font-display overflow-hidden text-[0.95rem] font-extrabold tracking-tight whitespace-nowrap transition-colors duration-300 max-lg:group-data-[tema=noche]/nav:text-white lg:text-[1.05rem]"
           style={{ width: 0, opacity: 0 }}
         >
           Empoderamiento&nbsp;Docente
