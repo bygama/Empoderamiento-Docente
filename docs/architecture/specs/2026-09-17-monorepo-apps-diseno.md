@@ -178,21 +178,25 @@ correr (registry caído, sin red).
 
 ### 4.4 Lo generado por Payload
 
-- **`payload-types.ts` y `migraciones/` van a la raíz de la app, fuera de
-  `src/`.** Payload lo permite: `typescript.outputFile` y `db.migrationDir`
-  son configurables. Esto corrige al spec del panel, que los ponía dentro de
-  `src/`. No es esconderlos: es no meter miles de líneas generadas en el
-  árbol que mide la salud del código nuestro.
-- **El route group `src/app/(payload)/` no se puede mover:** Payload lo
-  necesita adentro del app dir. Son pocos archivos chicos que re-exportan de
-  `@payloadcms/next`, y **se miden**. Si bajan el score, se discute con el
-  owner y queda escrito acá — nunca se apaga en silencio (§5.8). La fase 0
-  del panel es la que lo mide.
-- **ESLint**: `globalIgnores` para lo generado, con comentario que diga qué
-  es y por qué. No es suprimir una regla sobre código nuestro: es no lintear
-  lo que no escribimos.
+> **Corregido el 2026-09-18, por medición.** Este apartado decía que
+> `payload-types.ts` y `migraciones/` tenían que salir de `src/` para no
+> ensuciar la medición del gate. **No hace falta:** con la fase 0 del panel
+> ya en `main`, el gate da **100/100 con todo lo generado adentro de `src/`**
+> (356 archivos, `payload-types.ts` incluido, que tiene 430 líneas). La
+> justificación era proteger un score que no estaba en riesgo, y el costo
+> —pelearse con los defaults de Payload y sumar dos opciones de config— era
+> real. Lo que sigue es lo que vale.
+
+- **Lo generado se queda donde Payload lo pone.** `payload-types.ts` y
+  `payload.config.ts` en la raíz de `src/`, las migraciones en
+  `src/cms/migraciones/`, el route group en `src/app/(payload)/`. Todo eso
+  **entra en la medición y pasa**. Si algún día la baja, se discute con el
+  owner y queda escrito acá — nunca se apaga en silencio (§5.8).
+- **No se toca `typescript.outputFile` ni `db.migrationDir`.** Moverlos es
+  config extra para nada: el defecto de Payload ya funciona y es lo que
+  cualquiera que llegue de su documentación espera encontrar.
 - La regla de **200 líneas** de AGENTS.md §6 se lee sobre código nuestro; lo
-  generado no cuenta.
+  generado no cuenta, y así quedó escrito en §6.
 
 ## 5. Archivos que se tocan
 
