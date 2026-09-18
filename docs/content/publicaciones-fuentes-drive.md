@@ -240,9 +240,9 @@ dirigidos. Es el único registro que tenemos de la escala del trabajo de ED y de
 - **Perfiles del equipo (2026-09-09):** 11 de 15 con producción cargada, y todo lo que había en mano ya está: Daniela (Bolema 2014 y la nota de Roberto Rocca), Karla (las cuatro de su CVU), Judith (#8 y #10 con título completo), Eduardo (#11), Cabrera (la Rúbrica), Paola (Revista UNO y el Festival), Darly (las dos que eligió). Faltan Iván, que tiene diez publicaciones con DOI pero no un CV con fechas para armar el recorrido, y Raquel, Gabriela y Marcela, sin producción académica en Drive.
 - **Biblioteca (2026-09-09):** `materiales.ts` tiene las 16 publicaciones con PDF, con ficha,
   autorías, tema y link a la revista o editorial (DOI cuando hay). El libro de Gedisa va con
-  link a la editorial y sin PDF; la tesis se aloja en `public/biblioteca/` hasta que Daniela
+  link a la editorial y sin PDF; la tesis se aloja en `apps/sitio/public/biblioteca/` hasta que Daniela
   confirme (Facundo: «publicalas todas, después resolvemos esos detalles»). Las portadas son
-  tipográficas (`public/biblioteca/portadas/`), generadas con la ficha de cada una.
+  tipográficas (`apps/sitio/public/biblioteca/portadas/`), generadas con la ficha de cada una.
   **Segunda tanda (2026-09-09):** 41 publicaciones más, las que cada persona eligió en su
   ficha (más las 10 de Iván y 4 de Andrea) y no tienen PDF: ficha por Crossref o por la
   revista, link al DOI o a la página del artículo, probados uno por uno con curl. Tipos

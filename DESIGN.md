@@ -309,7 +309,7 @@ referencia).
 
 ### Archivos
 
-Los SVG oficiales se guardan en `public/brand/`:
+Los SVG oficiales se guardan en `apps/sitio/public/brand/`:
 
 - `logo-completo.svg` — versión sobre claro, con tagline.
 - `logo-completo-negativo.svg` — versión sobre azul, con tagline.

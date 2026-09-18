@@ -159,7 +159,7 @@ producción, sin leer en detalle) + 3 PDF de publicaciones. `Foto Dr. Lalo.jpeg`
   Educativa 2022).
 - Fotos: `Equipo ED.docx` (marzo) y las fichas de julio dicen «subí foto nueva» para
   Daniela, Karla, Iván, Wendolyne, Gabriela, Darly, Pedro, Paola, Judith, Luis Cabrera,
-  Marcela y Eduardo. Verificar que `/public/equipo/*.jpg` sean las versiones de julio y no
+  Marcela y Eduardo. Verificar que `apps/sitio/public/equipo/*.jpg` sean las versiones de julio y no
   las de marzo (comparar con los archivos listados arriba).
 - Corrección pedida por Andrea: donde diga «CIEAM» va «CIEMAE».
 

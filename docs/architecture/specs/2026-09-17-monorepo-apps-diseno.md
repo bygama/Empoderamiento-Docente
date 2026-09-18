@@ -97,10 +97,10 @@ solo.**
         ├── next.config.ts  tsconfig.json  eslint.config.mjs  postcss.config.mjs
         ├── .env.example
         ├── public/
-        ├── payload.config.ts
-        ├── payload-types.ts    ← GENERADO, fuera de src/ (§4.4)
-        ├── migraciones/        ← GENERADAS y commiteadas, fuera de src/ (§4.4)
         └── src/                ← lo único que mide el gate
+            ├── payload.config.ts
+            ├── payload-types.ts  ← GENERADO, se queda acá (§4.4)
+            ├── cms/migraciones/  ← GENERADAS y commiteadas (§4.4)
             ├── app/
             │   ├── (sitio)/    ← el sitio de hoy; las URLs no cambian
             │   ├── (payload)/  ← GENERADO por Payload
@@ -303,7 +303,9 @@ PR.
 
 ## 12. Decisiones abiertas
 
-- **Que Facundo confirme la corrección del §3 de su spec** (el árbol adentro
-  de `apps/sitio/`, y los generados fuera de `src/`).
-- **Cuándo entra el PR de la mudanza** respecto del arranque de la fase 0:
-  la recomendación es antes, pero lo coordina quien tome el panel.
+- **Que Facundo confirme la corrección del §3 de su spec:** el árbol que ahí
+  se describe cuelga ahora de `apps/sitio/`. Lo generado **se queda donde
+  Payload lo pone**, como decía su spec — la corrección del §4.4 de este
+  documento le dio la razón.
+- **Cuándo entra el PR de la mudanza** — resuelto: entró después de la fase 0
+  del panel, no antes, porque la fase 0 llegó primero a `main`.
