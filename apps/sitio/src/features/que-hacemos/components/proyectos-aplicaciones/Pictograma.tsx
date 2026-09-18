@@ -1,4 +1,4 @@
-import type { PictoKey } from "@/features/que-hacemos/proyectos";
+import type { PictoKey } from "@/features/que-hacemos/data/proyectos";
 
 /**
  * Pictogramas de las fichas: dibujos de línea, trazo único en el azul del

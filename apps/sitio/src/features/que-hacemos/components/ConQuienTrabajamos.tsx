@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ALIADOS } from "@/config/aliados";
-import { INTERLOCUTORES } from "@/features/que-hacemos/areas";
+import { INTERLOCUTORES } from "@/features/que-hacemos/data/areas";
 
 /**
  * Con quién trabaja ED: los cuatro tipos de interlocutor y, debajo, los

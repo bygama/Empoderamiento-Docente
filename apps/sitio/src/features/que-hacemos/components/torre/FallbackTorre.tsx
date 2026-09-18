@@ -1,4 +1,4 @@
-import { TAMBORES } from "../../data";
+import { TAMBORES } from "@/features/que-hacemos/data/secciones";
 
 /**
  * Fallback plano: todas las estaciones apiladas. Es lo que se sirve en

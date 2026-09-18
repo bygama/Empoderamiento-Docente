@@ -1,4 +1,4 @@
-import { MIRADA } from "@/features/que-hacemos/areas";
+import { MIRADA } from "@/features/que-hacemos/data/areas";
 
 /**
  * Cómo se reparten los seis pasos en pilas.

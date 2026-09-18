@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { CSSProperties } from "react";
-import { MIRADA, MIRADA_INTRO } from "@/features/que-hacemos/areas";
+import { MIRADA, MIRADA_INTRO } from "@/features/que-hacemos/data/areas";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { BandaAliados } from "./mirada-pasos/BandaAliados";
 import { crearAchicado } from "./mirada-pasos/coreografia-achicado";

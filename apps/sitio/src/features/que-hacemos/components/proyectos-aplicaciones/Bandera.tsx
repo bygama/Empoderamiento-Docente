@@ -1,6 +1,6 @@
 import { useId } from "react";
-import type { PaisKey } from "@/features/que-hacemos/proyectos";
-import { PAISES } from "@/features/que-hacemos/proyectos";
+import type { PaisKey } from "@/features/que-hacemos/data/proyectos";
+import { PAISES } from "@/features/que-hacemos/data/proyectos";
 
 /**
  * Banderas propias, flat y ondeadas, en un cuadro de 40 x 34 recortado

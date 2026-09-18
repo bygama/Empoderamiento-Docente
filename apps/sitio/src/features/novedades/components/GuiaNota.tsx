@@ -1,6 +1,6 @@
 "use client";
 
-import type { NovedadSeccion } from "../data";
+import type { NovedadSeccion } from "@/features/novedades/data/novedades";
 
 /**
  * "En esta nota" — índice de secciones de la ficha (referencia: la Table of

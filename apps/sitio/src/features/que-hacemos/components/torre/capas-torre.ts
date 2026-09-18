@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import { TAMBORES } from "../../data";
+import { TAMBORES } from "@/features/que-hacemos/data/secciones";
 import type { EstadoTorre } from "./pintar-torre";
 import type { RefsTorre } from "./refs-torre";
 

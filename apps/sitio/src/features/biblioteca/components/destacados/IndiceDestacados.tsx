@@ -1,4 +1,4 @@
-import type { ItemDestacado } from "../../data/materiales";
+import type { ItemDestacado } from "@/features/biblioteca/data/materiales";
 
 /** Índice lateral sticky (solo desktop): marca el artículo en foco y navega. */
 export function IndiceDestacados({

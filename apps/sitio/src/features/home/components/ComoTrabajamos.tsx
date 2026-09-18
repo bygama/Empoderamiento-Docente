@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { PASOS } from "@/features/home/data";
+import { PASOS } from "@/features/home/components/como-trabajamos/data";
 import { crearMetodo } from "./como-trabajamos/coreografia-metodo";
 import { IndicadorPasos } from "./como-trabajamos/IndicadorPasos";
 import { PasoMetodo } from "./como-trabajamos/PasoMetodo";

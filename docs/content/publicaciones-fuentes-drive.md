@@ -4,7 +4,7 @@ Qué se revisó: todos los PDF que subieron Raquel (dos cuentas) y la cuenta de 
 compartido; la carpeta «CV Daniela y Proyectos- Libro Reyes»; las quince fichas del equipo
 (los `Nombre.docx` de julio) y los CV que hay en Drive (Daniela 2020 y 2025, Karla, Judith,
 Darly, Luis Cabrera, Luis López, Wendolyne, Paola); los tres PDF que aportó Facundo el
-2026-09-07; y lo que la web ya tiene cargado (`casos/data.ts`, `quienes-somos/data/equipo.ts`,
+2026-09-07; y lo que la web ya tiene cargado (`investigacion/data/casos.ts`, `quienes-somos/data/equipo.ts`,
 `biblioteca/data/materiales.ts`).
 
 Regla: acá está **todo lo que nos pasaron**, con archivo o sin archivo. Lo que tiene PDF se
@@ -236,7 +236,7 @@ dirigidos. Es el único registro que tenemos de la escala del trabajo de ED y de
 
 ## 4. Qué tiene la web y qué le falta
 
-- **Casos de investigación:** 01 (Oaxaca, PDF #1) y 02 (escuelas técnicas, PDF #2) son reales. Los otros dos son demo. Pendientes con el cliente en `casos/data.ts`.
+- **Casos de investigación:** 01 (Oaxaca, PDF #1) y 02 (escuelas técnicas, PDF #2) son reales. Los otros dos son demo. Pendientes con el cliente en `investigacion/data/casos.ts`.
 - **Perfiles del equipo (2026-09-09):** 11 de 15 con producción cargada, y todo lo que había en mano ya está: Daniela (Bolema 2014 y la nota de Roberto Rocca), Karla (las cuatro de su CVU), Judith (#8 y #10 con título completo), Eduardo (#11), Cabrera (la Rúbrica), Paola (Revista UNO y el Festival), Darly (las dos que eligió). Faltan Iván, que tiene diez publicaciones con DOI pero no un CV con fechas para armar el recorrido, y Raquel, Gabriela y Marcela, sin producción académica en Drive.
 - **Biblioteca (2026-09-09):** `materiales.ts` tiene las 16 publicaciones con PDF, con ficha,
   autorías, tema y link a la revista o editorial (DOI cuando hay). El libro de Gedisa va con

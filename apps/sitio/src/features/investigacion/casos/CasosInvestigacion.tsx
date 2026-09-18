@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { RevealLines } from "@/components/ui/RevealLines";
-import { CASOS } from "./data";
+import { CASOS } from "@/features/investigacion/data/casos";
 import { CarpetaCaso } from "./CarpetaCaso";
 import { ExpedienteCaso } from "./ExpedienteCaso";
 import { NavegacionCasos } from "./NavegacionCasos";

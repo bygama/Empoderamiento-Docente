@@ -3,7 +3,7 @@
 > **Actualización 2026-09-08.** La página se reordenó con la regla «el texto manda, la
 > animación acompaña»: hero con la frase del cartel oficial y las seis áreas → Áreas en
 > texto plano → Niveles → Cómo trabajamos (seis verbos, estático) → Con quién → Cierre.
-> Las seis áreas oficiales y su texto están en `apps/sitio/src/features/que-hacemos/areas.ts` y en
+> Las seis áreas oficiales y su texto están en `apps/sitio/src/features/que-hacemos/data/areas.ts` y en
 > `copy-que-hacemos.md`; el porqué y las fuentes, en `que-hace-ed-fuentes.md`. Lo que
 > sigue es la arquitectura original (siete líneas, torre, camino) y vale como historia.
 

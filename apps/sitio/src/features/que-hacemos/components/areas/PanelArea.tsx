@@ -1,4 +1,4 @@
-import type { Area } from "@/features/que-hacemos/areas";
+import type { Area } from "@/features/que-hacemos/data/areas";
 
 /**
  * El panel de detalle de cada área: «Qué te llevás» y «Para quién», como una

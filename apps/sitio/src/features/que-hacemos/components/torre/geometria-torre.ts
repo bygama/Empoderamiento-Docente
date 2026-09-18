@@ -1,4 +1,4 @@
-import { TAMBORES } from "../../data";
+import { TAMBORES } from "@/features/que-hacemos/data/secciones";
 
 export const SEP = "  •  ";
 const ANCHO_CHAR = 0.62; // ancho promedio (em) de Manrope extrabold mayúsculas

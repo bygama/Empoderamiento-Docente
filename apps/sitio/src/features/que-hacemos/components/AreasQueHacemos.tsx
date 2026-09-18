@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import { AREAS } from "@/features/que-hacemos/areas";
+import { AREAS } from "@/features/que-hacemos/data/areas";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";

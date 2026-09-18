@@ -1,5 +1,5 @@
 import type { Ref } from "react";
-import type { TAMBORES } from "../../data";
+import type { TAMBORES } from "@/features/que-hacemos/data/secciones";
 import { CHIP_ANGS, type Geo, type GeoTambor } from "./geometria-torre";
 
 type Tambor = (typeof TAMBORES)[number];

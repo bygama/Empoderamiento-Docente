@@ -1,4 +1,4 @@
-import { AREAS } from "@/features/que-hacemos/areas";
+import { AREAS } from "@/features/que-hacemos/data/areas";
 
 /**
  * Clases de un ítem del índice según por dónde va la lectura: el riel se

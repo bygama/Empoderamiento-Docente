@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef } from "react";
 import { irAElemento, irAPosicion } from "@/lib/indice";
 import { EVENTO_CASO } from "../abrir-caso";
-import { CASOS } from "../data";
+import { CASOS } from "@/features/investigacion/data/casos";
 import type { Maquina } from "./useLugarExpediente";
 
 type Acciones = {

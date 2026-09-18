@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
-import { NOVEDADES, CATEGORIAS, CATEGORIA_LABEL, type CategoriaKey } from "../data";
+import { NOVEDADES, CATEGORIAS, CATEGORIA_LABEL, type CategoriaKey } from "@/features/novedades/data/novedades";
 import { NovedadCard } from "./NovedadCard";
 import { PaginacionNovedades } from "./PaginacionNovedades";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";

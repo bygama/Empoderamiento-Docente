@@ -1,6 +1,6 @@
 import type { Ref } from "react";
 import Image from "next/image";
-import type { TAMBORES } from "../../data";
+import type { TAMBORES } from "@/features/que-hacemos/data/secciones";
 
 type Tambor = (typeof TAMBORES)[number];
 

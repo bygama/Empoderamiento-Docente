@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { CATEGORIA_LABEL, fechaCorta, type Novedad } from "../data";
+import { CATEGORIA_LABEL, fechaCorta, type Novedad } from "@/features/novedades/data/novedades";
 import { useTransicionFaro } from "./TransicionFaro";
 
 /**
