@@ -193,12 +193,11 @@ Comentar solo cuando:
 
 ## 8. Manejo de errores
 
-> El backend es **Neon + Payload** (ver §12). Lo que entra por el panel
-> (`/admin`) lo valida Payload según el schema de cada colección. Para
-> código nuevo que reciba input fuera del panel (API routes propias,
-> formularios que no pasen por Payload), validar con **Zod**, capturar
-> excepciones y devolver un mensaje genérico al cliente (sin filtrar
-> detalles internos).
+> El backend es **Neon + Prisma**, con un admin propio (ver §12). **No hay
+> ninguna capa que valide sola por nosotros:** todo input —el de las Server
+> Actions del admin y el de los formularios públicos— se valida con **Zod** en
+> el borde. Capturar excepciones y devolver un mensaje genérico al cliente, sin
+> filtrar detalles internos.
 
 - **Componentes:** usar `error.tsx` y `not-found.tsx` de Next.js para
   manejo a nivel de route.
@@ -260,30 +259,36 @@ Comentar solo cuando:
 
 ## 12. Backend y persistencia
 
-**Backend elegido: Neon (Postgres) + Payload (panel de contenido en `/admin`),
-fotos en Vercel Blob y correos por Resend.** Decisión en
-[`architecture/adrs/0003-adoptar-neon-y-payload.md`](architecture/adrs/0003-adoptar-neon-y-payload.md)
-y diseño en
-[`architecture/specs/2026-09-15-panel-admin-diseno.md`](architecture/specs/2026-09-15-panel-admin-diseno.md).
-La definición del panel vive en `apps/sitio/src/cms/` y `apps/sitio/src/payload.config.ts`; lo que
-Payload genera (`apps/sitio/src/app/(payload)/`, `apps/sitio/src/payload-types.ts`,
-`apps/sitio/src/cms/migraciones/`) no se edita a mano. Lo que sigue de esta sección
-(Zod en los bordes, secretos solo server-side, migraciones acordadas con el
-humano) vale igual con Neon.
+**Backend elegido: Neon (Postgres) con Prisma, y un admin a medida en `/admin`
+con better-auth**, fotos en Vercel Blob y correos por Resend. Decisión en
+[`architecture/adrs/0005-admin-a-medida.md`](architecture/adrs/0005-admin-a-medida.md)
+y [`architecture/adrs/0007-prisma-como-orm.md`](architecture/adrs/0007-prisma-como-orm.md);
+diseño en
+[`architecture/specs/2026-09-18-admin-a-medida-diseno.md`](architecture/specs/2026-09-18-admin-a-medida-diseno.md).
 
-- **Validar los bordes con Zod** en cualquier código nuevo que reciba input
-  fuera del panel (API routes propias, formularios que no pasen por
-  Payload). Lo que entra por `/admin` lo valida Payload según el schema de
-  cada colección.
+- **`datos/` es la única puerta a la base.** `apps/sitio/src/datos/consultas/`
+  lee y `apps/sitio/src/datos/acciones/` escribe; **ningún componente importa
+  Prisma**. Lo reutilizable vive en `packages/` y no sabe nada de ED: si
+  aparece «novedad» en `packages/kit-admin`, está mal puesto.
+- **Validar los bordes con Zod** en todo input, sin excepción — incluido el de
+  las Server Actions del admin. No hay una capa que valide sola por nosotros.
 - **Secretos solo server-side:** ni las variables de conexión a la base
-  (`DATABASE_URL`, `DATABASE_URL_UNPOOLED`) ni las claves de proveedor
-  (`PAYLOAD_SECRET`, `VISTA_PREVIA_SECRET`, `BLOB_READ_WRITE_TOKEN`,
-  `RESEND_API_KEY`) se prefijan con `NEXT_PUBLIC_` ni se usan en el browser.
-  Placeholders en `apps/sitio/.env.example`.
-- **No exponer detalles internos** en los mensajes de error al cliente.
-- **Migraciones / schema:** confirmar el diseño de colecciones y campos con
-  el humano antes de crearlos, y generarlos con `pnpm migrate:create`. No
-  inventar colecciones ni campos no acordados.
+  (`DATABASE_URL`, `DATABASE_URL_UNPOOLED`) ni las claves de proveedor (el
+  secreto de better-auth, `BLOB_READ_WRITE_TOKEN`, `RESEND_API_KEY`) se
+  prefijan con `NEXT_PUBLIC_` ni se usan en el browser. Placeholders en
+  `apps/sitio/.env.example`.
+- **La sesión se verifica en el middleware, antes de renderizar**, nunca dentro
+  del componente.
+- **No exponer detalles internos** en los mensajes de error al cliente, ni
+  permitir enumerar usuarios: los errores de login son genéricos.
+- **Migraciones / schema:** confirmar el diseño con el humano antes de crear
+  tablas. Las migraciones las genera Prisma y se commitean; **nunca
+  `prisma db push`**, que `scripts/guarda-prisma.mjs` bloquea porque crea
+  tablas sin dejar archivo de migración.
+- **Sin meta-capa de configuración** para los formularios del admin: cada
+  entidad escribe el suyo con los primitivos de `packages/kit-admin`. Y se
+  escribe en vocabulario relacional —tablas, columnas, controles—, nunca
+  «colecciones» ni «globals».
 
 ---
 

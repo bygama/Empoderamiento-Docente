@@ -23,9 +23,14 @@ de envío de CV.
 - **Zod 4** (validación de bordes; se usa cuando aparezcan formularios)
 - **pnpm 11** (pinned vía `packageManager`), **Node ≥ 22**
 
-**Backend / persistencia:** **Neon** (Postgres) + **Payload** (panel de
-contenido en `/admin`), con fotos en Vercel Blob y correos por Resend. Ver
-[ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md).
+**Backend / persistencia:** **Neon** (Postgres) con **Prisma**, y un **admin a
+medida** en `/admin` con **better-auth**, con fotos en Vercel Blob y correos por
+Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
+[ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md).
+
+> **Estado:** el admin está en construcción. Hoy el repo tiene el sitio y nada
+> más; los cimientos llegan en la fase 1. El plan, en
+> [la spec](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md) §9.
 
 Versiones exactas en [`apps/sitio/package.json`](apps/sitio/package.json):
 el repo es un workspace pnpm y las dependencias viven en la app.
@@ -54,13 +59,10 @@ pnpm build        # build de producción
 pnpm start        # servir el build de producción
 pnpm lint         # ESLint (eslint-config-next)
 pnpm typecheck    # TypeScript (tsc --noEmit)
-# Los comandos del panel son de la app, no del workspace: van con --filter.
-pnpm --filter sitio payload         # CLI de Payload
-pnpm --filter sitio migrate         # corre las migraciones pendientes
-pnpm --filter sitio migrate:create  # genera una migración nueva
-pnpm --filter sitio generate:types  # regenera los tipos del panel
-pnpm --filter sitio build:vercel    # el build de Vercel: migra y buildea
 ```
+
+Los comandos de base de datos llegan con la fase 1 del admin. Van con
+`--filter` porque son de la app, no del workspace.
 
 Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm build` en verde
 (ver [Pre-PR checklist en `AGENTS.md`](AGENTS.md) §10).
@@ -69,17 +71,15 @@ Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm build` en verde
 
 ## Variables de entorno
 
-Hacen falta para correr el panel (`/admin`); sin panel, el sitio no necesita
-ninguna:
+**Hoy el sitio no necesita ninguna.** Son la infraestructura del admin, que
+llega en la fase 1:
 
 - `DATABASE_URL` y `DATABASE_URL_UNPOOLED` — conexión a Postgres (Docker en
-  local, Neon en Vercel).
-- `PAYLOAD_SECRET` — firma las sesiones del panel.
-- `VISTA_PREVIA_SECRET` — protege la ruta de vista previa en modo borrador.
+  local, Neon en Vercel). La segunda es la directa, sin pooler: el pooler corta
+  las transacciones largas de una migración.
 - `NEXT_PUBLIC_SITE_URL` — URL pública del sitio (pública, cliente).
-- `BLOB_READ_WRITE_TOKEN` — fotos a Vercel Blob; sin token, se guardan en
-  `fotos-local/`.
-- `RESEND_API_KEY` — correos del panel; sin clave, salen por consola.
+- `BLOB_READ_WRITE_TOKEN` — fotos a Vercel Blob.
+- `RESEND_API_KEY` — correos del admin; sin clave, salen por consola.
 
 Todas menos `NEXT_PUBLIC_SITE_URL` son secretas y **solo server-side**. Los
 placeholders viven en
@@ -99,27 +99,36 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
 ├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
 ├── package.json           ← raíz del workspace: delega en las apps + el gate
 ├── pnpm-workspace.yaml    ← packages: ["apps/*"]
+├── packages/              ← lo reutilizable, sin dominio de ED (fase 1)
+│   ├── db/  auth/  kit-admin/
 └── apps/
-    └── sitio/             ← el sitio y su panel (por ahora, la única app)
+    └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz
         ├── .env.example   ← las variables son de la app
         ├── public/        ← assets estáticos (brand/, fotos/, aliados/, …)
+        ├── prisma/        ← esquema y migraciones (fase 1)
         ├── (config)       ← tsconfig.json, eslint.config.mjs,
         │                     next.config.ts, postcss.config.mjs
         └── src/
             ├── app/(sitio)/   ← las páginas del sitio y su layout
-            ├── app/(payload)/ ← el panel en /admin (lo genera Payload)
-            ├── cms/           ← definición del panel: colecciones, accesos
+            ├── app/(admin)/   ← las rutas del admin (fase 1)
+            ├── datos/         ← la única puerta a la base (fase 2)
+            ├── admin/         ← las pantallas del admin (fase 2)
             ├── components/    ← UI reutilizable (brand/, layout/, ui/, …)
             ├── features/      ← secciones por dominio (home, novedades, …)
             ├── config/        ← site.ts (datos institucionales) + nav.ts
             └── lib/           ← hooks/ y utilidades
 ```
 
+Lo marcado «fase N» todavía no existe: es el plan del
+[ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
+
 Es un **monorepo** (workspace pnpm): hoy hay una sola app y una segunda se
-agregaría al lado, en `apps/`. Los comandos se corren desde la raíz, que
+agregaría al lado, en `apps/`. Lo que se comparte entre proyectos va en
+`packages/`, nunca en una app. Los comandos se corren desde la raíz, que
 delega en la app. El porqué está en el
-[ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md).
+[ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md) y en el
+[ADR-0006](docs/architecture/adrs/0006-packages-reutilizables.md).
 
 El theming de Tailwind v4 vive en `apps/sitio/src/app/globals.css` (bloque
 `@theme`), no en `tailwind.config.js`. Los datos institucionales (mail,
@@ -162,32 +171,31 @@ La fuente de verdad sobre cómo opera el repo son los `.md` de la raíz y de
 
 ## Deploy
 
-El sitio y el panel corren en **Vercel**: preview por PR, producción desde
-`main`, con **Root Directory = `apps/sitio`** (es un monorepo: Vercel instala
-desde la raíz del workspace y buildea la app) y build con `pnpm build:vercel`
-(corre las migraciones de Payload y después `next build`). La base es **Neon**
-(una rama por preview), las fotos van a **Vercel Blob** y los correos del
-panel a **Resend**; las cuatro piezas se instalan desde el Marketplace de
-Vercel y escriben sus variables solas. Variables propias en `apps/sitio/.env.example`.
+El sitio corre en **Vercel**: preview por PR, producción desde `main`, con
+**Root Directory = `apps/sitio`** (es un monorepo: Vercel instala desde la raíz
+del workspace y buildea la app). La base es **Neon** (una rama por preview), las
+fotos van a **Vercel Blob** y los correos a **Resend**; las cuatro piezas se
+instalan desde el Marketplace de Vercel y escriben sus variables solas.
+Variables propias en `apps/sitio/.env.example`.
 
-## Panel de administración
+Cuando llegue la fase 1 del admin, el build pasa a correr las migraciones de
+Prisma antes de `next build`.
 
-En `/admin`. Para correrlo en local hace falta un Postgres (Docker):
+## Admin
 
-    docker run -d --name ed-postgres -e POSTGRES_PASSWORD=ed -e POSTGRES_DB=ed_panel -p 5435:5432 -v ed-postgres-datos:/var/lib/postgresql/data postgres:17
+**En construcción.** Va a vivir en `/admin`, construido a medida sobre Prisma y
+better-auth, con la base en Neon. El diseño completo —arquitectura, mapa de
+URLs, modelo de contenido, seguridad y fases— está en
+[`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md),
+y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
 
-y un `apps/sitio/.env.local` según su `.env.example`. La primera vez,
-`/admin` pide crear el primer usuario. Sin token de Blob las fotos se guardan
-en `fotos-local/`; sin clave de Resend los correos salen por la consola. Diseño y decisiones:
-`docs/architecture/specs/2026-09-15-panel-admin-diseno.md` y el ADR-0003.
-Sin `.env.local` el sitio compila y corre igual; el panel avisa por consola
-que falta `DATABASE_URL` y no se conecta hasta tenerla.
+Para correrlo en local va a hacer falta un Postgres (Docker):
 
-Tres cosas que aprendimos hoy armando el panel: cada vez que se suma un
-plugin o un componente propio, hay que correr
-`pnpm --filter sitio generate:importmap` (sin eso `/admin` no carga); si
-`pnpm typecheck` falla por tipos de rutas que no existen en el código,
-borrar `apps/sitio/.next` y buildear los regenera; y en local no hace falta
-correr `pnpm --filter sitio migrate` contra la base de desarrollo — esa base la
-sincroniza Payload solo (`push`) y las migraciones son para producción y
-previews.
+    docker run -d --name ed-postgres -e POSTGRES_PASSWORD=ed -e POSTGRES_DB=ed -p 5435:5432 -v ed-postgres-datos:/var/lib/postgresql/data postgres:17
+
+y un `apps/sitio/.env.local` según su `.env.example`. Sin `.env.local` el sitio
+compila y corre igual.
+
+Una maña del repo que sobrevive a cualquier stack: si `pnpm typecheck` falla
+por tipos de rutas que no existen en el código, borrar `apps/sitio/.next` y
+buildear de nuevo los regenera.

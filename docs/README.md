@@ -24,8 +24,8 @@
 | Mapa del sitio    | [`content/site-map-ED.pdf`](content/site-map-ED.pdf) | Árbol de páginas y navegación del sitio (PDF, 7 páginas)                     |
 | Estilo de código  | [`conventions/CODE-STYLE.md`](conventions/CODE-STYLE.md) | Decisiones de estilo que las tools no enforce-an + índice de configs |
 | Código IA-friendly| [`AI_GUIDELINES.md`](AI_GUIDELINES.md)          | Reglas detalladas: naming, archivos chicos, TS, Tailwind v4, GSAP            |
-| ADRs              | [`architecture/adrs/`](architecture/adrs/README.md) | Decisiones arquitectónicas (stack base, Neon y Payload para el panel, etc.)   |
-| Diseño del panel  | [`architecture/specs/2026-09-15-panel-admin-diseno.md`](architecture/specs/2026-09-15-panel-admin-diseno.md) | Panel de administración con Payload sobre Neon: alcance, modelo de contenido, acceso, fases y riesgos |
+| ADRs              | [`architecture/adrs/`](architecture/adrs/README.md) | Decisiones arquitectónicas (stack base, Neon, el admin a medida, Prisma, etc.) |
+| Diseño del admin  | [`architecture/specs/2026-09-18-admin-a-medida-diseno.md`](architecture/specs/2026-09-18-admin-a-medida-diseno.md) | El admin a medida sobre Neon + Prisma: arquitectura, mapa de URLs, modelo de contenido, seguridad y fases |
 | Monorepo          | [`architecture/specs/2026-09-17-monorepo-apps-diseno.md`](architecture/specs/2026-09-17-monorepo-apps-diseno.md) | El repo pasa a `apps/`: por qué una app y no dos, cómo queda el gate multi-proyecto, qué se muda y en qué orden |
 
 ---
@@ -40,7 +40,7 @@
 | Hacer commits                                     | [`COMMITS.md`](COMMITS.md) → `../AGENTS.md` §9                                       |
 | Entender la arquitectura del proyecto             | `../AGENTS.md` §1 + §3 → [`architecture/adrs/0001-stack-base.md`](architecture/adrs/0001-stack-base.md) |
 | Instalar y correr local                           | [`../README.md`](../README.md) (getting started) → `package.json` scripts (`pnpm dev` / `build` / `start` / `lint` / `typecheck`) |
-| Entender el backend / el panel (Neon + Payload)   | `../AGENTS.md` §12 → [`architecture/adrs/0003-adoptar-neon-y-payload.md`](architecture/adrs/0003-adoptar-neon-y-payload.md) → [`architecture/specs/2026-09-15-panel-admin-diseno.md`](architecture/specs/2026-09-15-panel-admin-diseno.md) |
+| Entender el backend / el admin (Neon + Prisma)    | `../AGENTS.md` §12 → [`architecture/adrs/0005-admin-a-medida.md`](architecture/adrs/0005-admin-a-medida.md) → [`architecture/specs/2026-09-18-admin-a-medida-diseno.md`](architecture/specs/2026-09-18-admin-a-medida-diseno.md) |
 | Ponerte al día con el estado del proyecto         | `../AGENTS.md` §13 (Estado del proyecto)                                             |
 
 ---
