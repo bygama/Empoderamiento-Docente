@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { Highlight } from "@/components/ui/Highlight";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -130,16 +131,43 @@ export function QueHacemosHeroFaro() {
               frase del cartel oficial de ED (2026-09-08; antes decía «Diseñamos
               y acompañamos procesos que transforman la matemática escolar»). El
               subrayado de «aprendizaje matemático» se pinta con la luz
-              (background-size). aria-hidden: para AT está el h2 sr-only de arriba. */}
+              (background-size) y la frase va en celeste, como «transformamos.»
+              del hero (Gastón, 2026-09-18). aria-hidden: para AT está el h2
+              sr-only de arriba. */}
           <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center">
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
               {/* Sin eyebrow: «Qué hacemos» ya es el título de la página y
                   el hero lo acaba de decir; repetirlo acá le quitaba peso al
                   momento tipográfico (pedido de Mateo, 2026-09-02). */}
-              <div data-mensaje>
+              {/* PRUEBA (Gastón, 2026-09-18): el logotipo a la izquierda de la
+                  frase, del alto de los tres renglones. EL TAMAÑO LO FIJA EL
+                  FARO: la escena es un SVG 1440×900 con «slice», así que el
+                  faro (x≈950, su halo arranca en ≈900) cae en pantalla en
+                  50vw + 180·S, con S = max(100vw/1440, 100vh/900). Lo que
+                  queda entre el borde del contenedor y ese punto se reparte
+                  entre logo (2,9 em de ancho), separación y frase (11,5 em el
+                  renglón más largo), de ahí el divisor 13,8 (medido: deja ~60 px de aire antes del halo). El segundo
+                  término del min() es para ventanas más angostas que el
+                  contenedor (1024–1280), donde el margen es fijo. */}
+              <div
+                data-mensaje
+                className="flex items-center gap-8 lg:gap-10"
+                style={{
+                  fontSize:
+                    "clamp(2rem, min((180 * max(100vw / 1440, 100vh / 900) + 472px) / 13.8, (50vw + 180 * max(100vw / 1440, 100vh / 900) - 160px) / 13.8), 3.9rem)",
+                }}
+              >
+                <Image
+                  src="/brand/logotipo-principal-ed-negativo.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={395}
+                  height={433}
+                  className="hidden h-[3.18em] w-auto shrink-0 select-none lg:block"
+                />
                 <p
-                  className="font-display max-w-[21ch] font-extrabold tracking-[-0.03em] text-balance text-white [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
-                  style={{ fontSize: "clamp(2.6rem, 1.2rem + 3.9vw, 4.6rem)", lineHeight: 1.06 }}
+                  className="font-display max-w-[21ch] font-extrabold tracking-[-0.03em] text-balance text-white [&_mark]:text-azul-claro [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
+                  style={{ fontSize: "1em", lineHeight: 1.06 }}
                 >
                   Consultora especializada en la transformación del{" "}
                   <Highlight>aprendizaje matemático</Highlight>.
