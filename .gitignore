@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -11,14 +11,14 @@
 !.yarn/versions
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
@@ -56,3 +56,12 @@ docs/superpowers/
 
 # fotos subidas al panel cuando no hay Vercel Blob (desarrollo)
 fotos-local/
+
+# next dev escribe un bloque `nextjs-agent-rules` dentro de la app, en un
+# AGENTS.md y un CLAUDE.md propios, cada vez que levanta (lo genera
+# node_modules/next/dist/server/lib/generate-agent-files.js). El contrato de
+# este repo vive en los .md de la raíz —la golden rule de AGENTS.md §3—, así
+# que esa copia generada no se versiona: dos AGENTS.md es justo lo que esa
+# regla existe para evitar.
+/apps/*/AGENTS.md
+/apps/*/CLAUDE.md

@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  apps/sitio:
     dependencies:
       '@payloadcms/db-postgres':
         specifier: ^3.89.0
