@@ -66,8 +66,32 @@ Spec de la lane: [`SPEC.md`](SPEC.md). Diseño:
    `AGENTS.md` **requiere confirmación humana explícita** (§5.6): se pide
    antes de editarlo, no después. *(mechanical · medium)*
    **Aceptación:**
-   `grep -rn "src/" AGENTS.md README.md docs/AI_GUIDELINES.md docs/README.md | grep -v "apps/sitio/src/"`
-   no devuelve ninguna línea.
+   el grep de rutas viejas no devuelve ninguna línea **fuera de tres
+   carve-outs, que son correctos y hay que excluir a mano**:
+
+   - las ramas de un diagrama de árbol (`└── src/`) que ya cuelgan de
+     `apps/sitio/`;
+   - el alias `"@/*": ["./src/*"]` del tsconfig y la frase que explica que es
+     relativo al archivo y **no** lleva prefijo;
+   - `src/styles/`, que se cita como una ruta que NO existe;
+   - los **ADRs y los specs**, que describen el repo que había cuando se
+     escribieron o árboles relativos a la app. Los ADRs además son inmutables
+     una vez aceptados, por la regla de `docs/architecture/adrs/README.md`.
+
+   El chequeo es sobre la documentación **operativa** —la que alguien sigue
+   para trabajar hoy—, no sobre el registro histórico.
+
+   ```bash
+   git ls-files "*.md" | xargs grep -n "src/" \
+     | grep -v "apps/sitio/src" | grep -vE "src/$" \
+     | grep -v '"\./src/\*"' | grep -v "relativo a ese archivo" \
+     | grep -v "src/styles/"
+   ```
+
+   **Y el grep no alcanza:** también se mira `git diff --stat`. Un `.md` que
+   cambia 68 líneas cuando se esperaba una es la señal que un grep de
+   contenido no da — un archivo corrompido con el patrón nuevo pasa el grep
+   justamente porque está lleno del patrón nuevo.
 
 5. **ADR-0004: el repo pasa a monorepo** — escribirlo con `skills/adr-create`
    sobre `docs/architecture/adrs/_template.md`: contexto, decisión,
