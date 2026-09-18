@@ -1,9 +1,12 @@
 # ADR-0003: Adoptar Neon y Payload para el panel de contenido (reemplaza Supabase)
 
-- **Status:** Accepted
+- **Status:** Superseded by ADR-0005 (solo la parte de Payload)
 - **Date:** 2026-09-15
 - **Decision-makers:** @bygama (Facundo), con Gastón y Mateo
 - **Supersedes:** ADR-0002 (Supabase como backend y persistencia)
+- **Superseded by:** [ADR-0005](0005-admin-a-medida.md) — el panel se
+  construye a medida. **Neon, Vercel Blob y Resend siguen vigentes**: lo que
+  este ADR decidió bien no se toca, y esa parte se lee acá.
 
 ---
 
@@ -19,8 +22,10 @@ aprobación: quien edita, publica.
 El ADR-0002 había elegido Supabase (Postgres + Auth + Storage) para cuando
 apareciera persistencia. El 2026-09-15 Facundo decidió no usar Supabase y
 usar Neon. Con eso, auth y almacenamiento de archivos ya no vienen con la
-base y hay que resolverlos aparte. El diseño completo del panel está en
-`docs/architecture/specs/2026-09-15-panel-admin-diseno.md`.
+base y hay que resolverlos aparte. El diseño completo del panel estaba en
+`docs/architecture/specs/2026-09-15-panel-admin-diseno.md`, borrado con la
+escisión del [ADR-0005](0005-admin-a-medida.md); se recupera del historial de
+git si hace falta leerlo.
 
 ## Decisión
 
@@ -99,6 +104,8 @@ escenas animadas (cantidad fija de piezas, largo máximo por texto).
 ## Referencias
 
 - Spec del panel: `docs/architecture/specs/2026-09-15-panel-admin-diseno.md`
+  (borrada por el ADR-0005; vive en el historial de git). La reemplaza
+  [el diseño del admin a medida](../specs/2026-09-18-admin-a-medida-diseno.md).
 - [ADR-0002](0002-adoptar-supabase-persistencia.md), que este reemplaza.
 - [Payload docs](https://payloadcms.com/docs) · [Neon + Vercel](https://neon.com/docs/guides/vercel-overview) · [Vercel Blob](https://vercel.com/docs/vercel-blob) · [Resend](https://resend.com/docs)
 - Issue de Turbopack: https://github.com/payloadcms/payload/issues/15429

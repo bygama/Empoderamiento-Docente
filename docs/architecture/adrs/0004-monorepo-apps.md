@@ -12,8 +12,9 @@
 El repo era un único proyecto Next en la raíz. Dos fuerzas lo empujaron a
 cambiar de forma:
 
-1. **El panel ya está adentro.** La fase 0 del
-   [diseño del panel](../specs/2026-09-15-panel-admin-diseno.md) montó
+1. **El panel ya está adentro.** La fase 0 del diseño del panel
+   (`specs/2026-09-15-panel-admin-diseno.md`, borrado después por el
+   [ADR-0005](0005-admin-a-medida.md)) montó
    Payload 3 en `/admin` dentro de la misma app ([ADR-0003](0003-adoptar-neon-y-payload.md)):
    route groups `(sitio)` y `(payload)`, la definición en `src/cms/`,
    migraciones versionadas y tipos generados. El repo dejó de ser «un sitio»
@@ -129,8 +130,9 @@ que ahora recorre todos y frena si alguno falta en el informe.
 - [Diseño del monorepo](../specs/2026-09-17-monorepo-apps-diseno.md) — layout
   exacto, gate multi-proyecto, orden de la mudanza y las señales que
   dispararían cada puerta futura.
-- [ADR-0003](0003-adoptar-neon-y-payload.md) y el
-  [diseño del panel](../specs/2026-09-15-panel-admin-diseno.md) — el panel que
+- [ADR-0003](0003-adoptar-neon-y-payload.md) y el diseño del panel
+  (`specs/2026-09-15-panel-admin-diseno.md`, borrado por el
+  [ADR-0005](0005-admin-a-medida.md)) — el panel que
   esta mudanza envuelve. Su §3 describe el árbol relativo a la raíz; desde
   este ADR, ese mismo árbol cuelga de `apps/sitio/`.
 - `AGENTS.md` §3 (estructura), §5.8 (el gate) y §6 (estándares de código).
