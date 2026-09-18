@@ -687,3 +687,38 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
     }
   }
 }
+
+/* EL TAMAÑO DE LA FRASE DEL FARO (QueHacemosHeroFaro, escena S1). Vive acá y
+   no en una clase por lo mismo que las medidas de `[data-mirada]`: depende del
+   ALTO de la ventana y son DOS variantes que tienen que convivir; con la
+   fórmula metida en una clase arbitraria no se puede leer ninguna de las dos.
+   El `em` de este elemento es además la unidad del logotipo que lo acompaña.
+
+   ABAJO DE LG el logotipo no se muestra, así que no hay a qué hacerle lugar y
+   la frase mide lo de siempre. Tenerlo, hasta el 2026-09-18, era la fórmula de
+   abajo sin techo de breakpoint, y en celular la achicaba un 23%.
+
+   DESDE LG entra el logotipo a la izquierda y EL TAMAÑO LO FIJA EL FARO
+   (Gastón, 2026-09-18): la escena es un SVG 1440×900 con «slice», así que el
+   faro —x≈950, su halo arranca en ≈900— cae en pantalla en 50vw + 180·S, con
+   S = max(100vw/1440, 100vh/900). Lo que queda entre el borde del contenedor y
+   ese punto se reparte entre logo (2,9em de ancho), separación y frase (11,5em
+   el renglón más largo): de ahí el divisor 13,8, medido, que deja unos 60px de
+   aire antes del halo. El segundo término del `min()` es para las ventanas más
+   angostas que el contenedor (1024–1280), donde el margen es fijo. */
+[data-mensaje] {
+  font-size: clamp(2.6rem, 1.2rem + 3.9vw, 4.6rem);
+}
+
+@media (min-width: 64rem) {
+  [data-mensaje] {
+    font-size: clamp(
+      2rem,
+      min(
+        (180 * max(100vw / 1440, 100vh / 900) + 472px) / 13.8,
+        (50vw + 180 * max(100vw / 1440, 100vh / 900) - 160px) / 13.8
+      ),
+      3.9rem
+    );
+  }
+}

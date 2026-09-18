@@ -139,24 +139,15 @@ export function QueHacemosHeroFaro() {
               {/* Sin eyebrow: «Qué hacemos» ya es el título de la página y
                   el hero lo acaba de decir; repetirlo acá le quitaba peso al
                   momento tipográfico (pedido de Mateo, 2026-09-02). */}
-              {/* PRUEBA (Gastón, 2026-09-18): el logotipo a la izquierda de la
-                  frase, del alto de los tres renglones. EL TAMAÑO LO FIJA EL
-                  FARO: la escena es un SVG 1440×900 con «slice», así que el
-                  faro (x≈950, su halo arranca en ≈900) cae en pantalla en
-                  50vw + 180·S, con S = max(100vw/1440, 100vh/900). Lo que
-                  queda entre el borde del contenedor y ese punto se reparte
-                  entre logo (2,9 em de ancho), separación y frase (11,5 em el
-                  renglón más largo), de ahí el divisor 13,8 (medido: deja ~60 px de aire antes del halo). El segundo
-                  término del min() es para ventanas más angostas que el
-                  contenedor (1024–1280), donde el margen es fijo. */}
-              <div
-                data-mensaje
-                className="flex items-center gap-8 lg:gap-10"
-                style={{
-                  fontSize:
-                    "clamp(2rem, min((180 * max(100vw / 1440, 100vh / 900) + 472px) / 13.8, (50vw + 180 * max(100vw / 1440, 100vh / 900) - 160px) / 13.8), 3.9rem)",
-                }}
-              >
+              {/* El logotipo a la izquierda de la frase, del alto de los tres
+                  renglones, desde lg (Gastón, 2026-09-18).
+
+                  EL TAMAÑO DE LA FRASE NO ESTÁ ACÁ: vive en `globals.css`,
+                  sobre `[data-mensaje]`, porque depende del alto de la ventana
+                  y son dos variantes —con logotipo y sin él— que tienen que
+                  convivir. Ahí está la cuenta de por qué es el que es. El
+                  logotipo se mide en `em`, así que sale de la misma fórmula. */}
+              <div data-mensaje className="flex items-center gap-8 lg:gap-10">
                 <Image
                   src="/brand/logotipo-principal-ed-negativo.png"
                   alt=""
