@@ -21,3 +21,7 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   esbuild: true
+  # Prisma baja sus engines en el postinstall. Sin esto el CLI instala pero no
+  # corre, y la falla aparece recién al migrar.
+  "@prisma/engines": true
+  prisma: true
