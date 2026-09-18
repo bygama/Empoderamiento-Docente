@@ -191,12 +191,14 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
 
         {/* Barra legal: dos renglones. Arriba ©, países y lema; abajo el
             crédito del sitio (`footer/CreditoSitio`). */}
-        <div className="border-azul-medio/15 flex flex-col gap-4 border-t pt-5 md:col-span-12">
-          <div className="text-azul-claro/55 flex flex-col gap-2 font-mono text-[0.72rem] tracking-[0.14em] uppercase md:flex-row md:items-center md:justify-between">
+        <div className="border-azul-medio/15 flex flex-col gap-4 border-t pt-5 lg:col-span-12">
+          <div className="text-azul-claro/55 flex flex-col items-center gap-2 text-center font-mono text-[0.72rem] tracking-[0.14em] uppercase lg:flex-row lg:justify-between lg:text-left">
             <p>
               © {year} {name}
             </p>
-            <p>{paises.join(" · ")}</p>
+            {/* El espacio duro ata cada «·» al país anterior: si la lista
+                parte en dos renglones, ninguno arranca con el punto. */}
+            <p className="text-balance">{paises.join(" · ")}</p>
             <p className="font-sans normal-case tracking-normal italic">
               Investigamos lo que hacemos, hacemos lo que investigamos.
             </p>
