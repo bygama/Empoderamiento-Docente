@@ -1,0 +1,17 @@
+/// Cuando un slug cambia, el admin escribe acá el 308 del viejo al nuevo.
+///
+/// Es la contraparte de la regla de que el slug es una columna y no se deriva
+/// del título (spec del admin §5): sin esta tabla, corregir una coma en un
+/// título rompería un link en LinkedIn o en un paper. El sitio la consulta
+/// antes de dar un 404.
+model Redireccion {
+  id     String @id @default(cuid())
+  /// La ruta vieja, con la barra inicial y sin dominio: "/novedades/lo-viejo".
+  desde  String @unique
+  /// La ruta nueva, en el mismo formato.
+  hacia  String
+
+  creadaEn DateTime @default(now()) @map("creada_en")
+
+  @@map("redirecciones")
+}

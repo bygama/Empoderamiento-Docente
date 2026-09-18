@@ -1,0 +1,16 @@
+// La conexión y el generador. El modelo de datos vive en los otros archivos
+// de esta carpeta: Prisma los junta todos.
+
+// Desde Prisma 7 las URLs NO van acá: viven en `prisma.config.ts`, que es
+// quien lee el entorno.
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  // Fuera de `src/`, a propósito: lo generado no se mide con la vara del
+  // código nuestro y el gate no tiene que verlo (AGENTS.md §5.8). Está
+  // git-ignorado; se regenera con `pnpm generate`.
+  output   = "../generado"
+}

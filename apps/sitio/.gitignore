@@ -1,0 +1,2 @@
+# Lo genera Prisma del esquema; se regenera con `pnpm generate`.
+prisma/generado/
