@@ -1,19 +1,16 @@
-// Compara el render de dos builds y dice si el sitio cambió.
-//
-// Existe porque «el sitio quedó igual» es la afirmación más fácil de declarar
-// sin probar. Un log pegado en un PROGRESS se pudre; esto se vuelve a correr.
+// Compara el render de dos builds y dice si el sitio cambió. Existe porque «el
+// sitio quedó igual» es la afirmación más fácil de declarar sin probar: un log
+// pegado en un PROGRESS se pudre, esto se vuelve a correr.
 //
 //   node scripts/comparar-render.mjs <appAntes> <appDespues>
 //
-// Cada argumento es una carpeta de app con un `.next` ya buildeado (los dos
-// tienen que existir; el script no buildea). Sale 1 si alguna página difiere
-// en texto, links o <head> — lo que ve una persona o un buscador.
-//
-// Los bytes de JS se informan pero NO hacen fallar: cambian por cómo el
-// bundler reparte los chunks, sin que cambie una línea de código. Se muestran
-// porque comparar solo el HTML no ve el bundle, y esa ceguera ya escondió un
-// cambio real una vez (la escisión de Payload: un chunk más por página y
-// ~2 KB menos en cada una).
+// Cada argumento es una carpeta de app con un `.next` ya buildeado (el script no
+// buildea). Sale 1 si una página difiere en texto, links o <head> —lo que ve una
+// persona o un buscador— o si desapareció. Los bytes de JS se informan pero NO
+// hacen fallar: cambian por cómo el bundler reparte los chunks. Se muestran
+// porque comparar solo el HTML no ve el bundle, y esa ceguera ya escondió dos
+// cambios reales: la escisión de Payload y las clases del admin filtrándose al
+// CSS del sitio.
 
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -78,8 +75,14 @@ function js(app, html) {
 const deA = new Set(paginas(antes));
 const deB = new Set(paginas(despues));
 let fallo = false;
-for (const p of [...deA].filter((x) => !deB.has(x))) (fallo = true), console.log(`  ${p}: SOLO en antes`);
-for (const p of [...deB].filter((x) => !deA.has(x))) (fallo = true), console.log(`  ${p}: SOLO en después`);
+
+// Que una página DESAPAREZCA es una regresión: se perdió una URL. Que aparezca
+// es normal en toda fase que sume pantallas, así que se informa y no frena.
+for (const p of [...deA].filter((x) => !deB.has(x))) {
+  fallo = true;
+  console.log(`  ${p}: DESAPARECIÓ`);
+}
+for (const p of [...deB].filter((x) => !deA.has(x))) console.log(`  ${p}: nueva`);
 
 for (const p of [...deA].filter((x) => deB.has(x))) {
   const a = readFileSync(join(appDir(antes), p), "utf8");
