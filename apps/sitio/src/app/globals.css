@@ -64,12 +64,6 @@ body {
   }
 }
 
-/* Cursor nativo oculto cuando el cursor custom está activo (solo desktop). */
-html.has-custom-cursor,
-html.has-custom-cursor * {
-  cursor: none !important;
-}
-
 /* === Utilidades propias del proyecto ============================== */
 
 /* Grilla de puntos azules — patrón gráfico oficial del manual §6. */
@@ -253,21 +247,6 @@ html.has-custom-cursor * {
 }
 
 /* === Port reveal de imágenes (RevealImage) ====================== */
-
-/* El reveal es 100% GSAP (clip-path inline vía gsap.set/timeline), igual que
-   el FUENTE. Esta regla es solo defensiva: garantiza que sin JS, antes de
-   hidratar, o con prefers-reduced-motion, la imagen quede SIEMPRE descubierta
-   (clip completo). Evita cualquier flash de imagen "tapada". GSAP sobrescribe
-   el clip-path inline al montar el timeline cuando hay motion permitido. */
-[data-reveal-image] {
-  clip-path: inset(0 0 0 0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal-image] {
-    clip-path: inset(0 0 0 0) !important;
-  }
-}
 
 /* === Líneas de acción — mano de cartas repartidas ================= */
 

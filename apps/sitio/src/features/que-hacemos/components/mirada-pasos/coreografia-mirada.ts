@@ -13,7 +13,8 @@ gsap.registerPlugin(ScrollTrigger);
  * franja. Es la intro de Contacto, y como ella corre SOLA, POR TIEMPO: nadie
  * tiene que scrollear para verla.
  *
- * EL RELEVO CON EL FARO es el de la torre de líneas (TorreLineas): la sección
+ * EL RELEVO CON EL FARO —heredado de la torre de líneas, la escena que ocupaba
+ * este lugar hasta el 2026-09-08—: la sección
  * se mete una pantalla debajo del final del faro y pinta por encima (z-20
  * contra su z-10), pero NACE APAGADA y se prende cuando su borde llega arriba,
  * donde el faro termina en blanco pleno (`visibilidad-seccion.ts`); si no,
