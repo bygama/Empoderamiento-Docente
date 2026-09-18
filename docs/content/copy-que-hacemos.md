@@ -39,6 +39,25 @@ Después de la frase central, la luz del faro muestra de a una estas cuatro fras
 **[confirmar]** Salen de lo que ustedes escribieron en la devolución de junio, dichas más
 llano. Si alguna no los representa, cámbienla por la que sí.
 
+### La versión en tarjetas, que estuvo en el código y hoy no se muestra
+
+Hubo una escena («Nuestro enfoque») que decía los mismos diferenciales en formato
+título + bajada. Se sacó del render en septiembre y su componente se borró el
+2026-09-18, así que estas cuatro quedan acá para no perderlas. La tercera **no
+aparece en ninguna otra parte del sitio ni de estos documentos**, y es una
+posición de ED que vale la pena no perder:
+
+| Título | Bajada |
+|---|---|
+| Partimos de lo que hay | para potenciar, nunca desde lo que falta. |
+| Nada viene enlatado | cada propuesta se piensa para su contexto. |
+| **Ningún saber es neutro** | **género, derechos humanos y justicia social.** |
+| Escenarios reales | escenarios de aprendizaje para un cambio real. |
+
+**[confirmar]** Son palabras de Dani acortadas para que entraran en la tarjeta, y
+nunca se validaron con ella. Si «Ningún saber es neutro» los representa, conviene
+que esté en el sitio en algún lado: hoy no está.
+
 ---
 
 ## Las seis áreas
