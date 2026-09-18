@@ -19,8 +19,8 @@ import { PieMenu } from "./mobile-nav/PieMenu";
 
 
 /**
- * Navegación mobile (< lg). Botón hamburguesa dentro de la píldora del Header
- * que abre un panel a pantalla completa con fondo `.faro-glow`: la noche del
+ * Navegación mobile (< lg). Botón hamburguesa —una isla circular suelta, a la
+ * derecha del Header— que abre un panel a pantalla completa con fondo `.faro-glow`: la noche del
  * faro. El panel INVIERTE la página —ella clara, él azul con el logo en
  * negativo—, mismo lenguaje que el Footer. Los 5 ítems del sitemap se apilan
  * grandes a la izquierda y el CTA "Contacto" queda como acción focal abajo.
@@ -120,9 +120,12 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
         onClick={() => setOpen(true)}
-        className="text-azul-principal hover:bg-azul-principal/5 inline-flex shrink-0 items-center justify-center overflow-hidden rounded-xl p-2 transition-colors lg:hidden"
+        // La isla del botón: un círculo blanco SÓLIDO —un vidrio se agrisa
+        // sobre los fondos oscuros—, que se lee sobre lo que sea sin cambiar.
+        // `BotonCerrar` copia esta caja.
+        className="border-azul-principal/10 text-azul-principal hover:bg-gris-fondo inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border bg-white shadow-[0_8px_24px_-12px_rgb(31_45_77_/_0.4)] transition-colors lg:hidden"
       >
-        <Menu size={22} />
+        <Menu size={22} data-mnav-rayas />
       </button>
 
       {hydrated &&
