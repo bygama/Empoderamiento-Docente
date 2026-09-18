@@ -48,12 +48,25 @@ Medido sobre `d452e61`, con Payload todavía adentro:
       Build de producción en los dos worktrees y diff del HTML prerenderizado,
       normalizando `BUILD_ID` y los hashes de chunk.
 
+      **Son 11 páginas, y el PLAN decía 9: los dos números son correctos y
+      cuentan cosas distintas.** El PLAN contaba **rutas** (`/novedades/<slug>`
+      es una); el build emite **archivos**, y de ese slug salen dos
+      (`relime-2025` y `unesco-montevideo`). Más `_global-error.html`, que la
+      «una 404» del PLAN no cubría. 9 rutas + 1 slug extra + `_global-error`
+      = 11 archivos. El conteo que vale para una verificación es el de
+      archivos: es el que no deja ninguno afuera.
+
       | Comparación | Páginas | Resultado |
       | --- | --- | --- |
-      | Texto visible | 10 | idénticas |
-      | Links de navegación | 7 | idénticos |
-      | `<title>` + `<meta>` | 7 | idénticos |
+      | Texto visible | 11 | idénticas |
+      | Links de navegación | 11 | idénticos |
+      | `<title>` + `<meta>` | 11 | idénticos |
       | `robots.txt` | 1 | idéntico |
+
+      La primera corrida cubrió 10 (faltaba `_global-error`) y tabulaba links y
+      `<head>` solo de las 7 de nivel superior. `scripts/comparar-render.mjs`
+      (`a216835`) cubre las tres dimensiones en las 11, y es lo que produjo la
+      tabla de arriba.
 
       El build ya no lista `/admin/[[...segments]]`, `/api/[...slug]`,
       `/vista-previa` ni `/vista-previa/salir`; el resto de las rutas es el
@@ -135,7 +148,45 @@ no editado a mano.
   resolviendo a un RC antes de que la fase 1 agregue la dependencia. Anotado
   para la fase 1.
 
-**Seats 2 y 3:** corriendo (silent failures · documentation impact).
+**Seat 2 — Silent failures — veredicto verbatim:**
+
+> **PASS** — I independently reproduced PLAN step 3's checkable claims from
+> scratch (own HTML parser, own route-manifest diff, own markdown-link walker)
+> against the actual build output in both worktrees, not the lane's retained
+> snapshots, and every dimension it claimed — text, links, `<head>`, route list,
+> `robots.txt`, alt text, zero broken doc links — came back identical. The
+> assertion was "merely declared" in the sense that no diff artifact survives to
+> prove it without redoing the work, and the stated method structurally cannot
+> see client-bundle differences (concretely: +1 JS chunk per page, unexplained)
+> — both real gaps worth fixing in the write-up, neither one evidence that the
+> site actually diverged.
+
+Este seat verificó además, contra el regex compilado de `routes-manifest.json`,
+que `[...resto]` **no** es código muerto: la ruta sigue viva e idéntica a la
+base. El ruling de conservarla queda respaldado por evidencia, no por lectura.
+
+**Hallazgos y qué se hizo:**
+
+- *Important* — la prueba del paso 3 vivía en scratch de sesión: nadie podía
+  rechequearla sin rehacer todo. **Arreglado con `scripts/comparar-render.mjs`**
+  (`a216835`). El seat propuso el cuerpo del PR como única sede durable, porque
+  asumió que el script iría en `work/admin-a-medida/scripts/`, que muere en el
+  handoff. Está en `scripts/` de la raíz: sobrevive al merge **y** se vuelve a
+  correr, que un log pegado no. Las dos cosas igual: la invocación y su salida
+  van también en el cuerpo del PR.
+- *Important* — el método no ve el bundle, y había un `+1 chunk` por página sin
+  explicar. **Medido:** ~2 KB **menos** por página, parejo en las once, y el JS
+  total baja de 75 archivos y 3,70 MB a 29 y 1,60 MB. Es Turbopack
+  re-particionando al irse `(payload)`. El seat midió `index` por su cuenta y
+  dio el mismo delta al byte (−1938). La afirmación correcta es **«el render es
+  idéntico y el bundle es más chico»**. El script ahora informa ese delta, así
+  que la ceguera queda cerrada de forma permanente.
+- *Minor* — eran 11 páginas y se tabularon 10. Corregido; `_global-error`
+  verificada idéntica.
+
+**Seat 3 — Documentation impact — veredicto: FAIL.** Seis hallazgos, todos
+reales, todos arreglados en `3af7989`. Detalle y rulings en `DECISIONS.md`.
+Re-review de esa lente en curso (`rerev-docs-r1`, ronda 1 de un cap de 5).
 
 ## Próximo
 
@@ -151,3 +202,48 @@ no editado a mano.
   tablas eran de Payload. Se recrea desde cero en la fase 1. Nada que rescatar.
 - `pnpm-workspace.yaml` sigue en `packages: ["apps/*"]`: `packages/*` se suma en
   la fase 1, cuando exista el primer package. Un glob vacío no aporta.
+
+### Fix loop — ronda 1 de 5 (lente: documentation impact)
+
+Seis hallazgos arreglados en `3af7989` y `a216835`. Un seat fresco los
+verdictó sobre el diff del arreglo.
+
+**Veredicto verbatim:**
+
+> **Fix round:** All findings addressed, no new Critical/Important breakage.
+
+El único que volvió NOT ADDRESSED en la primera pasada fue la deriva de conteo
+entre documentos: yo había arreglado `AGENTS.md` y dejado `PLAN.md` y
+`PROGRESS.md`. Se cerró reconciliando en `PROGRESS` en vez de reescribiendo el
+`PLAN`, y el seat respaldó ese criterio:
+
+> Putting that arithmetic in PROGRESS.md rather than editing PLAN.md is the
+> right call: PLAN records intent, PROGRESS records what the build actually
+> emitted, and rewriting a plan post-hoc to match execution would erase the
+> distinction your own DECISIONS.md ruling protects.
+
+Sin breakage nuevo y sin observaciones fuera de alcance. **Loop cerrado en la
+ronda 1**, muy por debajo del cap de 5.
+
+## Verification (final)
+
+Sobre `a216835` + el ajuste de `robots.ts`:
+
+```
+pnpm typecheck                          → exit 0
+pnpm lint                               → exit 0
+pnpm build                              → exit 0
+node scripts/verificar-react-doctor.mjs → 100/100, sin diagnósticos (294 archivos)
+node scripts/comparar-render.mjs <base> <head>
+                                        → 11 páginas, render idéntico (exit 0)
+links markdown rotos en todo el repo    → 0
+```
+
+**Review de cierre: HECHA.** Tres seats frescos en Sonnet, una lente cada uno,
+sin historia compartida con quien escribió la lane.
+
+| Seat | Lente | Veredicto |
+| --- | --- | --- |
+| 1 | Correctness against the SPEC | **PASS** |
+| 2 | Silent failures | **PASS** |
+| 3 | Documentation impact | **FAIL** → fix loop ronda 1 → cerrado |
