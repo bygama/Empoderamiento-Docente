@@ -52,10 +52,28 @@ let informe;
 try {
   informe = JSON.parse(salida);
 } catch {
+  // Dos desenlaces muy distintos, y confundirlos es lo que convierte un gate
+  // en decoración:
+  //
+  //  - stdout vacío → el comando no llegó a correr (sin red, registry caído,
+  //    pnpm ausente). No es un problema del código y no frena a nadie.
+  //  - stdout con algo que no parsea → react-doctor SÍ corrió y su informe
+  //    vino roto: un crash a mitad de escritura, un formato que cambió. Eso
+  //    es una medición incompleta, y una medición incompleta no es un
+  //    aprobado (AGENTS.md §5.8).
+  if (salida.trim() === "") {
+    console.log(
+      `\n${GRIS}  react-doctor no pudo correr (¿sin red, o el registry caído?). No frena el push.${FIN}\n`,
+    );
+    process.exit(0);
+  }
+  console.log(`\n${ROJO}${AZUL}  react-doctor devolvió una salida que no se puede leer.${FIN}`);
   console.log(
-    `\n${GRIS}  react-doctor no pudo correr (¿sin red, o el registry caído?). No frena el push.${FIN}\n`,
+    `${GRIS}  Corrió, pero su informe no es JSON válido, así que la medición no existe.\n  Lo primero que devolvió:${FIN}`,
   );
-  process.exit(0);
+  console.log(`${GRIS}  ${salida.trim().slice(0, 200)}${FIN}`);
+  console.log(`${GRIS}  Corré \`pnpm react-doctor\` a mano para ver qué pasó.${FIN}\n`);
+  process.exit(1);
 }
 
 const resumen = informe.summary ?? {};
@@ -88,16 +106,21 @@ if (faltantes.length > 0 || incompletos.length > 0 || resumen.score == null) {
       `${GRIS}  Revisá que sigan existiendo y que estén en PROYECTOS, acá arriba.${FIN}`,
     );
   }
-  for (const [nombre, p] of incompletos) {
-    const salteados = p.skippedChecks ?? [];
-    if (salteados.length) console.log(`  ${nombre} — chequeos salteados: ${salteados.join(", ")}`);
-    for (const [check, razon] of Object.entries(p.skippedCheckReasons ?? {})) {
-      console.log(`${GRIS}  ${check}: ${String(razon).split("\n")[0]}${FIN}`);
+  if (incompletos.length) {
+    for (const [nombre, p] of incompletos) {
+      const salteados = p.skippedChecks ?? [];
+      if (salteados.length) console.log(`  ${nombre} — chequeos salteados: ${salteados.join(", ")}`);
+      for (const [check, razon] of Object.entries(p.skippedCheckReasons ?? {})) {
+        console.log(`${GRIS}  ${check}: ${String(razon).split("\n")[0]}${FIN}`);
+      }
     }
+    // Esta pista explica un chequeo salteado, no un proyecto que falta:
+    // imprimirla siempre manda a buscar un borrado que puede no existir.
+    console.log(
+      `${GRIS}  Suele ser un archivo borrado y todavía no commiteado: react-doctor lo busca\n  porque sigue en el índice de git. Commiteá el borrado y volvé a probar.${FIN}`,
+    );
   }
-  console.log(
-    `${GRIS}  Suele ser un archivo borrado y todavía no commiteado: react-doctor lo busca\n  porque sigue en el índice de git. Commiteá el borrado y volvé a probar.${FIN}\n`,
-  );
+  console.log("");
   process.exit(1);
 }
 
