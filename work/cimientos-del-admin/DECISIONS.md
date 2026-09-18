@@ -134,3 +134,61 @@ informa bytes justamente para esto.
 Frenaba ante cualquier diferencia de lista, y eso lo volvía inservible como gate
 en toda fase que sume pantallas — o sea todas. Ahora una página que DESAPARECE
 sigue siendo una regresión y frena; una que aparece se informa y no frena.
+
+---
+
+## Rulings del fix loop (review de cierre, ronda 1)
+
+**2026-09-18 — La guarda de `db push` se colaba, y era la falla que existe para
+impedir.** Lo encontró el seat de silent failures: filtrar los tokens que
+empiezan con `-` y mirar los dos primeros no alcanza, porque un flag con valor
+separado deja su valor en la lista. `--schema ./x db push` hacía que el primer
+«verbo» fuera `./x` y **el comando corría**. No era el `--no-verify` aceptado:
+era el script envuelto fallando en silencio ante una invocación normal. Ahora se
+busca `db` y `push` como tokens sueltos en ese orden, en cualquier posición.
+Bloquea de más en un caso imaginable, y ante un comando que cambia la base sin
+dejar migración el error que conviene es el que frena.
+
+**2026-09-18 — El comparador sí medía el CSS; el nombre mentía.**
+El seat de correctness concluyó que `comparar-render.mjs` no medía CSS y que por
+lo tanto el umbral del 5% no se podía verificar. Media razón: la función se
+llamaba `js()` y rotulaba «js chunks», pero su regex cubre todo lo que cuelga de
+`static/chunks/`, **CSS incluido** —por eso el +4103 incluía los +2880 de CSS—.
+El defecto era el nombre, y alcanzó para que un lector cuidadoso concluyera que
+la herramienta no existía. Renombrado a `activos`, y el rótulo dice «js+css».
+
+**2026-09-18 — El SPEC había dejado caer dos promesas de seguridad en silencio,
+y eso se corrige diciéndolas.** El seat de correctness verificó que la enmienda
+anterior de este archivo borró «rotación de sesión al login» y «tokens de reset
+hasheados en reposo» sin mencionarlo, y que **ninguna de las dos está
+entregada**: no hay código de rotación, y `verification.identifier` guarda el
+token en claro (comprobado contra la base; el replay devuelve `INVALID_TOKEN`,
+así que el uso único sí está). Ahora el SPEC §4 lista las tres cosas que
+prometía y no entrega, con lo que acota cada una. Enmendar un SPEC para reportar
+es correcto; enmendarlo para que deje de pedir lo que no se hizo, no.
+
+**2026-09-18 — `RESEND_API_KEY` y `BLOB_READ_WRITE_TOKEN` están declaradas pero
+no conectadas.** El seat de documentación notó que el README implicaba
+comportamiento condicional —«sin clave sale por consola»— cuando el código no
+lee esas variables en ningún lado: el enlace sale por consola **siempre**.
+Corregido en el README y en `.env.example`; ponerlas hoy no cambia nada.
+
+**2026-09-18 — El doble cast de `ROLES` era un bug con dos síntomas.**
+`ROLES as unknown as string[]` apagaba toda la verificación, y por eso el layout
+necesitaba su propio cast para leer `rol`. `[...ROLES]` satisface el
+`DBFieldType` de better-auth sin aserción, y con eso el tipo llega hasta
+`sesion.user.rol` — comprobado con un probe: pasa de «no existe» a
+`string | null | undefined`. Los dos casts se fueron.
+
+**2026-09-18 — El largo mínimo de contraseña vive en `@ed/auth`.**
+Estaba duplicado a mano entre la config y el formulario. Peor que la
+duplicación: si la política subía, el formulario habría seguido validando con el
+número viejo y su error genérico habría reportado «ese enlace ya no sirve» ante
+un rechazo por largo. Ahora se exporta y se importa.
+
+**2026-09-18 — `ClienteDeBase` no restringe nada, y queda dicho.**
+Se deriva de `Parameters<typeof prismaAdapter>[0]`, que en better-auth es
+`interface PrismaClient {}` — una interfaz vacía que acepta cualquier valor no
+nulo. El comentario decía que era el contrato de la frontera y no lo es. Es una
+debilidad de tipado de la librería, no de esta lane, pero el comentario se
+corrige para no prometer una verificación que no ocurre.
