@@ -32,7 +32,7 @@ import path from "node:path";
  * falla, y un package que se cae de la medición en silencio es exactamente
  * lo que este archivo existe para impedir.
  */
-const PROYECTOS = ["apps/sitio/src", "packages/db/src"];
+const PROYECTOS = ["apps/sitio/src", "packages/db/src", "packages/auth/src"];
 
 const AZUL = "\x1b[1m";
 const GRIS = "\x1b[2m";

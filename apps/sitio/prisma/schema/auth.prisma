@@ -1,0 +1,86 @@
+// Las tablas de better-auth.
+//
+// Se conservan SUS nombres (`user`, `session`, `account`, `verification`) y no
+// se traducen al castellano como el resto del esquema: son tablas de la
+// librería, igual que `_prisma_migrations` es de Prisma. Renombrarlas obliga a
+// mantener un mapeo y convierte cada actualización en una revisión de nombres.
+// En el admin, a la gente se le habla de «cuentas»; el nombre de la tabla y el
+// de la pantalla no tienen por qué coincidir.
+//
+// Salió de la definición de better-auth 1.7.5, no del CLI: el CLI separado
+// quedó en la 1.4.21 y ahí `Account` todavía no tenía `issuer`.
+
+model User {
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+
+  /// administra | edita. Lo valida `@ed/auth` en el borde (`esRol`), y la
+  /// columna es texto: un enum de Postgres acá ataría el esquema a lo que el
+  /// adaptador de better-auth decida generar, que cambia entre versiones.
+  rol String @default("edita")
+
+  sessions Session[]
+  accounts Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  /// Lo llena better-auth para proveedores externos (Google, etc.). Para una
+  /// cuenta de credencial NO lo escribe —comprobado contra la 1.7.5—, así que
+  /// lleva default en la base: sin él, dar de alta a alguien con contraseña
+  /// revienta con «issuer is missing». El default va acá y no en nullable para
+  /// no aflojar el @@unique de abajo: en Postgres dos NULL no chocan.
+  issuer                String    @default("")
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  /// El hash, nunca la contraseña. Lo escribe better-auth.
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([issuer, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
