@@ -531,7 +531,8 @@ Reglas para el panel y sus datos:
   payloads). Nunca confiar en input externo.
 - **Secretos solo server-side:** `DATABASE_URL`, `PAYLOAD_SECRET`,
   `VISTA_PREVIA_SECRET`, `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca
-  llevan `NEXT_PUBLIC_` ni llegan al browser. Placeholders en `.env.example`;
+  llevan `NEXT_PUBLIC_` ni llegan al browser. Placeholders en
+  `apps/sitio/.env.example`;
   en Vercel, el build corta si falta alguna
   (`apps/sitio/src/cms/entorno.ts`).
 - **Acceso por rol** en cada colección (`apps/sitio/src/cms/acceso.ts`): dos

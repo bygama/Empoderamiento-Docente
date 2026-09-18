@@ -1,7 +1,7 @@
 # CODE-STYLE.md — Estilo de código y documentación
 
-> Las reglas operativas que sí están automatizadas viven en configuración
-> (`eslint.config.mjs`, `tsconfig.json`). Este archivo agrupa las decisiones
+> Las reglas operativas que sí están automatizadas viven en la configuración
+> de la app (`apps/sitio/eslint.config.mjs`, `apps/sitio/tsconfig.json`). Este archivo agrupa las decisiones
 > de estilo **que las herramientas no enforce-an** y sirve como índice para
 > encontrar dónde vive cada regla. No hay Prettier, commitlint ni
 > `.editorconfig` configurados por ahora.
@@ -12,10 +12,11 @@
 
 | Donde vive                | Qué regula                                  |
 | ------------------------- | ------------------------------------------- |
-| `eslint.config.mjs`       | Reglas semánticas TS/React/Next.js          |
-| `tsconfig.json`           | TS strict + path aliases (`@/*`)            |
-| `next.config.ts`          | Configuración de Next.js                     |
-| `postcss.config.mjs`      | PostCSS + `@tailwindcss/postcss` (Tailwind v4) |
+| `apps/sitio/eslint.config.mjs` | Reglas semánticas TS/React/Next.js     |
+| `apps/sitio/tsconfig.json` | TS strict + path aliases (`@/*`)           |
+| `apps/sitio/next.config.ts` | Configuración de Next.js                  |
+| `apps/sitio/postcss.config.mjs` | PostCSS + `@tailwindcss/postcss` (v4) |
+| `pnpm-workspace.yaml`     | Qué apps tiene el monorepo y el hoist de `next` |
 | `.gitignore`              | Qué no se versiona                           |
 | `docs/COMMITS.md`         | Convención humana de commits                |
 | `docs/AI_GUIDELINES.md`   | Reglas de código IA-friendly                |
@@ -102,7 +103,8 @@ repite acá por visibilidad:
 Cuando aparezca una decisión de estilo nueva:
 
 - **Si las tools la pueden enforce-ar** → mejor sumar la regla a
-  `eslint.config.mjs` o `tsconfig.json` (o sumar la tool que falte, p. ej.
+  `apps/sitio/eslint.config.mjs` o su `tsconfig.json` (o sumar la tool que
+  falte, p. ej.
   Prettier, y documentarla). Acá solo dejamos la referencia al archivo
   donde quedó.
 - **Si es decisión humana** (Markdown, naming de branches, idioma) →

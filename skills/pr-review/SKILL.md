@@ -111,7 +111,7 @@ Estas son binarias: pasa o no pasa.
 
 No hay un `pnpm doctor` por ahora; chequear a mano:
 
-- No hay `.env*` real trackeado (riesgo de leak) — solo `.env.example` si
+- No hay `.env*` real trackeado (riesgo de leak) — solo `apps/sitio/.env.example` si
   existiera.
 - No hay secretos / credenciales literales en `apps/sitio/src/`.
 - Los adapters CLAUDE/CODEX/GEMINI referencian `AGENTS.md`.

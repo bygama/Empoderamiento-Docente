@@ -133,7 +133,7 @@ si alguien lo "corrige" a `apps/sitio/src`, deja de resolver.
 
 ## 6. TypeScript estricto
 
-`tsconfig.json` debe tener:
+El `tsconfig.json` de la app (`apps/sitio/tsconfig.json`) debe tener:
 
 ```json
 {
@@ -259,7 +259,7 @@ humano) vale igual con Neon.
   (`DATABASE_URL`, `DATABASE_URL_UNPOOLED`) ni las claves de proveedor
   (`PAYLOAD_SECRET`, `VISTA_PREVIA_SECRET`, `BLOB_READ_WRITE_TOKEN`,
   `RESEND_API_KEY`) se prefijan con `NEXT_PUBLIC_` ni se usan en el browser.
-  Placeholders en `.env.example`.
+  Placeholders en `apps/sitio/.env.example`.
 - **No exponer detalles internos** en los mensajes de error al cliente.
 - **Migraciones / schema:** confirmar el diseño de colecciones y campos con
   el humano antes de crearlos, y generarlos con `pnpm migrate:create`. No
