@@ -14,7 +14,13 @@ import gsap from "gsap";
 // escuchara, alternaría de superficie a cada evento y el navbar nunca
 // llegaría a decidir. Un panel interno cualquiera (menú mobile, listas con
 // overflow) tampoco lleva la marca y por lo tanto no mueve el navbar.
+//
+// SOLO ESCRITORIO (≥ lg). En celular y tablet el header queda fijo arriba, se
+// scrollee para donde se scrollee (decisión del owner, 2026-09-18): ahí son un
+// logo y un botón sueltos, que no tapan la lectura como la píldora, y el botón
+// es la única puerta al menú.
 export function crearAutoHide(nav: HTMLElement) {
+  const escritorio = window.matchMedia("(min-width: 64rem)");
 
   const TOP_SHOWN = 16; // top-4 (1rem) — posición visible
   const TOP_HIDDEN = -120; // fuera de cuadro por arriba
@@ -37,6 +43,10 @@ export function crearAutoHide(nav: HTMLElement) {
   };
 
   const onScroll = (e: Event) => {
+    if (!escritorio.matches) {
+      show(); // por si la ventana se achicó con el navbar escondido
+      return;
+    }
     // El scroll del documento tiene por target al `document`, que no es un
     // Element; un Element solo cuenta si vive dentro de una capa marcada.
     const objetivo = e.target instanceof Element ? e.target : null;
@@ -72,7 +82,14 @@ export function crearAutoHide(nav: HTMLElement) {
     passive: true,
     capture: true,
   });
+  // Girar la tablet o achicar la ventana con el navbar escondido: vuelve ya,
+  // sin esperar al próximo scroll.
+  const alCruzar = () => {
+    if (!escritorio.matches) show();
+  };
+  escritorio.addEventListener("change", alCruzar);
   return () => {
+    escritorio.removeEventListener("change", alCruzar);
     document.removeEventListener("scroll", onScroll, { capture: true });
     gsap.set(nav, { clearProps: "top" });
   };
