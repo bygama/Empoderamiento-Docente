@@ -55,5 +55,47 @@ lectura es exactamente para lo que existe. La alternativa —recortar los
 comentarios que explican el porqué— sale más cara: son el «nunca se apaga en
 silencio» de §5.8 escrito donde se lee.
 
-**Abierto para el owner:** aceptar el desvío y anotarlo en §6 como excepción
-(junto a la de los hooks de coreografía), o pedir la partición.
+**Resuelto.** El owner aceptó el desvío en conversación y quedó escrito como
+excepción en `AGENTS.md` §6, al lado de la de los hooks de coreografía.
+
+**Pendiente de una línea:** después de la close review el script creció a
+**160 líneas** (cerrar el hueco del `catch`, abajo), así que el 137 que cita
+§6 quedó viejo. Corregirlo requiere confirmación humana (§5.6).
+
+## 2026-09-17 — El `catch` del `JSON.parse` deja de ser puerta de salida
+
+**Qué.** La seat de «fallas silenciosas» de la close review encontró que
+cualquier salida que no parsea caía en el mismo `exit 0` que «no hay red»: un
+crash de react-doctor a mitad de escribir el informe dejaba pasar el push con
+el mensaje «no pudo correr». Es **código heredado** —idéntico en `bb7fcd7`,
+antes de la mudanza— pero esta lane endureció los otros dos huecos silenciosos
+y dejaba este intacto, en un gate cuyo contrato dice «nunca se apaga en
+silencio».
+
+**Ruling.** Se arregla, aunque no sea una regresión de esta lane: el costo es
+chico y §5.8 es explícito. Los dos desenlaces se separan por si hubo salida:
+
+- `stdout` vacío → la herramienta no llegó a correr. Exit 0, no frena.
+- `stdout` con algo que no parsea → corrió y su informe vino roto. Es una
+  medición incompleta. Exit 1, e imprime los primeros caracteres de lo que
+  devolvió, que es la pista.
+
+**Verificado** con dos copias del script fuera del repo, una por camino:
+vacío → exit 0; JSON truncado → exit 1.
+
+## 2026-09-17 — `perl -pi` con backticks: qué se hace en vez
+
+**Qué.** Un `perl -pi -e 's|…|…|'` con backticks adentro del patrón destruyó
+`docs/README.md`: pegó el reemplazo al principio de las 68 líneas. Lo encontró
+la seat de documentación, no la aceptación del paso 4 — cuyo grep excluía toda
+línea con `apps/sitio/src`, y después de la corrupción **todas** la tenían.
+
+**Ruling.** Para reemplazos de una línea en markdown se usa una edición
+puntual sobre el texto exacto, no `perl -pi`. `perl` queda para lo que no
+tiene alternativa: normalizar finales de línea (`s/\r?\n/\r\n/`), que no
+depende de comillas ni de backticks.
+
+**Y la aceptación cambia de forma:** un grep que excluye el patrón nuevo no
+puede detectar un archivo que quedó lleno del patrón nuevo. Además del grep,
+el paso mira el diff (`git diff --stat`): un `.md` que cambia 68 líneas cuando
+se esperaba una es la señal que el grep no da.
