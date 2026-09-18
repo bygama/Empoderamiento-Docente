@@ -28,8 +28,13 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
       gsap.set(panel, { autoAlpha: 0 });
       if (reduced) return; // sin timeline: lo maneja el efecto de abajo.
 
-      const items = panel.querySelectorAll("[data-mnav-item]");
-      const cta = panel.querySelector("[data-mnav-cta]");
+      // La cortina: el filo cruza la pantalla entera mientras el contenido
+      // recorre la mitad. Ese desfase es todo el efecto —las palabras aparecen
+      // cortadas por el filo y se terminan de acomodar con él—, por eso NO hay
+      // entrada escalonada de ítems: competiría con la cortina. Las dos capas
+      // comparten duración y curva para llegar juntas, y al ser una curva
+      // simétrica la reversa es la misma cortina yéndose.
+      const cortina = { duration: 0.7, ease: "power3.inOut" };
       tlRef.current = gsap
         .timeline({
           paused: true,
@@ -43,23 +48,13 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
             toggleRef.current?.focus({ preventScroll: true });
           },
         })
-        .to(panel, { autoAlpha: 1, duration: 0.3, ease: "power2.out" })
-        .from(
-          items,
-          {
-            autoAlpha: 0,
-            y: 20,
-            duration: 0.5,
-            ease: "power3.out",
-            stagger: 0.06,
-          },
-          "<0.05",
-        )
-        .from(
-          cta,
-          { autoAlpha: 0, y: 14, duration: 0.45, ease: "power3.out" },
-          "<0.12",
-        );
+        // El panel se prende de una: lo que se ve entrar es la cortina, no un
+        // fundido. (Un tween mínimo y no un `set`: en la reversa tiene que
+        // volver a apagarse, y un `set` en el instante 0 no siempre lo hace.)
+        .to(panel, { autoAlpha: 1, duration: 0.01 })
+        .fromTo("[data-mnav-velo]", { opacity: 0 }, { opacity: 1, ...cortina }, 0)
+        .fromTo("[data-mnav-cortina]", { xPercent: 100 }, { xPercent: 0, ...cortina }, 0)
+        .fromTo("[data-mnav-contenido]", { xPercent: -50 }, { xPercent: 0, ...cortina }, 0);
     }, panel);
 
     return () => {
@@ -93,7 +88,9 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
     // Foco al ABRIR: a la X, y DIFERIDO dos frames, porque el panel arranca
     // en `autoAlpha: 0` (visibility hidden) y un elemento invisible no puede
     // recibir foco (lo mismo que documenta el overlay del equipo). Para cuando
-    // la timeline pintó su primer frame, la X ya es enfocable.
+    // la timeline pintó su primer frame, la X ya es enfocable. `preventScroll`
+    // porque a esa altura la X todavía viaja con la cortina, fuera de pantalla:
+    // sin él, el navegador scrollea lo que haga falta para traerla a la vista.
     //
     // El foco al CERRAR no vive acá: va pegado al `close()` (arriba y en el
     // onReverseComplete). Si se restaurara en este efecto, correría con el
@@ -104,7 +101,7 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
     let raf = 0;
     if (open) {
       raf = requestAnimationFrame(() => {
-        raf = requestAnimationFrame(() => closeRef.current?.focus());
+        raf = requestAnimationFrame(() => closeRef.current?.focus({ preventScroll: true }));
       });
     }
     return () => cancelAnimationFrame(raf);
