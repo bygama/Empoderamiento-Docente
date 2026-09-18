@@ -1,7 +1,7 @@
 /**
  * GRILLA COMPARTIDA. La columna de texto y la lámina de fotos nacen del
  * MISMO contenedor que el resto del sitio (`max-w-screen-xl` + `px-5/px-10`,
- * igual que DistintoEd, RedEd o el footer): el borde izquierdo del texto cae
+ * igual que MiradaEd, ImpulsanEd o el footer): el borde izquierdo del texto cae
  * en la misma línea que los títulos de las otras secciones y el borde derecho
  * de la foto cierra sobre el mismo margen. 7fr/6fr da a la lectura algo más
  * de aire que a la imagen sin romper el equilibrio de la doble página.

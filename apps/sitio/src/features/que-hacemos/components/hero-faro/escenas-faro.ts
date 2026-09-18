@@ -157,9 +157,10 @@ export function armarEscenas(tl: gsap.core.Timeline, { cam, entrada }: Camara) {
   // punto brillante todavía visibles, y la torre de líneas se fundía
   // encima de eso. El velo es uniforme y va sobre la escena: remata la
   // sobreexposición para que al final del runway la pantalla SEA blanca.
-  // De ese blanco nace la torre (TorreLineas arranca con su propio velo
-  // blanco y lo disuelve por tiempo). Como es un plano uniforme, no
-  // puede despegarse de la linterna: no vuelve la "segunda esfera".
+  // De ese blanco nace la sección siguiente, que arranca apagada y se
+  // prende cuando su borde llega arriba (ver coreografia-mirada). Como es
+  // un plano uniforme, no puede despegarse de la linterna: no vuelve la
+  // "segunda esfera".
   // Sube largo y en seno (no acelerando hasta el final): el blanco llega
   // como una sobreexposición que crece, no como un golpe.
   tl.to("[data-velo-blanco]", { opacity: 1, duration: 0.07, ease: "sine.inOut" }, despues(0.93));
