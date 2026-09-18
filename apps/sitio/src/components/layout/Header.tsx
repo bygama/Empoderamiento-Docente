@@ -26,9 +26,11 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  *    CTA "Contacto" naranja (único acento de acción).
  *
  * Adaptación a ED (invisible, igual que el Header anterior): la intro se dispara
- * cuando el IntroGate TERMINA (`onReveal`), no en el mount — si no, su animación
- * corta queda tapada por el zoom-through del gate. Sin gate o con reduced-motion,
- * el JSX por defecto ya muestra el estado ABIERTO (final). Respeta prefers-reduced-motion.
+ * por `onReveal`, no en el mount. Eso venía de cuando había un portón de entrada
+ * (IntroGate, borrado el 2026-09-18): su zoom tapaba esta animación corta si
+ * arrancaban juntas. Hoy `onReveal` corre de inmediato, así que es lo mismo que
+ * el mount, y la rama de espera queda por si algún día vuelve un gate. Con
+ * reduced-motion el JSX ya muestra el estado ABIERTO (final).
  */
 
 export function Header() {

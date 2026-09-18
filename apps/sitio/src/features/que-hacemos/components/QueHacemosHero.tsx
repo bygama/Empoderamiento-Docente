@@ -152,8 +152,8 @@ export function QueHacemosHero() {
         className="relative z-10 mx-auto flex w-full max-w-screen-xl flex-col items-center px-5 text-center md:px-10"
         style={{
           // Sigue al mouse y ADEMÁS se inclina apenas hacia él (mira al
-          // cursor) — mismos signos que useTilt: rotateY con x, rotateX
-          // contra y. Ángulos chicos para que acompañe sin marear.
+          // cursor): rotateY va con x y rotateX en contra de y, que es el
+          // signo que hace que la cara siga al puntero. Ángulos chicos.
           transform:
             "perspective(1000px) translate3d(calc(var(--qhx, 0) * 10px), calc(var(--qhy, 0) * 8px), 0) rotateY(calc(var(--qhx, 0) * 2.6deg)) rotateX(calc(var(--qhy, 0) * -2.1deg))",
         }}

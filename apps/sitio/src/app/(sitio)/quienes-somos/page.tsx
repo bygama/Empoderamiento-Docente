@@ -18,11 +18,12 @@ export default function QuienesSomosPage() {
       <MiradaEd />
       {/* «Nuestro enfoque» (TRANSFORMACIÓN armándose + diferenciales) estuvo
           acá entre la mirada y el equipo (2026-09-08) y se sacó al día
-          siguiente por decisión de Gastón. El componente sigue en
-          features/que-hacemos por si se reincorpora. */}
+          siguiente por decisión de Gastón. Su copy quedó guardado en
+          docs/content/copy-que-hacemos.md; el código se borró el 2026-09-18. */}
       <ImpulsanEd />
-      {/* RedEd y DistintoEd removidos del render (página muy larga) — los
-          componentes siguen en features/quienes-somos por si se reincorporan. */}
+      {/* Acá estuvieron RedEd (el grafo de la red) y DistintoEd (la comparativa
+          con una capacitación genérica): Gastón los sacó el 2026-07-22 porque
+          la página quedaba muy larga, y su código se borró el 2026-09-18. */}
       {/* Próximas secciones (sitemap): Trayectoria y alianzas · Cierre. */}
     </main>
   );

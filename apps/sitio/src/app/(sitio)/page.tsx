@@ -7,15 +7,16 @@ import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNoveda
 export default function Home() {
   return (
     <main>
-      {/* IntroGate removido: se entra directo al Inicio (sin "Comenzá la
-          experiencia"). El Hero y el navbar animan en el mount — ver
-          intro-signal.ts (entered/revealed = true por defecto). */}
+      {/* Se entra directo al Inicio: el portón «Comenzá la experiencia»
+          (IntroGate) salió del render el 2026-06-24 y su código se borró el
+          2026-09-18. El Hero y el navbar animan en el mount — ver
+          intro-signal.ts, que responde «ya entramos» siempre. */}
       <HeroQuienes />
       {/* Ancla del scroll-hint del Hero */}
       <div id="contenido" />
-      {/* El bloque «Qué hacemos» en texto plano (QueHacemosResumen, 2026-09-08)
-          se sacó de la home al día siguiente por decisión de Gastón; el
-          componente sigue en features/home por si se reincorpora. */}
+      {/* Acá hubo un bloque «Qué hacemos» en texto plano (QueHacemosResumen):
+          entró el 2026-09-08 y Gastón lo sacó al día siguiente. Su código se
+          borró el 2026-09-18; está en el historial si vuelve a hacer falta. */}
       <DatosDuros />
       <ComoTrabajamos />
       {/* Áreas de especialización (el abanico de siete cartas). Había salido
