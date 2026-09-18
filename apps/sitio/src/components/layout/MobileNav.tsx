@@ -4,7 +4,6 @@ import { useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import type { DatosDelSitio } from "@/config/datos-del-sitio";
-import { NAV_LINKS, esPaginaActiva } from "@/config/nav";
 import { irEnPagina, partirDestino } from "@/lib/navegar";
 import { Menu } from "@/components/ui/icons";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
@@ -45,10 +44,10 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
   const pathname = usePathname();
-  // Submenú desplegado (acordeón): el de la página actual arranca abierto.
-  const [desplegado, setDesplegado] = useState<string | null>(
-    () => NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null,
-  );
+  // Página en foco (ver NavegacionMenu). El menú abre siempre en la lista
+  // completa: se resetea al abrir y al cambiar de ruta, no al cerrar, para que
+  // la lista no se rearme a la vista mientras la cortina se va.
+  const [desplegado, setDesplegado] = useState<string | null>(null);
 
   // true recién en cliente (post-hidratación): el portal a <body> se monta
   // solo entonces. Patrón canónico sin setState-en-efecto ni mismatch.
@@ -64,7 +63,7 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
   if (pathname !== prevPath) {
     setPrevPath(pathname);
     setOpen(false);
-    setDesplegado(NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null);
+    setDesplegado(null);
   }
 
   // Este menú es de < lg: si la ventana cruza a escritorio con el panel
@@ -111,7 +110,10 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
         aria-label="Abrir menú"
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setDesplegado(null);
+          setOpen(true);
+        }}
         // La isla del botón: un círculo blanco SÓLIDO —un vidrio se agrisa
         // sobre los fondos oscuros—, que se lee sobre lo que sea sin cambiar.
         // `BotonCerrar` copia esta caja.

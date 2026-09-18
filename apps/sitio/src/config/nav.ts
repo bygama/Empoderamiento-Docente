@@ -2,6 +2,7 @@
  * Navegación principal del sitio.
  *
  * "Inicio" NO va como link de texto: el LOGO es el acceso a Inicio (cliqueable).
+ * Excepción: el menú mobile lo suma primero (mobile-nav/NavegacionMenu.tsx).
  * "Contacto" se rinde como CTA (naranja), no como link de texto, para respetar
  * la regla del manual (naranja solo en acciones).
  *
