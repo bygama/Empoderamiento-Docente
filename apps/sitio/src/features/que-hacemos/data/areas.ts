@@ -64,9 +64,6 @@ export type Area = {
   alt: string;
 };
 
-export const DESCRIPTOR =
-  "Consultora especializada en la transformación del aprendizaje matemático.";
-
 export const BAJADA =
   "Investigamos, diseñamos e implementamos soluciones para la transformación educativa en Matemáticas, junto a ministerios, redes de escuelas, instituciones y equipos docentes. No capacitamos docentes: transformamos la relación con las matemáticas.";
 
@@ -304,28 +301,5 @@ export const MIRADA = [
       "El aprendizaje queda en la institución: criterios, herramientas y decisiones que el equipo sostiene por sí mismo.",
     foto: "/fotos/equipo-docente-escuela.webp",
     fotoAlt: "Un equipo docente reunido frente a la pizarra de su escuela",
-  },
-] as const;
-
-// ── Con quién trabajamos ──────────────────────────────────────────────────────
-// Los cuatro tipos de interlocutor que aparecen en el brief, la planilla de
-// alianzas y los proyectos hechos. ED no vende cursos a docentes sueltos:
-// trabaja con quienes deciden y sostienen la enseñanza.
-export const INTERLOCUTORES = [
-  {
-    quien: "Ministerios y secretarías de educación",
-    que: "Asesoría, currículo, materiales y acompañamiento a equipos técnicos",
-  },
-  {
-    quien: "Empresas y fundaciones con programas educativos",
-    que: "Currícula, evaluaciones, materiales y desarrollo profesional para sus redes de escuelas",
-  },
-  {
-    quien: "Redes de escuelas e instituciones",
-    que: "Procesos de transformación sostenidos en el tiempo, con acompañamiento",
-  },
-  {
-    quien: "Consultoras, organismos y universidades",
-    que: "Dispositivos masivos de desarrollo profesional, investigación y transferencia",
   },
 ] as const;
