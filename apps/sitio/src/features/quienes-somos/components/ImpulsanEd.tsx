@@ -1,5 +1,6 @@
 "use client";
 
+import { SelloED } from "@/components/brand/SelloED";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -283,6 +284,9 @@ export function ImpulsanEd() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:radial-gradient(circle,#fff_1.1px,transparent_1.6px)] [background-size:24px_24px]"
       />
+      {/* La firma de la última hoja (SelloED), arriba a la derecha de la
+          lámina. */}
+      <SelloED className="absolute top-8 right-8 z-10 md:top-10 md:right-10" />
 
       {/* Degradé de salida hacia el pie: una sombra ancha que sube desde el
           final de la lámina, toma cuerpo a media altura y VUELVE a cero justo

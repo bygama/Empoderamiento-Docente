@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
+import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { PUNTOS } from "./constelacion";
@@ -307,6 +308,9 @@ export function CierreInvestigacion() {
         <span className="text-azul-claro/60 absolute top-7 right-8 z-[36] hidden font-mono text-[0.68rem] tracking-[0.2em] uppercase lg:block">
           Archivo ED · Última hoja · Cierre
         </span>
+        {/* La firma, en la esquina opuesta al folio y por encima de las
+            nubes como él. */}
+        <SelloED className="absolute top-6 left-8 z-[36]" />
 
         {/* ── El faro, plantado en el piso. El ancho escala con el alto para
             que la linterna quede a la altura de los mensajes en cualquier

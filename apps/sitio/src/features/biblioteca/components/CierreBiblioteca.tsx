@@ -5,6 +5,7 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
+import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ArrowUpRight } from "@/components/ui/icons";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
@@ -113,6 +114,9 @@ export function CierreBiblioteca() {
           />
           <PuntosFaro />
         </div>
+
+        {/* La firma de la última hoja (SelloED). */}
+        <SelloED className="absolute top-7 left-7 z-20 md:top-9 md:left-9" />
 
         <div className="relative z-10 flex min-h-[58svh] flex-col items-center justify-center px-5 py-24 text-center md:px-10 md:py-28">
           <RevealLines
