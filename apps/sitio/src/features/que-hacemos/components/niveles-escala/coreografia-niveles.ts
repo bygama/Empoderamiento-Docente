@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { NIVELES } from "@/features/que-hacemos/data/secciones";
+import { NIVELES } from "@/features/que-hacemos/data/niveles";
 import { ALTO_SVH, ENTRADA_SVH } from "./niveles-escena";
 import { instalarToggle } from "./toggle-nivel";
 
