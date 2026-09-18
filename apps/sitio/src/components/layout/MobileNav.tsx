@@ -13,18 +13,17 @@ import { irArriba, irASeccion } from "@/lib/indice";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useMenuAnimado } from "./mobile-nav/useMenuAnimado";
-import { BarraMenu } from "./mobile-nav/BarraMenu";
-import { BotonCerrar } from "./mobile-nav/BotonCerrar";
+import { BarraMenu, HuecoBarra } from "./mobile-nav/BarraMenu";
 import { NavegacionMenu } from "./mobile-nav/NavegacionMenu";
 import { PieMenu } from "./mobile-nav/PieMenu";
 
 
 /**
  * Navegación mobile (< lg). Botón hamburguesa dentro de la píldora del Header
- * que abre un panel a pantalla completa con fondo `.faro-glow` (metáfora del
- * faro de marca). Los 5 ítems del sitemap se apilan grandes —mismo lenguaje
- * editorial que el Footer: tipografía display + hairline + flecha ↗— y el CTA
- * "Contacto" queda como acción focal abajo.
+ * que abre un panel a pantalla completa con fondo `.faro-glow`: la noche del
+ * faro. El panel INVIERTE la página —ella clara, él azul con el logo en
+ * negativo—, mismo lenguaje que el Footer. Los 5 ítems del sitemap se apilan
+ * grandes a la izquierda y el CTA "Contacto" queda como acción focal abajo.
  *
  * - Entra como una CORTINA desde la derecha (la coreografía y su porqué, en
  *   `useMenuAnimado`); el cierre es la misma cortina en reversa.
@@ -157,17 +156,21 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
             {/* Velo: apaga la página de atrás mientras la cortina la cruza. */}
             <div data-mnav-velo className="bg-azul-principal/60 absolute inset-0" />
 
-            {/* Primero en el DOM: es lo primero que encuentra el Tab. */}
-            <BotonCerrar closeRef={closeRef} onCerrar={close} />
-
-            {/* La cortina son DOS capas (ver useMenuAnimado): la de afuera entra
-                de punta a punta y recorta; la de adentro lleva el contenido a
-                mitad de velocidad. `overflow-clip` y no `hidden`: un contenedor
-                `hidden` se puede scrollear por código, y enfocar algo de adentro
-                con el contenido todavía corrido lo dejaría desplazado. */}
+            {/* La cortina (ver useMenuAnimado): la capa de afuera entra de punta
+                a punta y recorta; adentro, el contenido viaja a mitad de
+                velocidad y la barra se queda quieta sobre la píldora de la
+                página. `overflow-clip` y no `hidden`: un contenedor `hidden` se
+                puede scrollear por código, y enfocar algo de adentro con las
+                capas todavía corridas lo dejaría desplazado. */}
             <div data-mnav-cortina className="absolute inset-0 overflow-clip">
-              <div data-mnav-contenido className="faro-glow flex h-full w-full flex-col overflow-y-auto">
-                <BarraMenu onCerrar={close} />
+              {/* Primero en el DOM: el cierre es lo primero que encuentra el Tab. */}
+              <BarraMenu closeRef={closeRef} onCerrar={close} />
+
+              <div
+                data-mnav-contenido
+                className="faro-glow flex h-full w-full flex-col overflow-y-auto text-white"
+              >
+                <HuecoBarra />
 
                 <NavegacionMenu
                   pathname={pathname}

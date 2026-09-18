@@ -16,8 +16,12 @@ type Opciones = {
 // 12·√2 ≈ 17, de ahí la escala.
 const CENTRO = 5;
 const ASPA = { scaleX: 0.94 };
-const JUNTAR = { duration: 0.3, ease: "power2.inOut" };
-const GIRAR = { duration: 0.4, ease: "power3.out" };
+// Las rayas esperan a que el filo termine de cruzar el botón (de 375 a 1023px
+// lo suelta antes de los 0,3 s): mientras lo cruza tienen que ser IGUALES a
+// las de la píldora que quedan del otro lado del filo, o se vería el corte.
+const ESPERA = 0.3;
+const JUNTAR = { duration: 0.14, ease: "power2.in" };
+const GIRAR = { duration: 0.26, ease: "power3.out" };
 
 /**
  * Apertura y cierre del panel: la timeline (que se arma una vez que el panel
@@ -44,7 +48,6 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
         gsap.set(rayaB, { y: -CENTRO, ...ASPA, rotation: -45 });
         return; // sin timeline: lo maneja el efecto de abajo.
       }
-      const icono = toggleRef.current?.querySelector("svg") ?? null;
 
       // La cortina: el filo cruza la pantalla entera mientras el contenido
       // recorre la mitad. Ese desfase es todo el efecto —las palabras aparecen
@@ -73,17 +76,16 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
         .fromTo("[data-mnav-velo]", { opacity: 0 }, { opacity: 1, ...cortina }, 0)
         .fromTo("[data-mnav-cortina]", { xPercent: 100 }, { xPercent: 0, ...cortina }, 0)
         .fromTo("[data-mnav-contenido]", { xPercent: -50 }, { xPercent: 0, ...cortina }, 0)
-        // Rayas → X en el gemelo. Primero se juntan al centro, y recién giran
-        // cuando la cortina ya pasó por debajo del botón: la X termina de
-        // armarse con el panel puesto, como en la referencia.
-        .to(rayaA, { y: CENTRO, ...JUNTAR }, 0)
-        .to(rayaB, { y: -CENTRO, ...JUNTAR }, 0)
-        .to(rayaA, { rotation: 45, ...ASPA, ...GIRAR }, JUNTAR.duration)
-        .to(rayaB, { rotation: -45, ...ASPA, ...GIRAR }, JUNTAR.duration);
-      // El ícono de la píldora se apaga en el instante 0 para que no asome,
-      // quieto, detrás del que gira; en la reversa vuelve justo cuando el
-      // diálogo se cierra.
-      if (icono) tlRef.current.to(icono, { autoAlpha: 0, duration: 0.01 }, 0);
+        // La barra (logo + cierre) se CONTRA-desplaza lo mismo que avanza la
+        // cortina: queda quieta en pantalla, calzada sobre la píldora, y el
+        // filo la destapa. Es el cambio de color de la referencia: el mismo
+        // logo y las mismas rayas, azules de un lado del filo y blancos del otro.
+        .fromTo("[data-mnav-fijo]", { xPercent: -100 }, { xPercent: 0, ...cortina }, 0)
+        // Rayas → X: se juntan al centro y giran, con el panel ya puesto.
+        .to(rayaA, { y: CENTRO, ...JUNTAR }, ESPERA)
+        .to(rayaB, { y: -CENTRO, ...JUNTAR }, ESPERA)
+        .to(rayaA, { rotation: 45, ...ASPA, ...GIRAR }, ESPERA + JUNTAR.duration)
+        .to(rayaB, { rotation: -45, ...ASPA, ...GIRAR }, ESPERA + JUNTAR.duration);
     }, panel);
 
     return () => {
@@ -130,25 +132,12 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
     // robaría el foco a cualquiera cada vez que el efecto se re-corre con el
     // menú cerrado (basta que la persona cambie `prefers-reduced-motion`, que
     // `useReducedMotion` escucha en vivo).
-    //
-    // `calzar` pone el botón gemelo exacto sobre el de la píldora, MIDIENDO y no
-    // copiando sus números: la píldora se corre con el ancho de pantalla. Se
-    // repite en cada resize mientras el panel está abierto (girar el celular).
-    const calzar = () => {
-      const burger = toggleRef.current?.getBoundingClientRect();
-      if (burger && closeRef.current) gsap.set(closeRef.current, { x: burger.left, y: burger.top });
-    };
     let raf = 0;
     if (open) {
-      calzar();
-      window.addEventListener("resize", calzar);
       raf = requestAnimationFrame(() => {
         raf = requestAnimationFrame(() => closeRef.current?.focus({ preventScroll: true }));
       });
     }
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", calzar);
-    };
+    return () => cancelAnimationFrame(raf);
   }, [open, reduced, panelRef, toggleRef, closeRef]);
 }
