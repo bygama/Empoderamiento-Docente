@@ -60,9 +60,16 @@ De los seis hallazgos del SPEC de la fase 0, tres son de esta lane:
 | 5 | Rate limit solo por cuenta | por IP **y** por cuenta, en el middleware |
 | 6 | `/admin` dependía de `robots.txt` | `X-Robots-Tag: noindex` real en la respuesta |
 
-Más lo que trae la capa nueva: **Argon2id**, rotación de sesión al login,
-tokens de reset de un solo uso hasheados en reposo, y errores genéricos para no
-permitir enumerar usuarios.
+Más lo que trae la capa nueva: tokens de reset de un solo uso con expiración,
+errores genéricos para no permitir enumerar usuarios, y protección CSRF por
+validación de origen.
+
+**El hasheo es scrypt, no Argon2id, y este párrafo dice la verdad en vez de
+repetir lo que se había planeado.** Argon2id es la primera opción de OWASP y
+scrypt la segunda aceptable; better-auth trae scrypt de fábrica y pasar a
+Argon2id significa sumar `@node-rs/argon2`, una dependencia que el owner no
+aprobó. Se implementó con el default y la decisión queda a la vista: el cambio
+es un `password.hash` en `packages/auth/src/config.ts` y una dependencia.
 
 **La sesión se verifica en el middleware, antes de renderizar.** Nunca dentro
 del componente.

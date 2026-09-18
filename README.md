@@ -183,18 +183,51 @@ Prisma antes de `next build`.
 
 ## Admin
 
-**En construcción.** Va a vivir en `/admin`, construido a medida sobre Prisma y
-better-auth, con la base en Neon. El diseño completo —arquitectura, mapa de
-URLs, modelo de contenido, seguridad y fases— está en
-[`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md),
+Vive en `/admin`, construido a medida sobre **Prisma** y **better-auth**. Hoy
+tiene los cimientos —entrar, salir y elegir contraseña— y **nada de contenido
+todavía**: las novedades, la biblioteca, los casos y el equipo llegan en las
+fases siguientes. El diseño completo está en
+[`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
 y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
 
-Para correrlo en local va a hacer falta un Postgres (Docker):
+### Levantarlo en local
 
-    docker run -d --name ed-postgres -e POSTGRES_PASSWORD=ed -e POSTGRES_DB=ed -p 5435:5432 -v ed-postgres-datos:/var/lib/postgresql/data postgres:17
+```bash
+# 1. Un Postgres
+docker run -d --name ed-postgres -e POSTGRES_PASSWORD=ed -e POSTGRES_DB=ed \
+  -p 5435:5432 -v ed-postgres-datos:/var/lib/postgresql/data postgres:17
 
-y un `apps/sitio/.env.local` según su `.env.example`. Sin `.env.local` el sitio
-compila y corre igual.
+# 2. Las variables: copiar apps/sitio/.env.example a .env.local y completarlo.
+#    El secreto de better-auth se genera así:
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# 3. El esquema
+pnpm migrate
+
+# 4. La primera cuenta. No hay registro público: esta es la única puerta.
+pnpm --filter sitio crear-cuenta tu@correo.org "Tu nombre" administra
+```
+
+Después, `/admin/olvide-mi-contrasena` con ese correo. Sin clave de Resend el
+enlace sale **por la consola del servidor**, que en local es lo que hace falta.
+
+> **Si ya tenías el contenedor de antes**, adentro vive una base `ed_panel` con
+> las nueve tablas que dejó Payload. Quedó huérfana con la fase 0 y no la toca
+> nadie: borrala cuando quieras con
+> `docker exec ed-postgres psql -U postgres -c "DROP DATABASE ed_panel;"`.
+
+### Comandos de base
+
+```bash
+pnpm migrate           # crea y aplica una migración (pide nombre)
+pnpm migrate:status    # ¿hay pendientes?
+pnpm migrate:deploy    # aplica las que falten, sin crear ninguna
+pnpm generate          # regenera el cliente de Prisma
+```
+
+Todos pasan por `scripts/guarda-prisma.mjs`, que **bloquea `prisma db push`**:
+`push` cambia la base sin dejar archivo de migración, y el entorno siguiente se
+queda sin esas tablas con el síntoma recién en producción.
 
 Una maña del repo que sobrevive a cualquier stack: si `pnpm typecheck` falla
 por tipos de rutas que no existen en el código, borrar `apps/sitio/.next` y
