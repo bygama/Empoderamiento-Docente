@@ -50,6 +50,24 @@ limpieza y la llama el MISMO efecto de antes, en la misma posición), y cada
 pedazo de markup a su propio archivo. Dos piezas no justifican la carpeta:
 quedan al lado del compositor.
 
+### Dónde va un archivo de datos
+
+Hay dos clases, y confundirlas es lo que hace que después nadie sepa dónde
+buscar:
+
+| Qué es | Dónde va | Ejemplo |
+| --- | --- | --- |
+| **Contenido del sitio** — lo que algún día administra el panel: personas, materiales, novedades, casos, áreas, proyectos | `features/<feature>/data/<tema>.ts` | `quienes-somos/data/equipo.ts` |
+| **Constantes de un componente partido** — los pasos de una animación, las cartas de una escena | junto a sus piezas, en la subcarpeta del componente | `home/components/lineas-accion/data.ts` |
+
+La prueba para distinguirlas: **si el cambio lo puede pedir el cliente, es
+contenido**; si solo tiene sentido leyéndolo al lado de la coreografía que lo
+consume, es una constante del componente.
+
+Un feature con contenido tiene `data/` aunque hoy sea un solo archivo: el
+nombre del tema (`novedades.ts`, `casos.ts`) dice más que `data.ts`, y cuando
+llegue el segundo tema no hay que mover nada.
+
 ---
 
 ## 3. Naming
@@ -114,7 +132,9 @@ import { siteConfig } from "@/config/site";
 ```
 
 Nunca rutas relativas largas (`../../../`) — son ilegibles y frágiles al
-mover archivos.
+mover archivos. Lo relativo queda para lo que está **en la misma carpeta**
+(`./coreografia`): apenas hay que subir un nivel, va `@/`. Hoy no queda ni un
+import con `../../` en toda la app, y esa es la señal a mantener.
 
 Configurar en el `tsconfig.json` de la app (`apps/sitio/tsconfig.json`). El
 `./src/*` es relativo a ese archivo, así que **no lleva el prefijo de la app**:
