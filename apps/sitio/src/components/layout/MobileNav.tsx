@@ -137,6 +137,11 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
               e.preventDefault();
               setOpen(false);
             }}
+            // El navegador puede cerrar el diálogo sin avisar por `cancel` (un
+            // segundo Escape o el «atrás» de Android sin interacción de por
+            // medio): sin esto el estado quedaría en abierto y el menú no
+            // volvería a abrir.
+            onClose={() => setOpen(false)}
             // `open:block` y no `block`: un `display` fijo le gana a la regla del
             // agente que esconde el dialog cerrado y el panel quedaría siempre
             // a la vista. El resto neutraliza margen, borde, fondo y topes de
