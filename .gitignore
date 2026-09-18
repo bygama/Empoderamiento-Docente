@@ -53,3 +53,12 @@ docs/superpowers/
 
 # playwright mcp (local screenshots / console artifacts)
 .playwright-mcp/
+
+# next dev escribe un bloque `nextjs-agent-rules` dentro de la app, en un
+# AGENTS.md y un CLAUDE.md propios, cada vez que levanta (lo genera
+# node_modules/next/dist/server/lib/generate-agent-files.js). El contrato de
+# este repo vive en los .md de la raíz —la golden rule de AGENTS.md §3—, así
+# que esa copia generada no se versiona: dos AGENTS.md es justo lo que esa
+# regla existe para evitar.
+/apps/*/AGENTS.md
+/apps/*/CLAUDE.md
