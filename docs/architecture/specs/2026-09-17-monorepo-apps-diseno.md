@@ -1,22 +1,45 @@
 # Monorepo: el repo pasa a `apps/` — diseño
 
 - **Fecha:** 2026-09-17
-- **Estado:** aprobado en conversación (Mateo), pendiente de plan de implementación
+- **Estado:** **implementado, y parcialmente superado.** Ver el recuadro.
 - **Decide:** Mateo, con Facundo y Gastón
-- **Relación:** complementaba al diseño del panel
-  (`2026-09-15-panel-admin-diseno.md`, borrado por el
-  [ADR-0005](../adrs/0005-admin-a-medida.md); lo reemplaza
-  [el diseño del admin a medida](2026-09-18-admin-a-medida-diseno.md))
-  y **corrige su §3**: el árbol que ahí se describe pasa a vivir dentro de
-  `apps/sitio/`. Lo demás de ese spec (alcance, modelo de contenido, acceso,
-  fases) no cambia.
+
+> ### Qué de este documento sigue en pie, y qué no
+>
+> **Sigue vigente** —y es la razón por la que este archivo no se borra— todo el
+> razonamiento de por qué el repo es un monorepo con **una sola app** y no dos
+> (§2 y §3.1), cómo quedó el gate multi-proyecto (§4.2) y en qué orden se hizo
+> la mudanza (§5).
+>
+> **Está superado** todo lo que describe el contenido de la app. Este documento
+> se escribió cuando el panel iba a ser **Payload**, decisión revertida por el
+> [ADR-0005](../adrs/0005-admin-a-medida.md). Donde acá diga `src/cms`,
+> `src/contenido`, `payload.config.ts`, `payload-types.ts` o el route group
+> `(payload)`, **nada de eso existe**: el admin se construye a medida y su
+> estructura real es `prisma/`, `src/datos/`, `src/admin/` y `packages/`.
+>
+> **La regla de `packages/` de este documento también cambió**: acá se dice que
+> aparece recién con un segundo consumidor, y el
+> [ADR-0006](../adrs/0006-packages-reutilizables.md) la enmendó.
+>
+> **Dónde está la verdad de hoy:** `AGENTS.md` §3 para el árbol, y
+> [el diseño del admin a medida](2026-09-18-admin-a-medida-diseno.md) para todo
+> lo demás.
+>
+> El diseño del panel que este documento complementaba
+> (`2026-09-15-panel-admin-diseno.md`) fue borrado por el ADR-0005; vive en el
+> historial de git.
 
 ---
 
 ## 1. Qué se quiere
 
-El sitio de ED es hoy un solo proyecto Next en la raíz del repo. El panel
-(spec del 2026-09-15) está por sumar Payload, la definición del panel
+> *Tiempo verbal: lo que sigue está escrito desde el 2026-09-17, antes de la
+> mudanza y con Payload todavía en el plan. Se conserva así a propósito — es el
+> contexto en el que se decidió.*
+
+El sitio de ED era entonces un solo proyecto Next en la raíz del repo. El panel
+(spec del 2026-09-15) estaba por sumar Payload, la definición del panel
 (`src/cms`), la capa de lectura (`src/contenido`), migraciones y tipos
 generados. Y ED, como organización, puede crecer a más de un producto web:
 un portal de inscripción, un campus, la landing de una diplomatura.

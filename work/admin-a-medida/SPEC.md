@@ -40,10 +40,10 @@ componentes cambiaban de fuente de datos.
 | Fotos | `@vercel/blob` + `sharp` | SDK directo, sin adaptador |
 | Correos | `resend` | SDK directo, sin adaptador |
 
-Salen 7 dependencias (`payload`, 5× `@payloadcms/*`, `graphql`); entran 5
+Salen 7 dependencias (`payload`, 5× `@payloadcms/*`, `graphql`); entran 6
 (`prisma`, `@prisma/client`, `@prisma/adapter-neon`, `better-auth`,
-`@vercel/blob`, `resend` — `sharp` y `zod` ya están). El repo queda con menos
-dependencias que hoy.
+`@vercel/blob`, `resend` — `sharp` y `zod` ya están). El repo queda con una
+dependencia menos que hoy.
 
 **Vocabulario:** se abandona el de Payload a propósito. Es Postgres relacional,
 no una base documental. No hay «colecciones», ni «globals», ni
