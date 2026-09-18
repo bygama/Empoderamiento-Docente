@@ -247,3 +247,43 @@ sin historia compartida con quien escribió la lane.
 | 1 | Correctness against the SPEC | **PASS** |
 | 2 | Silent failures | **PASS** |
 | 3 | Documentation impact | **FAIL** → fix loop ronda 1 → cerrado |
+
+### El camino de arranque del README, corrido de verdad
+
+`next start` sobre el build de `c035098`, por `localhost` (nunca `127.0.0.1`,
+que no hidrata):
+
+```
+/  /que-hacemos  /quienes-somos  /investigacion  /biblioteca
+/novedades  /novedades/relime-2025  /contacto  /robots.txt     → 200
+
+/admin        → 404
+/api/fotos    → 404     ← el endpoint público y enumerable, cerrado en vivo
+/vista-previa → 404
+
+<title>Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas</title>
+```
+
+Los tres 404 son la prueba en runtime de que los hallazgos 2 y 3 de seguridad
+del SPEC §6 quedaron cerrados: sin REST autogenerada no hay biblioteca de
+medios que enumerar, y `/api` quedó libre para los formularios de la fase 4.
+
+## Cierre
+
+Lane **cerrada**. Los cuatro archivos y su evidencia quedan en el historial de
+git; la carpeta `work/admin-a-medida/` se borra en el commit de cierre, como
+manda el handoff, y viaja en el mismo PR.
+
+**Lo que sigue:** la lane de la **fase 1** (cimientos: `packages/db`,
+`packages/auth`, middleware con cabeceras y rate limit, login en `/admin`)
+contra este mismo SPEC, que vive en
+`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`.
+
+Dos cosas anotadas para esa lane:
+
+1. **Revalidar contra el registry que `prisma@latest` siga resolviendo a un
+   RC** antes de agregar la dependencia. La medición del ADR-0007 es del
+   2026-09-18 y eso se mueve.
+2. **Sumar `packages/` a las dos listas del gate** (`PROYECTOS` en
+   `scripts/verificar-react-doctor.mjs` y el script `react-doctor` de la raíz)
+   en el mismo PR que cree el primer package, y a `pnpm-workspace.yaml`.
