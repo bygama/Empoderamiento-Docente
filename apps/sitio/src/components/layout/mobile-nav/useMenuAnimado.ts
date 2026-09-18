@@ -83,6 +83,11 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
         } else {
           tlRef.current.reverse(); // el close() lo hace onReverseComplete
         }
+      } else {
+        // Ya lo cerró el navegador por su cuenta (ver `onClose` en MobileNav):
+        // la timeline quedó al final y hay que rebobinarla, o la próxima
+        // apertura arrancaría con la cortina ya puesta.
+        tlRef.current?.pause(0);
       }
     }
     // Foco al ABRIR: a la X, y DIFERIDO dos frames, porque el panel arranca
