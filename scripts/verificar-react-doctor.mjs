@@ -36,13 +36,18 @@ const VERDE = "\x1b[32m";
 const FIN = "\x1b[0m";
 
 let salida;
+// stderr se captura, no se tira: cuando el comando no llega a correr, el
+// motivo real (sin red, un 404 del registry, un crash) sale por ahí, y sin
+// eso el aviso de más abajo dice «¿sin red?» ante cualquier causa.
+let errores = "";
 try {
   salida = execFileSync(
     "pnpm",
     ["dlx", "react-doctor", "--no-supply-chain", "--json", "--project", PROYECTOS.join(",")],
-    { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], shell: process.platform === "win32" },
+    { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], shell: process.platform === "win32" },
   );
 } catch (e) {
+  errores = e?.stderr ?? "";
   // El comando sale != 0 cuando ENCUENTRA errores: eso no es una falla de
   // ejecución y su stdout sirve igual.
   salida = e?.stdout ?? "";
@@ -62,9 +67,9 @@ try {
   //    es una medición incompleta, y una medición incompleta no es un
   //    aprobado (AGENTS.md §5.8).
   if (salida.trim() === "") {
-    console.log(
-      `\n${GRIS}  react-doctor no pudo correr (¿sin red, o el registry caído?). No frena el push.${FIN}\n`,
-    );
+    console.log(`\n${GRIS}  react-doctor no pudo correr. No frena el push.${FIN}`);
+    const motivo = errores.trim().split("\n").slice(0, 3).join("\n  ");
+    console.log(`${GRIS}  ${motivo || "Sin salida de error: probablemente no haya red."}${FIN}\n`);
     process.exit(0);
   }
   console.log(`\n${ROJO}${AZUL}  react-doctor devolvió una salida que no se puede leer.${FIN}`);
