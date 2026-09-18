@@ -31,6 +31,8 @@ internos (refactors).
 | ----- | --------------------------------------------- | -------- |
 | 0001  | [Stack base del sitio](0001-stack-base.md)    | Accepted (persistencia superseded por 0002) |
 | 0002  | [Adoptar Supabase para backend y persistencia](0002-adoptar-supabase-persistencia.md) | Accepted (reemplaza MongoDB de 0001) |
+| 0003  | _(reservado)_ Payload + Neon para el panel de administración | Pendiente (llega con la fase 0 del panel) |
+| 0004  | [Pasar el repo a monorepo con `apps/`](0004-monorepo-apps.md) | Accepted |
 
 ---
 
