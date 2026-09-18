@@ -116,7 +116,9 @@ import { siteConfig } from "@/config/site";
 Nunca rutas relativas largas (`../../../`) — son ilegibles y frágiles al
 mover archivos.
 
-Configurar en `tsconfig.json`:
+Configurar en el `tsconfig.json` de la app (`apps/sitio/tsconfig.json`). El
+`./src/*` es relativo a ese archivo, así que **no lleva el prefijo de la app**:
+si alguien lo "corrige" a `apps/sitio/src`, deja de resolver.
 
 ```json
 {
@@ -243,9 +245,9 @@ fotos en Vercel Blob y correos por Resend.** Decisión en
 [`architecture/adrs/0003-adoptar-neon-y-payload.md`](architecture/adrs/0003-adoptar-neon-y-payload.md)
 y diseño en
 [`architecture/specs/2026-09-15-panel-admin-diseno.md`](architecture/specs/2026-09-15-panel-admin-diseno.md).
-La definición del panel vive en `src/cms/` y `src/payload.config.ts`; lo que
-Payload genera (`src/app/(payload)/`, `src/payload-types.ts`,
-`src/cms/migraciones/`) no se edita a mano. Lo que sigue de esta sección
+La definición del panel vive en `apps/sitio/src/cms/` y `apps/sitio/src/payload.config.ts`; lo que
+Payload genera (`apps/sitio/src/app/(payload)/`, `apps/sitio/src/payload-types.ts`,
+`apps/sitio/src/cms/migraciones/`) no se edita a mano. Lo que sigue de esta sección
 (Zod en los bordes, secretos solo server-side, migraciones acordadas con el
 humano) vale igual con Neon.
 
@@ -267,7 +269,7 @@ humano) vale igual con Neon.
 
 ## 13. Configuración centralizada
 
-`src/config/site.ts` exporta la config institucional (forma real):
+`apps/sitio/src/config/site.ts` exporta la config institucional (forma real):
 
 ```ts
 export const siteConfig = {

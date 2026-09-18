@@ -16,8 +16,9 @@ de envío de CV.
 
 - **Next.js 16** (App Router) + **React 19**
 - **TypeScript 5** (strict)
-- **Tailwind CSS v4** (CSS-first: el tema vive en `src/app/globals.css` con
-  bloque `@theme`, sin `tailwind.config.js`)
+- **Tailwind CSS v4** (CSS-first: el tema vive en
+  `apps/sitio/src/app/globals.css` con bloque `@theme`, sin
+  `tailwind.config.js`)
 - **GSAP 3** + **Lenis** (animaciones y smooth scroll)
 - **Zod 4** (validación de bordes; se usa cuando aparezcan formularios)
 - **pnpm 11** (pinned vía `packageManager`), **Node ≥ 22**
@@ -26,7 +27,8 @@ de envío de CV.
 contenido en `/admin`), con fotos en Vercel Blob y correos por Resend. Ver
 [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md).
 
-Versiones exactas en [`package.json`](package.json).
+Versiones exactas en [`apps/sitio/package.json`](apps/sitio/package.json):
+el repo es un workspace pnpm y las dependencias viven en la app.
 
 ---
 
@@ -52,11 +54,12 @@ pnpm build        # build de producción
 pnpm start        # servir el build de producción
 pnpm lint         # ESLint (eslint-config-next)
 pnpm typecheck    # TypeScript (tsc --noEmit)
-pnpm payload         # CLI de Payload (acceso directo a sus subcomandos)
-pnpm migrate         # corre las migraciones pendientes de Payload
-pnpm migrate:create  # genera una migración nueva a partir de las colecciones
-pnpm generate:types  # regenera src/payload-types.ts desde las colecciones
-pnpm build:vercel    # el build que usa Vercel: migra y después next build
+# Los comandos del panel son de la app, no del workspace: van con --filter.
+pnpm --filter sitio payload         # CLI de Payload
+pnpm --filter sitio migrate         # corre las migraciones pendientes
+pnpm --filter sitio migrate:create  # genera una migración nueva
+pnpm --filter sitio generate:types  # regenera los tipos del panel
+pnpm --filter sitio build:vercel    # el build de Vercel: migra y buildea
 ```
 
 Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm build` en verde
@@ -79,8 +82,9 @@ ninguna:
 - `RESEND_API_KEY` — correos del panel; sin clave, salen por consola.
 
 Todas menos `NEXT_PUBLIC_SITE_URL` son secretas y **solo server-side**. Los
-placeholders viven en [`.env.example`](.env.example). Los `.env*` reales
-están git-ignorados.
+placeholders viven en
+[`apps/sitio/.env.example`](apps/sitio/.env.example): las variables son de la
+app, no del workspace. Los `.env*` reales están git-ignorados.
 
 ---
 
@@ -92,20 +96,34 @@ están git-ignorados.
 ├── CLAUDE.md             ← adapter para Claude Code (puntero a AGENTS.md)
 ├── DESIGN.md              ← sistema de diseño (tokens, tipos, reglas)
 ├── docs/                  ← documentación auxiliar (ver docs/README.md)
-├── public/                ← assets estáticos (brand/, fotos/, aliados/, equipo/)
-├── src/
-│   ├── app/               ← App Router: layout.tsx, page.tsx, globals.css
-│   ├── components/        ← UI reutilizable (brand/, layout/, providers/, ui/)
-│   ├── features/home/     ← secciones del home (Hero, LineasAccion, …)
-│   ├── config/            ← site.ts (datos institucionales) + nav.ts
-│   └── lib/               ← hooks/ y utilidades
-└── (config raíz)          ← tsconfig.json, eslint.config.mjs, next.config.ts,
-                              postcss.config.mjs, pnpm-workspace.yaml, .npmrc
+├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
+├── package.json           ← raíz del workspace: delega en las apps + el gate
+├── pnpm-workspace.yaml    ← packages: ["apps/*"]
+└── apps/
+    └── sitio/             ← el sitio y su panel (por ahora, la única app)
+        ├── package.json   ← las dependencias viven acá, no en la raíz
+        ├── .env.example   ← las variables son de la app
+        ├── public/        ← assets estáticos (brand/, fotos/, aliados/, …)
+        ├── (config)       ← tsconfig.json, eslint.config.mjs,
+        │                     next.config.ts, postcss.config.mjs
+        └── src/
+            ├── app/(sitio)/   ← las páginas del sitio y su layout
+            ├── app/(payload)/ ← el panel en /admin (lo genera Payload)
+            ├── cms/           ← definición del panel: colecciones, accesos
+            ├── components/    ← UI reutilizable (brand/, layout/, ui/, …)
+            ├── features/      ← secciones por dominio (home, novedades, …)
+            ├── config/        ← site.ts (datos institucionales) + nav.ts
+            └── lib/           ← hooks/ y utilidades
 ```
 
-El theming de Tailwind v4 vive en `src/app/globals.css` (bloque `@theme`), no
-en `tailwind.config.js`. Los datos institucionales (mail, dirección, redes)
-están centralizados en `src/config/site.ts`.
+Es un **monorepo** (workspace pnpm): hoy hay una sola app y una segunda se
+agregaría al lado, en `apps/`. Los comandos se corren desde la raíz, que
+delega en la app. El porqué está en el
+[ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md).
+
+El theming de Tailwind v4 vive en `apps/sitio/src/app/globals.css` (bloque
+`@theme`), no en `tailwind.config.js`. Los datos institucionales (mail,
+dirección, redes) están centralizados en `apps/sitio/src/config/site.ts`.
 
 ---
 
@@ -145,11 +163,12 @@ La fuente de verdad sobre cómo opera el repo son los `.md` de la raíz y de
 ## Deploy
 
 El sitio y el panel corren en **Vercel**: preview por PR, producción desde
-`main`, build con `pnpm build:vercel` (corre las migraciones de Payload y
-después `next build`). La base es **Neon** (una rama por preview), las fotos
-van a **Vercel Blob** y los correos del panel a **Resend**; las cuatro
-piezas se instalan desde el Marketplace de Vercel y escriben sus variables
-solas. Variables propias en `.env.example`.
+`main`, con **Root Directory = `apps/sitio`** (es un monorepo: Vercel instala
+desde la raíz del workspace y buildea la app) y build con `pnpm build:vercel`
+(corre las migraciones de Payload y después `next build`). La base es **Neon**
+(una rama por preview), las fotos van a **Vercel Blob** y los correos del
+panel a **Resend**; las cuatro piezas se instalan desde el Marketplace de
+Vercel y escriben sus variables solas. Variables propias en `apps/sitio/.env.example`.
 
 ## Panel de administración
 
@@ -157,17 +176,18 @@ En `/admin`. Para correrlo en local hace falta un Postgres (Docker):
 
     docker run -d --name ed-postgres -e POSTGRES_PASSWORD=ed -e POSTGRES_DB=ed_panel -p 5435:5432 -v ed-postgres-datos:/var/lib/postgresql/data postgres:17
 
-y un `.env.local` según `.env.example`. La primera vez, `/admin` pide crear
-el primer usuario. Sin token de Blob las fotos se guardan en `fotos-local/`;
-sin clave de Resend los correos salen por la consola. Diseño y decisiones:
+y un `apps/sitio/.env.local` según su `.env.example`. La primera vez,
+`/admin` pide crear el primer usuario. Sin token de Blob las fotos se guardan
+en `fotos-local/`; sin clave de Resend los correos salen por la consola. Diseño y decisiones:
 `docs/architecture/specs/2026-09-15-panel-admin-diseno.md` y el ADR-0003.
 Sin `.env.local` el sitio compila y corre igual; el panel avisa por consola
 que falta `DATABASE_URL` y no se conecta hasta tenerla.
 
 Tres cosas que aprendimos hoy armando el panel: cada vez que se suma un
-plugin o un componente propio, hay que correr `pnpm generate:importmap` (sin
-eso `/admin` no carga); si `pnpm typecheck` falla por tipos de rutas que no
-existen en el código, `pnpm next typegen` los regenera; y en local no hace
-falta correr `pnpm migrate` contra la base de desarrollo — esa base la
+plugin o un componente propio, hay que correr
+`pnpm --filter sitio generate:importmap` (sin eso `/admin` no carga); si
+`pnpm typecheck` falla por tipos de rutas que no existen en el código,
+borrar `apps/sitio/.next` y buildear los regenera; y en local no hace falta
+correr `pnpm --filter sitio migrate` contra la base de desarrollo — esa base la
 sincroniza Payload solo (`push`) y las migraciones son para producción y
 previews.

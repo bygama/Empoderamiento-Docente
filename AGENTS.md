@@ -14,6 +14,9 @@
 ## Quickstart (30 segundos)
 
 - **Qué es:** sitio web institucional de **Empoderamiento Docente (ED)**.
+- **Forma del repo:** **monorepo** (workspace pnpm). El sitio y su panel viven
+  en `apps/sitio/`; la raíz es del repo, no de una app. Ver
+  [ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md).
 - **Stack:** Next.js 16 (App Router) + React 19 + TypeScript strict +
   Tailwind CSS v4 (theming en CSS) + GSAP + Lenis + Zod.
 - **Backend/persistencia:** **Neon** (Postgres) + **Payload** (panel de
@@ -84,7 +87,7 @@ ED a definir con el cliente).
 - **Next.js 16** (App Router) + **React 19**
 - **TypeScript 5** (strict, sin `any` salvo justificación)
 - **Tailwind CSS v4** (vía `@tailwindcss/postcss`; el tema vive en CSS,
-  en `src/app/globals.css`, no en un `tailwind.config.js`)
+  en `apps/sitio/src/app/globals.css`, no en un `tailwind.config.js`)
 - **GSAP 3** + **Lenis** (animaciones, smooth scroll)
 - **Zod 4** (validación de datos en bordes; se usará cuando se sumen formularios)
 - **Payload 3** sobre **Neon** (Postgres): panel de contenido en `/admin`,
@@ -94,12 +97,13 @@ ED a definir con el cliente).
 **Backend/persistencia: Neon + Payload.** La base es Postgres en Neon (Docker
 en local); el panel de contenido es Payload 3 montado en `/admin` dentro de
 esta app, con fotos en Vercel Blob y correos por Resend. Definición en
-`src/cms/` y `src/payload.config.ts`; lo generado por Payload no se edita.
-Detalle y alternativas en
+`apps/sitio/src/cms/` y `apps/sitio/src/payload.config.ts`; lo generado por
+Payload no se edita. Detalle y alternativas en
 [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md); guías en
 §12 y en `docs/AI_GUIDELINES.md` §12.
 
-Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
+Versiones exactas → `apps/sitio/package.json`: las dependencias viven en la
+app, no en la raíz del workspace. Fijar majors, minors flotando (`^`).
 
 ---
 
@@ -119,34 +123,65 @@ Versiones exactas → `package.json`. Fijar majors, minors flotando (`^`).
 │   ├── MESSAGING.md       ← copy canónico de marca
 │   ├── AI_GUIDELINES.md   ← reglas detalladas de código IA-friendly
 │   ├── conventions/       ← CODE-STYLE.md
-│   └── architecture/adrs/ ← decisiones arquitectónicas (ADRs)
+│   └── architecture/
+│       ├── adrs/          ← decisiones arquitectónicas (ADRs)
+│       └── specs/         ← diseños largos (el panel, el monorepo)
 ├── skills/                ← workflows estables (adr-create, pr-review)
+├── work/                  ← lanes de trabajo: SPEC, PLAN, PROGRESS y
+│                            DECISIONS de cada cambio grande en curso
 ├── .githooks/             ← pre-push: el gate de §5.8 (se instala solo)
 ├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
-├── public/                ← assets estáticos (brand/, imágenes)
-├── src/
-│   ├── app/               ← App Router: layout.tsx, page.tsx, globals.css
-│   ├── components/        ← UI reutilizable
-│   │   ├── brand/         ← logotipo / marca
-│   │   ├── layout/        ← Header, Footer, MobileNav, etc.
-│   │   ├── providers/     ← LenisProvider (smooth scroll)
-│   │   └── ui/            ← botones, reveals, íconos (ui/icons/)
-│   ├── features/          ← módulos por dominio
-│   │   └── home/components/ ← secciones del home (Hero, LineasAccion, …)
-│   │       └── hero/        ← al partir un componente, sus piezas van a una
-│   │                           subcarpeta con su nombre y el compositor se
-│   │                           queda en su ruta (AI_GUIDELINES §2)
-│   ├── config/            ← site.ts (datos institucionales) + nav.ts
-│   └── lib/               ← hooks/ y utilidades (intro-signal.ts)
-└── (config raíz)          ← tsconfig.json, eslint.config.mjs, next.config.ts,
-                              postcss.config.mjs, pnpm-workspace.yaml, .npmrc
+├── package.json           ← raíz del workspace: delega en las apps + el gate
+├── pnpm-workspace.yaml    ← packages: ["apps/*"] + publicHoistPattern
+├── pnpm-lock.yaml         ← uno solo, de todo el workspace
+└── apps/
+    └── sitio/             ← el sitio y su panel (por ahora, la única app)
+        ├── package.json   ← las dependencias viven acá, no en la raíz
+        ├── .env.example   ← las variables son de la app
+        ├── public/        ← assets estáticos (brand/, imágenes)
+        ├── (config)       ← tsconfig.json, eslint.config.mjs,
+        │                     next.config.ts, postcss.config.mjs
+        └── src/
+            ├── app/
+            │   ├── (sitio)/   ← el sitio: sus páginas y su layout
+            │   ├── (payload)/ ← GENERADO por Payload: /admin y su API
+            │   └── globals.css
+            ├── cms/           ← definición del panel (nuestra)
+            │   ├── colecciones/ ← usuarios, fotos, …
+            │   └── migraciones/ ← el esquema versionado, se commitea
+            ├── payload.config.ts
+            ├── payload-types.ts ← GENERADO, no se edita
+            ├── components/    ← UI reutilizable
+            │   ├── brand/       ← logotipo / marca
+            │   ├── layout/      ← Header, Footer, MobileNav, etc.
+            │   ├── providers/   ← LenisProvider (smooth scroll)
+            │   └── ui/          ← botones, reveals, íconos (ui/icons/)
+            ├── features/      ← módulos por dominio
+            │   └── home/components/ ← secciones del home (Hero, …)
+            │       └── hero/    ← al partir un componente, sus piezas van a
+            │                       una subcarpeta con su nombre y el
+            │                       compositor se queda en su ruta
+            │                       (AI_GUIDELINES §2)
+            ├── config/        ← site.ts (datos institucionales) + nav.ts
+            └── lib/           ← hooks/ y utilidades (intro-signal.ts)
 ```
 
-> **Nota:** el theming de Tailwind v4 vive en `src/app/globals.css` (bloque
-> `@theme`), no en `src/styles/` ni en un `tailwind.config.js`. El panel de
-> contenido (Payload) vive en `src/app/(payload)/` (generado) y su definición
-> en `src/cms/` + `src/payload.config.ts`; el sitio, en `src/app/(sitio)/`
-> (ver [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md)).
+> **Nota:** el theming de Tailwind v4 vive en
+> `apps/sitio/src/app/globals.css` (bloque `@theme`), no en `src/styles/` ni
+> en un `tailwind.config.js`. El panel de contenido (Payload) vive en
+> `apps/sitio/src/app/(payload)/` (generado) y su definición en
+> `apps/sitio/src/cms/` + `apps/sitio/src/payload.config.ts`; el sitio, en
+> `apps/sitio/src/app/(sitio)/` (ver
+> [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md)).
+
+> **Por qué `apps/`:** el layout es lo que hace barato crecer; partir el
+> deployable es lo que hace caro operar. Hoy el sitio y su panel son **un solo
+> deployable** y viven juntos en `apps/sitio`. Una segunda app se agrega al
+> lado, sin rediseñar nada; `packages/` aparece recién cuando haya un segundo
+> consumidor de algo. El razonamiento completo, con las señales que
+> dispararían cada cambio, en el
+> [ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md) y en su
+> [diseño](docs/architecture/specs/2026-09-17-monorepo-apps-diseno.md).
 
 **Golden rule:** los `.md` raíz y `docs/` son la fuente de verdad. El
 adapter (`CLAUDE.md`, y un futuro folder `.claude/`) solo mapea ese contrato
@@ -214,7 +249,7 @@ usa lenguaje inclusivo:
 
 ### 5.3. Datos institucionales centralizados
 
-- Email, dirección, teléfono, URLs de redes → `src/config/site.ts`.
+- Email, dirección, teléfono, URLs de redes → `apps/sitio/src/config/site.ts`.
 - Nunca hardcodear datos institucionales en JSX.
 
 ### 5.4. Logos de aliados
@@ -222,7 +257,7 @@ usa lenguaje inclusivo:
 Solo publicar con autorización confirmada por el usuario. Por defecto, NO
 publicar. Los autorizados son exactamente los de la carpeta «LOGOS ALIANZAS»
 de ED (hoy: Techint, UNESCO, Bloom/ser+, UCSH, Science Up); la lista única
-vive en `src/config/aliados.ts` y el detalle en
+vive en `apps/sitio/src/config/aliados.ts` y el detalle en
 `docs/content/aliados-fuentes-drive.md`. Ministerio de Educación: no se
 puede por contrato. OEI, SEMS-SEP, CENEVAL: sin autorización, no van.
 
@@ -281,6 +316,18 @@ y **frena el push** si alguno falla. Se instala solo con `pnpm install`.
   `eslint-disable` de reglas del gate. Si una regla parece un falso positivo,
   se arregla igual con un cambio que preserve el comportamiento, o se discute
   con el owner y queda escrito — nunca se apaga en silencio.
+- **El gate mide por proyecto, y los proyectos están declarados.** Desde el
+  monorepo, el alcance vive en dos lugares a la vista: el script
+  `react-doctor` del `package.json` de la raíz y la lista `PROYECTOS` de
+  `scripts/verificar-react-doctor.mjs`. El verificador recorre todos y exige
+  100 en cada uno — y **frena si alguno no aparece en el informe**, porque un
+  proyecto ausente se lee igual que «cero hallazgos». Cuando se sume una app,
+  se suma a las dos listas.
+- **Lo que Payload genera se mide igual, y pasa.** `payload-types.ts` y el
+  route group `(payload)` viven adentro de `apps/sitio/src` y entran en la
+  medición: 100/100 con ellos adentro, comprobado el 2026-09-18. No se los
+  esconde ni se los saca del alcance; si algún día bajan el score, se discute
+  con el owner y queda escrito acá.
 - **Una medición incompleta no es un aprobado.** react-doctor arma su lista de
   archivos con el índice de git: un borrado sin commitear le hace fallar el
   análisis de mantenibilidad y **esconder el score**, con una salida que se
@@ -331,7 +378,15 @@ esa misma guía).
       partió la migración quedaron todos por debajo.
 - [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
       partir un hook por debajo de 80 suele separar el efecto de su limpieza,
-      que es justo lo que hay que evitar. Ahí manda el tope de 200.
+      que es justo lo que hay que evitar. Ahí manda el tope de 200. La otra
+      excepción es `scripts/verificar-react-doctor.mjs` (hoy 160 líneas, 89
+      sin comentarios): partir el script del gate en dos archivos lo vuelve
+      más difícil de auditar de una lectura, que es exactamente para lo que
+      existe, y sus comentarios son el «nunca se apaga en silencio» de §5.8
+      escrito donde se lee.
+- [ ] Lo **generado** no cuenta para estos topes: `payload-types.ts`, el route
+      group `(payload)` y las migraciones los escribe Payload, no se editan a
+      mano y no se miden con la vara del código nuestro.
 - [ ] Cero `any` sin comentario justificando.
 - [ ] Cero rutas relativas largas (`../../..`) — usar `@/` alias.
 
@@ -467,20 +522,21 @@ panel en `docs/architecture/specs/2026-09-15-panel-admin-diseno.md`.
 
 Reglas para el panel y sus datos:
 
-- **Definición en código:** colecciones, páginas y accesos en `src/cms/`,
-  juntados en `src/payload.config.ts`. Lo que Payload genera
-  (`src/app/(payload)/`, `src/payload-types.ts`, `src/cms/migraciones/`) no
-  se edita a mano; al sumar un plugin o componente propio, `pnpm
-  generate:importmap`.
+- **Definición en código:** colecciones, páginas y accesos en
+  `apps/sitio/src/cms/`, juntados en `apps/sitio/src/payload.config.ts`. Lo
+  que Payload genera (`app/(payload)/`, `payload-types.ts`, `cms/migraciones/`,
+  todo bajo `apps/sitio/src/`) no se edita a mano; al sumar un plugin o
+  componente propio, `pnpm --filter sitio generate:importmap`.
 - **Validar todos los bordes con Zod** antes de escribir/leer (formularios,
   payloads). Nunca confiar en input externo.
 - **Secretos solo server-side:** `DATABASE_URL`, `PAYLOAD_SECRET`,
   `VISTA_PREVIA_SECRET`, `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca
   llevan `NEXT_PUBLIC_` ni llegan al browser. Placeholders en `.env.example`;
-  en Vercel, el build corta si falta alguna (`src/cms/entorno.ts`).
-- **Acceso por rol** en cada colección (`src/cms/acceso.ts`): dos roles,
-  administra y edita; nada es público salvo lo que la spec marca de lectura
-  pública (las fotos).
+  en Vercel, el build corta si falta alguna
+  (`apps/sitio/src/cms/entorno.ts`).
+- **Acceso por rol** en cada colección (`apps/sitio/src/cms/acceso.ts`): dos
+  roles, administra y edita; nada es público salvo lo que la spec marca de
+  lectura pública (las fotos).
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
   tablas o políticas. No inventar tablas ni columnas que no estén acordadas.
 
@@ -495,14 +551,15 @@ implementar (y, si amerita, en un ADR de implementación).
 - [x] Documentación AI-neutral (`AGENTS.md`, adapters, `docs/`)
 - [x] Scaffold Next.js 16 (App Router) + React 19 + TS strict + Tailwind v4 + ESLint 9
 - [x] Stack adicional instalado: GSAP, Lenis, Zod
-- [x] `pnpm-workspace.yaml` con `allowBuilds` aprobando sharp y unrs-resolver
+- [x] `pnpm-workspace.yaml` con `allowBuilds` (sharp, unrs-resolver, esbuild)
 - [x] Mapear tokens de `DESIGN.md` al Tailwind v4 (`globals.css` con `@theme`)
 - [x] Cargar fuentes Manrope + Inter (+ JetBrains Mono) vía `next/font/google`
 - [x] Configurar metadata base + `lang="es"` en root layout
-- [x] `src/config/site.ts` con datos institucionales + `src/config/nav.ts`
-- [x] Home real (`src/app/page.tsx` + `src/features/home/`)
+- [x] `apps/sitio/src/config/site.ts` con datos institucionales + `nav.ts`
+- [x] Home real (`apps/sitio/src/app/(sitio)/` + `apps/sitio/src/features/`)
 - [x] Crear `README.md` de onboarding humano en la raíz
 - [x] Panel de contenido: Payload sobre Neon montado en `/admin` (fase 0)
+- [x] El repo pasa a monorepo: el sitio y su panel, en `apps/sitio/`
 - [ ] Panel: fases 1 a 4 del spec (novedades y biblioteca, casos y equipo,
       páginas y ajustes, fotos y guía de uso)
 - [ ] Sitemap definitivo
