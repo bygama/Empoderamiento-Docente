@@ -124,16 +124,35 @@ dos builds no se pisaran en el mismo checkout.
 
 El loop de arreglo corresponde a la lente que falló (documentación). El
 arreglo del gate no venía de un FAIL pero toca el artefacto de más riesgo
-después de revisado, así que va a la misma seat fresca.
+después de revisado, así que fue a la misma seat fresca.
+
+### Re-review del diff de arreglo (`e20b4a6..edb3cb0`) — **PASS**
+
+> **PASS** — Los 6 hallazgos están ADDRESSED con evidencia de comando o de
+> filesystem (incluida la ejecución real de los dos scripts de mayor riesgo,
+> no solo lectura de código); nada de lo que el arreglo tocó fuera del alcance
+> de los hallazgos quedó roto (CODE-STYLE.md, CRLF, links, gate en verde).
+> Queda un nit menor de redacción en el propio criterio del paso 4 (conteo
+> "tres" vs. cuatro bullets, categoría `work/*.md` no nombrada) que no amerita
+> FAIL porque el contenido real que deja afuera el grep es legítimo en todos
+> los casos que inspeccioné.
+
+Cómo lo probó, que es lo que le da peso: armó un workspace pnpm vacío fuera
+del repo para medir los dos lados de `--fail-if-no-match`, y se fabricó un
+`pnpm.cmd` falso controlado por variable de entorno para ejercitar los tres
+caminos del `catch` del verificador.
+
+El nit de redacción se arregló en `63b667d` (los carve-outs pasan a ser
+cuatro y el cuarto es «el registro»: ADRs, specs y `work/`). El único otro
+apunte —el padding de la tabla de `CODE-STYLE.md`, cosmético— también.
 
 ## Abierto
 
 1. **El panel andando.** `/admin` da 500 sin Postgres y el demonio de Docker
    no está levantado acá. Falta el `docker run` del README y entrar a
    `/admin`.
-2. **Re-review** del diff de arreglo, sobre la lente que falló.
-3. **Vercel:** cuando exista el proyecto, Root Directory = `apps/sitio`.
-4. **Preguntarle a facundo** por la ruta de vista previa: quedó en
+2. **Vercel:** cuando exista el proyecto, Root Directory = `apps/sitio`.
+3. **Preguntarle a facundo** por la ruta de vista previa: quedó en
    `app/(sitio)/vista-previa/route.ts`, o sea la URL pública
    `/vista-previa`; el spec del panel decía `api/vista-previa`. Funciona
    igual, pero es un handler viviendo entre páginas.
