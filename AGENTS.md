@@ -409,11 +409,17 @@ esa misma guía).
 - [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
       partir un hook por debajo de 80 suele separar el efecto de su limpieza,
       que es justo lo que hay que evitar. Ahí manda el tope de 200. La otra
-      excepción es `scripts/verificar-react-doctor.mjs` (hoy 160 líneas, 89
-      sin comentarios): partir el script del gate en dos archivos lo vuelve
-      más difícil de auditar de una lectura, que es exactamente para lo que
-      existe, y sus comentarios son el «nunca se apaga en silencio» de §5.8
-      escrito donde se lee.
+      excepción es `scripts/verificar-react-doctor.mjs` (**165 líneas, 129 sin
+      comentarios**, medido el 2026-09-18): partir el script del gate en dos
+      archivos lo vuelve más difícil de auditar de una lectura, que es
+      exactamente para lo que existe, y sus comentarios son el «nunca se apaga
+      en silencio» de §5.8 escrito donde se lee.
+      **El tope se mide en líneas totales**, que es el número con el que se
+      concedió esta excepción. Antes acá decía «160 líneas, 89 sin
+      comentarios»: el 160 era cierto al escribirlo y quedó viejo por 5, pero
+      el 89 nunca lo fue — en ese mismo commit eran 127. La excepción era 38
+      líneas más grande de lo que este párrafo declaraba, y una excepción a una
+      regla dura no se sostiene con un número que nadie volvió a medir.
 - [ ] Lo **generado** no cuenta para estos topes: las migraciones de
       `apps/sitio/prisma/migrations/` las escribe Prisma, no se editan a mano y
       no se miden con la vara del código nuestro.
