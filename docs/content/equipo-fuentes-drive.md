@@ -14,7 +14,7 @@ de Daniela) si además hay una trayectoria con fechas (CV) y publicaciones.
 ## 1. Roster oficial
 
 Fuente: `EQUIPO Y ALIANZAS.xlsx` (Raquel, modificada 2026-08-04), hoja EQUIPO ED. Son
-**15 personas**. La web (`src/features/quienes-somos/data/equipo.ts`) tiene 12.
+**15 personas**. La web (`apps/sitio/src/features/quienes-somos/data/equipo.ts`) tiene 12.
 
 | # | Persona | Posición (planilla) | País | Contrato | En la web |
 |---|---------|---------------------|------|----------|-----------|

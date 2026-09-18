@@ -5,7 +5,7 @@
 > de interfaz. **No especifica animaciones** (fase posterior).
 >
 > **Nota sobre la página ya construida:** existe una implementación previa
-> de `/investigacion` (8 componentes en `src/features/investigacion/`).
+> de `/investigacion` (8 componentes en `apps/sitio/src/features/investigacion/`).
 > Esta arquitectura se diseña **desde el doc maestro, no desde esa
 > implementación**; la auditoría de qué componente existente se reutiliza
 > como esqueleto se hace en la fase siguiente.
@@ -518,7 +518,7 @@ arrastrables en desktop—, análisis, aprendizaje, qué cambió, producción
 relacionada) → navegación persistente «Volver a los casos» / «Siguiente
 caso», pestañas laterales, Escape, foco gestionado y reduced-motion.
 Contenido actual: **3 casos demo marcados «CASO DEMO — CONTENIDO
-PROVISIONAL»** en `src/features/investigacion/casos/data.ts`, reemplazables
+PROVISIONAL»** en `apps/sitio/src/features/investigacion/casos/data.ts`, reemplazables
 por casos reales sin tocar diseño ni animaciones.
 
 ---
@@ -604,7 +604,7 @@ comparte» — sin repetir estructura ni copy.
 | «La práctica (también) produce conocimiento» | Home: paso 02 del método y área 05 | Frase ya usada dos veces; esta página no la repite |
 | 4 nombres de líneas «inferidos» | Biblioteca, `PuenteInvestigacion.tsx` | Baja prioridad: el contenido de Biblioteca es **simbólico** (el cliente cargará el real al finalizar la web). Alinear los lomos a la taxonomía de 6 recién en esa etapa |
 | Puentes Biblioteca ↔ Investigación | Ambas páginas | Espejarse sin repetir estructura ni copy |
-| Implementación previa de `/investigacion` | `src/features/investigacion/` (8 componentes) | Auditar contra esta arquitectura en la fase siguiente: qué esqueleto se reutiliza (los 8 componentes mapean 1:1 a estas 8 secciones), qué copy se reemplaza |
+| Implementación previa de `/investigacion` | `apps/sitio/src/features/investigacion/` (8 componentes) | Auditar contra esta arquitectura en la fase siguiente: qué esqueleto se reutiliza (los 8 componentes mapean 1:1 a estas 8 secciones), qué copy se reemplaza |
 
 ---
 

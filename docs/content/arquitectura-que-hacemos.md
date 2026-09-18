@@ -3,7 +3,7 @@
 > **Actualización 2026-09-08.** La página se reordenó con la regla «el texto manda, la
 > animación acompaña»: hero con la frase del cartel oficial y las seis áreas → Áreas en
 > texto plano → Niveles → Cómo trabajamos (seis verbos, estático) → Con quién → Cierre.
-> Las seis áreas oficiales y su texto están en `src/features/que-hacemos/areas.ts` y en
+> Las seis áreas oficiales y su texto están en `apps/sitio/src/features/que-hacemos/areas.ts` y en
 > `copy-que-hacemos.md`; el porqué y las fuentes, en `que-hace-ed-fuentes.md`. Lo que
 > sigue es la arquitectura original (siete líneas, torre, camino) y vale como historia.
 
@@ -11,7 +11,7 @@
 > lugar de «Nuestro enfoque» del sitemap y ahora cuenta eso: la frase del cartel y cuatro frases
 > de por qué no es una capacitación tradicional (palabras de Dani, jun 2026), en lugar de las
 > cinco preguntas del método, que repetían «Cómo trabajamos». Las frases viven en
-> `src/features/que-hacemos/components/preguntas-faro.ts`. Las áreas son siete desde el
+> `apps/sitio/src/features/que-hacemos/components/preguntas-faro.ts`. Las áreas son siete desde el
 > 2026-09-09 (las validó la dirección). El mismo día «Cómo trabajamos» deja el mazo apilado
 > (seis tarjetas superpuestas, una sola a la vista) por UNA tarjeta clavada cuyo contenido
 > cambia con el scroll —las letras del verbo se arman y desarman, la explicación entra y sale

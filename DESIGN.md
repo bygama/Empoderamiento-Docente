@@ -14,7 +14,7 @@ tipografías, jerarquía, espaciado e iconografía.
 
 ### Tokens
 
-> Valores canónicos = los del bloque `@theme` en `src/app/globals.css`
+> Valores canónicos = los del bloque `@theme` en `apps/sitio/src/app/globals.css`
 > (ver §8). Esta tabla los documenta; si difieren, **gana `globals.css`**.
 
 | Token            | Hex       | RGB              | Rol                                              |
@@ -59,7 +59,7 @@ tipografías, jerarquía, espaciado e iconografía.
 | Mono / código | **JetBrains Mono** | 400 / 500   |
 
 Las tres se cargan vía `next/font/google` con `display: 'swap'` y subset
-`latin` (ver `src/app/layout.tsx`). Manrope (`font-display`) e Inter
+`latin` (ver `apps/sitio/src/app/layout.tsx`). Manrope (`font-display`) e Inter
 (`font-sans`) son las principales; JetBrains Mono (`font-mono`) es auxiliar,
 para notación / detalles tipo código.
 
@@ -113,7 +113,7 @@ Tailwind v4 para el rango fluido. Valores en rem, base 16px.
 - **Color por defecto:** `azul-principal`. Sobre fondos oscuros: blanco.
 - **Tamaño:** 20px (inline en texto), 24px (UI), 48–64px (íconos de feature).
 - **Set propio, sin librería externa.** Los íconos viven como componentes
-  React en `src/components/ui/icons/index.tsx` (SVG `currentColor`, stroke
+  React en `apps/sitio/src/components/ui/icons/index.tsx` (SVG `currentColor`, stroke
   1.5px). Se decidió **no** usar `lucide-react` para no sumar una
   dependencia. Si falta un ícono, agregar un componente nuevo a ese archivo
   respetando el estilo (no inventar otra librería ni redibujar el logo).
@@ -121,7 +121,7 @@ Tailwind v4 para el rango fluido. Valores en rem, base 16px.
 ### Set canónico
 
 Cinco íconos forman el set de referencia del manual. Mapeo a los
-componentes de `src/components/ui/icons/`:
+componentes de `apps/sitio/src/components/ui/icons/`:
 
 | Ícono              | Concepto    | Componente    | Uso típico                              |
 | ------------------ | ----------- | ------------- | --------------------------------------- |
@@ -207,7 +207,7 @@ Reservar para una palabra por titular, no abusar.
 
 ## 8. Mapeo a Tailwind
 
-Implementado en `src/app/globals.css` con bloque `@theme` de Tailwind v4.
+Implementado en `apps/sitio/src/app/globals.css` con bloque `@theme` de Tailwind v4.
 Cualquier cambio en los tokens visuales se aplica acá y se propaga
 automáticamente a las clases utilitarias.
 
@@ -222,7 +222,7 @@ automáticamente a las clases utilitarias.
   --color-gris-fondo: #f2f4f7;
   --color-gris-texto: #6b7280;
 
-  /* tipografías expuestas por next/font/google en src/app/layout.tsx */
+  /* tipografías expuestas por next/font/google en apps/sitio/src/app/layout.tsx */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
@@ -252,7 +252,7 @@ Clases utilitarias generadas automáticamente:
 - **Escala:** `text-display`, `text-h1`, `text-h2`, `text-h3`, `text-body`,
   `text-small` (cada una ya incluye su line-height).
 
-Las fuentes se cargan con `next/font/google` en `src/app/layout.tsx`, que
+Las fuentes se cargan con `next/font/google` en `apps/sitio/src/app/layout.tsx`, que
 las inyecta como CSS vars (`--font-inter`, `--font-manrope`) que luego
 consume el `@theme`.
 
