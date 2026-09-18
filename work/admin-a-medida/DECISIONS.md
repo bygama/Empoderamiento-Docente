@@ -172,3 +172,27 @@ El seat objetó que `DECISIONS.md` justificaba solo el subconjunto de
 0007 y el índice nombran a Payload porque documentan su salida; la spec del
 monorepo es legítima recién ahora que lleva el recuadro; la spec del admin
 nombra lo que reemplaza. Ninguno describe a Payload como el plan vigente.
+
+**2026-09-18 — «El sitio quedó idéntico» era más ancho que la evidencia.**
+El seat de silent failures midió lo que mi método no podía ver: cada página
+pide **un chunk más de JS** después de la escisión. Medido por mí: son ~2 KB
+**menos** por página, con un delta parejo en las once, y el JS total construido
+baja de 75 archivos y 3,70 MB a 29 y 1,60 MB. Es Turbopack re-particionando el
+grafo al irse `(payload)`, no código agregado. Pero la afirmación correcta es
+**«el render es idéntico y el bundle es más chico»**, no «es idéntico»: el HTML
+prerenderizado no ve el bundle, y esa ceguera escondió un cambio real.
+
+**2026-09-18 — La prueba del paso 3 pasa a ser un script, no un log.**
+El otro hallazgo del mismo seat: la evidencia vivía en scratch de sesión, así
+que «idénticas» en PROGRESS era una afirmación que nadie podía rechequear sin
+rehacer la comparación entera. Un log pegado se pudre y la carpeta de la lane
+se borra en el handoff. Se agrega `scripts/comparar-render.mjs` (107 líneas, 79
+sin comentarios — bajo el tope de §6): toma dos apps con su `.next` buildeado y
+compara texto, links y `<head>` de cada página prerenderizada, informando de
+paso el delta de chunks y de bytes. Sale 1 si algo del render difiere. Vive en
+`scripts/`, así que sobrevive al handoff y sirve para las fases 1 a 4.
+
+**2026-09-18 — El seat confirmó que `[...resto]` NO es código muerto.**
+Lo verificó contra el regex compilado en `routes-manifest.json`, no contra mi
+comentario: la ruta sigue viva e igual que en la base. El ruling de conservarla
+queda respaldado por evidencia y no por mi lectura.
