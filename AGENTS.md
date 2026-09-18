@@ -137,36 +137,39 @@ un release candidate de la 8 (ADR-0007).
 │                            DECISIONS de cada cambio grande en curso
 ├── .githooks/             ← pre-push: el gate de §5.8 (se instala solo)
 ├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs,
-│                            guarda-prisma.mjs (fase 1)
+│                            guarda-prisma.mjs, comparar-render.mjs
 ├── package.json           ← raíz del workspace: delega en las apps + el gate
-├── pnpm-workspace.yaml    ← packages: ["apps/*"] + publicHoistPattern
+├── pnpm-workspace.yaml    ← packages: ["apps/*", "packages/*"] + publicHoistPattern
 ├── pnpm-lock.yaml         ← uno solo, de todo el workspace
-├── packages/              ← LO REUSABLE, cero dominio de ED adentro (fase 1)
-│   ├── db/                ← cliente Prisma + Neon, slugs, redirecciones
+├── packages/              ← LO REUSABLE, cero dominio de ED adentro
+│   ├── db/                ← cliente Prisma, slugs, redirecciones
 │   ├── auth/              ← better-auth configurado, permisos, guarda
-│   └── kit-admin/         ← tabla, formulario, controles, imágenes, avisos
+│   └── kit-admin/         ← tabla, formulario, controles, uploader (fase 2)
 └── apps/
     └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz
         ├── .env.example   ← las variables son de la app
         ├── public/        ← assets estáticos (brand/, imágenes)
-        ├── prisma/        ← el modelo de datos (fase 1)
-        │   ├── schema/      ← base · auth · contenido · sitio
+        ├── prisma/        ← el modelo de datos
+        │   ├── schema/      ← base · auth · sitio (contenido: fase 2)
         │   └── migrations/  ← generadas, se commitean, nunca a mano
         ├── (config)       ← tsconfig.json, eslint.config.mjs,
         │                     next.config.ts, postcss.config.mjs
         └── src/
             ├── app/
             │   ├── (sitio)/   ← el sitio: sus páginas y su layout
-            │   ├── (admin)/   ← SOLO rutas del admin (fase 1)
-            │   ├── api/       ← formularios públicos: contacto, cv (fase 4)
+            │   ├── (admin)/   ← SOLO rutas del admin
+            │   ├── api/       ← auth/ · contacto y cv llegan en la fase 4
             │   └── globals.css
-            ├── datos/         ← la ÚNICA puerta a la base (fase 2)
-            │   ├── consultas/   ← lo que lee el sitio
-            │   └── acciones/    ← Server Actions que escribe el admin
-            ├── admin/         ← las pantallas del admin (fase 2)
-            │   └── <entidad>/   ← Lista, Formulario y sus límites
-            ├── middleware.ts  ← sesión · cabeceras · rate limit (fase 1)
+            ├── datos/         ← la ÚNICA puerta a la base
+            │   ├── cliente.ts   ← el PrismaClient de la app
+            │   ├── auth.ts      ← la sesión, armada con esa base
+            │   ├── consultas/   ← lo que lee el sitio (fase 2)
+            │   └── acciones/    ← Server Actions que escribe el admin (fase 2)
+            ├── admin/         ← las pantallas del admin
+            │   ├── armazon/     ← la caja, los campos, salir
+            │   └── <entidad>/   ← Lista, Formulario y sus límites (fase 2)
+            ├── middleware.ts  ← sesión · cabeceras · rate limit
             ├── components/    ← UI reutilizable
             │   ├── brand/       ← logotipo / marca
             │   ├── layout/      ← Header, Footer, MobileNav, etc.
@@ -557,12 +560,12 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 [ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md); diseño en
 `docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`.
 
-> **Estas reglas están escritas en presente pero el admin todavía no existe:**
-> la fase 0 (la escisión de Payload) es lo único hecho. Nada de `prisma/`,
-> `datos/`, `admin/`, `middleware.ts`, `packages/` ni
-> `scripts/guarda-prisma.mjs` está en el árbol — llegan con las fases 1 y 2
-> (§13). Son el contrato al que tiene que ajustarse quien las construya, no una
-> descripción de lo que hay.
+> **Qué de esto ya existe.** Las fases 0 y 1 están hechas (§13): `packages/db`,
+> `packages/auth`, `apps/sitio/prisma/` con sus migraciones,
+> `apps/sitio/src/datos/`, `apps/sitio/src/admin/`, `middleware.ts` y
+> `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
+> lo que hay. Lo único que todavía no existe es `packages/kit-admin`, que nace
+> en la fase 2 contra una entidad de verdad, y las tablas de contenido.
 
 Reglas para el admin y sus datos:
 

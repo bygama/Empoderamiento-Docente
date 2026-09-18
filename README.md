@@ -28,9 +28,10 @@ medida** en `/admin` con **better-auth**, con fotos en Vercel Blob y correos por
 Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
 [ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md).
 
-> **Estado:** el admin está en construcción. Hoy el repo tiene el sitio y nada
-> más; los cimientos llegan en la fase 1. El plan, en
-> [la spec](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md) §9.
+> **Estado:** el admin tiene sus cimientos —entrar, salir y elegir contraseña—
+> y todavía ninguna pantalla de contenido. El plan de las fases que faltan, en
+> [la spec](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md) §9,
+> y cómo levantarlo, más abajo en [Admin](#admin).
 
 Versiones exactas en [`apps/sitio/package.json`](apps/sitio/package.json):
 el repo es un workspace pnpm y las dependencias viven en la app.
@@ -61,8 +62,7 @@ pnpm lint         # ESLint (eslint-config-next)
 pnpm typecheck    # TypeScript (tsc --noEmit)
 ```
 
-Los comandos de base de datos llegan con la fase 1 del admin. Van con
-`--filter` porque son de la app, no del workspace.
+Los comandos de base de datos están más abajo, en [Admin](#admin).
 
 Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm build` en verde
 (ver [Pre-PR checklist en `AGENTS.md`](AGENTS.md) §10).
@@ -71,8 +71,8 @@ Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm build` en verde
 
 ## Variables de entorno
 
-**Hoy el sitio no necesita ninguna.** Son la infraestructura del admin, que
-llega en la fase 1:
+**El sitio público no necesita ninguna**: compila y corre sin `.env.local`. El
+admin sí las necesita todas:
 
 - `DATABASE_URL` y `DATABASE_URL_UNPOOLED` — conexión a Postgres (Docker en
   local, Neon en Vercel). La segunda es la directa, sin pooler: el pooler corta
@@ -96,24 +96,27 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
 ├── CLAUDE.md             ← adapter para Claude Code (puntero a AGENTS.md)
 ├── DESIGN.md              ← sistema de diseño (tokens, tipos, reglas)
 ├── docs/                  ← documentación auxiliar (ver docs/README.md)
-├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
+├── scripts/               ← hooks, el gate, la guarda de Prisma, comparar-render
 ├── package.json           ← raíz del workspace: delega en las apps + el gate
-├── pnpm-workspace.yaml    ← packages: ["apps/*"]
-├── packages/              ← lo reutilizable, sin dominio de ED (fase 1)
-│   ├── db/  auth/  kit-admin/
+├── pnpm-workspace.yaml    ← packages: ["apps/*", "packages/*"]
+├── packages/              ← lo reutilizable, sin dominio de ED
+│   ├── db/     ← cliente Prisma, slugs, redirecciones
+│   ├── auth/   ← better-auth configurado, permisos, guarda
+│   └── kit-admin/  ← los primitivos del admin (fase 2, todavía no existe)
 └── apps/
     └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz
         ├── .env.example   ← las variables son de la app
         ├── public/        ← assets estáticos (brand/, fotos/, aliados/, …)
-        ├── prisma/        ← esquema y migraciones (fase 1)
+        ├── prisma/        ← esquema y migraciones
         ├── (config)       ← tsconfig.json, eslint.config.mjs,
         │                     next.config.ts, postcss.config.mjs
         └── src/
             ├── app/(sitio)/   ← las páginas del sitio y su layout
-            ├── app/(admin)/   ← las rutas del admin (fase 1)
-            ├── datos/         ← la única puerta a la base (fase 2)
-            ├── admin/         ← las pantallas del admin (fase 2)
+            ├── app/(admin)/   ← las rutas del admin
+            ├── datos/         ← la única puerta a la base
+            ├── admin/         ← las pantallas del admin
+            ├── middleware.ts  ← sesión, cabeceras, rate limit
             ├── components/    ← UI reutilizable (brand/, layout/, ui/, …)
             ├── features/      ← secciones por dominio (home, novedades, …)
             ├── config/        ← site.ts (datos institucionales) + nav.ts
