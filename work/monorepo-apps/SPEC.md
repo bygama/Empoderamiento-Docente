@@ -38,13 +38,29 @@ Payload y sus generados, `packages/` compartidos, Turborepo, el proyecto de
 Vercel (todavía no existe; AGENTS.md §13 lo tiene pendiente), CI, y cualquier
 cambio de **contenido** en un archivo de `src/`.
 
-## Precondición
+## Precondición — cumplida, y el alcance cambió (2026-09-18)
 
-**`bygama/fix-investigacion-titulo-pixelado` mergeada o descartada.** Son 9
-commits sobre 11 archivos de `src/` en un worktree activo. La mudanza renombra
-`src/` entero, así que esa rama tendría que rebasar sobre un árbol movido. No
-es un problema de checkout —dos worktrees no lo evitan— es de **orden de
-merge**, y lo decide quien tenga las dos ramas.
+La precondición era que `bygama/fix-investigacion-titulo-pixelado` estuviera
+mergeada o descartada, porque la mudanza renombra `src/` entero. **Se cumplió
+sola:** esa rama entró a `main` y ya no existe en el remoto.
+
+Pero entró con mucho más que eso. Mientras esta lane se planificaba, `main`
+recibió **26 commits**, incluida la **fase 0 completa del panel**: Payload 3
+montado en `/admin`, los route groups `(sitio)` y `(payload)`, `src/cms/` con
+usuarios y fotos, las migraciones, el ADR-0003 y la puesta al día de
+`AGENTS.md` sobre Neon y Payload.
+
+Eso cambia dos cosas de esta lane:
+
+1. **La rama original no rebasa.** Sus renombres chocan con los del route
+   group `(sitio)` (rename/rename en siete archivos). La mudanza se rehace
+   sobre el `main` nuevo, que es más limpio que resolver conflictos a mano.
+2. **Lo que se muda ahora incluye el panel.** No es «el sitio»: es el sitio y
+   su panel, que son un mismo deployable y se van juntos a `apps/sitio/`.
+
+Lo que **no** cambia es el diseño: el spec del monorepo y el del panel
+describen el mismo árbol, y el nuestro solo le agrega `apps/sitio/` arriba.
+Ninguna línea del código del panel se toca.
 
 ## Definición de done
 
