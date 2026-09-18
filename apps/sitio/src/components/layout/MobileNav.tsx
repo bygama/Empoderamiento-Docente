@@ -2,19 +2,18 @@
 
 import { useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { DatosDelSitio } from "@/config/datos-del-sitio";
-import { NAV_LINKS, HOME_LINK, esPaginaActiva } from "@/config/nav";
+import { NAV_LINKS, esPaginaActiva } from "@/config/nav";
 import { irEnPagina, partirDestino } from "@/lib/navegar";
-import { Menu, X } from "@/components/ui/icons";
+import { Menu } from "@/components/ui/icons";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
 import { irArriba, irASeccion } from "@/lib/indice";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useMenuAnimado } from "./mobile-nav/useMenuAnimado";
+import { BarraMenu } from "./mobile-nav/BarraMenu";
 import { NavegacionMenu } from "./mobile-nav/NavegacionMenu";
 import { PieMenu } from "./mobile-nav/PieMenu";
 
@@ -26,6 +25,8 @@ import { PieMenu } from "./mobile-nav/PieMenu";
  * editorial que el Footer: tipografía display + hairline + flecha ↗— y el CTA
  * "Contacto" queda como acción focal abajo.
  *
+ * - Entra como una CORTINA desde la derecha (la coreografía y su porqué, en
+ *   `useMenuAnimado`); el cierre es la misma cortina en reversa.
  * - El panel es un `<dialog>` abierto con `showModal()`: el navegador se
  *   encarga del top layer, del `inert` sobre el resto de la página y de
  *   atrapar el Tab, que antes no teníamos.
@@ -136,7 +137,7 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
               e.preventDefault();
               setOpen(false);
             }}
-            // `open:flex` y no `flex`: un `display` fijo le gana a la regla del
+            // `open:block` y no `block`: un `display` fijo le gana a la regla del
             // agente que esconde el dialog cerrado y el panel quedaría siempre
             // a la vista. El resto neutraliza margen, borde, fondo y topes de
             // tamaño del agente para que siga siendo full-bleed, y `h-full
@@ -144,49 +145,35 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
             // `width`/`height: fit-content`, que le ganan al tamaño implícito
             // del inset y encogían el panel (los ítems quedaban 21px más
             // angostos y 59px más arriba que antes de ser <dialog>).
-            className="faro-glow fixed inset-0 z-[70] m-0 hidden h-full w-full max-h-none max-w-none flex-col overflow-y-auto border-0 bg-transparent p-0 backdrop:bg-transparent open:flex lg:hidden"
+            className="fixed inset-0 z-[70] m-0 hidden h-full w-full max-h-none max-w-none overflow-clip border-0 bg-transparent p-0 backdrop:bg-transparent open:block lg:hidden"
             style={{ visibility: "hidden" }}
           >
-            {/* Barra superior: logo (→ Inicio) + cerrar. */}
-            <div className="flex items-center justify-between px-5 py-4">
-              <Link
-                href={HOME_LINK.href}
-                aria-label="Empoderamiento Docente — Inicio"
-                onClick={close}
-                className="inline-flex items-center"
-              >
-                <Image
-                  src="/brand/logotipo-principal-ed.png"
-                  alt="Empoderamiento Docente"
-                  width={425}
-                  height={467}
-                  unoptimized
-                  className="h-10 w-auto"
+            {/* Velo: apaga la página de atrás mientras la cortina la cruza. */}
+            <div data-mnav-velo className="bg-azul-principal/60 absolute inset-0" />
+
+            {/* La cortina son DOS capas (ver useMenuAnimado): la de afuera entra
+                de punta a punta y recorta; la de adentro lleva el contenido a
+                mitad de velocidad. `overflow-clip` y no `hidden`: un contenedor
+                `hidden` se puede scrollear por código, y enfocar la X con el
+                contenido todavía corrido lo dejaría desplazado para siempre. */}
+            <div data-mnav-cortina className="absolute inset-0 overflow-clip">
+              <div data-mnav-contenido className="faro-glow flex h-full w-full flex-col overflow-y-auto">
+                <BarraMenu closeRef={closeRef} onCerrar={close} />
+
+                <NavegacionMenu
+                  pathname={pathname}
+                  secciones={secciones}
+                  desplegado={desplegado}
+                  onDesplegar={setDesplegado}
+                  onCerrar={close}
+                  onSubirEnPagina={subir}
+                  onIrASeccion={irA}
+                  onIrADestino={irADestino}
                 />
-              </Link>
-              <button
-                ref={closeRef}
-                type="button"
-                aria-label="Cerrar menú"
-                onClick={close}
-                className="text-azul-principal hover:bg-azul-principal/5 inline-flex items-center justify-center rounded-xl p-2 transition-colors"
-              >
-                <X size={24} />
-              </button>
+
+                <PieMenu pathname={pathname} correo={sitio.correo} redes={sitio.redes} onCerrar={close} onSubirEnPagina={subir} />
+              </div>
             </div>
-
-            <NavegacionMenu
-              pathname={pathname}
-              secciones={secciones}
-              desplegado={desplegado}
-              onDesplegar={setDesplegado}
-              onCerrar={close}
-              onSubirEnPagina={subir}
-              onIrASeccion={irA}
-              onIrADestino={irADestino}
-            />
-
-            <PieMenu pathname={pathname} correo={sitio.correo} redes={sitio.redes} onCerrar={close} onSubirEnPagina={subir} />
           </dialog>,
           document.body,
         )}
