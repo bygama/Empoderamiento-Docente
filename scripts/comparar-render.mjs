@@ -61,8 +61,10 @@ const DIMENSIONES = {
       .join("\n"),
 };
 
-/** Bytes de los chunks que la página pide, contando cada uno una sola vez. */
-function js(app, html) {
+// Bytes de los activos de la página, cada uno contado una vez. **Incluye el
+// CSS**, que Next también deja bajo `static/chunks/`: llamar a esto «js» ya hizo
+// que un lector concluyera que el CSS no se medía.
+function activos(app, html) {
   const chunks = new Set([...html.matchAll(/\/_next\/(static\/chunks\/[^"]+)/g)].map((m) => m[1]));
   let bytes = 0;
   for (const c of chunks) {
@@ -87,10 +89,10 @@ for (const p of [...deA].filter((x) => deB.has(x))) {
   const a = readFileSync(join(appDir(antes), p), "utf8");
   const b = readFileSync(join(appDir(despues), p), "utf8");
   const distintas = Object.keys(DIMENSIONES).filter((k) => DIMENSIONES[k](a) !== DIMENSIONES[k](b));
-  const ja = js(antes, a);
-  const jb = js(despues, b);
+  const ja = activos(antes, a);
+  const jb = activos(despues, b);
   const delta = jb.bytes - ja.bytes;
-  const resumen = `js ${ja.cuantos}→${jb.cuantos} chunks, ${delta >= 0 ? "+" : ""}${delta} bytes`;
+  const resumen = `${ja.cuantos}→${jb.cuantos} activos (js+css), ${delta >= 0 ? "+" : ""}${delta} bytes`;
   if (distintas.length > 0) fallo = true;
   const estado = distintas.length > 0 ? `DISTINTA en ${distintas.join(", ")}` : "igual";
   console.log(`  ${p}: ${estado} — ${resumen}`);
