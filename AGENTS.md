@@ -551,6 +551,13 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 [ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md); diseño en
 `docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`.
 
+> **Estas reglas están escritas en presente pero el admin todavía no existe:**
+> la fase 0 (la escisión de Payload) es lo único hecho. Nada de `prisma/`,
+> `datos/`, `admin/`, `middleware.ts`, `packages/` ni
+> `scripts/guarda-prisma.mjs` está en el árbol — llegan con las fases 1 y 2
+> (§13). Son el contrato al que tiene que ajustarse quien las construya, no una
+> descripción de lo que hay.
+
 Reglas para el admin y sus datos:
 
 - **`datos/` es la única puerta a la base.** `apps/sitio/src/datos/consultas/`
@@ -598,7 +605,7 @@ define al implementar cada fase.
 - [x] El repo pasa a monorepo: el sitio, en `apps/sitio/`
 - [x] **Payload afuera** (fase 0 del ADR-0005): su código, sus 7 dependencias y
       su spec salieron del repo, y el sitio quedó idéntico — comprobado con el
-      diff del HTML prerenderizado de las 10 páginas contra `d452e61`.
+      diff del HTML prerenderizado de las **11** páginas contra `d452e61`.
 - [ ] **Admin, fase 1 — cimientos:** `packages/db` + `packages/auth`,
       `middleware.ts` con cabeceras y rate limit, login en `/admin`.
 - [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y

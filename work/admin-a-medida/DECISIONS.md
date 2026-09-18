@@ -125,3 +125,50 @@ comentario apunte a algo que ya no está».
 Un contrato que describe solo el presente no sirve para contestar «dónde va este
 archivo», y uno que describe solo el futuro miente. Las marcas «fase N»
 distinguen lo que existe de lo que está planificado.
+
+---
+
+## Rulings del fix loop (review de cierre, ronda 1)
+
+**2026-09-18 — El barrido de staleness miró markdown y se olvidó del código y
+de la config.** Lo levantó el seat de documentation impact, y tenía razón dos
+veces: `apps/sitio/src/app/robots.ts:3` citaba «spec §6» de la spec borrada, y
+`.gitattributes` fijaba en LF `apps/sitio/src/payload-types.ts`, un archivo que
+ya no existe, con cuatro líneas explicando un problema imposible. Los dos
+arreglados. El método falló, no la ejecución: el grep de verificación recorría
+`*.md` y la config de la app, y ninguno de los dos archivos entraba.
+
+**2026-09-18 — La spec del monorepo se marca, no se borra.**
+El seat señaló que borré la spec del panel por quedar falsa y no apliqué el
+mismo criterio a su hermana. La diferencia que justifica el trato distinto: la
+del panel describía una decisión **revertida**; la del monorepo describe una
+decisión **vigente** (ADR-0004, una sola app, el gate multi-proyecto) cuyo árbol
+ilustrativo quedó viejo. Borrarla perdería el razonamiento de una decisión que
+sigue en pie. Lleva ahora un recuadro que dice qué sigue valiendo y qué está
+superado, y su §1 pasa a pasado con una nota de tiempo verbal.
+
+**2026-09-18 — `AGENTS.md` §12 estaba en presente para cosas que no existen.**
+El §3 marcaba «(fase N)» en cada path y el §12, cuarenta líneas después, hablaba
+de `datos/`, del middleware y de la guarda de Prisma como si estuvieran. Ahora
+lleva el mismo aviso: son el contrato al que tiene que ajustarse quien lo
+construya, no una descripción de lo que hay.
+
+**2026-09-18 — Eran 11 páginas prerenderizadas, no 10.**
+La que faltaba es `_global-error.html`, y el seat la detectó por la deriva entre
+el «9 rutas» del PLAN y el «10 páginas» de PROGRESS. Comparada: idéntica salvo
+los IDs de módulo del payload de React, que cambian entre builds igual que el
+`BUILD_ID`. El número correcto es 11 y así queda en `AGENTS.md` §13.
+
+**2026-09-18 — «Entran 5» era «entran 6».**
+Se enumeraban seis paquetes y se decía cinco, en el SPEC y en el ADR-0005.
+Corregido en los dos. La afirmación de fondo cambia: **salen 7 y entran 6**, así
+que el repo queda con **una** dependencia menos, no dos.
+
+**2026-09-18 — Los 10 archivos del grep, juzgados uno por uno.**
+El seat objetó que `DECISIONS.md` justificaba solo el subconjunto de
+`AGENTS.md`. Los diez: `docs/AI_GUIDELINES.md:171` es un **falso positivo**
+(«payloads de API», la palabra inglesa para el cuerpo de un request); los ADRs
+0002, 0003 y 0004 son historia y su contexto no se reescribe; los ADRs 0005 y
+0007 y el índice nombran a Payload porque documentan su salida; la spec del
+monorepo es legítima recién ahora que lleva el recuadro; la spec del admin
+nombra lo que reemplaza. Ninguno describe a Payload como el plan vigente.

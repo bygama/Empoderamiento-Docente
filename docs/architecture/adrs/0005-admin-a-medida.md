@@ -74,7 +74,9 @@ después.
 ### Positivas
 
 - **Menos dependencias que antes.** Salen 7 (`payload`, los cinco
-  `@payloadcms/*` y `graphql`), entran 5. `pnpm install` sacó 226 paquetes.
+  `@payloadcms/*` y `graphql`) y entran 6 (`prisma`, `@prisma/client`,
+  `@prisma/adapter-neon`, `better-auth`, `@vercel/blob`, `resend`).
+  `pnpm install` sacó 226 paquetes.
 - **Cero código generado dentro de `src/`.** Se van las 702 líneas generadas
   —`payload-types.ts`, el route group `(payload)` y la migración— y con ellas
   los tres `globalIgnores` de ESLint que existían para esconderlas.
