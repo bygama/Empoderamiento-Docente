@@ -11,6 +11,14 @@ type Opciones = {
   closeRef: RefObject<HTMLButtonElement | null>;
 };
 
+// Rayas → X, en unidades del viewBox de 24 del ícono `Menu` (rayas en y=7 y
+// y=17, de 18 de largo). CENTRO las lleva a y=12; el aspa del ícono `X` mide
+// 12·√2 ≈ 17, de ahí la escala.
+const CENTRO = 5;
+const ASPA = { scaleX: 0.94 };
+const JUNTAR = { duration: 0.3, ease: "power2.inOut" };
+const GIRAR = { duration: 0.4, ease: "power3.out" };
+
 /**
  * Apertura y cierre del panel: la timeline (que se arma una vez que el panel
  * existe), el `showModal()` / `close()` del `<dialog>` y el manejo del foco.
@@ -26,7 +34,17 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
 
     const ctx = gsap.context(() => {
       gsap.set(panel, { autoAlpha: 0 });
-      if (reduced) return; // sin timeline: lo maneja el efecto de abajo.
+      // Las dos rayas del botón gemelo (BotonCerrar). Sin movimiento no hay
+      // timeline que las lleve: quedan en X de entrada, que es lo que el botón
+      // hace cuando el panel está a la vista.
+      const [rayaA, rayaB] = gsap.utils.toArray<SVGLineElement>("[data-mnav-cerrar] line");
+      gsap.set([rayaA, rayaB], { transformOrigin: "50% 50%" });
+      if (reduced) {
+        gsap.set(rayaA, { y: CENTRO, ...ASPA, rotation: 45 });
+        gsap.set(rayaB, { y: -CENTRO, ...ASPA, rotation: -45 });
+        return; // sin timeline: lo maneja el efecto de abajo.
+      }
+      const icono = toggleRef.current?.querySelector("svg") ?? null;
 
       // La cortina: el filo cruza la pantalla entera mientras el contenido
       // recorre la mitad. Ese desfase es todo el efecto —las palabras aparecen
@@ -54,7 +72,18 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
         .to(panel, { autoAlpha: 1, duration: 0.01 })
         .fromTo("[data-mnav-velo]", { opacity: 0 }, { opacity: 1, ...cortina }, 0)
         .fromTo("[data-mnav-cortina]", { xPercent: 100 }, { xPercent: 0, ...cortina }, 0)
-        .fromTo("[data-mnav-contenido]", { xPercent: -50 }, { xPercent: 0, ...cortina }, 0);
+        .fromTo("[data-mnav-contenido]", { xPercent: -50 }, { xPercent: 0, ...cortina }, 0)
+        // Rayas → X en el gemelo. Primero se juntan al centro, y recién giran
+        // cuando la cortina ya pasó por debajo del botón: la X termina de
+        // armarse con el panel puesto, como en la referencia.
+        .to(rayaA, { y: CENTRO, ...JUNTAR }, 0)
+        .to(rayaB, { y: -CENTRO, ...JUNTAR }, 0)
+        .to(rayaA, { rotation: 45, ...ASPA, ...GIRAR }, JUNTAR.duration)
+        .to(rayaB, { rotation: -45, ...ASPA, ...GIRAR }, JUNTAR.duration);
+      // El ícono de la píldora se apaga en el instante 0 para que no asome,
+      // quieto, detrás del que gira; en la reversa vuelve justo cuando el
+      // diálogo se cierra.
+      if (icono) tlRef.current.to(icono, { autoAlpha: 0, duration: 0.01 }, 0);
     }, panel);
 
     return () => {
@@ -93,9 +122,7 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
     // Foco al ABRIR: a la X, y DIFERIDO dos frames, porque el panel arranca
     // en `autoAlpha: 0` (visibility hidden) y un elemento invisible no puede
     // recibir foco (lo mismo que documenta el overlay del equipo). Para cuando
-    // la timeline pintó su primer frame, la X ya es enfocable. `preventScroll`
-    // porque a esa altura la X todavía viaja con la cortina, fuera de pantalla:
-    // sin él, el navegador scrollea lo que haga falta para traerla a la vista.
+    // la timeline pintó su primer frame, la X ya es enfocable.
     //
     // El foco al CERRAR no vive acá: va pegado al `close()` (arriba y en el
     // onReverseComplete). Si se restaurara en este efecto, correría con el
@@ -103,12 +130,25 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
     // robaría el foco a cualquiera cada vez que el efecto se re-corre con el
     // menú cerrado (basta que la persona cambie `prefers-reduced-motion`, que
     // `useReducedMotion` escucha en vivo).
+    //
+    // `calzar` pone el botón gemelo exacto sobre el de la píldora, MIDIENDO y no
+    // copiando sus números: la píldora se corre con el ancho de pantalla. Se
+    // repite en cada resize mientras el panel está abierto (girar el celular).
+    const calzar = () => {
+      const burger = toggleRef.current?.getBoundingClientRect();
+      if (burger && closeRef.current) gsap.set(closeRef.current, { x: burger.left, y: burger.top });
+    };
     let raf = 0;
     if (open) {
+      calzar();
+      window.addEventListener("resize", calzar);
       raf = requestAnimationFrame(() => {
         raf = requestAnimationFrame(() => closeRef.current?.focus({ preventScroll: true }));
       });
     }
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", calzar);
+    };
   }, [open, reduced, panelRef, toggleRef, closeRef]);
 }
