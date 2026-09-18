@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ROL_POR_DEFECTO } from "@ed/auth";
 import { auth } from "@/datos/auth";
 import { SalirDelAdmin } from "@/admin/armazon/SalirDelAdmin";
 
@@ -22,7 +23,7 @@ export default async function LayoutProtegido({ children }: { children: React.Re
         <div>
           <p className="font-[family-name:var(--font-manrope)] font-bold">Empoderamiento Docente</p>
           <p className="text-sm text-gris-texto">
-            {sesion.user.name} · {String((sesion.user as { rol?: string }).rol ?? "")}
+            {sesion.user.name} · {sesion.user.rol ?? ROL_POR_DEFECTO}
           </p>
         </div>
         <SalirDelAdmin />

@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { LARGO_MINIMO_CONTRASENA } from "@ed/auth";
 import { authCliente } from "@/admin/auth-cliente";
 import { Aviso, Boton, Campo } from "@/admin/armazon/Campos";
-
-const LARGO_MINIMO = 12;
 
 export function FormularioNueva() {
   const router = useRouter();
@@ -15,8 +14,8 @@ export function FormularioNueva() {
 
   async function guardar(datos: FormData) {
     const nueva = String(datos.get("contrasena") ?? "");
-    if (nueva.length < LARGO_MINIMO) {
-      setError(`La contraseña tiene que tener ${LARGO_MINIMO} caracteres o más.`);
+    if (nueva.length < LARGO_MINIMO_CONTRASENA) {
+      setError(`La contraseña tiene que tener ${LARGO_MINIMO_CONTRASENA} caracteres o más.`);
       return;
     }
     if (nueva !== String(datos.get("repetida") ?? "")) {
