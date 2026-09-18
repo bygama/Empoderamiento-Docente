@@ -116,3 +116,21 @@ Lo estricto sería un nonce por respuesta, y un nonce distinto en cada request
 obliga a renderizar dinámico, que es justo lo que el sitio público no es. El
 sitio no renderiza input de nadie ni carga scripts de terceros. La función ya
 está partida para darle nonce solo al admin cuando tenga pantallas con datos.
+
+**2026-09-18 — Las clases del admin se filtran al CSS del sitio público, y se
+deja anotado en vez de taparlo.**
+`comparar-render.mjs` lo detectó en su primer uso real: cada página pública pesa
+**+4103 bytes**, que son +2880 de CSS (contado dos veces, como preload y como
+hoja) y +1223 de JS del runtime, por el segundo layout raíz. El CSS creció
+porque Tailwind arma **una sola hoja para los dos route groups**, así que
+`min-h-dvh`, `max-w-md`, `max-w-prose` y compañía —que solo usa el admin— viajan
+a `/`. Hoy es 1,4 KB sobre 174 KB: menos del 1%, no vale partir la hoja por eso.
+**Pero crece con cada pantalla del admin**, y las fases 2 y 3 traen muchas. El
+umbral para actuar: si el CSS del sitio sube más de un 5% respecto de `6d72bc0`,
+se parte la hoja por route group. Se mide con este mismo script, que ahora
+informa bytes justamente para esto.
+
+**2026-09-18 — `comparar-render.mjs` ya no falla porque aparezca una página.**
+Frenaba ante cualquier diferencia de lista, y eso lo volvía inservible como gate
+en toda fase que sume pantallas — o sea todas. Ahora una página que DESAPARECE
+sigue siendo una regresión y frena; una que aparece se informa y no frena.
