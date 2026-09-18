@@ -14,14 +14,16 @@
 ## Quickstart (30 segundos)
 
 - **Qué es:** sitio web institucional de **Empoderamiento Docente (ED)**.
-- **Forma del repo:** **monorepo** (workspace pnpm). El sitio y su panel viven
-  en `apps/sitio/`; la raíz es del repo, no de una app. Ver
-  [ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md).
+- **Forma del repo:** **monorepo** (workspace pnpm). El sitio y su admin viven
+  en `apps/sitio/`, y lo reutilizable en `packages/`; la raíz es del repo, no
+  de una app. Ver [ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md) y
+  [ADR-0006](docs/architecture/adrs/0006-packages-reutilizables.md).
 - **Stack:** Next.js 16 (App Router) + React 19 + TypeScript strict +
   Tailwind CSS v4 (theming en CSS) + GSAP + Lenis + Zod.
-- **Backend/persistencia:** **Neon** (Postgres) + **Payload** (panel de
-  contenido en `/admin`), fotos en Vercel Blob, correos por Resend. Ver
-  [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md).
+- **Backend/persistencia:** **Neon** (Postgres) con **Prisma**, y un **admin a
+  medida** en `/admin` con **better-auth**; fotos en Vercel Blob, correos por
+  Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
+  [ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md).
 - **Onboarding humano:** [`README.md`](README.md) (instalación, scripts, estructura).
 - **Lanzamiento:** **junio 2026** (estimado).
 - **Reglas duras** (no negociables):
@@ -57,7 +59,7 @@
 | Hacer **commits**                           | `docs/COMMITS.md` → §9 commit protocol                                                      |
 | Hacer **review** antes de PR                | §6 quality standards → §10 pre-PR checklist                                                 |
 | Entender la **arquitectura del repo**       | §1 purpose → §3 project structure → `docs/architecture/adrs/0001-stack-base.md`             |
-| **Backend / datos / panel** (Neon + Payload) | §2 stack → §12 backend/datos → `docs/architecture/adrs/0003-adoptar-neon-y-payload.md` → `docs/architecture/specs/2026-09-15-panel-admin-diseno.md` → `docs/AI_GUIDELINES.md` §12 |
+| **Backend / datos / admin** (Neon + Prisma) | §2 stack → §12 backend/datos → `docs/architecture/adrs/0005-admin-a-medida.md` → `docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md` → `docs/AI_GUIDELINES.md` §12 |
 | **Instalar y correr local**                 | `README.md` (getting started) → `package.json` scripts (`pnpm dev` / `build` / `start` / `lint` / `typecheck`) |
 
 > Si tu tarea no entra en la tabla, pedile al usuario que la describa y
@@ -90,20 +92,24 @@ ED a definir con el cliente).
   en `apps/sitio/src/app/globals.css`, no en un `tailwind.config.js`)
 - **GSAP 3** + **Lenis** (animaciones, smooth scroll)
 - **Zod 4** (validación de datos en bordes; se usará cuando se sumen formularios)
-- **Payload 3** sobre **Neon** (Postgres): panel de contenido en `/admin`,
-  fotos en Vercel Blob, correos por Resend (ver ADR-0003)
+- **Prisma 7** sobre **Neon** (Postgres) + **better-auth**: admin a medida en
+  `/admin`, fotos en Vercel Blob, correos por Resend (ver ADR-0005 y ADR-0007)
 - **pnpm 11** (pinned vía `packageManager`), **Node ≥ 22**
 
-**Backend/persistencia: Neon + Payload.** La base es Postgres en Neon (Docker
-en local); el panel de contenido es Payload 3 montado en `/admin` dentro de
-esta app, con fotos en Vercel Blob y correos por Resend. Definición en
-`apps/sitio/src/cms/` y `apps/sitio/src/payload.config.ts`; lo generado por
-Payload no se edita. Detalle y alternativas en
-[ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md); guías en
-§12 y en `docs/AI_GUIDELINES.md` §12.
+**Backend/persistencia: Neon con Prisma, y un admin propio.** La base es
+Postgres en Neon (Docker en local); el admin se construye a medida y vive en
+`/admin` dentro de esta app. El esquema está en `apps/sitio/prisma/schema/` y
+sus migraciones se commitean; la única puerta a la base es
+`apps/sitio/src/datos/`. Lo reutilizable vive en `packages/` y no sabe nada de
+ED. Detalle y alternativas en
+[ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
+[ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md); guías en §12 y en
+`docs/AI_GUIDELINES.md` §12.
 
 Versiones exactas → `apps/sitio/package.json`: las dependencias viven en la
-app, no en la raíz del workspace. Fijar majors, minors flotando (`^`).
+app, no en la raíz del workspace. Fijar majors, minors flotando (`^`). **Prisma
+es la excepción y va exacta, sin `^`**: el tag `latest` de npm resuelve hoy a
+un release candidate de la 8 (ADR-0007).
 
 ---
 
@@ -125,32 +131,42 @@ app, no en la raíz del workspace. Fijar majors, minors flotando (`^`).
 │   ├── conventions/       ← CODE-STYLE.md
 │   └── architecture/
 │       ├── adrs/          ← decisiones arquitectónicas (ADRs)
-│       └── specs/         ← diseños largos (el panel, el monorepo)
+│       └── specs/         ← diseños largos (el admin, el monorepo)
 ├── skills/                ← workflows estables (adr-create, pr-review)
 ├── work/                  ← lanes de trabajo: SPEC, PLAN, PROGRESS y
 │                            DECISIONS de cada cambio grande en curso
 ├── .githooks/             ← pre-push: el gate de §5.8 (se instala solo)
-├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs
+├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs,
+│                            guarda-prisma.mjs (fase 1)
 ├── package.json           ← raíz del workspace: delega en las apps + el gate
 ├── pnpm-workspace.yaml    ← packages: ["apps/*"] + publicHoistPattern
 ├── pnpm-lock.yaml         ← uno solo, de todo el workspace
+├── packages/              ← LO REUSABLE, cero dominio de ED adentro (fase 1)
+│   ├── db/                ← cliente Prisma + Neon, slugs, redirecciones
+│   ├── auth/              ← better-auth configurado, permisos, guarda
+│   └── kit-admin/         ← tabla, formulario, controles, imágenes, avisos
 └── apps/
-    └── sitio/             ← el sitio y su panel (por ahora, la única app)
+    └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz
         ├── .env.example   ← las variables son de la app
         ├── public/        ← assets estáticos (brand/, imágenes)
+        ├── prisma/        ← el modelo de datos (fase 1)
+        │   ├── schema/      ← base · auth · contenido · sitio
+        │   └── migrations/  ← generadas, se commitean, nunca a mano
         ├── (config)       ← tsconfig.json, eslint.config.mjs,
         │                     next.config.ts, postcss.config.mjs
         └── src/
             ├── app/
             │   ├── (sitio)/   ← el sitio: sus páginas y su layout
-            │   ├── (payload)/ ← GENERADO por Payload: /admin y su API
+            │   ├── (admin)/   ← SOLO rutas del admin (fase 1)
+            │   ├── api/       ← formularios públicos: contacto, cv (fase 4)
             │   └── globals.css
-            ├── cms/           ← definición del panel (nuestra)
-            │   ├── colecciones/ ← usuarios, fotos, …
-            │   └── migraciones/ ← el esquema versionado, se commitea
-            ├── payload.config.ts
-            ├── payload-types.ts ← GENERADO, no se edita
+            ├── datos/         ← la ÚNICA puerta a la base (fase 2)
+            │   ├── consultas/   ← lo que lee el sitio
+            │   └── acciones/    ← Server Actions que escribe el admin
+            ├── admin/         ← las pantallas del admin (fase 2)
+            │   └── <entidad>/   ← Lista, Formulario y sus límites
+            ├── middleware.ts  ← sesión · cabeceras · rate limit (fase 1)
             ├── components/    ← UI reutilizable
             │   ├── brand/       ← logotipo / marca
             │   ├── layout/      ← Header, Footer, MobileNav, etc.
@@ -168,18 +184,25 @@ app, no en la raíz del workspace. Fijar majors, minors flotando (`^`).
 
 > **Nota:** el theming de Tailwind v4 vive en
 > `apps/sitio/src/app/globals.css` (bloque `@theme`), no en `src/styles/` ni
-> en un `tailwind.config.js`. El panel de contenido (Payload) vive en
-> `apps/sitio/src/app/(payload)/` (generado) y su definición en
-> `apps/sitio/src/cms/` + `apps/sitio/src/payload.config.ts`; el sitio, en
-> `apps/sitio/src/app/(sitio)/` (ver
-> [ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md)).
+> en un `tailwind.config.js`. Las marcas «fase N» del árbol son del plan del
+> [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md): hoy existe lo que
+> no las lleva, y el calendario está en §13 y en
+> `docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md` §9.
+>
+> **Las cuatro fronteras** que sostienen ese layout, y que se revisan a ojo
+> porque ningún gate las mide: `packages/` no sabe nada de ED; `datos/` es la
+> única puerta a la base y ningún componente importa Prisma; `app/` son rutas
+> y nada más; `features/` recibe props y nunca cambia de contrato.
 
-> **Por qué `apps/`:** el layout es lo que hace barato crecer; partir el
-> deployable es lo que hace caro operar. Hoy el sitio y su panel son **un solo
-> deployable** y viven juntos en `apps/sitio`. Una segunda app se agrega al
-> lado, sin rediseñar nada; `packages/` aparece recién cuando haya un segundo
-> consumidor de algo. El razonamiento completo, con las señales que
-> dispararían cada cambio, en el
+> **Por qué `apps/` y `packages/`:** el layout es lo que hace barato crecer;
+> partir el deployable es lo que hace caro operar. El sitio y su admin son **un
+> solo deployable** y viven juntos en `apps/sitio`; una segunda app se agrega al
+> lado, sin rediseñar nada. `packages/` existe desde ahora porque la
+> reutilización entre proyectos es un **requisito**, no un descubrimiento: eso
+> enmienda la regla original del ADR-0004 y queda registrado en el
+> [ADR-0006](docs/architecture/adrs/0006-packages-reutilizables.md). Lo que
+> viaja a otro proyecto son los packages, nunca las apps. El razonamiento
+> completo, con las señales que dispararían cada cambio, en el
 > [ADR-0004](docs/architecture/adrs/0004-monorepo-apps.md) y en su
 > [diseño](docs/architecture/specs/2026-09-17-monorepo-apps-diseno.md).
 
@@ -321,13 +344,15 @@ y **frena el push** si alguno falla. Se instala solo con `pnpm install`.
   `react-doctor` del `package.json` de la raíz y la lista `PROYECTOS` de
   `scripts/verificar-react-doctor.mjs`. El verificador recorre todos y exige
   100 en cada uno — y **frena si alguno no aparece en el informe**, porque un
-  proyecto ausente se lee igual que «cero hallazgos». Cuando se sume una app,
-  se suma a las dos listas.
-- **Lo que Payload genera se mide igual, y pasa.** `payload-types.ts` y el
-  route group `(payload)` viven adentro de `apps/sitio/src` y entran en la
-  medición: 100/100 con ellos adentro, comprobado el 2026-09-18. No se los
-  esconde ni se los saca del alcance; si algún día bajan el score, se discute
-  con el owner y queda escrito acá.
+  proyecto ausente se lee igual que «cero hallazgos». Cuando se sume una app o
+  un package con React, se suma a las dos listas.
+- **No hay código generado adentro de `src/`, y se hizo a propósito.** La
+  escisión de Payload se llevó las 702 líneas que generaba dentro del proyecto
+  (`payload-types.ts`, el route group `(payload)`, su migración) y con ellas los
+  `globalIgnores` de ESLint que existían para esconderlas. Lo que Prisma genera
+  vive en `node_modules`, así que el gate no lo ve. Si alguna vez algo generado
+  vuelve a caer en `src/`, se discute con el owner y queda escrito acá antes de
+  esconderlo.
 - **Una medición incompleta no es un aprobado.** react-doctor arma su lista de
   archivos con el índice de git: un borrado sin commitear le hace fallar el
   análisis de mantenibilidad y **esconder el score**, con una salida que se
@@ -389,9 +414,9 @@ esa misma guía).
       más difícil de auditar de una lectura, que es exactamente para lo que
       existe, y sus comentarios son el «nunca se apaga en silencio» de §5.8
       escrito donde se lee.
-- [ ] Lo **generado** no cuenta para estos topes: `payload-types.ts`, el route
-      group `(payload)` y las migraciones los escribe Payload, no se editan a
-      mano y no se miden con la vara del código nuestro.
+- [ ] Lo **generado** no cuenta para estos topes: las migraciones de
+      `apps/sitio/prisma/migrations/` las escribe Prisma, no se editan a mano y
+      no se miden con la vara del código nuestro.
 - [ ] Cero `any` sin comentario justificando.
 - [ ] Cero rutas relativas largas (`../../..`) — usar `@/` alias.
 
@@ -414,9 +439,9 @@ esa misma guía).
 - **Imágenes:** `next/image` con `alt`, `width`, `height`, `loading="lazy"`
   excepto LCP.
 - **Fonts:** `next/font/google` con `display: 'swap'` y subset `latin`.
-- **Validación:** todo dato de entrada (formularios, payloads) se valida en
-  el borde con **Zod** antes de tocar la base; el contenido del panel lo
-  valida Payload con las reglas de cada campo (ver §12).
+- **Validación:** todo dato de entrada se valida en el borde con **Zod** antes
+  de tocar la base — sin excepción, y eso incluye lo que escribe el admin por
+  sus Server Actions (ver §12). No hay una capa que valide sola por nosotros.
 - **Imports:** orden framework → externos → internos (`@/...`).
 - **Naming:** PascalCase componentes/tipos, camelCase utils/hooks
   (con prefijo `use`), SCREAMING_SNAKE_CASE constantes, kebab-case carpetas.
@@ -518,36 +543,42 @@ Antes de pedir merge a `main`:
 
 ---
 
-## 12. Backend y datos (Neon + Payload)
+## 12. Backend y datos (Neon + Prisma, admin propio)
 
-**El backend es Neon (Postgres) y el panel de contenido es Payload**, adentro
-de esta app en `/admin`. Decisión y alternativas en
-[ADR-0003](docs/architecture/adrs/0003-adoptar-neon-y-payload.md); diseño del
-panel en `docs/architecture/specs/2026-09-15-panel-admin-diseno.md`.
+**El backend es Neon (Postgres) con Prisma, y el admin se construye a medida**,
+adentro de esta app en `/admin`. Decisión y alternativas en
+[ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
+[ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md); diseño en
+`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`.
 
-Reglas para el panel y sus datos:
+Reglas para el admin y sus datos:
 
-- **Definición en código:** colecciones, páginas y accesos en
-  `apps/sitio/src/cms/`, juntados en `apps/sitio/src/payload.config.ts`. Lo
-  que Payload genera (`app/(payload)/`, `payload-types.ts`, `cms/migraciones/`,
-  todo bajo `apps/sitio/src/`) no se edita a mano; al sumar un plugin o
-  componente propio, `pnpm --filter sitio generate:importmap`.
-- **Validar todos los bordes con Zod** antes de escribir/leer (formularios,
-  payloads). Nunca confiar en input externo.
-- **Secretos solo server-side:** `DATABASE_URL`, `PAYLOAD_SECRET`,
-  `VISTA_PREVIA_SECRET`, `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca
-  llevan `NEXT_PUBLIC_` ni llegan al browser. Placeholders en
-  `apps/sitio/.env.example`;
-  en Vercel, el build corta si falta alguna
-  (`apps/sitio/src/cms/entorno.ts`).
-- **Acceso por rol** en cada colección (`apps/sitio/src/cms/acceso.ts`): dos
-  roles, administra y edita; nada es público salvo lo que la spec marca de
-  lectura pública (las fotos).
+- **`datos/` es la única puerta a la base.** `apps/sitio/src/datos/consultas/`
+  lee y `apps/sitio/src/datos/acciones/` escribe. **Ningún componente importa
+  Prisma.** Lo reutilizable vive en `packages/` y no sabe nada de ED.
+- **El esquema está en `apps/sitio/prisma/schema/`** y sus migraciones se
+  generan con Prisma y **se commitean**. Nunca se editan a mano ni se aplican a
+  mano contra la base: `scripts/guarda-prisma.mjs` bloquea `prisma db push`
+  con exit 1, porque `push` crea tablas sin archivo de migración y el síntoma
+  aparece recién en producción.
+- **Nada de meta-capa de configuración para los formularios.** Cada entidad
+  escribe el suyo con los primitivos de `packages/kit-admin`. Un objeto que un
+  renderizador genérico traduce a formulario es el modelo de Payload, y es cómo
+  se termina reescribiendo Payload.
+- **Se escribe en vocabulario relacional**: tablas, columnas y controles. No
+  «colecciones», «globals» ni `CollectionConfig`.
+- **Validar todos los bordes con Zod** antes de escribir o leer, incluidas las
+  Server Actions del admin. Nunca confiar en input externo.
+- **Secretos solo server-side:** `DATABASE_URL`, el secreto de better-auth,
+  `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan `NEXT_PUBLIC_` ni
+  llegan al browser. Placeholders en `apps/sitio/.env.example`.
+- **La sesión se verifica en el middleware, antes de renderizar**, nunca dentro
+  del componente. Dos roles, administra y edita; nada del admin es público.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
-  tablas o políticas. No inventar tablas ni columnas que no estén acordadas.
+  tablas. No inventar tablas ni columnas que no estén acordadas.
 
-No describir aquí tablas concretas: el modelo de datos se define al
-implementar (y, si amerita, en un ADR de implementación).
+No describir aquí tablas concretas: el modelo de datos vive en la spec y se
+define al implementar cada fase.
 
 ---
 
@@ -564,17 +595,18 @@ implementar (y, si amerita, en un ADR de implementación).
 - [x] `apps/sitio/src/config/site.ts` con datos institucionales + `nav.ts`
 - [x] Home real (`apps/sitio/src/app/(sitio)/` + `apps/sitio/src/features/`)
 - [x] Crear `README.md` de onboarding humano en la raíz
-- [x] Panel de contenido: Payload sobre Neon montado en `/admin` (fase 0)
-- [x] El repo pasa a monorepo: el sitio y su panel, en `apps/sitio/`
-- [ ] Panel: la ida y vuelta contra una base de verdad — el `docker run` del
-      README, entrar a `/admin` y crear el primer usuario. Es lo único de la
-      fase 0 que quedó sin verificar, y es entorno, no código: la config, el
-      init de Payload y el adaptador de Postgres ya se comprobaron.
-- [ ] Panel: fases 1 a 4 del spec (novedades y biblioteca, casos y equipo,
-      páginas y ajustes, fotos y guía de uso)
+- [x] El repo pasa a monorepo: el sitio, en `apps/sitio/`
+- [x] **Payload afuera** (fase 0 del ADR-0005): su código, sus 7 dependencias y
+      su spec salieron del repo, y el sitio quedó idéntico — comprobado con el
+      diff del HTML prerenderizado de las 10 páginas contra `d452e61`.
+- [ ] **Admin, fase 1 — cimientos:** `packages/db` + `packages/auth`,
+      `middleware.ts` con cabeceras y rate limit, login en `/admin`.
+- [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
+      novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`.
+- [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
+      aliados, páginas y ajustes.
+- [ ] **Admin, fase 4 — URLs y SEO:** las 26 rutas nuevas (15 perfiles, 4 casos,
+      7 landings de tipo), `sitemap.xml`, canonicals, redirecciones y JSON-LD.
+      Reemplaza al «sitemap definitivo» que este §13 venía arrastrando.
 - [ ] Vercel: Root Directory = `apps/sitio` cuando exista el proyecto
-- [ ] Decidir dónde vive la vista previa: quedó en `app/(sitio)/vista-previa/`,
-      o sea la URL pública `/vista-previa`, y el spec del panel decía
-      `api/vista-previa`. Funciona igual, pero es un handler entre páginas.
-- [ ] Sitemap definitivo
 - [ ] CI/CD
