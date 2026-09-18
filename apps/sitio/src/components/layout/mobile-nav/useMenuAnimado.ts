@@ -1,5 +1,6 @@
 import { useEffect, useRef, type RefObject } from "react";
 import gsap from "gsap";
+import { botonSinMovimiento, sumarBoton } from "./coreografia-boton";
 
 type Opciones = {
   open: boolean;
@@ -10,18 +11,6 @@ type Opciones = {
   toggleRef: RefObject<HTMLButtonElement | null>;
   closeRef: RefObject<HTMLButtonElement | null>;
 };
-
-// Rayas → X, en unidades del viewBox de 24 del ícono `Menu` (rayas en y=7 y
-// y=17, de 18 de largo). CENTRO las lleva a y=12; el aspa del ícono `X` mide
-// 12·√2 ≈ 17, de ahí la escala.
-const CENTRO = 5;
-const ASPA = { scaleX: 0.94 };
-// Las rayas esperan a que el filo termine de cruzar el botón (de 375 a 1023px
-// lo suelta antes de los 0,3 s): mientras lo cruza tienen que ser IGUALES a
-// las de la píldora que quedan del otro lado del filo, o se vería el corte.
-const ESPERA = 0.3;
-const JUNTAR = { duration: 0.14, ease: "power2.in" };
-const GIRAR = { duration: 0.26, ease: "power3.out" };
 
 /**
  * Apertura y cierre del panel: la timeline (que se arma una vez que el panel
@@ -38,14 +27,9 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
 
     const ctx = gsap.context(() => {
       gsap.set(panel, { autoAlpha: 0 });
-      // Las dos rayas del botón gemelo (BotonCerrar). Sin movimiento no hay
-      // timeline que las lleve: quedan en X de entrada, que es lo que el botón
-      // hace cuando el panel está a la vista.
-      const [rayaA, rayaB] = gsap.utils.toArray<SVGLineElement>("[data-mnav-cerrar] line");
-      gsap.set([rayaA, rayaB], { transformOrigin: "50% 50%" });
+      const gemelo = panel.querySelector<HTMLElement>("[data-mnav-cerrar]");
       if (reduced) {
-        gsap.set(rayaA, { y: CENTRO, ...ASPA, rotation: 45 });
-        gsap.set(rayaB, { y: -CENTRO, ...ASPA, rotation: -45 });
+        botonSinMovimiento(gemelo);
         return; // sin timeline: lo maneja el efecto de abajo.
       }
 
@@ -77,15 +61,12 @@ export function useMenuAnimado({ open, reduced, hydrated, panelRef, toggleRef, c
         .fromTo("[data-mnav-cortina]", { xPercent: 100 }, { xPercent: 0, ...cortina }, 0)
         .fromTo("[data-mnav-contenido]", { xPercent: -50 }, { xPercent: 0, ...cortina }, 0)
         // La barra (logo + cierre) se CONTRA-desplaza lo mismo que avanza la
-        // cortina: queda quieta en pantalla, calzada sobre la píldora, y el
-        // filo la destapa. Es el cambio de color de la referencia: el mismo
-        // logo y las mismas rayas, azules de un lado del filo y blancos del otro.
-        .fromTo("[data-mnav-fijo]", { xPercent: -100 }, { xPercent: 0, ...cortina }, 0)
-        // Rayas → X: se juntan al centro y giran, con el panel ya puesto.
-        .to(rayaA, { y: CENTRO, ...JUNTAR }, ESPERA)
-        .to(rayaB, { y: -CENTRO, ...JUNTAR }, ESPERA)
-        .to(rayaA, { rotation: 45, ...ASPA, ...GIRAR }, ESPERA + JUNTAR.duration)
-        .to(rayaB, { rotation: -45, ...ASPA, ...GIRAR }, ESPERA + JUNTAR.duration);
+        // cortina: queda quieta en pantalla, calzada sobre las islas del
+        // Header, y el filo la destapa. Es el cambio de color de la referencia:
+        // el mismo logo y el mismo botón, claros de un lado del filo y de noche
+        // del otro.
+        .fromTo("[data-mnav-fijo]", { xPercent: -100 }, { xPercent: 0, ...cortina }, 0);
+      sumarBoton(tlRef.current, toggleRef.current, gemelo);
     }, panel);
 
     return () => {
