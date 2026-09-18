@@ -295,15 +295,16 @@ body {
 
 /* === Port navbar mobile (MobileNav) ============================== */
 
-/* Glow del faro: fondo claro premium con un halo de azul-claro arriba.
-   Metáfora de marca (faro/luz). Tokens, no hardcodes. Usado como fondo del
-   panel de navegación mobile. */
+/* Glow del faro, de noche: el azul de marca con un halo de azul-medio que
+   baja desde arriba, como el haz sobre el agua. Metáfora de marca (faro/luz).
+   Tokens, no hardcodes. Es el fondo del panel de navegación mobile, que
+   INVIERTE la página: ella es clara, el panel es la noche del faro. */
 .faro-glow {
-  background-color: var(--color-gris-fondo);
+  background-color: var(--color-azul-principal);
   background-image: radial-gradient(
-    110% 75% at 50% -5%,
-    color-mix(in srgb, var(--color-azul-claro) 55%, transparent),
-    transparent 62%
+    120% 70% at 50% -10%,
+    color-mix(in srgb, var(--color-azul-medio) 45%, transparent),
+    transparent 65%
   );
 }
 

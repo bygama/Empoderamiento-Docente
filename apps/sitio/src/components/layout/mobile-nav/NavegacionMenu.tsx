@@ -1,8 +1,14 @@
 import Link from "next/link";
 import type { MouseEvent } from "react";
-import { ArrowUpRight, ChevronDown } from "@/components/ui/icons";
+import { ChevronDown } from "@/components/ui/icons";
 import { NAV_LINKS, esPaginaActiva } from "@/config/nav";
 import type { SeccionPagina } from "@/lib/hooks/useSeccionesPagina";
+
+// Sobre el azul del panel (mismos valores que el Footer sobre su azul).
+const ROTULO =
+  "text-azul-claro/70 flex items-center gap-3 font-mono text-[0.68rem] font-medium tracking-[0.2em] uppercase";
+const CHIP =
+  "text-azul-claro inline-flex min-h-10 items-center rounded-full border border-white/20 px-3.5 font-sans text-[0.9rem] font-medium transition-colors hover:border-white hover:text-white";
 
 type Props = {
   /** Ruta actual: marca el ítem activo. */
@@ -43,15 +49,20 @@ export function NavegacionMenu({
   return (
     <nav
       aria-label="Navegación principal"
-      className="flex flex-1 flex-col justify-center px-6 sm:px-8"
+      className="flex flex-1 flex-col justify-center px-8 py-4"
     >
-      <ul>
+      {/* Rótulo con hairline, como los del Footer: nombra la lista. */}
+      <p className={ROTULO}>
+        <span aria-hidden="true" className="bg-verde-concepto h-px w-6" />
+        Explorar
+      </p>
+      <ul className="mt-3">
         {NAV_LINKS.map((link) => {
           const active = esPaginaActiva(pathname, link.href);
           const sub = link.submenu ?? [];
           const abierto = desplegado === link.href;
           return (
-            <li key={link.href} data-mnav-item className="border-azul-principal/10 border-b">
+            <li key={link.href}>
               <div className="flex items-center justify-between">
                 <Link
                   href={link.href}
@@ -63,25 +74,18 @@ export function NavegacionMenu({
                     else onCerrar();
                   }}
                   aria-current={active ? "page" : undefined}
-                  className="group flex flex-1 items-center justify-between py-4"
+                  className="group flex flex-1 items-center gap-3 py-2.5"
                 >
+                  {/* La página donde se está: una marca verde adelante (verde =
+                      concepto, DESIGN.md) y el nombre en azul-claro. */}
+                  {active && <span aria-hidden="true" className="bg-verde-concepto h-0.5 w-5 shrink-0" />}
                   <span
-                    className={`font-display text-[clamp(1.6rem,1rem+4vw,2.4rem)] font-bold tracking-[-0.01em] transition-colors ${
-                      active
-                        ? "text-verde-concepto"
-                        : "text-azul-principal group-hover:text-verde-concepto"
+                    className={`font-display text-[clamp(1.75rem,1.1rem+3.6vw,2.5rem)] leading-tight font-semibold tracking-[-0.02em] transition-colors ${
+                      active ? "text-azul-claro" : "group-hover:text-azul-claro text-white"
                     }`}
                   >
                     {link.label}
                   </span>
-                  <ArrowUpRight
-                    size={22}
-                    className={`shrink-0 transition-[color,opacity,translate] duration-300 ${
-                      active
-                        ? "text-verde-concepto opacity-100"
-                        : "text-azul-principal/40 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-                    }`}
-                  />
                 </Link>
                 {sub.length > 0 && (
                   <button
@@ -89,7 +93,7 @@ export function NavegacionMenu({
                     aria-label={`${abierto ? "Ocultar" : "Ver"} secciones de ${link.label}`}
                     aria-expanded={abierto}
                     onClick={() => onDesplegar(abierto ? null : link.href)}
-                    className="text-azul-principal/60 hover:text-azul-principal ml-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform"
+                    className="text-azul-claro/60 ml-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform hover:text-white"
                     style={{ transform: abierto ? "rotate(180deg)" : undefined }}
                   >
                     <ChevronDown size={20} />
@@ -104,7 +108,7 @@ export function NavegacionMenu({
                         href={s.href}
                         scroll={false}
                         onClick={(e) => onIrADestino(e, s.href)}
-                        className="border-azul-principal/15 text-azul-principal hover:border-azul-principal inline-flex min-h-10 items-center rounded-full border px-3.5 font-sans text-[0.9rem] font-medium transition-colors"
+                        className={CHIP}
                       >
                         {s.label}
                       </Link>
@@ -119,17 +123,14 @@ export function NavegacionMenu({
 
       {secciones.length >= 2 && (
         <div className="mt-8">
-          <p className="text-gris-texto font-mono text-[0.68rem] font-medium tracking-[0.2em] uppercase">
+          <p className={ROTULO}>
+            <span aria-hidden="true" className="bg-verde-concepto h-px w-6" />
             En esta página
           </p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {secciones.map((s) => (
               <li key={s.id}>
-                <button
-                  type="button"
-                  onClick={() => onIrASeccion(s.id)}
-                  className="border-azul-principal/15 text-azul-principal hover:border-azul-principal inline-flex min-h-10 items-center rounded-full border px-3.5 font-sans text-[0.9rem] font-medium transition-colors"
-                >
+                <button type="button" onClick={() => onIrASeccion(s.id)} className={CHIP}>
                   {s.label}
                 </button>
               </li>

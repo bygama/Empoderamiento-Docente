@@ -33,7 +33,7 @@ export function PieMenu({
 }) {
   const enContacto = pathname === CTA_LINK.href;
   return (
-    <div data-mnav-cta className="flex flex-col gap-5 px-6 pt-4 pb-10 sm:px-8">
+    <div className="flex flex-col gap-5 px-8 pt-4 pb-10">
       <Link
         href={CTA_LINK.href}
         onClick={(e) => {
@@ -53,7 +53,7 @@ export function PieMenu({
       {/* Mail de contacto: centrado, justo debajo del CTA. */}
       <a
         href={`mailto:${correo}`}
-        className="text-gris-texto hover:text-azul-principal text-center font-mono text-[0.78rem] tracking-wide transition-colors"
+        className="text-azul-claro/70 text-center font-mono text-[0.78rem] tracking-wide transition-colors hover:text-white"
       >
         {correo}
       </a>
@@ -62,8 +62,8 @@ export function PieMenu({
           táctil). Solo las que tienen URL confirmada; sin ninguna, la
           fila entera no se muestra. */}
       {REDES.some(({ key }) => redes[key]) && (
-        <div className="border-azul-principal/10 flex items-center justify-between gap-4 border-t pt-5">
-          <span className="text-gris-texto font-mono text-[0.72rem] font-medium tracking-[0.18em] uppercase">
+        <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-5">
+          <span className="text-azul-claro/70 font-mono text-[0.72rem] font-medium tracking-[0.18em] uppercase">
             Seguinos
           </span>
           <ul className="flex items-center gap-2.5">
@@ -77,7 +77,7 @@ export function PieMenu({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Empoderamiento Docente en ${label}`}
-                    className="border-azul-principal/15 text-azul-principal/75 hover:border-azul-principal hover:bg-azul-principal inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors hover:text-white"
+                    className="hover:text-azul-principal inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white hover:bg-white"
                   >
                     <Icon size={20} />
                   </a>
