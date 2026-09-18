@@ -177,6 +177,7 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
                   secciones={secciones}
                   desplegado={desplegado}
                   onDesplegar={setDesplegado}
+                  reduced={reduced}
                   onCerrar={close}
                   onSubirEnPagina={subir}
                   onIrASeccion={irA}

@@ -33,7 +33,7 @@ export function PieMenu({
 }) {
   const enContacto = pathname === CTA_LINK.href;
   return (
-    <div className="flex flex-col gap-5 px-8 pt-4 pb-10">
+    <div data-mnav-flip className="flex flex-col gap-5 px-8 pt-4 pb-10">
       <Link
         href={CTA_LINK.href}
         onClick={(e) => {
