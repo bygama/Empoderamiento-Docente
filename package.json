@@ -13,6 +13,11 @@
     "lint": "pnpm --fail-if-no-match -r lint",
     "typecheck": "pnpm --fail-if-no-match -r typecheck",
     "react-doctor": "pnpm dlx react-doctor --no-supply-chain --project apps/sitio/src,packages/db/src",
+    "prisma": "node scripts/guarda-prisma.mjs",
+    "migrate": "node scripts/guarda-prisma.mjs migrate dev",
+    "migrate:deploy": "node scripts/guarda-prisma.mjs migrate deploy",
+    "migrate:status": "node scripts/guarda-prisma.mjs migrate status",
+    "generate": "node scripts/guarda-prisma.mjs generate",
     "prepare": "node scripts/instalar-hooks.mjs"
   }
 }
