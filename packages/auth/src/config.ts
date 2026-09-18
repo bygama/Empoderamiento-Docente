@@ -80,6 +80,35 @@ export function crearAuth({
       updateAge: UN_DIA,
     },
 
+    /**
+     * Rate limit **por IP**, que es lo que faltaba: hasta acá el único freno
+     * era por cuenta, así que probar una contraseña contra mil correos
+     * distintos no chocaba con nada y dejaba enumerar usuarios a gusto.
+     *
+     * El límite de `signIn` es deliberadamente más duro que el general: tres
+     * intentos por minuto desde una IP frena la fuerza bruta sin molestar a
+     * quien escribió mal la contraseña una vez. El de `forgetPassword` frena
+     * usar el envío de correos como manguera contra buzones ajenos.
+     */
+    rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 60,
+      customRules: {
+        "/sign-in/email": { window: 60, max: 3 },
+        "/forget-password": { window: 300, max: 3 },
+        "/reset-password": { window: 300, max: 5 },
+      },
+    },
+
+    advanced: {
+      ipAddress: {
+        // En Vercel la IP real viene acá; sin decirlo, todas las requests
+        // parecerían venir del proxy y compartirían un solo cupo.
+        ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
+      },
+    },
+
     user: {
       additionalFields: {
         rol: {
