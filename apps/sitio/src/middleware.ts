@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { hayCookieDeSesion } from "@ed/auth";
 
 /**
  * Las cabeceras de seguridad de todo el sitio, y las que solo valen para el
@@ -10,6 +11,10 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 
 const ADMIN = "/admin";
+const ENTRAR = "/admin/entrar";
+
+/** Las del admin que se ven SIN sesión: si no, no habría por dónde entrar. */
+const ABIERTAS = [ENTRAR, "/admin/olvide-mi-contrasena", "/admin/nueva-contrasena"];
 
 /**
  * La política de contenido.
@@ -42,9 +47,28 @@ function politicaDeContenido(esAdmin: boolean): string {
   ].join("; ");
 }
 
+/**
+ * Adónde mandar a quien no tiene sesión. El `volver` es **solo la ruta**: con
+ * una URL completa esto sería un redirect abierto de manual.
+ */
+function aEntrar(req: NextRequest, ruta: string): URL {
+  const destino = req.nextUrl.clone();
+  destino.pathname = ENTRAR;
+  destino.search = ruta === ADMIN ? "" : `?volver=${encodeURIComponent(ruta)}`;
+  return destino;
+}
+
 export function middleware(req: NextRequest) {
-  const esAdmin = req.nextUrl.pathname.startsWith(ADMIN);
-  const res = NextResponse.next();
+  const ruta = req.nextUrl.pathname;
+  const esAdmin = ruta.startsWith(ADMIN);
+
+  // Del admin sin sesión no sale ni una página a medio renderizar: se corta
+  // acá y se redirige. Es un filtro optimista —Edge no puede consultar la
+  // base—; la comprobación de verdad la hace el layout del admin.
+  const cerrada =
+    esAdmin && !ABIERTAS.some((a) => ruta === a || ruta.startsWith(`${a}/`));
+  const res =
+    cerrada && !hayCookieDeSesion(req) ? NextResponse.redirect(aEntrar(req, ruta)) : NextResponse.next();
 
   res.headers.set("Content-Security-Policy", politicaDeContenido(esAdmin));
   // Dos años y subdominios: el valor que pide la lista de precarga de HSTS.
