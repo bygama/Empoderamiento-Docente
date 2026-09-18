@@ -66,7 +66,7 @@ Spec de la lane: [`SPEC.md`](SPEC.md). Diseño:
    `AGENTS.md` **requiere confirmación humana explícita** (§5.6): se pide
    antes de editarlo, no después. *(mechanical · medium)*
    **Aceptación:**
-   el grep de rutas viejas no devuelve ninguna línea **fuera de tres
+   el grep de rutas viejas no devuelve ninguna línea **fuera de estos cuatro
    carve-outs, que son correctos y hay que excluir a mano**:
 
    - las ramas de un diagrama de árbol (`└── src/`) que ya cuelgan de
@@ -74,9 +74,10 @@ Spec de la lane: [`SPEC.md`](SPEC.md). Diseño:
    - el alias `"@/*": ["./src/*"]` del tsconfig y la frase que explica que es
      relativo al archivo y **no** lleva prefijo;
    - `src/styles/`, que se cita como una ruta que NO existe;
-   - los **ADRs y los specs**, que describen el repo que había cuando se
-     escribieron o árboles relativos a la app. Los ADRs además son inmutables
-     una vez aceptados, por la regla de `docs/architecture/adrs/README.md`.
+   - el **registro**: los ADRs, los specs y los archivos de `work/`, que
+     describen el repo que había cuando se escribieron, árboles relativos a la
+     app, o la mudanza misma en pasado. Los ADRs además son inmutables una vez
+     aceptados, por la regla de `docs/architecture/adrs/README.md`.
 
    El chequeo es sobre la documentación **operativa** —la que alguien sigue
    para trabajar hoy—, no sobre el registro histórico.
