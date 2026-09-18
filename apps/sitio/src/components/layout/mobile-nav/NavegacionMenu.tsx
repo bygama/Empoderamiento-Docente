@@ -2,7 +2,6 @@ import Link from "next/link";
 import { useRef, type MouseEvent } from "react";
 import { ChevronDown } from "@/components/ui/icons";
 import { NAV_LINKS, esPaginaActiva } from "@/config/nav";
-import type { SeccionPagina } from "@/lib/hooks/useSeccionesPagina";
 import { useAcordeonFlip } from "./useAcordeonFlip";
 
 // Sobre el azul del panel (mismos valores que el Footer sobre su azul).
@@ -11,13 +10,10 @@ const ROTULO =
 // Destino de un submenú: la escala chica del panel, en grilla de dos columnas.
 const DESTINO =
   "text-azul-claro/80 inline-flex min-h-10 items-center py-1.5 font-sans text-[0.95rem] leading-snug transition-colors hover:text-white";
-const CHIP =
-  "text-azul-claro inline-flex min-h-10 items-center rounded-full border border-white/20 px-3.5 font-sans text-[0.9rem] font-medium transition-colors hover:border-white hover:text-white";
 
 type Props = {
   /** Ruta actual: marca el ítem activo. */
   pathname: string;
-  secciones: SeccionPagina[];
   /** href del ítem con el submenú desplegado, o null. */
   desplegado: string | null;
   onDesplegar: (href: string | null) => void;
@@ -26,7 +22,6 @@ type Props = {
   onCerrar: () => void;
   /** Ya estamos en esa página: cierra y sube al principio deslizando. */
   onSubirEnPagina: () => void;
-  onIrASeccion: (id: string) => void;
   onIrADestino: (e: MouseEvent<HTMLAnchorElement>, href: string) => void;
 };
 
@@ -34,28 +29,24 @@ type Props = {
 const idSub = (href: string) => `mnav-sub${href.replaceAll("/", "-")}`;
 
 /**
- * Navegación grande apilada (eco del Footer) más el atajo a las secciones de
- * la página actual: sin él hay que recorrer todas las escenas hasta llegar a
- * la que se busca. En desktop ese atajo es la columna de marcas del borde
- * derecho (IndicePagina).
+ * Navegación grande apilada (eco del Footer): las páginas del sitio y, adentro
+ * de cada una, sus destinos con nombre propio (los de `config/nav.ts`).
  *
  * Cada página con submenú abre un ACORDEÓN: el chevron despliega sus destinos
  * en una grilla chica de dos columnas, uno solo a la vez, y las demás páginas
  * se apagan para que se lea cuál está abierta. El de la página actual arranca
  * abierto (el estado vive en el compositor, que lo resetea al cambiar de
- * ruta). Cómo se mueve sin animar alturas, en `useAcordeonFlip`. Los destinos del submenú van por `onIrADestino`
- * porque pueden llevar query y hash: en la misma página cortan directo y en
+ * ruta). Cómo se mueve sin animar alturas, en `useAcordeonFlip`. Los destinos
+ * del submenú van por `onIrADestino` porque pueden llevar query y hash: en la misma página cortan directo y en
  * otra navegan y aterrizan.
  */
 export function NavegacionMenu({
   pathname,
   onSubirEnPagina,
-  secciones,
   desplegado,
   onDesplegar,
   reduced,
   onCerrar,
-  onIrASeccion,
   onIrADestino,
 }: Props) {
   const navRef = useRef<HTMLElement>(null);
@@ -148,24 +139,6 @@ export function NavegacionMenu({
           );
         })}
       </ul>
-
-      {secciones.length >= 2 && (
-        <div data-mnav-flip className="mt-8">
-          <p className={ROTULO}>
-            <span aria-hidden="true" className="bg-verde-concepto h-px w-6" />
-            En esta página
-          </p>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {secciones.map((s) => (
-              <li key={s.id}>
-                <button type="button" onClick={() => onIrASeccion(s.id)} className={CHIP}>
-                  {s.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </nav>
   );
 }

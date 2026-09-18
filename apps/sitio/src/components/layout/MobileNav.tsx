@@ -8,8 +8,7 @@ import { NAV_LINKS, esPaginaActiva } from "@/config/nav";
 import { irEnPagina, partirDestino } from "@/lib/navegar";
 import { Menu } from "@/components/ui/icons";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
-import { useSeccionesPagina } from "@/lib/hooks/useSeccionesPagina";
-import { irArriba, irASeccion } from "@/lib/indice";
+import { irArriba } from "@/lib/indice";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useMenuAnimado } from "./mobile-nav/useMenuAnimado";
@@ -46,7 +45,6 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
   const pathname = usePathname();
-  const secciones = useSeccionesPagina();
   // Submenú desplegado (acordeón): el de la página actual arranca abierto.
   const [desplegado, setDesplegado] = useState<string | null>(
     () => NAV_LINKS.find((l) => esPaginaActiva(pathname, l.href))?.href ?? null,
@@ -86,20 +84,14 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
 
   const close = () => setOpen(false);
 
-  // Saltar a una sección de la página actual: cierra el menú y desliza
-  // (ver irASeccion). La espera deja que el body suelte el lock.
-  const irA = (id: string) => {
-    close();
-    window.setTimeout(() => irASeccion(id, { corte: true, alFinal: true }), 60);
-  };
   // Tocar el nombre de la página en la que ya estamos: cierra y sube al
-  // principio deslizando. Misma espera de 60ms que arriba, por el lock.
+  // principio deslizando. La espera deja que el body suelte el lock.
   const subir = () => {
     close();
     window.setTimeout(irArriba, 60);
   };
   // Destino de un submenú: en la misma página desliza (con la misma
-  // espera); en otra, navega Next y aterriza el layout.
+  // espera que arriba); en otra, navega Next y aterriza el layout.
   const irADestino = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (partirDestino(href).pathname !== pathname) {
       close();
@@ -177,13 +169,11 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
 
                 <NavegacionMenu
                   pathname={pathname}
-                  secciones={secciones}
                   desplegado={desplegado}
                   onDesplegar={setDesplegado}
                   reduced={reduced}
                   onCerrar={close}
                   onSubirEnPagina={subir}
-                  onIrASeccion={irA}
                   onIrADestino={irADestino}
                 />
 
