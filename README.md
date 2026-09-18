@@ -78,8 +78,16 @@ admin sí las necesita todas:
   local, Neon en Vercel). La segunda es la directa, sin pooler: el pooler corta
   las transacciones largas de una migración.
 - `NEXT_PUBLIC_SITE_URL` — URL pública del sitio (pública, cliente).
+- `BETTER_AUTH_SECRET` — firma las sesiones del admin. Sin esto no arranca.
+
+Las dos que siguen están **declaradas pero todavía no conectadas**: hoy ningún
+código las lee, y ponerlas no cambia nada. Se conectan cuando el admin suba una
+foto (fase 2) y cuando mande un correo de verdad.
+
 - `BLOB_READ_WRITE_TOKEN` — fotos a Vercel Blob.
-- `RESEND_API_KEY` — correos del admin; sin clave, salen por consola.
+- `RESEND_API_KEY` — correos del admin. **Mientras tanto el enlace de
+  «olvidé mi contraseña» sale siempre por la consola del servidor**, con clave
+  o sin ella.
 
 Todas menos `NEXT_PUBLIC_SITE_URL` son secretas y **solo server-side**. Los
 placeholders viven en
@@ -123,8 +131,8 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
             └── lib/           ← hooks/ y utilidades
 ```
 
-Lo marcado «fase N» todavía no existe: es el plan del
-[ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
+Todo eso existe salvo `kit-admin`, que está marcado y llega en la fase 2. El
+plan completo, en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
 
 Es un **monorepo** (workspace pnpm): hoy hay una sola app y una segunda se
 agregaría al lado, en `apps/`. Lo que se comparte entre proyectos va en
@@ -211,8 +219,9 @@ pnpm migrate
 pnpm --filter sitio crear-cuenta tu@correo.org "Tu nombre" administra
 ```
 
-Después, `/admin/olvide-mi-contrasena` con ese correo. Sin clave de Resend el
-enlace sale **por la consola del servidor**, que en local es lo que hace falta.
+Después, `/admin/olvide-mi-contrasena` con ese correo. El enlace sale **por la
+consola del servidor**: el envío por Resend todavía no está conectado, así que
+poner la clave no cambia nada por ahora.
 
 > **Si ya tenías el contenedor de antes**, adentro vive una base `ed_panel` con
 > las nueve tablas que dejó Payload. Quedó huérfana con la fase 0 y no la toca

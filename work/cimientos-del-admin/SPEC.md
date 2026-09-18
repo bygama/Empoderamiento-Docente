@@ -60,16 +60,29 @@ De los seis hallazgos del SPEC de la fase 0, tres son de esta lane:
 | 5 | Rate limit solo por cuenta | por IP **y** por cuenta, en el middleware |
 | 6 | `/admin` dependía de `robots.txt` | `X-Robots-Tag: noindex` real en la respuesta |
 
-Más lo que trae la capa nueva: tokens de reset de un solo uso con expiración,
-errores genéricos para no permitir enumerar usuarios, y protección CSRF por
-validación de origen.
+Lo que la capa nueva **sí** trae: tokens de reset de un solo uso con expiración
+de una hora, errores genéricos para no permitir enumerar usuarios, y protección
+CSRF por validación de origen.
 
-**El hasheo es scrypt, no Argon2id, y este párrafo dice la verdad en vez de
-repetir lo que se había planeado.** Argon2id es la primera opción de OWASP y
-scrypt la segunda aceptable; better-auth trae scrypt de fábrica y pasar a
-Argon2id significa sumar `@node-rs/argon2`, una dependencia que el owner no
-aprobó. Se implementó con el default y la decisión queda a la vista: el cambio
-es un `password.hash` en `packages/auth/src/config.ts` y una dependencia.
+### Tres cosas que este SPEC prometía y NO se entregaron
+
+Las tres son de better-auth, no decisiones de implementación, y ninguna se
+tapa: la review de cierre encontró que una enmienda anterior de este archivo
+las había borrado sin decirlo, que es peor que no entregarlas.
+
+1. **Argon2id → scrypt.** Argon2id es la primera opción de OWASP y scrypt la
+   segunda aceptable. better-auth trae scrypt de fábrica y pasar a Argon2id
+   exige `@node-rs/argon2`, una dependencia que el owner no aprobó. El cambio
+   es un `password.hash` en `packages/auth/src/config.ts` más esa dependencia.
+2. **Rotación de sesión al login: no hay.** No existe código de rotación en
+   `packages/auth/src` ni en `apps/sitio/src/datos`, y no se verificó que
+   better-auth la haga por dentro. Queda **sin confirmar**, no dado por hecho.
+3. **Tokens de reset hasheados en reposo: no lo están.** Comprobado contra la
+   base: `verification.identifier` guarda `reset-password:<token>` **en claro**.
+   Quien pueda leer la base puede usar cualquier token vivo. Lo que lo acota:
+   duran una hora, son de un solo uso —replay verificado: devuelve
+   `INVALID_TOKEN`— y quien lee la base ya tiene la partida ganada por otros
+   lados. Cambiarlo es trabajo propio sobre el adaptador de better-auth.
 
 **La sesión se verifica en el middleware, antes de renderizar.** Nunca dentro
 del componente.
