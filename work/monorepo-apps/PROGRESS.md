@@ -133,7 +133,7 @@ después de revisado, así que va a la misma seat fresca.
    `/admin`.
 2. **Re-review** del diff de arreglo, sobre la lente que falló.
 3. **Vercel:** cuando exista el proyecto, Root Directory = `apps/sitio`.
-5. **Preguntarle a facundo** por la ruta de vista previa: quedó en
+4. **Preguntarle a facundo** por la ruta de vista previa: quedó en
    `app/(sitio)/vista-previa/route.ts`, o sea la URL pública
    `/vista-previa`; el spec del panel decía `api/vista-previa`. Funciona
    igual, pero es un handler viviendo entre páginas.
