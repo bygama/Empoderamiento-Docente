@@ -7,11 +7,11 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "pnpm --filter sitio dev",
-    "build": "pnpm --filter sitio build",
-    "start": "pnpm --filter sitio start",
-    "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck",
+    "dev": "pnpm --fail-if-no-match --filter sitio dev",
+    "build": "pnpm --fail-if-no-match --filter sitio build",
+    "start": "pnpm --fail-if-no-match --filter sitio start",
+    "lint": "pnpm --fail-if-no-match -r lint",
+    "typecheck": "pnpm --fail-if-no-match -r typecheck",
     "react-doctor": "pnpm dlx react-doctor --no-supply-chain --project apps/sitio/src",
     "prepare": "node scripts/instalar-hooks.mjs"
   }
