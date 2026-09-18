@@ -10,19 +10,19 @@
 
 ## Índice rápido por archivo
 
-| Donde vive                | Qué regula                                  |
-| ------------------------- | ------------------------------------------- |
-| `apps/sitio/eslint.config.mjs` | Reglas semánticas TS/React/Next.js     |
-| `apps/sitio/tsconfig.json` | TS strict + path aliases (`@/*`)           |
-| `apps/sitio/next.config.ts` | Configuración de Next.js                  |
-| `apps/sitio/postcss.config.mjs` | PostCSS + `@tailwindcss/postcss` (v4) |
-| `pnpm-workspace.yaml`     | Qué apps tiene el monorepo y el hoist de `next` |
-| `.gitignore`              | Qué no se versiona                           |
-| `docs/COMMITS.md`         | Convención humana de commits                |
-| `docs/AI_GUIDELINES.md`   | Reglas de código IA-friendly                |
-| `docs/GLOSSARY.md`        | Vocabulario del dominio                     |
-| `DESIGN.md`               | Tokens visuales (`@theme` en globals.css)   |
-| `AGENTS.md`               | Hard rules + quality standards              |
+| Donde vive                      | Qué regula                                      |
+| ------------------------------- | ----------------------------------------------- |
+| `apps/sitio/eslint.config.mjs`  | Reglas semánticas TS/React/Next.js              |
+| `apps/sitio/tsconfig.json`      | TS strict + path aliases (`@/*`)                |
+| `apps/sitio/next.config.ts`     | Configuración de Next.js                        |
+| `apps/sitio/postcss.config.mjs` | PostCSS + `@tailwindcss/postcss` (v4)           |
+| `pnpm-workspace.yaml`           | Qué apps tiene el monorepo y el hoist de `next` |
+| `.gitignore`                    | Qué no se versiona                              |
+| `docs/COMMITS.md`               | Convención humana de commits                    |
+| `docs/AI_GUIDELINES.md`         | Reglas de código IA-friendly                    |
+| `docs/GLOSSARY.md`              | Vocabulario del dominio                         |
+| `DESIGN.md`                     | Tokens visuales (`@theme` en globals.css)       |
+| `AGENTS.md`                     | Hard rules + quality standards                  |
 
 ---
 
