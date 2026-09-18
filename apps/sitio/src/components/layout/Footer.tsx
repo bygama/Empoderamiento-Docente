@@ -170,12 +170,15 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
         </div>
 
         {/* Tira de aliados (logos autorizados) — centrada, sin título. */}
-        <div className="md:col-span-12">
+        <div className="lg:col-span-12">
           <div className="border-azul-medio/15 relative border-t pt-8">
             <span className="bg-verde-concepto absolute top-0 left-1/2 h-px w-20 -translate-x-1/2" />
-            <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-5">
+            {/* Celular: grilla de dos columnas, así los logos comparten eje
+                aunque midan distinto, y el que queda solo cierra al centro.
+                Desde tablet, una sola tira. */}
+            <ul className="grid grid-cols-2 items-center justify-items-center gap-x-4 gap-y-6 md:flex md:flex-wrap md:justify-center md:gap-x-8 md:gap-y-5 lg:gap-x-12">
               {aliados.map((aliado) => (
-                <li key={aliado.id} className="flex h-11 items-center">
+                <li key={aliado.id} className="flex h-11 items-center last:odd:col-span-2">
                   <LogoDeAliado
                     aliado={aliado}
                     className={`${altoDe(aliado.tamano).pie} w-auto opacity-70 transition-opacity duration-300 hover:opacity-100 [filter:brightness(0)_invert(1)]`}
