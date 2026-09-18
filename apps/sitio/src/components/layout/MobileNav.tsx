@@ -14,6 +14,7 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useMenuAnimado } from "./mobile-nav/useMenuAnimado";
 import { BarraMenu } from "./mobile-nav/BarraMenu";
+import { BotonCerrar } from "./mobile-nav/BotonCerrar";
 import { NavegacionMenu } from "./mobile-nav/NavegacionMenu";
 import { PieMenu } from "./mobile-nav/PieMenu";
 
@@ -156,14 +157,17 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
             {/* Velo: apaga la página de atrás mientras la cortina la cruza. */}
             <div data-mnav-velo className="bg-azul-principal/60 absolute inset-0" />
 
+            {/* Primero en el DOM: es lo primero que encuentra el Tab. */}
+            <BotonCerrar closeRef={closeRef} onCerrar={close} />
+
             {/* La cortina son DOS capas (ver useMenuAnimado): la de afuera entra
                 de punta a punta y recorta; la de adentro lleva el contenido a
                 mitad de velocidad. `overflow-clip` y no `hidden`: un contenedor
-                `hidden` se puede scrollear por código, y enfocar la X con el
-                contenido todavía corrido lo dejaría desplazado para siempre. */}
+                `hidden` se puede scrollear por código, y enfocar algo de adentro
+                con el contenido todavía corrido lo dejaría desplazado. */}
             <div data-mnav-cortina className="absolute inset-0 overflow-clip">
               <div data-mnav-contenido className="faro-glow flex h-full w-full flex-col overflow-y-auto">
-                <BarraMenu closeRef={closeRef} onCerrar={close} />
+                <BarraMenu onCerrar={close} />
 
                 <NavegacionMenu
                   pathname={pathname}
