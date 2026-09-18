@@ -33,9 +33,10 @@ internos (refactors).
 | 0002  | [Adoptar Supabase para backend y persistencia](0002-adoptar-supabase-persistencia.md) | Superseded by ADR-0003 |
 | 0003  | [Adoptar Neon y Payload para el panel de contenido](0003-adoptar-neon-y-payload.md) | Superseded by ADR-0005 (solo Payload; Neon sigue vigente) |
 | 0004  | [Pasar el repo a monorepo con `apps/`](0004-monorepo-apps.md) | Accepted (enmendado por 0006) |
-| 0005  | [Construir el admin a medida y sacar Payload](0005-admin-a-medida.md) | Accepted (reemplaza Payload de 0003) |
+| 0005  | [Construir el admin a medida y sacar Payload](0005-admin-a-medida.md) | Accepted (reemplaza Payload de 0003; enmendado por 0008) |
 | 0006  | [Abrir `packages/` ahora, con la reutilización como requisito](0006-packages-reutilizables.md) | Accepted (enmienda 0004) |
-| 0007  | [Usar Prisma como ORM, en la versión 7.10.0 exacta](0007-prisma-como-orm.md) | Accepted |
+| 0007  | [Usar Prisma como ORM, en la versión 7.10.0 exacta](0007-prisma-como-orm.md) | Accepted (enmendado por 0008) |
+| 0008  | [Adaptador de Postgres y scrypt](0008-correcciones-de-la-fase-1.md) | Accepted (corrige 0005 y 0007) |
 
 ---
 

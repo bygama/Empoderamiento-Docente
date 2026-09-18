@@ -31,9 +31,9 @@ capa de arriba.
 
 | Capa | Qué | Por qué |
 | --- | --- | --- |
-| ORM | **Prisma `7.10.0` exacta** | migraciones maduras; `latest` resuelve hoy a un RC (ADR-0007) |
+| ORM | **Prisma `7.10.0` exacta** con `@prisma/adapter-pg` | migraciones maduras; `latest` resuelve hoy a un RC (ADR-0007). El adaptador **no** es el de Neon: su driver habla por WebSocket y no llega a un Postgres común (ADR-0008) |
 | Sesión | **better-auth** + `prismaAdapter` | autohospedado en la misma base, sin proveedor nuevo |
-| Mutaciones | **Server Actions + Zod** | libera el namespace `/api` para los formularios públicos |
+| Mutaciones | **Server Actions + Zod** | libera el namespace `/api` para los formularios públicos. **Excepción: los formularios de acceso van por HTTP a `/api/auth`** — el rate limit vive en ese handler y una Server Action lo saltearía |
 | Fotos | `@vercel/blob` + `sharp` | SDK directo, sin adaptador |
 | Correos | `resend` | SDK directo, sin adaptador |
 
@@ -167,13 +167,24 @@ Lo que cierra respecto del estado anterior:
 | `GET /api/fotos` público y enumerable | desaparece: sin REST autogenerada no hay qué enumerar |
 | `/api` tomado por un catch-all | liberado para `/api/contacto` y `/api/cv` |
 | El secreto de la vista previa en el query string (queda en logs y en el `Referer`) | cookie firmada de un solo uso, con expiración |
-| Rate limit solo por cuenta | por IP **y** por cuenta, en el middleware |
+| Rate limit solo por cuenta | **por IP**, en la config de better-auth: 3 intentos por minuto en sign-in |
 | `/admin` dependía de `robots.txt` | `X-Robots-Tag: noindex` real en la respuesta |
 
-Y lo que trae la capa nueva: **Argon2id**, rotación de sesión al login, tokens
-de reset de un solo uso hasheados en reposo, y errores genéricos para no
-permitir enumerar usuarios. **La sesión se verifica en el middleware, antes de
-renderizar**, nunca dentro del componente.
+Y lo que trae la capa nueva: **scrypt** para el hasheo (el default de
+better-auth; Argon2id quedó afuera por pedir una dependencia sin aprobar, ver
+[ADR-0008](../adrs/0008-correcciones-de-la-fase-1.md)), tokens de reset de un
+solo uso con expiración, errores genéricos para no permitir enumerar usuarios, y
+protección CSRF por validación de origen.
+
+**La sesión se corta en el middleware y se verifica en el layout del admin.**
+El middleware corre en Edge y no puede consultar la base, así que ahí solo se
+mira que la cookie esté; la comprobación de verdad —firma, expiración, que la
+sesión exista— la hace el layout de `(protegido)` antes de renderizar. Ningún
+componente pregunta por su cuenta.
+
+**Lo que el rate limit NO cubre:** es por IP, y eso cierra la enumeración de
+usuarios. Un ataque repartido entre muchas IPs contra una sola cuenta queda
+afuera: el bloqueo por cuenta no está en better-auth y sería trabajo propio.
 
 **Secretos solo del lado del servidor**: `DATABASE_URL`, el secreto de
 better-auth, `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan

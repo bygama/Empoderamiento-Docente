@@ -1,6 +1,9 @@
 # ADR-0005: Construir el admin a medida y sacar Payload (reemplaza Payload)
 
-- **Status:** Accepted
+- **Status:** Accepted, corregido en dos detalles por el ADR-0008
+- **Amended by:** [ADR-0008](0008-correcciones-de-la-fase-1.md) — el adaptador
+  es `@prisma/adapter-pg` y el hasheo es scrypt. La decisión de fondo (admin a
+  medida, Payload afuera) no cambia.
 - **Date:** 2026-09-18
 - **Decision-makers:** @mateo
 - **Supersedes:** ADR-0003 (Payload como panel de contenido)

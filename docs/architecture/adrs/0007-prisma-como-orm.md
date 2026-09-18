@@ -1,6 +1,8 @@
 # ADR-0007: Usar Prisma como ORM, en la versión 7.10.0 exacta
 
-- **Status:** Accepted
+- **Status:** Accepted, corregido en un detalle por el ADR-0008
+- **Amended by:** [ADR-0008](0008-correcciones-de-la-fase-1.md) — el adaptador
+  es `@prisma/adapter-pg`, no el de Neon. La elección de Prisma no cambia.
 - **Date:** 2026-09-18
 - **Decision-makers:** @mateo
 
