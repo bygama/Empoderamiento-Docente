@@ -75,8 +75,10 @@ Cuando se integre Supabase harán falta:
 - `SUPABASE_SERVICE_ROLE_KEY` — service role key, **solo server-side**, nunca
   expuesta al cliente ni prefijada con `NEXT_PUBLIC_`.
 
-Los placeholders viven en [`.env.example`](.env.example) (comentados, para la
-futura integración). Los `.env*` reales están git-ignorados.
+Los placeholders viven en
+[`apps/sitio/.env.example`](apps/sitio/.env.example) (comentados, para la
+futura integración): las variables son de la app, no del workspace. Los
+`.env*` reales están git-ignorados.
 
 ---
 

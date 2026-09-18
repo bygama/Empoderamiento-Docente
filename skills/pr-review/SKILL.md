@@ -113,14 +113,14 @@ No hay un `pnpm doctor` por ahora; chequear a mano:
 
 - No hay `.env*` real trackeado (riesgo de leak) — solo `.env.example` si
   existiera.
-- No hay secretos / credenciales literales en `src/`.
+- No hay secretos / credenciales literales en `apps/sitio/src/`.
 - Los adapters CLAUDE/CODEX/GEMINI referencian `AGENTS.md`.
 - La rama deriva del tip de `origin/main`.
 - `pnpm-lock.yaml` presente y coherente con `package.json`.
 
 Warning (no falla, pero anotar):
 
-- Patterns de lenguaje no inclusivo en `src/`.
+- Patterns de lenguaje no inclusivo en `apps/sitio/src/`.
 
 ### 2.2 Lint + typecheck + build
 
@@ -178,9 +178,9 @@ verificaron.
 
 - ¿Server Components por default? ¿`"use client"` justificado?
 - ¿Imports usan `@/`?
-- ¿Componente reutilizable en `src/components/`? ¿Sección del home en
-  `src/features/home/components/`? ¿Página nueva en `src/app/`?
-- ¿Datos institucionales centralizados en `src/config/` (site.ts / nav.ts),
+- ¿Componente reutilizable en `apps/sitio/src/components/`? ¿Sección del home en
+  `apps/sitio/src/features/home/components/`? ¿Página nueva en `apps/sitio/src/app/`?
+- ¿Datos institucionales centralizados en `apps/sitio/src/config/` (site.ts / nav.ts),
   no hardcodeados en JSX?
 - (No hay backend ni DB: si el PR introduce entrada de datos, validar los
   bordes con Zod y abrir un ADR antes de sumar persistencia.)
@@ -227,12 +227,12 @@ Esto es lo que sube la calidad del review más fuerte. Verificar:
 
 - **Claims del PR description vs archivos reales.** Si la descripción
   dice "agregué la sección X al home", buscar que el componente exista
-  (p. ej. en `src/features/home/components/`) y esté montado.
+  (p. ej. en `apps/sitio/src/features/home/components/`) y esté montado.
 - **Doc ↔ código.** Si el PR cambia un token visual, ¿se actualizó
   `DESIGN.md`? Si suma un término nuevo del dominio, ¿se sumó a
   `GLOSSARY.md`? Si es decisión arquitectónica grande, ¿hay ADR?
 - **Valores duplicados.** Si el mail institucional o la dirección
-  aparece en JSX, debería estar en `src/config/site.ts`.
+  aparece en JSX, debería estar en `apps/sitio/src/config/site.ts`.
 - **Cierre de reviews previas.** Si hay comentarios de reviews
   anteriores (en la misma PR), confirmar que se atendieron — no
   asumir "ya está, lo arreglaron".
@@ -245,7 +245,7 @@ Cuando reportes un hallazgo, **citar el bloque exacto**:
 > "Hay un color hardcodeado en el componente del header."
 >
 > ✅ Bien:
-> En `src/components/Header.tsx:23` se usa `bg-[#1F2A44]` directo en
+> En `apps/sitio/src/components/Header.tsx:23` se usa `bg-[#1F2A44]` directo en
 > lugar del token `bg-azul-principal` definido en `DESIGN.md`.
 
 Esto evita que el autor del PR tenga que adivinar dónde está el
