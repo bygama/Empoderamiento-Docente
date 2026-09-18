@@ -23,6 +23,10 @@ import { LinkPie } from "./footer/LinkPie";
  *     con el wordmark "EMPODERAMIENTO DOCENTE | ED" superpuesto (eco del
  *     "WOLVERINE WORLDWIDE | W").
  *
+ * Por debajo de `lg` (celular y tablet) no hay dos columnas: todo se apila
+ * sobre un solo eje centrado, que es el que ya tenían los aliados, el crédito
+ * y el wordmark de la foto.
+ *
  * Datos nunca hardcodeados: la marca desde @/config/site, y las redes y los
  * países de Ajustes › Datos del sitio, que le pasa el layout. Una red sin URL
  * no se muestra (no inventar URLs).
@@ -61,13 +65,13 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
       className="bg-azul-principal relative isolate overflow-hidden rounded-t-[var(--footer-radio)] text-white"
     >
       {/* ── Bloque principal ─────────────────────────────────────────── */}
-      <div className="mx-auto grid max-w-screen-xl gap-x-10 gap-y-8 px-5 pt-11 pb-0 md:grid-cols-12 md:px-10 md:pt-14">
+      <div className="mx-auto grid max-w-screen-xl gap-x-10 gap-y-8 px-5 pt-11 pb-0 md:px-10 md:pt-14 lg:grid-cols-12">
         {/* Columna marca */}
-        <div className="flex flex-col gap-8 md:col-span-5 md:gap-0 lg:col-span-4">
+        <div className="flex flex-col items-center gap-7 text-center lg:col-span-4 lg:items-start lg:gap-0 lg:text-left">
           <LinkPie
             href={HOME_LINK.href}
             aria-label={name}
-            className="focus-visible:outline-azul-claro inline-flex w-fit rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 md:mt-10 lg:mt-14"
+            className="focus-visible:outline-azul-claro inline-flex w-fit rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 lg:mt-14"
           >
             {/* MISMO logo que el navbar (logotipo-principal-ed). Como está hecho
                 para fondo claro, va sobre un chip blanco para leerse en el navy.
@@ -79,15 +83,15 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
                 width={425}
                 height={467}
                 priority={false}
-                className="h-20 w-auto md:h-24 lg:h-28"
+                className="h-16 w-auto md:h-20 lg:h-28"
               />
             </span>
           </LinkPie>
 
           {/* Descripción centrada verticalmente (al medio de la columna),
-              alineada a la izquierda. */}
-          <div className="flex items-center md:flex-1">
-            <p className="text-azul-claro/85 max-w-xs font-sans text-[0.92rem] leading-relaxed">
+              alineada a la izquierda en escritorio. */}
+          <div className="flex items-center lg:flex-1">
+            <p className="text-azul-claro/85 max-w-xs font-sans text-[0.92rem] leading-relaxed text-balance md:max-w-md lg:max-w-xs lg:text-wrap">
               Consultora especializada en la transformación del aprendizaje
               matemático. Investigación, materiales didácticos, desarrollo
               profesional docente, acompañamiento, currículo y evaluación.
@@ -96,7 +100,7 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
 
           {/* Redes al pie de la columna: solo las que tienen URL confirmada. */}
           {REDES.some(({ key }) => redes[key]) && (
-            <ul className="flex items-center gap-4">
+            <ul className="flex items-center gap-6 lg:gap-4">
               {REDES.map(({ key, label, Icon }) => {
                 const url = redes[key];
                 if (!url) return null;
@@ -107,7 +111,7 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`${name} en ${label}`}
-                      className="text-azul-claro/70 hover:text-white -m-2.5 inline-flex p-2.5 transition-colors"
+                      className="text-azul-claro/70 hover:text-white -m-3 inline-flex p-3 transition-colors lg:-m-2.5 lg:p-2.5"
                     >
                       <Icon size={20} aria-hidden="true" />
                     </a>
@@ -119,9 +123,11 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
         </div>
 
         {/* Columna navegación + sub-columnas */}
-        <div className="md:col-span-7 lg:col-span-8 lg:pl-8">
+        <div className="lg:col-span-8 lg:pl-8">
           {/* Navegación grande apilada con hairlines (silueta Wolverine). */}
-          <nav aria-label="Navegación del pie">
+          {/* Apilado, el ancho se acota: en tablet una hairline de borde a
+              borde con el texto al centro se lee vacía. */}
+          <nav aria-label="Navegación del pie" className="mx-auto max-w-lg lg:max-w-none">
             <ul>
               {FOOTER_NAV.map((link) => {
                 const esAccion = link.href === CTA_LINK.href;
@@ -131,11 +137,13 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
                         hero; en la misma, sube al hero deslizando. */}
                     <LinkPie
                       href={link.href}
-                      className="group border-azul-medio/30 hover:text-azul-claro focus-visible:outline-azul-claro flex items-center justify-between border-t py-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:py-3"
+                      className="group border-azul-medio/30 hover:text-azul-claro focus-visible:outline-azul-claro flex items-center justify-center gap-2 border-t py-2.5 lg:justify-between transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:py-3"
                     >
                       <span className="font-display text-[clamp(1.2rem,0.85rem+1.1vw,1.7rem)] font-bold tracking-[-0.01em]">
                         {link.label}
                       </span>
+                      {/* Sin hover (táctil) la flecha de los ítems no se vería
+                          nunca: apilado solo la lleva Contacto, pegada al texto. */}
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -147,7 +155,7 @@ export function Footer({ sitio: { redes, paises }, aliados }: Props) {
                         className={`h-5 w-5 shrink-0 transition-[opacity,translate] duration-300 ${
                           esAccion
                             ? "opacity-100"
-                            : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-70"
+                            : "hidden -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-70 lg:block"
                         }`}
                       >
                         <path d="M7 17 17 7" />
