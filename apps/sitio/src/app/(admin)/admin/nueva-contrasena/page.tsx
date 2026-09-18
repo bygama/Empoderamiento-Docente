@@ -1,0 +1,13 @@
+import { Suspense } from "react";
+import { Pantalla } from "@/admin/armazon/Pantalla";
+import { FormularioNueva } from "./FormularioNueva";
+
+export default function NuevaContrasena() {
+  return (
+    <Pantalla titulo="Elegí tu contraseña" bajada="Doce caracteres o más.">
+      <Suspense>
+        <FormularioNueva />
+      </Suspense>
+    </Pantalla>
+  );
+}

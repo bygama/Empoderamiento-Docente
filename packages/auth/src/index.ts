@@ -6,6 +6,8 @@
 
 export { crearAuth } from "./config";
 export { hayCookieDeSesion } from "./guarda";
+export { crearClienteDeAuth } from "./cliente";
+export type { ClienteDeAuth } from "./cliente";
 export type { Auth, OpcionesDeAuth } from "./config";
 export { ROLES, ROL_POR_DEFECTO, PUEDE, SIN_PERMISO, esRol } from "./permisos";
 export type { Rol } from "./permisos";

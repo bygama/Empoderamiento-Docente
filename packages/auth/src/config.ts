@@ -96,6 +96,9 @@ export function crearAuth({
       max: 60,
       customRules: {
         "/sign-in/email": { window: 60, max: 3 },
+        "/request-password-reset": { window: 300, max: 3 },
+        // El nombre viejo sigue respondiendo como alias: si no se limita, es
+        // una puerta de atrás al mismo envío de correos.
         "/forget-password": { window: 300, max: 3 },
         "/reset-password": { window: 300, max: 5 },
       },

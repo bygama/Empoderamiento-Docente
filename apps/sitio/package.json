@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "crear-cuenta": "tsx scripts/crear-cuenta.ts"
   },
   "dependencies": {
     "@ed/auth": "workspace:*",
@@ -32,6 +33,7 @@
     "eslint-config-next": "16.3.4",
     "prisma": "7.10.0",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13",
     "typescript": "^5.9.3"
   }
 }
