@@ -3,7 +3,10 @@
 - **Fecha:** 2026-09-17
 - **Estado:** aprobado en conversación (Mateo), pendiente de plan de implementación
 - **Decide:** Mateo, con Facundo y Gastón
-- **Relación:** complementa al [diseño del panel](2026-09-15-panel-admin-diseno.md)
+- **Relación:** complementaba al diseño del panel
+  (`2026-09-15-panel-admin-diseno.md`, borrado por el
+  [ADR-0005](../adrs/0005-admin-a-medida.md); lo reemplaza
+  [el diseño del admin a medida](2026-09-18-admin-a-medida-diseno.md))
   y **corrige su §3**: el árbol que ahí se describe pasa a vivir dentro de
   `apps/sitio/`. Lo demás de ese spec (alcance, modelo de contenido, acceso,
   fases) no cambia.
