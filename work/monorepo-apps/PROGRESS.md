@@ -126,7 +126,30 @@ cada paso marcado `high`.
 
 El loop de arreglo formal corresponde a la lente que falló (documentación). El
 arreglo del gate no venía de un FAIL, pero toca el artefacto de más riesgo
-**después** de revisado, así que también va a una seat fresca.
+**después** de revisado, así que también fue a la misma seat fresca.
+
+### Re-review del diff del arreglo (`3a31cdc..ccb2407`) — **PASS**
+
+Una sola seat, fresca, con veredicto por hallazgo. Nota de método: la
+instalación no tiene `references/re-reviewer.md`; el briefing se compuso
+adaptando `lane-reviewer.md` al alcance del diff de arreglo.
+
+> **PASS** — Los 6 hallazgos están ADDRESSED con evidencia corrida (no leída):
+> ejercité los dos caminos del `catch` y el camino feliz del gate, verifiqué
+> archivo por archivo que `docs/README.md` no perdió contenido, confirmé cada
+> ruta nueva en el filesystem, y contrasté cada afirmación de
+> `PROGRESS.md`/`DECISIONS.md` contra el estado real del repo (commits,
+> `.gitignore`, `AGENTS.md`). El barrido adicional a `docs/content/*.md` fue
+> correcto y no introdujo corrupción ni links rotos, y `typecheck`/`lint`
+> siguen en 0.
+
+Lo que comprobó de más, sin que se lo pidiera nadie: que los 11 archivos
+tocados tengan CRLF consistente al 100% (sin mezcla), y que los ~29 links
+relativos de `README.md` y `docs/README.md` resuelvan.
+
+Sobre el número de §6 hizo una distinción más precisa que la de esta lane: no
+es «declarar cerrado lo abierto», es un dato que **el propio commit de arreglo
+introdujo** al agrandar el script. Queda como el único pendiente del cierre.
 
 ## Cerrado después de escribir esto
 
@@ -145,6 +168,4 @@ arreglo del gate no venía de un FAIL, pero toca el artefacto de más riesgo
 2. **`AGENTS.md` §6 cita 137 líneas** y el verificador quedó en **160** al
    cerrar el hueco del `catch`. Corregir ese número necesita confirmación
    humana (§5.6).
-3. **Re-review del diff de arreglo** — una seat fresca sobre la lente que
-   falló (documentación) más el arreglo del gate.
-4. **Que facundo confirme la corrección del §3 de su spec** (PR #154).
+3. **Que facundo confirme la corrección del §3 de su spec** (PR #154).
