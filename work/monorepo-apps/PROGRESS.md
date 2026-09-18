@@ -64,10 +64,29 @@ Payload **no** baja el score.
 | Documentación | resolución de links relativos | todos resuelven |
 
 La prueba de comportamiento corrió después: las siete rutas públicas en
-**200** por `localhost`, `/que-es-ed` en 307 y `/robots.txt` en 200. `/admin`
-da 500 sin Postgres —el demonio de Docker no está levantado en esta máquina—
-y el sitio sigue en 200 después, que es lo que promete `src/cms/base.ts`. **El
-panel andando queda sin verificar.**
+**200** por `localhost`, `/que-es-ed` en 307 y `/robots.txt` en 200.
+
+### El panel, hasta donde se puede sin base
+
+`/admin` da 500 porque no hay Postgres: el demonio de Docker no está levantado
+en esta máquina. Pero **de qué 500 se trata** sí se puede averiguar, y es la
+diferencia entre «falta el entorno» y «la mudanza lo rompió»:
+
+1. Sin variables, el error es `missing secret key. A secret key is needed to
+   secure Payload`. Para llegar ahí, Payload tuvo que resolver
+   `@payload-config`, cargar `payload.config.ts` y ejecutarlo. Y el warning
+   propio del repo —`[panel] Falta DATABASE_URL`— se imprime, así que
+   `src/cms/base.ts` también corre.
+2. Con `PAYLOAD_SECRET` y un `DATABASE_URL` apuntando a un puerto vacío a
+   propósito, el error pasa a ser `connect ECONNREFUSED ::1:5999`, con el
+   stack pasando por `@payloadcms/db-postgres/dist/connect.js`,
+   `BasePayload.init` y el chunk compilado de `@payloadcms/next` bajo
+   `apps/sitio/.next/`.
+
+O sea: **config, init de Payload, adaptador de Postgres y el bundle de la ruta
+de admin resuelven y corren después de la mudanza.** Lo único que falta es una
+base de verdad. La ida y vuelta contra Postgres **queda sin verificar** —es
+entorno, no código.
 
 ## Close review
 
@@ -148,9 +167,9 @@ apunte —el padding de la tabla de `CODE-STYLE.md`, cosmético— también.
 
 ## Abierto
 
-1. **El panel andando.** `/admin` da 500 sin Postgres y el demonio de Docker
-   no está levantado acá. Falta el `docker run` del README y entrar a
-   `/admin`.
+1. **La ida y vuelta del panel contra Postgres.** Todo lo demás del panel se
+   verificó (ver arriba); falta el `docker run` del README, entrar a `/admin`
+   y crear el primer usuario.
 2. **Vercel:** cuando exista el proyecto, Root Directory = `apps/sitio`.
 3. **Preguntarle a facundo** por la ruta de vista previa: quedó en
    `app/(sitio)/vista-previa/route.ts`, o sea la URL pública
