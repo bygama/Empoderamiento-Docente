@@ -6,3 +6,9 @@
 # haga checkout. Por eso van forzados a LF en toda plataforma.
 .githooks/** text eol=lf
 *.sh        text eol=lf
+
+# Lo que Payload genera, en LF por el mismo motivo al revés: `next dev` reescribe
+# payload-types.ts en LF cada vez que corre, y con el repo en CRLF el archivo
+# queda «modificado» con un diff vacío hasta que alguien hace `git checkout --`.
+# Fijarlo en LF de los dos lados corta esa fricción de raíz.
+apps/sitio/src/payload-types.ts text eol=lf
