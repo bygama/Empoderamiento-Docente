@@ -26,39 +26,62 @@ const argumentos = process.argv.slice(2);
 const APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "apps", "sitio");
 
 /**
- * `db push` en cualquiera de sus formas.
+ * ¿Los argumentos piden `db <cual>`?
  *
- * Filtrar los tokens que empiezan con `-` y mirar los dos primeros NO alcanza:
- * un flag con valor separado deja su valor en la lista, y
- * `--schema ./x db push` corría igual porque el primer «verbo» pasaba a ser
- * `./x`. Lo encontró la review de cierre de esta lane.
+ * **La regla de oro: el chequeo tiene que mirar los MISMOS tokens que va a ver
+ * Prisma.** Dos versiones se colaron por romper eso, las dos encontradas por la
+ * review de cierre. Filtrar lo que empieza con `-` y mirar los dos primeros
+ * falla porque un flag con valor separado deja su valor en la lista. Y buscar
+ * en el array falla porque en Windows se invoca con `shell: true`: Node pega
+ * los argumentos con espacios y `cmd.exe` los vuelve a separar, así que un solo
+ * elemento `"db push"` pasaba el chequeo y Prisma lo recibía partido en dos.
  *
- * Acá se busca `db` y `push` como tokens sueltos, en ese orden, en cualquier
- * posición. Bloquea de más en un caso imaginable —un `--file push` junto a un
- * `db execute`— y eso está bien: ante un comando que cambia la base sin dejar
- * migración, el error que conviene es el que frena.
+ * Por eso se parte todo por espacios primero, que es lo que hace el shell.
+ * Bloquea de más en un caso imaginable —un `--file push` junto a un
+ * `db execute`— y está bien: ante un comando que toca la base o el esquema, el
+ * error que conviene es el que frena.
  */
-function esDbPush(args) {
-  const db = args.indexOf("db");
-  const push = args.indexOf("push");
-  return db !== -1 && push > db;
+function pideDb(args, cual) {
+  const tokens = args.flatMap((a) => a.split(/\s+/)).filter(Boolean);
+  const db = tokens.indexOf("db");
+  const sub = tokens.indexOf(cual);
+  return db !== -1 && sub > db;
 }
 
-if (esDbPush(argumentos)) {
-  // Qué, por qué y el fix: un error escrito para que quien lo lee sepa
-  // exactamente qué hacer después (AGENTS.md, «Error messages carry the fix»).
-  console.error(
-    [
-      "ERROR: `prisma db push` está bloqueado en este repo.",
-      "",
+// Los errores dicen qué, por qué y el fix: escritos para que quien los lee sepa
+// exactamente qué hacer (AGENTS.md, «Error messages carry the fix»).
+const BLOQUEADOS = [
+  {
+    cual: "push",
+    motivo: [
       "POR QUÉ: `push` escribe el esquema en la base sin dejar un archivo de",
       "  migración. Esa migración no se commitea, el próximo entorno corre",
       "  `migrate deploy` sin ella, y el síntoma aparece en producción como",
       "  «la tabla no existe».",
       "",
-      "FIX: `pnpm --filter sitio migrate:create` genera la migración y la",
-      "  aplica. Se commitea junto con el cambio de esquema.",
-    ].join("\n"),
+      "FIX: `pnpm migrate` genera la migración y la aplica. Se commitea junto",
+      "  con el cambio de esquema.",
+    ],
+  },
+  {
+    // Está acá porque pasó: se corrió como prueba de que la guarda no bloqueaba
+    // de más, y dejó el esquema sin una sola explicación. Se recuperó de git.
+    cual: "pull",
+    motivo: [
+      "POR QUÉ: lee la base y sobrescribe el esquema, que acá es la fuente de",
+      "  verdad. Y borra los comentarios `//` en el camino: conserva los `///`",
+      "  de doc, no los que explican por qué.",
+      "",
+      "FIX: si la base y el esquema no coinciden, manda el esquema. Corregilo a",
+      "  mano y generá la migración con `pnpm migrate`.",
+    ],
+  },
+];
+
+for (const { cual, motivo } of BLOQUEADOS) {
+  if (!pideDb(argumentos, cual)) continue;
+  console.error(
+    [`ERROR: \`prisma db ${cual}\` está bloqueado en este repo.`, "", ...motivo].join("\n"),
   );
   process.exit(1);
 }

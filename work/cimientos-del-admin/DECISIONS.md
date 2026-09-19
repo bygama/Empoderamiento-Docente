@@ -192,3 +192,25 @@ Se deriva de `Parameters<typeof prismaAdapter>[0]`, que en better-auth es
 nulo. El comentario decía que era el contrato de la frontera y no lo es. Es una
 debilidad de tipado de la librería, no de esta lane, pero el comentario se
 corrige para no prometer una verificación que no ocurre.
+
+## Ronda 2 del fix loop
+
+**2026-09-18 — La guarda se colaba OTRA VEZ, por un agujero distinto.**
+El re-review encontró que `node scripts/guarda-prisma.mjs "db push"` —un solo
+argumento con un espacio adentro— pasaba. El chequeo veía un token; después
+`spawnSync` con `shell: true` en Windows pega los argumentos con espacios y
+`cmd.exe` los vuelve a separar, así que Prisma recibía `db push` y lo ejecutaba,
+con exit 0 y sin aviso. Reproducido también desde PowerShell.
+
+La lección, escrita en el archivo: **el chequeo tiene que mirar los mismos
+tokens que va a ver Prisma.** Ahora se parte todo por espacios antes de buscar,
+que es lo que hace el shell. Dos versiones de esta función se colaron por
+romper esa regla.
+
+**2026-09-18 — `db pull` también se bloquea, y el motivo lo encontré
+rompiéndolo.** Corrí `db pull` como prueba de que la guarda no bloqueaba de más.
+Introspecciona la base y **sobrescribe el esquema**: se llevó puestos todos los
+comentarios `//` de los tres archivos —conserva los `///` de doc, no los que
+explican por qué—. Se recuperó de git, que es la única razón por la que no costó
+nada. En un repo donde el esquema es la fuente de verdad, `db pull` va en la
+dirección contraria, así que queda bloqueado con su propio mensaje.
