@@ -24,6 +24,11 @@ Los dos candidatos reales, medidos el 2026-09-18:
 | ¿Llegó a 1.0? | va por la 7 | todavía no |
 | Adaptador de better-auth | `@better-auth/prisma-adapter` | `@better-auth/drizzle-adapter` |
 
+> **Precisión del [ADR-0008](0008-correcciones-de-la-fase-1.md):** esos dos
+> nombres eran de paquetes sueltos al comparar. Al implementar, el adaptador
+> resultó ser un subpath del paquete principal —`better-auth/adapters/prisma`—
+> y no hay nada que instalar aparte.
+
 Los dos sirven y los dos están a mitad de una transición de major. Drizzle tiene
 más descargas; es el número que le juega a favor y no se esconde.
 
@@ -55,6 +60,10 @@ Un `pnpm install` con `^` se trae un RC a producción.
 - `prisma migrate` da historial, estado y un flujo de despliegue probado.
 - Los tipos se generan del esquema: no hay que escribirlos ni mantenerlos.
 - El adaptador de Neon (`@prisma/adapter-neon`) es oficial.
+  > **Corregido por el [ADR-0008](0008-correcciones-de-la-fase-1.md):** es
+  > oficial, pero **no sirve acá**. Habla por WebSocket, para runtimes Edge; el
+  > admin corre en Node y Neon acepta el protocolo Postgres de siempre. Se usa
+  > **`@prisma/adapter-pg`**.
 - La integración con better-auth está documentada y es de una sola dirección:
   su CLI escribe los modelos en `schema.prisma` y Prisma hace la migración.
 
