@@ -143,3 +143,70 @@ Las demás lentes cerraron en las rondas 1 y 2.
 - El hasheo es **scrypt**, no Argon2id. Ver `SPEC.md` §4 y `DECISIONS.md`.
 - El rate limit cubre IP, **no cuenta**: un ataque repartido entre muchas IPs
   contra una sola cuenta no está cubierto.
+
+### Veredictos, verbatim
+
+**Correctness against the SPEC** — 0 Critical, 2 Important, ambos cerrados.
+**Type and interface design** — **PASS**:
+
+> Static gates (`typecheck`, `lint`) are clean, all four claimed boundaries hold
+> or are explicitly acknowledged as deferred, and none of the three Important
+> findings are active bugs — they're type-soundness/duplication gaps in code
+> paths currently wired correctly by the only caller that exists.
+
+**Documentation impact** — **FAIL** en la ronda 1, cerrado en la 2:
+
+> Two of the lane's own core artifacts (`AGENTS.md` §12, and `README.md`'s
+> Stack/Estructura/env-var sections) contain direct, same-file
+> self-contradictions about whether phase 1 exists, and three architecture
+> documents still name the two things this lane explicitly reversed.
+
+**Silent failures** — 0 Critical, 1 Important grave (la guarda), y confirmó
+contra el sistema corriendo lo que yo había dado por bueno sin probar:
+
+> `curl --cookie "better-auth.session_token=totalmente.inventado-y-falso"
+> /admin` → **307 → /admin/entrar**, no admin content leaked. Confirms
+> `hayCookieDeSesion` (presence-only) is backstopped by `auth.api.getSession()`
+> in `(protegido)/layout.tsx`, which correctly rejects the forged token.
+
+**Fix loop, ronda 5 (final)** — veredicto de cierre:
+
+> **Fix round: All findings addressed, no new Critical/Important breakage.**
+>
+> v5 holds. I re-ran all four historical bypasses (none reopen), attempted five
+> new angles including a dedicated probe into Windows-specific `spawnSync`
+> argv-escaping fidelity (the one mechanism that could theoretically make the
+> guard's view of argv diverge from Prisma's), and found no path to a real
+> `db push`/`db pull` dispatch.
+
+Sobre estrechar el único over-block (`db execute --file push`), el mismo seat
+diseñó la regla más fina y argumentó en contra de mandarla:
+
+> Ship it as-is — don't narrow. […] it's exactly the kind of "one more clever
+> rule" that the four prior rounds show accretes risk faster than it removes it.
+> A file that happens to be named `push` erroring out is a five-second fix for
+> whoever hits it; a fifth parsing rule quietly wrong is not.
+
+### El camino de arranque, corrido sobre el build final
+
+```
+sitio público: las 8 rutas + robots.txt   → 200
+/admin sin sesión                         → 307
+/admin/entrar · /admin/olvide-mi-contrasena → 200
+cabeceras de seguridad en /admin          → las 5
+```
+
+## Cierre
+
+Lane **cerrada**. Los cuatro archivos y su evidencia quedan en el historial de
+git; la carpeta se borra en el commit de cierre y viaja en el mismo PR.
+
+**Lo que sigue:** la fase 2 — `packages/kit-admin` y novedades de punta a punta,
+con el sitio leyéndola por `datos/consultas/`. Anotado para esa lane:
+
+1. El CSS del admin se filtra al sitio público (+1,4 KB hoy). Umbral escrito:
+   si supera el 5%, se parte la hoja por route group.
+2. `comparar-render.mjs` informa un delta combinado de js+css, así que no puede
+   aislar ese 5% si el JS cambia en el mismo build.
+3. Tres cosas que la fase 1 no entregó: scrypt en vez de Argon2id, sin rotación
+   de sesión, y tokens de reset en claro. Ver `SPEC.md` §4 y el ADR-0008.
