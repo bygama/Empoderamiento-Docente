@@ -123,18 +123,16 @@ no hay open redirect en `volver`, y no hay hueco en el matcher del middleware.
 | 1 | la guarda | un flag con valor separado dejaba su valor como «verbo» |
 | 2 | la guarda | un argumento con un espacio adentro; el shell lo repartía |
 | 3 | la guarda | `%VAR%`, `^` y **inyección con `&`** — todo por `shell: true` |
-| 4 | — | se sacó el shell: la clase entera |
+| 4 | la guarda | un `push` señuelo antes del `db`, por un flag que consume valor |
+| 5 | — | **cerrada**: se dejó de parsear |
 
-Las tres primeras las arreglé parcheando el mismo chequeo. La cuarta salió de
-aceptar que **el chequeo nunca fue el problema**.
+Las cuatro primeras fueron la misma equivocación con cuatro caras: yo modelando
+cómo Prisma lee sus argumentos. La quinta no modela nada, y el seat lo probó
+estructuralmente en vez de por casos — verificó que el `argv` del padre y el del
+hijo son idénticos byte por byte sin shell, que era el mecanismo común de v1
+a v4.
 
 Las demás lentes cerraron en las rondas 1 y 2.
-
-## Próximo
-
-1. Veredicto de la ronda 4 sobre la guarda.
-2. `work-handoff` y el PR.
-3. Después, la fase 2: `packages/kit-admin` y novedades de punta a punta.
 
 ## Notas
 
