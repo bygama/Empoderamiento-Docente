@@ -1,48 +1,46 @@
-// La guarda del CLI de Prisma. Delega todo, menos `db push`.
+// La guarda del CLI de Prisma. Delega todo, menos `db push` y `db pull`.
 //
 //   node scripts/guarda-prisma.mjs <lo que sea que le pasarías a prisma>
 //
 // `db push` aplica el esquema contra la base SIN generar el archivo de
-// migración. Anda perfecto en la máquina de quien lo corre, y la migración
-// que nunca existió no se commitea: el entorno siguiente que despliega con
-// `migrate deploy` se queda sin esas tablas, y el síntoma aparece recién en
-// producción como «la tabla no existe».
+// migración. Anda en la máquina de quien lo corre, la migración que nunca
+// existió no se commitea, y el entorno siguiente se queda sin esas tablas: el
+// síntoma aparece en producción como «la tabla no existe».
 //
-// Por eso se bloquea acá y no en una convención: una convención se olvida a
-// las tres semanas, y el costo de olvidarla lo paga alguien que no estuvo.
-// Los scripts de base del package.json pasan todos por este archivo, así que
-// la única forma de saltearlo es invocar el CLI a mano — que queda a la vista
-// en el historial del shell, igual que `git push --no-verify` en §5.8.
+// `db pull` va al revés: lee la base, sobrescribe el esquema —que acá es la
+// fuente de verdad— y borra los comentarios `//` en el camino.
+//
+// **Se invoca a Prisma SIN shell, y eso es lo que hace que la guarda sirva.**
+// Tres versiones se colaron mientras usaba `shell: true`, todas por la misma
+// razón: `cmd.exe` recibía la línea armada y la volvía a partir DESPUÉS del
+// chequeo. Pasaban `"db push"` como un argumento, `db pu^sh` (el `^` se lo come
+// el shell) y `db %VAR%` con la variable en el entorno. Peor: un `&` adentro de
+// cualquier argumento ejecutaba un comando arbitrario — inyección a través del
+// wrapper, sin relación con `db push`. Sin shell, Node pasa el arreglo al
+// proceso hijo tal cual y la guarda ve lo mismo que Prisma.
 
 import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const argumentos = process.argv.slice(2);
 
-// El CLI y el esquema viven en la app, no en la raíz del workspace: se delega
-// parado ahí para que `prisma` resuelva y para que el `--schema` por defecto
-// apunte al lugar correcto sin pasárselo.
+// El esquema vive en la app: se corre parado ahí para que el `--schema` por
+// defecto apunte al lugar correcto sin pasárselo.
 const APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "apps", "sitio");
 
-/**
- * ¿Los argumentos piden `db <cual>`?
- *
- * **La regla de oro: el chequeo tiene que mirar los MISMOS tokens que va a ver
- * Prisma.** Dos versiones se colaron por romper eso, las dos encontradas por la
- * review de cierre. Filtrar lo que empieza con `-` y mirar los dos primeros
- * falla porque un flag con valor separado deja su valor en la lista. Y buscar
- * en el array falla porque en Windows se invoca con `shell: true`: Node pega
- * los argumentos con espacios y `cmd.exe` los vuelve a separar, así que un solo
- * elemento `"db push"` pasaba el chequeo y Prisma lo recibía partido en dos.
- *
- * Por eso se parte todo por espacios primero, que es lo que hace el shell.
- * Bloquea de más en un caso imaginable —un `--file push` junto a un
- * `db execute`— y está bien: ante un comando que toca la base o el esquema, el
- * error que conviene es el que frena.
- */
+/** El entry de JavaScript del CLI, para poder correrlo con node y sin shell. */
+function entryDePrisma() {
+  const req = createRequire(path.join(APP, "package.json"));
+  const manifiesto = req.resolve("prisma/package.json");
+  const { bin } = req(manifiesto);
+  return path.join(path.dirname(manifiesto), typeof bin === "string" ? bin : bin.prisma);
+}
+
+/** ¿Los argumentos piden `db <cual>`? Se compara sin distinguir mayúsculas. */
 function pideDb(args, cual) {
-  const tokens = args.flatMap((a) => a.split(/\s+/)).filter(Boolean);
+  const tokens = args.map((a) => a.toLowerCase());
   const db = tokens.indexOf("db");
   const sub = tokens.indexOf(cual);
   return db !== -1 && sub > db;
@@ -54,18 +52,15 @@ const BLOQUEADOS = [
   {
     cual: "push",
     motivo: [
-      "POR QUÉ: `push` escribe el esquema en la base sin dejar un archivo de",
-      "  migración. Esa migración no se commitea, el próximo entorno corre",
-      "  `migrate deploy` sin ella, y el síntoma aparece en producción como",
-      "  «la tabla no existe».",
+      "POR QUÉ: escribe el esquema en la base sin dejar un archivo de migración.",
+      "  El próximo entorno corre `migrate deploy` sin ella y el síntoma aparece",
+      "  en producción como «la tabla no existe».",
       "",
       "FIX: `pnpm migrate` genera la migración y la aplica. Se commitea junto",
       "  con el cambio de esquema.",
     ],
   },
   {
-    // Está acá porque pasó: se corrió como prueba de que la guarda no bloqueaba
-    // de más, y dejó el esquema sin una sola explicación. Se recuperó de git.
     cual: "pull",
     motivo: [
       "POR QUÉ: lee la base y sobrescribe el esquema, que acá es la fuente de",
@@ -80,19 +75,27 @@ const BLOQUEADOS = [
 
 for (const { cual, motivo } of BLOQUEADOS) {
   if (!pideDb(argumentos, cual)) continue;
-  console.error(
-    [`ERROR: \`prisma db ${cual}\` está bloqueado en este repo.`, "", ...motivo].join("\n"),
-  );
+  console.error([`ERROR: \`prisma db ${cual}\` está bloqueado acá.`, "", ...motivo].join("\n"));
   process.exit(1);
 }
 
-const prisma = spawnSync("pnpm", ["exec", "prisma", ...argumentos], {
+// `format` no se bloquea: es útil y, probado contra el esquema de hoy con
+// Prisma 7.10, conserva los comentarios. Avisa igual porque REIMPRIME los
+// archivos enteros, y en la review de cierre alguien vio que se llevaba
+// comentarios sueltos. Mirar el diff cuesta menos que descubrirlo después.
+if (argumentos.some((a) => a.toLowerCase() === "format")) {
+  console.warn(
+    "AVISO: `prisma format` reimprime el esquema entero. Revisá el diff antes\n" +
+      "  de commitear: los comentarios que no cuelgan de un modelo son lo\n" +
+      "  primero que se pierde si alguna versión cambia de criterio.\n",
+  );
+}
+
+const prisma = spawnSync(process.execPath, [entryDePrisma(), ...argumentos], {
   cwd: APP,
   stdio: "inherit",
-  shell: process.platform === "win32",
 });
 
-// El exit del CLI se propaga tal cual: si `migrate status` encuentra
-// migraciones pendientes sale != 0, y quien llame a esta guarda tiene que
-// enterarse igual que si hubiera llamado a Prisma directo.
+// El exit del CLI se propaga tal cual: si `migrate status` encuentra pendientes
+// sale != 0, y quien llame acá tiene que enterarse igual.
 process.exit(prisma.status ?? 1);

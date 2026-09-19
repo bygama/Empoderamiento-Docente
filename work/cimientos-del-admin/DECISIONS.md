@@ -214,3 +214,28 @@ comentarios `//` de los tres archivos —conserva los `///` de doc, no los que
 explican por qué—. Se recuperó de git, que es la única razón por la que no costó
 nada. En un repo donde el esquema es la fuente de verdad, `db pull` va en la
 dirección contraria, así que queda bloqueado con su propio mensaje.
+
+## Ronda 3 del fix loop
+
+**2026-09-18 — La causa raíz era `shell: true`, y estuve tres versiones
+parcheando el síntoma.** El re-review rompió la versión 3 por cuatro caminos, y
+el cuarto no era sobre `db push`: `generate & echo INYECTADO` ejecutaba **un
+comando arbitrario**. Con `shell: true` en Windows, Node pega los argumentos en
+una línea y `cmd.exe` la vuelve a partir; eso expande `%VAR%` del entorno, se
+come los `^` de escape y trata `&` como separador. Ningún chequeo de tokens
+podía ganarle: el chequeo miraba una lista y el shell armaba otra.
+
+**Se invoca a Prisma sin shell**, con `process.execPath` contra su entry de
+JavaScript. Node pasa el arreglo al proceso hijo tal cual y la guarda ve
+exactamente lo que ve Prisma. Los cuatro bypasses mueren juntos, y el de
+inyección se verificó: el comando inyectado se ejecutó **0 veces**.
+
+La lección, que vale más que el archivo: **cuando tres arreglos seguidos fallan
+por razones distintas, el problema no es el chequeo.**
+
+**2026-09-18 — El aviso de `format` dice lo que medí, no lo que me contaron.**
+El seat reportó que `prisma format` borra comentarios sueltos. Lo corrí contra
+este esquema con Prisma 7.10 y **no los borró**: git quedó limpio y las
+cabeceras siguen. Así que el aviso no afirma que los borre; avisa que reimprime
+los archivos enteros y que conviene mirar el diff. Repetir la observación de
+otro como hecho propio es la misma falla que esta review vino encontrando.
