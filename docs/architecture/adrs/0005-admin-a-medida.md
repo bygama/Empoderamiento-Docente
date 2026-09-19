@@ -80,6 +80,9 @@ después.
   `@payloadcms/*` y `graphql`) y entran 6 (`prisma`, `@prisma/client`,
   `@prisma/adapter-neon`, `better-auth`, `@vercel/blob`, `resend`).
   `pnpm install` sacó 226 paquetes.
+  > **Corregido por el [ADR-0008](0008-correcciones-de-la-fase-1.md):** el
+  > adaptador es **`@prisma/adapter-pg`**. El driver serverless de Neon habla
+  > por WebSocket y no llega a un Postgres común.
 - **Cero código generado dentro de `src/`.** Se van las 702 líneas generadas
   —`payload-types.ts`, el route group `(payload)` y la migración— y con ellas
   los tres `globalIgnores` de ESLint que existían para esconderlas.
@@ -108,6 +111,11 @@ después.
   rotación de sesión y tokens de reset de un solo uso. La línea es la que traza
   cualquier empresa grande: la capa de identidad se adopta, la autorización de
   negocio y la UI se construyen.
+  > **Corregido por el [ADR-0008](0008-correcciones-de-la-fase-1.md):** de esas
+  > tres, la fase 1 entregó **una**. El hasheo es **scrypt**, no Argon2id. La
+  > **rotación de sesión no está**, y no se verificó que better-auth la haga por
+  > dentro. Los tokens **sí** son de un solo uso, pero se guardan **en claro**,
+  > no hasheados. El detalle, en la spec del admin §7.
 - El admin se construye por fases, cada una mergeable sola, y la fase 2 prueba
   el enfoque completo contra una sola entidad antes de replicarlo.
 - La base tiene los backups de Neon; el historial de versiones puede sumarse

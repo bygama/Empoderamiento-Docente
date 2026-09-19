@@ -74,3 +74,22 @@ owner.
 - Diseño del admin: `../specs/2026-09-18-admin-a-medida-diseno.md`.
 - [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
   — Argon2id primero, scrypt como alternativa aceptable.
+
+---
+
+## Cómo se marcó esto en el 0005 y el 0007
+
+Los ADRs de este repo son **inmutables una vez aceptados**, así que sus
+oraciones originales quedaron **intactas**. Lo que se agregó es una anotación
+`> Corregido por el ADR-0008` **inmediatamente después de cada afirmación
+corregida**, no solo en la cabecera.
+
+El motivo es concreto: un puntero arriba de todo no sirve a quien aterriza a
+mitad del documento —buscando «adapter-neon», o salteando a «Consecuencias»—,
+que es exactamente como se leen los ADRs viejos. Lo levantó la review de cierre
+de la fase 1.
+
+El precedente del repo era **menos** que esto, no más: el ADR-0006 enmendó al
+0004 sin dejar ni una marca en su cuerpo ni en su Status. Agregar metadata al
+lado de una oración no reescribe la decisión; dejar la decisión sin marcar sí
+engaña.
