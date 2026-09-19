@@ -2,21 +2,17 @@
 //
 //   node scripts/guarda-prisma.mjs <lo que sea que le pasarías a prisma>
 //
-// `db push` aplica el esquema contra la base SIN generar el archivo de
-// migración. La migración que nunca existió no se commitea, el entorno
-// siguiente se queda sin esas tablas, y el síntoma aparece en producción.
+// `db push` aplica el esquema sin dejar migración: el entorno siguiente se
+// queda sin esas tablas y el síntoma aparece en producción. `db pull` va al
+// revés y sobrescribe el esquema desde la base, borrando los comentarios `//`.
 //
-// `db pull` va al revés: lee la base, sobrescribe el esquema —que acá es la
-// fuente de verdad— y borra los comentarios `//` en el camino.
+// **Se invoca SIN shell**: con `shell: true`, `cmd.exe` volvía a partir la línea
+// después del chequeo, y un `&` en cualquier argumento ejecutaba un comando
+// arbitrario. Sin shell, Node entrega el arreglo al hijo tal cual.
 //
-// **Se invoca a Prisma SIN shell, y eso es lo que hace que la guarda sirva.**
-// Tres versiones se colaron mientras usaba `shell: true`, todas por la misma
-// razón: `cmd.exe` recibía la línea armada y la volvía a partir DESPUÉS del
-// chequeo. Pasaban `"db push"` como un argumento, `db pu^sh` (el `^` se lo come
-// el shell) y `db %VAR%` con la variable en el entorno. Peor: un `&` adentro de
-// cualquier argumento ejecutaba un comando arbitrario — inyección a través del
-// wrapper, sin relación con `db push`. Sin shell, Node pasa el arreglo al
-// proceso hijo tal cual y la guarda ve lo mismo que Prisma.
+// La review de cierre de la fase 1 rompió **cuatro** versiones de este archivo,
+// cada una por una puerta distinta. El detalle está en el DECISIONS de la lane
+// `cimientos-del-admin` y en el ADR-0008.
 
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
@@ -37,12 +33,18 @@ function entryDePrisma() {
   return path.join(path.dirname(manifiesto), typeof bin === "string" ? bin : bin.prisma);
 }
 
-/** ¿Los argumentos piden `db <cual>`? Se compara sin distinguir mayúsculas. */
+/**
+ * ¿Los argumentos podrían llegar a `db <cual>`?
+ *
+ * **No se parsea, y esa es la decisión.** Prisma tiene flags globales que
+ * consumen el token siguiente, así que cualquier chequeo por orden o adyacencia
+ * se rompe con un señuelo: `--telemetry-information push db push` pasaba.
+ * Se pregunta lo único independiente del orden: si `db` y `push` (o `pull`)
+ * están **las dos** presentes. Bloquea de más a propósito.
+ */
 function pideDb(args, cual) {
   const tokens = args.map((a) => a.toLowerCase());
-  const db = tokens.indexOf("db");
-  const sub = tokens.indexOf(cual);
-  return db !== -1 && sub > db;
+  return tokens.includes("db") && tokens.includes(cual);
 }
 
 // Los errores dicen qué, por qué y el fix: escritos para que quien los lee sepa
@@ -51,20 +53,18 @@ const BLOQUEADOS = [
   {
     cual: "push",
     motivo: [
-      "POR QUÉ: escribe el esquema en la base sin dejar un archivo de migración.",
-      "  El próximo entorno corre `migrate deploy` sin ella y el síntoma aparece",
-      "  en producción como «la tabla no existe».",
+      "POR QUÉ: escribe el esquema en la base sin dejar archivo de migración. El",
+      "  próximo entorno corre `migrate deploy` sin ella y el síntoma aparece en",
+      "  producción como «la tabla no existe».",
       "",
-      "FIX: `pnpm migrate` genera la migración y la aplica. Se commitea junto",
-      "  con el cambio de esquema.",
+      "FIX: `pnpm migrate` genera la migración y la aplica, y se commitea.",
     ],
   },
   {
     cual: "pull",
     motivo: [
       "POR QUÉ: lee la base y sobrescribe el esquema, que acá es la fuente de",
-      "  verdad. Y borra los comentarios `//` en el camino: conserva los `///`",
-      "  de doc, no los que explican por qué.",
+      "  verdad. Y borra los comentarios `//` en el camino.",
       "",
       "FIX: si la base y el esquema no coinciden, manda el esquema. Corregilo a",
       "  mano y generá la migración con `pnpm migrate`.",

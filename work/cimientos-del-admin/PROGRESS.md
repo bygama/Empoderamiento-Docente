@@ -96,12 +96,43 @@ salir                   → 200
 /admin después de salir → 307 a /admin/entrar
 ```
 
-**Review de cierre: pendiente.** Ocho pasos en `high`, siete tocando auth o
-seguridad.
+### Review de cierre
+
+Cuatro seats frescos en Sonnet, una lente cada uno. Ocho pasos en `high`, siete
+tocando auth o seguridad, así que la review pesó más que la de la fase 0.
+
+| Lente | Veredicto |
+| --- | --- |
+| Type and interface design | **PASS**, 3 Important |
+| Documentation impact | **FAIL**, 2 Critical |
+| Correctness against the SPEC | 0 Critical, 2 Important |
+| Silent failures | 0 Critical, 1 Important **grave** |
+
+**Lo que encontraron y yo no:** la guarda de `db push` no guardaba; mi enmienda
+al SPEC había borrado dos promesas de seguridad en silencio; y un puntero en la
+cabecera de un ADR no le sirve a quien entra por el medio del documento.
+
+**Lo que confirmaron contra el sistema corriendo**, y que yo había dado por
+bueno sin probar: la cookie de sesión forjada se rechaza sin filtrar contenido,
+no hay open redirect en `volver`, y no hay hueco en el matcher del middleware.
+
+### El fix loop
+
+| Ronda | Qué falló | Por qué |
+| --- | --- | --- |
+| 1 | la guarda | un flag con valor separado dejaba su valor como «verbo» |
+| 2 | la guarda | un argumento con un espacio adentro; el shell lo repartía |
+| 3 | la guarda | `%VAR%`, `^` y **inyección con `&`** — todo por `shell: true` |
+| 4 | — | se sacó el shell: la clase entera |
+
+Las tres primeras las arreglé parcheando el mismo chequeo. La cuarta salió de
+aceptar que **el chequeo nunca fue el problema**.
+
+Las demás lentes cerraron en las rondas 1 y 2.
 
 ## Próximo
 
-1. Review de cierre por seats frescos.
+1. Veredicto de la ronda 4 sobre la guarda.
 2. `work-handoff` y el PR.
 3. Después, la fase 2: `packages/kit-admin` y novedades de punta a punta.
 

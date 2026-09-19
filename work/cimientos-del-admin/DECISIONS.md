@@ -239,3 +239,33 @@ este esquema con Prisma 7.10 y **no los borró**: git quedó limpio y las
 cabeceras siguen. Así que el aviso no afirma que los borre; avisa que reimprime
 los archivos enteros y que conviene mirar el diff. Repetir la observación de
 otro como hecho propio es la misma falla que esta review vino encontrando.
+
+## Ronda 4 del fix loop
+
+**2026-09-18 — Cuarto bypass: yo estaba reimplementando el parser de Prisma.**
+`--telemetry-information push db push` pasaba. Ese flag consume el token
+siguiente como valor, así que el `push` señuelo queda en un índice **anterior**
+al `db` y cualquier chequeo por orden da falso — mientras Prisma despacha el
+`db push` del final igual. La premisa que yo había escrito, «sin shell la guarda
+ve lo que ve Prisma», era falsa por un motivo nuevo: no alcanza con ver los
+mismos tokens si se los interpreta con un parser distinto.
+
+**La salida no fue un quinto parser: fue dejar de parsear.** Ahora se pregunta
+lo único que no depende del orden —si `db` y `push` (o `pull`) están las dos
+presentes— y se bloquea de más a propósito. Un `db execute --file push` queda
+frenado, y ese es el lado correcto para equivocarse.
+
+**2026-09-18 — Los 55 comentarios de la guarda se mudan a este archivo.**
+El script llegó a 112 líneas, 55 de ellas comentario documentando los cuatro
+bypasses. La tentación era declararlo excepción al tope de 100, como el script
+del gate. Se descartó: la historia de cuatro fallas es un registro de
+decisiones, no un comentario de código, y la excepción del gate ya se pudrió una
+vez (§6 la justificaba con un número que nunca fue cierto). El script queda en
+**100 líneas, 55 sin comentarios**, con lo que hace falta leer ahí y un puntero
+acá.
+
+**2026-09-18 — El número de §6 volvió a quedar viejo, por mi propia mano.**
+En la fase 0 corregí «160/89» a «165/129». Al sumarle los packages al gate en
+esta lane, el script pasó a **170/103** y el número volvió a mentir el mismo
+día. Corregido, y la lección es que un número medido en prosa se pudre: si
+volviera a pasar, conviene que el gate lo calcule en vez de escribirlo.

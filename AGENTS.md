@@ -412,8 +412,8 @@ esa misma guía).
 - [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
       partir un hook por debajo de 80 suele separar el efecto de su limpieza,
       que es justo lo que hay que evitar. Ahí manda el tope de 200. La otra
-      excepción es `scripts/verificar-react-doctor.mjs` (**165 líneas, 129 sin
-      comentarios**, medido el 2026-09-18): partir el script del gate en dos
+      excepción es `scripts/verificar-react-doctor.mjs` (**170 líneas, 103 sin
+      comentarios**, medido el 2026-09-18 después de sumarle los packages al gate): partir el script del gate en dos
       archivos lo vuelve más difícil de auditar de una lectura, que es
       exactamente para lo que existe, y sus comentarios son el «nunca se apaga
       en silencio» de §5.8 escrito donde se lee.
