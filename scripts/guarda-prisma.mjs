@@ -3,9 +3,8 @@
 //   node scripts/guarda-prisma.mjs <lo que sea que le pasarías a prisma>
 //
 // `db push` aplica el esquema contra la base SIN generar el archivo de
-// migración. Anda en la máquina de quien lo corre, la migración que nunca
-// existió no se commitea, y el entorno siguiente se queda sin esas tablas: el
-// síntoma aparece en producción como «la tabla no existe».
+// migración. La migración que nunca existió no se commitea, el entorno
+// siguiente se queda sin esas tablas, y el síntoma aparece en producción.
 //
 // `db pull` va al revés: lee la base, sobrescribe el esquema —que acá es la
 // fuente de verdad— y borra los comentarios `//` en el camino.
