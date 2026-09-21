@@ -4,7 +4,7 @@
 - **Base:** `9e721f1` (= `origin/main` al 2026-09-21, con la fase A de métricas mergeada)
 - **Spec:** [`SPEC.md`](SPEC.md) · **Inventario:** [`INVENTARIO.md`](INVENTARIO.md) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
 
-**Estado: spec escrito, pendiente de la lectura de Facundo y del plan de la fase A (Inicio → Hero).**
+**Estado: SPEC leído y aprobado; PLAN de la fase A escrito, revisado (1 crítico y 7 importantes corregidos) y aprobado para ejecutar. Rama por crear.**
 
 ## Baseline
 
