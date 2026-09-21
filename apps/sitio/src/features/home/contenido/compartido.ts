@@ -6,12 +6,12 @@ import type { ComoTrabajamosDeQueHacemos } from "@/features/que-hacemos/contenid
 // así al navegador de `/` no viaja lo que no se dibuja. Solo tipos de Qué
 // hacemos: este módulo no trae Zod.
 
-/** Una carta del abanico de Inicio: el título, la frase y el detalle de un área. */
-export type AreaDeInicio = Pick<AreaDeQueHacemos, "titulo" | "frase" | "detalle">;
+/** Una carta del abanico de Inicio: el título, la frase y el detalle de un área, y el nombre corto que va en su lomo en celular. */
+export type AreaDeInicio = Pick<AreaDeQueHacemos, "titulo" | "nombreCorto" | "frase" | "detalle">;
 
 /** Las siete áreas de Qué hacemos, como las muestra Inicio. */
 export function areasDeInicio({ areas }: AreasDeQueHacemos): AreaDeInicio[] {
-  return areas.map(({ titulo, frase, detalle }) => ({ titulo, frase, detalle }));
+  return areas.map(({ titulo, nombreCorto, frase, detalle }) => ({ titulo, nombreCorto, frase, detalle }));
 }
 
 /**
