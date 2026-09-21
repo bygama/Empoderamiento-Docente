@@ -101,29 +101,37 @@ export function entradaHero(inners: HTMLElement[]) {
       "-=0.15",
     );
 
-  // Cards mobile (< lg): MISMO gesto stack→deploy, pero sobre [data-mcard]
-  // (capa con transform 100% de GSAP; el slot la centra por CSS → sin
-  // conflicto ni doble-centrado). Timeline propio para no tocar los tempos
-  // del desktop. En desktop estas cards están display:none → tween invisible.
+  // Cards mobile (< lg): MISMO gesto stack→deploy, sobre [data-mcard] (las
+  // cuatro fotos del primer pantallazo; su lugar se lo da el flex, el transform
+  // es todo de GSAP). Timeline propio para no tocar los tempos del desktop. En
+  // desktop estas cards están display:none → tween invisible.
+  // La pila es GRANDE —cerca de media pantalla— y con las fotos apenas
+  // corridas entre sí: tiene que leerse como un mazo, no como una foto chica
+  // perdida en el blanco. Comparte el eje central con la marca del header.
   const mcards = gsap.utils.toArray<HTMLElement>("[data-mcard]");
   if (mcards.length) {
+    const CORRIDA = [[-10, -9], [12, -5], [-7, 10], [9, 12]];
+    const enPila = (el: HTMLElement) => {
+      const ancho = Math.min(window.innerWidth * 0.48, 352);
+      return Math.min(1.7, ancho / (el.offsetWidth || ancho));
+    };
     gsap.set(mcards, {
-      x: (_i, el: HTMLElement) => {
+      x: (i, el: HTMLElement) => {
         const r = el.getBoundingClientRect();
-        return window.innerWidth / 2 - (r.left + r.width / 2);
+        return window.innerWidth / 2 - (r.left + r.width / 2) + CORRIDA[i % 4][0];
       },
-      y: (_i, el: HTMLElement) => {
+      y: (i, el: HTMLElement) => {
         const r = el.getBoundingClientRect();
-        return window.innerHeight / 2 - (r.top + r.height / 2);
+        return window.innerHeight / 2 - (r.top + r.height / 2) + CORRIDA[i % 4][1];
       },
-      scale: 0.5,
+      scale: (_i, el: HTMLElement) => enPila(el) * 0.85,
       autoAlpha: 0,
     });
     gsap
       .timeline({ defaults: { ease: "power3.out" }, delay: 0.2 })
       .to(
         mcards,
-        { autoAlpha: 1, scale: 0.62, duration: 0.7, ease: "power2.out", stagger: 0.05 },
+        { autoAlpha: 1, scale: (_i, el: HTMLElement) => enPila(el), duration: 0.7, ease: "power2.out", stagger: 0.05 },
         0,
       )
       .to(
