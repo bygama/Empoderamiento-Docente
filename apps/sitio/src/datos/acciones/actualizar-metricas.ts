@@ -31,9 +31,11 @@ export async function actualizarMetricasAhora(): Promise<{ ok: boolean; detalle:
     const resultado = await sincronizarMetricas({ cliente, base, minimoDias: 3 });
     revalidatePath("/admin");
     return resultado;
-  } catch {
+  } catch (e) {
     // Si esto tira sin capturar, Next reemplaza toda la portada del admin por
     // su pantalla de error genérica: mejor un aviso en el panel, como el resto.
+    // El mensaje al panel es en llano; el detalle va al log del servidor.
+    console.error("actualizarMetricasAhora:", e);
     return { ok: false, detalle: "No se pudo actualizar; probá de nuevo en un rato." };
   }
 }

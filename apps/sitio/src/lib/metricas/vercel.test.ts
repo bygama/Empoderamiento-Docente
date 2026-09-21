@@ -61,3 +61,21 @@ test("un 401 se explica en llano", async () => {
     return true;
   });
 });
+
+test("la ventana se pide a visits/count con el rango entero", async () => {
+  const urls: string[] = [];
+  const cliente = crearClienteDeAnaliticas({
+    token: "x",
+    proyecto: "prj_x",
+    fetchImpl: async (entrada) => {
+      urls.push(String(entrada));
+      return Response.json({ data: { pageviews: 10, visitors: 8 } });
+    },
+  });
+  assert.deepEqual(await cliente.ventana({ desde: "2026-09-01", hasta: "2026-09-07" }), { vistas: 10, visitantes: 8 });
+  assert.equal(urls.length, 1);
+  assert.match(urls[0], /\/visits\/count\?/);
+  assert.match(urls[0], /since=2026-09-01/);
+  assert.match(urls[0], /until=2026-09-07/);
+  assert.doesNotMatch(urls[0], /by=/);
+});

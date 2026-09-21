@@ -1,5 +1,5 @@
 import type { PrismaClient } from "@/../prisma/generado/client";
-import { base } from "@/datos/cliente";
+import { base as baseDeLaApp } from "@/datos/cliente";
 import { clienteDesdeEntorno } from "@/lib/metricas/entorno";
 import { ayerUTC, diaISO, fechaUTC, MAXIMO_DIAS_POR_CORRIDA, rangoFaltante, sumarDias, ventanasDe } from "@/lib/metricas/periodos";
 import { DIMENSIONES } from "@/lib/metricas/tipos";
@@ -14,10 +14,11 @@ const PAUSA_MS = 250;
 const pausa = () => new Promise((r) => setTimeout(r, PAUSA_MS));
 
 // `total` es la marca de agua: la próxima corrida decide desde dónde seguir
-// mirando la fila `total` más nueva. Si se guardara primero y después
-// fallara otra dimensión (un 429, por ejemplo), la marca avanzaría sin que
-// el rango haya entrado entero. Por eso va última.
-const ORDEN_DIMENSIONES = [...DIMENSIONES.filter((d) => d !== "total"), "total"] as const;
+// mirando la fila `total` más nueva. Si se guardara antes de que termine el
+// resto (una dimensión o una ventana con un 429, por ejemplo) la marca
+// avanzaría sin que el rango haya entrado entero. Por eso corre última, después
+// de las dimensiones de acá abajo y de las ventanas.
+const ORDEN_DIMENSIONES = DIMENSIONES.filter((d) => d !== "total");
 
 async function registrar(base: PrismaClient, corrida: Rango & { ok: boolean; detalle: string }) {
   await base.sincronizacionMetricas.create({
@@ -75,6 +76,12 @@ export async function sincronizarMetricas({
       ventanas++;
       await pausa();
     }
+    // `total` cierra la corrida, después de las dimensiones y las ventanas: es
+    // la marca de agua que decide el rango de la próxima (ver el comentario de
+    // ORDEN_DIMENSIONES). Mismo patrón de upserts independientes que el resto.
+    const filasTotal = await cliente.porDia(rango, "total");
+    await Promise.all(filasTotal.map((fila) => guardarFila(base, fila)));
+    filas += filasTotal.length;
     const dias = Math.round((fechaUTC(rango.hasta).getTime() - fechaUTC(rango.desde).getTime()) / 86_400_000) + 1;
     return registrar(base, { ...rango, ok: true, detalle: `${dias} días, ${filas} filas, ${ventanas} ventanas.` });
   } catch (e) {
@@ -91,7 +98,7 @@ export async function sincronizarDesdeEntorno(): Promise<{ ok: boolean; detalle:
   const cliente = clienteDesdeEntorno();
   if (!cliente) {
     const hoy = diaISO(new Date());
-    return registrar(base, { desde: hoy, hasta: hoy, ok: false, detalle: "Faltan VERCEL_TOKEN y/o VERCEL_ANALYTICS_PROJECT_ID: ver el README." });
+    return registrar(baseDeLaApp, { desde: hoy, hasta: hoy, ok: false, detalle: "Faltan VERCEL_TOKEN y/o VERCEL_ANALYTICS_PROJECT_ID: ver el README." });
   }
-  return sincronizarMetricas({ cliente, base });
+  return sincronizarMetricas({ cliente, base: baseDeLaApp });
 }
