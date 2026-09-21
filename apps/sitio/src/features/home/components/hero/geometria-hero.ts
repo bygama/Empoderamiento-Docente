@@ -60,5 +60,17 @@ export const BANDA_ABAJO_MOVIL: readonly HuecoMovil[] = [
   { w: 40, ar: 340 / 260, celular: 3, cartelDe: 5 },
 ];
 
+// Al bajar, los otros cuatro conceptos de a uno, en zigzag y con el cartel
+// completo: son tarjetas de computadora con cartel (`tarjeta`, su lugar en
+// «Tarjetas (computadora)»), con su foto y su texto. En escritorio se leen
+// todos juntos; acá la dimensión es el scroll.
+export type ConceptoMovil = { w: number; ar: number; tarjeta: number };
+export const CONCEPTOS_MOVIL: readonly ConceptoMovil[] = [
+  { w: 56, ar: 280 / 240, tarjeta: 4 },
+  { w: 42, ar: 240 / 300, tarjeta: 2 },
+  { w: 58, ar: 340 / 250, tarjeta: 7 },
+  { w: 42, ar: 240 / 300, tarjeta: 10 },
+];
+
 /** Cuántas fotos guarda «Tarjetas (celular)»: el largo que ya tiene el contenido guardado. */
 export const TARJETAS_CELULAR = 8;
