@@ -54,3 +54,10 @@ El criterio anterior (comparar `NEXT_PUBLIC_SITE_URL` con `siteConfig.url`)
 habría cerrado el dominio real a Google si en producción faltara esa variable,
 cosa que no podemos verificar. `VERCEL_ENV` lo fija Vercel solo: `preview` se
 cierra, `production` y local no cambian.
+
+**2026-09-21 — Producción sale siempre de un build de `main`; nada de «Promote to Production» sobre un preview.**
+`/robots.txt` se prerenderiza en el build con el `VERCEL_ENV` de ese deploy.
+Promover un preview no rebuildea (la API de Vercel lo dice explícitamente:
+«this action does not rebuild the deployment»), así que publicaría en el
+dominio real el `robots.txt` cerrado. Hallazgo del implementador de la Task 2;
+va en el checklist de la Task 5 y en el README cuando se escriba.
