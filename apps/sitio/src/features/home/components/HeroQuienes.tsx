@@ -8,6 +8,7 @@ import { Manifiesto } from "./Manifiesto";
 import { MisionPanel } from "./MisionPanel";
 import { MathField } from "@/components/ui/MathField";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import type { Hero as ContenidoDelHero } from "@/features/home/contenido/hero";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -24,7 +25,7 @@ if (typeof window !== "undefined") {
  * en píxeles para que línea y borrado vayan pegados.
  * Respeta prefers-reduced-motion (capas apiladas en flow, sin animación).
  */
-export function HeroQuienes() {
+export function HeroQuienes({ hero }: { hero: ContenidoDelHero }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const zoneRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -238,7 +239,7 @@ export function HeroQuienes() {
 
       {/* Hero — scrollea normal (sin slide). */}
       <div className="relative z-10">
-        <Hero />
+        <Hero contenido={hero} />
       </div>
 
       {/* Quiénes somos → barrido verde → Misión (apilado debajo del hero). */}

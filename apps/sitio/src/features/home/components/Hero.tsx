@@ -4,6 +4,7 @@ import { useRef, type CSSProperties } from "react";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMouseParallax } from "@/lib/hooks/useMouseParallax";
+import type { Hero as ContenidoDelHero } from "@/features/home/contenido/hero";
 import { crearHero } from "./hero/coreografia-hero";
 import { CampoCards } from "./hero/CampoCards";
 import { CampoCardsMobile } from "./hero/CampoCardsMobile";
@@ -26,12 +27,14 @@ import { HeroCopy } from "./hero/HeroCopy";
  * suben con un fade suave — así el texto no "molesta" al aparecer.
  * Respeta prefers-reduced-motion (sin animación, estado final visible).
  *
- * Piezas: tarjetas en `hero/hero-cards.ts`, coreografía en
+ * Piezas: geometría en `hero/geometria-hero.ts`, coreografía en
  * `hero/coreografia-hero.ts` (+ `entrada-hero.ts`), campos en `CampoCards` /
- * `CampoCardsMobile`, copy en `HeroCopy`. Este compositor arma la sección y
- * dispara la coreografía desde el layout effect.
+ * `CampoCardsMobile`, copy en `HeroCopy`. El contenido (textos, fotos y
+ * carteles) llega por props desde `features/home/contenido/hero.ts` o desde la
+ * base. Este compositor arma la sección y dispara la coreografía desde el
+ * layout effect.
  */
-export function Hero() {
+export function Hero({ contenido }: { contenido: ContenidoDelHero }) {
   const ref = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -70,9 +73,9 @@ export function Hero() {
         style={{ background: "radial-gradient(circle, rgb(31 154 120 / 0.1) 0%, transparent 70%)" }}
       />
 
-      <CampoCards />
-      <CampoCardsMobile />
-      <HeroCopy />
+      <CampoCards tarjetas={contenido.tarjetas} />
+      <CampoCardsMobile tarjetas={contenido.tarjetasCelular} />
+      <HeroCopy contenido={contenido} />
     </section>
   );
 }
