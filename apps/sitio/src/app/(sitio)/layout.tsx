@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Caveat, Courier_Prime, Inter, Manrope, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -112,6 +113,10 @@ export default function RootLayout({
             <Footer />
           </div>
         </LenisProvider>
+        {/* Cuenta vistas y visitantes sin cookies (ADR-0009). Solo en producción:
+            en desarrollo cargaría un script de depuración desde un dominio de
+            Vercel que la CSP bloquea, y no hay nada que medir. */}
+        {process.env.NODE_ENV === "production" ? <Analytics /> : null}
       </body>
     </html>
   );

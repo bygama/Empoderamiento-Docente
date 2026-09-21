@@ -95,6 +95,8 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   // Todo menos los assets y el favicon: ponerle cabeceras a cada chunk de JS
-  // no aporta nada y se paga en cada request.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|avif|woff2)$).*)"],
+  // no aporta nada y se paga en cada request. `_vercel` es el script y los
+  // envíos de la analítica (`/_vercel/insights/…`): pasarlos por el
+  // middleware gastaba una invocación por vista y no aportaba nada.
+  matcher: ["/((?!_next/static|_next/image|_vercel|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|avif|woff2)$).*)"],
 };
