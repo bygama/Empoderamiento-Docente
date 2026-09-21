@@ -1632,7 +1632,7 @@ export type ContenidoDe<S extends Slug> = {
 ```
 
 - [ ] **Step 6: `HeroCopy` recibe el texto** — `apps/sitio/src/features/home/components/hero/HeroCopy.tsx`
-queda así (el halo y las clases no cambian; el `h1` se arma con `split(/s+/)`,
+queda así (el halo y las clases no cambian; el `h1` se arma con `split(/\s+/)`,
 la última palabra lleva el acento como hoy):
 
 ```tsx
@@ -1653,7 +1653,7 @@ export function HeroCopy({ contenido }: Props) {
   // Cada palabra es un <span data-hero-word> para animarla; la última lleva
   // el acento verde (data-hero-accent): es la que remata la frase. Se parte
   // por cualquier espacio: dos seguidos no dejan un span vacío.
-  const palabras = contenido.titulo.split(/s+/);
+  const palabras = contenido.titulo.split(/\s+/);
   return (
     <div
       data-hero-copy-scroll
