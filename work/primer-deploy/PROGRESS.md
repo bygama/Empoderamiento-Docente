@@ -2,11 +2,10 @@
 
 - **Rama:** `chore/primer-deploy` (todavía no creada)
 - **Base:** `f3f3f9c` (= `origin/main` al 2026-09-21)
-- **Spec:** [`SPEC.md`](SPEC.md) · **Plan:** `PLAN.md` (se escribe cuando el
-  spec quede aprobado) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
+- **Spec:** [`SPEC.md`](SPEC.md) · **Plan:** [`PLAN.md`](PLAN.md) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
 
-**Estado: spec escrito, pendiente de revisión del owner. Sin cambios en el
-repo ni en Vercel.**
+**Estado: spec revisado y mergeado (PR #165); PLAN escrito, pendiente de
+arrancar. Sin cambios en el repo ni en Vercel.**
 
 ## Baseline
 
