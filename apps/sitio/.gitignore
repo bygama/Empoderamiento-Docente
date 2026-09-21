@@ -1,2 +1,5 @@
 # Lo genera Prisma del esquema; se regenera con `pnpm generate`.
 prisma/generado/
+
+# Las fotos subidas desde el admin en local (SPEC §4.4). En Vercel van a Blob.
+.fotos/

@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
     // Las fotos que sube el admin viven en Vercel Blob.
     remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
   },
+  experimental: {
+    // Las fotos suben por una Server Action y Next capa el cuerpo en 1 MB
+    // por defecto. 5 MB = los 4 MB del tope de la foto (lib/contenido/fotos.ts)
+    // más el margen del multipart. Más que eso no tiene sentido: Vercel corta
+    // el cuerpo de una función en 4,5 MB. Este corte pasa ANTES de entrar a la
+    // acción, por eso el navegador chequea el tamaño antes de mandar.
+    serverActions: { bodySizeLimit: "5mb" },
+  },
   async redirects() {
     return [
       // La sección vive en "/quienes-somos"; el slug viejo redirige al nuevo

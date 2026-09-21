@@ -77,3 +77,11 @@ un host fuera de `remotePatterns` rompería el render de la home al publicar.
 lista cerrada (`RUTAS_INTERNAS`) la trae quien escribe el esquema. `grupo` es
 un `z.object` con etiqueta para que el formulario titule «Botón principal» sin
 escribir JSX por sección.
+
+**2026-09-21 — Las fotos pesan hasta 4 MB, no 8.**
+Vercel corta el cuerpo de una función en 4,5 MB, Server Actions incluidas: con
+el tope del spec, una foto de 6 MB pasa en local y da 413 en producción. Para
+las fotos del sitio (webp de 100–300 KB) sobra. El tope se chequea también en
+el navegador, porque `bodySizeLimit` corta antes de entrar a la acción y ese
+error no lo ve ningún `try` del servidor. Si algún día hace falta más, la
+salida es la subida directa desde el navegador (`@vercel/blob/client`).
