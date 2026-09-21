@@ -13,9 +13,10 @@ export type Paso = ComoTrabajamos["pasos"][number] & { n: string; frase: string 
  * `[data-paso]`, que es lo que la coreografía apila y cross-fadea: exactamente
  * uno por paso.
  *
- * En celular (< md) es una columna anclada arriba: la foto apaisada, de alto
- * fijo (`--metodo-foto`, la define `ComoTrabajamos`), y el texto debajo. El
- * recorte apaisado de cada foto se apunta con `focoMovil` (`foco-movil.ts`); en
+ * En celular (< md) son dos mitades: la foto apaisada centrada en la de arriba
+ * (entre el header y `--metodo-linea`) y el texto en la de abajo, a
+ * `--metodo-texto` del eje. Las medidas las define `ComoTrabajamos`. El recorte
+ * apaisado de cada foto se apunta con `focoMovil` (`foco-movil.ts`); en
  * computadora manda el foco editable de la foto.
  */
 export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
@@ -23,13 +24,13 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
   return (
     <div
       data-paso={idx}
-      className="absolute inset-0 flex items-start pt-(--metodo-arriba) md:items-center md:pt-0"
+      className="absolute inset-0 flex items-start md:items-center"
     >
       <div className="mx-auto grid w-full max-w-screen-xl grid-cols-12 items-center gap-x-6 px-5 md:gap-x-8 md:px-10">
 
         {/* Foto real — pegada al eje central (alterna lado) */}
         <div
-          className={`col-span-12 md:col-span-5 md:row-start-1 ${
+          className={`col-span-12 flex h-(--metodo-linea) items-center pt-20 pb-6 md:col-span-5 md:row-start-1 md:block md:h-auto md:p-0 ${
             fotoRight ? "md:col-start-8" : "md:col-start-1"
           }`}
         >
@@ -62,7 +63,7 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
             simétrico al intercalar. Mismo ancho de bloque que la foto
             (25rem) para que los bordes exteriores coincidan. */}
         <div
-          className={`relative col-span-12 col-start-1 mt-10 pl-10 md:col-span-5 md:mt-0 md:row-start-1 md:pl-0 ${
+          className={`relative col-span-12 col-start-1 mt-(--metodo-texto) md:col-span-5 md:mt-0 md:row-start-1 ${
             fotoRight
               ? "md:col-start-1 md:text-right"
               : "md:col-start-8 md:text-left"
@@ -71,7 +72,7 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
           {/* Número watermark — sangra hacia el borde EXTERIOR */}
           <span
             aria-hidden="true"
-            className={`font-display text-azul-principal/[0.05] pointer-events-none absolute -top-8 z-0 select-none text-[9rem] leading-none font-bold tabular-nums md:-top-20 md:text-[14rem] ${
+            className={`font-display text-azul-principal/[0.05] pointer-events-none absolute -top-4 z-0 select-none text-[9rem] leading-none font-bold tabular-nums md:-top-20 md:text-[14rem] ${
               fotoRight ? "-left-2" : "-right-2"
             }`}
           >
@@ -80,7 +81,7 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
 
           {/* Bloque de texto de ancho fijo, anclado al eje central. */}
           <div
-            className={`relative z-10 max-w-[25rem] ${
+            className={`relative z-10 max-w-[25rem] max-md:mx-auto ${
               fotoRight ? "md:ml-auto" : "md:mr-auto"
             }`}
           >

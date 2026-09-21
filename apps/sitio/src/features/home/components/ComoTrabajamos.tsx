@@ -16,14 +16,21 @@ import { PasoMetodo } from "./como-trabajamos/PasoMetodo";
  * puntos sincronizado. Mask reveal del título de cada paso. Foto alterna
  * izq/der por índice.
  *
- * En celular (< md) cada paso es una columna: la foto ARRIBA, apaisada y de
- * alto fijo (`--metodo-foto`, igual para los cinco: si dependiera del texto
- * saltaría de tamaño en cada cruce), y el texto debajo, que crece hacia el aire
- * de abajo. Ese alto es lo que sobra de la pantalla después del header y del
- * texto más largo (unos 29rem), con piso y techo: en un celular bajo la foto se
- * achica y el texto entra entero. En uno alto sobra pantalla: `--metodo-arriba`
- * baja el conjunto para que no quede colgado del header con un hueco abajo. El alto es `svh` y no `vh`: en iPhone `100vh` mide sin la barra de
- * Safari y el final del texto quedaba detrás de ella.
+ * En celular (< md) la pantalla se parte en DOS MITADES con el eje de puntos,
+ * en fila, como bisagra: arriba la foto apaisada, centrada en su mitad; abajo
+ * el texto. Tres medidas, las tres acá para que `PasoMetodo` e
+ * `IndicadorPasos` compartan una sola cuenta:
+ *  · `--metodo-linea`: dónde va el eje. La mitad exacta de la pantalla, salvo
+ *    en los celulares bajos, donde el texto más largo (unos 19rem con su aire; algo más por debajo de 360px de ancho)
+ *    no entra en media pantalla: ahí el eje sube lo justo.
+ *  · `--metodo-foto`: el alto de la foto, igual en los cinco pasos —si
+ *    dependiera del texto saltaría en cada cruce—: lo que deja la mitad de
+ *    arriba sin el header ni el aire, con techo.
+ *  · `--metodo-texto`: cuánto baja el texto desde el eje. Se centra en su
+ *    mitad tomando de referencia el texto MÁS LARGO, no el de cada paso: así
+ *    el título queda siempre a la misma altura y no salta al cruzar.
+ * El alto es `svh` y no `vh`: en iPhone `100vh` mide sin la barra de Safari y
+ * el final del texto quedaba detrás de ella.
  *
  * Piezas: el contenido llega por props (de
  * `features/home/contenido/como-trabajamos.ts` o de la base), la coreografía
@@ -56,7 +63,7 @@ export function ComoTrabajamos({ contenido, frases }: { contenido: ContenidoDeCo
       aria-label="Cómo trabajamos"
     >
       <div className="relative h-[380vh] md:h-[500vh]">
-        <div className="sticky top-0 flex h-svh flex-col overflow-hidden [--metodo-arriba:max(5.5rem,calc((100svh-36rem)/2))] [--metodo-foto:clamp(7.5rem,calc(100svh-29rem),16rem)] md:h-screen">
+        <div className="sticky top-0 flex h-svh flex-col overflow-hidden [--metodo-foto:min(16rem,calc(var(--metodo-linea)-8rem))] [--metodo-linea:min(50svh,calc(100svh-19rem))] [--metodo-texto:max(1.75rem,calc((100svh-var(--metodo-linea)-15rem)/2))] max-[359px]:[--metodo-linea:min(50svh,calc(100svh-20.5rem))] md:h-screen">
 
           {/* Glow verde ambiental */}
           <div
