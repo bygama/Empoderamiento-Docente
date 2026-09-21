@@ -1,12 +1,21 @@
+import { Fragment } from "react";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
+import type { Hero } from "@/features/home/contenido/hero";
+
+type Props = { contenido: Pick<Hero, "titulo" | "bajada" | "botonPrincipal" | "botonSecundario"> };
 
 /**
  * Contenido CENTRADO en el primer viewport (se va con el scroll): halo de
  * legibilidad, titular palabra por palabra, descripción y acciones. Todo
- * entra por data-attributes desde la coreografía del hero.
+ * entra por data-attributes desde la coreografía del hero. El texto llega por
+ * props: es lo que se edita desde el admin.
  */
-export function HeroCopy() {
+export function HeroCopy({ contenido }: Props) {
+  // Cada palabra es un <span data-hero-word> para animarla; la última lleva
+  // el acento verde (data-hero-accent): es la que remata la frase. Se parte
+  // por cualquier espacio: dos seguidos no dejan un span vacío.
+  const palabras = contenido.titulo.split(/\s+/);
   return (
     <div
       data-hero-copy-scroll
@@ -33,27 +42,27 @@ export function HeroCopy() {
           className="font-display font-bold text-balance tracking-[-0.02em]"
           style={{ fontSize: "clamp(1.85rem, 1rem + 2.4vw, 2.7rem)", lineHeight: 1.12 }}
         >
-          <span data-hero-word className="inline-block">La</span>{" "}
-          <span data-hero-word className="inline-block">transformación</span>{" "}
-          <span data-hero-word className="inline-block">educativa</span>{" "}
-          <span data-hero-word className="inline-block">comienza</span>{" "}
-          <span data-hero-word className="inline-block">en</span>{" "}
-          <span data-hero-word className="inline-block">las</span>{" "}
-          <span
-            data-hero-word
-            data-hero-accent
-            className="text-verde-concepto inline-block"
-          >
-            matemáticas.
-          </span>
+          {palabras.map((palabra, i) => (
+            <Fragment key={i}>
+              {i > 0 ? " " : null}
+              {i === palabras.length - 1 ? (
+                <span data-hero-word data-hero-accent className="text-verde-concepto inline-block">
+                  {palabra}
+                </span>
+              ) : (
+                <span data-hero-word className="inline-block">
+                  {palabra}
+                </span>
+              )}
+            </Fragment>
+          ))}
         </h1>
 
         <p
           data-hero-desc
           className="text-gris-texto mx-auto mt-6 max-w-[40rem] text-balance font-sans text-[1.02rem] leading-relaxed md:text-[1.12rem]"
         >
-          Escuchamos cada realidad y diseñamos soluciones educativas a medida,
-          con base en la investigación y más de 15 años de experiencia.
+          {contenido.bajada}
         </p>
 
         <div
@@ -62,8 +71,8 @@ export function HeroCopy() {
         >
           {/* La acción principal al final del recorrido del ojo, y del lado
               en que el navbar tiene Contacto (Gastón, 2026-09-11). */}
-          <ButtonSecondary href="/que-hacemos">Qué hacemos</ButtonSecondary>
-          <ButtonPrimary href="/contacto">Contactanos</ButtonPrimary>
+          <ButtonSecondary href={contenido.botonSecundario.ruta}>{contenido.botonSecundario.texto}</ButtonSecondary>
+          <ButtonPrimary href={contenido.botonPrincipal.ruta}>{contenido.botonPrincipal.texto}</ButtonPrimary>
         </div>
       </div>
     </div>

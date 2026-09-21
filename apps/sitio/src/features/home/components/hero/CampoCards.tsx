@@ -1,19 +1,26 @@
 import Image from "next/image";
-import { CARDS } from "./hero-cards";
+import type { Hero } from "@/features/home/contenido/hero";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { GEOMETRIA_CARDS } from "./geometria-hero";
 
 /**
  * Campo de tarjetas dispersas (desktop, ≥ lg). Tres capas por tarjeta:
  * `[data-card-outer]` (posición + parallax de scroll), `[data-card-mouse]`
  * (parallax de mouse por profundidad) y `[data-card-inner]` (la entrada).
+ * La geometría vive en código; foto y cartel llegan por props, en el mismo
+ * orden.
  */
-export function CampoCards() {
+export function CampoCards({ tarjetas }: { tarjetas: Hero["tarjetas"] }) {
   return (
     <div
       data-hero-cards
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-10 hidden lg:block"
     >
-      {CARDS.map((c, i) => {
+      {GEOMETRIA_CARDS.map((c, i) => {
+        const tarjeta = tarjetas[i];
+        // El esquema garantiza once; el chequeo es por si alguna vez llega un documento a medias.
+        if (!tarjeta) return null;
         // Profundidad del mouse-parallax: más grande = más cerca = se mueve más
         // (negativo = en contra del mouse), igual que la referencia.
         const depth = -Math.round(c.w * 2);
@@ -34,36 +41,30 @@ export function CampoCards() {
                   className="relative w-full overflow-hidden rounded-2xl shadow-[0_28px_70px_-28px_rgb(31_45_77_/_0.5)] ring-1 ring-white/40"
                   style={{ aspectRatio: c.ar }}
                 >
-                  {c.img ? (
-                    <Image src={c.img} alt={c.alt ?? ""} fill sizes="22vw" className="object-cover" />
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-azul-principal via-[#34507f] to-verde-concepto">
-                      <span
-                        className="absolute inset-0 opacity-30"
-                        style={{ background: "radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.5) 0%, transparent 55%)" }}
-                      />
-                      <span className="font-display absolute bottom-3 left-4 text-[1.5rem] font-bold tracking-tight text-white/85">
-                        ED
-                      </span>
-                    </div>
-                  )}
+                  {/* Sin style cuando el foco está en el centro: el HTML de hoy queda igual. */}
+                  <Image
+                    src={tarjeta.foto.src}
+                    alt={tarjeta.foto.alt}
+                    fill
+                    sizes="22vw"
+                    className="object-cover"
+                    style={estiloDeFoco(tarjeta.foto.foco)}
+                  />
                 </div>
 
                 {/* Cartel referencial (tipo web de referencia): sobresale del
                     borde inferior para "rellenar" el hueco al scrollear. */}
-                {c.label && (
+                {tarjeta.cartel && (
                   <div
                     data-card-label
                     className="absolute -bottom-5 left-3 z-10 w-max max-w-[20rem] rounded-xl bg-white/85 px-3.5 py-2.5 shadow-[0_16px_36px_-18px_rgb(31_45_77_/_0.45)] ring-1 ring-azul-principal/10 backdrop-blur-md"
                   >
                     <p className="font-display text-verde-concepto text-[0.82rem] leading-tight font-semibold tracking-[-0.01em]">
-                      {c.label.title}
+                      {tarjeta.cartel.titulo}
                     </p>
-                    {c.label.desc && (
-                      <p className="text-gris-texto mt-0.5 font-sans text-[0.72rem] leading-snug whitespace-nowrap">
-                        {c.label.desc}
-                      </p>
-                    )}
+                    <p className="text-gris-texto mt-0.5 font-sans text-[0.72rem] leading-snug whitespace-nowrap">
+                      {tarjeta.cartel.descripcion}
+                    </p>
                   </div>
                 )}
               </div>

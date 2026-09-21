@@ -1,3 +1,4 @@
+import { heroInicial } from "@/features/home/contenido/hero";
 import { HeroQuienes } from "@/features/home/components/HeroQuienes";
 import { DatosDuros } from "@/features/home/components/DatosDuros";
 import { ComoTrabajamos } from "@/features/home/components/ComoTrabajamos";
@@ -11,7 +12,7 @@ export default function Home() {
           (IntroGate) salió del render el 2026-06-24 y su código se borró el
           2026-09-18. El Hero y el navbar animan en el mount — ver
           intro-signal.ts, que responde «ya entramos» siempre. */}
-      <HeroQuienes />
+      <HeroQuienes hero={heroInicial} />
       {/* Ancla del scroll-hint del Hero */}
       <div id="contenido" />
       {/* Acá hubo un bloque «Qué hacemos» en texto plano (QueHacemosResumen):
