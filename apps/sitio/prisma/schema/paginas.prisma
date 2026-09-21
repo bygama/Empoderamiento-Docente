@@ -1,0 +1,39 @@
+// El contenido editable de las páginas (work/edicion-de-paginas/SPEC.md §4).
+// Un documento por página validado por el esquema de cada sección, y no una
+// columna por texto: la estructura vive en código, la base guarda el
+// documento. Es la divergencia más grande con el spec del admin (§12).
+
+/// Una fila por página del sitio. Dos versiones del contenido: la que lee el
+/// sitio y la que se está editando. Sin historial: eso quedó fuera de alcance.
+/// `publicado` en null significa «esta página todavía muestra el contenido
+/// inicial del código»; `borrador` en null, «el borrador es lo publicado».
+model Pagina {
+  slug         String    @id            // inicio | que-hacemos | …
+  publicado    Json?                    // { seccion: contenido } validado
+  publicadoEn  DateTime?
+  publicadoPor String?                  // nombre de la cuenta, en llano
+  borrador     Json?
+  borradorEn   DateTime?
+  borradorPor  String?
+
+  @@map("paginas")
+}
+
+/// Una foto subida desde el admin. `alt` es obligatorio (AGENTS.md §6). El
+/// punto de foco NO va acá: vive con cada uso de la foto en el contenido,
+/// porque la misma foto puede recortarse distinto en dos marcos. El id es el
+/// UUID que nombra el archivo (`/api/fotos/<id>` en local, `fotos/<id>.<ext>`
+/// en Blob); lo genera la acción y la ruta pública solo acepta esa forma.
+model Foto {
+  id        String   @id @default(uuid())
+  url       String                       // Blob en Vercel; /api/fotos/<id> en local
+  alt       String
+  ancho     Int
+  alto      Int
+  bytes     Int
+  tipo      String                       // image/webp | image/jpeg | image/png
+  subidaEn  DateTime @default(now())
+  subidaPor String
+
+  @@map("fotos")
+}
