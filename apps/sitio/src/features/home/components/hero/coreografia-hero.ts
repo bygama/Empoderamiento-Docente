@@ -18,6 +18,7 @@ export function crearHero(scope: HTMLElement) {
   let cleanupEnter: (() => void) | undefined;
   let fallback: number | undefined;
   let ran = false;
+  const mm = gsap.matchMedia(scope);
 
   const ctx = gsap.context(() => {
     const inners = gsap.utils.toArray<HTMLElement>("[data-card-inner]");
@@ -76,12 +77,21 @@ export function crearHero(scope: HTMLElement) {
       });
     });
 
-    // La copy se va con el scroll.
-    gsap.to("[data-hero-copy-scroll]", {
-      y: -80,
-      opacity: 0,
-      ease: "none",
-      scrollTrigger: { trigger: scope, start: "top top", end: "55% top", scrub: 1 },
+    // La copy se va con el scroll. En escritorio, la capa entera (con su
+    // halo). Por debajo de lg esa capa también lleva las bandas de fotos, que
+    // se quedan: se va solo el bloque de texto.
+    const irse = (quien: string, hasta: string) =>
+      gsap.to(quien, {
+        y: -80,
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: { trigger: scope, start: "top top", end: hasta, scrub: 1 },
+      });
+    mm.add("(min-width: 64rem)", () => {
+      irse("[data-hero-copy-scroll]", "55% top");
+    });
+    mm.add("(max-width: 63.999rem)", () => {
+      irse("[data-hero-copy]", "+=60%");
     });
   }, scope);
 
@@ -91,6 +101,7 @@ export function crearHero(scope: HTMLElement) {
     window.clearTimeout(refresh);
     if (fallback) window.clearTimeout(fallback);
     cleanupEnter?.();
+    mm.revert();
     ctx.revert();
   };
 }

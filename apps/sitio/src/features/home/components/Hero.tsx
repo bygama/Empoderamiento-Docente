@@ -7,7 +7,6 @@ import { useMouseParallax } from "@/lib/hooks/useMouseParallax";
 import type { Hero as ContenidoDelHero } from "@/features/home/contenido/hero";
 import { crearHero } from "./hero/coreografia-hero";
 import { CampoCards } from "./hero/CampoCards";
-import { CampoCardsMobile } from "./hero/CampoCardsMobile";
 import { HeroCopy } from "./hero/HeroCopy";
 
 /**
@@ -28,8 +27,9 @@ import { HeroCopy } from "./hero/HeroCopy";
  * Respeta prefers-reduced-motion (sin animación, estado final visible).
  *
  * Piezas: geometría en `hero/geometria-hero.ts`, coreografía en
- * `hero/coreografia-hero.ts` (+ `entrada-hero.ts`), campos en `CampoCards` /
- * `CampoCardsMobile`, copy en `HeroCopy`. El contenido (textos, fotos y
+ * `hero/coreografia-hero.ts` (+ `entrada-hero.ts`), campo de escritorio en
+ * `CampoCards`, copy en `HeroCopy` (que por debajo de lg lleva además las
+ * bandas de fotos del primer pantallazo). El contenido (textos, fotos y
  * carteles) llega por props desde `features/home/contenido/hero.ts` o desde la
  * base. Este compositor arma la sección y dispara la coreografía desde el
  * layout effect.
@@ -55,7 +55,7 @@ export function Hero({ contenido }: { contenido: ContenidoDelHero }) {
     <section
       ref={ref}
       data-section="hero"
-      className="text-azul-principal relative isolate min-h-[160svh] overflow-hidden lg:h-[93.75vw] lg:min-h-0"
+      className="text-azul-principal relative isolate overflow-hidden lg:h-[93.75vw]"
       style={{ "--pnx": "0", "--pny": "0" } as CSSProperties}
     >
       {/* Sentinel del navbar: mientras está a la vista (top del viewport) el
@@ -74,7 +74,6 @@ export function Hero({ contenido }: { contenido: ContenidoDelHero }) {
       />
 
       <CampoCards tarjetas={contenido.tarjetas} />
-      <CampoCardsMobile tarjetas={contenido.tarjetasCelular} />
       <HeroCopy contenido={contenido} />
     </section>
   );
