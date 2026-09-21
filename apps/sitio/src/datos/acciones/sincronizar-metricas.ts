@@ -1,4 +1,6 @@
 import type { PrismaClient } from "@/../prisma/generado/client";
+import { base } from "@/datos/cliente";
+import { clienteDesdeEntorno } from "@/lib/metricas/entorno";
 import { ayerUTC, diaISO, fechaUTC, MAXIMO_DIAS_POR_CORRIDA, rangoFaltante, sumarDias, ventanasDe } from "@/lib/metricas/periodos";
 import { DIMENSIONES } from "@/lib/metricas/tipos";
 import type { FilaDiaria, Rango } from "@/lib/metricas/tipos";
@@ -78,4 +80,18 @@ export async function sincronizarMetricas({
   } catch (e) {
     return registrar(base, { ...rango, ok: false, detalle: e instanceof Error ? e.message : String(e) });
   }
+}
+
+/**
+ * Lo que llama el cron: arma el cliente con las variables del entorno. Si
+ * faltan, deja la corrida registrada como fallida (para que el panel lo
+ * muestre) y no toca la API.
+ */
+export async function sincronizarDesdeEntorno(): Promise<{ ok: boolean; detalle: string }> {
+  const cliente = clienteDesdeEntorno();
+  if (!cliente) {
+    const hoy = diaISO(new Date());
+    return registrar(base, { desde: hoy, hasta: hoy, ok: false, detalle: "Faltan VERCEL_TOKEN y/o VERCEL_ANALYTICS_PROJECT_ID: ver el README." });
+  }
+  return sincronizarMetricas({ cliente, base });
 }
