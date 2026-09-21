@@ -2,14 +2,26 @@ import { Fragment } from "react";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import type { Hero } from "@/features/home/contenido/hero";
+import { BandaFotosMovil } from "./BandaFotosMovil";
+import { fotosDeBanda } from "./fotos-movil";
+import { BANDA_ABAJO_MOVIL, BANDA_ARRIBA_MOVIL } from "./geometria-hero";
 
-type Props = { contenido: Pick<Hero, "titulo" | "bajada" | "botonPrincipal" | "botonSecundario"> };
+type Props = {
+  contenido: Pick<Hero, "titulo" | "bajada" | "botonPrincipal" | "botonSecundario" | "tarjetas" | "tarjetasCelular">;
+};
 
 /**
  * Contenido CENTRADO en el primer viewport (se va con el scroll): halo de
  * legibilidad, titular palabra por palabra, descripción y acciones. Todo
  * entra por data-attributes desde la coreografía del hero. El texto llega por
  * props: es lo que se edita desde el admin.
+ *
+ * En escritorio es una capa absoluta sobre el campo de tarjetas. Por debajo de
+ * lg es el PRIMER PANTALLAZO, en el flujo: una columna del alto de la pantalla
+ * con una banda de fotos arriba del texto y otra abajo (`BandaFotosMovil`), que
+ * se reparten lo que el texto deja libre. El piso de alto es para los celulares
+ * bajos: ahí la banda de abajo asoma cortada por el borde —invita a bajar— en
+ * vez de aplastarse.
  */
 export function HeroCopy({ contenido }: Props) {
   // Cada palabra es un <span data-hero-word> para animarla; la última lleva
@@ -19,7 +31,7 @@ export function HeroCopy({ contenido }: Props) {
   return (
     <div
       data-hero-copy-scroll
-      className="absolute inset-x-0 top-0 z-20 flex h-screen flex-col items-center justify-center px-5 text-center md:px-10"
+      className="relative z-20 flex h-svh min-h-[46rem] flex-col items-center px-5 pt-20 pb-8 text-center min-[360px]:min-h-[40rem] md:px-10 lg:absolute lg:inset-x-0 lg:top-0 lg:h-screen lg:min-h-0 lg:justify-center lg:pt-0 lg:pb-0"
     >
       {/* Halo blanco suave detrás del texto central (solo desktop ≥ lg). En
           desktop angosto el scatter se acerca al copy; este velo difumina SOLO
@@ -36,7 +48,8 @@ export function HeroCopy({ contenido }: Props) {
             "radial-gradient(50% 50% at 50% 50%, #ffffff 0%, rgba(255,255,255,0.9) 46%, rgba(255,255,255,0) 78%)",
         }}
       />
-      <div data-hero-copy className="mx-auto max-w-2xl translate-y-[5vh]">
+      <BandaFotosMovil fotos={fotosDeBanda(BANDA_ARRIBA_MOVIL, contenido)} cartelA="izquierda" className="pb-4" />
+      <div data-hero-copy className="mx-auto max-w-2xl shrink-0 lg:translate-y-[5vh]">
         <h1
           data-hero-headline
           className="font-display font-bold text-balance tracking-[-0.02em]"
@@ -75,6 +88,7 @@ export function HeroCopy({ contenido }: Props) {
           <ButtonPrimary href={contenido.botonPrincipal.ruta}>{contenido.botonPrincipal.texto}</ButtonPrimary>
         </div>
       </div>
+      <BandaFotosMovil fotos={fotosDeBanda(BANDA_ABAJO_MOVIL, contenido)} cartelA="derecha" className="pt-5" />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { RUTAS_INTERNAS } from "@/config/nav";
 import { foto, grupo, listaFija, rutaInterna, textoCorto } from "@/lib/contenido/campos";
 import { fotoDeRuta } from "@/lib/contenido/fotos";
-import { GEOMETRIA_CARDS, GEOMETRIA_MOBILE } from "../components/hero/geometria-hero";
+import { GEOMETRIA_CARDS, TARJETAS_CELULAR } from "../components/hero/geometria-hero";
 
 // El hero de Inicio: lo que se edita (SPEC §4.1) y lo que se ve sin base. La
 // cantidad de tarjetas sale de la geometría para que las dos listas no se
@@ -43,10 +43,10 @@ export const esquemaHero = z.object({
     etiquetaDelItem: "Tarjeta",
     ayuda: `Son ${GEOMETRIA_CARDS.length} tarjetas: la escena del hero está armada para exactamente esa cantidad. Seis llevan cartel (la 1, 3, 5, 6, 8 y 11).`,
   }),
-  tarjetasCelular: listaFija(GEOMETRIA_MOBILE.length, grupo({ foto: fotoDelCollage() }), {
+  tarjetasCelular: listaFija(TARJETAS_CELULAR, grupo({ foto: fotoDelCollage() }), {
     etiqueta: "Tarjetas (celular)",
     etiquetaDelItem: "Tarjeta",
-    ayuda: `Son ${GEOMETRIA_MOBILE.length} tarjetas: en el celular la escena muestra exactamente esa cantidad, casi todas repetidas de las de computadora.`,
+    ayuda: "En el celular, la 1 y la 2 van arriba del texto y la 8 y la 4 abajo; las demás hoy no se muestran. La 1 lleva el cartel de la tarjeta 1 de computadora y la 4, el de la 6. Los conceptos que siguen al bajar son las tarjetas de computadora con cartel.",
   }),
 });
 
@@ -73,7 +73,7 @@ export const heroInicial: Hero = {
     { foto: fotoDeRuta("/fotos/mesa-con-materiales.webp", "Docentes trabajan con materiales alrededor de una mesa"), cartel: null },
     { foto: fotoDeRuta("/fotos/cubos-dos-manos.webp", "Dos cubos de papel armados, uno en cada mano"), cartel: { titulo: "Materiales propios", descripcion: "Recursos listos para llevar al aula" } },
   ],
-  // En el orden de GEOMETRIA_MOBILE. Solo `comparar-tareas-ronda` es exclusiva del celular.
+  // Las bandas del celular usan la 1, la 2, la 8 y la 4 (geometria-hero.ts). Solo `comparar-tareas-ronda` es exclusiva del celular.
   tarjetasCelular: [
     { foto: fotoDeRuta("/fotos/docentes-trabajan-aula.webp", "Docentes resuelven una tarea en un aula") },
     { foto: fotoDeRuta("/fotos/comparar-tareas-ronda.webp", "Docentes en ronda comparan dos tareas") },
