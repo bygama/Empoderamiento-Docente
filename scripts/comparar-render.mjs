@@ -42,6 +42,10 @@ function paginas(app) {
   return salida.sort();
 }
 
+// El valor de un atributo dentro del texto de un tag, o "" si no está. Sirve
+// para leer <img>: el \s antes del nombre evita que "src" pise a "srcSet".
+const atributoDe = (tag, nombre) => tag.match(new RegExp(`\\s${nombre}="([^"]*)"`, "i"))?.[1] ?? "";
+
 // El <script> se saca entero: adentro viaja el payload de React, con ids de
 // módulo y de build distintos en cada corrida, que no son contenido.
 const DIMENSIONES = {
@@ -58,6 +62,17 @@ const DIMENSIONES = {
       .map((m) => m[0])
       .filter((t) => !/charSet|viewport|next-size-adjust/.test(t))
       .sort()
+      .join("\n"),
+  // Cada <img>, en su orden real: acá el orden importa (dos fotos que
+  // cambiaron de lugar son una regresión aunque el conjunto sea el mismo),
+  // por eso esta dimensión no se ordena como sí hacen links y head. Guarda
+  // src, srcset, sizes, alt y style —ninguna otra dimensión los ve—; src y
+  // srcset van los dos, no uno tapando al otro, porque srcset es la
+  // escalera de anchos que arma next/image y un cambio ahí no se puede
+  // perder solo porque también haya src.
+  imagenes: (h) =>
+    [...h.matchAll(/<img\b[^>]*>/g)]
+      .map((m) => ["src", "srcset", "sizes", "alt", "style"].map((a) => atributoDe(m[0], a)).join("|"))
       .join("\n"),
 };
 

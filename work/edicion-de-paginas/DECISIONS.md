@@ -85,3 +85,16 @@ las fotos del sitio (webp de 100–300 KB) sobra. El tope se chequea también en
 el navegador, porque `bodySizeLimit` corta antes de entrar a la acción y ese
 error no lo ve ningún `try` del servidor. Si algún día hace falta más, la
 salida es la subida directa desde el navegador (`@vercel/blob/client`).
+
+**2026-09-21 — Publicar y descartar dejan `borrador` en null.**
+«No hay borrador» quiere decir «el borrador es lo publicado». La marca «sin
+publicar» de la lista es `borradorEn !== null`, y el chequeo de cambios
+cruzados compara `borradorEn` con el que vio la pantalla (`null` cuando no
+había). La lógica con la base inyectada vive en `editar-paginas.ts` y se
+prueba contra el Postgres local; las Server Actions solo verifican la sesión.
+
+**2026-09-21 — `salirDeVistaPrevia` va en su propio archivo, sin `datos/auth`.**
+La importa el layout del sitio para la franja de borrador. `datos/auth` exige
+el secreto de better-auth al cargarse y arranca la sesión: no tiene por qué
+entrar en cada render de la home. No necesita sesión: solo borra la cookie de
+quien la tiene y vuelve a la ruta por la que entró (o a Inicio).
