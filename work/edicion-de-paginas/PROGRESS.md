@@ -14,6 +14,7 @@ Medido sobre `9e721f1`:
 - Todo el contenido del sitio vive en código: `features/<pagina>/data/*.ts`, archivos de datos dentro de las carpetas de componentes y arrays sueltos en los `.tsx` (ver INVENTARIO §0 y §(a)).
 - `prisma/schema/` tiene `base`, `auth`, `sitio` y `metricas`; no hay tablas de páginas ni de fotos.
 - `next.config.ts` ya admite imágenes de `*.public.blob.vercel-storage.com`.
+- Build sin `DATABASE_URL` sobre `2ac8a57`: fallaba en `/api/cron/metricas` (`datos/cliente.ts` armaba el adaptador al cargarse); A0 lo arregla.
 
 ## Hecho
 
