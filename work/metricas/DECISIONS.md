@@ -117,3 +117,15 @@ las peticiones con cabecera `Next-Action` y la acción contesta en llano
 («Hay que entrar al admin para actualizar.»). Regla que hereda la fase 2:
 toda Server Action del admin verifica la sesión ella misma, porque el layout
 protegido nunca las cubre.
+
+**2026-09-21 — La ventana se pide a `visits/count`, sin probar `aggregate` antes.**
+La revisión final contrastó la API con la doc de Vercel: `aggregate` exige
+`by`, y `count` con `since`/`until` es la consulta de un rango entero. Probar
+primero `aggregate` sumaba cuatro llamadas inválidas por corrida y, si el
+rechazo no era un 400 exacto, dejaba las tarjetas sin datos para siempre.
+
+**2026-09-21 — Las tarjetas toman la ventana más nueva, no la del último `total`.**
+Las ventanas se escriben con `fechaFin = ayer`; la marca `hastaDia` sale del
+último `total`. Si la API omite un día sin tráfico, las dos fechas se separan y
+la grilla quedaba vacía. `total` no se rellena con ceros: la marca atrasada es
+lo que hace repedir un día que Vercel no cerró.
