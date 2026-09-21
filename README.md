@@ -89,6 +89,17 @@ foto (fase 2) y cuando mande un correo de verdad.
   «olvidé mi contraseña» sale siempre por la consola del servidor**, con clave
   o sin ella.
 
+Las cuatro de las **métricas** ([ADR-0009](docs/architecture/adrs/0009-analitica-de-vercel-con-copia-diaria.md);
+la portada del admin lee una copia diaria de la analítica de Vercel):
+
+- `VERCEL_TOKEN` — token de la cuenta de Vercel para la API de Web Analytics.
+  **Abre toda la cuenta**: solo en Production y en tu `.env.local`, nunca en
+  un preview ni con `NEXT_PUBLIC_`.
+- `VERCEL_ANALYTICS_PROJECT_ID` — el `prj_…` del proyecto (Settings → General).
+- `VERCEL_TEAM_ID` — vacío en una cuenta personal; el `team_…` si es un equipo.
+- `CRON_SECRET` — lo que el cron manda en `Authorization`; Vercel lo inyecta si
+  existe. Sin él, `/api/cron/metricas` responde 401 a todo.
+
 Todas menos `NEXT_PUBLIC_SITE_URL` son secretas y **solo server-side**. Los
 placeholders viven en
 [`apps/sitio/.env.example`](apps/sitio/.env.example): las variables son de la
@@ -228,6 +239,17 @@ poner la clave no cambia nada por ahora.
 > nadie: borrala cuando quieras con
 > `docker exec ed-postgres psql -U postgres -c "DROP DATABASE ed_panel;"`.
 
+### Las métricas
+
+La portada muestra cuánta gente entra al sitio y qué páginas mira: visitantes
+y vistas de los últimos 7 y 30 días, contra el período anterior. No consulta a
+Vercel al renderizar: un cron (`/api/cron/metricas`, a las 4 UTC) copia cada
+día lo que falta a las tablas `metricas_*`, y el botón «Actualizar ahora» hace
+lo mismo a mano, con un freno de diez minutos. Sin `VERCEL_TOKEN` y
+`VERCEL_ANALYTICS_PROJECT_ID` el panel lo dice y no copia nada; en local no
+hace falta cargarlos. Los días son UTC. Diseño y decisiones en
+[`work/metricas/`](work/metricas/).
+
 ### Comandos de base
 
 ```bash
@@ -243,4 +265,6 @@ queda sin esas tablas con el síntoma recién en producción.
 
 Una maña del repo que sobrevive a cualquier stack: si `pnpm typecheck` falla
 por tipos de rutas que no existen en el código, borrar `apps/sitio/.next` y
-buildear de nuevo los regenera.
+buildear de nuevo los regenera. Y otra: después de una migración, reiniciá `pnpm dev`:
+el cliente de Prisma vive en la memoria del proceso y el viejo no conoce las
+tablas nuevas.
