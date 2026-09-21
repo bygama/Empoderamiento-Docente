@@ -12,6 +12,7 @@
     "start": "pnpm --fail-if-no-match --filter sitio start",
     "lint": "pnpm --fail-if-no-match -r lint",
     "typecheck": "pnpm --fail-if-no-match -r typecheck",
+    "test": "pnpm --fail-if-no-match -r --if-present test",
     "react-doctor": "pnpm dlx react-doctor --no-supply-chain --project apps/sitio/src,packages/db/src,packages/auth/src",
     "prisma": "node scripts/guarda-prisma.mjs",
     "migrate": "node scripts/guarda-prisma.mjs migrate dev",
