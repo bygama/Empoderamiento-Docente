@@ -164,7 +164,11 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
           className="font-display overflow-hidden text-[0.95rem] font-extrabold max-[379px]:text-[0.85rem] tracking-tight whitespace-nowrap transition-colors duration-300 max-lg:group-data-[tema=noche]/nav:text-white lg:text-[1.05rem]"
           style={{ width: 0, opacity: 0 }}
         >
-          Empoderamiento&nbsp;Docente
+          {/* Capa interna: en el intro mobile el nombre se DESTAPA corriéndose
+              adentro del recorte de su padre (solo transform). */}
+          <span data-nav-word-in className="inline-block">
+            Empoderamiento&nbsp;Docente
+          </span>
         </span>
       </Link>
 
