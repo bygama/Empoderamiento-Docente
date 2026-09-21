@@ -16,6 +16,15 @@ import { PasoMetodo } from "./como-trabajamos/PasoMetodo";
  * puntos sincronizado. Mask reveal del título de cada paso. Foto alterna
  * izq/der por índice.
  *
+ * En celular (< md) cada paso es una columna: la foto ARRIBA, apaisada y de
+ * alto fijo (`--metodo-foto`, igual para los cinco: si dependiera del texto
+ * saltaría de tamaño en cada cruce), y el texto debajo, que crece hacia el aire
+ * de abajo. Ese alto es lo que sobra de la pantalla después del header y del
+ * texto más largo (unos 29rem), con piso y techo: en un celular bajo la foto se
+ * achica y el texto entra entero. En uno alto sobra pantalla: `--metodo-arriba`
+ * baja el conjunto para que no quede colgado del header con un hueco abajo. El alto es `svh` y no `vh`: en iPhone `100vh` mide sin la barra de
+ * Safari y el final del texto quedaba detrás de ella.
+ *
  * Piezas: el contenido llega por props (de
  * `features/home/contenido/como-trabajamos.ts` o de la base), la coreografía
  * en `como-trabajamos/coreografia-metodo.ts`, cada paso en `PasoMetodo`, los
@@ -47,7 +56,7 @@ export function ComoTrabajamos({ contenido, frases }: { contenido: ContenidoDeCo
       aria-label="Cómo trabajamos"
     >
       <div className="relative h-[380vh] md:h-[500vh]">
-        <div className="sticky top-0 flex h-screen flex-col overflow-hidden">
+        <div className="sticky top-0 flex h-svh flex-col overflow-hidden [--metodo-arriba:max(5.5rem,calc((100svh-36rem)/2))] [--metodo-foto:clamp(7.5rem,calc(100svh-29rem),16rem)] md:h-screen">
 
           {/* Glow verde ambiental */}
           <div
