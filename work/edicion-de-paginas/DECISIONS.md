@@ -63,3 +63,17 @@ puede recortarse distinto en dos marcos), así que en la tabla quedaban
 muertas. El id lo genera la acción con `randomUUID()` porque nombra también el
 archivo y la ruta pública solo acepta un UUID; el default de la columna dice lo
 mismo. Ruling del controlador sobre la revisión del plan (I6).
+
+**2026-09-21 — El valor de `foto()` es un objeto `{ src, alt, foco }`, no un id.**
+Con un id, el sitio tendría que hacer un join al renderizar y el `alt` de las
+fotos de `public/` no tendría dónde vivir. `alt` y `foco` van con cada uso (la
+misma foto en dos marcos tenía dos alt distintos en `hero-cards.ts`); la tabla
+`fotos` guarda el archivo, sus medidas y quién lo subió, y su `url` es el
+`src`. El `src` se acota a `/fotos/…`, `/api/fotos/<uuid>` y el host del Blob:
+un host fuera de `remotePatterns` rompería el render de la home al publicar.
+
+**2026-09-21 — `rutaInterna(rutas)` recibe la lista; `grupo()` para los sub-objetos con nombre.**
+`lib/contenido/` no puede importar `config/nav.ts` sin saber de ED, así que la
+lista cerrada (`RUTAS_INTERNAS`) la trae quien escribe el esquema. `grupo` es
+un `z.object` con etiqueta para que el formulario titule «Botón principal» sin
+escribir JSX por sección.
