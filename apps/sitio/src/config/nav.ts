@@ -95,3 +95,10 @@ export const HOME_LINK = { label: "Inicio", href: "/" } as const;
 export function esPaginaActiva(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
+
+/**
+ * Las siete rutas del sitio, la lista cerrada que el admin ofrece para un
+ * enlace interno (SPEC §4.2, `rutaInterna`). Sale del menú para que no haya
+ * dos listas: Inicio, las cinco del nav y Contacto.
+ */
+export const RUTAS_INTERNAS: readonly string[] = [HOME_LINK.href, ...NAV_LINKS.map((l) => l.href), CTA_LINK.href];
