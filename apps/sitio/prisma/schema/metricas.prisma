@@ -2,7 +2,10 @@
 // La llena un cron; el admin lee de acá y nunca de la API en el render.
 
 /// Una fila por día, dimensión y valor. `valor` es "" en la fila del total y
-/// en la fila «el resto» (que además lleva `agrupado = true`).
+/// en la fila «el resto» (que además lleva `agrupado = true`). `agrupado`
+/// entra en la clave porque el referido vacío (tráfico directo) y «el
+/// resto» del mismo día comparten `valor = ""`: sin esa columna, una fila
+/// pisa a la otra.
 model MetricaDiaria {
   fecha      DateTime @db.Date
   dimension  String   // total | pagina | pais | referido | dispositivo
@@ -11,7 +14,7 @@ model MetricaDiaria {
   vistas     Int
   visitantes Int      // únicos DE ESE DÍA: no se suman entre días
 
-  @@id([fecha, dimension, valor])
+  @@id([fecha, dimension, valor, agrupado])
   @@map("metricas_diarias")
 }
 

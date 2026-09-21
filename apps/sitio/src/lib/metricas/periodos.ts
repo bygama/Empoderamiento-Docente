@@ -5,14 +5,19 @@ import type { Dia, Rango } from "./tipos";
 // mensual no se nota y el panel lo dice en la cabecera.
 
 const MS_POR_DIA = 86_400_000;
-const MAXIMO_DIAS_POR_CORRIDA = 31;
+export const MAXIMO_DIAS_POR_CORRIDA = 31;
 
 export function diaISO(fecha: Date): Dia {
   return fecha.toISOString().slice(0, 10);
 }
 
+/** La fecha a medianoche UTC: lo que se guarda en las columnas `@db.Date`. */
+export function fechaUTC(dia: Dia): Date {
+  return new Date(`${dia}T00:00:00.000Z`);
+}
+
 export function sumarDias(dia: Dia, n: number): Dia {
-  return diaISO(new Date(new Date(`${dia}T00:00:00.000Z`).getTime() + n * MS_POR_DIA));
+  return diaISO(new Date(fechaUTC(dia).getTime() + n * MS_POR_DIA));
 }
 
 export function ayerUTC(hoy: Date): Dia {
