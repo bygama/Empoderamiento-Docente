@@ -17,5 +17,3 @@ export type FilaDiaria = {
   vistas: number;
   visitantes: number;
 };
-
-export type Ventana = { fechaFin: Dia; dias: 7 | 30; vistas: number; visitantes: number };

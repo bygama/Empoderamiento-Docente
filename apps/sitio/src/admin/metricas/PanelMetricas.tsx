@@ -33,22 +33,25 @@ export async function PanelMetricas() {
   let cuerpo: React.ReactNode;
   if (!estado.hayVariables) {
     cuerpo = (
-      <Estado titulo="Faltan las variables de Vercel" texto="Sin el token y el ID del proyecto no hay nada que copiar. Están explicadas en el README, sección «Admin»." />
+      <Estado titulo="Faltan las variables de Vercel" texto="Sin el token y el ID del proyecto no hay nada que copiar. Están explicadas en el README, sección «Variables de entorno»." />
     );
   } else if (!estado.hastaDia) {
     cuerpo = (
       <Estado titulo="El sitio empieza a contar cuando se publica" texto="La primera copia llega al día siguiente del primer deploy. Si ya pasó un día, tocá «Actualizar ahora»." />
     );
   } else {
-    const cards = await tarjetas(estado.hastaDia);
-    cuerpo = (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.flatMap((t) => [
-          <Tarjeta key={`v${t.dias}`} etiqueta={`Visitantes, últimos ${t.dias} días`} valor={t.visitantes} variacion={t.variacionVisitantes} />,
-          <Tarjeta key={`p${t.dias}`} etiqueta={`Vistas, últimos ${t.dias} días`} valor={t.vistas} variacion={t.variacionVistas} />,
-        ])}
-      </div>
-    );
+    const cards = await tarjetas();
+    cuerpo =
+      cards.length === 0 ? (
+        <Estado titulo="Las tarjetas llegan con la próxima copia" texto="Hay días copiados pero todavía ninguna ventana de 7 o 30 días. Tocá «Actualizar ahora» o esperá la próxima corrida." />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {cards.flatMap((t) => [
+            <Tarjeta key={`v${t.dias}`} etiqueta={`Visitantes, últimos ${t.dias} días`} valor={t.visitantes} variacion={t.variacionVisitantes} />,
+            <Tarjeta key={`p${t.dias}`} etiqueta={`Vistas, últimos ${t.dias} días`} valor={t.vistas} variacion={t.variacionVistas} />,
+          ])}
+        </div>
+      );
   }
 
   return (

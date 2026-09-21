@@ -104,17 +104,9 @@ export function crearClienteDeAnaliticas({
       return mapearPorDia(await consultar("visits/aggregate", params, by), dimension);
     },
     async ventana(rango) {
-      // Rama pendiente de confirmar en A1 (todavía no corrió): (a) aggregate sin
-      // `by`; si la API lo rechaza con 400, (b) count con since/until. Cuando A1
-      // corra contra la API real, confirma esta estrategia o la cambia acá.
-      try {
-        return mapearVentana(await consultar("visits/aggregate", { since: rango.desde, until: rango.hasta }));
-      } catch (e) {
-        if (e instanceof ErrorDeAnaliticas && e.estado === 400) {
-          return mapearVentana(await consultar("visits/count", { since: rango.desde, until: rango.hasta }));
-        }
-        throw e;
-      }
+      // Un rango entero sin agrupar es `visits/count`: `aggregate` exige `by`.
+      // A1 lo confirma contra la respuesta real cuando haya token.
+      return mapearVentana(await consultar("visits/count", { since: rango.desde, until: rango.hasta }));
     },
   };
 }
