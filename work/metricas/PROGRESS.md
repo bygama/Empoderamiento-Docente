@@ -2,14 +2,13 @@
 
 - **Rama:** `feat/metricas` (todavía no creada)
 - **Base:** `f3f3f9c` (= `origin/main` al 2026-09-21)
-- **Spec:** [`SPEC.md`](SPEC.md) · **Plan:** `PLAN.md` (se escribe cuando el
-  spec quede aprobado) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
+- **Spec:** [`SPEC.md`](SPEC.md) · **Plan:** [`PLAN.md`](PLAN.md) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
 
 Esta lane depende de [`primer-deploy`](../primer-deploy/PROGRESS.md): las
 fases A y B se pueden construir y probar en local antes, pero la fase C
 (verificación en producción) recién cuando el sitio esté publicado.
 
-**Estado: spec escrito, pendiente de revisión del owner. Sin código.**
+**Estado: spec revisado y mergeado (PR #165); PLAN escrito, pendiente de arrancar. Sin código.**
 
 ## Baseline
 
