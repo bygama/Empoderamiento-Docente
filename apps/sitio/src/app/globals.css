@@ -343,13 +343,53 @@ body {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-.deck:not(.is-live) .deck-card-inner {
+/* El nombre corto del lomo solo existe en la pila mobile. */
+.deck-corto {
+  display: none;
+}
+.deck:not(.is-live):not(.is-pila) .deck-card-inner {
   transition:
     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.5s;
 }
-.deck:not(.is-live) .deck-card:hover .deck-card-inner {
+.deck:not(.is-live):not(.is-pila) .deck-card:hover .deck-card-inner {
   transform: translateY(-6px);
+}
+
+/* Modo pila (celular y tablet con motion, ver lineas-accion/pila-movil.ts): el
+   título pasa de largo y el MAZO queda fijo mientras se recorre la pista. Las
+   siete cartas comparten una celda de grilla, así todas miden lo que la más
+   alta y la de adelante tapa entera a la de atrás, sin animar alturas. El
+   padding de arriba es el header fijo; el lateral negativo, para que el
+   recorte del mazo no se coma las sombras. */
+.deck.is-pila .deck-pista {
+  height: 430svh;
+}
+.deck.is-pila .deck-cards {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 30rem);
+  grid-template-rows: max-content;
+  justify-content: center;
+  align-content: start;
+  gap: 0;
+  margin: 0 -1.25rem;
+  /* En pantallas altas (tablet, celulares largos) el mazo baja para no quedar
+     colgado del header con media pantalla vacía debajo. */
+  padding: max(5.25rem, calc((100svh - 34rem) / 2)) 1.25rem 1rem;
+}
+.deck.is-pila .deck-card {
+  grid-area: 1 / 1;
+}
+.deck.is-pila .deck-card-inner {
+  box-shadow:
+    0 -12px 26px -16px rgb(31 45 77 / 0.2),
+    0 18px 44px -16px rgb(31 45 77 / 0.16);
+}
+.deck.is-pila .deck-corto {
+  display: block;
 }
 
 /* Modo live: escenario sticky a pantalla completa. El alto del scroll
