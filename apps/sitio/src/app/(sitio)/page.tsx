@@ -1,18 +1,20 @@
-import { heroInicial } from "@/features/home/contenido/hero";
+import { contenidoDe } from "@/datos/consultas/paginas";
 import { HeroQuienes } from "@/features/home/components/HeroQuienes";
 import { DatosDuros } from "@/features/home/components/DatosDuros";
 import { ComoTrabajamos } from "@/features/home/components/ComoTrabajamos";
 import { LineasAccion } from "@/features/home/components/LineasAccion";
 import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNovedades";
 
-export default function Home() {
+export default async function Home() {
+  // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
+  const { hero } = await contenidoDe("inicio");
   return (
     <main>
       {/* Se entra directo al Inicio: el portón «Comenzá la experiencia»
           (IntroGate) salió del render el 2026-06-24 y su código se borró el
           2026-09-18. El Hero y el navbar animan en el mount — ver
           intro-signal.ts, que responde «ya entramos» siempre. */}
-      <HeroQuienes hero={heroInicial} />
+      <HeroQuienes hero={hero} />
       {/* Ancla del scroll-hint del Hero */}
       <div id="contenido" />
       {/* Acá hubo un bloque «Qué hacemos» en texto plano (QueHacemosResumen):
