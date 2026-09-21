@@ -11,6 +11,7 @@ import type { Areas } from "@/features/home/contenido/areas";
 import type { AreaDeInicio } from "@/features/home/contenido/compartido";
 import { CartaArea } from "./lineas-accion/CartaArea";
 import { crearManoCartas } from "./lineas-accion/mano-cartas";
+import { crearPilaMovil } from "./lineas-accion/pila-movil";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -26,10 +27,11 @@ const CARD_W = 360; // px — fallback del ancho de carta (el real se mide en ru
  * el ancho máximo de la grilla, tapando el título.
  *
  * Desktop + motion → escenario sticky animado con GSAP (integrado con
- * Lenis vía el ticker global). Mobile / tablet / reduced-motion → grilla
- * estática legible (la clase .is-live se agrega pre-paint solo cuando hay
- * que animar, así no hay flash grilla→abanico). Los textos llegan por props
- * (de `features/home/contenido/areas.ts` o de la base).
+ * Lenis vía el ticker global). Mobile / tablet → la pila vertical
+ * (`lineas-accion/pila-movil.ts`, clase .is-pila). Reduced-motion → grilla
+ * estática legible. Las clases se agregan pre-paint solo cuando hay que
+ * animar, así no hay flash de la grilla. Los textos llegan por props (de
+ * `features/home/contenido/areas.ts` o de la base).
  */
 export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: readonly AreaDeInicio[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
@@ -41,11 +43,11 @@ export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: re
     if (!root) return;
 
     // El abanico animado es solo para desktop con motion. En mobile y tablet
-    // va la grilla estática: la pila superpuesta que había dejaba seis de las
-    // siete cartas tapadas, el título asomando por los costados y el CTA
-    // montado sobre la última carta. Reduced-motion también cae a la grilla.
+    // va la PILA (lineas-accion/pila-movil.ts): una carta abierta por vez y
+    // las anteriores reducidas a su lomo. Con reduced-motion, la grilla
+    // estática legible.
     if (reduced) return;
-    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+    if (!window.matchMedia("(min-width: 1024px)").matches) return crearPilaMovil(root);
 
     const scroll = root.querySelector<HTMLElement>("[data-deck-scroll]");
     const stage = root.querySelector<HTMLElement>("[data-deck-stage]");
@@ -206,7 +208,9 @@ export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: re
             </p>
           </div>
 
-          {/* Las cartas. */}
+          {/* Las cartas. La pista solo pesa en la pila mobile: es el tramo de
+              scroll que recorre el mazo, que queda fijo adentro suyo. */}
+          <div data-deck-pista className="deck-pista">
           <ul className="deck-cards mt-14 md:mt-16">
             {areas.map((area, i) => (
               <li key={area.titulo} data-deck-card className="deck-card">
@@ -214,6 +218,7 @@ export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: re
               </li>
             ))}
           </ul>
+          </div>
 
           {/* Salida → Investigación, que es el archivo de casos: las áreas
               puestas en práctica. El copy lo dice, si no el salto no se

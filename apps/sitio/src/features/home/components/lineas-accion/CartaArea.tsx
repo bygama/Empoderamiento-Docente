@@ -24,7 +24,7 @@ const ICONOS = [Users, Lightbulb, Compass, TrendingUp, BookOpen, School, Target]
  * (mobile, reduced-motion) no existen a la vista.
  */
 export function CartaArea({
-  area: { titulo, frase, detalle: texto },
+  area: { titulo, nombreCorto: corto, frase, detalle: texto },
   indice,
   total,
   azulBase,
@@ -52,8 +52,19 @@ export function CartaArea({
         className="deck-card-inner relative isolate flex h-full flex-col overflow-hidden"
       >
         {/* Encabezado de la carta: etiqueta de área + paginado. */}
-        <div className="flex items-start justify-between px-7 pt-6">
-          <span className="text-naranja-accion font-mono inline-flex items-center gap-2 text-[0.72rem] font-medium tracking-[0.26em] uppercase">
+        <div className="relative flex items-start justify-between px-7 pt-6">
+          {/* Lomo de la pila mobile: cuando la carta queda tapada, la etiqueta
+              le deja el lugar al número con el nombre corto (pila-movil.ts).
+              Fuera de la pila no existe (`.deck-corto` en globals.css). */}
+          <span
+            data-deck-corto
+            aria-hidden="true"
+            className="deck-corto font-display text-azul-principal absolute top-[1.35rem] left-7 text-[0.9rem] font-bold tracking-[-0.01em] whitespace-nowrap"
+          >
+            <span className="text-azul-principal/35 font-mono mr-2 text-[0.72rem] font-medium">{n}</span>
+            {corto}
+          </span>
+          <span data-deck-etiqueta className="text-naranja-accion font-mono inline-flex items-center gap-2 text-[0.72rem] font-medium tracking-[0.26em] uppercase">
             <span aria-hidden="true" className="bg-naranja-accion block h-px w-5" />
             Área {n}
           </span>
