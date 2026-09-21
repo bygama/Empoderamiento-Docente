@@ -1,0 +1,41 @@
+// La copia diaria de la analítica de Vercel (ADR-0009, work/metricas/SPEC.md).
+// La llena un cron; el admin lee de acá y nunca de la API en el render.
+
+/// Una fila por día, dimensión y valor. `valor` es "" en la fila del total y
+/// en la fila «el resto» (que además lleva `agrupado = true`).
+model MetricaDiaria {
+  fecha      DateTime @db.Date
+  dimension  String   // total | pagina | pais | referido | dispositivo
+  valor      String   // "" · la ruta · el país (ISO-2) · el host · el tipo
+  agrupado   Boolean  @default(false)
+  vistas     Int
+  visitantes Int      // únicos DE ESE DÍA: no se suman entre días
+
+  @@id([fecha, dimension, valor])
+  @@map("metricas_diarias")
+}
+
+/// Visitantes únicos de una ventana entera, pedidos a la API como un rango:
+/// una persona que entró tres días cuenta una vez. Es lo que muestran las
+/// tarjetas; sumar los días daría un número inflado.
+model MetricaVentana {
+  fechaFin   DateTime @db.Date  // el último día de la ventana (ayer)
+  dias       Int               // 7 | 30
+  vistas     Int
+  visitantes Int
+
+  @@id([fechaFin, dias])
+  @@map("metricas_ventanas")
+}
+
+/// Qué pasó en cada sincronización: el panel muestra la última y sus errores.
+model SincronizacionMetricas {
+  id        Int      @id @default(autoincrement())
+  corridaEn DateTime @default(now())
+  desde     DateTime @db.Date
+  hasta     DateTime @db.Date
+  ok        Boolean
+  detalle   String   // "3 días, 187 filas, 4 ventanas" o el error, en llano
+
+  @@map("metricas_sincronizaciones")
+}
