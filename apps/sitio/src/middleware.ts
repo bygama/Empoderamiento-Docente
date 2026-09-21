@@ -67,8 +67,13 @@ export function middleware(req: NextRequest) {
   // base—; la comprobación de verdad la hace el layout del admin.
   const cerrada =
     esAdmin && !ABIERTAS.some((a) => ruta === a || ruta.startsWith(`${a}/`));
+  // Una Server Action sin cookie no se redirige: un redirect no es una
+  // respuesta válida para una acción y el cliente se rompe con «unexpected
+  // response». La acción verifica la sesión ella misma —toda acción del admin
+  // lo hace, porque el layout no las cubre— y contesta en llano.
+  const esAccion = req.headers.has("next-action");
   const res =
-    cerrada && !hayCookieDeSesion(req) ? NextResponse.redirect(aEntrar(req, ruta)) : NextResponse.next();
+    cerrada && !esAccion && !hayCookieDeSesion(req) ? NextResponse.redirect(aEntrar(req, ruta)) : NextResponse.next();
 
   res.headers.set("Content-Security-Policy", politicaDeContenido(esAdmin));
   // Dos años y subdominios: el valor que pide la lista de precarga de HSTS.
