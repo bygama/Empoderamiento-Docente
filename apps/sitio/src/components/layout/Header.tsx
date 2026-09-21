@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import type { DatosDelSitio } from "@/config/datos-del-sitio";
 import { NAV_LINKS, CTA_LINK, HOME_LINK, esPaginaActiva } from "@/config/nav";
 import { NavDropdown } from "./NavDropdown";
-import { crearIntroNavbar } from "./header/coreografia-intro";
+import { crearIntroSegunAncho } from "./header/coreografia-intro";
 import { crearAutoHide } from "./header/auto-hide";
 import { crearTemaSegunFondo } from "./header/tema-fondo";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
@@ -93,7 +93,7 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
   useIsomorphicLayoutEffect(() => {
     const nav = ref.current;
     if (!nav || reducedMotion || !isHome) return;
-    return crearIntroNavbar(nav);
+    return crearIntroSegunAncho(nav);
   }, [reducedMotion]);
 
   // Auto-hide de la píldora al scrollear: quién es la superficie dueña del
@@ -127,6 +127,7 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
         href={HOME_LINK.href}
         onClick={alClicSubirEnPagina(isHome)}
         aria-label="Empoderamiento Docente — Inicio"
+        data-nav-marca
         className="flex shrink-0 items-center"
       >
         {/* Logo (PNG transparente) tal cual lo pasó el cliente, sin recuadro. */}
@@ -155,10 +156,12 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
         {/* Wordmark que se colapsa. Aparece también en mobile (navbar full-width):
             arranca visible "Empoderamiento Docente" y, tras el hold, colapsa —
             misma coreografía que en desktop. Font un poco menor en mobile para
-            que entre junto al logo + hamburguesa en pantallas chicas. */}
+            que entre junto al logo + hamburguesa en pantallas chicas, y un punto
+            menos por debajo de 380px: ahí la marca centrada del intro (ver
+            header/intro-marca-movil.ts) no entraba sin tocar el botón. */}
         <span
           data-nav-word
-          className="font-display overflow-hidden text-[0.95rem] font-extrabold tracking-tight whitespace-nowrap transition-colors duration-300 max-lg:group-data-[tema=noche]/nav:text-white lg:text-[1.05rem]"
+          className="font-display overflow-hidden text-[0.95rem] font-extrabold max-[379px]:text-[0.85rem] tracking-tight whitespace-nowrap transition-colors duration-300 max-lg:group-data-[tema=noche]/nav:text-white lg:text-[1.05rem]"
           style={{ width: 0, opacity: 0 }}
         >
           Empoderamiento&nbsp;Docente

@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { hasRevealed, onReveal } from "@/lib/intro-signal";
+import { crearIntroMarcaMovil } from "./intro-marca-movil";
 
 // Cuánto se ve el wordmark antes de colapsar y abrir los links. Hay dos tiempos
 // según DÓNDE estás cuando arranca la intro (posición de scroll al cargar):
@@ -18,12 +19,24 @@ const MIN_HOLD_MS = 700;
 const EVENTOS_INTENCION = ["pointermove", "wheel", "touchstart", "keydown"] as const;
 
 /**
+ * El intro del Inicio según el ancho: en escritorio (≥ lg) la píldora que se
+ * abre; por debajo, la marca que arranca centrada y viaja a la izquierda. Al
+ * cruzar el corte (girar una tablet) `matchMedia` desarma uno y arma el otro.
+ */
+export function crearIntroSegunAncho(nav: HTMLElement) {
+  const mm = gsap.matchMedia();
+  mm.add("(min-width: 64rem)", () => crearIntroNavbar(nav));
+  mm.add("(max-width: 63.999rem)", () => crearIntroMarcaMovil(nav));
+  return () => mm.revert();
+}
+
+/**
  * INTRO DEL NAVBAR — arranca CERRADO (logo + wordmark) y morfea a ABIERTO: el
  * wordmark se sostiene un ratito, colapsa, y entran los links con slide + fade
  * escalonado. La llama el MISMO efecto de layout de antes, en la misma
  * posición, y devuelve su limpieza.
  */
-export function crearIntroNavbar(nav: HTMLElement) {
+function crearIntroNavbar(nav: HTMLElement) {
   let cleanupReveal: (() => void) | undefined;
   let fallback: number | undefined;
   let openTimer: number | undefined;
