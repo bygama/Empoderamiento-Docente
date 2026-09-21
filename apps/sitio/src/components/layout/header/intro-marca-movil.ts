@@ -11,9 +11,13 @@ const UMBRAL_NOMBRE = 40;
 const AIRE_BOTON = 12;
 
 /**
- * INTRO DE LA MARCA EN CELULAR Y TABLET (< lg, solo en el Inicio). El logo con
- * su nombre arrancan CENTRADOS arriba —en el mismo eje que la pila de fotos del
- * hero— y, cuando el hero se asienta, viajan a la izquierda, que es donde viven.
+ * INTRO DE LA MARCA EN CELULAR Y TABLET (< lg, solo en el Inicio). La marca se
+ * presenta en tres tiempos, CENTRADA arriba —en el mismo eje que la pila de
+ * fotos del hero—: primero el logo solo; después el nombre se destapa desde
+ * atrás suyo mientras el logo se corre lo justo para que el conjunto siga
+ * centrado; y cuando el hero se asienta, todo viaja a la izquierda, que es
+ * donde vive. Los dos primeros van ENCIMADOS al fade de la pila de fotos, que
+ * era tiempo muerto: el orden se lee (logo, nombre, fotos) sin alargar el intro.
  * Después el nombre acompaña al scroll: visible arriba de todo, cerrado al bajar.
  *
  * Solo `transform` y `opacity`: la marca ya está maquetada a la izquierda y se
@@ -26,12 +30,15 @@ export function crearIntroMarcaMovil(nav: HTMLElement) {
   let viajo = false;
   let abierto = true;
   let quitarScroll = () => {};
+  let centrar: gsap.core.Tween | undefined;
 
   const ctx = gsap.context(() => {
     const marca = nav.querySelector<HTMLElement>("[data-nav-marca]");
     const nombre = nav.querySelector<HTMLElement>("[data-nav-word]");
     const boton = nav.querySelector<HTMLElement>("[data-nav-burger]");
-    if (!marca || !nombre) return;
+    const letras = nav.querySelector<HTMLElement>("[data-nav-word-in]");
+    const logo = nav.querySelector<HTMLElement>("[data-nav-logo]");
+    if (!marca || !nombre || !letras || !logo) return;
 
     const ponerNombre = (visible: boolean) => {
       if (visible === abierto) return;
@@ -57,6 +64,9 @@ export function crearIntroMarcaMovil(nav: HTMLElement) {
       if (viajo) return;
       viajo = true;
       window.clearTimeout(reloj);
+      // Si la presentación sigue en curso se le saca solo el corrimiento —haya
+      // arrancado o no—; el fade del logo y el destape del nombre terminan.
+      centrar?.kill();
       ctx.add(() => {
         gsap.to(marca, { x: 0, duration: 0.8, ease: "power3.inOut" });
       });
@@ -81,7 +91,20 @@ export function crearIntroMarcaMovil(nav: HTMLElement) {
       const tope = boton
         ? boton.getBoundingClientRect().left - AIRE_BOTON - caja.right
         : alCentro;
-      gsap.set(marca, { x: Math.max(0, Math.min(alCentro, tope)) });
+      const centrada = Math.max(0, Math.min(alCentro, tope));
+      // Con el logo solo, el conjunto se corre medio nombre a la derecha para
+      // que lo centrado sea el logo. Mientras tanto el link no recibe toques:
+      // su caja —con el nombre todavía tapado— llega hasta encima del botón.
+      const logoSolo = alCentro + (caja.width - logo.getBoundingClientRect().width) / 2;
+      centrar = gsap.fromTo(marca, { x: logoSolo }, { x: centrada, duration: 0.7, ease: "power3.inOut" });
+      gsap
+        .timeline()
+        .set(marca, { pointerEvents: "none" })
+        .fromTo(marca, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, 0)
+        .add(centrar, 0.35)
+        .fromTo(letras, { xPercent: -100 }, { xPercent: 0, duration: 0.7, ease: "power3.inOut" }, 0.35)
+        .fromTo(letras, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, ease: "power2.out" }, 0.4)
+        .set(marca, { pointerEvents: "auto" });
       reloj = window.setTimeout(viajar, SOSTEN_MS);
     }
 
