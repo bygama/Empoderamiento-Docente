@@ -31,7 +31,7 @@ const area = grupo({
   nombreCorto: textoCorto({
     maximo: 24,
     etiqueta: "Nombre corto",
-    ayuda: "En el índice de la izquierda y en los botones del hero: tiene que entrar en una columna angosta.",
+    ayuda: "En el índice de la izquierda, en los botones del hero y en el lomo de las cartas de Inicio en celular: tiene que entrar en una columna angosta.",
   }),
   frase: textoCorto({ maximo: 70, etiqueta: "Frase", ayuda: "La idea fuerza, en verde, debajo del título. También va en la carta de Inicio." }),
   // Una sola idea en negrita por detalle: la que distingue al área (Gastón,
