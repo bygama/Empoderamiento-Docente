@@ -1,14 +1,16 @@
 /**
  * Indicador de pasos — eje vertical (centro en desktop, margen izquierdo
  * compacto en mobile). Funciona igual con la alternancia: siempre queda entre
- * la foto y el texto. En celular la foto va arriba, así que el eje no se centra
- * en la pantalla: arranca donde arranca el texto (header + foto + separación,
- * las mismas medidas de `PasoMetodo`). La coreografía anima cada `[data-nav-dot]`.
+ * la foto y el texto. En celular la foto va arriba y el texto abajo, así que
+ * el eje se acuesta: la misma columna, girada, queda en fila sobre
+ * `--metodo-linea` (la bisagra entre las dos mitades, ver `ComoTrabajamos`). Se
+ * gira el contenedor y no cada punto para que la coreografía, que anima el
+ * alto de cada `[data-nav-dot]`, sirva igual para los dos sentidos.
  */
 export function IndicadorPasos({ pasos }: { pasos: ReadonlyArray<{ n: string }> }) {
   return (
-    <div className="pointer-events-none absolute inset-0 z-20 flex items-start justify-start pt-[calc(var(--metodo-arriba)+var(--metodo-foto)+2.75rem)] pl-4 md:items-center md:justify-center md:pt-0 md:pl-0">
-      <div className="relative flex flex-col items-center gap-2.5">
+    <div className="pointer-events-none absolute inset-0 z-20 flex items-start justify-center pt-(--metodo-linea) md:items-center md:pt-0">
+      <div className="relative flex -translate-y-1/2 -rotate-90 flex-col items-center gap-2.5 md:translate-y-0 md:rotate-0">
         {/* Línea fina conectora */}
         <span
           aria-hidden="true"
