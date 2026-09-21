@@ -56,3 +56,10 @@ consulta, con el mismo error en llano. No es un Proxy sobre el cliente porque
 better-auth lee `_runtimeDataModel` al construirse y ese acceso tiraría
 adentro de su arranque asíncrono (rechazo sin manejar que mata al build);
 comprobado con un script antes de decidirlo.
+
+**2026-09-21 — `Foto` sin `focoX`/`focoY`, y con id `uuid()`.**
+El foco vive en el valor `foto()` de cada lugar del contenido (la misma foto
+puede recortarse distinto en dos marcos), así que en la tabla quedaban
+muertas. El id lo genera la acción con `randomUUID()` porque nombra también el
+archivo y la ruta pública solo acepta un UUID; el default de la columna dice lo
+mismo. Ruling del controlador sobre la revisión del plan (I6).
