@@ -228,7 +228,10 @@ verdad a la vez.
 - **Historial de versiones con restaurar, autoguardado y bloqueo de documento
   concurrente.** Son cerca de un tercio del trabajo y, con tres editoras y los
   backups de Neon, no compran lo que cuestan. Se pueden sumar después.
-- Editor de texto enriquecido, más de un idioma, comentarios, analíticas.
+- Editor de texto enriquecido, más de un idioma, comentarios.
+- Analíticas: quedaron afuera de este diseño y entran aparte, como módulo que
+  no depende del kit, por el [ADR-0009](../adrs/0009-analitica-de-vercel-con-copia-diaria.md)
+  y la lane `work/metricas/` (2026-09-21).
 - Cambios de diseño del sitio, de geometría o de animaciones.
 - Aprobación previa a publicar.
 - Fichas propias para los 63 materiales (ver §5).

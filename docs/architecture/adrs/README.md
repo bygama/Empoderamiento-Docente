@@ -37,6 +37,7 @@ internos (refactors).
 | 0006  | [Abrir `packages/` ahora, con la reutilización como requisito](0006-packages-reutilizables.md) | Accepted (enmienda 0004) |
 | 0007  | [Usar Prisma como ORM, en la versión 7.10.0 exacta](0007-prisma-como-orm.md) | Accepted (enmendado por 0008) |
 | 0008  | [Adaptador de Postgres y scrypt](0008-correcciones-de-la-fase-1.md) | Accepted (corrige 0005 y 0007) |
+| 0009  | [Medir el tráfico con la analítica de Vercel y una copia diaria en Neon](0009-analitica-de-vercel-con-copia-diaria.md) | Accepted |
 
 ---
 
