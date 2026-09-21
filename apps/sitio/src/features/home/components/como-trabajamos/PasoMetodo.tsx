@@ -1,6 +1,8 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { ComoTrabajamos } from "@/features/home/contenido/como-trabajamos";
-import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { resolverFoto } from "@/lib/contenido/fotos";
+import { focoMovil } from "./foco-movil";
 
 /** Un paso del contenido, con su número («01») y su frase (la idea del verbo de Qué hacemos) ya puestos por el compositor. */
 export type Paso = ComoTrabajamos["pasos"][number] & { n: string; frase: string };
@@ -10,24 +12,29 @@ export type Paso = ComoTrabajamos["pasos"][number] & { n: string; frase: string 
  * alternando por índice (01 izq · 02 der · 03 izq · 04 der). El wrapper lleva
  * `[data-paso]`, que es lo que la coreografía apila y cross-fadea: exactamente
  * uno por paso.
+ *
+ * En celular (< md) es una columna anclada arriba: la foto apaisada, de alto
+ * fijo (`--metodo-foto`, la define `ComoTrabajamos`), y el texto debajo. El
+ * recorte apaisado de cada foto se apunta con `focoMovil` (`foco-movil.ts`); en
+ * computadora manda el foco editable de la foto.
  */
 export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
   const fotoRight = idx % 2 === 1;
   return (
     <div
       data-paso={idx}
-      className="absolute inset-0 flex items-center"
+      className="absolute inset-0 flex items-start pt-(--metodo-arriba) md:items-center md:pt-0"
     >
       <div className="mx-auto grid w-full max-w-screen-xl grid-cols-12 items-center gap-x-6 px-5 md:gap-x-8 md:px-10">
 
         {/* Foto real — pegada al eje central (alterna lado) */}
         <div
-          className={`hidden md:col-span-5 md:row-start-1 md:block ${
+          className={`col-span-12 md:col-span-5 md:row-start-1 ${
             fotoRight ? "md:col-start-8" : "md:col-start-1"
           }`}
         >
           <div
-            className={`relative w-full max-w-[25rem] overflow-hidden rounded-2xl shadow-[0_28px_72px_-18px_rgb(31_45_77/0.20)] ${
+            className={`relative w-full overflow-hidden rounded-2xl md:max-w-[25rem] shadow-[0_28px_72px_-18px_rgb(31_45_77/0.20)] ${
               fotoRight ? "mr-auto" : "ml-auto"
             }`}
           >
@@ -36,10 +43,10 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
               alt={paso.foto.alt}
               width={400}
               height={533}
-              className="aspect-[3/4] max-h-[66vh] w-full object-cover"
+              className="h-(--metodo-foto) w-full object-cover object-(--foco-movil) md:aspect-[3/4] md:h-auto md:max-h-[66vh] md:object-(--foco)"
+              style={{ "--foco-movil": focoMovil(paso.foto), "--foco": resolverFoto(paso.foto).objectPosition } as CSSProperties}
               sizes="(max-width: 768px) 90vw, 400px"
               priority={idx === 0}
-              style={estiloDeFoco(paso.foto.foco)}
             />
             {/* Overlay tenue de marca */}
             <div
@@ -55,7 +62,7 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
             simétrico al intercalar. Mismo ancho de bloque que la foto
             (25rem) para que los bordes exteriores coincidan. */}
         <div
-          className={`relative col-span-12 col-start-1 pl-10 md:col-span-5 md:row-start-1 md:pl-0 ${
+          className={`relative col-span-12 col-start-1 mt-10 pl-10 md:col-span-5 md:mt-0 md:row-start-1 md:pl-0 ${
             fotoRight
               ? "md:col-start-1 md:text-right"
               : "md:col-start-8 md:text-left"
@@ -64,7 +71,7 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
           {/* Número watermark — sangra hacia el borde EXTERIOR */}
           <span
             aria-hidden="true"
-            className={`font-display text-azul-principal/[0.05] pointer-events-none absolute -top-20 z-0 select-none text-[9rem] leading-none font-bold tabular-nums md:text-[14rem] ${
+            className={`font-display text-azul-principal/[0.05] pointer-events-none absolute -top-8 z-0 select-none text-[9rem] leading-none font-bold tabular-nums md:-top-20 md:text-[14rem] ${
               fotoRight ? "-left-2" : "-right-2"
             }`}
           >
