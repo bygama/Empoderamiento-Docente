@@ -40,3 +40,17 @@ buscadores cuando `NEXT_PUBLIC_SITE_URL` no coincide con `siteConfig.url`.
 **2026-09-21 — `vercel.json` es de esta lane.**
 Lo crea `primer-deploy` con el Build Command; `metricas` solo le suma `crons`.
 Dos lanes en paralelo no pueden pelearse por el mismo archivo.
+
+**2026-09-21 — El sitio ya estaba en producción: la lane cambia de «crear» a «poner al día».**
+Comprobado con curl: https://empoderamientodocente.org responde 200 con
+`Server: Vercel`; `/admin` da 404, `/robots.txt` devuelve la 404 del sitio y no
+hay analítica: es un build anterior al monorepo. La cuenta la administran
+Mateo y Gastón (Facundo no tiene acceso). GitHub no muestra deployments ni
+checks de Vercel: la integración Git no está conectada a este repo o no
+publica. Los pasos de Vercel pasan a ser un checklist para ellos.
+
+**2026-09-21 — `robots.ts` cierra los previews por `VERCEL_ENV`, no por URL.**
+El criterio anterior (comparar `NEXT_PUBLIC_SITE_URL` con `siteConfig.url`)
+habría cerrado el dominio real a Google si en producción faltara esa variable,
+cosa que no podemos verificar. `VERCEL_ENV` lo fija Vercel solo: `preview` se
+cierra, `production` y local no cambian.

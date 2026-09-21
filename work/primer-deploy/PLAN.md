@@ -1,19 +1,21 @@
-# PLAN — El primer deploy
+# PLAN — Poner al día el deploy
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Objetivo:** el sitio y su admin publicados en Vercel (plan gratis) con la base
-en Neon (gratis), las migraciones corriendo en cada build, Web Analytics
-activada y la primera cuenta del admin creada en producción.
+**Objetivo:** que el proyecto de Vercel que ya sirve
+`https://empoderamientodocente.org` publique el `main` de hoy con el admin
+andando: base en Neon (gratis), migraciones en cada build, Web Analytics
+activada y la primera cuenta creada en producción.
 
-**Arquitectura:** un proyecto de Vercel con Root Directory `apps/sitio` sobre
-el workspace pnpm; `apps/sitio/vercel.json` declara el build (generar el
-cliente de Prisma, aplicar migraciones, compilar); Neon por la integración del
-Marketplace; las variables en Vercel. Único cambio de código: `robots.ts`
-cierra el sitio a los buscadores mientras viva en `vercel.app`.
+**Arquitectura:** el proyecto existe en la cuenta de Mateo y Gastón (Facundo
+no tiene acceso) y hoy publica un build viejo, anterior al monorepo. Del lado
+del repo: `apps/sitio/vercel.json` declara el build y `robots.ts` cierra los
+previews a los buscadores. Del lado de Vercel: un checklist para quien tiene
+la cuenta (Git al repo, Root Directory `apps/sitio`, Neon, variables,
+analítica, deploy).
 
-**Stack:** Vercel CLI (`pnpm dlx vercel@latest`, 59.x), Neon, Next 16.3, Prisma
-7.10 exacta, better-auth, pnpm 11.
+**Stack:** Vercel (Hobby), Neon, Next 16.3, Prisma 7.10 exacta, better-auth,
+pnpm 11, `node --test` vía `tsx`.
 
 **Spec:** [`SPEC.md`](SPEC.md) · decisiones en [`DECISIONS.md`](DECISIONS.md) ·
 estado en [`PROGRESS.md`](PROGRESS.md).
@@ -21,33 +23,26 @@ estado en [`PROGRESS.md`](PROGRESS.md).
 ## Restricciones (valen en todos los pasos)
 
 - **Gratis:** Vercel Hobby y Neon gratis (riesgo no comercial aceptado en
-  `DECISIONS.md`). Sin dominio propio, sin Blob, sin Resend.
-- **Confirmación de Facundo** (AGENTS.md §5.6) antes de: cada commit, el push,
-  el PR, tocar `AGENTS.md`, y cualquier acción en Vercel o Neon (son cuentas
-  de afuera). Los pasos que abren el navegador los hace Facundo en su
-  terminal (`! <comando>` en el prompt).
+  `DECISIONS.md`). Sin cambiar de cuenta ni de dominio; sin Blob ni Resend.
+- **Confirmación de Facundo** (AGENTS.md §5.6) antes de cada commit, push, PR y
+  de tocar `AGENTS.md`. Lo que pasa en Vercel lo hacen Mateo o Gastón con el
+  checklist de la Task 5.
 - **Commits** Conventional, en español, imperativo, header ≤ 72; nunca
   `git add -A`. Trailer `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
 - **Gates** antes de cada push: `pnpm typecheck`, `pnpm lint`,
   `node scripts/verificar-react-doctor.mjs` (100/100). `pnpm build` antes del PR.
-- **Secretos** nunca en archivos versionados ni en el reporte de una tarea.
-  `vercel env pull` escribe en un archivo git-ignorado y se borra al terminar.
+- **Producción no se cierra a los buscadores bajo ninguna variable nuestra:**
+  el único criterio para `robots.ts` es `VERCEL_ENV`, que Vercel fija solo.
+- **Secretos** nunca en archivos versionados, en reportes ni por chat.
 - **El repo es CRLF**: archivos nuevos en LF están bien; editar con reemplazos
   exactos.
 - **Nada de código** salvo `vercel.json`, `robots.ts` y su helper, y los docs.
 
 ---
 
-### Task 1: El build de Vercel en `apps/sitio/vercel.json`
+### Task 1: El build de Vercel en `apps/sitio/vercel.json` — HECHA (`bc40e65`)
 
-**Files:**
-- Create: `apps/sitio/vercel.json`
-
-**Interfaces:**
-- Produce: el Build Command que Vercel ejecuta desde `apps/sitio`; la lane
-  `metricas` le suma después la clave `crons` a este mismo archivo.
-
-- [ ] **Step 1: Escribir el archivo**
+**Files:** `apps/sitio/vercel.json` (creado).
 
 ```json
 {
@@ -57,32 +52,15 @@ estado en [`PROGRESS.md`](PROGRESS.md).
 ```
 
 Por qué `pnpm -w run`: los scripts `generate` y `migrate:deploy` viven en el
-`package.json` de la raíz del workspace y pasan por `scripts/guarda-prisma.mjs`;
-desde `apps/sitio` (el Root Directory) `pnpm migrate:deploy` a secas falla con
-«Command not found» (verificado el 2026-09-21). El cliente de Prisma
-(`prisma/generado`) está ignorado por git, así que sin `generate` el `next
-build` no compila.
-
-- [ ] **Step 2: Probar la secuencia en local, parado donde va a pararse Vercel**
-
-```bash
-cd apps/sitio && rm -rf .next && pnpm -w run generate && pnpm -w run migrate:deploy && pnpm exec next build 2>&1 | tail -n 12
-```
-
-Esperado: «Generated Prisma Client», «No pending migrations to apply» (la base
-local ya está migrada) y el build en verde. Si `migrate:deploy` pidiera
-`DATABASE_URL`, es que `.env.local` no está en `apps/sitio`: ahí va.
-
-- [ ] **Step 3: Commit** (con OK)
-
-```bash
-git add apps/sitio/vercel.json
-git commit -m "ci(deploy): declarar el build de Vercel con el cliente de Prisma y las migraciones"
-```
+`package.json` de la raíz y pasan por `scripts/guarda-prisma.mjs`; desde
+`apps/sitio` (el Root Directory) `pnpm migrate:deploy` a secas falla con
+«Command not found». El cliente de Prisma está ignorado por git, así que sin
+`generate` el `next build` no compila. Verificado en local parado en
+`apps/sitio`: cliente generado, 3 migraciones sin pendientes, build en verde.
 
 ---
 
-### Task 2: Sin dominio, el sitio no se indexa
+### Task 2: Los previews no se indexan; producción no cambia
 
 **Files:**
 - Create: `apps/sitio/src/lib/dominio.ts`
@@ -91,126 +69,71 @@ git commit -m "ci(deploy): declarar el build de Vercel con el cliente de Prisma 
 - Modify: `apps/sitio/package.json` (script `test`), `package.json` raíz (script `test`)
 
 **Interfaces:**
-- Produce: `esElDominioDefinitivo({ publica, definitiva }: { publica: string | undefined; definitiva: string }): boolean`.
+- Produce: `esUnPreviewDeVercel(entorno: string | undefined): boolean`.
 
-- [ ] **Step 1: El runner de tests, sin dependencias nuevas**
-
-En `apps/sitio/package.json`, dentro de `scripts`:
-
-```json
-"test": "tsx --test \"src/**/*.test.ts\""
-```
-
-En el `package.json` de la raíz, dentro de `scripts`:
-
-```json
-"test": "pnpm --fail-if-no-match -r --if-present test"
-```
-
+- [ ] **Step 1: El runner de tests, sin dependencias nuevas.** En
+`apps/sitio/package.json`, dentro de `scripts`: `"test": "tsx --test \"src/**/*.test.ts\""`.
+En el `package.json` de la raíz: `"test": "pnpm --fail-if-no-match -r --if-present test"`.
 `tsx` ya es dependencia de la app (lo usa `crear-cuenta`) y sabe correr el
 test runner de Node.
 
-- [ ] **Step 2: El test que falla**
-
-`apps/sitio/src/lib/dominio.test.ts`:
+- [ ] **Step 2: El test que falla** `apps/sitio/src/lib/dominio.test.ts`:
 
 ```ts
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { esElDominioDefinitivo } from "./dominio";
+import { esUnPreviewDeVercel } from "./dominio";
 
-test("con la URL definitiva, el sitio se indexa", () => {
-  assert.equal(
-    esElDominioDefinitivo({ publica: "https://empoderamientodocente.org", definitiva: "https://empoderamientodocente.org" }),
-    true,
-  );
+test("producción no es un preview", () => {
+  assert.equal(esUnPreviewDeVercel("production"), false);
 });
 
-test("la barra final y las mayúsculas no cambian la respuesta", () => {
-  assert.equal(
-    esElDominioDefinitivo({ publica: "https://EmpoderamientoDocente.org/", definitiva: "https://empoderamientodocente.org" }),
-    true,
-  );
+test("los previews y los deploys de desarrollo de Vercel sí", () => {
+  assert.equal(esUnPreviewDeVercel("preview"), true);
+  assert.equal(esUnPreviewDeVercel("development"), true);
 });
 
-test("en vercel.app no se indexa", () => {
-  assert.equal(
-    esElDominioDefinitivo({ publica: "https://empoderamiento-docente.vercel.app", definitiva: "https://empoderamientodocente.org" }),
-    false,
-  );
-});
-
-test("sin URL pública (local) no se indexa", () => {
-  assert.equal(esElDominioDefinitivo({ publica: undefined, definitiva: "https://empoderamientodocente.org" }), false);
+test("en local no hay entorno de Vercel y no se cierra nada", () => {
+  assert.equal(esUnPreviewDeVercel(undefined), false);
 });
 ```
 
-- [ ] **Step 3: Verlo fallar**
+- [ ] **Step 3: Verlo fallar** — `pnpm --filter sitio test` → falla por `./dominio` inexistente.
 
-```bash
-pnpm --filter sitio test
-```
-
-Esperado: falla porque `./dominio` no existe.
-
-- [ ] **Step 4: El helper**
-
-`apps/sitio/src/lib/dominio.ts`:
+- [ ] **Step 4: El helper** `apps/sitio/src/lib/dominio.ts`:
 
 ```ts
 /**
- * ¿La URL pública de este deploy es la definitiva?
+ * ¿Este deploy es un preview de Vercel?
  *
- * Los canonicals y el `metadataBase` salen de `siteConfig.url`, que es el
- * dominio definitivo. Mientras el sitio viva en una URL provisoria
- * (`vercel.app`), esos canonicals apuntan a un dominio que todavía no lo sirve,
- * y Google indexaría la provisoria con canonicals rotos. Sin URL pública
- * (desarrollo, previews sin variable) tampoco hay nada que indexar.
+ * Los previews son URLs públicas (`*.vercel.app`) que Google puede indexar, y
+ * sus canonicals apuntan al dominio real: conviene cerrarlos a los buscadores.
+ * Producción y local no se tocan. Se decide por `VERCEL_ENV`, que Vercel fija
+ * solo en cada deploy: nunca por una variable nuestra, que si faltara en
+ * producción cerraría el dominio real.
  */
-export function esElDominioDefinitivo({
-  publica,
-  definitiva,
-}: {
-  publica: string | undefined;
-  definitiva: string;
-}): boolean {
-  if (!publica) return false;
-  const limpiar = (url: string) => url.trim().toLowerCase().replace(/\/+$/, "");
-  return limpiar(publica) === limpiar(definitiva);
+export function esUnPreviewDeVercel(entorno: string | undefined): boolean {
+  return entorno !== undefined && entorno !== "production";
 }
 ```
 
-- [ ] **Step 5: Verlo pasar**
+- [ ] **Step 5: Verlo pasar** — `pnpm --filter sitio test` → 3 tests en verde.
 
-```bash
-pnpm --filter sitio test
-```
-
-Esperado: 4 tests en verde, salida limpia.
-
-- [ ] **Step 6: `robots.ts` usa el helper**
-
-`apps/sitio/src/app/robots.ts` queda así:
+- [ ] **Step 6: `robots.ts` usa el helper** (`apps/sitio/src/app/robots.ts`):
 
 ```ts
 import type { MetadataRoute } from "next";
-import { siteConfig } from "@/config/site";
-import { esElDominioDefinitivo } from "@/lib/dominio";
+import { esUnPreviewDeVercel } from "@/lib/dominio";
 
 // El admin y su API no se indexan; el sitio, todo. Las tres rutas siguen
 // listadas aunque hoy ninguna exista: `/admin` vuelve en la fase 1,
 // `/vista-previa` en la 2 y `/api` en la 4 con los formularios de contacto y
 // de CV (ADR-0005). Sacarlas para reponerlas sería churn.
 //
-// Mientras el sitio viva en una URL provisoria (vercel.app, sin dominio), se
-// cierra entero: los canonicals apuntan al dominio definitivo y Google
-// indexaría la provisoria con canonicals rotos (work/primer-deploy).
+// Los previews de Vercel se cierran enteros: son URLs públicas con canonicals
+// que apuntan al dominio real. Producción no cambia (work/primer-deploy).
 export default function robots(): MetadataRoute.Robots {
-  const definitivo = esElDominioDefinitivo({
-    publica: process.env.NEXT_PUBLIC_SITE_URL,
-    definitiva: siteConfig.url,
-  });
-  if (!definitivo) {
+  if (esUnPreviewDeVercel(process.env.VERCEL_ENV)) {
     return { rules: [{ userAgent: "*", disallow: "/" }] };
   }
   return {
@@ -219,28 +142,26 @@ export default function robots(): MetadataRoute.Robots {
 }
 ```
 
-- [ ] **Step 7: Verificar las dos salidas con un build**
-
-```bash
-cd apps/sitio && rm -rf .next && NEXT_PUBLIC_SITE_URL=https://ejemplo.vercel.app pnpm exec next build > /dev/null 2>&1 && (PORT=3100 pnpm exec next start > /tmp/robots.log 2>&1 &) ; sleep 6; curl -s http://localhost:3100/robots.txt; PID=$(netstat -ano | grep ":3100 " | grep LISTENING | awk '{print $5}' | head -n 1); taskkill //PID $PID //F > /dev/null
-```
-
-Esperado: `User-Agent: *` y `Disallow: /`. Repetir con
-`NEXT_PUBLIC_SITE_URL=https://empoderamientodocente.org`: esperado `Allow: /`
-y los tres `Disallow`. (Si la herramienta bloquea el `sleep` suelto, usar
-`until curl -s -o /dev/null http://localhost:3100/; do sleep 1; done`.)
+- [ ] **Step 7: Verificar las salidas con un build.** Parado en `apps/sitio`:
+`rm -rf .next && VERCEL_ENV=preview pnpm exec next build`, levantar
+`PORT=3100 pnpm exec next start` en segundo plano, esperar con
+`until curl -s -o /dev/null http://localhost:3100/; do sleep 1; done`,
+`curl -s http://localhost:3100/robots.txt` → `Disallow: /`; apagar el proceso
+(PID de `netstat -ano | grep ":3100 " | grep LISTENING`, `taskkill //PID <pid> //F`).
+Repetir con `VERCEL_ENV=production` y sin la variable: `Allow: /` y los tres
+`Disallow`.
 
 - [ ] **Step 8: Gates y commit** (con OK)
 
 ```bash
 pnpm typecheck && pnpm lint && node scripts/verificar-react-doctor.mjs
 git add apps/sitio/src/lib/dominio.ts apps/sitio/src/lib/dominio.test.ts apps/sitio/src/app/robots.ts apps/sitio/package.json package.json
-git commit -m "feat(seo): cerrar el sitio a los buscadores mientras viva en vercel.app"
+git commit -m "feat(seo): cerrar los previews de Vercel a los buscadores"
 ```
 
 ---
 
-### Task 3: La documentación del deploy
+### Task 3: La documentación del deploy real
 
 **Files:**
 - Modify: `README.md` (secciones «Deploy» y «Admin»)
@@ -248,204 +169,162 @@ git commit -m "feat(seo): cerrar el sitio a los buscadores mientras viva en verc
   (checkbox de Vercel) — **pedir OK a Facundo antes**
 - Modify: `work/primer-deploy/PROGRESS.md`
 
+Se escribe cuando Mateo o Gastón hayan respondido las preguntas de `SPEC.md`
+§3, para que el README diga lo que hay y no lo que se supone.
+
 - [ ] **Step 1: README, sección Deploy** — reemplazar la sección entera por:
 
 ```markdown
 ## Deploy
 
-El sitio y su admin corren en **Vercel** (plan gratis por ahora; ver
-`work/primer-deploy/DECISIONS.md`), en un proyecto con **Root Directory
-`apps/sitio`** conectado a este repo: producción desde `main`, un preview por
-PR. El build lo declara `apps/sitio/vercel.json`: genera el cliente de Prisma,
-aplica las migraciones que falten y recién después compila; un deploy con una
+El sitio y su admin corren en **Vercel**, en el proyecto que ya sirve
+`https://empoderamientodocente.org` (la cuenta la administran Mateo y Gastón;
+ver `work/primer-deploy/`). El proyecto tiene **Root Directory `apps/sitio`**
+y está conectado a este repo: producción desde `main`, un preview por PR. El
+build lo declara `apps/sitio/vercel.json`: genera el cliente de Prisma, aplica
+las migraciones que falten y recién después compila; un deploy con una
 migración rota no se publica.
 
 La base es **Neon** por la integración del Marketplace (escribe `DATABASE_URL`
 y `DATABASE_URL_UNPOOLED` en el proyecto). Las demás variables se cargan en
-Vercel: `BETTER_AUTH_SECRET` (uno por entorno) y `NEXT_PUBLIC_SITE_URL` (la URL
-de producción). Blob y Resend siguen sin conectar: ningún código los lee.
+Vercel: `BETTER_AUTH_SECRET` (una por entorno) y `NEXT_PUBLIC_SITE_URL` (solo
+en Production). Blob y Resend siguen sin conectar: ningún código los lee.
 
-Mientras el sitio viva en `vercel.app`, sin dominio propio, `robots.txt` lo
-cierra a los buscadores: los canonicals apuntan a `empoderamientodocente.org`
-y no conviene que Google indexe la URL provisoria. Se abre solo cuando
-`NEXT_PUBLIC_SITE_URL` sea el dominio definitivo.
+Los previews se cierran a los buscadores (`robots.txt` con `Disallow: /`):
+son URLs públicas con canonicals que apuntan al dominio real. Producción se
+indexa normal.
 ```
 
-- [ ] **Step 2: README, sección Admin** — agregar al final de «Levantarlo en
-local», antes de «Comandos de base»:
+(Ajustar el nombre de la cuenta o del equipo con lo que respondan.)
+
+- [ ] **Step 2: README, sección Admin** — agregar antes de «Comandos de base»:
 
 ```markdown
 ### La primera cuenta en producción
 
-El script de cuentas corre en tu máquina contra la base de Neon:
+El script de cuentas corre en tu máquina contra la base de Neon; hace falta la
+`DATABASE_URL_UNPOOLED` del proyecto (la tiene quien administra Vercel):
 
 ```bash
 DATABASE_URL="<la DATABASE_URL_UNPOOLED del proyecto>" pnpm --filter sitio crear-cuenta correo@ed.org "Nombre" administra
 ```
 
 Después, `/admin/olvide-mi-contrasena` en la URL de producción: el enlace sale
-por los logs del deploy (`pnpm dlx vercel@latest logs <url>`) mientras Resend
-no esté conectado.
+por los logs del deploy (Vercel → proyecto → Logs) mientras Resend no esté
+conectado.
 ```
 
 - [ ] **Step 3: AGENTS.md** (con OK de Facundo). En el árbol de §3, debajo de
-`├── .env.example   ← las variables son de la app`, agregar:
+`├── .env.example   ← las variables son de la app`, agregar
+`        ├── vercel.json    ← el build de Vercel (Root Directory = apps/sitio)`;
+en §13 reemplazar `- [ ] Vercel: Root Directory = \`apps/sitio\` cuando exista el proyecto`
+por `- [x] Vercel: el proyecto que sirve empoderamientodocente.org, con Root Directory = \`apps/sitio\`, Neon y Web Analytics (work/primer-deploy)`.
 
-```
-        ├── vercel.json    ← el build de Vercel (Root Directory = apps/sitio)
-```
-
-y en §13 reemplazar `- [ ] Vercel: Root Directory = \`apps/sitio\` cuando exista el proyecto`
-por `- [x] Vercel: proyecto con Root Directory = \`apps/sitio\`, Neon y Web Analytics (work/primer-deploy)`.
-
-- [ ] **Step 4: Verificar y commit** (con OK)
-
-```bash
-grep -n "pendiente de definir" README.md || echo "ok: ya no dice pendiente"
-git add README.md AGENTS.md
-git commit -m "docs(deploy): describir el deploy en Vercel y la primera cuenta en producción"
-```
-
-Ojo: si `AGENTS.md` tiene el bloque de `next dev` al final sin commitear,
-sacarlo antes del `git add` y reponerlo después (queda sin commitear a
-propósito).
+- [ ] **Step 4: Commit** (con OK): `docs(deploy): describir el deploy real en Vercel y la primera cuenta en producción`.
+Ojo con el bloque de `next dev` al final de `AGENTS.md`: sacarlo antes del
+`git add` y reponerlo después.
 
 ---
 
 ### Task 4: PR de los cambios del repo
 
-- [ ] **Step 1:** `pnpm build` en verde, push de la rama `chore/primer-deploy`
-  (con OK), PR contra `main` con título `chore(deploy): preparar el primer
-  deploy a Vercel` y cuerpo en español (qué cambia: `vercel.json`, `robots`
-  cerrado en URL provisoria, README); merge con `gh pr merge --rebase
-  --delete-branch` (con OK) y verificar MERGED. El proyecto de Vercel se crea
-  sobre `main` ya mergeado, así el primer build usa el `vercel.json`.
+- [ ] **Step 1:** `pnpm build` en verde, push de `chore/primer-deploy` (con OK),
+PR contra `main` con título `chore(deploy): preparar el deploy del monorepo en
+Vercel` y cuerpo en español; merge con `gh pr merge --rebase --delete-branch`
+(con OK) y verificar MERGED. Cuando Vercel esté conectado al repo, ese PR o el
+siguiente trae el primer preview y sirve para la Task 6.
 
 ---
 
-### Task 5: El proyecto en Vercel y Neon (con Facundo)
+### Task 5: Poner al día el proyecto que existe (Mateo o Gastón)
 
-Todo esto toca cuentas de afuera. Cada comando se corre con el OK de Facundo,
-y los que abren el navegador los corre él. Se trabaja parado en `apps/sitio`.
+El proyecto de Vercel ya existe, sirve `https://empoderamientodocente.org` y
+lo administran Mateo y Gastón. Facundo no tiene acceso: este checklist se les
+manda tal cual, con las cuatro preguntas de `SPEC.md` §3. Cada paso dice qué
+verificar y qué cambiar si no está. Nada de esto toca el dominio ni los DNS.
 
-- [ ] **Step 1: Entrar**
+- [ ] **Step 1: Git.** Vercel → proyecto → Settings → Git. Tiene que estar
+conectado al repo `bygama/Empoderamiento-Docente`, con Production Branch
+`main`. Si está conectado a otro repo (un fork viejo) o no está conectado,
+conectarlo: «Connect Git Repository» → GitHub → `bygama/Empoderamiento-Docente`
+(la app de GitHub de Vercel tiene que tener acceso a la organización
+`bygama`). Con eso, cada push a `main` deploya producción y cada PR recibe su
+preview; hoy nada de eso pasa (GitHub no muestra checks de Vercel).
 
-```
-! pnpm dlx vercel@latest login
-```
+- [ ] **Step 2: Root Directory.** Settings → General → Root Directory =
+`apps/sitio`, y «Include source files outside of the Root Directory in the
+Build Step» **encendido** (el build corre `scripts/guarda-prisma.mjs`, que
+vive en la raíz del repo). Framework Preset: Next.js. Build Command y Output
+Directory se dejan en blanco: los toma de `apps/sitio/vercel.json`. Sin este
+paso, el próximo deploy de `main` falla: desde la mudanza a monorepo no hay
+`next` en la raíz.
 
-- [ ] **Step 2: Crear y vincular el proyecto, sin deployar todavía**
+- [ ] **Step 3: Neon.** Vercel → proyecto → Storage → Create Database → Neon
+(plan gratis), conectado a Production, Preview y Development. Escribe
+`DATABASE_URL` y `DATABASE_URL_UNPOOLED` (verificar en Settings → Environment
+Variables). Si el proyecto ya tuviera una base, decirlo antes de crear otra.
 
-```bash
-cd apps/sitio && pnpm dlx vercel@latest link
-```
+- [ ] **Step 4: Variables propias.** Settings → Environment Variables:
+  - `BETTER_AUTH_SECRET` en Production y otro valor en Preview. Se generan con
+    `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+    Sin esto el admin no arranca.
+  - `NEXT_PUBLIC_SITE_URL` = `https://empoderamientodocente.org`, solo en
+    Production (en los previews better-auth usa la URL del preview).
+  - No hace falta nada de Blob ni de Resend todavía.
 
-Elegir la cuenta personal de Facundo (decisión de `SPEC.md` §3), «Link to
-existing project? No», nombre `empoderamiento-docente`. Queda `.vercel/` en
-`apps/sitio`, git-ignorado (verificar con `git status --short`; si apareciera,
-agregar `.vercel` a `apps/sitio/.gitignore`).
+- [ ] **Step 5: Web Analytics.** Proyecto → Analytics → Enable. Gratis en el
+plan Hobby (50.000 vistas por mes). El componente que cuenta llega con la lane
+de métricas; activarla ahora no cambia nada del sitio.
 
-- [ ] **Step 3: Root Directory y archivos fuera de él** (dashboard, Facundo)
+- [ ] **Step 6: Deploy de `main`.** Deployments → «Redeploy» del último, o
+mejor, un push a `main` (cuando el PR de esta lane esté mergeado). En el log
+tienen que verse «Generated Prisma Client», «migrations applied» (o «No
+pending migrations») y el build en verde.
 
-Vercel → proyecto → Settings → General: **Root Directory = `apps/sitio`** y
-**«Include source files outside of the Root Directory in the Build Step»
-encendido** (el build corre `scripts/guarda-prisma.mjs`, que vive en la raíz).
-Framework Preset: Next.js. Guardar.
-
-- [ ] **Step 4: Neon**
-
-```bash
-pnpm dlx vercel@latest integration add neon
-```
-
-Si pide terminar en el navegador, Facundo lo termina ahí. Después:
-
-```bash
-pnpm dlx vercel@latest env ls
-```
-
-Esperado: `DATABASE_URL` y `DATABASE_URL_UNPOOLED` en Production (y en
-Preview/Development si la integración las escribe). Solo nombres, nunca
-valores.
-
-- [ ] **Step 5: Las variables propias**
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"   # uno para production y otro para preview
-pnpm dlx vercel@latest env add BETTER_AUTH_SECRET production
-pnpm dlx vercel@latest env add BETTER_AUTH_SECRET preview
-pnpm dlx vercel@latest env add NEXT_PUBLIC_SITE_URL production   # https://empoderamiento-docente.vercel.app
-```
-
-Preview no lleva `NEXT_PUBLIC_SITE_URL`: better-auth cae a `VERCEL_URL`, que
-es la URL de cada preview.
-
-- [ ] **Step 6: Conectar el repo y hacer el primer deploy**
-
-```bash
-pnpm dlx vercel@latest git connect
-```
-
-(Facundo autoriza la app de GitHub de Vercel sobre `bygama` si hace falta.)
-Después, el primer deploy de producción desde la CLI, para no depender de un
-push:
-
-```bash
-pnpm dlx vercel@latest deploy --prod 2>&1 | tail -n 5
-```
-
-Esperado: la URL de producción. Si el build falla, `pnpm dlx vercel@latest
-inspect <url> --logs` muestra el motivo; los dos sospechosos de siempre son el
-Root Directory sin guardar y la opción de archivos fuera del root apagada.
-
-- [ ] **Step 7: Web Analytics** (dashboard, Facundo): proyecto → Analytics →
-Enable. No cambia el código: el componente que cuenta llega con la lane de
-métricas.
+- [ ] **Step 7: Avisar.** Mandar a Facundo: el nombre del proyecto y de la
+cuenta/equipo, cómo se deployaba lo de antes, y que los seis pasos están. Para
+la lane de métricas van a hacer falta, más adelante, el ID del proyecto
+(`prj_…`, en Settings → General), el ID del equipo si es un equipo, y un token
+de la cuenta cargado **solo en Production** como `VERCEL_TOKEN` (Account
+Settings → Tokens; nunca se manda por chat).
 
 ---
 
 ### Task 6: Verificación en producción y cierre
 
-- [ ] **Step 1: El sitio y el admin responden**
+- [ ] **Step 1: El sitio y el admin responden** (cuando Mateo o Gastón avisen
+que el deploy de `main` salió)
 
 ```bash
-P=https://empoderamiento-docente.vercel.app
-curl -s -o /dev/null -w "sitio %{http_code}\n" $P/
-curl -s -o /dev/null -w "admin %{http_code} -> %{redirect_url}\n" $P/admin
-curl -s $P/robots.txt
-curl -s -D - -o /dev/null $P/admin/entrar | grep -iE "x-robots-tag|strict-transport"
+D=https://empoderamientodocente.org
+curl -s -o /dev/null -w "sitio %{http_code}\n" $D/
+curl -s -o /dev/null -w "admin %{http_code} -> %{redirect_url}\n" $D/admin
+curl -s $D/robots.txt
+curl -s -D - -o /dev/null $D/admin/entrar | grep -iE "x-robots-tag|strict-transport|content-security"
 ```
 
-Esperado: 200; 307 a `/admin/entrar`; `Disallow: /` (URL provisoria); las
-cabeceras de seguridad.
+Esperado: 200; 307 a `/admin/entrar`; `Allow: /` con los tres `Disallow`
+(producción no se cierra); las cabeceras de seguridad. Hoy (2026-09-21, antes
+de la puesta al día) `/admin` da 404 y `/robots.txt` devuelve la 404 del sitio.
 
-- [ ] **Step 2: Las migraciones corrieron en el build**
+- [ ] **Step 2: Un preview se cierra a los buscadores.** En el PR de esta
+lane (o en el siguiente que se abra), el check de Vercel deja la URL del
+preview: `curl -s https://<preview>.vercel.app/robots.txt` → `Disallow: /`.
+
+- [ ] **Step 3: La primera cuenta.** La corre quien tenga la
+`DATABASE_URL_UNPOOLED` de Neon (Mateo o Gastón, desde su clon del repo con
+las dependencias instaladas):
 
 ```bash
-pnpm dlx vercel@latest inspect $P --logs 2>&1 | grep -iE "migration|prisma" | head -n 8
+DATABASE_URL="<DATABASE_URL_UNPOOLED de Neon>" pnpm --filter sitio crear-cuenta gaston@<correo-real> "Gastón" administra
 ```
 
-Esperado: «3 migrations found» y «applied» (o «No pending migrations» en
-deploys siguientes).
+Después, `https://empoderamientodocente.org/admin/olvide-mi-contrasena` con
+ese correo; el enlace sale en los logs del deploy (Vercel → proyecto → Logs,
+buscar «Correo de contraseña nueva») mientras Resend no esté conectado.
+Abrirlo, elegir la contraseña, entrar y ver la portada.
 
-- [ ] **Step 3: La primera cuenta**
-
-```bash
-cd apps/sitio && pnpm dlx vercel@latest env pull .env.vercel.local --environment production
-URL=$(grep '^DATABASE_URL_UNPOOLED=' .env.vercel.local | cut -d= -f2- | tr -d '"')
-DATABASE_URL="$URL" pnpm crear-cuenta gaston@<correo-real> "Gastón" administra
-rm .env.vercel.local
-```
-
-(El correo real lo da Facundo.) Después, en el navegador,
-`$P/admin/olvide-mi-contrasena` con ese correo; el enlace sale en
-`pnpm dlx vercel@latest logs $P` (buscar «Correo de contraseña nueva»);
-abrirlo, elegir la contraseña, entrar y ver la portada del admin.
-
-- [ ] **Step 4: Cierre de la lane**
-
-Al día siguiente, Vercel → Analytics muestra las visitas de las pruebas.
-`PROGRESS.md`: marcar las seis tareas, anotar la URL de producción y el
-nombre del proyecto, y mover a «Hecho» lo abierto (cuenta elegida, si Neon
-dio rama por preview). Commit `docs(work): cerrar la lane del primer deploy`
-(con OK) por PR.
+- [ ] **Step 4: Cierre de la lane.** Al día siguiente, Vercel → Analytics
+muestra las visitas. `PROGRESS.md`: marcar las seis tareas, anotar el nombre
+del proyecto y de la cuenta, cómo se deployaba antes y qué respondieron Mateo y
+Gastón. Commit `docs(work): cerrar la lane del deploy` (con OK) por PR.
