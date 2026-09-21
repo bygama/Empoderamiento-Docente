@@ -7,6 +7,7 @@ import { useMouseParallax } from "@/lib/hooks/useMouseParallax";
 import type { Hero as ContenidoDelHero } from "@/features/home/contenido/hero";
 import { crearHero } from "./hero/coreografia-hero";
 import { CampoCards } from "./hero/CampoCards";
+import { ConceptosMovil } from "./hero/ConceptosMovil";
 import { HeroCopy } from "./hero/HeroCopy";
 
 /**
@@ -29,10 +30,10 @@ import { HeroCopy } from "./hero/HeroCopy";
  * Piezas: geometría en `hero/geometria-hero.ts`, coreografía en
  * `hero/coreografia-hero.ts` (+ `entrada-hero.ts`), campo de escritorio en
  * `CampoCards`, copy en `HeroCopy` (que por debajo de lg lleva además las
- * bandas de fotos del primer pantallazo). El contenido (textos, fotos y
- * carteles) llega por props desde `features/home/contenido/hero.ts` o desde la
- * base. Este compositor arma la sección y dispara la coreografía desde el
- * layout effect.
+ * bandas de fotos del primer pantallazo) y el tramo de conceptos de celular en
+ * `ConceptosMovil`. El contenido (textos, fotos y carteles) llega por props
+ * desde `features/home/contenido/hero.ts` o desde la base. Este compositor
+ * arma la sección y dispara la coreografía desde el layout effect.
  */
 export function Hero({ contenido }: { contenido: ContenidoDelHero }) {
   const ref = useRef<HTMLElement | null>(null);
@@ -75,6 +76,7 @@ export function Hero({ contenido }: { contenido: ContenidoDelHero }) {
 
       <CampoCards tarjetas={contenido.tarjetas} />
       <HeroCopy contenido={contenido} />
+      <ConceptosMovil tarjetas={contenido.tarjetas} />
     </section>
   );
 }

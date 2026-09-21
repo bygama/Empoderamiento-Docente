@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { hasEntered, onEnter } from "@/lib/intro-signal";
 import { entradaHero } from "./entrada-hero";
+import { revelarConceptos } from "./conceptos-movil";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -79,7 +80,7 @@ export function crearHero(scope: HTMLElement) {
 
     // La copy se va con el scroll. En escritorio, la capa entera (con su
     // halo). Por debajo de lg esa capa también lleva las bandas de fotos, que
-    // se quedan: se va solo el bloque de texto.
+    // se quedan: se va solo el bloque de texto, y arranca el tramo de conceptos.
     const irse = (quien: string, hasta: string) =>
       gsap.to(quien, {
         y: -80,
@@ -92,6 +93,7 @@ export function crearHero(scope: HTMLElement) {
     });
     mm.add("(max-width: 63.999rem)", () => {
       irse("[data-hero-copy]", "+=60%");
+      revelarConceptos();
     });
   }, scope);
 
