@@ -109,3 +109,11 @@ siguiente.
 El gate (react-doctor, `async-await-in-loop`) no admite el `await` fila por
 fila del plan. Son claves distintas y el Pool de pg los acota a 10 a la vez;
 la pausa entre llamadas a la API de Vercel se mantiene.
+
+**2026-09-21 — El middleware no redirige las Server Actions; cada acción verifica la sesión.**
+Una acción sin cookie redirigida a `/admin/entrar` no llega a la pantalla: el
+cliente de Next rompe con «unexpected response». El middleware deja pasar
+las peticiones con cabecera `Next-Action` y la acción contesta en llano
+(«Hay que entrar al admin para actualizar.»). Regla que hereda la fase 2:
+toda Server Action del admin verifica la sesión ella misma, porque el layout
+protegido nunca las cubre.
