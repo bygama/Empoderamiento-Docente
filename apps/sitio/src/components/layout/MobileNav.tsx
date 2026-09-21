@@ -116,8 +116,9 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
         }}
         // La isla del botón: un círculo blanco SÓLIDO —un vidrio se agrisa
         // sobre los fondos oscuros—, que se lee sobre lo que sea sin cambiar.
-        // `BotonCerrar` copia esta caja.
-        className="border-azul-principal/10 text-azul-principal hover:bg-gris-fondo inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border bg-white shadow-[0_8px_24px_-12px_rgb(31_45_77_/_0.4)] transition-colors lg:hidden"
+        // `rounded-3xl` y NO `rounded-full`: ver coreografia-boton.ts (en
+        // iPhone quedaba cuadrado). `BotonCerrar` copia esta caja.
+        className="border-azul-principal/10 text-azul-principal hover:bg-gris-fondo inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl border bg-white shadow-[0_8px_24px_-12px_rgb(31_45_77_/_0.4)] transition-colors lg:hidden"
       >
         <Menu size={22} data-mnav-rayas />
       </button>

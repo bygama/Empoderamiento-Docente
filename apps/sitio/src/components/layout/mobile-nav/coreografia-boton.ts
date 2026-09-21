@@ -14,10 +14,16 @@ import gsap from "gsap";
  * tapado.
  */
 
-// Porcentajes y no píxeles: de 50 % (círculo) a 25 % se interpola parejo. Desde
-// los 9999px de `rounded-full` no se vería nada hasta el último instante.
-const REDONDO = "50%";
-const CUADRADO = "25%";
+// En PÍXELES, y los botones con `rounded-3xl` (1,5rem: la mitad justa de sus
+// 3rem, o sea un círculo) en vez de `rounded-full`. No es un detalle: el radio
+// de `rounded-full` es `calc(infinity * 1px)`, que Chrome recorta a 3,4e7px
+// pero WebKit deja en 3,4e38px. GSAP parte del valor computado y lo convierte
+// a la unidad pedida; con ese número la cuenta pierde toda la precisión
+// (3,4e38 + (50 − 3,4e38) = 0) y en iPhone el botón en reposo quedaba con
+// radio 0: cuadrado. Con un radio finito y la misma unidad que el computado
+// no hay conversión que pueda fallar.
+const REDONDO = 24;
+const CUADRADO = 12;
 const FORMA = { duration: 0.15, ease: "power2.out" };
 const RETRAER = { scaleX: 0, duration: 0.3, ease: "power2.inOut" };
 const NACER = { duration: 0.25, ease: "power3.out" };
