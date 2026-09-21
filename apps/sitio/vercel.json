@@ -1,4 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm -w run generate && pnpm -w run migrate:deploy && next build"
+  "buildCommand": "pnpm -w run generate && pnpm -w run migrate:deploy && next build",
+  "crons": [{ "path": "/api/cron/metricas", "schedule": "0 4 * * *" }]
 }
