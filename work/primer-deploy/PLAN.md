@@ -276,10 +276,14 @@ Variables). Si el proyecto ya tuviera una base, decirlo antes de crear otra.
 plan Hobby (50.000 vistas por mes). El componente que cuenta llega con la lane
 de métricas; activarla ahora no cambia nada del sitio.
 
-- [ ] **Step 6: Deploy de `main`.** Deployments → «Redeploy» del último, o
-mejor, un push a `main` (cuando el PR de esta lane esté mergeado). En el log
-tienen que verse «Generated Prisma Client», «migrations applied» (o «No
-pending migrations») y el build en verde.
+- [ ] **Step 6: Deploy de `main`.** Con Git conectado (Step 1), cualquier
+push a `main` deploya producción solo; si no hay nada que pushear,
+Deployments → «Create Deployment» → rama `main`. En el log tienen que verse
+«Generated Prisma Client», «migrations applied» (o «No pending migrations»)
+y el build en verde. Producción sale siempre de un build de `main`: no usar
+«Promote to Production» sobre un preview, porque no rebuildea y publicaría
+en el dominio real el `robots.txt` cerrado del preview (el sitio entero fuera
+de Google hasta el próximo deploy).
 
 - [ ] **Step 7: Avisar.** Mandar a Facundo: el nombre del proyecto y de la
 cuenta/equipo, cómo se deployaba lo de antes, y que los seis pasos están. Para

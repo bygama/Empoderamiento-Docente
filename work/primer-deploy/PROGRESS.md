@@ -1,10 +1,10 @@
 # PROGRESS — Poner al día el deploy
 
-- **Rama:** `chore/primer-deploy` (todavía no creada)
+- **Rama:** `chore/primer-deploy`
 - **Base:** `f3f3f9c` (= `origin/main` al 2026-09-21)
 - **Spec:** [`SPEC.md`](SPEC.md) · **Plan:** [`PLAN.md`](PLAN.md) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
 
-**Estado: en ejecución. Task 1 hecha (bc40e65); Task 2 en curso con el criterio nuevo (`VERCEL_ENV`); Tasks 3 y 4 después; Task 5 es un checklist para Mateo o Gastón, que tienen la cuenta de Vercel.**
+**Estado: en ejecución. Tasks 1 y 2 hechas (`bc40e65`, `917476d`); Task 4 (PR) en curso; Task 3 (README y AGENTS.md) espera las respuestas de Mateo o Gastón a las cuatro preguntas del SPEC §3; Task 5 es el checklist para ellos; Task 6, después de su deploy.**
 
 ## Baseline
 
@@ -18,10 +18,10 @@ Medido sobre `f3f3f9c`:
 
 ## Hecho
 
-(nada todavía)
+- 2026-09-21 — Task 1: `apps/sitio/vercel.json` con el Build Command del monorepo (`bc40e65`).
+- 2026-09-21 — Task 2: `robots.ts` cierra los previews por `VERCEL_ENV`; helper `esUnPreviewDeVercel` con cinco tests; `pnpm test` en la app y en la raíz (`917476d`). Revisión aprobada: ningún valor de `VERCEL_ENV` cierra producción.
 
 ## Abierto
 
-- En qué cuenta de Vercel vive el proyecto (recomendación: la de Facundo, y
-  transferir a ED después).
+- Las cuatro preguntas del SPEC §3 (cuenta y proyecto, cómo se deployaba lo de antes, nombres de las variables, base existente). Con las respuestas se escribe la Task 3.
 - Si la integración de Neon en el plan gratis da una rama por preview.
