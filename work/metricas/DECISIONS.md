@@ -92,3 +92,20 @@ en Production; para probar en local, en `.env.local` y nada más.
 Cada beacon a `/_vercel/insights/view` pasaba por el middleware y gastaba una
 invocación por vista. Es un cambio de una línea en el middleware de Mateo y
 entra en la fase A.
+
+**2026-09-21 — `agrupado` entra en la clave de `metricas_diarias`.**
+La revisión de A6 encontró que el referido vacío (tráfico directo, muy común)
+y la fila «el resto» compartían `valor = ""` en el mismo día: misma clave,
+una pisaba a la otra. La clave pasa a `(fecha, dimension, valor, agrupado)`
+con una segunda migración; el valor mágico se sigue descartando.
+
+**2026-09-21 — `total` se guarda al final de cada corrida.**
+Es la marca de agua de lo copiado: si se guardara primero y fallara otra
+dimensión, la corrida siguiente daría esos días por hechos y los agujeros
+quedarían para siempre. Al final, una corrida rota se repite entera al día
+siguiente.
+
+**2026-09-21 — Los upserts de una misma respuesta van en paralelo.**
+El gate (react-doctor, `async-await-in-loop`) no admite el `await` fila por
+fila del plan. Son claves distintas y el Pool de pg los acota a 10 a la vez;
+la pausa entre llamadas a la API de Vercel se mantiene.

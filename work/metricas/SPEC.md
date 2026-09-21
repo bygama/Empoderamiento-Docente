@@ -55,7 +55,7 @@ model MetricaDiaria {
   vistas     Int
   visitantes Int      // visitantes únicos DE ESE DÍA: no se suman entre días
 
-  @@id([fecha, dimension, valor])
+  @@id([fecha, dimension, valor, agrupado])
   @@map("metricas_diarias")
 }
 
@@ -98,9 +98,10 @@ model SincronizacionMetricas {
   `total` (`by=day`), `pagina` (`requestPath`), `pais` (`country`), `referido`
   (`referrerHostname`; vacío = «directo») y `dispositivo` (`deviceType`).
 - Cuando la API agrupa el resto en «Others», se guarda con `valor = ""` y
-  `agrupado = true` (en las dimensiones que no son `total`, `valor = ""` solo
-  existe para esa fila). Nada de valores mágicos que puedan chocar con un
-  host real.
+  `agrupado = true`. El referido vacío (tráfico directo) también lleva
+  `valor = ""`, con `agrupado = false`: por eso `agrupado` entra en la clave,
+  si no una fila pisaba a la otra. Nada de valores mágicos que puedan chocar
+  con un host real.
 - **Los campos exactos de cada respuesta se graban de la API real** (con el
   proyecto ya creado) antes de escribir los mapeos: si alguna dimensión no
   trae `visitors`, el modelo se ajusta en ese momento y queda anotado en
