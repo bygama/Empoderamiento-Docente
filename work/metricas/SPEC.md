@@ -1,7 +1,7 @@
 # SPEC — Las métricas del admin
 
 - **Fecha:** 2026-09-21
-- **Estado:** aprobado por el owner en conversación; revisado; pendiente de plan
+- **Estado:** aprobado por el owner en conversación; revisado; plan escrito (PLAN.md); fase A implementada (A2–A8), A1 espera el token
 - **Decide:** Facundo (owner), diseñado en conversación
 - **Tier:** M · rama `feat/metricas`
 - **Registra:** [ADR-0009](../../docs/architecture/adrs/0009-analitica-de-vercel-con-copia-diaria.md)
