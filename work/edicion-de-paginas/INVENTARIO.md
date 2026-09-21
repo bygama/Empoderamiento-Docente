@@ -32,7 +32,7 @@ Orden de scroll: **Hero+QuiénesSomos+Misión → En números → Cómo trabajam
   - Panel "¿Quiénes somos?": título corto + 2 párrafos partidos en *segmentos* (`QS_PARAGRAPHS`, tipo `FillSeg[]`: cada frase se corta en fragmentos `{t, accent?}` para el efecto de relleno por scroll) + botón "Conocé al equipo". Editar este texto implica editar una lista de fragmentos, no un string simple.
   - Panel "Misión": mismo mecanismo (`MISION_PARAGRAPHS`), título + 2 párrafos segmentados, sin botón.
 - Imágenes:
-  - 11 tarjetas flotantes de escritorio (`CARDS` en `hero-cards.ts`), cada una con `img`, `alt`, y **5 de las 11** llevan además un cartelito `label: {title, desc}` (título 2-3 palabras + descripción 4-7 palabras, ambos cortos a propósito porque flotan sobre la foto).
+  - 11 tarjetas flotantes de escritorio (`CARDS` en `hero-cards.ts`), cada una con `img`, `alt`, y **6 de las 11** llevan además un cartelito `label: {title, desc}` (título 2-3 palabras + descripción 4-7 palabras, ambos cortos a propósito porque flotan sobre la foto).
   - 8 tarjetas de mobile (`MOBILE_CARDS`), casi todas repiten fotos del set de escritorio; solo 1 foto es exclusiva de mobile (`comparar-tareas-ronda.webp`).
   - 1 foto en el panel "¿Quiénes somos?" (`/fotos/formadoras-pizarra-umce.webp`, con alt) y 1 en "Misión" (`/fotos/docentes-encuentro-formacion.webp`, con alt). Ambas a `aspect-[16/9]`/`aspect-[5/4]`, `object-cover`.
   - Todas las fotos tienen `alt` descriptivo, salvo las que son puramente decorativas.
