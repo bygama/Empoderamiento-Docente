@@ -588,8 +588,12 @@ Reglas para el admin y sus datos:
 - **Secretos solo server-side:** `DATABASE_URL`, el secreto de better-auth,
   `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan `NEXT_PUBLIC_` ni
   llegan al browser. Placeholders en `apps/sitio/.env.example`.
-- **La sesión se verifica en el middleware, antes de renderizar**, nunca dentro
-  del componente. Dos roles, administra y edita; nada del admin es público.
+- **La sesión se verifica antes de renderizar:** el middleware solo mira que la
+  cookie exista, el layout protegido la comprueba de verdad para las páginas, y
+  **toda Server Action del admin empieza por `auth.api.getSession`** y contesta
+  en llano si no hay sesión, porque el layout no las cubre (el middleware las
+  deja pasar: un redirect no es una respuesta válida para una acción). Dos
+  roles, administra y edita; nada del admin es público.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
   tablas. No inventar tablas ni columnas que no estén acordadas.
 
