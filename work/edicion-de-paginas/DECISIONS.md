@@ -46,3 +46,13 @@ renderizar y con alt también para las fotos de `public/`; `Foto` pierde
 `focoX`/`focoY` y usa `uuid()`. Fotos hasta 4 MB (Vercel corta el cuerpo en
 4,5 MB). La franja de borrador va abajo (el header es una píldora flotante).
 La miniatura del foco es 4:3, no el recorte de cada marco.
+
+**2026-09-21 — `datos/cliente.ts` lee `DATABASE_URL` en la primera consulta, no al importar.**
+`next build` importa cada ruta para leer su configuración, sin base: el
+adaptador armado al cargar el módulo hacía fallar el build en
+`/api/cron/metricas` desde la fase A de métricas. Ahora el adaptador posterga
+la lectura de la URL hasta `connect()`, que Prisma llama en la primera
+consulta, con el mismo error en llano. No es un Proxy sobre el cliente porque
+better-auth lee `_runtimeDataModel` al construirse y ese acceso tiraría
+adentro de su arranque asíncrono (rechazo sin manejar que mata al build);
+comprobado con un script antes de decidirlo.
