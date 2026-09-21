@@ -34,3 +34,15 @@ los tres antes o durante la fase A.
 No tenemos la cuenta de Vercel a mano (la administran Mateo y Gastón) y lo
 visual no puede esperarla. Un mismo `almacen.ts` con dos implementaciones;
 `next/image` sigue haciendo recorte, compresión y tamaños.
+
+**2026-09-21 — Tres OK del owner para arrancar la fase A.**
+Facundo: «dale, sí a las tres, mandale»: subir plan y spec enmendado, agregar
+`@vercel/blob`, y la excepción acotada en AGENTS.md §12 (el formulario de cada
+página sale de su esquema; las entidades siguen a mano).
+
+**2026-09-21 — Enmiendas al SPEC tras la revisión del plan.**
+La foto es un valor `{ src, alt, foco }` en su lugar (no un id): sin join al
+renderizar y con alt también para las fotos de `public/`; `Foto` pierde
+`focoX`/`focoY` y usa `uuid()`. Fotos hasta 4 MB (Vercel corta el cuerpo en
+4,5 MB). La franja de borrador va abajo (el header es una píldora flotante).
+La miniatura del foco es 4:3, no el recorte de cada marco.

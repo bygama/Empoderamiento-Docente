@@ -44,8 +44,9 @@ plegable con el nombre que tiene en el sitio («Hero», «¿Quiénes somos?»,
 - Los **textos**, con su largo máximo a la vista y un contador. Cuando el largo
   está calibrado a mano (un título que tiene que caer en dos renglones), el
   campo lo dice en llano: «un renglón en pantalla», «dos renglones».
-- Las **fotos**, con la miniatura recortada como la muestra el sitio, el texto
-  alternativo (obligatorio) y el punto de foco.
+- Las **fotos**, con una miniatura 4:3 donde se marca el punto de foco (no el
+  recorte exacto de cada marco: ese lo hace el sitio), el texto alternativo
+  (obligatorio) y el foco.
 - Las **listas fijas** (las 11 tarjetas del hero, los 5 pasos), con la
   cantidad exacta que la escena necesita: se edita cada ítem, no se agregan ni
   se sacan. El formulario lo dice: «Son 5 pasos: la escena está armada para
@@ -150,7 +151,10 @@ En `apps/sitio/src/lib/contenido/campos.ts` (sin dominio de ED):
   fragmentos `{t, accent}` que la coreografía consume. Editar es escribir, no
   armar una lista de pedazos.
 - `listaFija(n, esquemaDelItem, { ayuda })` — exactamente `n` ítems.
-- `foto()` — el id de una fila de `fotos` (§4.4) o una ruta de `public/`.
+- `foto()` — el valor de una foto en su lugar: `{ src, alt, foco: { x, y } }`. `src`
+  es una ruta de `public/`, `/api/fotos/…` en local o una URL de Blob; el foco
+  va con el lugar (la misma foto puede tener foco distinto en marcos
+  distintos) y el alt viaja con el valor, también para las fotos de `public/`.
 - `rutaInterna()` — una de las rutas del sitio (lista cerrada en
   `config/nav.ts`).
 
@@ -187,15 +191,13 @@ puede pasar al admin sección por sección.
 /// Una foto subida desde el admin. `alt` es obligatorio (AGENTS.md §6). El
 /// punto de foco dice dónde está lo importante para que cada marco recorte bien.
 model Foto {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   url       String                       // Blob en Vercel; /api/fotos/<id> en local
   alt       String
   ancho     Int
   alto      Int
   bytes     Int
   tipo      String                       // image/webp | image/jpeg | image/png
-  focoX     Float    @default(0.5)       // 0..1
-  focoY     Float    @default(0.5)
   subidaEn  DateTime @default(now())
   subidaPor String
 
@@ -203,14 +205,18 @@ model Foto {
 }
 ```
 
-Coincide con la tabla `fotos` del spec del admin (imagen, alt obligatorio,
-punto focal). Las fotos que hoy están en `public/fotos/**` no se migran a la
+Coincide con la tabla `fotos` del spec del admin (imagen, alt obligatorio); el
+punto de foco no está en la tabla sino en el valor `foto()` de cada lugar, que
+es donde tiene sentido (§4.2). Las fotos que hoy están en `public/fotos/**` no se migran a la
 base de golpe: el contenido inicial las referencia por ruta, y la primera vez
 que alguien elige otra foto para ese lugar, la nueva va a `fotos`. El campo
-`foto()` acepta las dos formas (ruta de `public/` o id de `fotos`) y
-`lib/contenido/fotos.ts` resuelve `src`, `alt` y `object-position`.
+El valor
+`foto()` (§4.2) lleva `src`, `alt` y `foco`, y `lib/contenido/fotos.ts` resuelve
+el `object-position`.
 
-**Subida.** Desde el formulario, jpg/png/webp de hasta 8 MB. El servidor
+**Subida.** Desde el formulario, jpg/png/webp de hasta 4 MB (Vercel corta el
+cuerpo de una función en 4,5 MB: con más pasaría en local y fallaría en
+producción). El servidor
 verifica el tipo por los bytes (no por la extensión), lee ancho y alto, y
 guarda. El punto de foco se elige con un clic sobre la miniatura. **Dónde se
 guarda** lo decide `lib/contenido/almacen.ts` con dos implementaciones: en
@@ -241,7 +247,8 @@ botón la abre en otra pestaña. Con la cookie de Draft Mode puesta, Next saltea
 lo prerenderizado y renderiza a pedido, y `contenidoDe()` devuelve el borrador.
 Nadie sin sesión puede habilitarlo: la cookie solo la pone esa acción.
 
-En ese estado el sitio muestra arriba una franja fina «Estás viendo un
+En ese estado el sitio muestra abajo (el header es una píldora flotante
+arriba) una franja fina «Estás viendo un
 borrador · Volver al sitio publicado» (un `POST` que deshabilita el Draft
 Mode) y manda `noindex` en la metadata. Las demás visitas siguen viendo la
 versión publicada.
@@ -337,6 +344,11 @@ hablar con Gastón y Mateo antes o durante la fase A:
    spec del admin no contempla.
 4. **El resaltado con asteriscos** como forma de editar los fragmentos.
 5. **Blob en Vercel, disco en local**, con el mismo `almacen.ts`.
+6. **El formulario de una página sale de su esquema** (seis tipos de campo
+   cerrados, en la app). AGENTS.md §12 prohíbe una «meta-capa de configuración
+   para los formularios» (la regla anti-Payload); acá es una excepción acotada a
+   las páginas: las entidades siguen con formularios escritos a mano con los
+   primitivos del kit. Necesita el OK del owner para el párrafo de AGENTS.md.
 
 ## 13. Fuera de alcance
 
