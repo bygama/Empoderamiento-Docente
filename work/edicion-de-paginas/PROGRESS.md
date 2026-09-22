@@ -4,7 +4,7 @@
 - **Base:** `9e721f1` (= `origin/main` al 2026-09-21, con la fase A de métricas mergeada)
 - **Spec:** [`SPEC.md`](SPEC.md) · **Plan:** [`PLAN.md`](PLAN.md) · **Inventario:** [`INVENTARIO.md`](INVENTARIO.md) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
 
-**Estado: fase A implementada (A0–A9) y revisada tarea por tarea; PR en preparación.**
+**Estado: fase A implementada (A0–A9), revisada tarea por tarea y con una revisión final de toda la rama («lista para mergear», sin críticos) más su ola de fixes; PR en curso.**
 
 ## Baseline
 
@@ -30,10 +30,12 @@ Medido sobre `9e721f1`:
 - 2026-09-21 — A7: «Páginas» y el editor (barra con estado relativo, secciones, acciones en try/catch); `cambio.ts` con `Cambio<T>` (valor o updater) para que `alCambiar` no pise ediciones concurrentes, con `confirmados` en vez de banderas de "sucio"; sin `useTransition` — un estado `pendiente` manual, porque react-doctor lo marcaba por `no-derived-useState`/`no-impure-state-updater` (commit aa29424, dos rondas de revisión).
 - 2026-09-21 — A8: la franja de borrador (`z-[60]`, entre el header y el menú mobile) y el `noindex` en vista previa; `almacen.ts` con `turbopackIgnore` en sus dos `path.join` para que Turbopack no arrastre `apps/sitio` entero al bundle de `/api/fotos`; verificado en el navegador (los 13 puntos del plan) y el sitio sin base (commits c97d8ad + 7e3de9d).
 - 2026-09-21 — A9: README (variables de entorno y «Editar las páginas», con la nota de no compartir fotos locales entre entornos), AGENTS.md §3/§12/§13 (con OK de Facundo), este PROGRESS.
+- 2026-09-21 — Revisión final de la rama (Opus, nueve pasadas; corrió gates y tests, comparó las 19 tarjetas contra `hero-cards.ts`: 0 diferencias): sin críticos, dos importantes y trece menores. Ola de fixes antes del PR: el build falla fuerte si hay `DATABASE_URL` y la consulta tira (en runtime sigue el fallback); `esSrcDeFoto` rechaza `%2e`/`%2f`; el alt de la foto con updater; «descartar» sin borrador lo dice; las ayudas de las listas fijas derivan la cantidad; `maxDuration` en la página del editor; `propioDe`/`primerProblema` a `lib/contenido/documento.ts` (`editar-paginas.ts` en 100 líneas); y, con OK de Facundo, los máximos del hero con aire (título 72, cartel 30, descripción 60) y el contador avisa al llegar al tope.
 
 ## Abierto
 
-- Cargar `BLOB_READ_WRITE_TOKEN` en Vercel (Mateo/Gastón) y probar una subida en producción.
-- Fase B: ¿Quiénes somos? y Misión con `textoConResaltado`.
-- Las cinco decisiones del SPEC §12 con Gastón y Mateo, incluida la excepción de AGENTS.md §12 (ya escrita acá con el OK de Facundo; falta que la vean ellos).
-- La revisión final de toda la rama, con lo que quedó diferido tarea a tarea: `editar-paginas.ts` (116 líneas) y `comparar-render.mjs` (117) por arriba de las 100 de la guía — a decidir si se parten o si se escribe la excepción en AGENTS.md §6, como la de `verificar-react-doctor.mjs`; y los máximos de los campos del hero al ras (título 56/60, carteles 22/24), decisión de contenido para Facundo.
+- Cargar `BLOB_READ_WRITE_TOKEN` en Vercel (Mateo/Gastón) y probar una subida real: ese camino nunca corrió contra Vercel.
+- Las cinco decisiones del SPEC §12 con Gastón y Mateo, incluida la excepción de AGENTS.md §12 (ya escrita con el OK de Facundo; falta que la vean ellos).
+- `scripts/comparar-render.mjs` (117 líneas) por arriba de las 100 de la guía: la revisión final propone escribir la excepción en AGENTS.md §6, como la de `verificar-react-doctor.mjs` (con OK).
+- Deuda anotada por la revisión final, para la fase B: nada borra una foto reemplazada (fila en `fotos` y archivo en Blob quedan); los 19 alts del hero viven dentro de `aria-hidden` (se escriben pero no se leen); `config/nav.ts` quedó en 104 líneas; `publicar` revalida solo su ruta (el SPEC §7 pide las dos cuando una sección se repite: fase D); dos pantallas que crean la fila a la vez chocan (ventana de milisegundos).
+- Fase B: ¿Quiénes somos? y Misión con `textoConResaltado`; el resto de Inicio.
