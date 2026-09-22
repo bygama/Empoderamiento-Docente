@@ -53,13 +53,16 @@ export function Manifiesto({ contenido }: { contenido: QuienesSomos }) {
             href={contenido.enlace.ruta}
             className="group focus-visible:outline-naranja-accion mt-2 inline-flex w-fit items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4"
           >
-            <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
+            {/* En un celular no hay hover: el toque pinta el círculo al
+                instante (`group-active`, solo con puntero táctil: en
+                computadora el clic no cambia nada) y suelta con el fade. */}
+            <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white pointer-coarse:group-active:border-naranja-accion pointer-coarse:group-active:bg-naranja-accion pointer-coarse:group-active:text-white pointer-coarse:group-active:duration-0">
               <ArrowRight
                 size={17}
                 className="transition-transform duration-300 group-hover:translate-x-0.5"
               />
             </span>
-            <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.9rem] font-medium tracking-wide transition-colors duration-500">
+            <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.9rem] font-medium tracking-wide transition-colors duration-500 pointer-coarse:group-active:text-naranja-accion pointer-coarse:group-active:duration-0">
               {contenido.enlace.texto}
             </span>
           </Link>
