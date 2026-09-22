@@ -3,17 +3,24 @@
 import Image from "next/image";
 import { useState, useTransition, type KeyboardEvent, type MouseEvent } from "react";
 import { Aviso } from "@/admin/armazon/Campos";
-import { subirFoto } from "@/datos/acciones/fotos";
-import type { Descripcion } from "@/lib/contenido/descripcion";
 import { MAXIMO_BYTES, posicionDelFoco, type ValorFoto } from "@/lib/contenido/fotos";
 import type { Cambio } from "./cambio";
 import { BOTON_SECUNDARIO, ENTRADA } from "./clases";
 
+/**
+ * Lo que el control necesita de quien guarda la foto: recibe el archivo y el
+ * alt, y contesta dónde quedó o por qué no. Llega por prop para que el control
+ * no conozca la Server Action de la app y pueda mudarse al kit.
+ */
+export type SubirFoto = (datos: FormData) => Promise<{ ok: true; foto: { src: string } } | { ok: false; detalle: string }>;
+
 type Props = {
   nombre: string;
-  descripcion: Extract<Descripcion, { tipo: "foto" }>;
+  etiqueta: string;
+  ayuda?: string;
   valor: ValorFoto;
   alCambiar: (valor: Cambio<ValorFoto>) => void;
+  subir: SubirFoto;
 };
 
 // Cuánto mueve cada pulsación de flecha, en fracción de la caja (0..1): un
@@ -29,7 +36,7 @@ const PASO_FOCO_GRANDE = 0.25;
  * tarjeta: las once tienen once relaciones de aspecto y el campo es uno solo
  * (DECISIONS, 8); el recorte real se ve en la vista previa.
  */
-export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
+export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: Props) {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [pendiente, empezar] = useTransition();
@@ -65,7 +72,7 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
     alCambiar((actual: ValorFoto) => ({ ...actual, foco }));
   };
 
-  const subir = () => {
+  const alSubir = () => {
     if (!archivo) return;
     if (!valor.alt.trim()) {
       setAviso("Escribí primero el texto alternativo: sin él la foto no se guarda.");
@@ -82,7 +89,7 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
     datos.append("alt", valor.alt);
     empezar(async () => {
       try {
-        const r = await subirFoto(datos);
+        const r = await subir(datos);
         if (!r.ok) {
           setAviso(r.detalle);
           return;
@@ -103,7 +110,7 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium">{descripcion.etiqueta}</p>
+      <p className="text-sm font-medium">{etiqueta}</p>
       {valor.src ? (
         <>
           <button
@@ -161,11 +168,11 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
           onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
           className="text-sm"
         />
-        <button type="button" disabled={!archivo || pendiente} onClick={subir} className={BOTON_SECUNDARIO}>
+        <button type="button" disabled={!archivo || pendiente} onClick={alSubir} className={BOTON_SECUNDARIO}>
           {pendiente ? "Subiendo…" : "Subir foto"}
         </button>
       </div>
-      <p className="text-xs text-gris-texto">jpg, png o webp de hasta 4 MB.{descripcion.ayuda ? ` ${descripcion.ayuda}` : ""}</p>
+      <p className="text-xs text-gris-texto">jpg, png o webp de hasta 4 MB.{ayuda ? ` ${ayuda}` : ""}</p>
       {aviso ? <Aviso tono="error">{aviso}</Aviso> : null}
     </div>
   );
