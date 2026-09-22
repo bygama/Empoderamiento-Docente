@@ -185,7 +185,8 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
   };
 
   return (
-    <div className="space-y-6">
+    // Abajo, en el celular, el lugar de la barra fija de las acciones (64 px): así no tapa el último campo.
+    <div className="space-y-6 max-lg:pb-16">
       <EncabezadoDelEditor
         nombre={pagina.nombre}
         estado={estado}
