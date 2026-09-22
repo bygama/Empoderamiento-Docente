@@ -41,7 +41,7 @@ export function Parrafo({ nombre, etiqueta, maximo, ayuda, valor, alCambiar }: P
         aria-describedby={ayuda ? `${idContador} ${idAyuda}` : idContador}
         aria-invalid={excedido ? true : undefined}
         onChange={(e) => alCambiar(e.target.value)}
-        className={ENTRADA}
+        className={`mt-1 ${ENTRADA}`}
       />
       {/* maxLength corta la tecla en silencio: sin esto, quien edita no entiende por qué dejó de escribir (Importante 2 de la revisión). */}
       {/* El span vive siempre en el DOM y solo cambia el texto: si naciera junto con el texto, el lector de pantalla puede no llegar a anunciarlo. */}

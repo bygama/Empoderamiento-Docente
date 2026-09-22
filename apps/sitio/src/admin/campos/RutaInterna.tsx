@@ -24,7 +24,7 @@ export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambia
         value={conocida ? valor : ""}
         aria-describedby={ayuda ? idAyuda : undefined}
         onChange={(e) => alCambiar(e.target.value)}
-        className={ENTRADA}
+        className={`mt-1 ${ENTRADA}`}
       >
         {/* Si el valor guardado ya no está en la lista, que se vea que falta elegir. */}
         {conocida ? null : <option value="">Elegí una ruta</option>}
