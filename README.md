@@ -71,8 +71,10 @@ Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm build` en verde
 
 ## Variables de entorno
 
-**El sitio público no necesita ninguna**: compila y corre sin `.env.local`. El
-admin sí las necesita todas:
+**El sitio público no necesita ninguna**: corre sin `.env.local` y compila sin
+base (con `DATABASE_URL` vacía; la URL se lee en la primera consulta). El
+admin sí las necesita todas, y el build completo pide al menos
+`BETTER_AUTH_SECRET`, porque la sesión se arma al cargar el admin:
 
 - `DATABASE_URL` y `DATABASE_URL_UNPOOLED` — conexión a Postgres (Docker en
   local, Neon en Vercel). La segunda es la directa, sin pooler: el pooler corta
@@ -80,11 +82,13 @@ admin sí las necesita todas:
 - `NEXT_PUBLIC_SITE_URL` — URL pública del sitio (pública, cliente).
 - `BETTER_AUTH_SECRET` — firma las sesiones del admin. Sin esto no arranca.
 
-Las dos que siguen están **declaradas pero todavía no conectadas**: hoy ningún
-código las lee, y ponerlas no cambia nada. Se conectan cuando el admin suba una
-foto (fase 2) y cuando mande un correo de verdad.
+`BLOB_READ_WRITE_TOKEN` — fotos a Vercel Blob. **Con el token, las fotos que
+sube el admin van a Blob; sin él (local) van a `apps/sitio/.fotos/`**,
+git-ignorada, y las sirve `/api/fotos/<id>`. No hace falta cargarlo en local.
 
-- `BLOB_READ_WRITE_TOKEN` — fotos a Vercel Blob.
+La que sigue está **declarada pero todavía no conectada**: hoy ningún código
+la lee, y ponerla no cambia nada.
+
 - `RESEND_API_KEY` — correos del admin. **Mientras tanto el enlace de
   «olvidé mi contraseña» sale siempre por la consola del servidor**, con clave
   o sin ella.
@@ -206,9 +210,10 @@ Prisma antes de `next build`.
 ## Admin
 
 Vive en `/admin`, construido a medida sobre **Prisma** y **better-auth**. Hoy
-tiene los cimientos —entrar, salir y elegir contraseña— y **nada de contenido
-todavía**: las novedades, la biblioteca, los casos y el equipo llegan en las
-fases siguientes. El diseño completo está en
+tiene los cimientos —entrar, salir y elegir contraseña—, la portada con las
+métricas y **la edición del hero de Inicio** (ver «Editar las páginas»); las
+novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
+El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
 y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
 
@@ -238,6 +243,28 @@ poner la clave no cambia nada por ahora.
 > las nueve tablas que dejó Payload. Quedó huérfana con la fase 0 y no la toca
 > nadie: borrala cuando quieras con
 > `docker exec ed-postgres psql -U postgres -c "DROP DATABASE ed_panel;"`.
+
+### Editar las páginas
+
+En «Páginas» están las siete del sitio en el orden del menú; por ahora se
+edita el **hero de Inicio** (textos, botones y las 11 + 8 fotos con sus
+carteles), y cada sección nueva se suma escribiendo su esquema en
+`src/features/<pagina>/contenido/` y anotándola en `src/contenido/paginas.ts`.
+Guardar **no publica**: cada página tiene un borrador y una versión publicada;
+«Vista previa» abre el sitio con el borrador (Draft Mode de Next, solo con
+sesión, con una franja abajo para volver) y «Publicar» lo pasa al sitio y
+regenera la página. Las fotos se suben desde el formulario (jpg, png o webp de
+hasta 4 MB, con texto alternativo obligatorio y punto de foco): con
+`BLOB_READ_WRITE_TOKEN` van a Vercel Blob; sin él, a `apps/sitio/.fotos/`
+(git-ignorada), servida por `/api/fotos/<id>`. Sin base el sitio muestra el
+contenido inicial del código y carga igual. Diseño y decisiones en
+[`work/edicion-de-paginas/`](work/edicion-de-paginas/).
+
+> **No compartas una base con fotos locales entre entornos:** una foto subida
+> sin `BLOB_READ_WRITE_TOKEN` queda con una URL de disco (`/api/fotos/<id>`
+> sobre `apps/sitio/.fotos/`), y en cuanto el token aparece en ese entorno
+> (por ejemplo, al promover a producción) esa URL da 404, porque el archivo
+> nunca viajó a Blob.
 
 ### Las métricas
 
