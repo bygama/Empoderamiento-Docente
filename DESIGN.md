@@ -178,7 +178,8 @@ por separado como fondo decorativo:
   (`work/armazon-del-admin/`). Los tres CTAs del sitio (`ButtonPrimary`, el
   del `Header` y el de `PieMenu`) siguen en blanco y se pasan en un cambio
   aparte.
-- Hover: oscurecer 10%
+- Hover: aclarar 10% (`naranja-accion/90` sobre blanco), que da 5,07:1.
+  Con el texto azul, oscurecer 10% bajaría el contraste a 3,75:1.
 - Padding: `px-6 py-3`, `rounded-lg`
 - Solo uno por sección visible cuando se pueda; jamás dos botones naranjas
   compitiendo.
