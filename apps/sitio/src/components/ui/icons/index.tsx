@@ -184,6 +184,17 @@ export function Check({ size = 24, ...rest }: IconProps) {
   );
 }
 
+/** Una flecha que sube desde una bandeja: elegir un archivo para subir. */
+export function Subir({ size = 24, ...rest }: IconProps) {
+  return (
+    <svg width={size} height={size} {...baseProps} {...rest}>
+      <path d="M12 15V4" />
+      <polyline points="7 9 12 4 17 9" />
+      <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    </svg>
+  );
+}
+
 /** Círculo con un signo de exclamación: el ícono de un error del admin. */
 export function Alerta({ size = 24, ...rest }: IconProps) {
   return (

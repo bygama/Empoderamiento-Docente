@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition, type KeyboardEvent, type MouseEvent } from "react";
+import { useRef, useState, useTransition, type KeyboardEvent, type MouseEvent } from "react";
 import { Boton } from "@/admin/armazon/Boton";
 import { Aviso } from "@/admin/armazon/Campos";
+import { claseDeBoton } from "@/admin/armazon/clases";
+import { Subir } from "@/components/ui/icons";
 import { MAXIMO_BYTES, posicionDelFoco, type ValorFoto } from "@/lib/contenido/fotos";
 import type { Cambio } from "./cambio";
 import { ENTRADA } from "./clases";
@@ -41,6 +43,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
   const [archivo, setArchivo] = useState<File | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [pendiente, empezar] = useTransition();
+  const refArchivo = useRef<HTMLInputElement>(null);
   const idArchivo = `${nombre}-archivo`;
 
   const elegirFoco = (e: MouseEvent<HTMLButtonElement>) => {
@@ -109,9 +112,19 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
     });
   };
 
+  // Vuelve a antes de elegir: sin archivo y con el input vacío, así se puede re-elegir el mismo.
+  const cancelar = () => {
+    setArchivo(null);
+    setAviso(null);
+    if (refArchivo.current) refArchivo.current.value = "";
+  };
+
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium">{etiqueta}</p>
+      <div>
+        <p className="text-admin-meta font-medium">{etiqueta}</p>
+        {ayuda ? <p className="mt-1 text-admin-meta text-gris-texto">{ayuda}</p> : null}
+      </div>
       {valor.src ? (
         <>
           <button
@@ -120,7 +133,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
             onKeyDown={moverFoco}
             disabled={pendiente}
             aria-label="Punto de foco: tocá la miniatura o usá las flechas"
-            className="relative block aspect-[4/3] w-full max-w-xs cursor-crosshair overflow-hidden rounded-lg border border-azul-claro disabled:cursor-not-allowed disabled:opacity-50"
+            className="relative block aspect-4/3 w-full max-w-xs cursor-crosshair overflow-hidden rounded-lg border border-gris-texto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Image src={valor.src} alt={valor.alt} fill sizes="320px" className="object-cover" style={{ objectPosition: posicionDelFoco(valor.foco) }} />
             <span
@@ -131,15 +144,13 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
           </button>
           {/* Nada que ver, todo que oír: anuncia dónde quedó el foco después de moverlo, con mouse o teclado. */}
           <span className="sr-only" aria-live="polite" aria-atomic="true">{`Foco en ${posicionDelFoco(valor.foco)}`}</span>
-          <p className="text-xs text-gris-texto">
-            Tocá la miniatura donde está lo importante, o usá las flechas del teclado. Cada marco del sitio recorta alrededor de ese punto.
-          </p>
+          <p className="text-admin-meta text-gris-texto">Tocá lo importante o usá las flechas: ahí se centra el recorte.</p>
         </>
       ) : (
-        <p className="text-sm text-gris-texto">Sin foto todavía.</p>
+        <p className="text-admin-meta text-gris-texto">Sin foto todavía.</p>
       )}
       <label className="block">
-        <span className="text-sm font-medium">Texto alternativo (obligatorio)</span>
+        <span className="text-admin-meta font-medium">Texto alternativo (obligatorio)</span>
         <input
           type="text"
           value={valor.alt}
@@ -156,24 +167,44 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
           className={`mt-1 ${ENTRADA}`}
         />
       </label>
-      <div className="flex flex-wrap items-center gap-3">
-        <label htmlFor={idArchivo} className="sr-only">
-          Archivo de la foto
-        </label>
-        {/* La key remonta el input tras cada subida: limpia su selección y deja re-elegir el mismo archivo. */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        {/*
+          El input nativo queda oculto pero enfocable (Tab llega, Enter abre el
+          selector) y su label hace de botón: así no aparece el «Choose File»
+          del navegador, que no se puede estilar ni traducir. `peer` le pasa al
+          label el foco del input. La key lo remonta tras cada subida: limpia
+          la selección y deja re-elegir el mismo archivo.
+        */}
         <input
           key={valor.src}
+          ref={refArchivo}
           id={idArchivo}
           type="file"
           accept="image/jpeg,image/png,image/webp"
+          disabled={pendiente}
           onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
-          className="text-sm"
+          className="peer sr-only"
         />
-        <Boton variante="secundario" disabled={!archivo || pendiente} aria-busy={pendiente || undefined} onClick={alSubir}>
-          {pendiente ? "Subiendo…" : "Subir foto"}
-        </Boton>
+        <label
+          htmlFor={idArchivo}
+          className={`${claseDeBoton("secundario")} cursor-pointer peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-azul-medio peer-disabled:cursor-not-allowed peer-disabled:opacity-60`}
+        >
+          <Subir size={16} />
+          {valor.src ? "Cambiar foto…" : "Elegir foto…"}
+        </label>
+        <span className="text-admin-meta text-gris-texto">jpg, png o webp · hasta 4 MB</span>
       </div>
-      <p className="text-xs text-gris-texto">jpg, png o webp de hasta 4 MB.{ayuda ? ` ${ayuda}` : ""}</p>
+      {archivo ? (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span className="min-w-0 truncate text-admin-meta">{archivo.name}</span>
+          <Boton variante="secundario" disabled={pendiente} aria-busy={pendiente || undefined} onClick={alSubir}>
+            {pendiente ? "Subiendo…" : "Subir foto"}
+          </Boton>
+          <Boton variante="terciario" disabled={pendiente} onClick={cancelar}>
+            Cancelar
+          </Boton>
+        </div>
+      ) : null}
       {aviso ? <Aviso tono="error">{aviso}</Aviso> : null}
     </div>
   );
