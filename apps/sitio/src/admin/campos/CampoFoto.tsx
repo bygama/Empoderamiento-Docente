@@ -137,7 +137,14 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
           value={valor.alt}
           maxLength={200}
           disabled={pendiente}
-          onChange={(e) => alCambiar({ ...valor, alt: e.target.value })}
+          onChange={(e) => {
+            const alt = e.target.value;
+            // Updater, no un valor plano: mismo motivo que el foco y la
+            // subida de más arriba — si esto corre después de que algo
+            // asíncrono resuelva pero antes de que React confirme, un valor
+            // plano pisaría lo que se haya tocado en otro campo mientras tanto.
+            alCambiar((actual: ValorFoto) => ({ ...actual, alt }));
+          }}
           className={ENTRADA}
         />
       </label>

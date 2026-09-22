@@ -65,6 +65,24 @@ test("guardar, chocar, publicar y descartar", { skip: !hayBase && "sin DATABASE_
   assert.deepEqual(despues?.publicado, { bloque: { titulo: "Dos" } });
 });
 
+test("descartar sin borrador no escribe y lo dice, en vez de mentir que descartó (M-4)", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { descartarBorradorEnBase, guardarBorradorEnBase, publicarEnBase } = await import("./editar-paginas");
+  await base.pagina.deleteMany({ where: { slug: SLUG } });
+
+  // Fila con `publicado` pero sin borrador: exactamente el caso de M-4.
+  await guardarBorradorEnBase(base, { slug: SLUG, seccion: "bloque", contenido: { titulo: "Cuatro" }, borradorEnVisto: null, quien: "Gastón" }, registro);
+  await publicarEnBase(base, { slug: SLUG, quien: "Gastón" }, registro);
+
+  const r = await descartarBorradorEnBase(base, SLUG, registro);
+  assert.equal(r.ok, true);
+  assert.equal(r.detalle, "No había borrador que descartar.");
+
+  // No escribió de más: sigue publicado igual que antes de llamar.
+  const fila = await base.pagina.findUnique({ where: { slug: SLUG } });
+  assert.deepEqual(fila?.publicado, { bloque: { titulo: "Cuatro" } });
+});
+
 test("una página o sección que no está en el registro no se guarda", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
   const { guardarBorradorEnBase } = await import("./editar-paginas");

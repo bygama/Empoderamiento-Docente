@@ -3,6 +3,12 @@ import { EditorDePagina } from "@/admin/paginas/EditorDePagina";
 import { esSlug, PAGINAS } from "@/contenido/paginas";
 import { paginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 
+// Las Server Actions de este árbol (subirFoto, en CampoFoto) toman el
+// maxDuration de la página que las invoca, no el de su propio archivo: 4 MB
+// de cuerpo + sharp + el put a Blob pueden superar el default de la función
+// (docs Next, route-segment-config/maxDuration). Mismo valor que el cron.
+export const maxDuration = 60;
+
 export default async function EditarPagina({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   // Un slug que no está en el registro, o una página sin secciones todavía, no tiene editor.

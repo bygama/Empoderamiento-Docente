@@ -41,4 +41,7 @@ test("solo se aceptan las fotos que el sitio sabe mostrar", () => {
   assert.equal(esSrcDeFoto("/fotos/2026/aula.webp"), true);
   assert.equal(esSrcDeFoto("/fotos/../.env.local"), false);
   assert.equal(esSrcDeFoto("/fotos/a/../b.webp"), false);
+  // M-1: "%2e"/"%2f" percent-encoded no deben colarse como "." o "/" adentro del segmento.
+  assert.equal(esSrcDeFoto("/fotos/..%2F.env.local"), false);
+  assert.equal(esSrcDeFoto("/fotos/%2e%2e/%2e%2e/.env.local"), false);
 });
