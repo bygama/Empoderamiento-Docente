@@ -16,9 +16,15 @@ export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambia
   const idAyuda = `${nombre}-ayuda`;
   return (
     <div>
-      <label htmlFor={idCampo} className="block text-sm font-medium">
+      <label htmlFor={idCampo} className="block text-admin-meta font-medium">
         {etiqueta}
       </label>
+      {/* La ayuda antes del campo: se lee antes de elegir, no después. */}
+      {ayuda ? (
+        <p id={idAyuda} className="mt-1 text-admin-meta text-gris-texto">
+          {ayuda}
+        </p>
+      ) : null}
       <select
         id={idCampo}
         value={conocida ? valor : ""}
@@ -34,11 +40,6 @@ export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambia
           </option>
         ))}
       </select>
-      {ayuda ? (
-        <p id={idAyuda} className="mt-1 text-xs text-gris-texto">
-          {ayuda}
-        </p>
-      ) : null}
     </div>
   );
 }

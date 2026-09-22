@@ -103,8 +103,9 @@ function CampoOpcional({ nombre, descripcion, valor, alCambiar }: PropsOpcional)
   const activo = valor !== null && valor !== undefined;
   return (
     <div className="space-y-3">
-      <label className="flex items-center gap-2 text-sm font-medium">
-        <input type="checkbox" checked={activo} onChange={(e) => alCambiar(e.target.checked ? valorVacio(descripcion.de) : null)} />
+      <label className="flex items-center gap-2 text-admin-meta font-medium">
+        {/* El tilde en el azul de la marca, no en el del navegador. */}
+        <input type="checkbox" className="size-4 accent-azul-principal" checked={activo} onChange={(e) => alCambiar(e.target.checked ? valorVacio(descripcion.de) : null)} />
         Lleva {descripcion.etiqueta.toLowerCase()}
       </label>
       {activo ? <Campo raiz nombre={nombre} descripcion={descripcion.de} valor={valor} alCambiar={alCambiar} /> : null}

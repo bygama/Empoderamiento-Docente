@@ -22,23 +22,36 @@ export function Parrafo({ nombre, etiqueta, maximo, ayuda, valor, alCambiar }: P
   // que es lo normal al escribir (`maxLength` no deja pasarse), no solo con
   // un dato viejo por encima. Pinta el contador y dispara el aviso de abajo.
   const alTope = valor.length >= maximo;
+  // A la vista recién desde el 80 % del máximo: antes es ruido. Para el lector
+  // de pantalla está siempre, por el `aria-describedby`.
+  const cerca = valor.length >= maximo * 0.8;
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={idCampo} className="text-sm font-medium">
+        <label htmlFor={idCampo} className="text-admin-meta font-medium">
           {etiqueta}
         </label>
         {/* Fuera del label: así su nombre accesible no cambia en cada tecla, y el contador se anuncia aparte por aria-describedby. */}
-        <span id={idContador} className={`text-xs font-normal ${alTope ? "text-naranja-accion-texto" : "text-gris-texto"}`}>
+        {/* Pasado el tope (un dato viejo) va en rojo, como el borde; al tope, en azul: el naranja es solo para la acción. */}
+        <span
+          id={idContador}
+          className={`text-admin-meta ${cerca ? "" : "sr-only"} ${excedido ? "text-rojo-error" : alTope ? "font-medium text-azul-principal" : "text-gris-texto"}`}
+        >
           {valor.length}/{maximo}
         </span>
       </div>
+      {/* La ayuda antes del campo: se lee antes de escribir, no después. */}
+      {ayuda ? (
+        <p id={idAyuda} className="mt-1 text-admin-meta text-gris-texto">
+          {ayuda}
+        </p>
+      ) : null}
       <textarea
         id={idCampo}
         rows={4}
         value={valor}
         maxLength={maximo}
-        aria-describedby={ayuda ? `${idContador} ${idAyuda}` : idContador}
+        aria-describedby={ayuda ? `${idAyuda} ${idContador}` : idContador}
         aria-invalid={excedido ? true : undefined}
         onChange={(e) => alCambiar(e.target.value)}
         className={`mt-1 ${ENTRADA}`}
@@ -48,11 +61,6 @@ export function Parrafo({ nombre, etiqueta, maximo, ayuda, valor, alCambiar }: P
       <span className="sr-only" aria-live="polite">
         {alTope ? "Llegaste al máximo de caracteres." : ""}
       </span>
-      {ayuda ? (
-        <p id={idAyuda} className="mt-1 text-xs text-gris-texto">
-          {ayuda}
-        </p>
-      ) : null}
     </div>
   );
 }
