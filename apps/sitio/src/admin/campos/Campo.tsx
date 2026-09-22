@@ -1,3 +1,4 @@
+import { subirFoto } from "@/datos/acciones/fotos";
 import { valorVacio, type Descripcion } from "@/lib/contenido/descripcion";
 import type { ValorFoto } from "@/lib/contenido/fotos";
 import { resolverCambio, type Cambio } from "./cambio";
@@ -31,15 +32,21 @@ export type PropsDeCampo = {
  * (`CampoFoto`) y los que arman un valor compuesto (`CampoGrupo`,
  * `ListaFija`), para no pisar una edición hecha en otro campo mientras algo
  * todavía no resolvió.
+ *
+ * Es el único archivo de `admin/campos/` que conoce `Descripcion` y la app:
+ * los controles reciben props planas (etiqueta, ayuda, máximo…) y la subida
+ * de fotos por prop, para mudarse a `packages/kit-admin` en la fase 2 sin
+ * llevarse este dibujante (AGENTS.md §12).
  */
 export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false }: PropsDeCampo) {
+  const texto = typeof valor === "string" ? valor : "";
   switch (descripcion.tipo) {
     case "textoCorto":
-      return <TextoCorto nombre={nombre} descripcion={descripcion} valor={typeof valor === "string" ? valor : ""} alCambiar={alCambiar} />;
+      return <TextoCorto nombre={nombre} etiqueta={descripcion.etiqueta} maximo={descripcion.maximo} ayuda={descripcion.ayuda} valor={texto} alCambiar={alCambiar} />;
     case "parrafo":
-      return <Parrafo nombre={nombre} descripcion={descripcion} valor={typeof valor === "string" ? valor : ""} alCambiar={alCambiar} />;
+      return <Parrafo nombre={nombre} etiqueta={descripcion.etiqueta} maximo={descripcion.maximo} ayuda={descripcion.ayuda} valor={texto} alCambiar={alCambiar} />;
     case "rutaInterna":
-      return <RutaInterna nombre={nombre} descripcion={descripcion} valor={typeof valor === "string" ? valor : ""} alCambiar={alCambiar} />;
+      return <RutaInterna nombre={nombre} etiqueta={descripcion.etiqueta} opciones={descripcion.opciones} ayuda={descripcion.ayuda} valor={texto} alCambiar={alCambiar} />;
     case "foto":
       // Si el valor no es un objeto (nulo, viejo, corrupto), lo reemplaza un
       // vacío del mismo tipo: los dos `as ValorFoto` son seguros porque acá
@@ -47,15 +54,21 @@ export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false }: P
       return (
         <CampoFoto
           nombre={nombre}
-          descripcion={descripcion}
+          etiqueta={descripcion.etiqueta}
+          ayuda={descripcion.ayuda}
           valor={valor && typeof valor === "object" ? (valor as ValorFoto) : (valorVacio(descripcion) as ValorFoto)}
           alCambiar={alCambiar}
+          subir={subirFoto}
         />
       );
     case "listaFija":
       return (
         <ListaFija
-          descripcion={descripcion}
+          etiqueta={descripcion.etiqueta}
+          etiquetaItem={descripcion.item.etiqueta}
+          cantidad={descripcion.cantidad}
+          ayuda={descripcion.ayuda}
+          itemVacio={() => valorVacio(descripcion.item)}
           valor={Array.isArray(valor) ? valor : []}
           alCambiar={alCambiar}
           porItem={(i, item, cambiarItem) => <Campo raiz nombre={`${nombre}.${i}`} descripcion={descripcion.item} valor={item} alCambiar={cambiarItem} />}
