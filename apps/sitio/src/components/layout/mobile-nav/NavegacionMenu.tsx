@@ -4,7 +4,7 @@ import { HOME_LINK, NAV_LINKS, esPaginaActiva } from "@/config/nav";
 import { PaginaMenu } from "./PaginaMenu";
 import { useAcordeonFlip } from "./useAcordeonFlip";
 
-// Sobre el azul del panel (mismos valores que el Footer sobre su azul).
+// «Volver», sobre el azul del panel (mismos valores que el Footer sobre su azul).
 const ROTULO =
   "text-azul-claro/70 flex items-center gap-3 font-mono text-[0.68rem] font-medium tracking-[0.2em] uppercase";
 
@@ -34,8 +34,9 @@ type Props = {
  * Tocar el chevron de una página la pone EN FOCO: las demás salen de la lista,
  * ella sube al tope y sus destinos bajan en vertical. Es una sola decisión por
  * pantalla —primero qué página, después qué parte— en vez de un acordeón con
- * todo a la vista. Se vuelve con el rótulo, que pasa a ser «Volver», o con el
- * mismo chevron. El menú abre siempre en la lista completa (el foco lo resetea
+ * todo a la vista. Se vuelve con «Volver», que aparece arriba solo en foco, o
+ * con el mismo chevron. La lista completa no lleva rótulo: el «Explorar» que
+ * tenía no decía nada que la lista no dijera (Gastón, 2026-09-22). El menú abre siempre en la lista completa (el foco lo resetea
  * el compositor): arrancar en foco escondería el resto del sitio. Cómo se
  * mueve todo sin animar alturas, en `useAcordeonFlip`.
  */
@@ -59,20 +60,14 @@ export function NavegacionMenu({
       // página cuatro destinos u ocho.
       className={`flex flex-1 flex-col px-8 py-4 ${desplegado ? "justify-start" : "justify-center"}`}
     >
-      {/* Rótulo con hairline, como los del Footer: nombra la lista. En foco es
-          la salida. */}
-      {desplegado ? (
+      {/* En foco, la salida: con el mismo estilo de rótulo que el Footer. */}
+      {desplegado && (
         <button type="button" onClick={() => cambiarFoco(null)} className={`${ROTULO} -my-3 min-h-11 hover:text-white`}>
           <ArrowLeft size={16} />
           Volver
         </button>
-      ) : (
-        <p className={ROTULO}>
-          <span aria-hidden="true" className="bg-verde-concepto h-px w-6" />
-          Explorar
-        </p>
       )}
-      <ul className="mt-3">
+      <ul className={desplegado ? "mt-3" : ""}>
         {PAGINAS.map((link) => (
           <PaginaMenu
             key={link.href}
