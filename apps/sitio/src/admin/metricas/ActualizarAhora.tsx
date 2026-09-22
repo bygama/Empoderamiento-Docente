@@ -14,7 +14,7 @@ export function ActualizarAhora() {
         type="button"
         disabled={pendiente}
         onClick={() => empezar(async () => setAviso(await actualizarMetricasAhora()))}
-        className="rounded-lg border border-azul-claro px-3 py-1.5 text-sm text-azul-medio transition-opacity hover:opacity-80 disabled:opacity-50"
+        className="rounded-lg border border-azul-claro px-3 py-1.5 text-admin-meta text-azul-medio transition-opacity hover:opacity-80 disabled:opacity-50"
       >
         {pendiente ? "Actualizando…" : "Actualizar ahora"}
       </button>

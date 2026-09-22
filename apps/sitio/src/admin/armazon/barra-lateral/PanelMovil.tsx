@@ -86,7 +86,7 @@ export function PanelMovil({ children }: { children: React.ReactNode }) {
           aria-expanded={abierto}
           aria-controls="panel-del-admin"
           onClick={abrir}
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-azul-claro"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-admin-meta font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-azul-claro"
         >
           <Menu size={20} />
           Menú

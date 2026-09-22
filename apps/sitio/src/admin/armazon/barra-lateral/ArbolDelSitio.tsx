@@ -26,7 +26,7 @@ function PaginaConSecciones({ pagina, actual }: { pagina: PaginaDelArbol; actual
       <details open={actual} className="group">
         <summary
           aria-current={actual ? "page" : undefined}
-          className={`relative flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors [&::-webkit-details-marker]:hidden ${actual ? ESTILO_ACTIVO : ESTILO_INACTIVO}`}
+          className={`relative flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 text-admin-meta transition-colors [&::-webkit-details-marker]:hidden ${actual ? ESTILO_ACTIVO : ESTILO_INACTIVO}`}
         >
           <span className="flex-1">{pagina.nombre}</span>
           {pagina.sinPublicar ? <PuntoSinPublicar /> : null}
@@ -49,9 +49,9 @@ function PaginaConSecciones({ pagina, actual }: { pagina: PaginaDelArbol; actual
 /** Una página que todavía no tiene secciones en el registro: atenuada y sin link (su editor daría 404). */
 function PaginaSinSecciones({ pagina }: { pagina: PaginaDelArbol }) {
   return (
-    <li className="flex items-baseline justify-between gap-2 px-3 py-2 text-sm text-azul-claro/75">
+    <li className="flex items-baseline justify-between gap-2 px-3 py-2 text-admin-meta text-azul-claro/75">
       <span>{pagina.nombre}</span>
-      <span className="text-xs">Todavía no se edita</span>
+      <span className="text-admin-meta">Todavía no se edita</span>
     </li>
   );
 }
@@ -62,10 +62,10 @@ export function ArbolDelSitio({ arbol }: { arbol: PaginaDelArbol[] }) {
     <nav aria-label="Navegación del admin" className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
       {/* «· métricas» lo separa de la página Inicio del sitio, que está más abajo con el mismo nombre. */}
       <ItemDeNavegacion href="/admin" activo={ruta === "/admin"}>
-        Inicio <span className="text-xs opacity-80">· métricas</span>
+        Inicio <span className="text-admin-meta opacity-80">· métricas</span>
       </ItemDeNavegacion>
       <div>
-        <p className="px-3 pb-2 text-xs font-medium tracking-wider text-azul-claro uppercase">Sitio</p>
+        <p className="px-3 pb-2 text-admin-meta font-medium tracking-wider text-azul-claro uppercase">Sitio</p>
         <ul className="space-y-1">
           <li>
             <ItemDeNavegacion href="/admin/paginas" activo={ruta === "/admin/paginas"}>

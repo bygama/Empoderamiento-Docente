@@ -21,7 +21,7 @@ export default async function LayoutProtegido({ children }: { children: React.Re
   if (!sesion) redirect("/admin/entrar");
 
   return (
-    <div className="min-h-dvh lg:pl-72">
+    <div className="min-h-dvh bg-white lg:pl-72">
       <BarraLateral usuario={{ nombre: sesion.user.name, rol: sesion.user.rol ?? ROL_POR_DEFECTO }} />
       <main className="mx-auto w-full max-w-5xl px-6 py-10">{children}</main>
     </div>

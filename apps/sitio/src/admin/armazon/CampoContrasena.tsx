@@ -32,7 +32,7 @@ export function CampoContrasena({ etiqueta, name, autoComplete, minLength, ayuda
   const describen = [ayuda ? idAyuda : null, invalido ? idDelError : null].filter(Boolean).join(" ");
   return (
     <div>
-      <label htmlFor={id} className="text-sm font-medium text-azul-principal">
+      <label htmlFor={id} className="text-admin-meta font-medium text-azul-principal">
         {etiqueta}
       </label>
       <div className="relative mt-1">
@@ -60,7 +60,7 @@ export function CampoContrasena({ etiqueta, name, autoComplete, minLength, ayuda
         </button>
       </div>
       {ayuda ? (
-        <p id={idAyuda} className="mt-1 text-xs text-gris-texto">
+        <p id={idAyuda} className="mt-1 text-admin-meta text-gris-texto">
           {ayuda}
         </p>
       ) : null}
