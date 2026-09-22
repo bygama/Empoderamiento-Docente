@@ -172,7 +172,12 @@ por separado como fondo decorativo:
 ### Botón primario (CTA)
 
 - Fondo: `naranja-accion`
-- Texto: blanco, Inter Medium
+- Texto: `azul-principal`, Inter Medium. Da **4,54:1**, que pasa AA (§1,
+  regla 5). El blanco sobre `naranja-accion` da 3,00:1: no llega al 4,5:1
+  que pide el texto de un botón. Cambiado el 2026-09-22 con el admin
+  (`work/armazon-del-admin/`). Los tres CTAs del sitio (`ButtonPrimary`, el
+  del `Header` y el de `PieMenu`) siguen en blanco y se pasan en un cambio
+  aparte.
 - Hover: oscurecer 10%
 - Padding: `px-6 py-3`, `rounded-lg`
 - Solo uno por sección visible cuando se pueda; jamás dos botones naranjas
