@@ -84,7 +84,15 @@ export function EncabezadoDelEditor({ nombre, estado, haySinGuardar, pendiente, 
       acciones={
         <>
           <Boton variante="secundario" sobreAzul={azul} disabled={corriendo} aria-busy={pendiente === "guardar" || undefined} onClick={alGuardar}>
-            {pendiente === "guardar" ? "Guardando…" : "Guardar borrador"}
+            {/* En el celular la barra de abajo no tiene lugar para «Guardar borrador»: se ve «Guardar» y el lector lee el nombre entero. */}
+            {pendiente === "guardar" ? (
+              "Guardando…"
+            ) : (
+              // Un solo hijo: en el `inline-flex` del botón, dos serían dos piezas separadas por el `gap`.
+              <span>
+                Guardar<span className="max-lg:sr-only"> borrador</span>
+              </span>
+            )}
           </Boton>
           <Boton variante="secundario" sobreAzul={azul} disabled={corriendo} aria-busy={pendiente === "vista-previa" || undefined} onClick={alVerBorrador}>
             {pendiente === "vista-previa" ? "Abriendo…" : "Vista previa"}
