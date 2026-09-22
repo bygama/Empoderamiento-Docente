@@ -208,9 +208,13 @@ export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: re
             </p>
           </div>
 
-          {/* Las cartas. La pista solo pesa en la pila mobile: es el tramo de
-              scroll que recorre el mazo, que queda fijo adentro suyo. */}
+          {/* Las cartas y la salida. La pista solo pesa en la pila mobile: es
+              el tramo de scroll que recorre el mazo, que queda fijo adentro
+              suyo. `.deck-mazo` es la escena fija de la pila (las cartas y,
+              debajo de la última, la salida); fuera de la pila no genera caja
+              (`display: contents`), así el abanico y la grilla no cambian. */}
           <div data-deck-pista className="deck-pista">
+          <div data-deck-mazo className="deck-mazo">
           <ul className="deck-cards mt-14 md:mt-16">
             {areas.map((area, i) => (
               <li key={area.titulo} data-deck-card className="deck-card">
@@ -218,12 +222,12 @@ export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: re
               </li>
             ))}
           </ul>
-          </div>
 
           {/* Salida → Investigación, que es el archivo de casos: las áreas
               puestas en práctica. El copy lo dice, si no el salto no se
               entendía (Gastón, 2026-09-11). En live aparece abajo-centro
-              cuando ya salieron todas las cartas. */}
+              cuando ya salieron todas las cartas; en la pila, debajo de la
+              última carta cuando se queda quieta. */}
           <div
             data-deck-cta
             className="deck-cta mt-12 flex justify-center md:justify-start"
@@ -232,13 +236,18 @@ export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: re
               href={contenido.enlace.ruta}
               className="group inline-flex items-center gap-3"
             >
-              <span className="border-azul-principal/15 group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
+              {/* En un celular no hay hover: el toque pinta el círculo al
+                  instante (`group-active`, solo con puntero táctil) y suelta
+                   con el fade de siempre. */}
+              <span className="border-azul-principal/15 group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white pointer-coarse:group-active:border-naranja-accion pointer-coarse:group-active:bg-naranja-accion pointer-coarse:group-active:text-white pointer-coarse:group-active:duration-0">
                 <ArrowRight size={17} />
               </span>
-              <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.93rem] font-medium tracking-wide transition-colors duration-500">
+              <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.93rem] font-medium tracking-wide transition-colors duration-500 pointer-coarse:group-active:text-naranja-accion pointer-coarse:group-active:duration-0">
                 {contenido.enlace.texto}
               </span>
             </Link>
+          </div>
+          </div>
           </div>
         </div>
       </div>

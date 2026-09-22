@@ -27,23 +27,28 @@ const LOMOS_MAX = 3;
  */
 export function crearPilaMovil(root: HTMLElement) {
   const pista = root.querySelector<HTMLElement>("[data-deck-pista]");
+  const escena = root.querySelector<HTMLElement>("[data-deck-mazo]");
   const mazo = root.querySelector<HTMLElement>(".deck-cards");
+  const salida = root.querySelector<HTMLElement>("[data-deck-cta]");
   const cartas = gsap.utils.toArray<HTMLElement>("[data-deck-card]", root);
-  if (!pista || !mazo || cartas.length < 2) return () => {};
+  if (!pista || !escena || !mazo || cartas.length < 2) return () => {};
 
   root.classList.add("is-pila");
 
   const ctx = gsap.context(() => {
     const total = cartas.length;
-    // Cuántos lomos entran sin que la carta abierta se corte abajo: depende
-    // del alto de la pantalla. Se recalcula en cada refresh.
+    // Cuántos lomos entran sin que la carta abierta —y la salida, debajo de la
+    // última— se corte abajo: depende del alto de la pantalla. Se recalcula
+    // en cada refresh. Si ni con un lomo entra la salida, queda debajo del
+    // borde y se ve cuando el mazo se suelta.
     const lomos = () => {
-      const estilo = getComputedStyle(mazo);
+      const estilo = getComputedStyle(escena);
       const libre =
-        mazo.clientHeight -
+        escena.clientHeight -
         parseFloat(estilo.paddingTop) -
         parseFloat(estilo.paddingBottom) -
-        cartas[0].offsetHeight;
+        mazo.offsetHeight -
+        (salida ? salida.offsetHeight + parseFloat(getComputedStyle(salida).marginTop) : 0);
       return Math.max(1, Math.min(LOMOS_MAX, Math.floor(libre / LOMO)));
     };
     // Dónde descansa la carta `j` cuando la abierta es la `k`: las últimas
@@ -53,7 +58,9 @@ export function crearPilaMovil(root: HTMLElement) {
 
     // El hint lo pone y lo saca la coreografía (se va con el revert).
     gsap.set(cartas, { willChange: "transform, opacity" });
-    gsap.set(cartas.slice(1), { y: () => mazo.clientHeight });
+    gsap.set(cartas.slice(1), { y: () => escena.clientHeight });
+    // La salida acompaña a la última carta: baja lo que baja ella en reposo.
+    if (salida) gsap.set(salida, { autoAlpha: 0, y: () => reposo(total - 1, total - 1) + 16 });
     gsap.set("[data-deck-corto]", { autoAlpha: 0 });
 
     const tramo = 1 / total;
@@ -94,6 +101,13 @@ export function crearPilaMovil(root: HTMLElement) {
     // aterriza la última carta (6/7) y el scrub lo estira hasta el final de la
     // pista: la última entraba justo cuando el mazo se soltaba, sin su rato
     // quieto y sin que se llegara a ver cómo arrastra a los lomos de arriba.
+    if (salida) {
+      tl.to(
+        salida,
+        { autoAlpha: 1, y: () => reposo(total - 1, total - 1), ease: "power3.out" },
+        (total - 1) * tramo + tramo * 0.1,
+      );
+    }
     tl.set({}, {}, 1);
 
     // SALIDA: cuando se suelta el mazo, la última carta se va hacia arriba
@@ -101,9 +115,10 @@ export function crearPilaMovil(root: HTMLElement) {
     // trabajamos» le deja lugar al siguiente (sube, se achica apenas, se
     // desenfoca y se desvanece; mismos valores que coreografia-metodo.ts). Va
     // sobre el mazo entero y no carta por carta: la `y` y la opacidad de cada
-    // carta son del timeline de arriba. Corre DESPUÉS de soltarse —mientras el
-    // mazo ya sube con el scroll— y no antes: si se desvaneciera fijo, quedaría
-    // una pantalla vacía hasta que se suelte.
+    // carta son del timeline de arriba. La salida NO se desvanece: se va con el
+    // scroll y se puede tocar hasta el final. Corre DESPUÉS de soltarse
+    // —mientras la escena ya sube con el scroll— y no antes: si se desvaneciera
+    // fija, quedaría una pantalla vacía hasta que se suelte.
     gsap.set(mazo, { willChange: "transform, opacity, filter" });
     gsap.fromTo(
       mazo,
