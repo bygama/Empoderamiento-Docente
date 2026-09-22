@@ -24,3 +24,13 @@ export async function salirDeVistaPrevia(datos: FormData): Promise<void> {
   const ruta = datos.get("ruta");
   redirect(typeof ruta === "string" && rutaDelSitio(ruta) ? ruta : "/");
 }
+
+/**
+ * Apaga el Draft Mode sin redirigir. La llama «Salir» del admin antes de
+ * cerrar la sesión: la cookie no vence sola, y quien sale del admin no tiene
+ * que seguir viendo borradores en el sitio. Sin sesión por el mismo motivo
+ * que `salirDeVistaPrevia`.
+ */
+export async function apagarVistaPrevia(): Promise<void> {
+  (await draftMode()).disable();
+}
