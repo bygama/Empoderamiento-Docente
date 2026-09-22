@@ -1,6 +1,7 @@
 import { subirFoto } from "@/datos/acciones/fotos";
 import { valorVacio, type Descripcion } from "@/lib/contenido/descripcion";
 import type { ValorFoto } from "@/lib/contenido/fotos";
+import { resumirItem } from "@/lib/contenido/resumen";
 import { resolverCambio, type Cambio } from "./cambio";
 import { CampoFoto } from "./CampoFoto";
 import { ListaFija } from "./ListaFija";
@@ -16,6 +17,8 @@ export type PropsDeCampo = {
   alCambiar: (valor: Cambio<unknown>) => void;
   /** La raíz de una sección o de un ítem no lleva caja propia: ya la tiene su bloque. */
   raiz?: boolean;
+  /** La raíz de un ítem de lista: sus campos van en dos columnas cuando el panel del ítem tiene lugar (`@container`). */
+  columnas?: boolean;
 };
 
 /**
@@ -38,7 +41,7 @@ export type PropsDeCampo = {
  * de fotos por prop, para mudarse a `packages/kit-admin` en la fase 2 sin
  * llevarse este dibujante (AGENTS.md §12).
  */
-export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false }: PropsDeCampo) {
+export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false, columnas = false }: PropsDeCampo) {
   const texto = typeof valor === "string" ? valor : "";
   switch (descripcion.tipo) {
     case "textoCorto":
@@ -64,6 +67,7 @@ export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false }: P
     case "listaFija":
       return (
         <ListaFija
+          nombre={nombre}
           etiqueta={descripcion.etiqueta}
           etiquetaItem={descripcion.item.etiqueta}
           cantidad={descripcion.cantidad}
@@ -71,13 +75,14 @@ export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false }: P
           itemVacio={() => valorVacio(descripcion.item)}
           valor={Array.isArray(valor) ? valor : []}
           alCambiar={alCambiar}
-          porItem={(i, item, cambiarItem) => <Campo raiz nombre={`${nombre}.${i}`} descripcion={descripcion.item} valor={item} alCambiar={cambiarItem} />}
+          resumenDe={(item) => resumirItem(descripcion.item, item)}
+          porItem={(i, item, cambiarItem) => <Campo raiz columnas nombre={`${nombre}.${i}`} descripcion={descripcion.item} valor={item} alCambiar={cambiarItem} />}
         />
       );
     case "opcional":
       return <CampoOpcional nombre={nombre} descripcion={descripcion} valor={valor} alCambiar={alCambiar} />;
     case "grupo":
-      return <CampoGrupo nombre={nombre} descripcion={descripcion} valor={valor} alCambiar={alCambiar} raiz={raiz} />;
+      return <CampoGrupo nombre={nombre} descripcion={descripcion} valor={valor} alCambiar={alCambiar} raiz={raiz} columnas={columnas} />;
   }
 }
 
@@ -108,10 +113,11 @@ type PropsGrupo = {
   valor: unknown;
   alCambiar: (valor: Cambio<unknown>) => void;
   raiz: boolean;
+  columnas: boolean;
 };
 
 /** Un grupo de campos: sin caja propia en la raíz de una sección o un ítem, con `fieldset` en cualquier otro lado. */
-function CampoGrupo({ nombre, descripcion, valor, alCambiar, raiz }: PropsGrupo) {
+function CampoGrupo({ nombre, descripcion, valor, alCambiar, raiz, columnas }: PropsGrupo) {
   // El valor y la descripción salen del mismo esquema ya validado: un «grupo» siempre trae un objeto por clave.
   const grupo = (valor ?? {}) as Record<string, unknown>;
   const campos = descripcion.campos.map(({ clave, descripcion: d }) => (
@@ -133,7 +139,8 @@ function CampoGrupo({ nombre, descripcion, valor, alCambiar, raiz }: PropsGrupo)
       }
     />
   ));
-  if (raiz) return <div className="space-y-5">{campos}</div>;
+  // En dos columnas (la foto a la izquierda y el resto a la derecha) solo la raíz de un ítem, y solo si su panel tiene lugar.
+  if (raiz) return <div className={columnas ? "grid items-start gap-5 @2xl:grid-cols-2" : "space-y-5"}>{campos}</div>;
   return (
     <fieldset className="space-y-4 rounded-lg border border-azul-claro/60 p-4">
       <legend className="px-1 text-sm font-medium">{descripcion.etiqueta}</legend>
