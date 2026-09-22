@@ -17,3 +17,20 @@
   del HTML antes y después, no un snapshot commiteado — Un snapshot del HTML
   del admin se rompe con cualquier cambio visual legítimo y no protege nada
   después de este paso. La evidencia queda en PROGRESS.
+- 2026-09-22 — La revisión de cierre es un solo revisor, en Opus 5.5, con
+  el lente de todo el cambio contra el SPEC — Decisión del owner, textual:
+  «1 revisor opus 5.5». El default de las marcas era cuatro (ese lente más
+  uno por cada paso `high`: tipos e interfaces para el 1, cobertura de tests
+  para el 2, impacto en la documentación para el 5); esos tres lentes no se
+  compran.
+- 2026-09-22 — La re-review en Sonnet y no en Opus — La plantilla de
+  re-review pide un modelo barato o medio para un diff chico y acotado a un
+  hallazgo; el «opus 5.5» del owner se leyó como la elección para la
+  revisión de cierre.
+- 2026-09-22 — La observación fuera de alcance de la re-review («la
+  excepción se busca solo por nombre, un `apagarVistaPrevia` en otro archivo
+  la heredaría») no se toma — El test pasa `SIN_SESION[relativa]?.acciones`:
+  la lista se busca por la ruta del archivo, así que en cualquier otro
+  archivo llega `undefined` y no hay excepción. (El caso «una excepción vale
+  para su acción y no para las otras del archivo» cubre el otro borde:
+  dentro del mismo archivo.)
