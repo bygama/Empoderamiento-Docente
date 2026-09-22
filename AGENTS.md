@@ -607,17 +607,18 @@ Reglas para el admin y sus datos:
   2026-09-22, `work/condiciones-de-la-revision/`):
   - **Solo las páginas.** Ninguna entidad genera su formulario desde un
     esquema.
-  - **Los seis tipos son cerrados.** Un séptimo se discute con el owner como
-    una regla nueva y se escribe acá antes de sumarlo; no entra en un PR de
-    contenido.
+  - **Los seis tipos son cerrados**: los seis constructores de
+    `lib/contenido/campos.ts` (más `opcional`, que no es un tipo propio: sale
+    de `.nullable()`). Un séptimo se discute con el owner como una regla nueva
+    y se escribe acá antes de sumarlo; no entra en un PR de contenido.
   - **La descripción de un campo dice qué control es y cómo se rotula**:
     etiqueta, ayuda, largo, opciones, cantidad. Nada de
     visibilidad condicional, componentes propios por campo ni hooks. Una
     sección que los necesite escribe su formulario a mano.
   - **Los controles no conocen el generador.** Los de `admin/campos/` reciben
     props planas y la subida de fotos por prop; solo `Campo.tsx` conoce
-    `Descripcion` y la app. Así se mudan a `packages/kit-admin` en la fase 2
-    sin llevárselo.
+    `Descripcion` y las acciones de `datos/`. Así se mudan a
+    `packages/kit-admin` en la fase 2 sin llevárselo.
 - **Se escribe en vocabulario relacional**: tablas, columnas y controles. No
   «colecciones», «globals» ni `CollectionConfig`.
 - **Validar todos los bordes con Zod** antes de escribir o leer, incluidas las
