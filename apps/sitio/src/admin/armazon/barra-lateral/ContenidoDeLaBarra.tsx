@@ -21,8 +21,8 @@ export function ContenidoDeLaBarra({ usuario, arbol }: { usuario: Usuario; arbol
       </div>
       <ArbolDelSitio arbol={arbol} />
       <div className="border-t border-white/15 px-6 py-4">
-        <p className="text-sm font-medium text-white">{usuario.nombre}</p>
-        <p className="text-xs text-azul-claro">{usuario.rol}</p>
+        <p className="text-admin-meta font-medium text-white">{usuario.nombre}</p>
+        <p className="text-admin-meta text-azul-claro">{usuario.rol}</p>
         <div className="mt-3">
           <SalirDelAdmin />
         </div>

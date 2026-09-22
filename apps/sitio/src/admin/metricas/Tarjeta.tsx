@@ -12,9 +12,9 @@ function leyendaDe(variacion: string): string {
 export function Tarjeta({ etiqueta, valor, variacion }: { etiqueta: string; valor: number; variacion: string }) {
   return (
     <div className="rounded-xl border border-azul-claro bg-white p-4">
-      <p className="text-sm text-gris-texto">{etiqueta}</p>
-      <p className="mt-1 font-[family-name:var(--font-manrope)] text-3xl font-bold">{numero.format(valor)}</p>
-      <p className="mt-1 text-xs text-gris-texto">{leyendaDe(variacion)}</p>
+      <p className="text-admin-meta text-gris-texto">{etiqueta}</p>
+      <p className="mt-1 font-display text-admin-titulo font-bold">{numero.format(valor)}</p>
+      <p className="mt-1 text-admin-meta text-gris-texto">{leyendaDe(variacion)}</p>
     </div>
   );
 }

@@ -35,12 +35,12 @@ export function Pantalla({
           sizes="(min-width: 1024px) 240px, 144px"
           className="relative h-auto w-36 lg:w-60"
         />
-        <p className="relative font-display text-sm font-medium text-azul-claro lg:text-lg">Admin del sitio</p>
+        <p className="relative font-display text-admin-meta font-medium text-azul-claro lg:text-admin-seccion">Admin del sitio</p>
       </aside>
       <main className="flex flex-1 items-center justify-center px-6 py-12 lg:px-16">
         <div className="w-full max-w-sm">
-          <h1 className="font-display text-3xl font-bold tracking-tight text-azul-principal">{titulo}</h1>
-          {bajada ? <p className="mt-2 text-sm text-gris-texto">{bajada}</p> : null}
+          <h1 className="font-display text-admin-titulo font-bold tracking-tight text-azul-principal">{titulo}</h1>
+          {bajada ? <p className="mt-2 text-admin-meta text-gris-texto">{bajada}</p> : null}
           <div className="mt-8">{children}</div>
         </div>
       </main>

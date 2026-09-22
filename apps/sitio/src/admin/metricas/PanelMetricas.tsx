@@ -16,8 +16,8 @@ export async function PanelMetricas() {
   const cabecera = (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h2 id="metricas" className="font-[family-name:var(--font-manrope)] text-xl font-bold">Cuánta gente entra al sitio</h2>
-        <p className="text-sm text-gris-texto">
+        <h2 id="metricas" className="font-display text-admin-seccion font-bold">Cuánta gente entra al sitio</h2>
+        <p className="text-admin-meta text-gris-texto">
           {estado.hastaDia
             ? `Datos hasta el ${fechaLarga.format(new Date(`${estado.hastaDia}T00:00:00.000Z`))} (días en hora universal).`
             : "Todavía sin datos."}

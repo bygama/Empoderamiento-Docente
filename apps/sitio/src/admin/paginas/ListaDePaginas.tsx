@@ -10,9 +10,9 @@ export function ListaDePaginas({ filas }: { filas: FilaDeLista[] }) {
         <li key={f.slug} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
           <div>
             <p className="font-medium">
-              {f.nombre} <span className="text-sm text-gris-texto">{f.ruta}</span>
+              {f.nombre} <span className="text-admin-meta text-gris-texto">{f.ruta}</span>
             </p>
-            <p className="text-sm text-gris-texto">
+            <p className="text-admin-meta text-gris-texto">
               {f.publicadoEn ? (
                 <>
                   Publicado el <Momento iso={f.publicadoEn} />
@@ -24,13 +24,13 @@ export function ListaDePaginas({ filas }: { filas: FilaDeLista[] }) {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {f.sinPublicar ? <span className="rounded-full bg-azul-claro/40 px-2.5 py-0.5 text-xs font-medium text-azul-principal">Cambios sin publicar</span> : null}
+            {f.sinPublicar ? <span className="rounded-full bg-azul-claro/40 px-2.5 py-0.5 text-admin-meta font-medium text-azul-principal">Cambios sin publicar</span> : null}
             {f.editable ? (
-              <Link href={`/admin/paginas/${f.slug}`} className="rounded-lg border border-azul-claro px-3 py-1.5 text-sm text-azul-medio transition-opacity hover:opacity-80">
+              <Link href={`/admin/paginas/${f.slug}`} className="rounded-lg border border-azul-claro px-3 py-1.5 text-admin-meta text-azul-medio transition-opacity hover:opacity-80">
                 Editar
               </Link>
             ) : (
-              <span className="text-sm text-gris-texto">Todavía no se edita desde acá</span>
+              <span className="text-admin-meta text-gris-texto">Todavía no se edita desde acá</span>
             )}
           </div>
         </li>
