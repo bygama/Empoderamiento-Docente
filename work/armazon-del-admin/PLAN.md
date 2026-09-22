@@ -29,21 +29,21 @@
 
 ## Pasos
 
-- [ ] **1. El CTA en `DESIGN.md`** — §7 «Botón primario»: el texto pasa a
+- [x] **1. El CTA en `DESIGN.md`** — §7 «Botón primario»: el texto pasa a
   `azul-principal` sobre `naranja-accion` (4,54:1), con el porqué (blanco
   da 3,00:1) y la nota de que los tres CTAs del sitio quedan para un cambio
   aparte.
   - Accept: `git grep -n "4,54" -- DESIGN.md` sale 0.
   - Accept: `git diff --stat` muestra solo `DESIGN.md`, fuera de la lane.
   - *(judgment · high)*
-- [ ] **2. El ojo en el set de íconos** — `Eye` y `EyeOff` en
+- [x] **2. El ojo en el set de íconos** — `Eye` y `EyeOff` en
   `apps/sitio/src/components/ui/icons/index.tsx`: trazo, `currentColor` y
   tamaño como los demás (`DESIGN.md` §5).
   - Accept: `git grep -c -E "export function Eye(Off)?\b" -- apps/sitio/src/components/ui/icons/index.tsx`
     da 2.
   - Accept: el gate sale 0.
   - *(mechanical · low)*
-- [ ] **3. Los primitivos del acceso con la marca** —
+- [x] **3. Los primitivos del acceso con la marca** —
   `admin/armazon/Campos.tsx` con tres cambios:
   - `Campo`: foco en `azul-medio`, `aria-invalid` y `aria-describedby`;
   - `Boton`: `naranja-accion` con texto `azul-principal`;
@@ -57,7 +57,7 @@
     texto y ≥ 3 en el borde del input.
   - Accept: el gate sale 0.
   - *(integration · medium)*
-- [ ] **4. La pantalla partida** — `admin/armazon/Pantalla.tsx`:
+- [x] **4. La pantalla partida** — `admin/armazon/Pantalla.tsx`:
   - a la izquierda, desde `lg`, el panel `azul-principal` con el logo en
     negativo (`next/image`, PNG de `public/brand/`), «Admin del sitio», la
     grilla de puntos blanca al 12 % y una forma `azul-medio` con
@@ -72,7 +72,7 @@
   - Accept: `document.title` es «Entrar · Admin ED».
   - Accept: el gate sale 0.
   - *(integration · medium)*
-- [ ] **5. Los formularios de acceso** `[batch]` —
+- [x] **5. Los formularios de acceso** `[batch]` —
   `FormularioEntrar`, `FormularioOlvide` y `FormularioNueva`:
   - las contraseñas pasan a `CampoContrasena` (paso 3);
   - «Nueva» lleva `minLength={12}` y la ayuda «Doce caracteres o más»;
@@ -85,7 +85,7 @@
   - Accept: una contraseña mala muestra el aviso con `role="alert"`.
   - Accept: el gate sale 0.
   - *(integration · medium)*
-- [ ] **6. La sidebar en escritorio** — la sidebar y lo que la rodea:
+- [x] **6. La sidebar en escritorio** — la sidebar y lo que la rodea:
   - **El compositor:** `admin/armazon/BarraLateral.tsx`, un Server
     Component con la interfaz `BarraLateral({ usuario: { nombre, rol } })`.
     Lee `PAGINAS`/`SLUGS` y `listaDePaginas()` dentro de un `try`: si la
@@ -106,7 +106,7 @@
   - Accept: `aria-current="page"` está en el ítem de la ruta.
   - Accept: el gate sale 0.
   - *(integration · high)*
-- [ ] **7. La sidebar en el celular** —
+- [x] **7. La sidebar en el celular** —
   `admin/armazon/barra-lateral/PanelMovil.tsx` (`"use client"`), con la
   interfaz `PanelMovil({ children })`: recibe como `children` el contenido de
   `BarraLateral` (paso 6).
@@ -122,7 +122,7 @@
   - Accept: a 1280 px, el botón no se ve y la sidebar sí.
   - Accept: el gate sale 0.
   - *(integration · high)*
-- [ ] **8. `AGENTS.md` §3 nombra la sidebar** — en el árbol, la línea de
+- [x] **8. `AGENTS.md` §3 nombra la sidebar** — en el árbol, la línea de
   `admin/armazon/` suma «la sidebar (barra-lateral/)».
   - Accept: `git grep -n "barra-lateral" -- AGENTS.md` sale 0.
   - Accept: el diff de `AGENTS.md` es de una línea.
