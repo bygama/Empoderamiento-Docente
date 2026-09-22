@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authCliente } from "@/admin/auth-cliente";
 import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
-import { Aviso, Boton, Campo } from "@/admin/armazon/Campos";
+import { Aviso, Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 
 /**
  * Entra al admin.
@@ -20,6 +20,8 @@ export function FormularioEntrar() {
   // Solo cuando el problema son los datos: un 429 no dice nada de lo escrito.
   const [datosRechazados, setDatosRechazados] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  // Los campos rechazados apuntan al aviso: el lector anuncia el porqué al volver a cada uno.
+  const idDelError = useId();
 
   async function entrar(datos: FormData) {
     setEnviando(true);
@@ -56,14 +58,25 @@ export function FormularioEntrar() {
         autoComplete="email"
         autoFocus
         aria-invalid={datosRechazados ? true : undefined}
+        aria-describedby={datosRechazados ? idDelError : undefined}
       />
-      <CampoContrasena etiqueta="Contraseña" name="contrasena" autoComplete="current-password" invalido={datosRechazados} />
-      {error ? <Aviso tono="error">{error}</Aviso> : null}
+      <CampoContrasena
+        etiqueta="Contraseña"
+        name="contrasena"
+        autoComplete="current-password"
+        invalido={datosRechazados}
+        idDelError={idDelError}
+      />
+      {error ? (
+        <Aviso tono="error" id={idDelError}>
+          {error}
+        </Aviso>
+      ) : null}
       <Boton type="submit" disabled={enviando}>
         {enviando ? "Entrando…" : "Entrar"}
       </Boton>
       <p className="text-center text-sm">
-        <Link className="text-azul-medio underline" href="/admin/olvide-mi-contrasena">
+        <Link className={ENLACE_DE_ACCESO} href="/admin/olvide-mi-contrasena">
           Olvidé mi contraseña
         </Link>
       </p>

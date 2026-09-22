@@ -14,6 +14,8 @@ type Props = {
   autoFocus?: boolean;
   /** Marca el campo con `aria-invalid` cuando el formulario rechazó lo que tiene. */
   invalido?: boolean;
+  /** El `id` del aviso que explica el rechazo: el campo lo suma a su `aria-describedby`. */
+  idDelError?: string;
 };
 
 /**
@@ -22,10 +24,12 @@ type Props = {
  * lector de pantalla anuncia un solo control con dos estados, no dos botones
  * que se turnan.
  */
-export function CampoContrasena({ etiqueta, name, autoComplete, minLength, ayuda, autoFocus, invalido }: Props) {
+export function CampoContrasena({ etiqueta, name, autoComplete, minLength, ayuda, autoFocus, invalido, idDelError }: Props) {
   const [visible, setVisible] = useState(false);
   const id = useId();
   const idAyuda = `${id}-ayuda`;
+  // La ayuda siempre; el aviso de error, solo mientras este campo es el rechazado.
+  const describen = [ayuda ? idAyuda : null, invalido ? idDelError : null].filter(Boolean).join(" ");
   return (
     <div>
       <label htmlFor={id} className="text-sm font-medium text-azul-principal">
@@ -41,7 +45,7 @@ export function CampoContrasena({ etiqueta, name, autoComplete, minLength, ayuda
           minLength={minLength}
           autoFocus={autoFocus}
           aria-invalid={invalido ? true : undefined}
-          aria-describedby={ayuda ? idAyuda : undefined}
+          aria-describedby={describen || undefined}
           className={`${ENTRADA_DE_ACCESO} pr-12`}
         />
         <button

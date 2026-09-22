@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LARGO_MINIMO_CONTRASENA } from "@ed/auth";
 import { authCliente } from "@/admin/auth-cliente";
@@ -16,6 +16,8 @@ export function FormularioNueva() {
   const [error, setError] = useState<string | null>(null);
   const [rechazado, setRechazado] = useState<Rechazado>(null);
   const [enviando, setEnviando] = useState(false);
+  // El campo rechazado apunta al aviso que explica por qué (`aria-describedby`).
+  const idDelError = useId();
 
   function rechazar(campo: Rechazado, mensaje: string) {
     setRechazado(campo);
@@ -63,6 +65,7 @@ export function FormularioNueva() {
         ayuda="Doce caracteres o más."
         autoFocus
         invalido={rechazado === "contrasena"}
+        idDelError={idDelError}
       />
       <CampoContrasena
         etiqueta="Repetila"
@@ -70,8 +73,13 @@ export function FormularioNueva() {
         autoComplete="new-password"
         minLength={LARGO_MINIMO_CONTRASENA}
         invalido={rechazado === "repetida"}
+        idDelError={idDelError}
       />
-      {error ? <Aviso tono="error">{error}</Aviso> : null}
+      {error ? (
+        <Aviso tono="error" id={idDelError}>
+          {error}
+        </Aviso>
+      ) : null}
       <Boton type="submit" disabled={enviando}>
         {enviando ? "Guardando…" : "Guardar"}
       </Boton>
