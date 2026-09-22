@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { useState, useTransition, type KeyboardEvent, type MouseEvent } from "react";
+import { Boton } from "@/admin/armazon/Boton";
 import { Aviso } from "@/admin/armazon/Campos";
 import { MAXIMO_BYTES, posicionDelFoco, type ValorFoto } from "@/lib/contenido/fotos";
 import type { Cambio } from "./cambio";
-import { BOTON_SECUNDARIO, ENTRADA } from "./clases";
+import { ENTRADA } from "./clases";
 
 /**
  * Lo que el control necesita de quien guarda la foto: recibe el archivo y el
@@ -168,9 +169,9 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
           onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
           className="text-sm"
         />
-        <button type="button" disabled={!archivo || pendiente} onClick={alSubir} className={BOTON_SECUNDARIO}>
+        <Boton variante="secundario" disabled={!archivo || pendiente} aria-busy={pendiente || undefined} onClick={alSubir}>
           {pendiente ? "Subiendo…" : "Subir foto"}
-        </button>
+        </Boton>
       </div>
       <p className="text-xs text-gris-texto">jpg, png o webp de hasta 4 MB.{ayuda ? ` ${ayuda}` : ""}</p>
       {aviso ? <Aviso tono="error">{aviso}</Aviso> : null}

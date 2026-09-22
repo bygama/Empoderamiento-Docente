@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { Boton } from "@/admin/armazon/Boton";
 import { Momento } from "@/admin/armazon/Momento";
-import { BOTON_SECUNDARIO } from "@/admin/campos/clases";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 
 /** Cuál de las cuatro acciones corre, o ninguna: cada botón muestra su propio progreso y todos se deshabilitan mientras una corre. */
@@ -59,25 +59,25 @@ export function BarraDeAcciones({ nombre, ruta, estado, haySinGuardar, pendiente
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button type="button" disabled={corriendo || !haySinGuardar} onClick={alGuardar} className={BOTON_SECUNDARIO}>
+          <Boton variante="secundario" disabled={corriendo || !haySinGuardar} aria-busy={pendiente === "guardar" || undefined} onClick={alGuardar}>
             {pendiente === "guardar" ? "Guardando…" : "Guardar borrador"}
-          </button>
-          <button type="button" disabled={corriendo} onClick={alVerBorrador} className={BOTON_SECUNDARIO}>
+          </Boton>
+          <Boton variante="secundario" disabled={corriendo} aria-busy={pendiente === "vista-previa" || undefined} onClick={alVerBorrador}>
             {pendiente === "vista-previa" ? "Abriendo…" : "Vista previa"}
-          </button>
+          </Boton>
           {/* El único naranja de la pantalla: es la acción (DESIGN.md, naranja solo CTAs). Texto azul: el blanco da 3,00:1 (DESIGN.md §7). */}
-          <button
-            type="button"
+          <Boton
+            variante="primario"
             disabled={corriendo || (!estado.borradorEn && !haySinGuardar)}
+            aria-busy={pendiente === "publicar" || undefined}
             onClick={alPublicar}
-            className="rounded-lg bg-naranja-accion px-4 py-2 text-sm font-medium text-azul-principal transition-colors hover:bg-naranja-accion/90 disabled:opacity-50"
           >
             {pendiente === "publicar" ? "Publicando…" : "Publicar"}
-          </button>
+          </Boton>
           {estado.borradorEn ? (
-            <button type="button" disabled={corriendo} onClick={alDescartar} className="text-sm text-gris-texto underline-offset-2 hover:underline">
+            <Boton variante="destructivo" disabled={corriendo} aria-busy={pendiente === "descartar" || undefined} onClick={alDescartar}>
               {pendiente === "descartar" ? "Descartando…" : "Descartar"}
-            </button>
+            </Boton>
           ) : null}
         </div>
       </div>
