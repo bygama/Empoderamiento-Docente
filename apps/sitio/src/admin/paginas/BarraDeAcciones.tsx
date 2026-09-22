@@ -65,12 +65,12 @@ export function BarraDeAcciones({ nombre, ruta, estado, haySinGuardar, pendiente
           <button type="button" disabled={corriendo} onClick={alVerBorrador} className={BOTON_SECUNDARIO}>
             {pendiente === "vista-previa" ? "Abriendo…" : "Vista previa"}
           </button>
-          {/* El único naranja de la pantalla: es la acción (DESIGN.md, naranja solo CTAs). */}
+          {/* El único naranja de la pantalla: es la acción (DESIGN.md, naranja solo CTAs). Texto azul: el blanco da 3,00:1 (DESIGN.md §7). */}
           <button
             type="button"
             disabled={corriendo || (!estado.borradorEn && !haySinGuardar)}
             onClick={alPublicar}
-            className="rounded-lg bg-naranja-accion px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-lg bg-naranja-accion px-4 py-2 text-sm font-medium text-azul-principal transition-colors hover:bg-naranja-accion/90 disabled:opacity-50"
           >
             {pendiente === "publicar" ? "Publicando…" : "Publicar"}
           </button>
