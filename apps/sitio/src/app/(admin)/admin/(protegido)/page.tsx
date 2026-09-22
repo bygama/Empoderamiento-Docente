@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PanelMetricas } from "@/admin/metricas/PanelMetricas";
 
 export default function InicioDelAdmin() {
@@ -6,11 +7,15 @@ export default function InicioDelAdmin() {
       <h1 className="sr-only">Inicio del admin</h1>
       <PanelMetricas />
       <section className="space-y-3">
-        <h2 className="font-[family-name:var(--font-manrope)] text-xl font-bold">Todavía no hay nada que editar</h2>
+        <h2 className="font-[family-name:var(--font-manrope)] text-xl font-bold">Páginas</h2>
         <p className="max-w-prose text-gris-texto">
-          Estos son los cimientos: entrar, salir y elegir una contraseña. Las novedades, la
-          biblioteca, los casos y el equipo llegan en las fases siguientes.
+          Los textos y las fotos de las siete páginas del sitio. Por ahora se edita el hero de Inicio; las
+          demás secciones se van sumando. Las novedades, la biblioteca, los casos y el equipo llegan en las
+          fases siguientes.
         </p>
+        <Link href="/admin/paginas" className="inline-block rounded-lg border border-azul-claro px-3 py-1.5 text-sm text-azul-medio transition-opacity hover:opacity-80">
+          Ir a Páginas
+        </Link>
       </section>
     </div>
   );
