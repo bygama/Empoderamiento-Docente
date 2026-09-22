@@ -12,10 +12,14 @@ export function SalirDelAdmin() {
       onClick={async () => {
         // Antes de cerrar la sesión: la cookie de la vista previa no vence
         // sola, y sin esto quien sale seguiría viendo borradores en el sitio.
-        await apagarVistaPrevia();
-        await authCliente.signOut();
-        router.push("/admin/entrar");
-        router.refresh();
+        // En un `finally`: si apagarla falla, salir del admin sale igual.
+        try {
+          await apagarVistaPrevia();
+        } finally {
+          await authCliente.signOut();
+          router.push("/admin/entrar");
+          router.refresh();
+        }
       }}
       className="rounded-lg border border-azul-claro px-3 py-1.5 text-sm transition-colors hover:bg-azul-claro/20"
     >
