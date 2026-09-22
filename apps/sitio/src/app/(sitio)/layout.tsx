@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { Caveat, Courier_Prime, Inter, Manrope, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
@@ -6,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { IndicePagina } from "@/components/layout/IndicePagina";
 import { AterrizajePorLink } from "@/components/layout/AterrizajePorLink";
+import { FranjaDeBorrador } from "@/components/layout/FranjaDeBorrador";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { siteConfig } from "@/config/site";
 
@@ -52,7 +54,7 @@ const courierPrime = Courier_Prime({
   weight: ["400", "700"],
 });
 
-export const metadata: Metadata = {
+const METADATA: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default:
@@ -77,6 +79,16 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * En Draft Mode el sitio manda `noindex`: un borrador no se indexa (SPEC §6).
+ * Leer `draftMode()` acá no vuelve dinámicas las páginas: en el prerender
+ * responde «apagado» y la metadata queda igual que antes.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const { isEnabled } = await draftMode();
+  return isEnabled ? { ...METADATA, robots: { index: false, follow: false } } : METADATA;
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -88,6 +100,8 @@ export default function RootLayout({
       className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} ${caveat.variable} ${courierPrime.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {/* Solo se ve con la cookie de Draft Mode (vista previa del admin). */}
+        <FranjaDeBorrador />
         <LenisProvider>
           {/* Para teclado y lectores de pantalla: saltear el header e ir al
               contenido. Invisible hasta que recibe el foco. */}
