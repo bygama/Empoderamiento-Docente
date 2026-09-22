@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authCliente } from "@/admin/auth-cliente";
-import { Aviso, Boton, Campo } from "@/admin/armazon/Campos";
+import { Aviso, Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 
 export function FormularioOlvide() {
   const [listo, setListo] = useState(false);
@@ -44,7 +44,7 @@ export function FormularioOlvide() {
         {enviando ? "Mandando…" : "Mandarme el enlace"}
       </Boton>
       <p className="text-center text-sm">
-        <Link className="text-azul-medio underline" href="/admin/entrar">
+        <Link className={ENLACE_DE_ACCESO} href="/admin/entrar">
           Volver
         </Link>
       </p>
