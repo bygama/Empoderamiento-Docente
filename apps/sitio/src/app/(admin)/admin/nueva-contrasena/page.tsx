@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Nueva contraseña · Admin ED" };
 
 export default function NuevaContrasena() {
   return (
-    <Pantalla titulo="Elegí tu contraseña" bajada="Doce caracteres o más.">
+    <Pantalla titulo="Elegí tu contraseña" bajada="Es la que vas a usar para entrar al admin.">
       <Suspense>
         <FormularioNueva />
       </Suspense>
