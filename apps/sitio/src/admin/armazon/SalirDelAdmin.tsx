@@ -21,7 +21,7 @@ export function SalirDelAdmin() {
           router.refresh();
         }
       }}
-      className="rounded-lg border border-azul-claro px-3 py-1.5 text-sm transition-colors hover:bg-azul-claro/20"
+      className="rounded-lg border border-azul-claro/60 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-claro"
     >
       Salir
     </button>

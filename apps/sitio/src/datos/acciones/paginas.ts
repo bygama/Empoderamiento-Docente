@@ -19,13 +19,21 @@ import { descartarBorradorEnBase, guardarBorradorEnBase, publicarEnBase, type Re
 const esquemaSlug = z.enum(SLUGS);
 const esquemaPedido = z.object({ slug: esquemaSlug, seccion: z.string().min(1), borradorEnVisto: z.string().nullable() });
 
+// El layout protegido, que dibuja la sidebar con el punto de «cambios sin
+// publicar» (admin/armazon/BarraLateral). El layout no se vuelve a pedir al
+// navegar: sin esta revalidación, el punto quedaría viejo hasta recargar.
+// Desde una Server Function, además, la pantalla se actualiza en el acto.
+const ARMAZON_DEL_ADMIN = "/(admin)/admin/(protegido)";
+
 export async function guardarBorrador(pedido: { slug: string; seccion: string; contenido: unknown; borradorEnVisto: string | null }): Promise<ResultadoDeGuardar> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para guardar." };
     const valido = esquemaPedido.safeParse(pedido);
     if (!valido.success) return { ok: false, detalle: "El pedido no tiene la forma esperada." };
-    return await guardarBorradorEnBase(base, { ...valido.data, contenido: pedido.contenido, quien: sesion.user.name });
+    const resultado = await guardarBorradorEnBase(base, { ...valido.data, contenido: pedido.contenido, quien: sesion.user.name });
+    if (resultado.ok) revalidatePath(ARMAZON_DEL_ADMIN, "layout");
+    return resultado;
   } catch (e) {
     console.error("guardarBorrador:", e);
     return { ok: false, detalle: "No se pudo guardar; probá de nuevo en un rato." };
@@ -40,7 +48,10 @@ export async function publicar(slug: string): Promise<ResultadoDePublicar> {
     if (!valido.success) return { ok: false, detalle: "Esa página no existe." };
     const resultado = await publicarEnBase(base, { slug: valido.data, quien: sesion.user.name });
     // La página del sitio es estática: esto la regenera en la próxima visita (spec del admin §4).
-    if (resultado.ok) revalidatePath(resultado.ruta);
+    if (resultado.ok) {
+      revalidatePath(resultado.ruta);
+      revalidatePath(ARMAZON_DEL_ADMIN, "layout");
+    }
     return resultado;
   } catch (e) {
     console.error("publicar:", e);
@@ -54,7 +65,9 @@ export async function descartarBorrador(slug: string): Promise<{ ok: boolean; de
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para descartar." };
     const valido = esquemaSlug.safeParse(slug);
     if (!valido.success) return { ok: false, detalle: "Esa página no existe." };
-    return await descartarBorradorEnBase(base, valido.data);
+    const resultado = await descartarBorradorEnBase(base, valido.data);
+    if (resultado.ok) revalidatePath(ARMAZON_DEL_ADMIN, "layout");
+    return resultado;
   } catch (e) {
     console.error("descartarBorrador:", e);
     return { ok: false, detalle: "No se pudo descartar; probá de nuevo en un rato." };
