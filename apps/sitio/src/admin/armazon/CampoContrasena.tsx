@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { Eye, EyeOff } from "@/components/ui/icons";
-import { ENTRADA_DE_ACCESO } from "./Campos";
+import { ENTRADA } from "@/admin/campos/clases";
 
 type Props = {
   etiqueta: string;
@@ -46,7 +46,7 @@ export function CampoContrasena({ etiqueta, name, autoComplete, minLength, ayuda
           autoFocus={autoFocus}
           aria-invalid={invalido ? true : undefined}
           aria-describedby={describen || undefined}
-          className={`${ENTRADA_DE_ACCESO} pr-12`}
+          className={`${ENTRADA} pr-12`}
         />
         <button
           type="button"

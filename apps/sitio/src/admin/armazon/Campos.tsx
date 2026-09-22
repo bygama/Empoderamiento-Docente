@@ -1,19 +1,16 @@
 /**
  * Los campos y el botón de las tres pantallas de acceso, y el aviso que usa
  * todo el admin. Los colores están medidos contra WCAG AA (PROGRESS de
- * `work/armazon-del-admin/`): el borde del input con `gris-texto` da 4,83:1
- * sobre blanco (con `azul-claro` daba 1,77:1, por debajo del 3:1 de un
- * control), y el texto del botón es `azul-principal` sobre el naranja
- * (4,54:1; DESIGN.md §7).
+ * `work/armazon-del-admin/`): la caja de texto es la `ENTRADA` del admin, y
+ * el texto del botón es `azul-principal` sobre el naranja (4,54:1; DESIGN.md
+ * §7).
  */
+
+import { ENTRADA } from "@/admin/campos/clases";
 
 /** Los links de las pantallas de acceso («Olvidé mi contraseña», «Volver»), con el foco en `azul-medio` como los campos. */
 export const ENLACE_DE_ACCESO =
   "rounded-sm text-azul-medio underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio";
-
-/** La caja de texto de las pantallas de acceso. `CampoContrasena` la reusa. */
-export const ENTRADA_DE_ACCESO =
-  "w-full rounded-lg border border-gris-texto bg-white px-3 py-2.5 text-azul-principal outline-none transition-colors focus:border-azul-medio focus:ring-2 focus:ring-azul-medio/30 aria-invalid:border-naranja-accion-texto";
 
 export function Campo({
   etiqueta,
@@ -22,7 +19,7 @@ export function Campo({
   return (
     <label className="block">
       <span className="text-sm font-medium text-azul-principal">{etiqueta}</span>
-      <input {...props} className={`mt-1 ${ENTRADA_DE_ACCESO}`} />
+      <input {...props} className={`mt-1 ${ENTRADA}`} />
     </label>
   );
 }

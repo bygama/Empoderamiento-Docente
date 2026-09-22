@@ -152,7 +152,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
             // plano pisaría lo que se haya tocado en otro campo mientras tanto.
             alCambiar((actual: ValorFoto) => ({ ...actual, alt }));
           }}
-          className={ENTRADA}
+          className={`mt-1 ${ENTRADA}`}
         />
       </label>
       <div className="flex flex-wrap items-center gap-3">
