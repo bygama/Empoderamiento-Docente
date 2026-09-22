@@ -33,7 +33,7 @@ export type PropsDeCampo = {
  * `ListaFija`), para no pisar una edición hecha en otro campo mientras algo
  * todavía no resolvió.
  *
- * Es el único archivo de `admin/campos/` que conoce `Descripcion` y la app:
+ * Es el único archivo de `admin/campos/` que conoce `Descripcion` y `datos/`:
  * los controles reciben props planas (etiqueta, ayuda, máximo…) y la subida
  * de fotos por prop, para mudarse a `packages/kit-admin` en la fase 2 sin
  * llevarse este dibujante (AGENTS.md §12).
