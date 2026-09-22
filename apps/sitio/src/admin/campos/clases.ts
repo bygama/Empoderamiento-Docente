@@ -7,7 +7,3 @@
  */
 export const ENTRADA =
   "w-full rounded-lg border border-gris-texto bg-white px-3 py-2 text-admin-cuerpo text-azul-principal outline-none transition-colors focus:border-azul-medio focus:ring-2 focus:ring-azul-medio/30 aria-invalid:border-rojo-error";
-
-/** Un botón secundario: borde, sin relleno. El único naranja del editor es «Publicar». */
-export const BOTON_SECUNDARIO =
-  "rounded-lg border border-azul-claro bg-white px-3 py-2 text-sm text-azul-medio transition-opacity hover:opacity-80 disabled:opacity-50";

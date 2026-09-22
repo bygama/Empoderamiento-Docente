@@ -7,6 +7,7 @@
  */
 
 import { ENTRADA } from "@/admin/campos/clases";
+import { claseDeBoton } from "./clases";
 
 /** Los links de las pantallas de acceso («Olvidé mi contraseña», «Volver»), con el foco en `azul-medio` como los campos. */
 export const ENLACE_DE_ACCESO =
@@ -25,15 +26,13 @@ export function Campo({
 }
 
 /**
- * El CTA de cada pantalla de acceso: el único naranja. El hover aclara en vez
- * de oscurecer, porque con el texto azul oscurecer baja el contraste a 3,75:1.
+ * El CTA de cada pantalla de acceso: el único naranja, el primario del admin
+ * (`Boton.tsx`) a todo el ancho. Conserva su firma porque los formularios de
+ * acceso lo usan tal cual.
  */
 export function Boton({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button
-      {...props}
-      className="w-full rounded-lg bg-naranja-accion px-6 py-3 font-medium text-azul-principal transition-colors hover:bg-naranja-accion/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio disabled:cursor-not-allowed disabled:opacity-60"
-    >
+    <button {...props} className={`w-full ${claseDeBoton("primario")}`}>
       {children}
     </button>
   );
