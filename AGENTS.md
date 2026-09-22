@@ -578,6 +578,12 @@ Reglas para el admin y sus datos:
 - **`datos/` es la única puerta a la base.** `apps/sitio/src/datos/consultas/`
   lee y `apps/sitio/src/datos/acciones/` escribe. **Ningún componente importa
   Prisma.** Lo reutilizable vive en `packages/` y no sabe nada de ED.
+- **Lo que no sabe de ED pero todavía no tiene un segundo proyecto que lo use
+  incuba en `apps/sitio/src/lib/`** (`lib/contenido/`, `lib/metricas/`). No
+  importa nada de la app, ni un `@/`, así que pasa a `packages/` sin cambios el
+  día que lo use un segundo proyecto. Es el criterio del ADR-0009 para las
+  métricas, extendido a contenido: mudarlo antes sería un package sin
+  consumidor, el riesgo que anota el ADR-0006.
 - **El esquema está en `apps/sitio/prisma/schema/`** y sus migraciones se
   generan con Prisma y **se commitean**. Nunca se editan a mano ni se aplican a
   mano contra la base: `scripts/guarda-prisma.mjs` bloquea `prisma db push`
