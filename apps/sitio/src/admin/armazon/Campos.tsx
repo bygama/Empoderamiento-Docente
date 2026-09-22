@@ -6,6 +6,7 @@
  * §7).
  */
 
+import { Alerta, Check, X } from "@/components/ui/icons";
 import { ENTRADA } from "@/admin/campos/clases";
 import { claseDeBoton } from "./clases";
 
@@ -19,7 +20,7 @@ export function Campo({
 }: { etiqueta: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-azul-principal">{etiqueta}</span>
+      <span className="text-admin-meta font-medium text-azul-principal">{etiqueta}</span>
       <input {...props} className={`mt-1 ${ENTRADA}`} />
     </label>
   );
@@ -38,21 +39,45 @@ export function Boton({ children, ...props }: React.ButtonHTMLAttributes<HTMLBut
   );
 }
 
+type PropsDeAviso = {
+  tono: "error" | "bien";
+  /** Va en el texto, no en la caja: así un `aria-describedby` que lo apunta lee el mensaje y no el botón de cerrar. */
+  id?: string;
+  /** Si llega, el aviso lleva una × que lo cierra. */
+  alCerrar?: () => void;
+  children: React.ReactNode;
+};
+
 /**
- * Un aviso. `tono` decide si es un error o una confirmación. El error se
- * anuncia en el acto (`role="alert"`); la confirmación, cuando el lector
- * termina lo que dice (`role="status"`). El texto del error es azul y el
- * naranja queda en el borde: `naranja-accion-texto` sobre su fondo daba
- * 4,33:1, por debajo de AA.
+ * Un aviso: un banner, nunca un toast (DESIGN.md §11). `tono` decide si es un
+ * error o una confirmación. El error se anuncia en el acto (`role="alert"`) y
+ * va en `rojo-error` sobre su tinte al 8 % (5,75:1); la confirmación, cuando
+ * el lector termina lo que dice (`role="status"`), en `azul-principal` sobre
+ * `azul-claro/30` (11,63:1). Sin verde: al lado de «Publicar» rompería la
+ * regla 4 de DESIGN.md §1. El rol va en el texto y la × queda afuera, para
+ * que no se anuncie como parte del mensaje.
  */
-export function Aviso({ tono, id, children }: { tono: "error" | "bien"; id?: string; children: React.ReactNode }) {
+export function Aviso({ tono, id, alCerrar, children }: PropsDeAviso) {
+  const error = tono === "error";
+  const Icono = error ? Alerta : Check;
   return (
-    <p
-      id={id}
-      role={tono === "error" ? "alert" : "status"}
-      className={`rounded-lg px-3 py-2 text-sm ${tono === "error" ? "border-l-4 border-naranja-accion bg-naranja-accion/10 text-azul-principal" : "bg-verde-concepto/10 text-verde-concepto-texto"}`}
+    <div
+      className={`flex items-start gap-2 rounded-lg border-l-4 px-3 py-2 text-admin-meta ${error ? "border-rojo-error bg-rojo-error/8 text-rojo-error" : "border-azul-medio bg-azul-claro/30 text-azul-principal"}`}
     >
-      {children}
-    </p>
+      <Icono size={20} className="shrink-0" />
+      <p id={id} role={error ? "alert" : "status"} className="flex-1">
+        {children}
+      </p>
+      {alCerrar ? (
+        <button
+          type="button"
+          onClick={alCerrar}
+          aria-label="Cerrar el aviso"
+          className="-my-1 -mr-1 shrink-0 rounded-md p-1.5 transition-colors hover:bg-white/60 focus-visible:outline-2 focus-visible:outline-azul-medio"
+        >
+          <X size={16} />
+        </button>
+      ) : null}
+    </div>
   );
 }
