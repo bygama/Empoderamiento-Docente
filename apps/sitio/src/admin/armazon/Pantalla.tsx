@@ -21,7 +21,8 @@ export function Pantalla({
 }) {
   return (
     <div className="flex min-h-dvh flex-col bg-white lg:flex-row">
-      <aside className="relative flex items-center justify-between gap-4 overflow-hidden bg-azul-principal px-6 py-5 lg:w-5/12 lg:flex-col lg:items-start lg:px-12 lg:py-12">
+      {/* «Admin del sitio» va pegado al logo, arriba, y el círculo abajo: si el texto quedaba al pie, entre 1024 y ~1090 px caía sobre el círculo (azul-claro sobre azul-medio: 2,88:1). */}
+      <aside className="relative flex items-center justify-between gap-4 overflow-hidden bg-azul-principal px-6 py-5 lg:w-5/12 lg:flex-col lg:items-start lg:justify-start lg:px-12 lg:py-12">
         <div aria-hidden="true" className="pattern-dots-inverse absolute inset-0 hidden lg:block" />
         <div aria-hidden="true" className="absolute -right-24 -bottom-32 hidden size-96 rounded-full bg-azul-medio lg:block" />
         {/* 144 px en el celular: el manual pide 120 como mínimo para el logo completo (§10). */}
