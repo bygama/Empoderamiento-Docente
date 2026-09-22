@@ -17,7 +17,12 @@ export type PropsDeCampo = {
   alCambiar: (valor: Cambio<unknown>) => void;
   /** La raíz de una sección o de un ítem no lleva caja propia: ya la tiene su bloque. */
   raiz?: boolean;
-  /** La raíz de un ítem de lista: sus campos van en dos columnas cuando el panel del ítem tiene lugar (`@container`). */
+  /**
+   * La raíz de una sección o de un ítem de lista: sus campos van de a dos
+   * cuando su contenedor (`@container`) tiene lugar, y las listas y los
+   * párrafos a todo el ancho. La raíz de un opcional no la lleva: queda
+   * apilada adentro de su columna.
+   */
   columnas?: boolean;
 };
 
@@ -120,32 +125,46 @@ type PropsGrupo = {
 function CampoGrupo({ nombre, descripcion, valor, alCambiar, raiz, columnas }: PropsGrupo) {
   // El valor y la descripción salen del mismo esquema ya validado: un «grupo» siempre trae un objeto por clave.
   const grupo = (valor ?? {}) as Record<string, unknown>;
-  const campos = descripcion.campos.map(({ clave, descripcion: d }) => (
-    <Campo
-      key={clave}
-      nombre={`${nombre}.${clave}`}
-      descripcion={d}
-      valor={grupo[clave]}
-      alCambiar={(v) =>
-        // El merge se arma contra el grupo más fresco (`actual`), no contra
-        // el `grupo` de este render: si `v` llega tarde (una foto que
-        // termina de subir), no pisa lo que se haya tocado en otro campo
-        // del mismo grupo mientras tanto.
-        alCambiar((actual: unknown) => {
-          // Mismo supuesto que `grupo` arriba: el valor de un «grupo» siempre es un objeto por clave.
-          const base = (actual ?? {}) as Record<string, unknown>;
-          return { ...base, [clave]: resolverCambio(v, base[clave]) };
-        })
-      }
-    />
-  ));
-  // En dos columnas (la foto a la izquierda y el resto a la derecha) solo la raíz de un ítem, y solo si su panel tiene lugar.
+  const campos = descripcion.campos.map(({ clave, descripcion: d }) => {
+    const campo = (
+      <Campo
+        key={clave}
+        nombre={`${nombre}.${clave}`}
+        descripcion={d}
+        valor={grupo[clave]}
+        alCambiar={(v) =>
+          // El merge se arma contra el grupo más fresco (`actual`), no contra
+          // el `grupo` de este render: si `v` llega tarde (una foto que
+          // termina de subir), no pisa lo que se haya tocado en otro campo
+          // del mismo grupo mientras tanto.
+          alCambiar((actual: unknown) => {
+            // Mismo supuesto que `grupo` arriba: el valor de un «grupo» siempre es un objeto por clave.
+            const base = (actual ?? {}) as Record<string, unknown>;
+            return { ...base, [clave]: resolverCambio(v, base[clave]) };
+          })
+        }
+      />
+    );
+    // En dos columnas, una lista o un párrafo ocupan todo el ancho: partidos a la mitad no se leen.
+    return columnas && (d.tipo === "listaFija" || d.tipo === "parrafo") ? (
+      <div key={clave} className="@2xl:col-span-2">
+        {campo}
+      </div>
+    ) : (
+      campo
+    );
+  });
   if (raiz) return <div className={columnas ? "grid items-start gap-5 @2xl:grid-cols-2" : "space-y-5"}>{campos}</div>;
+  // Sin caja (SPEC §5 de `work/editor-sin-pared/`): el `legend` y sus campos
+  // de a dos cuando su propio ancho lo permite. `min-w-0` le saca al
+  // `fieldset` el ancho mínimo que el navegador le pone de fábrica.
   return (
-    <fieldset className="space-y-4 rounded-lg border border-azul-claro/60 p-4">
-      <legend className="px-1 text-sm font-medium">{descripcion.etiqueta}</legend>
-      {descripcion.ayuda ? <p className="text-xs text-gris-texto">{descripcion.ayuda}</p> : null}
-      {campos}
+    <fieldset className="min-w-0 space-y-2">
+      <legend className="font-display text-admin-seccion font-bold">{descripcion.etiqueta}</legend>
+      {descripcion.ayuda ? <p className="text-admin-meta text-gris-texto">{descripcion.ayuda}</p> : null}
+      <div className="@container">
+        <div className="grid items-start gap-4 @md:grid-cols-2">{campos}</div>
+      </div>
     </fieldset>
   );
 }
