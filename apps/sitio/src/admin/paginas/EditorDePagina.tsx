@@ -7,6 +7,7 @@ import { descartarBorrador, guardarBorrador, publicar } from "@/datos/acciones/p
 import { abrirVistaPrevia } from "@/datos/acciones/vista-previa";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 import { EncabezadoDelEditor, type EstadoPendiente } from "./EncabezadoDelEditor";
+import { useFrenarSalida } from "./useFrenarSalida";
 import { Seccion } from "./Seccion";
 
 type AvisoDelEditor = { ok: boolean; detalle: ReactNode };
@@ -52,6 +53,7 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
   const [aviso, setAviso] = useState<AvisoDelEditor | null>(null);
   const [pendiente, setPendiente] = useState<EstadoPendiente>(null);
   const haySinGuardar = pagina.secciones.some((s) => contenidos[s.clave] !== confirmados[s.clave]);
+  const soltarSalida = useFrenarSalida(haySinGuardar);
 
   const cambiar = (clave: string, cambio: Cambio<unknown>) => {
     setContenidos((c) => ({ ...c, [clave]: resolverCambio(cambio, c[clave]) }));
@@ -171,7 +173,9 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
         setAviso(r);
         return;
       }
-      // Recargar es lo más simple para volver a lo publicado: el editor se arma de nuevo desde el servidor.
+      // Recargar es lo más simple para volver a lo publicado: el editor se
+      // arma de nuevo desde el servidor. Ya se confirmó: no preguntar otra vez.
+      soltarSalida();
       window.location.reload();
     } catch {
       avisarSinRed();
