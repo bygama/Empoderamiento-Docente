@@ -4,26 +4,38 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LARGO_MINIMO_CONTRASENA } from "@ed/auth";
 import { authCliente } from "@/admin/auth-cliente";
-import { Aviso, Boton, Campo } from "@/admin/armazon/Campos";
+import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
+import { Aviso, Boton } from "@/admin/armazon/Campos";
+
+/** Qué campo rechazó el formulario, para marcarlo con `aria-invalid`. */
+type Rechazado = "contrasena" | "repetida" | null;
 
 export function FormularioNueva() {
   const router = useRouter();
   const token = useSearchParams().get("token") ?? "";
   const [error, setError] = useState<string | null>(null);
+  const [rechazado, setRechazado] = useState<Rechazado>(null);
   const [enviando, setEnviando] = useState(false);
+
+  function rechazar(campo: Rechazado, mensaje: string) {
+    setRechazado(campo);
+    setError(mensaje);
+  }
 
   async function guardar(datos: FormData) {
     const nueva = String(datos.get("contrasena") ?? "");
+    // `minLength` ya lo frena en el navegador; esto cubre al que lo saltea.
     if (nueva.length < LARGO_MINIMO_CONTRASENA) {
-      setError(`La contraseña tiene que tener ${LARGO_MINIMO_CONTRASENA} caracteres o más.`);
+      rechazar("contrasena", `La contraseña tiene que tener ${LARGO_MINIMO_CONTRASENA} caracteres o más.`);
       return;
     }
     if (nueva !== String(datos.get("repetida") ?? "")) {
-      setError("Las dos contraseñas no coinciden.");
+      rechazar("repetida", "Las dos contraseñas no coinciden.");
       return;
     }
     setEnviando(true);
     setError(null);
+    setRechazado(null);
     const { error: fallo } = await authCliente.resetPassword({ newPassword: nueva, token });
     setEnviando(false);
     if (fallo) {
@@ -43,20 +55,21 @@ export function FormularioNueva() {
 
   return (
     <form action={guardar} className="space-y-4">
-      <Campo
+      <CampoContrasena
         etiqueta="Contraseña nueva"
         name="contrasena"
-        type="password"
-        required
         autoComplete="new-password"
+        minLength={LARGO_MINIMO_CONTRASENA}
+        ayuda="Doce caracteres o más."
         autoFocus
+        invalido={rechazado === "contrasena"}
       />
-      <Campo
+      <CampoContrasena
         etiqueta="Repetila"
         name="repetida"
-        type="password"
-        required
         autoComplete="new-password"
+        minLength={LARGO_MINIMO_CONTRASENA}
+        invalido={rechazado === "repetida"}
       />
       {error ? <Aviso tono="error">{error}</Aviso> : null}
       <Boton type="submit" disabled={enviando}>
