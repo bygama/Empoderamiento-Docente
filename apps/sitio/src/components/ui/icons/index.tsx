@@ -184,6 +184,17 @@ export function Check({ size = 24, ...rest }: IconProps) {
   );
 }
 
+/** Círculo con un signo de exclamación: el ícono de un error del admin. */
+export function Alerta({ size = 24, ...rest }: IconProps) {
+  return (
+    <svg width={size} height={size} {...baseProps} {...rest}>
+      <circle cx="12" cy="12" r="9" />
+      <line x1="12" y1="7.5" x2="12" y2="12.5" />
+      <line x1="12" y1="16.5" x2="12.01" y2="16.5" />
+    </svg>
+  );
+}
+
 export function Menu({ size = 24, ...rest }: IconProps) {
   return (
     <svg width={size} height={size} {...baseProps} {...rest}>
