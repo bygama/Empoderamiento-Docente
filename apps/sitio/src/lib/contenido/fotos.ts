@@ -9,10 +9,16 @@ export type ValorFoto = { src: string; alt: string; foco: Foco };
 /** 4 MB: Vercel corta el cuerpo de una función en 4,5 MB (DECISIONS, 3). Se chequea en el navegador y en el servidor. */
 export const MAXIMO_BYTES = 4 * 1024 * 1024;
 
-// Un segmento de ruta que no es "." ni "..": sin este freno, "/fotos/../.env.local"
-// pasaba como foto válida y se colaba un path traversal hasta afuera de
-// public/. No afecta a un nombre de archivo que solo empieza con punto.
-const SEGMENTO_DE_RUTA = /(?!\.{1,2}\/|\.{1,2}$)[^\s?#/]+/;
+// Un segmento de ruta que no es "." ni "..", ni "%2e"/"%2f" percent-encoded
+// (mayúscula o minúscula) escondido adentro: sin el primer freno,
+// "/fotos/../.env.local" pasaba como foto válida y se colaba un path
+// traversal hasta afuera de public/; sin el segundo, lo mismo colaba
+// codificado ("/fotos/..%2F.env.local"). El servidor de estáticos de Next no
+// decodifica "%2e"/"%2f" a un salto de carpeta, así que hoy no hay traversal
+// real por acá, pero es defensa en profundidad contra quien arma a mano el
+// payload de la acción (M-1 de la revisión). No afecta a un nombre de
+// archivo que solo empieza con punto.
+const SEGMENTO_DE_RUTA = /(?!\.{1,2}\/|\.{1,2}$)(?:(?!%2[eEfF])[^\s?#/])+/;
 const RUTA_DE_FOTO = new RegExp(String.raw`/fotos/(?:${SEGMENTO_DE_RUTA.source}/)*${SEGMENTO_DE_RUTA.source}`);
 
 // Lo único que el sitio sabe mostrar: sus fotos de public/, las subidas en

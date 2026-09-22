@@ -1,7 +1,6 @@
-import { z } from "zod";
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { PAGINAS } from "@/contenido/paginas";
-import { comoDocumento, type PaginaRegistrada, type RegistroDePaginas, type SeccionRegistrada } from "@/lib/contenido/documento";
+import { comoDocumento, primerProblema, propioDe, type PaginaRegistrada, type RegistroDePaginas, type SeccionRegistrada } from "@/lib/contenido/documento";
 import { haceCuanto } from "@/lib/contenido/tiempo";
 
 // Lo que hace cada acción del editor en la base (SPEC §7), con el cliente y
@@ -16,25 +15,6 @@ export type ResultadoDeGuardar = { ok: true; borradorEn: string; borradorPor: st
 export type ResultadoDePublicar =
   | { ok: true; detalle: string; publicadoEn: string; publicadoPor: string; ruta: string }
   | { ok: false; detalle: string };
-
-/**
- * El valor de una clave PROPIA del registro, o undefined si no está. Un
- * `registro[clave]` a secas deja pasar `"__proto__"`, `"constructor"` y
- * similares como si fueran una página o sección real (resuelven al
- * prototipo del objeto, que existe pero no tiene `secciones` ni `esquema`,
- * y el código de abajo tira en vez de contestar en llano); `Object.hasOwn`
- * corta eso antes de indexar.
- */
-function propioDe<T>(registro: Record<string, T>, clave: string): T | undefined {
-  return Object.hasOwn(registro, clave) ? registro[clave] : undefined;
-}
-
-/** El primer problema de Zod, en llano y con el camino al campo. */
-function primerProblema(error: z.ZodError): string {
-  const [problema] = error.issues;
-  const donde = problema && problema.path.length > 0 ? ` (en ${problema.path.map(String).join(" › ")})` : "";
-  return `${problema?.message ?? "Hay un dato que no pasa."}${donde}`;
-}
 
 function mensajeDeConflicto(fila: Fila | null): string {
   if (fila?.borradorEn) {
@@ -109,6 +89,10 @@ export async function descartarBorradorEnBase(
   registro: RegistroDePaginas = PAGINAS,
 ): Promise<{ ok: boolean; detalle: string }> {
   if (!propioDe(registro, slug)) return { ok: false, detalle: "Esa página no se edita desde acá." };
+  const fila = await base.pagina.findUnique({ where: { slug } });
+  if (!fila) return { ok: false, detalle: "Esa página todavía no tiene nada guardado." };
+  // M-4: `updateMany` cuenta la fila, no el cambio; sin esto contestaba «se descartó» aunque `borradorEn` ya fuera null.
+  if (!fila.borradorEn) return { ok: true, detalle: "No había borrador que descartar." };
   const { count } = await base.pagina.updateMany({ where: { slug }, data: { borrador: Prisma.DbNull, borradorEn: null, borradorPor: null } });
   return count === 0
     ? { ok: false, detalle: "Esa página todavía no tiene nada guardado." }
