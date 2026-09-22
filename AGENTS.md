@@ -164,11 +164,14 @@ un release candidate de la 8 (ADR-0007).
             ├── datos/         ← la ÚNICA puerta a la base
             │   ├── cliente.ts   ← el PrismaClient de la app
             │   ├── auth.ts      ← la sesión, armada con esa base
-            │   ├── consultas/   ← lo que lee el sitio (fase 2)
-            │   └── acciones/    ← Server Actions que escribe el admin (fase 2)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, metricas)
+            │   └── acciones/    ← Server Actions del admin (paginas, vista-previa, fotos, metricas)
             ├── admin/         ← las pantallas del admin
             │   ├── armazon/     ← la caja, los campos, salir
+            │   ├── paginas/     ← «Páginas» y el editor (lista, barra, secciones)
+            │   ├── campos/      ← los controles del formulario; se mudan a kit-admin en la fase 2
             │   └── <entidad>/   ← Lista, Formulario y sus límites (fase 2)
+            ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
             ├── middleware.ts  ← sesión · cabeceras · rate limit
             ├── components/    ← UI reutilizable
             │   ├── brand/       ← logotipo / marca
@@ -176,13 +179,14 @@ un release candidate de la 8 (ADR-0007).
             │   ├── providers/   ← LenisProvider (smooth scroll)
             │   └── ui/          ← botones, reveals, íconos (ui/icons/)
             ├── features/      ← módulos por dominio
-            │   └── home/components/ ← secciones del home (Hero, …)
-            │       └── hero/    ← al partir un componente, sus piezas van a
-            │                       una subcarpeta con su nombre y el
-            │                       compositor se queda en su ruta
-            │                       (AI_GUIDELINES §2)
+            │   ├── home/components/ ← secciones del home (Hero, …)
+            │   │   └── hero/    ← al partir un componente, sus piezas van a
+            │   │                   una subcarpeta con su nombre y el
+            │   │                   compositor se queda en su ruta
+            │   │                   (AI_GUIDELINES §2)
+            │   └── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
             ├── config/        ← site.ts (datos institucionales) + nav.ts
-            └── lib/           ← hooks/ y utilidades (intro-signal.ts)
+            └── lib/           ← hooks/, metricas/, contenido/ (tipos de campo, fotos, almacén: sin dominio de ED)
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -565,7 +569,9 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 > `apps/sitio/src/datos/`, `apps/sitio/src/admin/`, `middleware.ts` y
 > `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
 > lo que hay. Lo único que todavía no existe es `packages/kit-admin`, que nace
-> en la fase 2 contra una entidad de verdad, y las tablas de contenido.
+> en la fase 2 contra una entidad de verdad. De las tablas de contenido existen
+> `paginas` y `fotos` (`work/edicion-de-paginas/`); las de las entidades llegan
+> con ellas.
 
 Reglas para el admin y sus datos:
 
@@ -581,6 +587,15 @@ Reglas para el admin y sus datos:
   escribe el suyo con los primitivos de `packages/kit-admin`. Un objeto que un
   renderizador genérico traduce a formulario es el modelo de Payload, y es cómo
   se termina reescribiendo Payload.
+
+  **Una excepción, acotada:** las páginas —documentos validados por el esquema
+  Zod de cada sección (`work/edicion-de-paginas/SPEC.md` §4.1)— generan su
+  formulario desde ese esquema, con tipos de campo cerrados
+  (`lib/contenido/campos.ts`) y un dibujante recursivo (`admin/campos/Campo.tsx`).
+  Las entidades (novedades, materiales, casos, equipo, aliados) siguen
+  escribiendo el suyo a mano con los primitivos del kit. La diferencia con
+  Payload es el tamaño y el borde: seis tipos, una descripción serializable de
+  una pantalla, y nada de colecciones ni de configuración abierta.
 - **Se escribe en vocabulario relacional**: tablas, columnas y controles. No
   «colecciones», «globals» ni `CollectionConfig`.
 - **Validar todos los bordes con Zod** antes de escribir o leer, incluidas las
@@ -623,6 +638,11 @@ define al implementar cada fase.
       de Prisma con sus migraciones, `middleware.ts` con las cabeceras de
       seguridad y el rate limit por IP, y entrar / salir / elegir contraseña en
       `/admin`. Sin contenido: eso es la fase 2.
+- [x] **Páginas, fase A — Inicio → Hero de punta a punta:** las tablas
+      `paginas` y `fotos`, los tipos de campo, el registro, el editor con
+      borrador, vista previa (Draft Mode) y publicar, y las fotos en Blob o en
+      disco. El hero del sitio lee por props. Diseño en
+      `work/edicion-de-paginas/`.
 - [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
       novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`.
 - [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
