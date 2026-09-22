@@ -194,8 +194,8 @@ componente pregunta por su cuenta.
 cookie, porque un redirect no es una respuesta válida para una acción, y el
 layout no las cubre. Por eso toda acción empieza por `auth.api.getSession` y
 contesta en llano si no hay sesión, y
-`apps/sitio/src/datos/acciones/acciones-con-sesion.test.ts` falla si una no lo
-hace.
+`apps/sitio/src/datos/acciones/acciones-con-sesion.test.ts` falla si una no
+empieza por esa llamada.
 
 **Lo que el rate limit NO cubre:** es por IP, y eso cierra la enumeración de
 usuarios. Un ataque repartido entre muchas IPs contra una sola cuenta queda
