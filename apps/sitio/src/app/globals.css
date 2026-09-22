@@ -347,6 +347,10 @@ body {
 .deck-corto {
   display: none;
 }
+/* La escena fija de la pila; fuera de ella no genera caja. */
+.deck-mazo {
+  display: contents;
+}
 .deck:not(.is-live):not(.is-pila) .deck-card-inner {
   transition:
     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
@@ -365,20 +369,34 @@ body {
 .deck.is-pila .deck-pista {
   height: 430svh;
 }
-.deck.is-pila .deck-cards {
+.deck.is-pila .deck-mazo {
+  display: block;
   position: sticky;
   top: 0;
   height: 100svh;
   overflow: hidden;
-  grid-template-columns: minmax(0, 30rem);
-  grid-template-rows: max-content;
-  justify-content: center;
-  align-content: start;
-  gap: 0;
   margin: 0 -1.25rem;
   /* En pantallas altas (tablet, celulares largos) el mazo baja para no quedar
      colgado del header con media pantalla vacía debajo. */
-  padding: max(5.25rem, calc((100svh - 34rem) / 2)) 1.25rem 1rem;
+  padding: max(5.25rem, calc((100svh - 38rem) / 2)) 1.25rem 1rem;
+}
+.deck.is-pila .deck-cards {
+  grid-template-columns: minmax(0, 30rem);
+  grid-template-rows: max-content;
+  justify-content: center;
+  gap: 0;
+  margin: 0;
+}
+/* La salida va debajo de la última carta, adentro de la escena: la pila le da
+   su lugar (`y`) y la hace entrar cuando esa carta se queda quieta. */
+.deck.is-pila .deck-cta {
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+/* Sin la salida abajo, el margen de escritorio sobra: el cambio de fondo con
+   la sección siguiente ya marca el corte. */
+.deck.is-pila .deck-stage {
+  padding-bottom: 3rem;
 }
 .deck.is-pila .deck-card {
   grid-area: 1 / 1;
