@@ -6,7 +6,7 @@ import { Aviso } from "@/admin/armazon/Campos";
 import { descartarBorrador, guardarBorrador, publicar } from "@/datos/acciones/paginas";
 import { abrirVistaPrevia } from "@/datos/acciones/vista-previa";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
-import { BarraDeAcciones, type EstadoPendiente } from "./BarraDeAcciones";
+import { EncabezadoDelEditor, type EstadoPendiente } from "./EncabezadoDelEditor";
 import { Seccion } from "./Seccion";
 
 type AvisoDelEditor = { ok: boolean; detalle: ReactNode };
@@ -14,8 +14,8 @@ type AvisoDelEditor = { ok: boolean; detalle: ReactNode };
 const SIN_RED = "No hubo respuesta del servidor. Fijate la conexión y probá de nuevo; lo que escribiste sigue en pantalla.";
 
 /**
- * El editor de una página: la barra fija con las acciones y las secciones en
- * el orden del scroll (SPEC §2). El contenido vive en el estado del navegador
+ * El editor de una página: el encabezado fijo con el estado y las acciones, y
+ * las secciones en el orden del scroll (SPEC §2). El contenido vive en el estado del navegador
  * hasta que se guarda; cada guardado encadena el `borradorEn` que devolvió el
  * anterior, así el chequeo de cambios cruzados vale sección tras sección.
  * Publicar y ver el borrador guardan primero lo que haya sin guardar: nadie
@@ -87,6 +87,11 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
   }
 
   const guardar = async () => {
+    // Ningún botón se deshabilita para explicar algo (DESIGN.md §11): contesta.
+    if (!haySinGuardar) {
+      setAviso({ ok: true, detalle: "No hay cambios para guardar." });
+      return;
+    }
     setPendiente("guardar");
     try {
       if (await guardarTodo()) setAviso({ ok: true, detalle: "Borrador guardado. El sitio sigue mostrando lo publicado." });
@@ -140,6 +145,10 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
   };
 
   const publicarAhora = async () => {
+    if (!estado.borradorEn && !haySinGuardar) {
+      setAviso({ ok: true, detalle: "La página ya está publicada así." });
+      return;
+    }
     setPendiente("publicar");
     try {
       if (haySinGuardar && !(await guardarTodo())) return;
@@ -173,18 +182,23 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
 
   return (
     <div className="space-y-6">
-      <BarraDeAcciones
+      <EncabezadoDelEditor
         nombre={pagina.nombre}
-        ruta={pagina.ruta}
         estado={estado}
         haySinGuardar={haySinGuardar}
         pendiente={pendiente}
+        aviso={
+          aviso ? (
+            <Aviso tono={aviso.ok ? "bien" : "error"} alCerrar={() => setAviso(null)}>
+              {aviso.detalle}
+            </Aviso>
+          ) : null
+        }
         alGuardar={guardar}
         alVerBorrador={verBorrador}
         alPublicar={publicarAhora}
         alDescartar={descartar}
       />
-      {aviso ? <Aviso tono={aviso.ok ? "bien" : "error"}>{aviso.detalle}</Aviso> : null}
       {pagina.secciones.map((s) => (
         <Seccion key={s.clave} clave={s.clave} nombre={s.nombre} descripcion={s.descripcion} valor={contenidos[s.clave]} alCambiar={(v) => cambiar(s.clave, v)} />
       ))}

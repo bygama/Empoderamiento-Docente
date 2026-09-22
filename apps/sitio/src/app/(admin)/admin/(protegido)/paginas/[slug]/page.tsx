@@ -15,10 +15,9 @@ export default async function EditarPagina({ params }: { params: Promise<{ slug:
   if (!esSlug(slug) || Object.keys(PAGINAS[slug].secciones).length === 0) notFound();
   const pagina = await paginaParaEditar(slug);
   return (
-    <>
-      <h1 className="sr-only">Editar {pagina.nombre}</h1>
-      {/* La key remonta el editor entero al navegar de una página a otra: sin ella, el estado local (lo escrito, lo sucio) sobreviviría al slug viejo. */}
-      <EditorDePagina key={pagina.slug} pagina={pagina} />
-    </>
+    // La key remonta el editor entero al navegar de una página a otra: sin
+    // ella, el estado local (lo escrito, lo sucio) sobreviviría al slug viejo.
+    // El `h1` es el del encabezado del editor.
+    <EditorDePagina key={pagina.slug} pagina={pagina} />
   );
 }
