@@ -53,19 +53,29 @@ function Cuando({ estado }: { estado: PaginaParaEditar["estado"] }) {
 export function EncabezadoDelEditor({ nombre, estado, haySinGuardar, pendiente, aviso, alGuardar, alVerBorrador, alPublicar, alDescartar }: Props) {
   const corriendo = pendiente !== null;
   const insignia = insigniaDelEstado(estado);
+  // Con cambios sin guardar, todo el encabezado pasa a azul (DESIGN.md §11) y lo de adentro va en su versión «sobre azul».
+  const azul = haySinGuardar;
   return (
     <Encabezado
       fijo
+      resaltado={azul}
       migas={[{ href: "/admin/paginas", etiqueta: "Páginas" }]}
       titulo={nombre}
-      estado={<Insignia tono={insignia.tono}>{insignia.etiqueta}</Insignia>}
+      estado={
+        <Insignia tono={insignia.tono} sobreAzul={azul}>
+          {insignia.etiqueta}
+        </Insignia>
+      }
       detalle={
         <>
+          {/* Vive siempre en el DOM y solo cambia el texto: así el lector de pantalla anuncia el cambio. Vacío, no ocupa lugar. */}
+          <span role="status" className="font-medium text-white empty:sr-only">
+            {haySinGuardar ? "Cambios sin guardar." : ""}
+          </span>
           <Cuando estado={estado} />
-          {haySinGuardar ? <span className="font-medium text-azul-principal">Hay cambios sin guardar.</span> : null}
           {estado.borradorEn ? (
             // Margen negativo: el blanco de 40 px no agranda la línea del detalle.
-            <Boton variante="destructivo" className="-my-2.5 -ml-2" disabled={corriendo} aria-busy={pendiente === "descartar" || undefined} onClick={alDescartar}>
+            <Boton variante="destructivo" sobreAzul={azul} className="-my-2.5 -ml-2" disabled={corriendo} aria-busy={pendiente === "descartar" || undefined} onClick={alDescartar}>
               {pendiente === "descartar" ? "Descartando…" : "Descartar borrador"}
             </Boton>
           ) : null}
@@ -73,16 +83,16 @@ export function EncabezadoDelEditor({ nombre, estado, haySinGuardar, pendiente, 
       }
       acciones={
         <>
-          <Boton variante="secundario" disabled={corriendo} aria-busy={pendiente === "guardar" || undefined} onClick={alGuardar}>
+          <Boton variante="secundario" sobreAzul={azul} disabled={corriendo} aria-busy={pendiente === "guardar" || undefined} onClick={alGuardar}>
             {pendiente === "guardar" ? "Guardando…" : "Guardar borrador"}
           </Boton>
-          <Boton variante="secundario" disabled={corriendo} aria-busy={pendiente === "vista-previa" || undefined} onClick={alVerBorrador}>
+          <Boton variante="secundario" sobreAzul={azul} disabled={corriendo} aria-busy={pendiente === "vista-previa" || undefined} onClick={alVerBorrador}>
             {pendiente === "vista-previa" ? "Abriendo…" : "Vista previa"}
             <ArrowUpRight size={16} />
             <span className="sr-only">(se abre en otra pestaña)</span>
           </Boton>
           {/* El único naranja de la pantalla: es la acción (DESIGN.md §1, regla 2). */}
-          <Boton variante="primario" disabled={corriendo} aria-busy={pendiente === "publicar" || undefined} onClick={alPublicar}>
+          <Boton variante="primario" sobreAzul={azul} disabled={corriendo} aria-busy={pendiente === "publicar" || undefined} onClick={alPublicar}>
             {pendiente === "publicar" ? "Publicando…" : "Publicar"}
           </Boton>
         </>
