@@ -1,5 +1,6 @@
 import { valorVacio, type Descripcion } from "@/lib/contenido/descripcion";
 import type { ValorFoto } from "@/lib/contenido/fotos";
+import { resolverCambio, type Cambio } from "./cambio";
 import { CampoFoto } from "./CampoFoto";
 import { ListaFija } from "./ListaFija";
 import { Parrafo } from "./Parrafo";
@@ -11,7 +12,7 @@ export type PropsDeCampo = {
   nombre: string;
   descripcion: Descripcion;
   valor: unknown;
-  alCambiar: (valor: unknown) => void;
+  alCambiar: (valor: Cambio<unknown>) => void;
   /** La raíz de una sección o de un ítem no lleva caja propia: ya la tiene su bloque. */
   raiz?: boolean;
 };
@@ -25,7 +26,11 @@ export type PropsDeCampo = {
  * «grupo» tienen su propia lógica (activarse, ser o no la raíz) y salen a
  * `CampoOpcional`/`CampoGrupo`: react-doctor marcaba a `Campo` con los siete
  * casos inline como difícil de seguir (complejidad ciclomática 17, AGENTS.md
- * §5.8).
+ * §5.8). `alCambiar` acepta un valor o un `Cambio<T>` (un armador contra el
+ * valor más fresco): lo necesitan los campos con algo asíncrono adentro
+ * (`CampoFoto`) y los que arman un valor compuesto (`CampoGrupo`,
+ * `ListaFija`), para no pisar una edición hecha en otro campo mientras algo
+ * todavía no resolvió.
  */
 export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false }: PropsDeCampo) {
   switch (descripcion.tipo) {
@@ -67,7 +72,7 @@ type PropsOpcional = {
   nombre: string;
   descripcion: Extract<Descripcion, { tipo: "opcional" }>;
   valor: unknown;
-  alCambiar: (valor: unknown) => void;
+  alCambiar: (valor: Cambio<unknown>) => void;
 };
 
 /** Un campo que puede no llevarse: la casilla decide, y su control solo aparece si está activa. */
@@ -88,7 +93,7 @@ type PropsGrupo = {
   nombre: string;
   descripcion: Extract<Descripcion, { tipo: "grupo" }>;
   valor: unknown;
-  alCambiar: (valor: unknown) => void;
+  alCambiar: (valor: Cambio<unknown>) => void;
   raiz: boolean;
 };
 
@@ -97,7 +102,23 @@ function CampoGrupo({ nombre, descripcion, valor, alCambiar, raiz }: PropsGrupo)
   // El valor y la descripción salen del mismo esquema ya validado: un «grupo» siempre trae un objeto por clave.
   const grupo = (valor ?? {}) as Record<string, unknown>;
   const campos = descripcion.campos.map(({ clave, descripcion: d }) => (
-    <Campo key={clave} nombre={`${nombre}.${clave}`} descripcion={d} valor={grupo[clave]} alCambiar={(v) => alCambiar({ ...grupo, [clave]: v })} />
+    <Campo
+      key={clave}
+      nombre={`${nombre}.${clave}`}
+      descripcion={d}
+      valor={grupo[clave]}
+      alCambiar={(v) =>
+        // El merge se arma contra el grupo más fresco (`actual`), no contra
+        // el `grupo` de este render: si `v` llega tarde (una foto que
+        // termina de subir), no pisa lo que se haya tocado en otro campo
+        // del mismo grupo mientras tanto.
+        alCambiar((actual: unknown) => {
+          // Mismo supuesto que `grupo` arriba: el valor de un «grupo» siempre es un objeto por clave.
+          const base = (actual ?? {}) as Record<string, unknown>;
+          return { ...base, [clave]: resolverCambio(v, base[clave]) };
+        })
+      }
+    />
   ));
   if (raiz) return <div className="space-y-5">{campos}</div>;
   return (

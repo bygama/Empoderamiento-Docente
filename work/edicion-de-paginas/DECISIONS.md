@@ -98,3 +98,16 @@ La importa el layout del sitio para la franja de borrador. `datos/auth` exige
 el secreto de better-auth al cargarse y arranca la sesión: no tiene por qué
 entrar en cada render de la home. No necesita sesión: solo borra la cookie de
 quien la tiene y vuelve a la ruta por la que entró (o a Inicio).
+
+**2026-09-21 — Las fechas del admin se muestran en la zona de quien mira.**
+El servidor corre en UTC y el equipo está en tres países: un componente
+cliente (`Momento`) formatea en el navegador y `suppressHydrationWarning` cubre
+la diferencia con lo que renderizó el servidor. El borrador se dice en relativo
+(«hace 3 minutos», SPEC §2) y lo publicado en absoluto («el 21/9 a las 14:05»).
+
+**2026-09-21 — La franja de borrador va abajo, y la miniatura del foco es un marco 4/3.**
+El header del sitio es una píldora `fixed top-4` que una franja arriba
+taparía. Y las once tarjetas del hero tienen once relaciones de aspecto con un
+solo campo de foto: la miniatura muestra el punto elegido sobre un marco 4/3,
+no el recorte exacto de cada tarjeta; la vista previa es donde se ve el
+recorte real.

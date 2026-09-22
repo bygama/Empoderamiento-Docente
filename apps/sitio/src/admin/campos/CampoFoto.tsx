@@ -1,18 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, useTransition, type KeyboardEvent, type MouseEvent } from "react";
+import { useState, useTransition, type KeyboardEvent, type MouseEvent } from "react";
 import { Aviso } from "@/admin/armazon/Campos";
 import { subirFoto } from "@/datos/acciones/fotos";
 import type { Descripcion } from "@/lib/contenido/descripcion";
 import { MAXIMO_BYTES, posicionDelFoco, type ValorFoto } from "@/lib/contenido/fotos";
+import type { Cambio } from "./cambio";
 import { BOTON_SECUNDARIO, ENTRADA } from "./clases";
 
 type Props = {
   nombre: string;
   descripcion: Extract<Descripcion, { tipo: "foto" }>;
   valor: ValorFoto;
-  alCambiar: (valor: ValorFoto) => void;
+  alCambiar: (valor: Cambio<ValorFoto>) => void;
 };
 
 // Cuánto mueve cada pulsación de flecha, en fracción de la caja (0..1): un
@@ -34,17 +35,6 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
   const [pendiente, empezar] = useTransition();
   const idArchivo = `${nombre}-archivo`;
 
-  // La subida es async: si la persona sigue escribiendo el alt o moviendo el
-  // foco mientras espera, el `valor` que cerró sobre `subir` queda viejo. El
-  // efecto mantiene el ref al día después de cada render (mutarlo durante el
-  // render mismo no es seguro: React puede rehacer o descartar ese trabajo);
-  // al resolver la subida se lee del ref, no del closure, para no pisar lo
-  // que se tocó mientras tanto.
-  const valorRef = useRef(valor);
-  useEffect(() => {
-    valorRef.current = valor;
-  }, [valor]);
-
   const elegirFoco = (e: MouseEvent<HTMLButtonElement>) => {
     // Enter o espacio disparan un click con clientX/clientY en 0 (detail 0):
     // restado contra la caja da negativo, y el clamp lo llevaría a la
@@ -55,7 +45,11 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
     const caja = e.currentTarget.getBoundingClientRect();
     const x = Math.min(1, Math.max(0, (e.clientX - caja.left) / caja.width));
     const y = Math.min(1, Math.max(0, (e.clientY - caja.top) / caja.height));
-    alCambiar({ ...valor, foco: { x: Number(x.toFixed(3)), y: Number(y.toFixed(3)) } });
+    const foco = { x: Number(x.toFixed(3)), y: Number(y.toFixed(3)) };
+    // Updater, no un valor plano: si esto corre justo después de que una
+    // subida resuelva pero antes de que React confirme ese cambio, un valor
+    // plano armado contra el `valor` de este render pisaría el `src` nuevo.
+    alCambiar((actual: ValorFoto) => ({ ...actual, foco }));
   };
 
   // Con el teclado: las flechas mueven el foco de a un paso (Shift, uno grande).
@@ -67,7 +61,8 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
     e.preventDefault();
     const x = Math.min(1, Math.max(0, valor.foco.x + dx));
     const y = Math.min(1, Math.max(0, valor.foco.y + dy));
-    alCambiar({ ...valor, foco: { x: Number(x.toFixed(3)), y: Number(y.toFixed(3)) } });
+    const foco = { x: Number(x.toFixed(3)), y: Number(y.toFixed(3)) };
+    alCambiar((actual: ValorFoto) => ({ ...actual, foco }));
   };
 
   const subir = () => {
@@ -94,10 +89,11 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
         }
         setAviso(null);
         setArchivo(null);
-        // Foto nueva, foco al centro: el anterior era de otra imagen. Usa el
-        // valor más fresco (el ref), no el que había al arrancar la subida:
-        // el alt pudo seguir escribiéndose mientras tanto.
-        alCambiar({ ...valorRef.current, src: r.foto.src, foco: { x: 0.5, y: 0.5 } });
+        // Foto nueva, foco al centro: el anterior era de otra imagen. Arma
+        // el valor contra `actual` (lo más fresco), no contra el `valor` que
+        // tenía este render cuando arrancó la subida: el alt pudo seguir
+        // escribiéndose mientras tanto.
+        alCambiar((actual: ValorFoto) => ({ ...actual, src: r.foto.src, foco: { x: 0.5, y: 0.5 } }));
       } catch {
         // Sin red, o el servidor cortó el pedido: un aviso, no la pantalla de error de Next.
         setAviso("No se pudo subir la foto. Fijate la conexión y probá de nuevo.");
@@ -114,8 +110,9 @@ export function CampoFoto({ nombre, descripcion, valor, alCambiar }: Props) {
             type="button"
             onClick={elegirFoco}
             onKeyDown={moverFoco}
+            disabled={pendiente}
             aria-label="Punto de foco: tocá la miniatura o usá las flechas"
-            className="relative block aspect-[4/3] w-full max-w-xs cursor-crosshair overflow-hidden rounded-lg border border-azul-claro"
+            className="relative block aspect-[4/3] w-full max-w-xs cursor-crosshair overflow-hidden rounded-lg border border-azul-claro disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Image src={valor.src} alt={valor.alt} fill sizes="320px" className="object-cover" style={{ objectPosition: posicionDelFoco(valor.foco) }} />
             <span
