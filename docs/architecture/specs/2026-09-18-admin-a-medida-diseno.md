@@ -152,6 +152,14 @@ es un cambio de código, porque el diseño las conoce.
 componente o en un `data.ts` pasa a una columna con el mismo nombre en español.
 No se crean columnas que no existan hoy.
 
+**Las páginas son la excepción, y solo ellas** (2026-09-21,
+`work/edicion-de-paginas/`): cada página es una fila con dos documentos JSON,
+el publicado y el borrador, y cada sección del documento se valida con su
+esquema Zod al guardar y otra vez al publicar. Sus textos no pasan a columnas
+sino a campos del esquema, con el mismo nombre en español. Las entidades
+(novedades, materiales, casos, equipo, aliados) siguen con una
+columna por texto.
+
 ## 7. Acceso y seguridad
 
 **Dos roles:** `administrador` (todo, incluidas las cuentas) y `editor` (crea,
@@ -166,7 +174,7 @@ Lo que cierra respecto del estado anterior:
 | Cero cabeceras de seguridad | `middleware.ts` + `headers()`: CSP, HSTS, `frame-ancestors` en `none` para `/admin`, `Referrer-Policy`, `Permissions-Policy` |
 | `GET /api/fotos` público y enumerable | desaparece: sin REST autogenerada no hay qué enumerar |
 | `/api` tomado por un catch-all | liberado para `/api/contacto` y `/api/cv` |
-| El secreto de la vista previa en el query string (queda en logs y en el `Referer`) | cookie firmada de un solo uso, con expiración |
+| El secreto de la vista previa en el query string (queda en logs y en el `Referer`) | el Draft Mode de Next: la cookie la pone una Server Action con sesión, `httpOnly` y `secure`. **No es de un solo uso ni vence sola** (vale lo mismo para todos hasta el próximo deploy), así que se apaga con «Volver al sitio publicado» y al salir del admin. Corregido el 2026-09-22: acá decía «cookie firmada de un solo uso, con expiración», y la fase A no la construyó así |
 | Rate limit solo por cuenta | **por IP**, en la config de better-auth: 3 intentos por minuto en sign-in |
 | `/admin` dependía de `robots.txt` | `X-Robots-Tag: noindex` real en la respuesta |
 
@@ -181,6 +189,13 @@ El middleware corre en Edge y no puede consultar la base, así que ahí solo se
 mira que la cookie esté; la comprobación de verdad —firma, expiración, que la
 sesión exista— la hace el layout de `(protegido)` antes de renderizar. Ningún
 componente pregunta por su cuenta.
+
+**Las Server Actions son la excepción:** el middleware las deja pasar sin
+cookie, porque un redirect no es una respuesta válida para una acción, y el
+layout no las cubre. Por eso toda acción empieza por `auth.api.getSession` y
+contesta en llano si no hay sesión, y
+`apps/sitio/src/datos/acciones/acciones-con-sesion.test.ts` falla si una no lo
+hace.
 
 **Lo que el rate limit NO cubre:** es por IP, y eso cierra la enumeración de
 usuarios. Un ataque repartido entre muchas IPs contra una sola cuenta queda
@@ -212,6 +227,13 @@ producción como «la tabla no existe».
 **Sección por sección:** cada sección cambia su lectura a `datos/consultas/` en
 su propio PR, y en ese mismo PR se borra su `data.ts`. Nunca hay dos fuentes de
 verdad a la vez.
+
+**Las páginas se adelantaron** (2026-09-21): la fase A de
+`work/edicion-de-paginas/` las hizo antes que el kit y las novedades, con sus
+controles en `apps/sitio/src/admin/campos/`. Esos controles reciben
+props planas y no conocen el generador de formularios de las páginas
+(`Campo.tsx`), así que en la fase 2 se mudan a `packages/kit-admin` y el
+generador se queda en la app.
 
 ## 10. Calidad
 
