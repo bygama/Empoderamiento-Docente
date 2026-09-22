@@ -15,6 +15,9 @@
   --color-naranja-accion-texto: #b35a15;
   --color-gris-fondo: #f2f4f7;
   --color-gris-texto: #6b7280;
+  /* SOLO errores y acciones destructivas del admin (DESIGN.md §1, regla 6):
+     6.57:1 sobre blanco, 5.75:1 sobre su tinte al 8 %. */
+  --color-rojo-error: #b42318;
 
   /* === Tipografías (variables expuestas por next/font en layout.tsx) === */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -38,6 +41,18 @@
   --text-body--line-height: 1.6;
   --text-small: 0.875rem;
   --text-small--line-height: 1.5;
+
+  /* === Escala del admin (DESIGN.md §11): fija, cuatro tamaños y ninguno más === */
+  --text-admin-titulo: 1.5rem;
+  --text-admin-titulo--line-height: 2rem;
+  --text-admin-titulo--letter-spacing: -0.01em;
+  --text-admin-seccion: 1.125rem;
+  --text-admin-seccion--line-height: 1.75rem;
+  --text-admin-seccion--letter-spacing: -0.01em;
+  --text-admin-cuerpo: 1rem;
+  --text-admin-cuerpo--line-height: 1.5rem;
+  --text-admin-meta: 0.875rem;
+  --text-admin-meta--line-height: 1.25rem;
 }
 
 body {
