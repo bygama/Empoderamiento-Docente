@@ -26,6 +26,7 @@ tipografías, jerarquía, espaciado e iconografía.
 | `naranja-accion` | `#E07A2F` | 224, 122, 47     | **Solo CTAs**: botones primarios, links de acción|
 | `gris-fondo`     | `#F2F4F7` | 242, 244, 247    | Fondo claro alternativo a blanco                 |
 | `gris-texto`     | `#6B7280` | 107, 114, 128    | Texto secundario, metadatos, captions            |
+| `rojo-error`     | `#B42318` | 180, 35, 24      | **Solo errores y acciones destructivas** (admin) |
 
 ### Reglas de uso (no negociables)
 
@@ -39,6 +40,11 @@ tipografías, jerarquía, espaciado e iconografía.
    verde se reserva para texto/íconos lejos del CTA.
 5. **Contraste mínimo:** texto sobre fondo debe pasar WCAG AA (4.5:1 cuerpo,
    3:1 títulos grandes).
+6. **Rojo solo para errores y lo destructivo.** `rojo-error` no es de la
+   marca: existe para que un error no se lea como una acción. Nunca
+   decorativo. Da 6,57:1 sobre blanco y 5,75:1 sobre su tinte al 8 %. Sumado
+   el 2026-09-22 con el admin (§11); hasta entonces los errores iban en
+   naranja.
 
 ### Uso semántico (mapeo a la marca)
 
@@ -227,6 +233,7 @@ automáticamente a las clases utilitarias.
   --color-naranja-accion: #e07a2f;
   --color-gris-fondo: #f2f4f7;
   --color-gris-texto: #6b7280;
+  --color-rojo-error: #b42318;
 
   /* tipografías expuestas por next/font/google en apps/sitio/src/app/layout.tsx */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -246,6 +253,18 @@ automáticamente a las clases utilitarias.
   --text-body--line-height: 1.6;
   --text-small: 0.875rem;
   --text-small--line-height: 1.5;
+
+  /* escala del admin (§11): fija, sin clamp */
+  --text-admin-titulo: 1.5rem;
+  --text-admin-titulo--line-height: 2rem;
+  --text-admin-titulo--letter-spacing: -0.01em;
+  --text-admin-seccion: 1.125rem;
+  --text-admin-seccion--line-height: 1.75rem;
+  --text-admin-seccion--letter-spacing: -0.01em;
+  --text-admin-cuerpo: 1rem;
+  --text-admin-cuerpo--line-height: 1.5rem;
+  --text-admin-meta: 0.875rem;
+  --text-admin-meta--line-height: 1.25rem;
 }
 ```
 
@@ -256,7 +275,9 @@ Clases utilitarias generadas automáticamente:
 - **Tipografía:** `font-sans` (Inter, default del cuerpo), `font-display` (Manrope,
   para títulos).
 - **Escala:** `text-display`, `text-h1`, `text-h2`, `text-h3`, `text-body`,
-  `text-small` (cada una ya incluye su line-height).
+  `text-small` (cada una ya incluye su line-height). En el admin, solo
+  `text-admin-titulo`, `text-admin-seccion`, `text-admin-cuerpo` y
+  `text-admin-meta` (§11).
 
 Las fuentes se cargan con `next/font/google` en `apps/sitio/src/app/layout.tsx`, que
 las inyecta como CSS vars (`--font-inter`, `--font-manrope`) que luego
@@ -324,3 +345,110 @@ Los SVG oficiales se guardan en `apps/sitio/public/brand/`:
 
 Hasta tenerlos en el repo, usar placeholder textual o el favicon de Next.js.
 **Nunca** generar ni redibujar el logo con IA o trazado manual.
+
+---
+
+## 11. Admin
+
+El admin (`/admin`) es una herramienta de trabajo, no una pieza de marca: lo
+usa el equipo de ED unas pocas veces por mes, y pesa más la claridad que la
+velocidad. Usa la paleta y las fuentes de la marca con estas reglas propias.
+Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED.
+Sumado el 2026-09-22 (`work/editor-sin-pared/`). Todos los contrastes están
+medidos con la fórmula de WCAG 2.x.
+
+### Fondo
+
+- El contenido va sobre **blanco**.
+- `gris-fondo` queda solo como relleno sin texto encima (un hover, una
+  miniatura vacía): `gris-texto` sobre `gris-fondo` da 4,39:1 y no llega a
+  AA.
+
+### Tipo: cuatro tamaños, y ninguno más
+
+| Token                | Tamaño / interlineado     | Fuente      | Uso                                                  |
+| -------------------- | ------------------------- | ----------- | ---------------------------------------------------- |
+| `text-admin-titulo`  | 1.5rem / 2rem (24/32 px)  | Manrope 700 | El `h1` de cada pantalla                             |
+| `text-admin-seccion` | 1.125rem / 1.75rem (18/28)| Manrope 700 | Títulos de sección y de grupo                        |
+| `text-admin-cuerpo`  | 1rem / 1.5rem (16/24)     | Inter 400   | Lo que se escribe y se lee: inputs, párrafos         |
+| `text-admin-meta`    | 0.875rem / 1.25rem (14/20)| Inter 400 o 500 | Etiquetas, ayudas, contadores, botones, insignias |
+
+- En el admin no van `text-xs`, `text-sm` … `text-3xl` ni
+  `font-[family-name:…]`: Manrope es `font-display`.
+- **La jerarquía sale de bajar lo secundario**, no de subir lo principal: la
+  etiqueta en meta medium `azul-principal`; la ayuda y el contador en meta
+  regular `gris-texto` (4,83:1).
+- El cuerpo va en 16 px porque por debajo iOS hace zoom al enfocar un input.
+  Su interlineado es 1,5 y no el 1,6 de §2: en el admin el cuerpo son
+  controles y textos cortos, no lectura larga.
+- Los dos títulos ya traen el `-0.01em` de §2 en el token.
+
+### Bordes y foco
+
+- **Borde de un control** (input, casilla, botón secundario): `gris-texto`,
+  4,83:1. Un control pide 3:1 (WCAG 1.4.11); `azul-claro` da 1,77:1 y no
+  sirve de borde.
+- **Divisores decorativos:** `azul-claro/60`. No informan nada, así que no
+  se miden.
+- **Foco:** `outline` de 2 px `azul-medio` (5,11:1) separado 2 px. Sobre
+  `azul-principal` va en `azul-claro` (7,68:1): `azul-medio` ahí da 2,67:1.
+- **Un campo con error** (`aria-invalid`): borde `rojo-error` (6,57:1).
+
+### Insignias de estado
+
+Una pastilla `rounded-full` en meta medium, **siempre con texto**: el color
+acompaña, no informa solo. Sin verde ni naranja, porque conviven con el
+botón primario (§1, regla 4); la jerarquía sale del contraste.
+
+| Tono        | Sobre blanco                                              | Sobre `azul-principal`                                  | Para                        |
+| ----------- | --------------------------------------------------------- | ------------------------------------------------------- | --------------------------- |
+| **fuerte**  | relleno `azul-principal`, texto blanco (13,63:1)          | relleno blanco, texto `azul-principal` (13,63:1)        | lo que pide atención        |
+| **normal**  | borde y punto `azul-medio` (5,11:1), texto `azul-principal` | borde y punto `azul-claro` (7,68:1), texto blanco (13,63:1) | el estado estable       |
+| **apagada** | borde y texto `gris-texto` (4,83:1)                       | borde y texto `azul-claro` (7,68:1)                     | lo que todavía no empezó    |
+
+### Botones
+
+Cuatro variantes de **40 px de alto**, `rounded-lg`, `px-4`, en meta medium.
+
+| Variante        | Sobre blanco                                          | Hover                                                   | Sobre `azul-principal`                                      |
+| --------------- | ----------------------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------- |
+| **primario**    | `naranja-accion`, texto `azul-principal` (4,54:1; §7) | `naranja-accion/90` (5,07:1)                            | igual, pero el hover subraya: el `/90` sobre azul da 3,93:1 |
+| **secundario**  | borde y texto `azul-principal` (§7)                   | fondo `azul-claro/30` (11,63:1)                         | borde y texto blanco; hover fondo `white/10` (10,02:1)      |
+| **terciario**   | sin borde, texto `azul-medio` (5,11:1)                | subrayado: con fondo `azul-claro/30` daría 4,36:1       | texto `azul-claro` (7,68:1)                                 |
+| **destructivo** | el terciario en `rojo-error` (6,57:1)                 | subrayado                                               | texto `azul-claro` (7,68:1): `rojo-error` ahí da 2,07:1     |
+
+- **Un solo primario por pantalla** (§7).
+- **Un botón no se deshabilita para explicar algo.** Se deshabilita solo
+  mientras corre una acción, y el que corre lo dice («Guardando…», con
+  `aria-busy`). Si no hay nada que hacer, contesta con un aviso.
+- Un link que navega con aspecto de botón usa las mismas clases.
+
+### Encabezado de página
+
+Cada pantalla abre con un encabezado: las migas (opcionales, meta
+`azul-medio`), el `h1` en `text-admin-titulo` con su insignia al lado, una
+línea de detalle en meta `gris-texto` y, a la derecha, las acciones, con un
+solo primario. Los avisos de la pantalla van adentro del encabezado, abajo.
+Fondo blanco con un divisor inferior; si es fijo, queda `sticky` arriba.
+
+- **Con cambios sin guardar** (modo navy), todo el encabezado pasa a
+  `azul-principal`: el texto en blanco (13,63:1), el detalle en `azul-claro`
+  (7,68:1), y las insignias y los botones toman su columna «sobre
+  `azul-principal`». Vuelve a blanco al guardar.
+- **En el celular** (por debajo de `lg`), el título, la insignia y el
+  detalle hacen scroll con la página; las acciones y los avisos van en una
+  barra fija abajo, con el mismo modo navy y el área segura del iPhone.
+
+### Avisos
+
+Un banner dentro del contenido, **nunca un toast**: el toast se va antes de
+que lo lea quien usa lector de pantalla o quien lee despacio.
+
+| Tono             | Colores                                                                        | Rol             | Ícono    |
+| ---------------- | ------------------------------------------------------------------------------ | --------------- | -------- |
+| **error**        | texto `rojo-error` sobre su tinte al 8 % (5,75:1), borde izquierdo `rojo-error` | `role="alert"`  | `Alerta` |
+| **confirmación** | texto `azul-principal` sobre `azul-claro/30` (11,63:1), borde izquierdo `azul-medio` | `role="status"` | `Check`  |
+
+- Sin verde: al lado de «Publicar» rompería la regla 4 de §1.
+- Una × opcional lo cierra, y el aviso siguiente reemplaza al anterior.
+- `gris-texto` no va sobre `azul-claro/30`: da 4,12:1.
