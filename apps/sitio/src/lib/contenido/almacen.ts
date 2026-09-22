@@ -27,7 +27,9 @@ export function almacenEnDisco(carpeta: string): Almacen {
   return {
     async guardar({ id, tipo, bytes }) {
       await mkdir(carpeta, { recursive: true });
-      await writeFile(path.join(carpeta, `${id}.${EXTENSION_POR_TIPO[tipo]}`), bytes);
+      // En producción las fotos van a Blob (almacenEnBlob no toca el disco):
+      // esta ruta es solo el fallback local, no hay nada real para rastrear.
+      await writeFile(path.join(/*turbopackIgnore: true*/ carpeta, `${id}.${EXTENSION_POR_TIPO[tipo]}`), bytes);
       return { url: `/api/fotos/${id}` };
     },
     async borrar(url) {
@@ -74,7 +76,9 @@ const EXTENSIONES = Object.entries(EXTENSION_POR_TIPO) as Array<[TipoDeImagen, s
 export async function buscarEnDisco(carpeta: string, id: string): Promise<{ ruta: string; tipo: TipoDeImagen } | null> {
   if (!ID_VALIDO.test(id)) return null;
   for (const [tipo, extension] of EXTENSIONES) {
-    const ruta = path.join(carpeta, `${id}.${extension}`);
+    // Mismo caso que en guardar(): en producción esto ni se llama (Blob no
+    // pasa por el disco), así que no hay nada real para el tracing.
+    const ruta = path.join(/*turbopackIgnore: true*/ carpeta, `${id}.${extension}`);
     try {
       await access(ruta);
       return { ruta, tipo };
