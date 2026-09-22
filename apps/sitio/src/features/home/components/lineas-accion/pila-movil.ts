@@ -22,6 +22,7 @@ const LOMOS_MAX = 3;
  * (miden lo que la más alta, ver `.is-pila` en globals.css) y la de adelante,
  * que es opaca, tapa a la de atrás. Solo `transform` y `opacity`, en un
  * timeline atado al scroll de la pista (`[data-deck-pista]`), igual que «Cómo
+ * trabajamos». Al final, el mazo entero se va como se va un paso de «Cómo
  * trabajamos». La clase `is-pila` se pone acá, antes del primer paint.
  */
 export function crearPilaMovil(root: HTMLElement) {
@@ -89,6 +90,33 @@ export function crearPilaMovil(root: HTMLElement) {
         t,
       );
     }
+    // El timeline tiene que durar 1 entero. Sin este remate termina cuando
+    // aterriza la última carta (6/7) y el scrub lo estira hasta el final de la
+    // pista: la última entraba justo cuando el mazo se soltaba, sin su rato
+    // quieto y sin que se llegara a ver cómo arrastra a los lomos de arriba.
+    tl.set({}, {}, 1);
+
+    // SALIDA: cuando se suelta el mazo, la última carta se va hacia arriba
+    // llevándose a los lomos, con el mismo gesto con el que un paso de «Cómo
+    // trabajamos» le deja lugar al siguiente (sube, se achica apenas, se
+    // desenfoca y se desvanece; mismos valores que coreografia-metodo.ts). Va
+    // sobre el mazo entero y no carta por carta: la `y` y la opacidad de cada
+    // carta son del timeline de arriba. Corre DESPUÉS de soltarse —mientras el
+    // mazo ya sube con el scroll— y no antes: si se desvaneciera fijo, quedaría
+    // una pantalla vacía hasta que se suelte.
+    gsap.set(mazo, { willChange: "transform, opacity, filter" });
+    gsap.fromTo(
+      mazo,
+      { y: 0, scale: 1, autoAlpha: 1, filter: "blur(0px)" },
+      {
+        y: -56,
+        scale: 0.97,
+        autoAlpha: 0,
+        filter: "blur(8px)",
+        ease: "power2.in",
+        scrollTrigger: { trigger: pista, start: "bottom bottom", end: "bottom 45%", scrub: 1 },
+      },
+    );
   }, root);
 
   return () => {
