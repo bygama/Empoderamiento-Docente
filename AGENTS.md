@@ -167,7 +167,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, metricas)
             │   └── acciones/    ← Server Actions del admin (paginas, vista-previa, fotos, metricas)
             ├── admin/         ← las pantallas del admin
-            │   ├── armazon/     ← la caja, los campos, salir
+            │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/)
             │   ├── paginas/     ← «Páginas» y el editor (lista, barra, secciones)
             │   ├── campos/      ← los controles del formulario; se mudan a kit-admin en la fase 2
             │   └── <entidad>/   ← Lista, Formulario y sus límites (fase 2)
