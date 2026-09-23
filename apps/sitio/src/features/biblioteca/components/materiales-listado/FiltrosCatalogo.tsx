@@ -1,75 +1,21 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search } from "@/components/ui/icons";
 import { PUBLICOS, TIPOS } from "@/features/biblioteca/contenido/modelo";
 import { vigilarDesborde } from "./columna-desborda";
+import { FiltroGrupo } from "./FiltroGrupo";
 import type { Filtros } from "./filtros";
 
-function Pildora({
-  activa,
-  onClick,
-  children,
-}: {
-  activa: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={activa}
-      onClick={onClick}
-      className={`rounded-lg border px-3 py-1.5 font-sans text-[0.82rem] font-medium transition-colors ${
-        activa
-          ? "border-azul-principal bg-azul-principal text-white"
-          : "border-azul-principal/15 text-azul-principal hover:bg-azul-claro/30 bg-white"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-/**
- * Grupo de filtros de un solo valor: "Todos" + una píldora por opción.
- * Tocar la opción activa la destilda (vuelve a "Todos").
- */
-function FiltroGrupo({
-  label,
-  opciones,
-  valor,
-  onChange,
-}: {
-  label: string;
-  opciones: readonly string[];
-  valor: string | null;
-  onChange: (valor: string | null) => void;
-}) {
-  return (
-    <fieldset className="mt-8">
-      <legend className="text-gris-texto font-mono text-[0.7rem] tracking-[0.12em] uppercase">
-        {label}
-      </legend>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Pildora activa={valor === null} onClick={() => onChange(null)}>
-          Todos
-        </Pildora>
-        {opciones.map((opcion) => (
-          <Pildora
-            key={opcion}
-            activa={valor === opcion}
-            onClick={() => onChange(valor === opcion ? null : opcion)}
-          >
-            {opcion}
-          </Pildora>
-        ))}
-      </div>
-    </fieldset>
-  );
-}
+// Los tres grupos, en orden. Arranca abierto el de tipo, que es el que trae
+// el submenú del navbar (`?tipo=`).
+const GRUPO_TIPO = "Tipo de material";
+const GRUPO_PUBLICO = "Público";
+const GRUPO_ANIO = "Año";
 
 /**
  * La columna de filtros del catálogo: buscador arriba y los grupos de
- * píldoras (tipo, público, año), sticky en desktop. El tema NO tiene grupo
+ * píldoras (tipo, público, año), sticky en desktop. Los grupos son
+ * desplegables, uno abierto a la vez, y cerrados muestran lo elegido
+ * (`FiltroGrupo.tsx`, pedido de Gastón). El tema NO tiene grupo
  * propio: el sidebar tiene que entrar completo en un viewport de laptop
  * (~800px) y era el grupo más alto; sigue como chip en cada fila y la
  * búsqueda lo matchea. El estado vive en el listado, y los años salen de los
@@ -93,6 +39,9 @@ export function FiltrosCatalogo({
   onLimpiar: () => void;
 }) {
   const columnaRef = useRef<HTMLElement | null>(null);
+  const [grupoAbierto, setGrupoAbierto] = useState<string | null>(GRUPO_TIPO);
+  const alternar = (grupo: string) => () =>
+    setGrupoAbierto((abierto) => (abierto === grupo ? null : grupo));
   // La columna toma la rueda solo cuando no entra en la pantalla.
   useEffect(() => {
     const columna = columnaRef.current;
@@ -145,26 +94,34 @@ export function FiltrosCatalogo({
         />
       </div>
 
-      <FiltroGrupo
-        label="Tipo de material"
-        opciones={TIPOS}
-        valor={filtros.tipo}
-        onChange={(tipo) => onCambiar({ tipo })}
-      />
-      <FiltroGrupo
-        label="Público"
-        opciones={PUBLICOS}
-        valor={filtros.publico}
-        onChange={(publico) => onCambiar({ publico })}
-      />
-      <FiltroGrupo
-        label="Año"
-        opciones={anios.map(String)}
-        valor={filtros.anio === null ? null : String(filtros.anio)}
-        onChange={(anio) =>
-          onCambiar({ anio: anio === null ? null : Number(anio) })
-        }
-      />
+      <div className="border-azul-principal/10 mt-6 border-t">
+        <FiltroGrupo
+          label={GRUPO_TIPO}
+          opciones={TIPOS}
+          valor={filtros.tipo}
+          onChange={(tipo) => onCambiar({ tipo })}
+          abierto={grupoAbierto === GRUPO_TIPO}
+          onAlternar={alternar(GRUPO_TIPO)}
+        />
+        <FiltroGrupo
+          label={GRUPO_PUBLICO}
+          opciones={PUBLICOS}
+          valor={filtros.publico}
+          onChange={(publico) => onCambiar({ publico })}
+          abierto={grupoAbierto === GRUPO_PUBLICO}
+          onAlternar={alternar(GRUPO_PUBLICO)}
+        />
+        <FiltroGrupo
+          label={GRUPO_ANIO}
+          opciones={anios.map(String)}
+          valor={filtros.anio === null ? null : String(filtros.anio)}
+          onChange={(anio) =>
+            onCambiar({ anio: anio === null ? null : Number(anio) })
+          }
+          abierto={grupoAbierto === GRUPO_ANIO}
+          onAlternar={alternar(GRUPO_ANIO)}
+        />
+      </div>
     </aside>
   );
 }
