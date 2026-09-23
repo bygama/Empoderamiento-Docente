@@ -148,6 +148,11 @@ lista y las métricas se rehacen en la lane 2, con sus pantallas.
   (queda su `legend`) y pone sus campos en 2 columnas cuando su propio
   ancho lo permite (`@container`, igual para cualquier grupo: nada por
   campo, AGENTS.md §12). De 2 niveles de caja alrededor de un input a 0.
+- **La raíz de la sección también, en 2 columnas** (enmienda de Mateo del
+  2026-09-22, en el paso 11: sin esto la grilla de computadora no entraba
+  en la primera pantalla): cuando hay lugar, sus campos van de a dos
+  (Título | Bajada, Botón principal | Botón secundario) y las listas y los
+  párrafos ocupan todo el ancho. Es la misma regla para cualquier sección.
 - **Tarjetas (`ListaFija`) en grilla:** una miniatura por ítem con su
   número y un resumen de una línea, en 6 columnas desde `lg` y 3 por
   debajo. Cada ítem es un `<details>` con el `name` de la lista, así se abre
