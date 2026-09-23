@@ -4,7 +4,7 @@
 - **Base:** `9e721f1` (= `origin/main` al 2026-09-21, con la fase A de métricas mergeada)
 - **Spec:** [`SPEC.md`](SPEC.md) · **Plan:** [`PLAN.md`](PLAN.md) · **Inventario:** [`INVENTARIO.md`](INVENTARIO.md) · **Rulings:** [`DECISIONS.md`](DECISIONS.md)
 
-**Estado: fase A implementada (A0–A9), revisada tarea por tarea y con una revisión final de toda la rama («lista para mergear», sin críticos) más su ola de fixes; PR en curso.**
+**Estado: cerrada el 2026-09-23.** La fase A entró en `main` con el PR #171 y se verificó sobre `e4cf0c9` (ver «Verification»). Lo que sigue abierto pasa al mapa del admin (diseño aprobado el 2026-09-23, lane `work/mapa-del-admin/`), módulo Contenido: ver «Abierto».
 
 ## Baseline
 
@@ -34,8 +34,20 @@ Medido sobre `9e721f1`:
 
 ## Abierto
 
+Todo lo de esta lista pasa, tal cual, al módulo Contenido del mapa del admin
+(`work/mapa-del-admin/`); la subida real a Blob, además, a la verificación en
+producción del deploy.
+
 - Cargar `BLOB_READ_WRITE_TOKEN` en Vercel (Mateo/Gastón) y probar una subida real: ese camino nunca corrió contra Vercel.
 - Las cinco decisiones del SPEC §12 con Gastón y Mateo, incluida la excepción de AGENTS.md §12 (ya escrita con el OK de Facundo; falta que la vean ellos).
 - `scripts/comparar-render.mjs` (117 líneas) por arriba de las 100 de la guía: la revisión final propone escribir la excepción en AGENTS.md §6, como la de `verificar-react-doctor.mjs` (con OK).
 - Deuda anotada por la revisión final, para la fase B: nada borra una foto reemplazada (fila en `fotos` y archivo en Blob quedan); los 19 alts del hero viven dentro de `aria-hidden` (se escriben pero no se leen); `config/nav.ts` quedó en 104 líneas; `publicar` revalida solo su ruta (el SPEC §7 pide las dos cuando una sección se repite: fase D); dos pantallas que crean la fila a la vez chocan (ventana de milisegundos).
 - Fase B: ¿Quiénes somos? y Misión con `textoConResaltado`; el resto de Inicio.
+
+## Verification
+
+### 2026-09-23 — L DoD de la fase A, sobre `main` `e4cf0c9` — PASS
+- L1 static: `pnpm typecheck` → exit 0 · `pnpm lint` → exit 0 · `node scripts/verificar-react-doctor.mjs` → exit 0 («100/100, sin diagnósticos», apps/sitio/src 391 archivos · packages/db/src 3 · packages/auth/src 5)
+- L2 behavioral: `pnpm test` → exit 0 (79 tests: 78 pasan, 0 fallan, 1 en skip a propósito: las respuestas grabadas de Vercel, que esperan la A1 de métricas; incluye el test de integración de `editar-paginas`) · `pnpm build` → exit 0 (21 páginas estáticas) · `pnpm migrate:status` → «Database schema is up to date!» (6 migraciones); arranca: `pnpm dev` → `GET /admin/entrar` 200
+- L3 end-to-end, en el navegador de Orca contra `localhost:3000` y el Postgres local: entrar con la cuenta local de prueba → `/admin/paginas` lista las siete páginas con Inicio editable → el editor de Inicio muestra «Sin editar» → cambiar el título y «Guardar borrador» → «Borrador sin publicar · guardado por Cuenta de prueba» (`guardarBorrador` en el log) → «Vista previa» (`abrirVistaPrevia`) → `/` muestra la franja «Estás viendo un borrador» y el título nuevo en el h1 → «Volver al sitio publicado» → el h1 vuelve al publicado → «Descartar borrador» → «Sin editar» otra vez. «Publicar» no se tocó en el navegador para no dejar publicado el contenido local: lo cubre el test de integración de L2. La subida a Blob no corrió: sigue en «Abierto».
+- Close review: 0 seats, decisión del owner (DECISIONS, 2026-09-23). La revisión de la rama se hizo antes del merge (ver «Hecho», 2026-09-21).
