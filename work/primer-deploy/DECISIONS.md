@@ -61,3 +61,16 @@ Promover un preview no rebuildea (la API de Vercel lo dice explícitamente:
 «this action does not rebuild the deployment»), así que publicaría en el
 dominio real el `robots.txt` cerrado. Hallazgo del implementador de la Task 2;
 va en el checklist de la Task 5 y en el README cuando se escriba.
+
+**2026-09-23 — Se cierra la lane; las Tasks 3, 5 y 6 pasan al plan del mapa del admin.**
+El PR #167 se mergeó el 2026-09-21 y la carpeta quedó en `work/`; eso frena
+abrir otra lane. Mateo eligió «Las cierro yo, con OK de Facundo» (se lo pide
+él a Facundo). Lo que falta depende de las respuestas de Mateo o Gastón y del
+deploy, y el mapa del admin (aprobado ese día) lo necesita antes que nada:
+Métricas en producción, las fotos en Blob y Search Console. Va como paso
+previo de ese plan, con esta nota incluida: producción sale de un build de
+`main`, nunca de promover un preview.
+
+**2026-09-23 — Cierre sin revisor nuevo.**
+Mateo, al elegir cómo verificar: «Gates + navegador, sin revisores
+(Recomendado)».
