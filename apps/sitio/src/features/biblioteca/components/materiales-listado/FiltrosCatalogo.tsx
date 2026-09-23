@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Search } from "@/components/ui/icons";
 import { PUBLICOS, TIPOS } from "@/features/biblioteca/contenido/modelo";
+import { vigilarDesborde } from "./columna-desborda";
 import type { Filtros } from "./filtros";
 
 function Pildora({
@@ -91,10 +92,26 @@ export function FiltrosCatalogo({
   onCambiar: (parcial: Partial<Filtros>) => void;
   onLimpiar: () => void;
 }) {
+  const columnaRef = useRef<HTMLElement | null>(null);
+  // La columna toma la rueda solo cuando no entra en la pantalla.
+  useEffect(() => {
+    const columna = columnaRef.current;
+    if (!columna) return;
+    return vigilarDesborde(columna);
+  }, []);
+
   return (
+    // Mide unos 712px: fijo a 7rem del borde, en cualquier notebook el grupo
+    // «Año» quedaba debajo de la pantalla y, por ser sticky, no había forma de
+    // llegar. Ahora nunca pasa del alto disponible y, si no entra, se recorre
+    // adentro suyo (la rueda scrollea la columna y no la página, solo cuando
+    // desborda: columna-desborda.ts). El fundido de abajo avisa que sigue; cae
+    // sobre el `pb-6`, así que cuando todo entra no tapa nada. El margen
+    // negativo es para que el recorte no se coma los anillos de foco.
     <aside
+      ref={columnaRef}
       aria-label="Buscador y filtros del catálogo"
-      className="lg:sticky lg:top-28 lg:self-start"
+      className="lg:sticky lg:top-28 lg:-mx-2 lg:-mt-1 lg:max-h-[calc(100svh-8.5rem)] lg:self-start lg:overflow-y-auto lg:px-2 lg:data-[desborda]:overscroll-contain lg:pt-1 lg:pb-6 lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] lg:[scrollbar-width:thin]"
     >
       <div className="flex items-baseline justify-between gap-4">
         <h2 className="font-display text-h3 text-azul-principal font-bold tracking-[-0.01em]">
