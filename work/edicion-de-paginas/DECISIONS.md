@@ -111,3 +111,15 @@ taparía. Y las once tarjetas del hero tienen once relaciones de aspecto con un
 solo campo de foto: la miniatura muestra el punto elegido sobre un marco 4/3,
 no el recorte exacto de cada tarjeta; la vista previa es donde se ve el
 recorte real.
+
+**2026-09-23 — Se cierra la lane, y lo abierto pasa al mapa del admin.**
+El PR #171 se mergeó el 2026-09-22 y la carpeta quedó en `work/`; eso frena
+abrir otra lane. Mateo eligió «Las cierro yo, con OK de Facundo» (se lo pide
+él a Facundo). La fase B y las deudas de «Abierto» pasan al módulo Contenido
+del mapa del admin (`work/mapa-del-admin/`), que las retoma con el diseño
+aprobado ese día.
+
+**2026-09-23 — Cierre sin revisor nuevo.**
+Mateo, al elegir cómo verificar: «Gates + navegador, sin revisores
+(Recomendado)». La rama tuvo su revisión final antes del merge (nueve pasadas,
+sin críticos); el cierre corre los gates y el recorrido del editor sobre `main`.
