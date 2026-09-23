@@ -129,3 +129,15 @@ Las ventanas se escriben con `fechaFin = ayer`; la marca `hastaDia` sale del
 último `total`. Si la API omite un día sin tráfico, las dos fechas se separan y
 la grilla quedaba vacía. `total` no se rellena con ceros: la marca atrasada es
 lo que hace repedir un día que Vercel no cerró.
+
+**2026-09-23 — Se cierra la lane; A1, B1 y C1 pasan al módulo Métricas del mapa del admin.**
+El PR #168 se mergeó el 2026-09-21 y la carpeta quedó en `work/`; eso frena
+abrir otra lane. Mateo eligió «Las cierro yo, con OK de Facundo» (se lo pide
+él a Facundo). El mapa del admin, aprobado ese día, amplía Métricas a cinco
+pantallas (Resumen · Búsquedas · Origen · Acciones · Enlaces) y la curva con
+las listas de B1 es su «Resumen»: planearla acá y allá la partiría en dos.
+
+**2026-09-23 — Cierre sin revisor nuevo.**
+Mateo, al elegir cómo verificar: «Gates + navegador, sin revisores
+(Recomendado)». La rama tuvo su revisión final antes del merge; el cierre corre
+los gates y el recorrido del panel sobre `main`.
