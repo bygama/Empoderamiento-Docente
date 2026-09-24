@@ -52,10 +52,11 @@ import { CierreFaro } from "./hero-faro/CierreFaro";
  * Copy: la frase central es la del cartel oficial; las cuatro frases del
  * enfoque son palabras de Dani (devolución de junio de 2026) y del pie del
  * sitio, marcadas VALIDAR con ED igual que el titular del cierre, pedido
- * por Gastón. Desktop-first: la coreografía corre en ≥1024px
- * sin reduced-motion (gsap.matchMedia rearma al cruzar el breakpoint); si
- * no, queda la escena estática encendida con el mensaje central (default
- * del JSX) y el runway colapsa a una pantalla (h-svh).
+ * por Gastón. En ≥1024px corre esta coreografía; en celular y tablet, otra
+ * composición del mismo mundo (faro al centro, luz hacia arriba: ver
+ * hero-faro/coreografia-faro-movil.ts). gsap.matchMedia rearma al cruzar el
+ * breakpoint. Con reduced-motion queda la escena estática encendida con el
+ * mensaje central (default del JSX) y el runway colapsa a una pantalla.
  */
 export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos }) {
   const mensaje = partirResaltado(contenido.mensaje);
@@ -85,11 +86,12 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
       className="relative z-10 lg:-mt-[100svh] lg:motion-reduce:mt-0"
       aria-labelledby="faro-titulo"
     >
-      {/* El runway solo existe donde corre la coreografía: en mobile o con
-          reduced-motion colapsa a una pantalla (nada de scroll muerto).
+      {/* El runway solo existe donde corre la coreografía: con
+          reduced-motion colapsa a una pantalla (nada de scroll muerto). En
+          celular y tablet es más corto (715svh, ver coreografia-faro-movil).
           Alto = DURACION_RECORRIDO · 620vh + 200vh (1.60 · 620 + 200 ≈ 1192):
           si cambia la duración de la línea de tiempo, cambia este número. */}
-      <div ref={altoRef} className="relative h-svh lg:h-[1192vh] lg:motion-reduce:h-svh">
+      <div ref={altoRef} className="relative h-[715svh] motion-reduce:h-svh lg:h-[1192vh] lg:motion-reduce:h-svh">
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
@@ -109,6 +111,15 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
             style={{ opacity: 0 }}
           />
 
+          {/* El resplandor donde la luz toca el texto, en celular y tablet:
+              lo mueve y lo prende hero-faro/coreografia-faro-movil.ts. */}
+          <div
+            data-luz-texto
+            aria-hidden="true"
+            className="pointer-events-none absolute top-0 left-0 h-72 w-[30rem] max-w-[130vw] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-azul-claro)_16%,transparent),transparent)] lg:hidden"
+            style={{ opacity: 0 }}
+          />
+
           {/* Titular de la sección, siempre perceptible para AT (h2: el h1
               de la página vive en QueHacemosHero, que va primero): la
               versión visual de abajo entra y sale con la coreografía. */}
@@ -119,7 +130,7 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
           {/* ══ Overlays de texto — una idea por momento ══ */}
 
           {/* S0 · La pregunta en la noche (principio «Singularidad», data.ts) */}
-          <div data-esc="0" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center" style={{ opacity: 0 }}>
+          <div data-esc="0" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center max-lg:items-start max-lg:pt-[max(6rem,13svh)]" style={{ opacity: 0 }}>
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
               <p className="text-azul-claro/90 font-display max-w-[30ch] text-[1.65rem] font-medium leading-snug md:text-[2rem]">
                 {contenido.apertura}
@@ -134,14 +145,23 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
               subrayado de «aprendizaje matemático» se pinta con la luz
               (background-size) y la frase va en celeste, como «transformamos.»
               del hero (Gastón, 2026-09-18). aria-hidden: para AT está el h2
-              sr-only de arriba. */}
-          <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center">
+              sr-only de arriba. En celular y tablet, centrado en el cielo
+              que queda entre el menú y el techo de la linterna (Gastón,
+              2026-09-23): la linterna está al 52% del alto y su techo, unos
+              6svh más arriba (40 unidades del dibujo; coreografia-faro-movil).
+              */}
+          <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center max-lg:pt-[max(6rem,13svh)] max-lg:pb-[calc(54svh+1rem)]">
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
               {/* Sin eyebrow: «Qué hacemos» ya es el título de la página y
                   el hero lo acaba de decir; repetirlo acá le quitaba peso al
                   momento tipográfico (pedido de Mateo, 2026-09-02). */}
               {/* El logotipo a la izquierda de la frase, del alto de los tres
-                  renglones, desde lg (Gastón, 2026-09-18).
+                  renglones, desde lg (Gastón, 2026-09-18). En tablet, a la
+                  DERECHA: a la izquierda quedaba debajo del logo del menú y
+                  se leía repetido. Ahí los renglones van sin balancear, así
+                  llegan hasta el logotipo (balanceados dejaban un hueco). En celular no va: al costado no le deja
+                  ancho a la frase, y arriba repetía el del menú (Gastón,
+                  2026-09-23).
 
                   EL TAMAÑO DE LA FRASE NO ESTÁ ACÁ: vive en `globals.css`,
                   sobre `[data-mensaje]`, porque depende del alto de la ventana
@@ -155,10 +175,10 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
                   aria-hidden="true"
                   width={395}
                   height={433}
-                  className="hidden h-[3.18em] w-auto shrink-0 select-none lg:block"
+                  className="h-[3.18em] w-auto shrink-0 select-none max-md:hidden md:max-lg:order-last"
                 />
                 <p
-                  className="font-display max-w-[21ch] font-extrabold tracking-[-0.03em] text-balance text-white [&_mark]:text-azul-claro [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
+                  className="font-display max-w-[21ch] font-extrabold max-lg:max-w-none md:max-lg:text-wrap tracking-[-0.03em] text-balance text-white [&_mark]:text-azul-claro [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
                   style={{ fontSize: "1em", lineHeight: 1.06 }}
                 >
                   {mensaje.antes}

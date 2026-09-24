@@ -507,8 +507,18 @@ function CapaMarMedio() {
  * reduced-motion) no la paga.
  */
 export function FaroEscena() {
+  // Celular y tablet (< lg): la pantalla es vertical y el faro (x 950 de
+  // 1440) quedaba afuera del cuadro. Ahí cada capa toma el ANCHO DEL DIBUJO
+  // ENTERO para su alto (1440/900 · 128svh = 204.8svh) y se ubica con el
+  // faro en el centro de la pantalla: left = 50% − ancho · 950/1440. Nunca
+  // menos que 147% del ancho: es lo mínimo para que el dibujo llegue al
+  // borde derecho con el faro al centro (la torre tiene 490 de 1440 a su
+  // derecha); con el celular apaisado, el 128% de siempre dejaba una franja
+  // sin dibujo. Así hay dibujo a los dos lados de la torre
+  // y la luz puede barrer hacia arriba (hero-faro/coreografia-faro-movil.ts).
+  // También vale sin JS y con reduced-motion. En escritorio, nada cambia.
   const capa =
-    "pointer-events-none absolute -inset-[14%] [transform-origin:var(--qh-origen)]";
+    "pointer-events-none absolute -inset-[14%] [transform-origin:var(--qh-origen)] max-lg:right-auto max-lg:left-[calc(50%-max(135.1svh,96.98%))] max-lg:w-[max(204.8svh,147%)]";
   return (
     <div
       aria-hidden="true"
