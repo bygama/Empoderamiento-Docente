@@ -27,12 +27,10 @@ function viajar(reduced: boolean) {
   const vh = window.innerHeight;
   // 0.048 está en unidades de la línea de tiempo del faro, que dura
   // DURACION_RECORRIDO: dividir lo pasa a progreso del runway.
-  // En celular y tablet el runway no arranca detrás del hero y su línea
-  // de tiempo va de 0 a 1 (coreografia-faro-movil.ts).
-  const destino =
-    window.innerWidth < 1024
-      ? top + (faro.offsetHeight - vh) * LECTURA_S0_MOVIL
-      : top + vh + (faro.offsetHeight - vh * 2) * (0.048 / DURACION_RECORRIDO);
+  // En celular y tablet el runway también arranca detrás del hero, pero
+  // su línea de tiempo va de 0 a 1 (coreografia-faro-movil.ts).
+  const lectura = window.innerWidth < 1024 ? LECTURA_S0_MOVIL : 0.048 / DURACION_RECORRIDO;
+  const destino = top + vh + (faro.offsetHeight - vh * 2) * lectura;
   const lenis = getLenis();
   if (lenis) {
     lenis.scrollTo(destino, {

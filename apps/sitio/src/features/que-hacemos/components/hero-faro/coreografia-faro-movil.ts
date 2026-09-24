@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { VERBO_POS } from "../preguntas-faro";
-import { crearCamaraMovil } from "./camara-faro-movil";
+import { crearCamaraMovil, type Punto } from "./camara-faro-movil";
 import { crearLuzMovil } from "./luz-faro-movil";
 
 if (typeof window !== "undefined") {
@@ -9,9 +9,11 @@ if (typeof window !== "undefined") {
 }
 
 /* ── Tiempos ───────────────────────────────────────────────────────────────
- * En unidades de recorrido: 1 unidad ≈ 5svh de scroll (runway de 715svh en
+ * En unidades de recorrido: la línea de tiempo arranca una pantalla después
+ * del principio del runway (esa pantalla va detrás del hero) y dura 800svh,
+ * así que 1 unidad ≈ 6,3svh de scroll (runway de 1000svh en
  * QueHacemosHeroFaro). `u()` las pasa a progreso 0–1. */
-const TOTAL = 123;
+const TOTAL = 126;
 const u = (n: number) => n / TOTAL;
 /**
  * Dónde está el faro en cada plano (fracción del ancho de la pantalla).
@@ -21,18 +23,26 @@ const u = (n: number) => n / TOTAL;
 const FARO = { izq: 0.26, der: 0.74 } as const;
 const S0_SALE = 9;
 const ENCENDIDO = 12.5;
-const MENSAJE = { lee: 20.5, sale: 34 };
-/** Una por frase: cuándo gira el haz hacia ella, cuándo la lee y cuándo se va. */
+/** Cuánto tarda un texto en aparecer (fundido, como en escritorio). */
+const ENTRA = 4;
+/**
+ * Un texto por momento, con el ritmo de escritorio: el haz GIRA hacia él
+ * (un solo movimiento largo, `giro`), el texto aparece cuando la luz ya
+ * está llegando (`entra`) y se va (`sale`) mientras el haz ya gira al
+ * siguiente. Entre giro y giro, el haz quieto.
+ */
+const MENSAJE = { giro: [ENCENDIDO + 2, ENCENDIDO + 8], entra: 19, sale: 34 } as const;
 const FRASES = [
-  { giro: 35, lee: 39, sale: 50 },
-  { giro: 52, lee: 61, sale: 71 },
-  { giro: 71.5, lee: 75, sale: 85 },
-  { giro: 85.5, lee: 89, sale: 99 },
+  { giro: [34, 42], entra: 40, sale: 50 },
+  { giro: [51, 63], entra: 60, sale: 71 }, // el giro dura el cruce entero del faro
+  { giro: [71, 79], entra: 77, sale: 85 },
+  { giro: [84, 94], entra: 92, sale: 100 }, // giro largo: baja casi 70°
 ] as const;
-const CIERRE = { viaje: 97, giro: 100, lee: 104, cta: 108 };
-const DESLUMBRE = 114;
-/** Cuánto tarda la luz en destapar un texto. */
-const LECTURA = 4;
+// El giro al cierre es el más grande (de la última frase, abajo a la
+// izquierda, al titular, arriba): arranca apenas empieza a irse la frase y
+// dura todo el viaje del faro de vuelta al centro.
+const CIERRE = { viaje: 98, giro: [99, 111], entra: 109, cta: 112 } as const;
+const DESLUMBRE = 117;
 /**
  * Donde aterriza el botón «Entrá al recorrido» del hero en mobile: con la
  * primera frase en pantalla y el faro todavía apagado (ver portal-viaje.ts).
@@ -41,22 +51,24 @@ export const LECTURA_S0_MOVIL = u(6);
 
 /**
  * EL FARO EN CELULAR Y TABLET (< lg). Misma escena y mismos textos que
- * computadora, compuesta para una pantalla vertical en cuatro planos, con
+ * computadora, compuesta para una pantalla vertical en planos, con
  * travellings de cámara entre ellos (el mundo entero se corre, con
  * paralaje: camara-faro-movil.ts):
+ *   llegada        la escena está detrás del hero y el faro sube mientras
+ *                  el hero se va, con la llegada de escritorio;
  *   1 · apagado    faro al centro, la frase en la noche;
  *   2 · encendido  el faro viaja a la izquierda mientras se prende; el haz
- *                  se estira desde la linterna y destapa el mensaje, arriba
- *                  a la derecha (en tablet, con el logotipo a su lado);
+ *                  nace apuntando al mensaje y se acomoda unos grados;
  *   3 · la tesis   el faro se queda; la luz baja a la primera frase;
  *   4 · el enfoque el faro cruza a la derecha con la luz prendida y las
- *                  otras tres frases entran desde la izquierda;
+ *                  otras tres frases entran desde la izquierda, cada una a
+ *                  su altura;
  *   cierre         vuelve al centro, la luz sube al titular y su botón, y
  *                  el deslumbre lava la pantalla a blanco desde el medio,
  *                  como en escritorio.
- * La luz es la que revela y se queda quieta mientras se lee
- * (luz-faro-movil.ts). Solo transform y opacity, salvo la máscara que
- * destapa cada texto y el subrayado, que escritorio anima igual.
+ * La luz se mueve como en escritorio: un giro por texto y quieta mientras
+ * se lee (luz-faro-movil.ts). Solo transform y opacity, salvo el subrayado,
+ * que escritorio anima igual.
  */
 export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
   const q = (sel: string) => root.querySelector<HTMLElement>(sel);
@@ -66,6 +78,7 @@ export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
   const titular = q("[data-cierre-titular]");
   const boton = q("[data-esc='cierre'] [data-cta] a");
   const cta = q("[data-esc='cierre'] [data-cta]");
+  const logoMovil = q("[data-logo-movil]");
   // Una por lugar de frase: el contenido editable trae exactamente esas (VERBO_POS).
   const frases = VERBO_POS.map((_, i) => q(`[data-verbo-txt='${i}'] [data-v]`));
   const camara = crearCamaraMovil(root);
@@ -78,12 +91,34 @@ export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
   cierreEl.removeAttribute("inert");
 
   const luz = crearLuzMovil(root, escenario, camara.foco);
-  // Dónde se queda la luz mientras se lee cada texto: del lado opuesto al
-  // faro, así lo cruza en diagonal (con el faro a la izquierda, hacia la
-  // derecha del texto; con el faro a la derecha, hacia su izquierda).
-  luz.agregar(mensajeTxt, mensaje, 0, u(MENSAJE.lee), u(LECTURA), 0.62);
-  frases.forEach((f, i) => f && luz.agregar(f, f, u(FRASES[i].giro), u(FRASES[i].lee), u(LECTURA), i === 0 ? 0.62 : 0.42));
-  luz.agregar(titular, cierreEl, u(CIERRE.giro), u(CIERRE.lee), u(LECTURA), 0.45);
+  // En celular la luz del mensaje no le apunta de lleno: pasa ENTRE la
+  // frase y el logotipo que va debajo, a la derecha del faro, y se pierde
+  // arriba a la derecha (Gastón, 2026-09-24). Destino: el borde derecho
+  // del logo, más cerca del pie de la frase que de la punta del logo: el
+  // cono se abre unas cuatro veces más hacia abajo que hacia arriba de su
+  // eje, y apuntando a mitad de camino le rozaba la punta. Así el cono
+  // entero queda centrado en el hueco (medido en 320, 390 y 430). En tablet el logo va al lado del texto (y este no se muestra):
+  // null, y la luz apunta al centro de la frase como siempre.
+  let hueco: Punto | null = null;
+  const medirHueco = () => {
+    const logo = logoMovil?.getBoundingClientRect();
+    if (!logoMovil || !logo || logo.width === 0) {
+      hueco = null;
+      return;
+    }
+    const base = escenario.getBoundingClientRect();
+    const pie = mensajeTxt.getBoundingClientRect().bottom - Number(gsap.getProperty(mensaje, "y"));
+    const punta = logo.top - Number(gsap.getProperty(logoMovil, "y"));
+    hueco = { x: logo.right - base.left, y: pie + (punta - pie) * 0.22 - base.top };
+  };
+  // El encendido nace apuntando un poco más arriba y se acomoda: el −8 → −2
+  // de escritorio.
+  luz.apuntar(mensajeTxt, mensaje, u(MENSAJE.giro[0]), u(MENSAJE.giro[1]), {
+    hacia: () => hueco,
+    inicio: (p) => ({ x: p.x, y: p.y - 60 }),
+  });
+  frases.forEach((f, i) => f && luz.apuntar(f, f, u(FRASES[i].giro[0]), u(FRASES[i].giro[1])));
+  luz.apuntar(titular, cierreEl, u(CIERRE.giro[0]), u(CIERRE.giro[1]));
   // El cierre va con el faro al centro, salvo en las pantallas bajas
   // (320×568): ahí su botón caía sobre la linterna, y el faro se corre a la
   // derecha lo justo para dejarlo al costado.
@@ -100,6 +135,7 @@ export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
   const remedir = () => {
     camara.medir();
     luz.medir();
+    medirHueco();
     medirCierre();
   };
   remedir();
@@ -119,7 +155,7 @@ export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
   gsap.set("[data-espejo]", { autoAlpha: 0 });
   gsap.set("[data-capa='marMedio']", { autoAlpha: 0.6 });
   gsap.set("[data-verbo-punto], [data-rastro]", { autoAlpha: 0 });
-  gsap.set([mensaje, "[data-mensaje] img", "[data-luz-texto]"], { autoAlpha: 0 });
+  gsap.set([mensaje, "[data-logo-movil]", "[data-luz-texto]"], { autoAlpha: 0 });
   gsap.set("[data-luz-texto]", { xPercent: -50, yPercent: -50 });
   camara.llegar(alto);
 
@@ -132,7 +168,15 @@ export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
       camara.aplicar();
       if (creada.tl) luz.girar(creada.tl.progress());
     },
-    scrollTrigger: { trigger: alto, start: "top top", end: "bottom bottom", scrub: 0.85, invalidateOnRefresh: true },
+    scrollTrigger: {
+      trigger: alto,
+      // Como en escritorio: la primera pantalla del runway va detrás del
+      // hero (la llegada), y la línea arranca recién después.
+      start: () => `top+=${window.innerHeight} top`,
+      end: "bottom bottom",
+      scrub: 0.85,
+      invalidateOnRefresh: true,
+    },
   });
   creada.tl = tl;
 
@@ -157,49 +201,69 @@ export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
     .to("[data-haz='izq']", { scaleX: 1, duration: u(8.5), ease: "power2.in" }, u(ENCENDIDO + 2))
     .to("[data-espejo]", { autoAlpha: 1, duration: u(6) }, u(ENCENDIDO + 2.5));
 
-  /* ── El mensaje: logo y frase, destapados por la luz ──────────────── */
-  tl.fromTo(mensaje, { autoAlpha: 0 }, { autoAlpha: 1, duration: u(0.5), ease: "none" }, u(MENSAJE.lee - 0.5))
-    .fromTo("[data-mensaje] img", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: u(3) }, u(MENSAJE.lee - 0.5))
-    .fromTo("[data-mensaje] mark", { backgroundSize: "0% 0.14em" }, { backgroundSize: "100% 0.14em", duration: u(3), ease: "power1.inOut" }, u(MENSAJE.lee + LECTURA + 0.5))
-    .to(mensaje, { autoAlpha: 0, y: -22, duration: u(3), ease: "power2.in" }, u(MENSAJE.sale));
-  resplandor(tl, MENSAJE.lee, MENSAJE.sale);
-
-  /* ── 3 y 4 · Las frases del enfoque ───────────────────────────────── */
+  /* ── Los textos: aparecen donde ya está la luz ────────────────────── */
+  // En celular el logotipo va aparte, a la derecha del faro: entra y sale
+  // con la frase.
+  aparecer(tl, [mensaje, "[data-logo-movil]"], { sel: "[data-mensaje] mark", grosor: "0.14em" }, { autoAlpha: 0, y: 12 }, MENSAJE.entra, MENSAJE.sale);
   // La tesis sube apenas (el faro no se movió); las otras tres entran desde
   // la izquierda, del lado opuesto al faro, hacia la luz.
   FRASES.forEach((f, i) => {
     const bloque = `[data-verbo-txt='${i}']`;
-    const desde = i === 0 ? { autoAlpha: 0, y: 16 } : { autoAlpha: 0, x: -28 };
-    tl.fromTo(`${bloque} [data-v]`, desde, { autoAlpha: 1, x: 0, y: 0, duration: u(5), ease: "sine.out" }, u(f.lee))
-      .fromTo(`${bloque} mark`, { backgroundSize: "0% 0.12em" }, { backgroundSize: "100% 0.12em", duration: u(3), ease: "sine.inOut" }, u(f.lee + LECTURA + 0.5))
-      .to(`${bloque} [data-v]`, { autoAlpha: 0, y: -14, duration: u(3), ease: "sine.in" }, u(f.sale));
-    resplandor(tl, f.lee, f.sale);
+    const desde = i === 0 ? { autoAlpha: 0, y: 14 } : { autoAlpha: 0, x: -20 };
+    aparecer(tl, `${bloque} [data-v]`, { sel: `${bloque} mark`, grosor: "0.12em" }, desde, f.entra, f.sale);
   });
+  aparecer(tl, cierreEl, null, { autoAlpha: 0, y: 12 }, CIERRE.entra, null);
+  tl.fromTo("[data-esc='cierre'] [data-cta]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: u(3) }, u(CIERRE.cta));
 
-  /* ── Cierre y deslumbre ────────────────────────────────────────────── */
-  tl.fromTo(cierreEl, { autoAlpha: 0 }, { autoAlpha: 1, duration: u(0.5), ease: "none" }, u(CIERRE.lee - 0.5))
-    .fromTo("[data-esc='cierre'] [data-cta]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: u(3) }, u(CIERRE.cta))
-    .to("[data-haz='izq']", { autoAlpha: 0, duration: u(4), ease: "power2.in" }, u(DESLUMBRE - 1))
+  /* ── Deslumbre ─────────────────────────────────────────────────────── */
+  tl.to("[data-haz='izq']", { autoAlpha: 0, duration: u(4), ease: "power2.in" }, u(DESLUMBRE - 1))
     .to([cierreEl, "[data-luz-texto]"], { autoAlpha: 0, duration: u(3), ease: "none" }, u(DESLUMBRE + 2.5))
     .to("[data-halo]", { scale: 46, duration: u(8), ease: "power2.in" }, u(DESLUMBRE))
     .to("[data-nucleo]", { scale: 30, duration: u(8), ease: "power2.in" }, u(DESLUMBRE + 0.5))
     .to("[data-capa='marMedio']", { autoAlpha: 0, duration: u(6), ease: "power2.in" }, u(DESLUMBRE + 1))
     .to("[data-velo-blanco]", { opacity: 1, duration: u(6.5), ease: "sine.inOut" }, u(DESLUMBRE + 2.5));
-  resplandor(tl, CIERRE.lee, null);
   tl.set({}, {}, 1);
   luz.girar(0);
 
   return () => {
     vivo = false;
     ScrollTrigger.removeEventListener("refreshInit", remedir);
-    luz.limpiar();
     camara.soltar();
     cierreEl.setAttribute("inert", "");
   };
 }
 
-/** El resplandor sobre el texto: se prende con la lectura y se apaga cuando el texto se va. */
-function resplandor(tl: gsap.core.Timeline, lee: number, sale: number | null) {
-  tl.to("[data-luz-texto]", { autoAlpha: 1, duration: u(LECTURA), ease: "sine.out" }, u(lee));
-  if (sale !== null) tl.to("[data-luz-texto]", { autoAlpha: 0, duration: u(3), ease: "sine.in" }, u(sale));
+/**
+ * Un texto: aparece con un fundido corto, se le pinta el subrayado de su
+ * palabra clave (si tiene: el titular del cierre no) y se va; el
+ * resplandor lo acompaña. Sin `sale` se queda (el cierre se va con el
+ * deslumbre).
+ */
+function aparecer(
+  tl: gsap.core.Timeline,
+  texto: gsap.TweenTarget,
+  marca: { sel: string; grosor: string } | null,
+  desde: gsap.TweenVars,
+  entra: number,
+  sale: number | null,
+) {
+  tl.fromTo(texto, desde, { autoAlpha: 1, x: 0, y: 0, duration: u(ENTRA), ease: "sine.out" }, u(entra)).to(
+    "[data-luz-texto]",
+    { autoAlpha: 1, duration: u(ENTRA), ease: "sine.out" },
+    u(entra),
+  );
+  if (marca) {
+    tl.fromTo(
+      marca.sel,
+      { backgroundSize: `0% ${marca.grosor}` },
+      { backgroundSize: `100% ${marca.grosor}`, duration: u(3), ease: "sine.inOut" },
+      u(entra + ENTRA),
+    );
+  }
+  if (sale === null) return;
+  tl.to(texto, { autoAlpha: 0, y: -14, duration: u(3), ease: "sine.in" }, u(sale)).to(
+    "[data-luz-texto]",
+    { autoAlpha: 0, duration: u(3), ease: "sine.in" },
+    u(sale),
+  );
 }
