@@ -92,13 +92,19 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
           hero y 800svh de línea de tiempo, ver coreografia-faro-movil).
           Alto = DURACION_RECORRIDO · 620vh + 200vh (1.60 · 620 + 200 ≈ 1192):
           si cambia la duración de la línea de tiempo, cambia este número. */}
-      <div ref={altoRef} className="relative h-[1000svh] motion-reduce:h-svh lg:h-[1192vh] lg:motion-reduce:h-svh">
+      <div ref={altoRef} className="relative h-[1000svh] motion-reduce:h-lvh lg:h-[1192vh] lg:motion-reduce:h-svh">
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
           // (ver app/(sitio)/que-hacemos/page.tsx). El cielo es uno solo para las dos
           // secciones, así no hay junta posible.
-          className="sticky top-0 isolate h-svh overflow-hidden"
+          // En celular y tablet mide el alto GRANDE de la pantalla (lvh, con
+          // la barra del navegador escondida): con svh, cuando Safari
+          // escondía su barra al scrollear quedaba abajo una franja del fondo
+          // liso de la página (Gastón, 2026-09-24). Con la barra visible, ese
+          // pedazo queda detrás de ella. dvh no: cambia con la barra y
+          // obligaría a recalcular la coreografía en pleno scroll.
+          className="sticky top-0 isolate h-svh overflow-hidden max-lg:h-lvh"
         >
           <FaroEscena />
 
@@ -149,9 +155,10 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
               sr-only de arriba. En celular y tablet, centrado en el cielo
               que queda entre el menú y el techo de la linterna (Gastón,
               2026-09-23): la linterna está al 52% del alto y su techo, unos
-              6svh más arriba (40 unidades del dibujo; coreografia-faro-movil).
+              6lvh más arriba (40 unidades del dibujo; coreografia-faro-movil).
+              En lvh, como la escena.
               */}
-          <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center max-lg:pt-[max(6rem,13svh)] max-lg:pb-[calc(54svh+1rem)]">
+          <div data-esc="1" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center max-lg:pt-[max(6rem,13svh)] max-lg:pb-[calc(54lvh+1rem)]">
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
               {/* Sin eyebrow: «Qué hacemos» ya es el título de la página y
                   el hero lo acaba de decir; repetirlo acá le quitaba peso al
