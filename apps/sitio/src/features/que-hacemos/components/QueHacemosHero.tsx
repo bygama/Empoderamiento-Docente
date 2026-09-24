@@ -169,11 +169,14 @@ export function QueHacemosHero({
         <TitularQH titulo={contenido.titulo} bajada={contenido.bajada} />
 
         {/* Las siete áreas, como chips: se leen de una y bajan a
-            su bloque en #areas. */}
+            su bloque en #areas. En celular no van: tres renglones de chips
+            le ganaban al titular, competían con la cápsula (tres tipos de
+            píldora en una pantalla) y el salto a #areas cruza todo el
+            recorrido. Ahí las áreas se leen en su propia sección. */}
         <ul
           data-qh-rise
           aria-label="Áreas de trabajo"
-          className="mt-7 flex max-w-[64ch] flex-wrap justify-center gap-2"
+          className="mt-7 hidden max-w-[64ch] flex-wrap justify-center gap-2 md:flex"
         >
           {nombresCortos.map((nombreCorto, i) => (
             <li key={idDeArea(i)}>
