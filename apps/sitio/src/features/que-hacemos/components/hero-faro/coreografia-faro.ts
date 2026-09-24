@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { crearCamara } from "./camara-faro";
 import { crearHaces } from "./haz-faro";
 import { armarEscenas } from "./escenas-faro";
+import { armarFaroMovil } from "./coreografia-faro-movil";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -156,6 +157,10 @@ export function crearCoreografiaFaro(root: HTMLElement, alto: HTMLElement) {
       cierreEl?.setAttribute("inert", "");
     };
   });
+
+  // Celular y tablet: otra composición (faro al centro, luz hacia arriba),
+  // otra coreografía. Ver coreografia-faro-movil.ts.
+  mm.add("(max-width: 1023.98px)", () => armarFaroMovil(root, alto));
 
   return () => mm.revert();
 }

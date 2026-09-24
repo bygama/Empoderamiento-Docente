@@ -20,16 +20,16 @@ import { VERBO_POS } from "../components/preguntas-faro";
 const frase = textoCorto({ maximo: 90, etiqueta: "Frase" }).refine((texto) => resaltadoValido(texto, { exactamente: 1 }), resaltadoExacto(1));
 
 export const esquemaFaro = z.object({
-  apertura: textoCorto({ maximo: 120, etiqueta: "Apertura", ayuda: "La primera frase de la escena, sola en la noche. Se ve en la computadora." }),
+  apertura: textoCorto({ maximo: 120, etiqueta: "Apertura", ayuda: "La primera frase de la escena, sola en la noche." }),
   mensaje: textoCorto({
     maximo: 110,
     etiqueta: "Mensaje",
-    ayuda: "La frase del cartel de ED, el momento más grande de la escena y lo único que se ve en el celular. Lo que va entre **dobles asteriscos** va en celeste, con el subrayado verde: una sola parte.",
+    ayuda: "La frase del cartel de ED, el momento más grande de la escena. Lo que va entre **dobles asteriscos** va en celeste, con el subrayado verde: una sola parte.",
   }).refine((texto) => resaltadoValido(texto, { exactamente: 1 }), resaltadoExacto(1)),
   frases: listaFija(VERBO_POS.length, frase, {
     etiqueta: "Frases del enfoque",
     etiquetaDelItem: "Frase",
-    ayuda: `Son ${VERBO_POS.length}, una por momento: cada una tiene su lugar en el cielo y su haz de luz. La primera es la tesis y va más grande. Cada una lleva una palabra clave entre **dobles asteriscos**, que la luz pinta de celeste. Se ven en la computadora.`,
+    ayuda: `Son ${VERBO_POS.length}, una por momento: cada una tiene su lugar en el cielo y su haz de luz. La primera es la tesis y va más grande. Cada una lleva una palabra clave entre **dobles asteriscos**, que la luz pinta de celeste. En el celular cada una tiene su lugar medido para frases de este largo.`,
   }),
   cierre: grupo(
     {
