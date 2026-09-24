@@ -43,9 +43,13 @@ export function FichaProyecto({
         {/* Encabezado en fila: banderas con el país a la izquierda, y arriba
             a la derecha SIEMPRE el sello, en mono y en dos renglones, con
             quién arriba y los años abajo (Gastón, 2026-09-11). El país cede
-            el ancho: se parte antes que el sello. */}
+            el ancho: se parte antes que el sello. Y si no le alcanza ni así
+            (tres banderas en una card de celular), el nombre baja debajo
+            de las banderas: antes empujaba la card 14px afuera de la
+            pantalla y la página se corría de costado. Solo en celular y
+            tablet (la grilla); en escritorio la card es más ancha. */}
         <div className="relative flex items-start justify-between gap-5">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-x-3 gap-y-2 max-lg:flex-wrap">
             <Banderas paises={ficha.paises} />
             <p className="font-display text-azul-principal text-[1.05rem] leading-tight font-semibold tracking-[-0.01em]">
               {nombrarPaises(ficha.paises)}
