@@ -83,15 +83,16 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
       id="faro"
       data-indice="El faro"
       ref={rootRef}
-      className="relative z-10 lg:-mt-[100svh] lg:motion-reduce:mt-0"
+      className="relative z-10 -mt-[100svh] motion-reduce:mt-0"
       aria-labelledby="faro-titulo"
     >
       {/* El runway solo existe donde corre la coreografía: con
           reduced-motion colapsa a una pantalla (nada de scroll muerto). En
-          celular y tablet es más corto (715svh, ver coreografia-faro-movil).
+          celular y tablet es más corto (1000svh: la pantalla de detrás del
+          hero y 800svh de línea de tiempo, ver coreografia-faro-movil).
           Alto = DURACION_RECORRIDO · 620vh + 200vh (1.60 · 620 + 200 ≈ 1192):
           si cambia la duración de la línea de tiempo, cambia este número. */}
-      <div ref={altoRef} className="relative h-[715svh] motion-reduce:h-svh lg:h-[1192vh] lg:motion-reduce:h-svh">
+      <div ref={altoRef} className="relative h-[1000svh] motion-reduce:h-svh lg:h-[1192vh] lg:motion-reduce:h-svh">
         <div
           data-escenario
           // Sin fondo propio: lo pone el envoltorio compartido con el hero
@@ -187,6 +188,26 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
                 </p>
               </div>
             </div>
+            {/* En celular el logotipo va en el cielo a la derecha del faro,
+                debajo de la frase (Gastón, 2026-09-24): con el faro a la
+                izquierda ahí queda un hueco. Hermano de la frase y no hijo:
+                [data-mensaje] se anima con transform, y eso lo volvía la
+                referencia de un absoluto (el logo caía sobre el texto). La
+                coreografía lo hace entrar y salir con la frase
+                (coreografia-faro-movil.ts). Sin coreografía (movimiento
+                reducido) el faro queda al centro y le quedaba encima: no va.
+                Centrado en (72%, 59%) con cuentas y no con translate: GSAP
+                absorbe el `translate` de Tailwind al animar y lo pisaba.
+                Ancho min(34vw, 11rem); alto = 1,096 × ancho (395×433). */}
+            <Image
+              data-logo-movil
+              src="/brand/logotipo-principal-ed-negativo.png"
+              alt=""
+              aria-hidden="true"
+              width={395}
+              height={433}
+              className="pointer-events-none absolute top-[calc(59%-min(18.6vw,6rem))] left-[calc(72%-min(17vw,5.5rem))] h-auto w-[34vw] max-w-44 select-none md:hidden motion-reduce:hidden"
+            />
           </div>
 
           {/* S2 sin caption: llevaba el eyebrow «Antes de proponer nada»

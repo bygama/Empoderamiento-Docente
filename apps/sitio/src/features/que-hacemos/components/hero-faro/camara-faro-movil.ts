@@ -22,8 +22,13 @@ const PARALAJE = { cielo: 0.35, horizonte: 0.65, faro: 1, marMedio: 1 } as const
 const REMATE = { alto: 60, medio: 30, holgura: 12 } as const;
 /** Lo más a la derecha que va el faro para dejarle lugar a algo. */
 const FX_MAX = 0.82;
-/** Llegada: cada capa sube desde abajo en su propia medida. */
-const LLEGADA = { cielo: 0.25, horizonte: 0.6, faro: 1, marMedio: 1.15 } as const;
+/**
+ * La llegada, la MISMA de escritorio (coreografia-faro.ts): el mundo entero
+ * arranca 0,86 pantallas más abajo y sube durante π/2 pantallas de scroll
+ * con freno en seno. Arranca al ritmo del scroll (π/2 · 0,86 / (π/2) =
+ * 0,86×) y desacelera hasta posarse con la primera frase en pantalla.
+ */
+const LLEGADA = { bajo: 0.86, pantallas: Math.PI / 2 } as const;
 type Capa = keyof typeof PARALAJE;
 
 export type Punto = { x: number; y: number };
@@ -104,22 +109,28 @@ export function crearCamaraMovil(root: HTMLElement) {
     return Math.min(FX_MAX, Math.max(0.5, fx));
   };
 
-  /** Llegada: mientras el hero se va, el mundo sube desde abajo con paralaje. */
+  /**
+   * Llegada: la escena está DETRÁS del hero (QueHacemosHeroFaro, -mt de una
+   * pantalla), así que el faro se ve subir mientras el hero se va, sin hueco
+   * negro en el medio. Antes la escena venía debajo del hero y al subir se
+   * sumaban dos movimientos —el scroll de la página y la subida propia—: el
+   * faro recorría el doble en el mismo tiempo y aterrizaba de golpe.
+   */
   const llegar = (alto: HTMLElement) => {
-    gsap.set(
+    gsap.fromTo(
       shifts.map((s) => s.el),
-      {
-        y: (_i: number, el: HTMLElement) =>
-          m.y + window.innerHeight * 0.55 * LLEGADA[(el.parentElement?.dataset.capa ?? "faro") as Capa],
-        willChange: "transform",
-      },
-    );
-    gsap.to(
-      shifts.map((s) => s.el),
+      { y: () => m.y + window.innerHeight * LLEGADA.bajo, willChange: "transform" },
       {
         y: () => m.y,
         ease: "sine.out",
-        scrollTrigger: { trigger: alto, start: "top bottom", end: "top top", scrub: 0.85, invalidateOnRefresh: true },
+        immediateRender: true,
+        scrollTrigger: {
+          trigger: alto,
+          start: "top top",
+          end: () => `top+=${window.innerHeight * LLEGADA.pantallas} top`,
+          scrub: 0.85,
+          invalidateOnRefresh: true,
+        },
       },
     );
   };
