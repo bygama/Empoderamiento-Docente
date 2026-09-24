@@ -75,11 +75,18 @@ export function crearTemaSegunFondo(nav: HTMLElement): () => void {
   // (`data-scroll-principal`) y ese scroll no burbujea hasta la ventana.
   document.addEventListener("scroll", alScrollear, { passive: true, capture: true });
   window.addEventListener("resize", pedir);
+  // Al cerrarse un modal vuelve a verse lo de abajo, y puede ser otro fondo: al
+  // elegir una página en el menú, la ruta cambia con la cortina todavía
+  // cerrándose, la medición de la página nueva cae en el menú y se saltea, y
+  // si nadie scrollea (un hero a pantalla completa) el logo se queda con el
+  // tema de la página anterior. `close` no burbujea: se escucha en captura.
+  document.addEventListener("close", pedir, { capture: true });
   return () => {
     cancelAnimationFrame(raf);
     window.clearTimeout(cola);
     document.removeEventListener("scroll", alScrollear, { capture: true });
     window.removeEventListener("resize", pedir);
+    document.removeEventListener("close", pedir, { capture: true });
     delete nav.dataset.tema;
   };
 }
