@@ -32,7 +32,9 @@ const ABIERTAS = [ENTRAR, "/admin/olvide-mi-contrasena", "/admin/nueva-contrasen
 function politicaDeContenido(esAdmin: boolean): string {
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'",
+    // React usa eval() en desarrollo para rearmar las pilas de llamadas de los
+    // errores; en producción nunca. Solo se abre en `next dev`.
+    `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
     "font-src 'self'",
