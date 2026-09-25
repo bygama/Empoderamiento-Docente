@@ -9,7 +9,7 @@ const BASE =
 // destructivo 6,57:1. Los dos últimos subrayan en hover: con el fondo
 // `azul-claro/30`, el `azul-medio` baja a 4,36:1.
 const SOBRE_BLANCO: Record<Variante, string> = {
-  primario: "bg-naranja-accion text-azul-principal hover:bg-naranja-accion/90",
+  primario: "bg-naranja-accion text-azul-principal hover:bg-naranja-accion/90 dark:text-gris-fondo",
   secundario: "border border-azul-principal text-azul-principal hover:bg-azul-claro/30",
   terciario: "text-azul-medio underline-offset-2 hover:underline",
   destructivo: "text-rojo-error underline-offset-2 hover:underline",
@@ -19,8 +19,11 @@ const SOBRE_BLANCO: Record<Variante, string> = {
 // sigue naranja pero subraya, porque el `/90` sobre azul da 3,93:1; el
 // secundario va en blanco (hover 10,02:1); el terciario y el destructivo, en
 // `azul-claro` (7,68:1), porque `rojo-error` ahí da 2,07:1.
+//
+// En el modo oscuro el texto del primario no se invierte: sobre el naranja va
+// el fondo oscuro (6,01:1), porque el `azul-principal` invertido es claro.
 const SOBRE_AZUL: Record<Variante, string> = {
-  primario: "bg-naranja-accion text-azul-principal underline-offset-2 hover:underline",
+  primario: "bg-naranja-accion text-azul-principal underline-offset-2 hover:underline dark:text-gris-fondo",
   secundario: "border border-white text-white hover:bg-white/10",
   terciario: "text-azul-claro underline-offset-2 hover:underline",
   destructivo: "text-azul-claro underline-offset-2 hover:underline",

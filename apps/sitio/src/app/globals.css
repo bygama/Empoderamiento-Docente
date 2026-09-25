@@ -55,6 +55,46 @@
   --text-admin-meta--line-height: 1.25rem;
 }
 
+/* === Los tres temas del admin (DESIGN.md §11): claro, mixto y oscuro ===
+   No hay una segunda paleta en las clases: cada tema le da a los mismos
+   tokens otros valores, y el admin se redibuja solo.
+   - claro: la paleta de la marca tal cual.
+   - oscuro: todo el admin se invierte. `white` es la superficie (la tarjeta),
+     `gris-fondo` el fondo de atrás, `azul-principal` el texto y el relleno
+     fuerte, y `azul-claro` los bordes y el texto sobre ese relleno; así el
+     relleno fuerte con texto `white` sigue leyéndose al revés. Texto 13,59:1
+     sobre la tarjeta, secundario 7,08:1, acento 7,14:1, error 6,71:1.
+   - mixto, el de fábrica: el contenido en claro y la sidebar (lo que lleva
+     `data-barra`) invertida sobre el azul de la marca. Texto 13,63:1,
+     secundario 8,74:1, acento 7,68:1; sobre la pastilla activa, 9,40:1.
+   Lo que la inversión no cubre (un logo, el texto sobre el naranja) usa la
+   variante `dark:`, que vale para todo lo que va sobre fondo oscuro. El
+   sitio público nunca lleva `data-tema`: esto no lo toca. */
+@custom-variant dark (&:where([data-tema="oscuro"], [data-tema="oscuro"] *, [data-tema="mixto"] [data-barra], [data-tema="mixto"] [data-barra] *));
+/* El armazón mismo en el tema mixto: lo que asoma detrás de las esquinas redondas de la tarjeta. */
+@custom-variant mixto (&:where([data-tema="mixto"]));
+
+[data-tema="oscuro"] {
+  color-scheme: dark;
+  --color-white: #172239;
+  --color-gris-fondo: #0e1628;
+  --color-azul-principal: #e8eef7;
+  --color-gris-texto: #a3aec0;
+  --color-azul-medio: #8fb0e0;
+  --color-azul-claro: #34476c;
+  --color-rojo-error: #f58b80;
+}
+
+[data-tema="mixto"] [data-barra] {
+  color-scheme: dark;
+  --color-white: #33466c;
+  --color-gris-fondo: #1f2d4d;
+  --color-azul-principal: #ffffff;
+  --color-gris-texto: #c5d0e0;
+  --color-azul-medio: #a9c5e8;
+  --color-azul-claro: #40547c;
+}
+
 body {
   background: var(--color-gris-fondo);
   color: var(--color-azul-principal);
