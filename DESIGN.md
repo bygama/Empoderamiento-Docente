@@ -354,15 +354,74 @@ El admin (`/admin`) es una herramienta de trabajo, no una pieza de marca: lo
 usa el equipo de ED unas pocas veces por mes, y pesa más la claridad que la
 velocidad. Usa la paleta y las fuentes de la marca con estas reglas propias.
 Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED.
-Sumado el 2026-09-22 (`work/editor-sin-pared/`). Todos los contrastes están
+Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
+sidebar y los temas, el 2026-09-24. Todos los contrastes están
 medidos con la fórmula de WCAG 2.x.
 
-### Fondo
+### Fondo y armazón
 
-- El contenido va sobre **blanco**.
-- `gris-fondo` queda solo como relleno sin texto encima (un hover, una
-  miniatura vacía): `gris-texto` sobre `gris-fondo` da 4,39:1 y no llega a
-  AA.
+- El contenido va sobre **blanco**, en una tarjeta que toca arriba, abajo y
+  a la derecha de la ventana. Solo las dos esquinas que dan a la sidebar son
+  redondas (`rounded-l-2xl`), y la tarjeta scrollea por dentro para que esas
+  curvas queden siempre a la vista. En el celular ocupa todo el ancho, debajo
+  de la barra del menú.
+- La sidebar va sobre `gris-fondo` en el tema claro, y ahí sí lleva texto:
+  `azul-principal` al 80 % (6,78:1) y lo secundario en `azul-medio`
+  (4,65:1). `gris-texto` no va sobre `gris-fondo`: da 4,39:1 y no llega a AA.
+- Fuera de la sidebar, `gris-fondo` queda solo como relleno sin texto encima
+  (un hover, una miniatura vacía).
+
+### Sidebar
+
+- **Un nivel y tres grupos**, separados por un divisor: lo que se mira todos
+  los días (Inicio, Mensajes, Métricas), lo que se publica (Contenido,
+  Novedades, Biblioteca) y, pegado abajo, lo que se configura (Cuentas,
+  Ajustes), que quien edita no ve. El registro está en
+  `apps/sitio/src/admin/armazon/barra-lateral/modulos.ts`; lo que hay adentro
+  de cada módulo va en pestañas, no en la sidebar.
+- **Cada entrada:** el ícono del set propio a 20 px y el nombre en
+  `text-admin-cuerpo`, 44 px de alto, `rounded-xl`. La activa es una pastilla
+  `white` con `shadow-sm`, y se anuncia con `aria-current`.
+- **Arriba**, el isotipo actual (`logotipo-principal-ed`, sin margen
+  transparente, así queda centrado) en una ficha de 44 px, con el nombre al
+  lado. **Abajo**, la cuenta, que abre Mi cuenta · Ver el sitio · el tema ·
+  Salir. Un divisor separa cada una del menú.
+- Ni naranja ni verde: el naranja es el CTA de cada pantalla y el verde, los
+  conceptos.
+
+### Temas: claro, mixto y oscuro
+
+Se eligen en el menú de la cuenta y quedan en una cookie, así el servidor
+dibuja el tema correcto desde la primera carga. **El de fábrica es el
+mixto.** No hay una segunda paleta en las clases: cada tema le da otros
+valores a los mismos tokens (`apps/sitio/src/app/globals.css`), y el admin se
+redibuja solo.
+
+| Token                                   | Claro     | Mixto (solo la sidebar)      | Oscuro    |
+| --------------------------------------- | --------- | ---------------------------- | --------- |
+| `white` (la superficie)                 | `#FFFFFF` | `#33466C` (pastilla y menú)  | `#172239` |
+| `gris-fondo` (el fondo de atrás)        | `#F2F4F7` | `#1F2D4D` (el azul de marca) | `#0E1628` |
+| `azul-principal` (texto, relleno fuerte)| `#1F2D4D` | `#FFFFFF`                    | `#E8EEF7` |
+| `gris-texto`                            | `#6B7280` | `#C5D0E0`                    | `#A3AEC0` |
+| `azul-medio`                            | `#4A6FA5` | `#A9C5E8`                    | `#8FB0E0` |
+| `azul-claro` (bordes, divisores)        | `#A9C5E8` | `#40547C`                    | `#34476C` |
+| `rojo-error`                            | `#B42318` | igual que claro              | `#F58B80` |
+
+- **Mixto:** el contenido en claro y la sidebar (con la barra del celular)
+  invertida sobre el azul de la marca. El marco que asoma detrás de las
+  esquinas redondas también es azul. Texto 13,63:1, secundario 8,74:1,
+  acento 7,68:1, y 9,40:1 sobre la pastilla activa.
+- **Oscuro:** se invierte todo el admin. `white` pasa a ser la superficie
+  oscura y `azul-principal` el texto claro, así que el relleno fuerte con
+  texto `white` (una insignia, las iniciales) sigue leyéndose al revés.
+  Texto 13,59:1 sobre la tarjeta, secundario 7,08:1, acento 7,14:1, error
+  6,71:1.
+- **Lo que la inversión no cubre** usa la variante `dark:`, que vale para
+  todo lo que va sobre fondo oscuro: el logo pasa a su versión negativa, y
+  el texto del botón primario no se invierte, porque sobre el naranja va el
+  fondo oscuro (6,01:1).
+- Solo el admin con sesión lleva tema: el login y el sitio público quedan
+  como están.
 
 ### Tipo: cuatro tamaños, y ninguno más
 
