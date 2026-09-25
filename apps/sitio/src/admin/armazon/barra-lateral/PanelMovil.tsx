@@ -78,31 +78,33 @@ export function PanelMovil({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="flex items-center justify-between bg-azul-principal px-4 py-3 lg:hidden">
+      <div data-barra className="flex items-center justify-between border-b border-azul-claro/60 bg-gris-fondo px-4 py-3 lg:hidden">
         {/* 128 px: el manual pide 120 como mínimo para el logo completo (§10). */}
-        <Image src="/brand/logo-ed-negativo.png" alt="Empoderamiento Docente" width={1252} height={608} sizes="128px" className="h-auto w-32" />
+        <Image src="/brand/logo-ed-principal.png" alt="Empoderamiento Docente" width={1252} height={608} sizes="128px" className="h-auto w-32 dark:hidden" />
+        <Image src="/brand/logo-ed-negativo.png" alt="Empoderamiento Docente" width={1252} height={608} sizes="128px" className="hidden h-auto w-32 dark:block" />
         <button
           type="button"
           aria-expanded={abierto}
           aria-controls="panel-del-admin"
           onClick={abrir}
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-admin-meta font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-azul-claro"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-admin-meta font-medium text-azul-principal transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-azul-medio"
         >
           <Menu size={20} />
           Menú
         </button>
       </div>
       <dialog
+        data-barra
         id="panel-del-admin"
         ref={dialogo}
         aria-label="Menú del admin"
-        className="fixed inset-y-0 left-0 m-0 h-dvh max-h-dvh w-72 max-w-[85vw] overflow-y-auto bg-azul-principal p-0 shadow-xl backdrop:bg-azul-principal/70"
+        className="fixed inset-y-0 left-0 m-0 h-dvh max-h-dvh w-80 max-w-[85vw] overflow-y-auto bg-gris-fondo p-0 shadow-xl backdrop:bg-azul-principal/70 dark:backdrop:bg-gris-fondo/80"
       >
         <button
           type="button"
           onClick={() => dialogo.current?.close()}
           aria-label="Cerrar el menú"
-          className="absolute top-5 right-4 rounded-lg p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-azul-claro"
+          className="absolute top-2 right-2 z-10 rounded-lg p-2 text-azul-principal transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-azul-medio"
         >
           <X size={20} />
         </button>

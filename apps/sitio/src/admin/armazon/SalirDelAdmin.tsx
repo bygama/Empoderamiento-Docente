@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { authCliente } from "@/admin/auth-cliente";
+import { Salir } from "@/components/ui/icons";
 import { apagarVistaPrevia } from "@/datos/acciones/salir-de-vista-previa";
 
-export function SalirDelAdmin() {
+/** Cierra la sesión. El aspecto lo pone quien lo usa: hoy, una opción del menú de la cuenta. */
+export function SalirDelAdmin({ className }: { className: string }) {
   const router = useRouter();
   return (
     <button
@@ -21,8 +23,9 @@ export function SalirDelAdmin() {
           router.refresh();
         }
       }}
-      className="rounded-lg border border-azul-claro/60 px-3 py-1.5 text-admin-meta text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-claro"
+      className={className}
     >
+      <Salir size={18} className="shrink-0" />
       Salir
     </button>
   );
