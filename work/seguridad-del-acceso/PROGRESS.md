@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 2 del PLAN (el rate limit, en la base).
+- Paso 3 del PLAN (el bloqueo por cuenta).
 
 ## Hecho
 
@@ -38,3 +38,13 @@ Medido sobre `275518e`:
   hash scrypt entra (200) y su `account.password` pasa a
   `$argon2id$v=19$m=19456,t=2,p=1$…`; vuelve a entrar con Argon2id (200) y una
   contraseña mala da 401.
+- 2026-09-26 — **Paso 2, el rate limit en la base.** Modelo `RateLimit`
+  (`@@map("rateLimit")`) y la migración `20260926202715_rate_limit_en_la_base`;
+  `rateLimit.storage: "database"`, sin la regla de `/forget-password`.
+  `pnpm migrate:status` → «Database schema is up to date!» (7 migraciones);
+  `pnpm typecheck` → exit 0. En el dev server, cuatro `POST
+  /api/auth/sign-in/email` desde `X-Forwarded-For: 10.0.0.1` → `401 401 401
+  429`, y `"rateLimit"` tiene `10.0.0.1|/sign-in/email | 3`. Ojo: Prisma 7 no
+  regenera el cliente en `migrate dev`, y better-auth valida el esquema contra
+  el cliente cargado: después de migrar hace falta `pnpm generate` y
+  reiniciar el dev server (el cliente vive en `globalThis` entre recargas).
