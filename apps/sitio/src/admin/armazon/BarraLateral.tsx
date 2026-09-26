@@ -11,7 +11,7 @@ import type { Tema } from "./tema";
  */
 async function hayPaginasSinPublicar(): Promise<boolean> {
   try {
-    return (await listaDePaginas()).some((f) => f.sinPublicar);
+    return (await listaDePaginas()).some((f) => f.estado.borradorEn);
   } catch (e) {
     console.error("BarraLateral: sin el punto de «sin publicar»:", e);
     return false;

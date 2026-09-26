@@ -13,10 +13,10 @@ export function ListaDePaginas({ filas }: { filas: FilaDeLista[] }) {
               {f.nombre} <span className="text-admin-meta text-gris-texto">{f.ruta}</span>
             </p>
             <p className="text-admin-meta text-gris-texto">
-              {f.publicadoEn ? (
+              {f.estado.publicadoEn ? (
                 <>
-                  Publicado el <Momento iso={f.publicadoEn} />
-                  {f.publicadoPor ? ` por ${f.publicadoPor}` : ""}
+                  Publicado el <Momento iso={f.estado.publicadoEn} />
+                  {f.estado.publicadoPor ? ` por ${f.estado.publicadoPor}` : ""}
                 </>
               ) : (
                 "Muestra el contenido inicial del código."
@@ -24,8 +24,8 @@ export function ListaDePaginas({ filas }: { filas: FilaDeLista[] }) {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {f.sinPublicar ? <span className="rounded-full bg-azul-claro/40 px-2.5 py-0.5 text-admin-meta font-medium text-azul-principal">Cambios sin publicar</span> : null}
-            {f.editable ? (
+            {f.estado.borradorEn ? <span className="rounded-full bg-azul-claro/40 px-2.5 py-0.5 text-admin-meta font-medium text-azul-principal">Cambios sin publicar</span> : null}
+            {f.secciones.length > 0 ? (
               <Link href={`/admin/paginas/${f.slug}`} className="rounded-lg border border-azul-claro px-3 py-1.5 text-admin-meta text-azul-medio transition-opacity hover:opacity-80">
                 Editar
               </Link>
