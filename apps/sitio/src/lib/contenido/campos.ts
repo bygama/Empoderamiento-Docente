@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Recomendado } from "./descripcion";
 import { esSrcDeFoto } from "./fotos";
 
 // Los tipos de campo con los que se escribe el esquema de una sección
@@ -10,7 +11,7 @@ import { esSrcDeFoto } from "./fotos";
 type Comun = { etiqueta?: string; ayuda?: string };
 
 export type MetaDeCampo =
-  | ({ tipo: "textoCorto"; maximo: number } & Comun)
+  | ({ tipo: "textoCorto"; maximo: number; recomendado?: Recomendado } & Comun)
   | ({ tipo: "parrafo"; maximo: number } & Comun)
   | ({ tipo: "foto" } & Comun)
   | ({ tipo: "rutaInterna" } & Comun)
@@ -27,7 +28,7 @@ export function metaDe(esquema: z.ZodType): MetaDeCampo | undefined {
 const SIN_SALTOS = /^[^\r\n]*$/;
 
 /** Una línea, sin saltos. El admin muestra el contador y la ayuda. */
-export function textoCorto({ maximo, ...resto }: { maximo: number } & Comun) {
+export function textoCorto({ maximo, ...resto }: { maximo: number; recomendado?: Recomendado } & Comun) {
   return z
     .string()
     .trim()

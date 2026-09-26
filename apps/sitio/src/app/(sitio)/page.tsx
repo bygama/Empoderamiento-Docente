@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
+import { OPEN_GRAPH_COMUN } from "@/config/metadata";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { HeroQuienes } from "@/features/home/components/HeroQuienes";
 import { DatosDuros } from "@/features/home/components/DatosDuros";
 import { ComoTrabajamos } from "@/features/home/components/ComoTrabajamos";
 import { LineasAccion } from "@/features/home/components/LineasAccion";
 import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNovedades";
+import { metadataDeSeo } from "@/lib/contenido/seo";
+
+// El título, la descripción y la imagen para redes salen del SEO de la página
+// (publicado, o el borrador en vista previa): se editan en su pestaña del admin.
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await contenidoDe("inicio");
+  return metadataDeSeo(seo, OPEN_GRAPH_COMUN);
+}
 
 export default async function Home() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.

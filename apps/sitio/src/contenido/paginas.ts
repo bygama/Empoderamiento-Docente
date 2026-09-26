@@ -6,7 +6,9 @@ import { enNumerosInicial, esquemaEnNumeros } from "@/features/home/contenido/en
 import { esquemaHero, heroInicial } from "@/features/home/contenido/hero";
 import { esquemaMision, misionInicial } from "@/features/home/contenido/mision";
 import { esquemaQuienesSomos, quienesSomosInicial } from "@/features/home/contenido/quienes-somos";
+import { seoInicial } from "@/features/home/contenido/seo";
 import type { RegistroDePaginas } from "@/lib/contenido/documento";
+import type { Seo } from "@/lib/contenido/seo";
 
 // Qué secciones tiene cada página y en qué orden (SPEC §4.1). Es lo que el
 // admin recorre para armar la pantalla y lo que datos/ usa para validar.
@@ -28,6 +30,8 @@ export const PAGINAS = {
       areas: { nombre: "Áreas de especialización", esquema: esquemaAreas, inicial: areasInicial },
       bibliotecaYNovedades: { nombre: "Biblioteca y Novedades", esquema: esquemaBibliotecaYNovedades, inicial: bibliotecaYNovedadesInicial },
     },
+    // El SEO de hoy (SPEC §6 de work/paginas-inicio/): con esto la página tiene pestaña SEO.
+    seo: seoInicial,
   },
   "que-hacemos": { ruta: "/que-hacemos", nombre: "Qué hacemos", secciones: {} },
   "quienes-somos": { ruta: "/quienes-somos", nombre: "Quiénes somos", secciones: {} },
@@ -48,7 +52,10 @@ export function esSlug(valor: string): valor is Slug {
 
 type Secciones<S extends Slug> = (typeof PAGINAS)[S]["secciones"];
 
-/** El contenido tipado de una página: `ContenidoDe<"inicio">` es `{ hero: Hero }`. */
+/** Si la página tiene SEO, su contenido lo trae bajo `seo`. */
+type SeoDe<S extends Slug> = (typeof PAGINAS)[S] extends { seo: Seo } ? { seo: Seo } : unknown;
+
+/** El contenido tipado de una página: `ContenidoDe<"inicio">` es `{ hero: Hero; …; seo: Seo }`. */
 export type ContenidoDe<S extends Slug> = {
   [K in keyof Secciones<S>]: Secciones<S>[K] extends { esquema: infer E extends z.ZodType } ? z.output<E> : never;
-};
+} & SeoDe<S>;

@@ -20,7 +20,10 @@ export function describir(esquema: z.ZodType, etiquetaPorDefecto = ""): Descripc
   // Sin la clave cuando no hay ayuda: así el árbol se compara entero en los tests.
   const base = meta?.ayuda === undefined ? { etiqueta } : { etiqueta, ayuda: meta.ayuda };
 
-  if (meta?.tipo === "textoCorto" || meta?.tipo === "parrafo") return { ...base, tipo: meta.tipo, maximo: meta.maximo };
+  if (meta?.tipo === "textoCorto") {
+    return meta.recomendado ? { ...base, tipo: "textoCorto", maximo: meta.maximo, recomendado: meta.recomendado } : { ...base, tipo: "textoCorto", maximo: meta.maximo };
+  }
+  if (meta?.tipo === "parrafo") return { ...base, tipo: "parrafo", maximo: meta.maximo };
   if (meta?.tipo === "foto") return { ...base, tipo: "foto" };
   if (meta?.tipo === "rutaInterna") {
     if (!(esquema instanceof z.ZodEnum)) throw new Error("rutaInterna tiene que ser un z.enum");

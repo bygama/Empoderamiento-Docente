@@ -1,4 +1,5 @@
 import { draftMode } from "next/headers";
+import { cache } from "react";
 import type { Pagina } from "@/../prisma/generado/client";
 import { PAGINAS, type ContenidoDe, type Slug } from "@/contenido/paginas";
 import { base } from "@/datos/cliente";
@@ -38,7 +39,12 @@ export async function filaDe(
   }
 }
 
-export async function contenidoDe<S extends Slug>(slug: S): Promise<ContenidoDe<S>> {
+/**
+ * El contenido completo de una página, SEO incluido. Con `cache` de React: la
+ * metadata (`generateMetadata`) y la página lo piden en el mismo pedido, y así
+ * la base se consulta una vez.
+ */
+export const contenidoDe = cache(async function contenidoDe<S extends Slug>(slug: S): Promise<ContenidoDe<S>> {
   const fila = await filaDe(slug);
   // Leer `isEnabled` no vuelve dinámica la página: en el prerender responde «apagado».
   const { isEnabled: enBorrador } = await draftMode();
@@ -46,4 +52,4 @@ export async function contenidoDe<S extends Slug>(slug: S): Promise<ContenidoDe<
   // completarPagina devuelve un Record; la forma precisa la garantiza el
   // esquema de cada sección, que es de donde sale ContenidoDe.
   return completarPagina(PAGINAS[slug], documento) as unknown as ContenidoDe<S>;
-}
+});

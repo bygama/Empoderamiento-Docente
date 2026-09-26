@@ -9,6 +9,7 @@ import { IndicePagina } from "@/components/layout/IndicePagina";
 import { AterrizajePorLink } from "@/components/layout/AterrizajePorLink";
 import { FranjaDeBorrador } from "@/components/layout/FranjaDeBorrador";
 import { LenisProvider } from "@/components/providers/LenisProvider";
+import { OPEN_GRAPH_COMUN, TITULO_DEL_SITIO } from "@/config/metadata";
 import { siteConfig } from "@/config/site";
 
 const inter = Inter({
@@ -57,8 +58,7 @@ const courierPrime = Courier_Prime({
 const METADATA: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default:
-      "Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas",
+    default: TITULO_DEL_SITIO,
     template: "%s | Empoderamiento Docente",
   },
   description: siteConfig.description,
@@ -70,12 +70,9 @@ const METADATA: Metadata = {
     "formación docente",
   ],
   openGraph: {
-    type: "website",
-    locale: "es_ES",
-    title:
-      "Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas",
+    ...OPEN_GRAPH_COMUN,
+    title: TITULO_DEL_SITIO,
     description: siteConfig.description,
-    siteName: siteConfig.name,
   },
 };
 
