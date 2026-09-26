@@ -7,14 +7,14 @@ import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNoveda
 
 export default async function Home() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, quienesSomos } = await contenidoDe("inicio");
+  const { hero, quienesSomos, mision } = await contenidoDe("inicio");
   return (
     <main>
       {/* Se entra directo al Inicio: el portón «Comenzá la experiencia»
           (IntroGate) salió del render el 2026-06-24 y su código se borró el
           2026-09-18. El Hero y el navbar animan en el mount — ver
           intro-signal.ts, que responde «ya entramos» siempre. */}
-      <HeroQuienes hero={hero} quienesSomos={quienesSomos} />
+      <HeroQuienes hero={hero} quienesSomos={quienesSomos} mision={mision} />
       {/* Ancla del scroll-hint del Hero */}
       <div id="contenido" />
       {/* Acá hubo un bloque «Qué hacemos» en texto plano (QueHacemosResumen):

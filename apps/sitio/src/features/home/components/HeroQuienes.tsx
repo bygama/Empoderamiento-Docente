@@ -7,6 +7,7 @@ import { MisionPanel } from "./MisionPanel";
 import { MathField } from "@/components/ui/MathField";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import type { Hero as ContenidoDelHero } from "@/features/home/contenido/hero";
+import type { Mision } from "@/features/home/contenido/mision";
 import type { QuienesSomos } from "@/features/home/contenido/quienes-somos";
 import { crearQuienes } from "./hero-quienes/coreografia-quienes";
 import { IndicadorQuienes } from "./hero-quienes/IndicadorQuienes";
@@ -22,7 +23,9 @@ import { IndicadorQuienes } from "./hero-quienes/IndicadorQuienes";
  * en píxeles para que línea y borrado vayan pegados.
  * Respeta prefers-reduced-motion (capas apiladas en flow, sin animación).
  */
-export function HeroQuienes({ hero, quienesSomos }: { hero: ContenidoDelHero; quienesSomos: QuienesSomos }) {
+type Props = { hero: ContenidoDelHero; quienesSomos: QuienesSomos; mision: Mision };
+
+export function HeroQuienes({ hero, quienesSomos, mision }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const zoneRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -73,7 +76,7 @@ export function HeroQuienes({ hero, quienesSomos }: { hero: ContenidoDelHero; qu
             </div>
             {/* Capa 2: Misión (se revela en el mismo lugar). */}
             <div data-mision-layer className="h-full w-full motion-reduce:h-auto">
-              <MisionPanel />
+              <MisionPanel contenido={mision} />
             </div>
             {/* Línea-borrador verde: la costura del barrido (derecha → izquierda). */}
             <span
