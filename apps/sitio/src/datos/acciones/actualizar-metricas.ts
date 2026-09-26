@@ -8,7 +8,7 @@ import { clienteDesdeEntorno } from "@/lib/metricas/entorno";
 import { sincronizarMetricas } from "./sincronizar-metricas";
 
 // Una Server Action corre antes de que se renderice el layout protegido, así
-// que el layout no la cubre y el middleware solo mira que la cookie exista:
+// que el layout no la cubre y el proxy solo mira que la cookie exista:
 // la sesión se verifica acá. Y tiene freno: es el único disparador a mano de
 // un token que abre toda la cuenta de Vercel.
 const FRENO_MS = 10 * 60 * 1000;

@@ -10,7 +10,7 @@ import { descartarBorradorEnBase, guardarBorradorEnBase, publicarEnBase, type Re
 
 // Las tres acciones del editor (SPEC §7). Toda acción del admin empieza por
 // `auth.api.getSession` y contesta en llano si no hay sesión: el layout
-// protegido no las cubre y el middleware las deja pasar (AGENTS.md §12). Todo
+// protegido no las cubre y el proxy las deja pasar (AGENTS.md §12). Todo
 // va adentro del `try`, la sesión incluida: si la base no responde, la acción
 // contesta en llano en vez de tirar y llevarse el editor (como
 // actualizar-metricas.ts). El contenido lo valida editar-paginas.ts contra el
