@@ -14,8 +14,8 @@
 | 2 | Páginas se muda a `/admin/contenido/paginas` | hecho, `5e6eabf` |
 | 3 | Título de pestaña | hecho, `e8a280a` |
 | 4 | El índice de tarjetas, en `/admin/contenido` | hecho, `c00384f` |
-| 5 | Pestañas, en las cinco pantallas de Contenido | hecho |
-| 6 | La lista, en Páginas | pendiente |
+| 5 | Pestañas, en las cinco pantallas de Contenido | hecho, `7d17737` |
+| 6 | La lista, en Páginas | hecho |
 | 7 | La guía de un módulo pasa a la Lista | pendiente |
 | 8 | El estado vacío, en Métricas | pendiente |
 | 9 | Las pantallas de acceso, con la marca | pendiente |
@@ -79,4 +79,17 @@
   en `/admin/contenido/paginas` las pestañas dan `Páginas:page Casos:-
   Equipo:- Aliados:- Fotos:-`, en `/admin/contenido/fotos` `… Fotos:page`;
   `/admin/contenido/otra` → «404: This page could not be found.» El texto de
-  la primera pestaña queda alineado con el `h1` (x = 440 los dos).
+  la primera pestaña queda alineado con el `h1` (x = 440 los dos). Commit
+  `7d17737`.
+- **Paso 6** — `admin/armazon/Lista.tsx` (`Lista` + `Fila`: principal,
+  detalle, insignias, acción; `atenuada` con su nota; `desplegable` con
+  `details`/`summary`), `admin/paginas/Cuando.tsx` (sacado del encabezado del
+  editor, que ahora lo importa) y `ListaDePaginas` reescrita: insignia de
+  `insigniaDelEstado`, «quién y cuándo», «Editar» (secundario, con el nombre
+  de la página para el lector) y «1 sección» desplegable con links a
+  `…/paginas/<slug>#seccion-<clave>`; las seis sin secciones, atenuadas con
+  «Todavía no se edita desde acá» y sin insignia (DECISIONS.md). `pnpm
+  --filter sitio typecheck` → exit 0; `pnpm --filter sitio lint` → exit 0.
+  Con sesión: clic en «Hero» → `/admin/contenido/paginas/inicio#seccion-hero`,
+  la sección a 112 px del borde (debajo del encabezado fijo), título «Inicio ·
+  Páginas · Admin ED».

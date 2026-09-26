@@ -1,9 +1,9 @@
 import { Boton } from "@/admin/armazon/Boton";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia } from "@/admin/armazon/Insignia";
-import { Momento } from "@/admin/armazon/Momento";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
+import { Cuando } from "./Cuando";
 import { insigniaDelEstado } from "./estado";
 
 /** Cuál de las cuatro acciones corre, o ninguna: la que corre muestra su progreso y las demás esperan. */
@@ -21,27 +21,6 @@ type Props = {
   alPublicar: () => void;
   alDescartar: () => void;
 };
-
-/** Cuándo y quién, con las fechas en la zona de quien mira. */
-function Cuando({ estado }: { estado: PaginaParaEditar["estado"] }) {
-  if (estado.borradorEn) {
-    return (
-      <span>
-        Borrador guardado <Momento iso={estado.borradorEn} relativo />
-        {estado.borradorPor ? ` por ${estado.borradorPor}` : ""}.
-      </span>
-    );
-  }
-  if (estado.publicadoEn) {
-    return (
-      <span>
-        Publicada el <Momento iso={estado.publicadoEn} />
-        {estado.publicadoPor ? ` por ${estado.publicadoPor}` : ""}.
-      </span>
-    );
-  }
-  return <span>El sitio muestra el contenido inicial del código.</span>;
-}
 
 /**
  * El encabezado fijo del editor (SPEC §4): la página, su insignia, cuándo y
