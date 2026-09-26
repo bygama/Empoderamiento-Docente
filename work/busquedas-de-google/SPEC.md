@@ -309,8 +309,9 @@ después se borra `metricas_sincronizaciones`. Ver §9.1.
    en un solo lugar, para ajustarlas cuando haya datos reales.
 6. **Pestañas se extiende en su archivo:** Resumen es `/admin/metricas`, que
    es prefijo de las otras cuatro, así que con la regla de hoy quedaría
-   encendida siempre. Una pestaña puede pedir `exacta`: se enciende solo en su
-   ruta. Métricas es su consumidor real; va a §11.
+   encendida siempre. ~~Una pestaña puede pedir `exacta`.~~ **Regla del padre
+   (DECISIONS.md): gana la pestaña más específica**, la de prefijo más largo
+   cortando en segmento, sin prop nueva. Va a §11.
 7. **Estado vacío se extiende en su archivo:** puede llevar pasos debajo del
    texto (una lista ordenada en meta), para «Conectá Search Console». Va a
    §11.
