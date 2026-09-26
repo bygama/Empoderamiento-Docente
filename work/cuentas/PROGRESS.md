@@ -156,7 +156,7 @@
   (`cuentas.test.ts`, `consultas/actividad.test.ts`: cuatro casos, corridos,
   no saltados). Aceptación: `pnpm --filter sitio test` 163 pass, 2 saltados
   (los de antes); `typecheck` y `lint` exit 0.
-- **Paso 11 — las acciones de Cuentas** (`5c07a13` y este commit). En el
+- **Paso 11 — las acciones de Cuentas** (`5c07a13` y `6c9f337`). En el
   paquete: `confirmarContrasena(auth, { headers, correo, contrasena,
   bloqueos })` → `"bien" | "mal" | "frenada"` (`verifyPassword` desde el
   servidor, cada fallo en el bloqueo por cuenta, con el secreto del contexto
@@ -182,5 +182,15 @@
   rechazo de la clave foránea con historia); «subir a administra prende el
   segundo factor y cierra las sesiones» lo cubre `roles.test.ts` (paso 1);
   react-doctor 100/100.
+- **Paso 12 — los patrones nuevos del armazón** (este commit).
+  `admin/armazon/Volver.tsx` y el slot `volver` de `Encabezado` (en el modo
+  navy pasa a `azul-claro`, para la ficha de una novedad de la lane 6);
+  `Buscador.tsx` (formulario `GET` con `next/form`, `role="search"`, caja con
+  `ENTRADA`, «Buscar» secundario y «Sacar los filtros») con `Filtro` (un
+  `select` con su etiqueta); `Paginado.tsx` («Más nuevas», «Página n de m»,
+  «Más viejas», links que conservan los filtros). DESIGN.md §11: «Volver»,
+  «Buscador» y «Paginado», con contrastes y primer consumidor, y la línea de
+  historia del §11. Aceptación: `pnpm --filter sitio typecheck` y `lint` exit
+  0; react-doctor 100/100.
 
 ## Abierto
