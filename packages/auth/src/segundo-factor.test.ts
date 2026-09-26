@@ -85,7 +85,8 @@ async function armar(rol: "administra" | "edita", mandarCodigo?: OpcionesDeAuth[
     return galletas.guardar(res);
   };
   const entrar = () => pedir("/sign-in/email", { email: "ana@ed.test", password: CONTRASENA });
-  return { db, cuenta, sucesos, codigos, galletas, pedir, entrar };
+  const suspender = () => ctx.internalAdapter.updateUser(cuenta.id, { suspendida: true });
+  return { db, cuenta, sucesos, codigos, galletas, pedir, entrar, suspender };
 }
 
 test("la contraseña sola no es una sesión ni anota «entro»; el código sí, con la tabla twoFactor vacía", async () => {
@@ -173,4 +174,23 @@ test("quien administra no lo puede apagar", async () => {
   assert.equal(res.status, 403);
   assert.equal(await codigoDe(res), "SEGUNDO_FACTOR_OBLIGATORIO");
   assert.equal((db.user[0] as { twoFactorEnabled?: boolean }).twoFactorEnabled, true);
+});
+
+test("una cuenta suspendida no entra: ni con la contraseña, ni con el código si la suspendieron en el medio", async () => {
+  const edita = await armar("edita");
+  await edita.suspender();
+  const res = await edita.entrar();
+  assert.equal(res.status, 403);
+  assert.equal(await codigoDe(res), "CUENTA_SUSPENDIDA");
+  assert.equal(edita.galletas.tiene("session_token"), false);
+
+  const administra = await armar("administra");
+  await administra.entrar();
+  await administra.pedir("/two-factor/send-otp");
+  await administra.suspender();
+  const conCodigo = await administra.pedir("/two-factor/verify-otp", { code: administra.codigos[0] });
+  assert.equal(conCodigo.status, 403);
+  assert.equal(await codigoDe(conCodigo), "CUENTA_SUSPENDIDA");
+  assert.equal(administra.galletas.tiene("session_token"), false);
+  assert.deepEqual([...edita.sucesos, ...administra.sucesos], []);
 });

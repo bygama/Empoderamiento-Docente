@@ -5,6 +5,7 @@ import { crearGanchos, destrabar } from "./ganchos";
 import type { OpcionesDeAuth } from "./opciones";
 import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
 import { segundoFactor } from "./segundo-factor";
+import { CAMPO_SUSPENDIDA } from "./suspendidas";
 import { CAMPOS_DE_LA_SESION, GANCHOS_DE_LA_BASE } from "./ubicacion";
 
 /**
@@ -190,6 +191,7 @@ export function configDeAuth({
           // mandarse el rol en el cuerpo del alta y darse permisos solo.
           input: false,
         },
+        suspendida: CAMPO_SUSPENDIDA,
       },
     },
   } satisfies Omit<BetterAuthOptions, "database">;

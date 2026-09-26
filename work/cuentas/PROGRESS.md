@@ -40,7 +40,7 @@
   `index.ts`. `cuentas.test.ts`, cinco casos contra la tabla. Aceptación:
   `pnpm --filter @ed/auth test` exit 0 (34/34), `typecheck` exit 0, `lint`
   exit 0.
-- **Paso 3 — el segundo factor en `@ed/auth`** (este commit).
+- **Paso 3 — el segundo factor en `@ed/auth`** (`b623856`).
   `segundo-factor.ts`: el plugin `twoFactor` solo con código por correo (6
   dígitos, 10 min, `storeOTP: "hashed"`, 5 intentos, paso pendiente 30 min,
   dispositivo 30 días, TOTP apagado) y el plugin propio
@@ -68,5 +68,14 @@
   exit 0 (sitio 153 pass, 1 saltado de antes); `pnpm typecheck` exit 0;
   `pnpm lint` exit 0; `node scripts/verificar-react-doctor.mjs` → 100/100,
   sin diagnósticos.
+- **Paso 4 — una cuenta suspendida no abre sesión** (este commit).
+  `suspendidas.ts`: `CAMPO_SUSPENDIDA` (campo adicional de `user`, `input:
+  false`, en `config.ts`) y `frenarSiEstaSuspendida(idDeCuenta, ctx)`, que
+  corre primero en el gancho de la base que crea toda sesión
+  (`GANCHOS_DE_LA_BASE` de `ubicacion.ts`) y contesta 403
+  `CUENTA_SUSPENDIDA`. Test en `segundo-factor.test.ts`: con la contraseña
+  buena, 403 y sin cookie; suspendida entre la contraseña y el código, el
+  código también da 403; no se anota nada. Aceptación: `pnpm --filter
+  @ed/auth test` 41/41; `pnpm typecheck` exit 0; `lint` exit 0.
 
 ## Abierto
