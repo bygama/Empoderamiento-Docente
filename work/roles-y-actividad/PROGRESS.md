@@ -43,6 +43,37 @@
   `guarda.test.ts` → 4 pasan. DESIGN.md §11 «Sin permiso». La excepción
   `mi-cuenta/` del test entra con la carpeta, en el paso 10.
 
+- **Paso 5 — cada acción chequea su capacidad** (`d11e5c5`).
+  `acciones-con-sesion.test.ts` suma `problemasDeCapacidad` (`puede(` justo
+  después de la sesión, sin `await` ni `base.` en el medio), `SIN_CAPACIDAD`
+  con `paginas.ts` ×3 y `fotos.ts` (lane paginas-inicio) y
+  `actualizar-metricas.ts` (lane busquedas-de-google), y un test que avisa
+  cuando una excepción ya chequea. `abrirVistaPrevia` suma su
+  `puede(…, "editarContenido")`. 13 pasan, exit 0.
+- **Paso 6 — la tabla `actividad`** (`472881a`). `actividad.prisma`, la
+  relación en `User`, migración `20260926220535_actividad` (FK `ON DELETE
+  RESTRICT`; `migrate dev` no tocó el índice parcial: sin drift, como se
+  midió). `datos/actividad.ts › registrarActividad` con los cuatro tipos y
+  Zod. `actividad.test.ts` → 4 pasan. Nota: en Prisma 7 `migrate dev` no
+  regenera el cliente; hay que correr `pnpm generate` después.
+- **Paso 7 — entrar, salir y la contraseña quedan anotados** (`409fb6c`).
+  `OpcionesDeAuth.registrar` y `SucesoDeSesion`; `sucesos.ts` (salir en el
+  `before` de `/sign-out`, cambiar la contraseña en el `after` de
+  `/change-password` con el aviso por correo); `ganchos.ts` anota `entro`;
+  `onPasswordReset` anota; `/change-password` 5 cada 5 min. `datos/auth.ts`
+  lo conecta a `registrarActividad`. El comentario de `freshAge` decía que
+  cambiar la contraseña pedía sesión fresca y no es así (better-auth la
+  marca `sensitive`, no `fresh`): corregido. `pnpm --filter @ed/auth test`
+  → 24 pasan.
+- **Paso 8 — dónde se abrió cada sesión** (`7422daa`). `ubicacion.ts`
+  (`ubicacionDelPedido`, `CAMPOS_DE_LA_SESION`, `GANCHOS_DE_LA_BASE`),
+  `session.additionalFields` y `databaseHooks` en `config.ts`, columnas
+  `ciudad` y `pais` (migración `20260926221013_sesion_ubicacion`).
+  `ubicacion.test.ts` → 4 pasan (incluye entrar con y sin las cabeceras
+  contra better-auth en memoria). `pnpm migrate:status` al día.
+- **Paso 9 — una sesión en llano** (`0487c65`). `lib/sesiones.ts`
+  (`dispositivoDe`, `lugarDe`) con test de user agents reales → 3 pasan.
+
 ## Hecho
 
 ## Abierto
