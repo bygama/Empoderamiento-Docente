@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 12 del PLAN (README y la guía).
+- Paso 13 del PLAN (AGENTS.md).
 
 ## Hecho
 
@@ -194,3 +194,14 @@ Medido sobre `275518e`:
   `node -e` de aceptación → `{ indice: true, sinMiddlewareEn7: true,
   sinScrypt: true }`, exit 0. La mención de «middleware» en la fila de la fase
   1 del §9 queda: es lo que se construyó entonces.
+- 2026-09-26 — **Paso 12, README y la guía.** README: `RESEND_API_KEY` y
+  `CORREO_REMITENTE` en «Variables de entorno»; `proxy.ts`, `correos/` y
+  `lib/correo/`, `lib/seguridad/` en el árbol; «Levantarlo en local» dice que
+  sin clave el correo sale por la consola; sección nueva «Correos» con lo que
+  hace ED en Resend (dominio con SPF y DKIM, DMARC de `p=none` a
+  `p=quarantine`, click y open tracking apagados, clave solo de envío en
+  Production) y cómo se destraba una cuenta frenada.
+  `docs/AI_GUIDELINES.md` §12: la sesión se corta en el proxy y se verifica en
+  el layout. `git grep -n "middleware" -- README.md docs/AI_GUIDELINES.md` →
+  nada (exit 1); `git grep -n "CORREO_REMITENTE" -- README.md
+  apps/sitio/.env.example` → las dos.

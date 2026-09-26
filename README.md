@@ -86,12 +86,15 @@ admin sí las necesita todas, y el build completo pide al menos
 sube el admin van a Blob; sin él (local) van a `apps/sitio/.fotos/`**,
 git-ignorada, y las sirve `/api/fotos/<id>`. No hace falta cargarlo en local.
 
-La que sigue está **declarada pero todavía no conectada**: hoy ningún código
-la lee, y ponerla no cambia nada.
+Las dos de los **correos** del admin («Elegí tu contraseña», «Tu contraseña
+cambió»; ver «Correos» más abajo):
 
-- `RESEND_API_KEY` — correos del admin. **Mientras tanto el enlace de
-  «olvidé mi contraseña» sale siempre por la consola del servidor**, con clave
-  o sin ella.
+- `RESEND_API_KEY` — la clave de Resend. **Sin ella, en local el correo sale
+  entero por la consola del servidor**, con el enlace; en producción no sale, y
+  el log lo dice sin mostrar el enlace.
+- `CORREO_REMITENTE` — desde qué dirección salen, de un dominio verificado en
+  Resend: `Empoderamiento Docente <no-responder@empoderamientodocente.org>`.
+  Con clave y sin remitente, el correo no sale.
 
 Las cuatro de las **métricas** ([ADR-0009](docs/architecture/adrs/0009-analitica-de-vercel-con-copia-diaria.md);
 la portada del admin lee una copia diaria de la analítica de Vercel):
@@ -139,11 +142,12 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
             ├── app/(admin)/   ← las rutas del admin
             ├── datos/         ← la única puerta a la base
             ├── admin/         ← las pantallas del admin
-            ├── middleware.ts  ← sesión, cabeceras, rate limit
+            ├── proxy.ts       ← sesión, cabeceras (CSP con nonce en el admin)
+            ├── correos/       ← las plantillas de los correos y por dónde salen
             ├── components/    ← UI reutilizable (brand/, layout/, ui/, …)
             ├── features/      ← secciones por dominio (home, novedades, …)
             ├── config/        ← site.ts (datos institucionales) + nav.ts
-            └── lib/           ← hooks/ y utilidades
+            └── lib/           ← hooks/, correo/ (Resend), seguridad/ (CSP) y utilidades
 ```
 
 Todo eso existe salvo `kit-admin`, que está marcado y llega en la fase 2. El
@@ -235,9 +239,8 @@ pnpm migrate
 pnpm --filter sitio crear-cuenta tu@correo.org "Tu nombre" administra
 ```
 
-Después, `/admin/olvide-mi-contrasena` con ese correo. El enlace sale **por la
-consola del servidor**: el envío por Resend todavía no está conectado, así que
-poner la clave no cambia nada por ahora.
+Después, `/admin/olvide-mi-contrasena` con ese correo. Sin `RESEND_API_KEY`
+el correo sale entero **por la consola del servidor**, con el enlace.
 
 > **Si ya tenías el contenedor de antes**, adentro vive una base `ed_panel` con
 > las nueve tablas que dejó Payload. Quedó huérfana con la fase 0 y no la toca
@@ -277,6 +280,34 @@ lo mismo a mano, con un freno de diez minutos. Sin `VERCEL_TOKEN` y
 `VERCEL_ANALYTICS_PROJECT_ID` el panel lo dice y no copia nada; en local no
 hace falta cargarlos. Los días son UTC. Diseño y decisiones en
 [`work/metricas/`](work/metricas/).
+
+### Correos
+
+El admin manda dos: **«Elegí tu contraseña»** (el enlace de «Olvidé mi
+contraseña», que vence en una hora) y **«Tu contraseña cambió»** (cada vez que
+alguien elige una, con las demás sesiones ya cerradas). Salen por la API de
+Resend, en segundo plano, desde `CORREO_REMITENTE`. Decisión y detalles en el
+[ADR-0010](docs/architecture/adrs/0010-seguridad-del-acceso.md).
+
+**Lo que tiene que hacer ED en Resend**, una vez, antes de que salgan correos
+de verdad:
+
+1. **Agregar y verificar el dominio** (`empoderamientodocente.org`, o el
+   subdominio que se elija para enviar) y cargar en su DNS los registros que
+   Resend muestra: **SPF** y **DKIM**.
+2. **Publicar un registro DMARC** (`_dmarc`), que dice qué hacer con un correo
+   que diga venir del dominio y no pase SPF ni DKIM. Arrancar con `p=none` y
+   subir a `p=quarantine` cuando los reportes estén limpios.
+3. **Apagar el click tracking** (y el open tracking) del dominio: reescribe los
+   enlaces del correo para contar clics, y el de la contraseña pasaría por un
+   tercero.
+4. Crear una clave con permiso **solo de envío** y cargarla como
+   `RESEND_API_KEY` en Vercel (Production), junto con `CORREO_REMITENTE`.
+
+**Si una cuenta queda frenada** (5 contraseñas mal en 15 minutos frenan esa
+cuenta de 15 minutos a 1 hora, aunque vengan de distintos lugares), se destraba
+sola al vencer el freno o al elegir una contraseña nueva desde «Olvidé mi
+contraseña».
 
 ### Comandos de base
 
