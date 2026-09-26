@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { estaEn } from "./ruta";
+import { pestanaActiva } from "./ruta";
 
 export type Pestana = { href: string; etiqueta: string };
 
@@ -18,21 +18,24 @@ const INACTIVA = "text-gris-texto hover:text-azul-principal";
 /**
  * Las pantallas de un módulo, debajo de su encabezado (DESIGN.md §11). Son
  * links que navegan, no el patrón ARIA de tabs: un `nav` y una lista, con la
- * activa anunciada por `aria-current`. La activa sale de la ruta —la pestaña
- * cuya `href` es la ruta o la contiene—, así un layout puede ponerlas sin que
- * cada página diga cuál es. Cliente solo por `usePathname`.
+ * activa anunciada por `aria-current`. La activa sale de la ruta —la más
+ * específica de las que la contienen (`pestanaActiva`)—, así un layout puede
+ * ponerlas sin que cada página diga cuál es. Cliente solo por `usePathname`.
  */
 export function Pestanas({ etiqueta, pestanas }: { etiqueta: string; pestanas: readonly Pestana[] }) {
-  const ruta = usePathname();
+  const activa = pestanaActiva(
+    usePathname(),
+    pestanas.map((p) => p.href),
+  );
   return (
     // El `-mx-3` alinea el texto de la primera con el título de arriba.
     <nav aria-label={etiqueta} className="-mx-3 overflow-x-auto">
       <ul className="flex gap-1">
         {pestanas.map((p) => {
-          const activa = estaEn(ruta, p.href);
+          const encendida = p.href === activa;
           return (
             <li key={p.href}>
-              <Link href={p.href} aria-current={activa ? "page" : undefined} className={`${BASE} ${activa ? ACTIVA : INACTIVA}`}>
+              <Link href={p.href} aria-current={encendida ? "page" : undefined} className={`${BASE} ${encendida ? ACTIVA : INACTIVA}`}>
                 {p.etiqueta}
               </Link>
             </li>

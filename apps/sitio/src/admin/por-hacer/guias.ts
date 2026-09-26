@@ -44,17 +44,6 @@ const GUIAS: Record<string, Guia> = {
       { nombre: "Un CV", ruta: "/admin/mensajes/cv/[id]", que: "El archivo no tiene URL pública y se borra a los 12 meses." },
     ],
   },
-  metricas: {
-    nombre: "Métricas",
-    para: "Todo dato gratis y legal, sin cookies. Nunca se identifica a una persona ni a una institución.",
-    pantallas: [
-      { nombre: "Resumen", ruta: "/admin/metricas", que: "Visitas contra el período anterior, la curva con marcas, los canales y las páginas más vistas.", hoy: { href: "/admin", etiqueta: "Hoy, en el Inicio" } },
-      { nombre: "Búsquedas", ruta: "/admin/metricas/busquedas", que: "Qué buscó la gente en Google para llegar, desde Search Console." },
-      { nombre: "Origen", ruta: "/admin/metricas/origen", que: "Países, regiones, referidos, dispositivos y la mejor hora para publicar." },
-      { nombre: "Qué hace la gente", ruta: "/admin/metricas/acciones", que: "Los materiales más consultados, el camino hasta enviar un CV y los contactos." },
-      { nombre: "Links para compartir", ruta: "/admin/metricas/enlaces", que: "Links cortos propios (/l/…) para saber qué posteo trajo gente." },
-    ],
-  },
   cuentas: {
     nombre: "Cuentas",
     para: "Quién entra al admin y qué puede hacer. Solo para quien dirige y quien administra.",
