@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { PAGINAS } from "@/contenido/paginas";
-import { comoDocumento, partesDe, primerProblema, propioDe, type PaginaRegistrada, type RegistroDePaginas } from "@/lib/contenido/documento";
+import { comoDocumento, partesDe, propioDe, type PaginaRegistrada, type RegistroDePaginas } from "@/lib/contenido/documento";
+import { primerProblema } from "@/lib/contenido/problemas";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 
 // Publicar en la base (SPEC §7 de la lane del hero): copia el borrador a
@@ -33,7 +34,7 @@ export async function publicarEnBase(
   for (const [clave, seccion] of partesDe(pagina)) {
     if (!(clave in borrador)) continue;
     const valido = seccion.esquema.safeParse(borrador[clave]);
-    if (!valido.success) return { ok: false, detalle: `La sección «${seccion.nombre}» no pasa: ${primerProblema(valido.error)}` };
+    if (!valido.success) return { ok: false, detalle: `No se puede publicar: ${primerProblema(seccion, valido.error)}` };
     publicado[clave] = valido.data;
   }
   const ahora = new Date();

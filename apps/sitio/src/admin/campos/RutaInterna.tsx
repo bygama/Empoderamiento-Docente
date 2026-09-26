@@ -7,13 +7,16 @@ type Props = {
   ayuda?: string;
   valor: string;
   alCambiar: (valor: string) => void;
+  /** Lo que el último guardado dijo de este campo. */
+  error?: string;
 };
 
 /** Un enlace interno se elige de la lista cerrada de rutas del sitio (SPEC §2): no hay enlaces libres. */
-export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambiar }: Props) {
+export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambiar, error }: Props) {
   const conocida = opciones.includes(valor);
   const idCampo = `${nombre}-campo`;
   const idAyuda = `${nombre}-ayuda`;
+  const idError = `${nombre}-error`;
   return (
     <div>
       <label htmlFor={idCampo} className="block text-admin-meta font-medium">
@@ -28,7 +31,8 @@ export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambia
       <select
         id={idCampo}
         value={conocida ? valor : ""}
-        aria-describedby={ayuda ? idAyuda : undefined}
+        aria-describedby={[ayuda ? idAyuda : "", error ? idError : ""].filter(Boolean).join(" ") || undefined}
+        aria-invalid={error ? true : undefined}
         onChange={(e) => alCambiar(e.target.value)}
         className={`mt-1 ${ENTRADA}`}
       >
@@ -40,6 +44,11 @@ export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambia
           </option>
         ))}
       </select>
+      {error ? (
+        <p id={idError} className="mt-1 text-admin-meta text-rojo-error">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { textoCorto } from "./campos";
-import { comoDocumento, completarPagina, primerProblema, propioDe, type PaginaRegistrada } from "./documento";
+import { comoDocumento, completarPagina, propioDe, type PaginaRegistrada } from "./documento";
 
 const pagina: PaginaRegistrada = {
   ruta: "/prueba",
@@ -43,18 +43,4 @@ test("propioDe solo devuelve valores propios: __proto__ y constructor no cuelan"
   assert.equal(propioDe(registro, "b"), undefined);
   assert.equal(propioDe(registro, "__proto__"), undefined);
   assert.equal(propioDe(registro, "constructor"), undefined);
-});
-
-test("primerProblema arma un mensaje en llano con el camino al campo", () => {
-  const resultado = pagina.secciones.bloque.esquema.safeParse({ titulo: "" });
-  assert.equal(resultado.success, false);
-  if (resultado.success) return;
-  assert.equal(primerProblema(resultado.error), "Este texto no puede quedar vacío. (en titulo)");
-});
-
-test("primerProblema sin camino no agrega el sufijo (en campo)", () => {
-  const resultado = pagina.secciones.bloque.esquema.safeParse(null);
-  assert.equal(resultado.success, false);
-  if (resultado.success) return;
-  assert.doesNotMatch(primerProblema(resultado.error), /\(en /);
 });

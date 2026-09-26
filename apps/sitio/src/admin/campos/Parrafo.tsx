@@ -1,4 +1,6 @@
 import { ENTRADA } from "./clases";
+import { estadoDelLargo, idsQueDescriben } from "./largo";
+import { Contador, PieDelCampo } from "./PieDelCampo";
 
 type Props = {
   nombre: string;
@@ -7,42 +9,29 @@ type Props = {
   ayuda?: string;
   valor: string;
   alCambiar: (valor: string) => void;
+  /** Lo que el último guardado dijo de este campo: se muestra debajo, en rojo. */
+  error?: string;
 };
 
-/** Varias líneas, con contador. El hero no lo usa; existe porque `parrafo()` existe y el dibujante cubre todos los tipos. */
-export function Parrafo({ nombre, etiqueta, maximo, ayuda, valor, alCambiar }: Props) {
+/**
+ * Varias líneas, con contador: los cuerpos de «¿Quiénes somos?» y «Misión».
+ * Crece con el texto (`field-sizing`) desde unos cuatro renglones
+ * (`min-h-28`), así un cuerpo largo se lee entero sin scrollear adentro.
+ */
+export function Parrafo({ nombre, etiqueta, maximo, ayuda, valor, alCambiar, error }: Props) {
   const idCampo = `${nombre}-campo`;
-  const idAyuda = `${nombre}-ayuda`;
-  const idContador = `${nombre}-contador`;
-  // Solo puede pasar con un valor guardado antes de bajar el máximo: el
-  // textarea ya no deja escribir de más (maxLength), esto avisa de un dato
-  // viejo, no reemplaza el límite.
-  const excedido = valor.length > maximo;
-  // Distinto de `excedido`: este se prende también al llegar justo al tope,
-  // que es lo normal al escribir (`maxLength` no deja pasarse), no solo con
-  // un dato viejo por encima. Pinta el contador y dispara el aviso de abajo.
-  const alTope = valor.length >= maximo;
-  // A la vista recién desde el 80 % del máximo: antes es ruido. Para el lector
-  // de pantalla está siempre, por el `aria-describedby`.
-  const cerca = valor.length >= maximo * 0.8;
+  const largo = estadoDelLargo(valor.length, maximo);
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3">
         <label htmlFor={idCampo} className="text-admin-meta font-medium">
           {etiqueta}
         </label>
-        {/* Fuera del label: así su nombre accesible no cambia en cada tecla, y el contador se anuncia aparte por aria-describedby. */}
-        {/* Pasado el tope (un dato viejo) va en rojo, como el borde; al tope, en azul: el naranja es solo para la acción. */}
-        <span
-          id={idContador}
-          className={`text-admin-meta ${cerca ? "" : "sr-only"} ${excedido ? "text-rojo-error" : alTope ? "font-medium text-azul-principal" : "text-gris-texto"}`}
-        >
-          {valor.length}/{maximo}
-        </span>
+        <Contador nombre={nombre} cuenta={valor.length} largo={largo} />
       </div>
       {/* La ayuda antes del campo: se lee antes de escribir, no después. */}
       {ayuda ? (
-        <p id={idAyuda} className="mt-1 text-admin-meta text-gris-texto">
+        <p id={`${nombre}-ayuda`} className="mt-1 text-admin-meta text-gris-texto">
           {ayuda}
         </p>
       ) : null}
@@ -51,16 +40,12 @@ export function Parrafo({ nombre, etiqueta, maximo, ayuda, valor, alCambiar }: P
         rows={4}
         value={valor}
         maxLength={maximo}
-        aria-describedby={ayuda ? `${idAyuda} ${idContador}` : idContador}
-        aria-invalid={excedido ? true : undefined}
+        aria-describedby={idsQueDescriben(nombre, { ayuda, largo, error })}
+        aria-invalid={largo.excedido || error ? true : undefined}
         onChange={(e) => alCambiar(e.target.value)}
-        className={`mt-1 ${ENTRADA}`}
+        className={`mt-1 ${ENTRADA} min-h-28 field-sizing-content`}
       />
-      {/* maxLength corta la tecla en silencio: sin esto, quien edita no entiende por qué dejó de escribir (Importante 2 de la revisión). */}
-      {/* El span vive siempre en el DOM y solo cambia el texto: si naciera junto con el texto, el lector de pantalla puede no llegar a anunciarlo. */}
-      <span className="sr-only" aria-live="polite">
-        {alTope ? "Llegaste al máximo de caracteres." : ""}
-      </span>
+      <PieDelCampo nombre={nombre} largo={largo} error={error} />
     </div>
   );
 }
