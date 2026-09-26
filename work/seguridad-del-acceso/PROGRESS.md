@@ -20,11 +20,34 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Los 13 pasos hechos y verificados (abajo). Falta la revisión de cierre, que
-  lanza el padre al recibir `worker_done` (1 revisor Opus 5.5, effort medium,
-  lente «el cambio entero contra su SPEC»), y el merge, que es suyo.
+- Nada: los 13 pasos hechos y verificados, la revisión de cierre en PASS y su
+  ronda de menores aplicada. La lane se cierra en el commit que borra esta
+  carpeta; el merge es del padre.
 
 ## Verification
+
+### 2026-09-26 — La revisión de cierre y su ronda — PASS
+
+- Close review — r1, el cambio entero contra su SPEC (Opus 5.5, medium), sobre
+  `1328353`: **PASS**, 0 Critical, 0 Important, 3 Minor (el veredicto, como lo
+  trajo el padre). Ronda de arreglos, un commit por cosa:
+  - `afcf188` — el comentario de `defaultCookieAttributes` en `config.ts`
+    decía que `FormularioEntrar` consultaba la sesión: ahora nombra el
+    rebote del proxy; el de `(protegido)/layout.tsx` ya no nombra el
+    middleware ni Edge (era el «Abierto» de más abajo).
+  - `dc95be7` — «Tu contraseña cambió» dice cuándo, como pedía el §2 del
+    SPEC: «cambió el 26 de septiembre de 2026 a las 20:15, hora universal», en
+    el texto y en el HTML; `avisarCambioDeContrasena` recibe `cuando`.
+  - `bb97ac8` — `packages/auth/src/ganchos.test.ts`, contra better-auth con
+    su adaptador en memoria: un 401 cuenta y entrar bien borra la fila, un
+    400 no cuenta, la cuenta frenada contesta 429 (mismo cuerpo,
+    `x-retry-after: 900`) antes de mirar la contraseña buena, el hash scrypt
+    pasa a Argon2id y un reset destraba. El test de `destrabar` se mudó ahí.
+  - la nota de `X-Forwarded-For` para el deploy, en «Abierto».
+- Después de la ronda: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
+  `pnpm test` → exit 0 (`@ed/auth` 16 pass; `sitio` 101 pass, 1 skip de
+  antes). El gate entero sobre `main` fresco va en el PR y en el
+  `worker_done`: esta carpeta se borra antes.
 
 ### 2026-09-26 — L DoD después del rebase sobre `origin/main` `8b53269` — PASS
 
@@ -128,22 +151,29 @@ Sobre `00669e9` (árbol limpio), en este worktree, base `ed_seguridad`:
 
 ## Next
 
-1. La revisión de cierre del padre. Si vuelve con hallazgos, se arreglan acá,
-   se re-verifica desde L1 y se anota en este archivo.
-2. Con la revisión en PASS y antes del merge: **el último commit del PR saca
-   `work/seguridad-del-acceso/`** (el cierre de la lane). Ya está rebaseada
-   sobre `8b53269`; si `main` vuelve a moverse, otro rebase (una migración
-   generada antes que otra ya mergeada se vuelve a generar, nunca se edita a
-   mano).
-3. Afuera del código, de ED (README, «Correos»): verificar el dominio en
+1. El merge, del padre, con el OK de Mateo. Si `main` se mueve antes, otro
+   rebase (una migración generada antes que otra ya mergeada se vuelve a
+   generar, nunca se edita a mano).
+2. Afuera del código, de ED (README, «Correos»): verificar el dominio en
    Resend con SPF, DKIM y DMARC, apagar el click tracking y cargar
    `RESEND_API_KEY` y `CORREO_REMITENTE` en Production.
 
 ## Abierto (fuera del alcance, para después)
 
-- `app/(admin)/admin/(protegido)/layout.tsx` todavía dice en un comentario que
-  «el middleware … corre en Edge». No se tocó: es el armazón que la lane 1 está
-  cambiando; va con esa lane o en un commit de una línea después.
+- **Para el deploy: verificar en Vercel cómo llega `X-Forwarded-For`**
+  (revisión r1, 2026-09-26). better-auth 1.7.5 (`getIPFromHeader` en
+  `@better-auth/core/utils/ip`) toma la IP de `x-forwarded-for` y después de
+  `x-real-ip` (`ipAddressHeaders` en `config.ts`), y sin `trustedProxies`
+  **solo acepta una cabecera con una única IP válida**: si llega vacía, con
+  algo que no es una IP o con una cadena de proxies (`cliente, proxy`), la
+  descarta. Si ninguna de las dos sirve, el rate limit usa la clave
+  `no-trusted-ip` (`rate-limiter/index.mjs`) y **todos esos pedidos comparten un
+  solo cupo por ruta** (3 intentos por minuto en `/sign-in/email` para todo el
+  mundo), con un aviso en el log: «Rate limiting could not determine a client
+  IP…». Con el primer deploy: mirar ese aviso en los logs y, si aparece,
+  configurar `advanced.ipAddress.trustedProxies` o la cabecera que ponga Vercel.
+  El bloqueo por cuenta no depende de esto (va por el HMAC del correo).
+
 - En las páginas del admin, `Cache-Control` lo termina escribiendo Next, no el
   proxy (era así antes de esta lane).
 - Cuando el layout protegido no encuentra la sesión, redirige a
