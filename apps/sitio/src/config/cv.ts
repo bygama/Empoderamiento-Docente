@@ -42,6 +42,9 @@ export const COLUMNAS_DEL_CV = ["nombre", "correo", "pais", "mensaje"] as const;
  */
 export const MAXIMO_DEL_CV = 4 * 1024 * 1024;
 
+/** Lo que se le dice a quien manda uno más pesado: lo chequea el navegador antes de mandar, y el servidor igual. */
+export const CV_PESA_DE_MAS = "Tu CV pesa más de 4 MB: exportalo de nuevo como PDF, más liviano, y probá otra vez.";
+
 /**
  * Si la entrada pública del CV está encendida: `CV_ABIERTO=si`. Apagada, que
  * es como viene, `/sumate-al-equipo` y `/api/cv` dan 404 y ningún link del

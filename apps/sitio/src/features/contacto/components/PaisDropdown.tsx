@@ -10,6 +10,8 @@ type Props = {
   name: string;
   options: readonly string[];
   placeholder?: string;
+  /** Cómo se anuncia la lista abierta. El formulario de CV lo usa también para el nivel. */
+  etiqueta?: string;
 };
 
 /**
@@ -29,6 +31,7 @@ export function PaisDropdown({
   name,
   options,
   placeholder = "Elegir…",
+  etiqueta = "País",
 }: Props) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
@@ -150,7 +153,7 @@ export function PaisDropdown({
         <ul
           id={listId}
           role="listbox"
-          aria-label="País"
+          aria-label={etiqueta}
           className="ring-azul-principal/5 absolute top-[calc(100%+0.4rem)] right-0 left-0 z-30 max-h-80 overflow-auto rounded-xl border border-azul-claro/70 bg-white p-1.5 shadow-[0_24px_54px_-18px_rgb(31_45_77/0.45)] ring-1"
         >
           {options.map((opt, i) => {

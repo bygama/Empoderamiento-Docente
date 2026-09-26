@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import { CAMPOS_DEL_CV, COLUMNAS_DEL_CV, MAXIMO_DEL_CV, cvAbierto } from "@/config/cv";
+import { CAMPOS_DEL_CV, COLUMNAS_DEL_CV, CV_PESA_DE_MAS, MAXIMO_DEL_CV, cvAbierto } from "@/config/cv";
 import { almacenPrivado, type AlmacenPrivado } from "@/lib/formularios/almacen-privado";
 import { datosDe, esquemaDe, valoresDe } from "@/lib/formularios/campos";
 import { esPdf } from "@/lib/formularios/pdf";
@@ -19,8 +19,6 @@ export const TOPE_DE_CV = 3;
 /** El margen del multipart y de los otros campos sobre el archivo. */
 const MARGEN_BYTES = 256 * 1024;
 
-const PESA_DE_MAS = "Tu CV pesa más de 4 MB: exportalo de nuevo como PDF, más liviano, y probá otra vez.";
-
 /**
  * Dónde viven los CV: el store privado de Blob (`CV_BLOB_READ_WRITE_TOKEN`)
  * o, en local, `apps/sitio/.cv/`. En Vercel sin token tira: el disco de una
@@ -37,14 +35,14 @@ export function almacenDeCV(entorno: Entorno = process.env): AlmacenPrivado {
 /** Lo que llegó en el campo del archivo, si es un PDF que entra; si no, qué decir. */
 async function pdfDe(archivo: FormDataEntryValue | null): Promise<Uint8Array | string> {
   if (!(archivo instanceof File) || archivo.size === 0) return "Adjuntá tu CV en PDF.";
-  if (archivo.size > MAXIMO_DEL_CV) return PESA_DE_MAS;
+  if (archivo.size > MAXIMO_DEL_CV) return CV_PESA_DE_MAS;
   const bytes = new Uint8Array(await archivo.arrayBuffer());
   return esPdf(bytes) ? bytes : "El archivo no es un PDF: exportá tu CV como PDF y probá de nuevo.";
 }
 
 export async function recibirCV(pedido: Request, entorno: Entorno = process.env): Promise<Response> {
   if (!cvAbierto(entorno)) return new Response("No encontrado", { status: 404 });
-  if (largoDelPedido(pedido) > MAXIMO_DEL_CV + MARGEN_BYTES) return rechazado(413, PESA_DE_MAS);
+  if (largoDelPedido(pedido) > MAXIMO_DEL_CV + MARGEN_BYTES) return rechazado(413, CV_PESA_DE_MAS);
   const datos = await pedido.formData().catch(() => null);
   if (!datos) return rechazado(400, "No entendimos lo que llegó. Probá de nuevo.");
 

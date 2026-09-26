@@ -68,7 +68,7 @@ import { PanelCierre } from "./experiencia/PanelCierre";
  * `coreografia-envio.ts`; markup en PanelHero, ColumnaIdentidad, IndiceTemas,
  * PanelFormulario (RailTema + CamposContacto) y PanelCierre.
  */
-export function ContactoExperiencia() {
+export function ContactoExperiencia({ cvAbierto }: { cvAbierto: boolean }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
   const [vista, setVista] = useState<Vista>("hero");
@@ -180,6 +180,7 @@ export function ContactoExperiencia() {
           temaActivo={temaActivo}
           temaIdx={temaIdx}
           envio={envio}
+          cvAbierto={cvAbierto}
           onCambiar={() => cambiarTema(contexto())}
           onEnviar={(e: FormEvent<HTMLFormElement>) => void enviar(contexto(), e)}
         />
