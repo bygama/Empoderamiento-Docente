@@ -193,6 +193,12 @@
 
 ## Next
 
+- **PR #181** (https://github.com/bygama/Empoderamiento-Docente/pull/181),
+  abierto sobre `main` en `446ab51`. La lane está en **pausa**: verificada
+  (L1–L3, abajo), esperando la revisión de cierre del padre. Cuando esa
+  revisión dé PASS (con su ronda de arreglos, si la hay), la lane se cierra en
+  este mismo PR: un commit con el estado final y otro que borra
+  `work/busquedas-de-google/` (work-handoff, modo close), como hizo #178.
 - **La revisión de cierre es del padre** (1 revisor Opus 5.5, «el cambio
   entero contra su SPEC»): esta lane reporta `worker_done` con el PR abierto y
   no abre asientos propios. Sus hallazgos vuelven como una tarea a esta
