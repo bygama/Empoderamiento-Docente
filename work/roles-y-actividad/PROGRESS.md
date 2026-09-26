@@ -114,9 +114,28 @@
   y otra lane pisó la sesión (memoria `orca-perfil-por-lane`). Con un perfil
   aislado (`roles-y-actividad`) no volvió a pasar; el mismo pedido por curl
   y dos veces más en el navegador dio 200.
+- **Rebase sobre `c957586` (#181, busquedas-de-google), pedido por el padre.**
+  El único conflicto, `permisos.ts`: la tabla de esta lane más
+  `configurarConexiones` para dirige y administra, con su comentario, y en la
+  matriz del test; la pantalla de Búsquedas pasa de `PUEDE.configurarConexiones(rol)`
+  a `puede(rol, "configurarConexiones")` (348d752). La migración de la 5
+  (`20260926213050_busquedas_y_tareas`) queda antes que las tres de esta lane:
+  no hubo que regenerar ninguna; aplicada a `ed_roles` con `migrate:deploy`.
+  Lo que quedaba esperando:
+  - **Métricas** (`2d37b4e`): `metricas/layout.tsx` con `<Guarda
+    capacidad="verMetricas">` (el test de la guarda lo exigía), y
+    `actualizarMetricasAhora` y `actualizarBusquedasAhora` con
+    `puede(…, "verMetricas")` justo después de la sesión; sale su excepción de
+    `SIN_CAPACIDAD`. No se anotan en la actividad (el §5.8 no lo lista).
+  - **La poda de 12 meses** (`0ab9f1d`): `datos/tareas/poda-de-actividad.ts`,
+    registrada en `TAREAS_DIARIAS`; su test la corre por el corredor con
+    `registrarCorrida` y un «hoy» de 2001, y ve la corrida en
+    `corridas_de_tareas`.
+  - Quedan solo las excepciones de la 4a (`paginas.ts` ×3, `fotos.ts`).
 
 - **Dónde queda (2026-09-26):** los 12 pasos hechos y verificados (abajo),
-  **PR #182** abierto contra `main`
+  rebasados sobre `c957586` con lo que esperaba a la lane 5, **PR #182**
+  abierto contra `main`
   (https://github.com/bygama/Empoderamiento-Docente/pull/182), pre-push en
   verde. Falta la revisión de cierre que lanza el padre (1 revisor Opus 5.5,
   medium, «el cambio entero contra su SPEC»). **Lo que sigue:** los arreglos
@@ -126,6 +145,41 @@
   volver a correr el gate antes.
 
 ## Verification
+
+### 2026-09-26 — L DoD después del rebase sobre `c957586` — PASS
+
+Sobre `0ab9f1d` (25 commits de la lane encima de `origin/main` en `c957586`).
+
+- L1 static: `pnpm typecheck` → exit 0 (después de `pnpm generate` y de
+  borrar `apps/sitio/.next/types`, tipos generados del build anterior que
+  apuntaban a rutas viejas) · `pnpm lint` → exit 0 ·
+  `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor:
+  100/100, sin diagnósticos», apps/sitio/src 483 archivos · packages/db/src
+  3 · packages/auth/src 17).
+- L2 behavioral: `pnpm test` → exit 0 (packages/auth 28/28; apps/sitio 151:
+  149 pasan, 0 fallan, 2 saltados, los mismos de antes). `pnpm build` →
+  exit 0 (`ƒ /admin/metricas`, `/admin/metricas/busquedas`, `/admin/mi-cuenta`,
+  `/api/cron/diario`). `pnpm migrate:status` contra `ed_roles` → «Database
+  schema is up to date!». Desde cero (`ed_roles_prueba`, creada y borrada):
+  `migrate deploy` de las 12 → «All migrations have been successfully
+  applied»; `migrate diff --from-config-datasource --to-schema prisma/schema`
+  → «This is an empty migration» (el índice parcial tampoco genera drift con
+  la migración de la 5 en el medio).
+- L3 end-to-end (navegador de Orca, perfil aislado, dev server en el 3016,
+  apagado al terminar):
+  - edita → `/admin/metricas` y `/admin/metricas/busquedas` se ven (sin «Sin
+    permiso»); Búsquedas dice «Todavía no está conectado» y no muestra
+    «Conectá Search Console». «Actualizar ahora» en las dos pasa la
+    capacidad: `POST 200` y el aviso de la conexión que falta en local
+    («Faltan las variables de Vercel…», «Search Console todavía no está
+    conectado.»), no `SIN_PERMISO`.
+  - administra y dirige → las dos pantallas, y Búsquedas muestra «Conectá
+    Search Console» (antes de esta lane, dirige no existía y
+    `configurarConexiones` era solo de administra).
+  - `actividad`: los `entro` y `salio` de estos tres ingresos quedaron.
+  - Capturas: dos intentos de `orca screenshot` fallaron (runtime de Orca);
+    la evidencia de esta vuelta son las lecturas del DOM de arriba.
+- Close review: la lanza el padre.
 
 ### 2026-09-26 — L DoD (SPEC §9 + las aceptaciones del PLAN) — PASS
 
