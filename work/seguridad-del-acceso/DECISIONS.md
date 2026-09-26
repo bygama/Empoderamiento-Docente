@@ -32,3 +32,32 @@
   Argon2id con otra memoria, pasadas o hilos pide rehash, además del scrypt
   viejo. Es una línea con `parseOptions` y deja que un cambio futuro de
   parámetros migre solo, como migra el scrypt.
+- 2026-09-26 — **La sesión de quien llega de otro sitio se recupera en el
+  proxy, no en `FormularioEntrar`** (padre, reemplaza el punto 5 de arriba).
+  react-doctor frenó las dos formas de hacerlo desde el cliente:
+  `router.replace` en el efecto (`nextjs-no-client-side-redirect`) y guardar
+  «hay sesión» en estado para hacer `redirect()` en el render
+  (`rerender-state-only-in-handlers`); esquivarlas con otro nombre sería apagar
+  la regla. **El proxy es mejor:** cubre cualquier link al admin (no solo los
+  que pasan por «entrar»), no muestra el formulario ni un instante y no
+  depende de JS ni de la CSP. Cuando una navegación llega sin la cookie y de
+  otro sitio, el proxy contesta una página mínima con
+  `<meta http-equiv="refresh">` a la misma URL; esa segunda navegación ya es
+  del mismo origen y lleva la cookie `Strict`. `FormularioEntrar` se queda solo
+  con la consulta después de entrar, en el handler. Condiciones del padre:
+  1. solo `GET` de documento sin la cookie, con `Sec-Fetch-Site: cross-site`,
+     `Sec-Fetch-Mode: navigate` y `Sec-Fetch-Dest: document`; nada de `POST`
+     (las Server Actions siguen como hoy), ni `none` ni `same-origin`;
+  2. la URL del refresh es relativa, sale del `pathname` + `search` del propio
+     pedido y va escapada para HTML: nunca de un parámetro ni de una cabecera;
+  3. la respuesta lleva `Cache-Control: no-store`, las cabeceras de `/admin`
+     (`X-Robots-Tag`, `X-Frame-Options`, la CSP) y un link visible «Seguir» a
+     la misma URL, para quien tenga el refresh apagado; sin script;
+  4. un test del proxy con las cuatro ramas (cross-site sin cookie → rebote;
+     same-origin sin cookie → 307 a `/admin/entrar`; con cookie → pasa; `POST`
+     cross-site → no rebota) y, de punta a punta, `curl -I` con y sin
+     `Sec-Fetch-Site: cross-site`.
+  En el ADR-0010 va como parte de la decisión de `SameSite=Strict`.
+- 2026-09-26 — **El paso 9 (`middleware.ts` → `proxy.ts`) se adelanta a antes
+  del 7**: el rebote de arriba vive en el proxy, y escribirlo en
+  `middleware.ts` para mudarlo dos pasos después sería trabajo doble.

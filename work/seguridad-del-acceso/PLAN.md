@@ -104,16 +104,19 @@ paso por commit, y cierra con work-verify y work-handoff. Estado en
    server, `select identifier from verification` no contiene el token del
    enlace impreso, y el enlace sigue sirviendo.
    *(integration · medium)*
-7. **Sesión y cookies.** `expiresIn` 12 h, `updateAge` 1 h, `freshAge` 10 min,
-   `revokeSessionsOnPasswordReset`, `SameSite=Strict` por
-   `defaultCookieAttributes`; `FormularioEntrar` consulta la sesión al cargar
-   (sin parpadeo, usable si falla) y después de entrar antes de seguir a
-   `volver`; el aviso del 429 pasa a «Esperá unos minutos».
-   Acepta: `pnpm typecheck` y `pnpm lint` salen 0; en el dev server el
-   `Set-Cookie` del login dice `SameSite=Strict` y `Max-Age=43200`; entrar con
-   sesión abierta en `/admin/entrar?volver=/admin/paginas` lleva a
-   `/admin/paginas` sin pedir contraseña; elegir contraseña cierra la otra
-   sesión (`select count(*) from session` baja a 0).
+7. **Sesión y cookies** (va después del 9, DECISIONS). `expiresIn` 12 h,
+   `updateAge` 1 h, `freshAge` 10 min, `revokeSessionsOnPasswordReset`,
+   `SameSite=Strict` por `defaultCookieAttributes`; el rebote del proxy para
+   las navegaciones de otro sitio sin cookie (las cuatro condiciones de
+   DECISIONS) con su test; `FormularioEntrar` confirma la sesión después de
+   entrar, en el handler, antes de seguir a `volver`; el aviso del 429 pasa a
+   «Esperá unos minutos».
+   Acepta: `pnpm --filter sitio test` (las cuatro ramas del proxy),
+   `pnpm typecheck`, `pnpm lint` y `node scripts/verificar-react-doctor.mjs`
+   salen 0; en el dev server el `Set-Cookie` del login dice `SameSite=Strict` y
+   `Max-Age=43200`; `curl -I` a `/admin/paginas` con `Sec-Fetch-Site:
+   cross-site` da 200 con el refresh y sin él da 307 a `/admin/entrar`; elegir
+   contraseña cierra la otra sesión (`select count(*) from session` baja a 0).
    *(judgment · high)*
 8. **La cookie de vista previa vence.** `abrirVistaPrevia` la reescribe
    después de `enable()` con `maxAge` 1 h y `SameSite=Lax`; se prueba primero y,
