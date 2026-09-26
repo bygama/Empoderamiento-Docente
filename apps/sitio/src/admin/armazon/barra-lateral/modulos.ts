@@ -20,6 +20,12 @@ export type Modulo = {
    * toda sesión: hoy, solo el Inicio.
    */
   capacidad?: Capacidad;
+  /**
+   * Lo que se crea en este módulo, como acceso rápido en el Inicio («Nueva
+   * novedad»): lo ve quien tiene la capacidad del módulo. El módulo lo suma
+   * en su línea cuando existe su pantalla; hoy no lo tiene ninguno.
+   */
+  accesoRapido?: { etiqueta: string; href: string };
 };
 
 export const GRUPOS: readonly (readonly Modulo[])[] = [
