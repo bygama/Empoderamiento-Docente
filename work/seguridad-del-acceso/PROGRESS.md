@@ -20,7 +20,94 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- work-verify: el gate completo y el recorrido de punta a punta.
+- Los 13 pasos hechos y verificados (abajo). Falta la revisión de cierre, que
+  lanza el padre al recibir `worker_done` (1 revisor Opus 5.5, effort medium,
+  lente «el cambio entero contra su SPEC»), y el merge, que es suyo.
+
+## Verification
+
+### 2026-09-26 — L DoD (lane del XL `mapa-del-admin`) — PASS
+
+Sobre `00669e9` (árbol limpio), en este worktree, base `ed_seguridad`:
+
+- L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
+  `node scripts/verificar-react-doctor.mjs` → exit 0, «react-doctor: 100/100,
+  sin diagnósticos (apps/sitio/src: 408 archivos · packages/db/src: 3 archivos
+  · packages/auth/src: 12 archivos)». Topes de AGENTS.md §6: el más largo de
+  lo nuevo es `FormularioEntrar.tsx` (77 líneas de código) y, de las
+  utilidades, `config.ts` (92, después de sacar `opciones.ts`) y
+  `lib/correo/resend.ts` (65).
+- L2 behavioral: `pnpm test` → exit 0 (`@ed/auth` 12 pass; `sitio` 96 pass,
+  1 skip de antes: el de las respuestas grabadas de A1 de métricas);
+  `pnpm build` → exit 0 (21/21 páginas; las tres de acceso `ƒ`, el sitio `○`);
+  `pnpm migrate:status` → «Database schema is up to date!» (8 migraciones);
+  arranca: `next dev -p 3012` → «Ready», y `next start -p 3013` (paso 10) →
+  «Ready».
+- L3 end-to-end, en el dev server y el navegador de Orca, con una cuenta nueva
+  (`recorrido@ed.test`, creada con `crear-cuenta`):
+  - «Olvidé mi contraseña» desde la pantalla → «Si ese correo tiene una
+    cuenta…» y la consola imprimió «Elegí tu contraseña» entero (el enlace,
+    «vence en 1 hora»); el enlace llevó a `/admin/nueva-contrasena?token=…`;
+    «Guardar» llevó a `/admin/entrar` y la consola imprimió «Tu contraseña
+    cambió» con «Cerramos todas las sesiones…».
+  - Entrar desde la pantalla → `/admin`; cookie `better-auth.session_token`
+    `httpOnly`, `SameSite=Strict`, 43194 s por delante; el hash guardado,
+    `$argon2id$v=19$m=19456,t=2,p=1$…`.
+  - Con dos sesiones abiertas (navegador + `curl`), un reset completo dejó 0
+    sesiones, y el navegador volvió a «entrar» en su siguiente navegación.
+  - Bloqueo, una IP distinta por intento: `recorrido@ed.test` → `401 ×5, 429`;
+    `no-existe-nadie@ed.test` → `401 ×5, 429`; las dos filas con
+    `bloqueos = 1` y 15 minutos de freno, y ninguna `clave` con el correo. El
+    sexto intento desde la pantalla, **con la contraseña buena**, mostró
+    «Demasiados intentos. Esperá unos minutos y probá de nuevo.» (captura a
+    390 de ancho: el aviso entra sin cortarse).
+  - Rehash: `vieja@ed.test` con un hash scrypt de better-auth
+    (`45cca7a06e5d3a6d5ff1…`) entró (200) y quedó
+    `$argon2id$v=19$m=19456,t=2,p=1$…`.
+  - Cabeceras: dos `curl -sI /admin/entrar` → `script-src 'self'
+    'nonce-I4h7pSrtYgFI6Gjmmgl5ag==' 'strict-dynamic' 'unsafe-eval'` y
+    `'nonce-X3qFnHaREqt8AIZTXIMMJQ=='` (distintos), COOP y CORP `same-origin`,
+    `X-Frame-Options: DENY`; el rebote (`Sec-Fetch-Site: cross-site`, sin
+    cookie) → 200 con `no-store` y `DENY`, sin él → 307 a
+    `/admin/entrar?volver=%2Fadmin%2Fpaginas`; el sitio → `script-src 'self'
+    'unsafe-inline' 'unsafe-eval'`, como antes.
+  - El admin con la CSP nueva: `/admin` y `/admin/paginas/inicio` en claro,
+    mixto y oscuro (`data-tema` confirmado) → consola 0 errores, 0
+    advertencias, 0 violaciones. Foco con teclado en «entrar»: arranca en el
+    correo y Tab recorre contraseña → «Mostrar contraseña» → «Entrar» →
+    «Olvidé mi contraseña», con `:focus-visible` en cada uno.
+  - Del mismo día y la misma sesión, sin cambios después en lo que tocan: la
+    cookie de vista previa (paso 8: `Lax`, 3589 s), el rebote en un navegador
+    de verdad (paso 7: `cross-site cookie: false` → `same-origin cookie:
+    true`) y `next start` sin `'unsafe-eval'` (paso 10).
+- Close review — el cambio entero contra su SPEC (Opus 5.5, medium): **no
+  corrida por esta sesión**; la lanza el padre al recibir `worker_done`.
+
+## Next
+
+1. La revisión de cierre del padre. Si vuelve con hallazgos, se arreglan acá,
+   se re-verifica desde L1 y se anota en este archivo.
+2. Con la revisión en PASS y antes del merge: rebasear sobre `main` si el
+   padre lo pide (una migración generada antes que otra ya mergeada se vuelve
+   a generar, nunca se edita a mano), y **el último commit del PR saca
+   `work/seguridad-del-acceso/`** (el cierre de la lane).
+3. Afuera del código, de ED (README, «Correos»): verificar el dominio en
+   Resend con SPF, DKIM y DMARC, apagar el click tracking y cargar
+   `RESEND_API_KEY` y `CORREO_REMITENTE` en Production.
+
+## Abierto (fuera del alcance, para después)
+
+- `app/(admin)/admin/(protegido)/layout.tsx` todavía dice en un comentario que
+  «el middleware … corre en Edge». No se tocó: es el armazón que la lane 1 está
+  cambiando; va con esa lane o en un commit de una línea después.
+- En las páginas del admin, `Cache-Control` lo termina escribiendo Next, no el
+  proxy (era así antes de esta lane).
+- Cuando el layout protegido no encuentra la sesión, redirige a
+  `/admin/entrar` sin `volver` (era así antes).
+- Barrido de restos (2026-09-26): sin logs temporales, sin archivos
+  `_scratch`, sin TODOs nuevos en el diff; el log de diagnóstico del paso 7 se
+  sacó antes de su commit, y los archivos de prueba en `%TEMP%` (cookies,
+  tokens, capturas) se borraron.
 
 ## Hecho
 
