@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { puede, type Capacidad } from "@ed/auth";
 import { base } from "./cliente";
 
 /**
@@ -34,6 +35,24 @@ export const TIPOS_DE_ACTIVIDAD = [
   "borro-un-cv",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
+
+/**
+ * Qué hay que poder para ver cada tipo, en el Inicio y en Cuentas › Actividad:
+ * la misma regla en los dos lados. Un tipo nuevo no compila hasta decir quién
+ * lo ve. Entrar, salir y lo que alguien cambia de su propia cuenta es de las
+ * cuentas: lo ve quien usa Cuentas.
+ */
+export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
+  entro: "usarCuentas",
+  salio: "usarCuentas",
+  "cambio-su-contrasena": "usarCuentas",
+  "cambio-su-nombre": "usarCuentas",
+};
+
+/** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */
+export function tiposQueVe(rol: unknown): TipoDeActividad[] {
+  return TIPOS_DE_ACTIVIDAD.filter((tipo) => puede(rol, QUIEN_VE[tipo]));
+}
 
 const esquema = z.object({
   tipo: z.enum(TIPOS_DE_ACTIVIDAD),

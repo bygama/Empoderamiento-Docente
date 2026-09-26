@@ -39,6 +39,21 @@ test("registra quién, qué, sobre qué y cuándo", sinBase, async () => {
   assert.ok(filas[0] && Date.now() - filas[0].en.getTime() < 60_000);
 });
 
+test("entrar, salir y lo que alguien cambia de su cuenta lo ven solo quienes usan Cuentas", async () => {
+  const { tiposQueVe } = await import("./actividad");
+  const deLasCuentas = ["entro", "salio", "cambio-su-contrasena", "cambio-su-nombre"];
+  for (const rol of ["dirige", "administra"]) {
+    assert.deepEqual(
+      tiposQueVe(rol).filter((t) => deLasCuentas.includes(t)),
+      deLasCuentas,
+      rol,
+    );
+  }
+  assert.deepEqual(tiposQueVe("edita").filter((t) => deLasCuentas.includes(t)), []);
+  assert.deepEqual(tiposQueVe("inventado"), []);
+  assert.deepEqual(tiposQueVe(undefined), []);
+});
+
 test("un tipo que no está en la lista no se guarda, y no tira", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
   const { registrarActividad } = await import("./actividad");
