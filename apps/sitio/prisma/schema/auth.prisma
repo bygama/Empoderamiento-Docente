@@ -43,6 +43,11 @@ model Session {
   updatedAt DateTime @updatedAt
   ipAddress String?
   userAgent String?
+  /// Dónde se abrió, de las cabeceras de Vercel (`@ed/auth`, ubicacion.ts):
+  /// la ciudad decodificada, hasta 80 caracteres. No son de better-auth.
+  ciudad    String?
+  /// El país, en dos letras (ISO 3166-1).
+  pais      String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

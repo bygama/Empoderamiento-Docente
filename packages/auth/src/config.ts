@@ -4,6 +4,7 @@ import { hashear, verificar } from "./contrasenas";
 import { crearGanchos, destrabar } from "./ganchos";
 import type { OpcionesDeAuth } from "./opciones";
 import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
+import { CAMPOS_DE_LA_SESION, GANCHOS_DE_LA_BASE } from "./ubicacion";
 
 /**
  * Arma la sesión. Este paquete **no importa el cliente generado de Prisma**:
@@ -102,7 +103,10 @@ export function crearAuth({
       expiresIn: 12 * UNA_HORA,
       updateAge: UNA_HORA,
       freshAge: 10 * 60,
+      // Dónde se abrió cada una, de las cabeceras de Vercel (ubicacion.ts).
+      additionalFields: CAMPOS_DE_LA_SESION,
     },
+    databaseHooks: GANCHOS_DE_LA_BASE,
 
     /**
      * Rate limit **por IP**, que es lo que faltaba: hasta acá el único freno
