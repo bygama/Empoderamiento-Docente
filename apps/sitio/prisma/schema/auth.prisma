@@ -27,8 +27,22 @@ model User {
   /// parciales sin un preview feature (migración `una_sola_dirige`).
   rol String @default("edita")
 
+  /// Si entra con código por correo: el plugin de dos factores de better-auth,
+  /// con su nombre. Para dirige y administra es obligatorio, y la base lo
+  /// garantiza con el CHECK `user_segundo_factor_obligatorio` (migración
+  /// `segundo_factor_y_cuentas`), que no está acá porque Prisma no escribe
+  /// CHECK.
+  twoFactorEnabled Boolean @default(false)
+  /// No abre sesión (`@ed/auth` lo mira al crear una). No se borra para que su
+  /// nombre siga en la historia.
+  suspendida       Boolean @default(false)
+  /// Cuándo vence la última invitación; null si nunca se la invitó. Solo se
+  /// lee mientras no eligió su contraseña. No es de better-auth.
+  invitacionVence  DateTime? @map("invitacion_vence")
+
   sessions  Session[]
   accounts  Account[]
+  twoFactor TwoFactor[]
   /// Lo que hizo en el admin (actividad.prisma). No es de better-auth.
   actividad Actividad[]
   /// Los mensajes que tomó y los avisos que eligió (mensajes.prisma). Tampoco.
@@ -96,6 +110,25 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+/// La tabla del plugin de dos factores, con sus nombres. **Queda vacía:** el
+/// admin usa solo el código por correo, que no escribe filas acá; guarda el
+/// secreto de una app de autenticación y los códigos de respaldo, que no se
+/// usan. Existe porque el plugin la consulta al verificar un código.
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String
+  userId                  String
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified                Boolean   @default(true)
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime?
+
+  @@index([secret])
+  @@index([userId])
+  @@map("twoFactor")
 }
 
 /// El rate limit por IP de better-auth (`rateLimit.storage = "database"`).
