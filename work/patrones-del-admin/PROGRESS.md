@@ -1,35 +1,42 @@
 # PROGRESS — Los patrones del admin
 
-## In progress
+## Done
 
 - 2026-09-26 — SPEC.md escrito desde el brief del padre (lane 1 del XL
   `work/mapa-del-admin/`) y aprobado por el padre con un cambio: sin número en
   las pestañas (DECISIONS.md). PLAN.md escrito: 10 pasos.
-- 2026-09-26 — Los 10 pasos hechos y la verificación L1–L3 en verde (abajo).
-  Falta la revisión de cierre, que lanza el padre al recibir `worker_done`
-  (1 revisor Opus 5.5, effort medium, lente «el cambio entero contra su
-  SPEC»), y el merge, que es del padre con el OK de Mateo.
+- 2026-09-26 — Los 10 pasos hechos, la verificación L1–L3 en verde y la
+  revisión de cierre del padre en PASS (abajo), con la ronda de arreglos 1
+  hecha. Lo que queda es del padre: el merge, con el OK de Mateo.
+
+## Ronda de arreglos 1 (2026-09-26)
+
+- Pedida por el padre sobre el PASS del revisor r1. Hecho: DECISIONS con la
+  ratificación del Important 1 y las dos citas corregidas; el espacio de
+  `(protegido)/page.tsx:19`; las 16 capturas en la carpeta del padre; el body
+  del PR #178 corregido (insignia solo en las páginas con secciones) y con la
+  lista de capturas. `pnpm --filter sitio typecheck` → exit 0.
+- Después: la lane se cierra (commit que borra esta carpeta), se rebasea sobre
+  `origin/main` y se corre el gate entero otra vez; su salida va en el
+  `worker_done`.
 
 ## Next
 
-- **PR #178** (https://github.com/bygama/Empoderamiento-Docente/pull/178),
-  abierto contra `main` en `eaf8fd9`. Nunca se mergea desde acá.
-- La revisión de cierre la lanza el padre. Si trae hallazgos, vuelven a esta
-  lane como Task: se arreglan acá, se re-verifica desde L1 y se pega el
-  veredicto en `## Verification`.
-- Cuando la revisión pase: el commit que cierra la lane **borra
-  `work/patrones-del-admin/`** y va en este mismo PR, antes del merge
-  (work-handoff, modo close). Si el padre pide rebasear sobre `main` nuevo,
-  se concilian los archivos compartidos (`guias.ts`, `modulos.ts`,
-  DESIGN.md §11, el README) y se corre el gate otra vez.
-- Lo que quedó andando para esa vuelta, fuera del repo: el dev server en su
-  pestaña de Orca («dev patrones-del-admin», puerto 3011), el perfil aislado
-  del navegador «patrones-del-admin» y la cuenta de prueba
-  `patrones@ed.test` (administra) en la base local `ed`, que no se commitea.
+- **PR #178** (https://github.com/bygama/Empoderamiento-Docente/pull/178).
+  Nunca se mergea desde la lane: el merge es del padre, con el OK de Mateo,
+  que antes revisa DESIGN.md §11 (con la excepción de tipo del login) viendo
+  las capturas.
+- La lane se cierra en este mismo PR: el commit que sigue a este borra
+  `work/patrones-del-admin/` (work-handoff, modo close). La historia guarda
+  los cuatro archivos.
+- Fuera del repo quedan, sin commitear: el dev server en su pestaña de Orca
+  («dev patrones-del-admin», puerto 3011), el perfil aislado del navegador
+  «patrones-del-admin», la cuenta de prueba `patrones@ed.test` (administra)
+  en la base local `ed` y las capturas en la carpeta del padre.
 
 ## Verification
 
-### 2026-09-26 — L DoD — PASS (L1–L3; la revisión de cierre, pendiente del padre)
+### 2026-09-26 — L DoD — PASS (L1–L3, y la revisión de cierre del padre)
 
 Sobre `8438458`, con el árbol limpio.
 
@@ -66,16 +73,37 @@ Sobre `8438458`, con el árbol limpio.
     `/admin/contenido/paginas/inicio#seccion-hero` con la sección a la vista.
   - El editor sigue: migas, tres botones, `sticky`, y el modo navy con un
     cambio sin guardar (sin guardar nada: Inicio sigue «Sin editar»).
-  - Capturas de Contenido, la lista de Páginas y el editor en claro, mixto y
-    oscuro, a 1568 × 921 y a 390 × 844, sin desborde horizontal; las tres de
-    acceso a 1568 × 921 y 390 × 844 (entrar también a 1024 × 768), sin
-    desborde. Las de acceso no llevan tema (SPEC §9.4).
+  - Capturas, guardadas en la ronda de arreglos 1 en
+    `C:/Users/mateo/AppData/Local/Temp/ed-orq/capturas/patrones-del-admin/`
+    (fuera del repo, sin commitear; el globito de Next dev sacado del DOM
+    antes de cada una), todas sin desborde horizontal: `contenido-claro.png`,
+    `contenido-mixto.png`, `contenido-oscuro.png`, `paginas-claro.png`,
+    `paginas-mixto.png`, `paginas-oscuro.png`, `editor-claro.png`,
+    `editor-mixto.png`, `editor-oscuro.png` (1568 × 921); `contenido-390.png`,
+    `paginas-390.png`, `editor-390.png` (tema mixto, 390 × 844); `entrar.png`,
+    `entrar-390.png`, `olvide.png`, `nueva-contrasena.png`. Las de acceso no
+    llevan tema (SPEC §9.4). Las capturas no se pueden subir desde la línea
+    de comandos: están en esa carpeta para que Mateo las agregue a mano.
   - Contrastes nuevos medidos y escritos en DESIGN.md §11 (paso 10).
 - Topes: el componente más largo tocado, `Encabezado.tsx`, 98 líneas; la
   utilidad más larga, `por-hacer/guias.ts`, 91.
-- Close review — el cambio entero contra su SPEC (Opus 5.5, medium): la
-  lanza el padre al recibir `worker_done` (work-run paso 4, hijo supervisado).
-  Pendiente.
+- Close review — el cambio entero contra su SPEC (Opus 5.5, medium),
+  revisor r1 del padre: **PASS con dos Important y tres Minor**, según el
+  resumen del padre en la ronda de arreglos 1 (el veredicto completo lo
+  guarda el padre). Important 1, la página sin secciones sin insignia:
+  ratificado por el padre, sin cambio de código (DECISIONS.md). Important 2,
+  las capturas afirmadas sin archivo: guardadas (arriba). Minor: la cita
+  «SPEC §9.6» corregida en DECISIONS, el espacio que faltaba en
+  `(protegido)/page.tsx:19` agregado, y las guías de Contenido sin test, al
+  triage (abajo).
+
+### Triage
+
+- `admin/por-hacer/guias-de-contenido.ts` no tiene test (Minor del revisor
+  r1). No bloquea: son datos de una carpeta que se borra entera cuando se
+  construye la última pestaña. Si una lane los toca antes, un test chico de
+  `guiaDeContenido` (las cuatro claves dan guía, `paginas` y una clave
+  inventada no) alcanza.
 
 ## Tried and failed
 
