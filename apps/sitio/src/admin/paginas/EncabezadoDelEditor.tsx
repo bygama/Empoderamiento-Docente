@@ -59,7 +59,10 @@ export function EncabezadoDelEditor({ nombre, estado, haySinGuardar, pendiente, 
     <Encabezado
       fijo
       resaltado={azul}
-      migas={[{ href: "/admin/paginas", etiqueta: "Páginas" }]}
+      migas={[
+        { href: "/admin/contenido", etiqueta: "Contenido" },
+        { href: "/admin/contenido/paginas", etiqueta: "Páginas" },
+      ]}
       titulo={nombre}
       estado={
         <Insignia tono={insignia.tono} sobreAzul={azul}>

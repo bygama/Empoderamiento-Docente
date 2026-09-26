@@ -4,11 +4,11 @@ import { useEffect } from "react";
 import { Boton } from "@/admin/armazon/Boton";
 
 /**
- * El admin no tenía límite de error: sin esto, un `listaDePaginas` o un
- * `paginaParaEditar` que tira se llevaría puesta toda la pantalla con el
- * genérico de Next, en inglés y sin salida.
+ * El límite de error de Contenido, del índice al editor: sin esto, un
+ * `listaDePaginas` o un `paginaParaEditar` que tira se llevaría puesta toda la
+ * pantalla con el genérico de Next, en inglés y sin salida.
  */
-export default function ErrorDePaginas({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function ErrorDeContenido({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     console.error(error);
   }, [error]);

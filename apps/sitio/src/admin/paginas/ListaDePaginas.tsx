@@ -26,7 +26,7 @@ export function ListaDePaginas({ filas }: { filas: FilaDeLista[] }) {
           <div className="flex items-center gap-3">
             {f.estado.borradorEn ? <span className="rounded-full bg-azul-claro/40 px-2.5 py-0.5 text-admin-meta font-medium text-azul-principal">Cambios sin publicar</span> : null}
             {f.secciones.length > 0 ? (
-              <Link href={`/admin/paginas/${f.slug}`} className="rounded-lg border border-azul-claro px-3 py-1.5 text-admin-meta text-azul-medio transition-opacity hover:opacity-80">
+              <Link href={`/admin/contenido/paginas/${f.slug}`} className="rounded-lg border border-azul-claro px-3 py-1.5 text-admin-meta text-azul-medio transition-opacity hover:opacity-80">
                 Editar
               </Link>
             ) : (
