@@ -13,7 +13,8 @@ import type { FilaDePendiente } from "@/datos/inicio/pendientes";
 export function Pendientes({ filas }: { filas: readonly FilaDePendiente[] }) {
   return (
     <section aria-labelledby="pendientes" className="space-y-3">
-      <h2 id="pendientes" className="flex items-center gap-2 font-display text-admin-seccion font-bold">
+      {/* 40 px de alto, como la fila de «Esta semana» con su link: así los dos títulos quedan a la misma altura. */}
+      <h2 id="pendientes" className="flex min-h-10 items-center gap-2 font-display text-admin-seccion font-bold">
         Pendientes
         {filas.length ? <Insignia tono="fuerte">{filas.length}</Insignia> : null}
       </h2>
