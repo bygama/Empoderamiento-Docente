@@ -1,7 +1,8 @@
 # SPEC — Roles y actividad
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-26, con `nombrar-direccion`
+  sumado (§2 y DECISIONS)
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación, tablas incluidas: DECISIONS del padre, 2026-09-26)
 - **Tier:** L · lane 3a del XL `work/mapa-del-admin/` · worktree propio, rama
@@ -72,6 +73,12 @@ borra. El esquema lo nombra en un comentario, con el porqué.
 `dirige` y se niega si ya hay una («Ya hay una persona que dirige: la
 dirección se pasa desde Cuentas»). El chequeo previo da el mensaje; el índice
 es la garantía, también contra dos altas a la vez.
+
+**Si esa persona ya tiene cuenta** (el caso de producción), un comando aparte,
+`pnpm --filter sitio nombrar-direccion <correo>`, la pasa a dirige. Se niega,
+con un mensaje en llano y un exit distinto de 0, si ya hay una dirige o si el
+correo no existe. `crear-cuenta` sigue solo dando de alta. Cada capacidad sin
+consumidor todavía dice en una línea qué lane la va a usar.
 
 ## 3. La guarda por módulo y «Sin permiso»
 
@@ -226,7 +233,8 @@ entrado hace menos de 10 minutos.
   con dónde viven las capacidades. (Cambia AGENTS.md: lo revisa Mateo en el
   PR, DECISIONS del padre.)
 - **README:** `crear-cuenta` con `dirige` para la primera persona de ED, y
-  `administra` para el desarrollo.
+  `administra` para el desarrollo; al lado, `nombrar-direccion` para la
+  persona de ED que ya tiene cuenta.
 - **DESIGN.md §11:** «Sin permiso», y lo que Mi cuenta estrene si hace falta.
   (Cambia DESIGN.md: lo revisa Mateo en el PR.)
 
@@ -236,11 +244,6 @@ entrado hace menos de 10 minutos.
   Actividad, el segundo factor y «← volver» (3b); el Inicio nuevo (3c); los
   avisos por mail (Mensajes).
 - Las acciones y pantallas de páginas, fotos y métricas (4a y 5).
-- **Nombrar dirige a una cuenta que ya existe.** `crear-cuenta` solo da de
-  alta; si la persona de ED ya tiene cuenta, la promoción es «pasar la
-  dirección» de 3b, que necesita una dirige. Si en producción ya hay cuentas
-  sin dirige, hace falta un paso (una línea de SQL o un modo de
-  `crear-cuenta`): lo decide el padre.
 - Cambiar el propio correo.
 
 ## 9. Criterio de hecho
