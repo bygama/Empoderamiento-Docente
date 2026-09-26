@@ -361,7 +361,7 @@ el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso» y el apartado, el
 mismo día (`work/roles-y-actividad/`); las pestañas de una página, el error en
 el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
 vista previa de buscador y redes, también (`work/paginas-inicio/`); el
-número, ese mismo día (`work/mensajes/`). Todos los contrastes están
+número, el filtro y el buscador, ese mismo día (`work/mensajes/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -637,9 +637,47 @@ Filas separadas por un divisor, en una caja con el mismo borde
   nombre de la fila para el lector («Editar Inicio»).
 - Primer consumidor: la lista de Páginas. También las guías de los módulos
   por hacer, las cuatro listas de Métricas › Búsquedas (sin acción: lo
-  principal y sus cifras en el detalle) y las versiones de una página (la más
+  principal y sus cifras en el detalle), las versiones de una página (la más
   nueva con la insignia «En el sitio», normal, y sin acción; las demás,
-  «Restaurar como borrador»).
+  «Restaurar como borrador») y las bandejas de Mensajes (quién lo tomó como
+  insignia normal, «Abrir» como acción).
+
+### Filtro
+
+La misma lista recortada por un valor que va en la URL (los estados de una
+bandeja: `?estado=en-curso`). No son pantallas del módulo, así que no son
+pestañas: van debajo del encabezado, a la izquierda del buscador.
+`apps/sitio/src/admin/armazon/Filtro.tsx`.
+
+- **Píldoras que son links**, en un `nav` con su `aria-label` («Estado de
+  los mensajes») y la activa con `aria-current="page"`. La activa la dice
+  quien lo usa, porque sale del query y no de la ruta.
+- **Cada una:** meta medium, 40 px de alto, `px-4`, `rounded-full`. La
+  activa con borde y texto `azul-principal` (13,63:1 · 13,59:1), **sin
+  relleno**, para que su número siga viéndose; las demás en `gris-texto`
+  (4,83:1 · 7,08:1), que en hover pasan a `azul-principal` sobre
+  `azul-claro/30` (11,63:1). El foco, el de siempre.
+- **Puede llevar su número** («Nuevo 3»). En el celular la fila scrollea de
+  costado si no entra (las cuatro de Mensajes, a 390 de ancho).
+- Primer consumidor: los estados de las bandejas de Mensajes (Nuevo · En
+  curso · Cerrado · Spam).
+
+### Buscador
+
+Una caja en las listas largas, a la derecha del filtro.
+`apps/sitio/src/admin/armazon/Buscador.tsx`.
+
+- **Un formulario GET con `role="search"`**, sin JavaScript: lo buscado
+  queda en la URL (`?q=`) y conserva lo demás (el estado). Su nombre
+  accesible dice dónde busca («Buscar en Contacto»); la etiqueta va
+  `sr-only` y la caja dice qué mira («Nombre, correo o texto»).
+- **La caja es la `ENTRADA` del admin** y el botón «Buscar», secundario:
+  buscar no es la acción de la pantalla. Con algo buscado aparece «Borrar la
+  búsqueda», terciario, que vuelve a la lista entera.
+- **Sin resultados, el estado vacío lo dice** con lo buscado y dónde («Nada
+  coincide con «zzz» en Cerrado»). En el celular, la caja ocupa el ancho.
+- Primer consumidor: las bandejas de Mensajes. Si otra lane deja uno antes
+  en `main`, queda uno solo (DECISIONS de `work/mensajes/`).
 
 ### Estado vacío
 
@@ -657,8 +695,9 @@ competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
   Console», en Métricas › Búsquedas (sumado el 2026-09-26,
   `work/busquedas-de-google/`).
 - Primer consumidor: los tres estados sin datos del panel de métricas. Lo
-  usan también las secciones de Búsquedas sin filas: nunca una lista vacía
-  muda.
+  usan también las secciones de Búsquedas sin filas y cada estado de una
+  bandeja de Mensajes, que dice qué llega ahí o cuándo se borra: nunca una
+  lista vacía muda.
 
 ### Sin permiso
 
@@ -675,8 +714,9 @@ no se la muestra, así que llega por un link viejo o tipeando.
 - **Sin primario**: acá no hay nada que hacer. Sin ícono de candado ni tono
   de error: no es una falla, es un lugar que no es tuyo.
 - No se esconde qué sección es: la URL ya lo dijo. Se explica de quién es.
-- Primer consumidor: la guarda de cada módulo (hoy Contenido y Métricas, y
-  Cuentas y Ajustes mientras son una guía).
+- Primer consumidor: la guarda de cada módulo (hoy Contenido, Métricas y
+  Mensajes, con la bandeja de CV aparte, y Cuentas y Ajustes mientras son
+  una guía).
 
 ### Apartado
 
