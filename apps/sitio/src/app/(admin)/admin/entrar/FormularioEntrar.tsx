@@ -8,14 +8,30 @@ import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
 import { Aviso, Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 
 /**
+ * Adónde ir después de entrar. Solo rutas del propio admin: un `volver`
+ * absoluto sería un redirect abierto, y llega por la URL, así que no se confía
+ * en él. Tampoco a «entrar» mismo, que con sesión mandaría acá otra vez.
+ */
+function destinoSeguro(volver: string | null): string {
+  const delAdmin = volver !== null && (volver === "/admin" || volver.startsWith("/admin/")) && !volver.startsWith("//");
+  return delAdmin && !volver.startsWith("/admin/entrar") ? volver : "/admin";
+}
+
+/**
  * Entra al admin.
  *
  * Va por HTTP contra `/api/auth`, no por una Server Action: el rate limit por
- * IP vive en ese handler y una llamada desde el servidor lo saltearía.
+ * IP y el bloqueo por cuenta viven en ese handler, y una llamada desde el
+ * servidor los saltearía.
+ *
+ * Quien llega desde un link de otro sitio con la sesión abierta no pasa por
+ * acá: la cookie es `SameSite=Strict` y no viaja en esa primera navegación,
+ * así que el proxy la rebota a la misma URL, y la segunda ya la lleva
+ * (`lib/seguridad/rebote.ts`).
  */
 export function FormularioEntrar() {
   const router = useRouter();
-  const parametros = useSearchParams();
+  const destino = destinoSeguro(useSearchParams().get("volver"));
   const [error, setError] = useState<string | null>(null);
   // Solo cuando el problema son los datos: un 429 no dice nada de lo escrito.
   const [datosRechazados, setDatosRechazados] = useState(false);
@@ -34,17 +50,23 @@ export function FormularioEntrar() {
     if (fallo) {
       // Un solo mensaje para «no existe» y para «contraseña mala»: distinguir
       // los dos le confirma a quien prueba cuáles correos existen. Por lo
-      // mismo se marcan los dos campos, no uno.
+      // mismo se marcan los dos campos, no uno. El 429 es el mismo para el
+      // límite por IP y para la cuenta frenada (hasta una hora): «unos minutos».
       const demasiados = fallo.status === 429;
-      setError(demasiados ? "Demasiados intentos. Esperá un minuto y probá de nuevo." : "El correo o la contraseña no coinciden.");
+      setError(demasiados ? "Demasiados intentos. Esperá unos minutos y probá de nuevo." : "El correo o la contraseña no coinciden.");
       setDatosRechazados(!demasiados);
       setEnviando(false);
       return;
     }
-    // Solo rutas del propio admin: un `volver` absoluto sería un redirect
-    // abierto, y llega por la URL, así que no se confía en él.
-    const volver = parametros.get("volver");
-    router.push(volver?.startsWith("/admin") && !volver.startsWith("//") ? volver : "/admin");
+    // Antes de seguir, que la sesión haya quedado: si el navegador no guardó
+    // la cookie, `volver` mandaría de nuevo acá sin explicar nada.
+    const { data } = await authCliente.getSession();
+    if (!data?.session) {
+      setError("Entraste, pero el navegador no guardó la sesión. Revisá que acepte cookies de este sitio y probá de nuevo.");
+      setEnviando(false);
+      return;
+    }
+    router.push(destino);
     router.refresh();
   }
 

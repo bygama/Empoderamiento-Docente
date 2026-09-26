@@ -12,8 +12,6 @@ import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
  */
 
 const UNA_HORA = 60 * 60;
-const UNA_SEMANA = 7 * 24 * 60 * 60;
-const UN_DIA = 24 * 60 * 60;
 
 /**
  * El cliente de Prisma que recibe `crearAuth`.
@@ -95,6 +93,9 @@ export function crearAuth({
       // se reemplazan al entrar (contrasenas.ts, ganchos.ts).
       password: { hash: hashear, verify: verificar },
       resetPasswordTokenExpiresIn: UNA_HORA,
+      // Elegir una contraseña nueva cierra todas las sesiones de la cuenta: si
+      // alguien se había metido, se queda afuera.
+      revokeSessionsOnPasswordReset: true,
       sendResetPassword: async ({ user, url }) => {
         await mandarResetDeContrasena({
           para: user.email,
@@ -121,9 +122,17 @@ export function crearAuth({
     // una hora.
     verification: { storeIdentifier: "hashed" },
 
+    /**
+     * Una sesión dura 12 horas sin uso: una jornada. Cada hora de uso la
+     * renueva (`updateAge`), así que quien trabaja no se queda afuera a mitad
+     * de algo, y una computadora olvidada abierta se cierra sola a la noche.
+     * `freshAge`: lo delicado (cambiar la contraseña, las cuentas) pide haber
+     * entrado hace menos de 10 minutos.
+     */
     session: {
-      expiresIn: UNA_SEMANA,
-      updateAge: UN_DIA,
+      expiresIn: 12 * UNA_HORA,
+      updateAge: UNA_HORA,
+      freshAge: 10 * 60,
     },
 
     /**
@@ -162,6 +171,16 @@ export function crearAuth({
     advanced: {
       // better-auth manda acá el correo del reset (`runInBackgroundOrAwait`).
       backgroundTasks: { handler: segundoPlano },
+      /**
+       * `SameSite=Strict`: la cookie de sesión no viaja en nada que empiece
+       * en otro sitio, ni siquiera en un link. Es la defensa de CSRF que no
+       * depende de que el origen se valide bien. El costo: quien llega al
+       * admin desde un link de un correo cae en «entrar» aunque tenga sesión,
+       * y por eso `FormularioEntrar` pregunta por la sesión con un `fetch`
+       * propio, que sí la lleva. `__Host-` no se puede: better-auth 1.7
+       * siempre antepone `__Secure-`.
+       */
+      defaultCookieAttributes: { sameSite: "strict" },
       ipAddress: {
         // En Vercel la IP real viene acá; sin decirlo, todas las requests
         // parecerían venir del proxy y compartirían un solo cupo.

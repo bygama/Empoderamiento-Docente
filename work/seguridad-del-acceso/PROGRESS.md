@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 7 del PLAN (sesión y cookies).
+- Paso 8 del PLAN (la cookie de vista previa vence).
 
 ## Hecho
 
@@ -97,3 +97,46 @@ Medido sobre `275518e`:
   `reset-password:`); el enlace sigue sirviendo (302 a
   `/admin/nueva-contrasena?token=…`, `POST /reset-password` → 200) y una
   segunda vez da 400 `INVALID_TOKEN`.
+- 2026-09-26 — **Ruling del padre: el rebote en el proxy** reemplaza la
+  consulta al cargar de `FormularioEntrar` (react-doctor frenó
+  `router.replace` en el efecto con `nextjs-no-client-side-redirect`, y el
+  `redirect()` en el render con `rerender-state-only-in-handlers`; 92/100 y
+  97/100). Condiciones en DECISIONS; el paso 9 se adelanta al 7.
+- 2026-09-26 — **Paso 9 (adelantado), `middleware.ts` → `proxy.ts`.** `git mv`,
+  `export function proxy`, y los comentarios que decían «middleware» o «Edge»
+  en `guarda.ts` y `datos/acciones/` al día. `pnpm typecheck` → exit 0; `curl
+  -I http://localhost:3012/admin` → `307` a `/admin/entrar` con las mismas
+  cabeceras de antes; el dev server ya no avisa «The "middleware" file
+  convention is deprecated».
+- 2026-09-26 — **Paso 7, sesión y cookies.** `config.ts`: `expiresIn` 12 h,
+  `updateAge` 1 h, `freshAge` 10 min, `revokeSessionsOnPasswordReset`,
+  `defaultCookieAttributes: { sameSite: "strict" }`.
+  `apps/sitio/src/lib/seguridad/rebote.ts` (`esLlegadaDeOtroSitio`,
+  `paginaDeRebote`) y el proxy lo usa antes del 307; `proxy.test.ts` con 6
+  tests (las cuatro ramas del padre, más «las pantallas de acceso no rebotan»
+  y el destino escapado que no sale del sitio). `FormularioEntrar`: sin
+  consulta al cargar; después de entrar confirma la sesión con
+  `authCliente.getSession()` en el handler; `destinoSeguro` descarta
+  `/admin/entrar` como `volver`; el 429 dice «Esperá unos minutos».
+  «Tu contraseña cambió» suma que se cerraron las sesiones. `pnpm test` →
+  auth 12/12, sitio 93 pass + 1 skip (A1), exit 0; `pnpm typecheck`,
+  `pnpm lint` → exit 0; `node scripts/verificar-react-doctor.mjs` → «100/100,
+  sin diagnósticos». De punta a punta:
+  - el login contesta `set-cookie: better-auth.session_token=…;
+    Max-Age=43200; Path=/; HttpOnly; SameSite=Strict`;
+  - `curl` a `/admin/paginas?seccion=hero` con `Sec-Fetch-Site: cross-site`,
+    `Sec-Fetch-Mode: navigate`, `Sec-Fetch-Dest: document` y sin cookie →
+    `200`, `cache-control: no-store, max-age=0`, `x-robots-tag: noindex,
+    nofollow`, la CSP, `<meta http-equiv="refresh"
+    content="0;url=/admin/paginas?seccion=hero">` y `<a
+    href="/admin/paginas?seccion=hero">Seguir</a>`; sin esas cabeceras →
+    `307` a `/admin/entrar?volver=%2Fadmin%2Fpaginas`; con la cookie → `200`;
+  - en el navegador de Orca, con sesión, un clic desde `http://127.0.0.1:3012/`
+    (otro sitio) a `http://localhost:3012/admin/paginas?desde=otro-sitio`
+    terminó en esa URL, no en «entrar». Un log temporal del proxy (sacado
+    después) mostró las dos vueltas: `cross-site cookie: false` y después
+    `same-origin cookie: true`;
+  - con una sesión abierta de `otra@ed.test`, elegir contraseña dejó
+    `select count(*) from session …` en 0, la cookie vieja volvió a «entrar»
+    (307) y la consola imprimió «Tu contraseña cambió» con «Cerramos todas las
+    sesiones…».
