@@ -1,5 +1,6 @@
 import { Aviso } from "@/admin/armazon/Campos";
 import { estadoDeBusquedas, resumenDeBusquedas } from "@/datos/consultas/busquedas";
+import { avisoDeCorrida } from "./aviso";
 import { CabeceraDeBusquedas } from "./CabeceraDeBusquedas";
 import { CuerpoDeBusquedas } from "./CuerpoDeBusquedas";
 
@@ -11,13 +12,12 @@ import { CuerpoDeBusquedas } from "./CuerpoDeBusquedas";
 export async function PanelBusquedas({ puedeConectar }: { puedeConectar: boolean }) {
   const estado = await estadoDeBusquedas();
   const resumen = estado.conectado && estado.hastaDia ? await resumenDeBusquedas(estado.hastaDia) : null;
-  // Sin conexión, la última corrida siempre dice eso mismo: el estado vacío ya lo explica.
-  const fallo = estado.conectado && estado.ultima && !estado.ultima.ok ? estado.ultima.detalle : null;
+  const aviso = avisoDeCorrida(estado);
 
   return (
     <section aria-labelledby="busquedas" className="space-y-6">
       <CabeceraDeBusquedas estado={estado} resumen={resumen} />
-      {fallo ? <Aviso tono="error">La última actualización falló: {fallo}</Aviso> : null}
+      {aviso ? <Aviso tono={aviso.tono}>{aviso.texto}</Aviso> : null}
       <CuerpoDeBusquedas estado={estado} resumen={resumen} puedeConectar={puedeConectar} />
     </section>
   );

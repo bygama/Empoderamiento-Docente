@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@/../prisma/generado/client";
 import { base as baseDeLaApp } from "@/datos/cliente";
-import { clienteDeBusquedasDesdeEntorno } from "@/lib/busquedas/entorno";
+import { clienteDeBusquedasDesdeEntorno, SIN_CONEXION } from "@/lib/busquedas/entorno";
 import type { ClienteDeBusquedas } from "@/lib/busquedas/search-console";
 import type { DimensionDeBusqueda, FilaDeBusqueda, Rango } from "@/lib/busquedas/tipos";
 import { ayerUTC, diaISO, fechaUTC, sumarDias } from "@/lib/metricas/periodos";
@@ -79,7 +79,7 @@ export async function sincronizarBusquedas({
 /** Arma el cliente con las variables del entorno y copia. Sin ellas, la corrida sale fallida y no toca la API. */
 export async function copiarBusquedas({ minimoDias = 0 }: { minimoDias?: number } = {}): Promise<ResultadoDeTarea> {
   const cliente = clienteDeBusquedasDesdeEntorno();
-  if (!cliente) return { ok: false, detalle: "Search Console no está conectado: faltan las variables (README)." };
+  if (!cliente) return { ok: false, detalle: SIN_CONEXION };
   return sincronizarBusquedas({ cliente, base: baseDeLaApp, minimoDias });
 }
 

@@ -4,6 +4,12 @@ import { crearClienteDeBusquedas, type ClienteDeBusquedas } from "./search-conso
 // solo del lado del servidor, nunca con NEXT_PUBLIC_ (README, «Variables de
 // entorno»).
 
+/**
+ * Lo que dice una corrida sin las variables. Una sola frase, compartida: la
+ * pantalla la reconoce para no mostrar como error el fallo de antes de conectar.
+ */
+export const SIN_CONEXION = "Search Console no está conectado: faltan las variables (README).";
+
 export function hayVariablesDeBusquedas(): boolean {
   return Boolean(process.env.SEARCH_CONSOLE_CLIENT_EMAIL && process.env.SEARCH_CONSOLE_PRIVATE_KEY && process.env.SEARCH_CONSOLE_SITE_URL);
 }
