@@ -641,8 +641,15 @@ Reglas para el admin y sus datos:
   respuesta válida para una acción). La sesión dura 12 h sin uso y su cookie es
   `SameSite=Strict`: por eso el proxy rebota a la misma URL la navegación que
   llega de otro sitio sin ella. Contraseñas en Argon2id, bloqueo por cuenta,
-  tokens hasheados y la CSP del admin con nonce: ADR-0010. Dos roles, administra
-  y edita; nada del admin es público.
+  tokens hasheados y la CSP del admin con nonce: ADR-0010. Nada del admin es
+  público.
+- **Tres roles, dirige, administra y edita**, con sus capacidades en
+  `packages/auth/src/permisos.ts`, el único archivo que compara contra el
+  string de un rol: todo lo demás pregunta `puede(rol, "…")`. Cada layout de
+  módulo pasa por `<Guarda capacidad>` («Sin permiso» si no la tiene), cada
+  Server Action chequea su capacidad justo después de la sesión, y lo que se
+  hace se anota con `registrarActividad` (`datos/actividad.ts`).
+  `guarda.test.ts` y `acciones-con-sesion.test.ts` fallan si algo se olvida.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
   tablas. No inventar tablas ni columnas que no estén acordadas.
 
