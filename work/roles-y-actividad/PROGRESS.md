@@ -74,6 +74,47 @@
 - **Paso 9 — una sesión en llano** (`0487c65`). `lib/sesiones.ts`
   (`dispositivoDe`, `lugarDe`) con test de user agents reales → 3 pasan.
 
+- **Paso 10 — Mi cuenta** (`f70b570`, `0dbafed`). `admin/armazon/Apartado.tsx`
+  (patrón nuevo, en DESIGN.md §11); `admin/mi-cuenta/` (MiCuenta,
+  FormularioDelNombre, FormularioDeLaContrasena, Sesiones, CerrarLasDemas);
+  `datos/consultas/mi-cuenta.ts`, `datos/acciones/mi-cuenta.ts ›
+  cambiarMiNombre`; la ruta; sale la guía de Mi cuenta; `mi-cuenta/` en
+  `SIN_GUARDA` y `cambiarMiNombre` en `SIN_CAPACIDAD`, con motivo.
+  react-doctor marcó dos (`js-set-map-lookups` en MenuDelAdmin,
+  `no-derived-useState` en el nombre): arreglados por código → 100/100.
+  En el navegador (3016), con las tres cuentas: sidebar por rol, «Sin
+  permiso» de edita en `/admin/cuentas`, la guía para administra, el nombre
+  (normaliza espacios, redibuja la sidebar, anota `cambio-su-nombre`), la
+  contraseña (actual mala → «La contraseña actual no es esa.» con
+  `aria-invalid`; buena → cierra la otra sesión, correo por consola, sigue
+  con sesión), «Cerrar las demás», la ciudad de las cabeceras («Córdoba,
+  Argentina», «Monterrey, México»), salir anota `salio`. Tres temas, 390 de
+  ancho sin scroll horizontal, foco con Tab en todos los controles. Dos
+  arreglos que salieron de mirarla: el campo del nombre se rearma con el
+  nombre guardado (`key`), y para quien dirige «Tu rol» y el correo dicen
+  que la dirección se pasa (no «lo cambia quien administra»).
+- **Paso 11 — `/.well-known/change-password`** (`b364f1a`). `curl -sI` → `308`,
+  `location: /admin/mi-cuenta#contrasena`.
+- **Paso 12 — los documentos** (`7447589`, `ecfbc80`, `e6b6b0e`). Spec del
+  admin §7 (tres roles, guarda, actividad, contraseña desde Mi cuenta; y
+  `freshAge` corregido), AGENTS.md §12 (la línea de los roles), README
+  (`crear-cuenta … dirige` y `nombrar-direccion`). Los greps de aceptación
+  encuentran las tres.
+- **Lo que no se pudo cerrar acá** (para el padre): `origin/main` sigue en
+  `446ab51`, así que (1) la capacidad `configurarConexiones` de la lane 5 no
+  existe todavía: quien rebasee después la extiende a dirige y administra en
+  `permisos.ts` (y a `permisos.test.ts`); (2) la poda de 12 meses de
+  `actividad` queda sin registrar: el cron diario es de la lane 5, y la
+  tarea es un `deleteMany({ where: { en: { lt: hace12Meses } } })` desde
+  `datos/`. Y (3) las excepciones de `SIN_CAPACIDAD` de 4a y 5, que salen
+  cuando cada una sume su `puede(…)` y su registro.
+- **Una rareza del entorno, no del código:** un «Cerrar las demás» dio 401
+  una vez; la cookie de sesión había desaparecido del navegador. Causa: el
+  perfil `default` de Orca comparte las cookies de `localhost` entre puertos
+  y otra lane pisó la sesión (memoria `orca-perfil-por-lane`). Con un perfil
+  aislado (`roles-y-actividad`) no volvió a pasar; el mismo pedido por curl
+  y dos veces más en el navegador dio 200.
+
 ## Hecho
 
 ## Abierto
