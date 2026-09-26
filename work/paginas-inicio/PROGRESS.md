@@ -39,7 +39,31 @@ Medido sobre `8b53269`:
   retomar: leer este archivo y DECISIONS; la base `ed_paginasinicio` tiene
   las 13 migraciones y ninguna fila en `paginas`.
 
+- 2026-09-26 — **Revisión r1: PASS** con 1 Important, 2 Minor y dos notas
+  (DECISIONS). Ronda de arreglos hecha; la lane se cierra en este PR.
+
 ## Verification
+
+### 2026-09-26 — Ronda de arreglos de r1, sobre `main` `5a07368` — PASS
+
+- **Typecheck en un clon limpio, antes de cualquier build** (`next-env.d.ts`
+  y `apps/sitio/.next/` borrados, dev server parado): sin
+  `src/tipos/imagenes.d.ts` → exit 2, «apps/sitio typecheck:
+  src/admin/paginas/VistaPreviaSeo.tsx(4,28): error TS2307: Cannot find module
+  '@/app/(sitio)/opengraph-image.png' or its corresponding type
+  declarations.»; con él → `pnpm typecheck` exit 0 («packages/db typecheck:
+  Done · packages/auth typecheck: Done · apps/sitio typecheck: Done»), y
+  todavía sin `next-env.d.ts` ni `.next/`.
+- `pnpm lint` → exit 0 · react-doctor → exit 0 (100/100, 534 archivos) ·
+  `pnpm build` → exit 0.
+- **El cambio de `aria-labelledby`:** `comparar-render.mjs` contra la
+  referencia de `main` → exit 0, «11 páginas, render idéntico» (no mira
+  atributos ARIA). El diff del documento entero de `/` sin scripts muestra
+  solo seis tags distintos: las tres `section` con `aria-label="Quiénes
+  somos"`, `"Misión"` y `"Áreas de especialización"` pasan a
+  `aria-labelledby="titulo-quienes-somos"`, `"titulo-mision"` y
+  `"titulo-areas"`, y sus tres `h2` suman ese `id`. Es la única diferencia,
+  y es la buscada.
 
 ### 2026-09-26 — L DoD después del rebase sobre `origin/main` `5a07368`, sobre `55531db` — PASS (falta la revisión de cierre, del padre)
 
@@ -379,7 +403,12 @@ Medido sobre `8b53269`:
   páginas llega con la fuente única de 4b (SPEC §12).
 - Visto al pasar, sin tocar: `HeroQuienes` sigue con `scrub: true` en tres
   ScrollTriggers (AGENTS.md §8 pide 0.5 como mínimo); el split fue mecánico y
-  no cambió el comportamiento a propósito.
+  no cambió el comportamiento a propósito. Lo levanta el padre aparte (r1).
+- También fijos en el código, visibles en el índice lateral del sitio: los
+  `data-indice` de las secciones de Inicio («Quiénes somos», «Áreas»,
+  «Biblioteca y novedades»). No siguen al título editable; es el mismo caso
+  que los `aria-label` de r1, pero con texto a la vista y fuera de lo que
+  pidió la ronda.
 - En desarrollo, después de `pnpm generate` hay que reiniciar el dev server:
   `datos/cliente.ts` guarda el `PrismaClient` en `globalThis` entre recargas
   (así se vio «No se pudo publicar» con `tx.versionDePagina` indefinido).
