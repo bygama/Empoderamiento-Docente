@@ -50,6 +50,6 @@ export const auth = crearAuth({
   segundoPlano,
   mandarResetDeContrasena: ({ para, nombre, enlace, minutosDeVigencia }) =>
     mandarCorreo({ para, contenido: elegiTuContrasena({ nombre, enlace, minutosDeVigencia }) }),
-  avisarCambioDeContrasena: ({ para, nombre }) =>
-    mandarCorreo({ para, contenido: tuContrasenaCambio({ nombre, olvideMiContrasena: `${url}/admin/olvide-mi-contrasena` }) }),
+  avisarCambioDeContrasena: ({ para, nombre, cuando }) =>
+    mandarCorreo({ para, contenido: tuContrasenaCambio({ nombre, cuando, olvideMiContrasena: `${url}/admin/olvide-mi-contrasena` }) }),
 });

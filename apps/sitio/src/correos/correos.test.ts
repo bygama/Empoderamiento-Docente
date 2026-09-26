@@ -18,10 +18,13 @@ test("«Elegí tu contraseña» lleva el enlace, cuánto dura, y escapa lo que l
   assert.match(elegiTuContrasena({ enlace: ENLACE, minutosDeVigencia: 72 * 60 }).texto, /^Hola:[\s\S]*vence en 72 horas/);
 });
 
-test("«Tu contraseña cambió» dice qué hacer si no fue la persona, sin botón", () => {
-  const correo = tuContrasenaCambio({ nombre: "Ana", olvideMiContrasena: "https://ed.test/admin/olvide-mi-contrasena" });
+test("«Tu contraseña cambió» dice cuándo, en hora universal, y qué hacer si no fue la persona, sin botón", () => {
+  const cuando = new Date("2026-09-26T20:15:42.000Z");
+  const correo = tuContrasenaCambio({ nombre: "Ana", cuando, olvideMiContrasena: "https://ed.test/admin/olvide-mi-contrasena" });
   assert.equal(correo.asunto, "Tu contraseña cambió");
   assert.match(correo.texto, /^Hola, Ana:/);
+  assert.match(correo.texto, /cambió el 26 de septiembre de 2026 a las 20:15, hora universal./);
+  assert.ok(correo.html.includes("a las 20:15, hora universal."));
   assert.match(correo.texto, /Si no fuiste vos, elegí otra ya mismo desde https:\/\/ed\.test\/admin\/olvide-mi-contrasena/);
   assert.ok(!correo.html.includes("<a "));
 });
