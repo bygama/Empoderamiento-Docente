@@ -179,7 +179,7 @@ export function LineasAccion({ contenido }: { contenido: Areas }) {
       data-indice="Áreas"
       data-section="lineas"
       className="deck from-white to-gris-fondo relative bg-gradient-to-b"
-      aria-label="Áreas de especialización"
+      aria-labelledby="titulo-areas"
     >
       <div data-deck-scroll className="deck-scroll">
         <div
@@ -189,7 +189,9 @@ export function LineasAccion({ contenido }: { contenido: Areas }) {
           {/* Encabezado: en grilla va arriba centrado; en live el título se
               reubica al centro y la bajada abajo. */}
           <div className="deck-head text-center">
+            {/* Nombra la sección (aria-labelledby): el nombre accesible es el título que se publica. */}
             <h2
+              id="titulo-areas"
               className="deck-title font-display text-azul-principal font-bold tracking-[-0.022em]"
               style={{
                 fontSize: "clamp(2rem, 6vw, 4.75rem)",
