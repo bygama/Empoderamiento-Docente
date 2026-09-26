@@ -19,7 +19,7 @@ const GUIAS: Record<string, Guia> = {
     nombre: "Contenido",
     para: "Los textos y las fotos del sitio que no se publican por fecha.",
     pantallas: [
-      { nombre: "Páginas", ruta: "/admin/contenido/paginas", que: "Las siete páginas con su estado, y el editor por secciones con borrador, vista previa y publicar.", hoy: { href: "/admin/paginas", etiqueta: "Abrir Páginas" } },
+      { nombre: "Páginas", ruta: "/admin/contenido/paginas", que: "Las siete páginas con su estado, y el editor por secciones con borrador, vista previa y publicar.", hoy: { href: "/admin/contenido/paginas", etiqueta: "Abrir Páginas" } },
       { nombre: "Casos", ruta: "/admin/contenido/casos", que: "Los cuatro casos de investigación. Se editan, pero no se crean ni se borran." },
       { nombre: "Equipo", ruta: "/admin/contenido/equipo", que: "Los 15 perfiles, en el orden que se arrastre, con sus etapas y sus publicaciones de la Biblioteca." },
       { nombre: "Aliados", ruta: "/admin/contenido/aliados", que: "Los logos. Sin la marca «Autorizado», que ponen quien dirige o quien administra, un logo no se publica." },

@@ -32,6 +32,10 @@ const nextConfig: NextConfig = {
       // La sección vive en "/quienes-somos"; el slug viejo redirige al nuevo
       // para no romper links existentes a "/que-es-ed".
       { source: "/que-es-ed", destination: "/quienes-somos", permanent: false },
+      // Páginas pasó a ser una pestaña de Contenido (work/patrones-del-admin/).
+      // 308: un marcador o un link viejo al editor sigue llegando.
+      { source: "/admin/paginas", destination: "/admin/contenido/paginas", permanent: true },
+      { source: "/admin/paginas/:slug", destination: "/admin/contenido/paginas/:slug", permanent: true },
     ];
   },
 };

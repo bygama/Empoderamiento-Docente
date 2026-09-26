@@ -22,8 +22,7 @@ export const GRUPOS: readonly (readonly Modulo[])[] = [
     { clave: "metricas", nombre: "Métricas", href: "/admin/metricas", Icono: Grafico, segmentos: ["metricas"] },
   ],
   [
-    // «paginas» la enciende hasta que Páginas se mude a /admin/contenido/paginas.
-    { clave: "contenido", nombre: "Contenido", href: "/admin/contenido", Icono: Documento, segmentos: ["contenido", "paginas"] },
+    { clave: "contenido", nombre: "Contenido", href: "/admin/contenido", Icono: Documento, segmentos: ["contenido"] },
     { clave: "novedades", nombre: "Novedades", href: "/admin/novedades", Icono: Periodico, segmentos: ["novedades"] },
     { clave: "biblioteca", nombre: "Biblioteca", href: "/admin/biblioteca", Icono: BookOpen, segmentos: ["biblioteca"] },
   ],
