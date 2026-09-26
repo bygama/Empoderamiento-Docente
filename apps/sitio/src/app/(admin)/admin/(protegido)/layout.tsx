@@ -1,7 +1,7 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ROL_POR_DEFECTO } from "@ed/auth";
-import { auth } from "@/datos/auth";
+import { sesionActual } from "@/datos/sesion";
 import { BarraLateral } from "@/admin/armazon/BarraLateral";
 import { COOKIE_DEL_TEMA, temaDe } from "@/admin/armazon/tema";
 
@@ -12,7 +12,8 @@ import { COOKIE_DEL_TEMA, temaDe } from "@/admin/armazon/tema";
  * propósito—, así que este layout es el que pregunta si la sesión existe,
  * está firmada y no venció. Envuelve a todo lo que cuelga de `/admin`
  * menos entrar, olvidé y nueva contraseña, así que ninguna pantalla del admin
- * puede olvidarse de chequear: no hay dónde olvidarse.
+ * puede olvidarse de chequear: no hay dónde olvidarse. Lo que cada rol puede
+ * usar lo decide aparte la guarda de cada módulo (`admin/armazon/Guarda.tsx`).
  *
  * Y es el armazón: la sidebar a la izquierda (desde `lg`) y el contenido en
  * una tarjeta que toca arriba, abajo y a la derecha de la ventana. Solo las
@@ -25,7 +26,7 @@ import { COOKIE_DEL_TEMA, temaDe } from "@/admin/armazon/tema";
  * esquinas redondas.
  */
 export default async function LayoutProtegido({ children }: { children: React.ReactNode }) {
-  const sesion = await auth.api.getSession({ headers: await headers() });
+  const sesion = await sesionActual();
   if (!sesion) redirect("/admin/entrar");
   const tema = temaDe((await cookies()).get(COOKIE_DEL_TEMA)?.value);
 
