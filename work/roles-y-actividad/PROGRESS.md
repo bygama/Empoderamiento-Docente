@@ -115,6 +115,59 @@
   aislado (`roles-y-actividad`) no volvió a pasar; el mismo pedido por curl
   y dos veces más en el navegador dio 200.
 
+## Verification
+
+### 2026-09-26 — L DoD (SPEC §9 + las aceptaciones del PLAN) — PASS
+
+Sobre `e6b6b0e` + los docs de la lane; `origin/main` en `446ab51` (sin
+cambios desde que arrancó la lane).
+
+- L1 static: `pnpm typecheck` → exit 0 · `pnpm lint` → exit 0 ·
+  `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor:
+  100/100, sin diagnósticos», apps/sitio/src 443 archivos · packages/db/src
+  3 · packages/auth/src 17).
+- L2 behavioral: `pnpm test` → exit 0 (packages/auth: 28 pasan, 0 fallan;
+  apps/sitio: 122, 120 pasan, 0 fallan, 2 saltados: «nombrar la dirección
+  pasa a dirige…», que se hace a un lado cuando la base ya tiene quien
+  dirige, y el de las respuestas grabadas de métricas, de antes). El saltado
+  propio se corrió aparte contra una base vacía (`ed_roles_prueba`, creada,
+  `migrate deploy` de las 11 migraciones desde cero → «All migrations have
+  been successfully applied», y borrada): `tsx --test
+  src/datos/direccion.test.ts src/datos/actividad.test.ts` → 8 pasan, 0
+  saltados. `pnpm build` → exit 0 («Compiled successfully»,
+  `ƒ /admin/mi-cuenta` en la tabla de rutas). `pnpm migrate:status` →
+  «Database schema is up to date!». Arranca: dev server en el 3016
+  (`next dev -p 3016`, pestaña de Orca), sirve.
+- L3 end-to-end (navegador de Orca, perfil aislado `roles-y-actividad`, las
+  tres cuentas de prueba):
+  - sidebar: edita → «Inicio, Mensajes, Métricas, Contenido, Novedades,
+    Biblioteca»; dirige y administra → las mismas más «Cuentas, Ajustes».
+  - edita en `/admin/cuentas` y `/admin/ajustes` → `h1` «Esta sección es de
+    quien dirige o administra», con su rol; en `/admin/contenido` y
+    `/admin/contenido/paginas` → las pantallas de Contenido. administra en
+    `/admin/cuentas` → la guía «Cuentas».
+  - Mi cuenta: el nombre («  Raquel   Ayala  » → «Raquel Ayala», la sidebar
+    lo muestra); la contraseña (actual mala → «La contraseña actual no es
+    esa.», `aria-invalid="true"`; buena → 200, la otra sesión cerrada, 1
+    sesión en la base, «Tu contraseña cambió» en la consola, sigue con
+    sesión); «Cerrar las demás» → `POST /api/auth/revoke-other-sessions 200`
+    y la lista queda en «No tenés el admin abierto en ningún otro lado»;
+    sesiones con `x-vercel-ip-*` → «Córdoba, Argentina», «Monterrey,
+    México»; sin ellas → «Ubicación desconocida».
+  - `actividad`: 16 filas con los cuatro tipos (`entro`, `salio`,
+    `cambio-su-contrasena` por el enlace y por Mi cuenta,
+    `cambio-su-nombre` con `sobre` = «Raquel Ayala»).
+  - `curl -sI http://localhost:3016/.well-known/change-password` → `308`,
+    `location: /admin/mi-cuenta#contrasena`.
+  - Tres temas (claro, mixto, oscuro), 390 × 844 sin scroll horizontal
+    (`scrollWidth` 375 ≤ 390), y Tab recorre nombre, «Guardar el nombre»,
+    las dos contraseñas con su «Mostrar», «Cambiar la contraseña», todos con
+    foco visible (`:focus-visible`, outline `azul-medio` o el anillo de la
+    entrada). Capturas en `%TEMP%\ed-orq\capturas\roles-y-actividad\`.
+- Close review: la lanza el padre al recibir `worker_done` (brief: 1 revisor
+  Opus 5.5, medium, «el cambio entero contra su SPEC»). No corrida acá, a
+  propósito.
+
 ## Hecho
 
 ## Abierto
