@@ -34,6 +34,12 @@ export const PUEDE = {
   tocarContenido: (rol: Rol) => rol === "administra" || rol === "edita",
   /** Dar de alta y de baja cuentas, y cambiarles el rol. */
   tocarCuentas: (rol: Rol) => rol === "administra",
+  /**
+   * Conectar los servicios de afuera (Search Console, y después los de
+   * Ajustes › Conexiones): a quien puede, la pantalla le muestra los pasos; a
+   * quien no, que todavía no está conectado.
+   */
+  configurarConexiones: (rol: Rol) => rol === "administra",
 } as const;
 
 /**
