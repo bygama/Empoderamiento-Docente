@@ -7,12 +7,16 @@ import { AvisoDeLaPagina } from "./AvisoDeLaPagina";
 import { EncabezadoDelEditor } from "./EncabezadoDelEditor";
 import { useAccionesDePagina } from "./useAccionesDePagina";
 
+/** El estado de la página, su aviso y sus acciones, como los da el hook. */
+export type AccionesDePagina = ReturnType<typeof useAccionesDePagina>;
+
 type Props = {
   pagina: PaginaEnRevision;
   pestanas: readonly Pestana[];
   /** «Qué cambió» publica desde acá (Vista previa · Publicar · Descartar); «Versiones» no lleva acciones. */
   conAcciones: boolean;
-  children: React.ReactNode;
+  /** Lo de abajo; como función, recibe las acciones de la página (Versiones restaura con ellas). */
+  children: React.ReactNode | ((acciones: AccionesDePagina) => React.ReactNode);
 };
 
 /**
@@ -38,7 +42,7 @@ export function PantallaDeRevision({ pagina, pestanas, conAcciones, children }: 
         alPublicar={conAcciones ? () => acciones.publicar() : undefined}
         alDescartar={conAcciones ? acciones.descartar : undefined}
       />
-      {children}
+      {typeof children === "function" ? children(acciones) : children}
     </div>
   );
 }
