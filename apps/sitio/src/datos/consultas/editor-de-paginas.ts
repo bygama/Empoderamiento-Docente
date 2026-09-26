@@ -13,7 +13,7 @@ import { CLAVE_SEO } from "@/lib/contenido/seo";
 /** El borrador y la publicación de una página, con quién y cuándo. Un borrador siempre es posterior a la publicación: publicar lo borra. */
 export type EstadoDePagina = { borradorEn: string | null; borradorPor: string | null; publicadoEn: string | null; publicadoPor: string | null };
 
-function estadoDe(fila: Pagina | null | undefined): EstadoDePagina {
+export function estadoDe(fila: Pagina | null | undefined): EstadoDePagina {
   return {
     borradorEn: fila?.borradorEn?.toISOString() ?? null,
     borradorPor: fila?.borradorPor ?? null,
