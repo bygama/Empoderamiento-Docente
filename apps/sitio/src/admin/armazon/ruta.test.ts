@@ -25,3 +25,9 @@ test("un prefijo que no corta en un segmento no cuenta, y sin coincidencia no ha
   assert.equal(pestanaActiva("/admin/metricasx", METRICAS), undefined);
   assert.equal(pestanaActiva("/admin/contenido", METRICAS), undefined);
 });
+
+test("en el editor de una página, la pestaña de la pantalla y no también la de Secciones", () => {
+  const editor = ["/admin/contenido/paginas/inicio", "/admin/contenido/paginas/inicio/seo", "/admin/contenido/paginas/inicio/cambios"];
+  assert.equal(pestanaActiva("/admin/contenido/paginas/inicio", editor), "/admin/contenido/paginas/inicio");
+  assert.equal(pestanaActiva("/admin/contenido/paginas/inicio/seo", editor), "/admin/contenido/paginas/inicio/seo");
+});

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { z } from "zod";
+import { LARGO_DE_BUSCADOR } from "./buscador";
 import { foto, textoCorto } from "./campos";
 
 // El SEO de una página (SPEC §6 de `work/paginas-inicio/`): una parte más de su
@@ -7,11 +8,8 @@ import { foto, textoCorto } from "./campos";
 // cambió» sin código aparte. Un solo esquema para todas las páginas. Sin
 // dominio de ED: lo común de Open Graph lo trae quien arma la metadata.
 
-/** La clave del documento donde vive el SEO. Ninguna sección puede llamarse así. */
-export const CLAVE_SEO = "seo";
-
-/** Hasta dónde muestra Google antes de cortar con «…». Es una recomendación, no un tope (DECISIONS). */
-export const LARGO_DE_BUSCADOR = { titulo: 60, descripcion: 160 } as const;
+// La clave y los largos viven en buscador.ts, sin Zod: los lee también el navegador.
+export { CLAVE_SEO, LARGO_DE_BUSCADOR } from "./buscador";
 
 export const esquemaSeo = z.object({
   titulo: textoCorto({

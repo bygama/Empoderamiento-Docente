@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { resolverCambio, type Cambio } from "@/admin/campos/cambio";
 import { ContextoDeErrores } from "@/admin/campos/errores";
+import type { Pestana } from "@/admin/armazon/Pestanas";
 import { Aviso } from "@/admin/armazon/Campos";
 import { descartarBorrador, guardarBorrador, publicar } from "@/datos/acciones/paginas";
 import { abrirVistaPrevia } from "@/datos/acciones/vista-previa";
@@ -30,7 +31,14 @@ const SIN_RED = "No hubo respuesta del servidor. Fijate la conexión y probá de
  * `correr(fn)` compartido es la forma que react-doctor marca como updater
  * impuro (no-impure-state-updater), sin importar qué haga el callback.
  */
-export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
+type Props = {
+  pagina: PaginaParaEditar;
+  pestanas: readonly Pestana[];
+  /** Lo que va después de las secciones, con lo que hay en pantalla (la vista previa del SEO). */
+  aparte?: (contenidos: Readonly<Record<string, unknown>>) => ReactNode;
+};
+
+export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
   const [contenidos, setContenidos] = useState<Record<string, unknown>>(() =>
     Object.fromEntries(pagina.secciones.map((s) => [s.clave, s.contenido])),
   );
@@ -220,6 +228,7 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
     <div className="space-y-6 max-lg:pb-16">
       <EncabezadoDelEditor
         nombre={pagina.nombre}
+        pestanas={pestanas}
         estado={estado}
         haySinGuardar={haySinGuardar}
         pendiente={pendiente}
@@ -244,6 +253,7 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
           <Seccion key={s.clave} clave={s.clave} nombre={s.nombre} descripcion={s.descripcion} valor={contenidos[s.clave]} alCambiar={(v) => cambiar(s.clave, v)} />
         ))}
       </ContextoDeErrores>
+      {aparte?.(contenidos)}
     </div>
   );
 }

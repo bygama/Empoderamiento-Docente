@@ -41,7 +41,7 @@ export function ListaDePaginas({ filas }: { filas: FilaDeLista[] }) {
             {f.nombre} <span className="text-admin-meta font-normal text-gris-texto">{f.ruta}</span>
           </>
         );
-        if (f.secciones.length === 0) return <Fila key={f.slug} principal={principal} atenuada="Todavía no se edita desde acá" />;
+        if (!f.editable) return <Fila key={f.slug} principal={principal} atenuada="Todavía no se edita desde acá" />;
         const insignia = insigniaDelEstado(f.estado);
         const cuantas = f.secciones.length === 1 ? "1 sección" : `${f.secciones.length} secciones`;
         return (
@@ -55,7 +55,7 @@ export function ListaDePaginas({ filas }: { filas: FilaDeLista[] }) {
                 Editar<span className="sr-only"> {f.nombre}</span>
               </BotonEnlace>
             }
-            desplegable={{ resumen: cuantas, contenido: <Secciones slug={f.slug} secciones={f.secciones} /> }}
+            desplegable={f.secciones.length > 0 ? { resumen: cuantas, contenido: <Secciones slug={f.slug} secciones={f.secciones} /> } : undefined}
           />
         );
       })}

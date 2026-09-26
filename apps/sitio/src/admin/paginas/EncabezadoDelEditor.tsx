@@ -1,6 +1,7 @@
 import { Boton } from "@/admin/armazon/Boton";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia } from "@/admin/armazon/Insignia";
+import { Pestanas, type Pestana } from "@/admin/armazon/Pestanas";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 import { Cuando } from "./Cuando";
@@ -11,6 +12,8 @@ export type EstadoPendiente = "guardar" | "vista-previa" | "publicar" | "descart
 
 type Props = {
   nombre: string;
+  /** Las pantallas de la página (Secciones, SEO…), en la fila de abajo del encabezado. */
+  pestanas: readonly Pestana[];
   estado: PaginaParaEditar["estado"];
   haySinGuardar: boolean;
   pendiente: EstadoPendiente;
@@ -29,7 +32,7 @@ type Props = {
  * el editor contesta con un aviso. Mientras una acción corre, las demás
  * esperan.
  */
-export function EncabezadoDelEditor({ nombre, estado, haySinGuardar, pendiente, aviso, alGuardar, alVerBorrador, alPublicar, alDescartar }: Props) {
+export function EncabezadoDelEditor({ nombre, pestanas, estado, haySinGuardar, pendiente, aviso, alGuardar, alVerBorrador, alPublicar, alDescartar }: Props) {
   const corriendo = pendiente !== null;
   const insignia = insigniaDelEstado(estado);
   // Con cambios sin guardar, todo el encabezado pasa a azul (DESIGN.md §11) y lo de adentro va en su versión «sobre azul».
@@ -88,6 +91,7 @@ export function EncabezadoDelEditor({ nombre, estado, haySinGuardar, pendiente, 
         </>
       }
       avisos={aviso}
+      pestanas={<Pestanas etiqueta={`Pantallas de ${nombre}`} pestanas={pestanas} sobreAzul={azul} />}
     />
   );
 }

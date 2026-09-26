@@ -3,7 +3,8 @@ import { PAGINAS, SLUGS, type Slug } from "@/contenido/paginas";
 import { base } from "@/datos/cliente";
 import { describir } from "@/lib/contenido/describir";
 import type { Descripcion } from "@/lib/contenido/descripcion";
-import { comoDocumento, completarPagina, type SeccionRegistrada } from "@/lib/contenido/documento";
+import { comoDocumento, completarPagina, parteDe, type SeccionRegistrada } from "@/lib/contenido/documento";
+import { CLAVE_SEO } from "@/lib/contenido/seo";
 
 // Lo que leen las dos pantallas del admin (SPEC §2): la lista de las siete
 // páginas y una página lista para editar. Las fechas viajan como ISO: el
@@ -27,12 +28,29 @@ function seccionesDe(slug: Slug): Array<[string, SeccionRegistrada]> {
   return Object.entries(secciones);
 }
 
+/** Las dos pestañas que editan: las secciones y el SEO (SPEC §7 de `work/paginas-inicio/`). */
+export type ParteDelEditor = "secciones" | "seo";
+
+/** Qué pestañas de edición tiene una página: una página con solo SEO también se edita. */
+export function partesEditables(slug: Slug): Record<ParteDelEditor, boolean> {
+  return { secciones: seccionesDe(slug).length > 0, seo: parteDe(PAGINAS[slug], CLAVE_SEO) !== undefined };
+}
+
+/** Lo que muestra una pestaña del editor: las secciones, o el SEO solo. */
+function partesDeLaPestana(slug: Slug, parte: ParteDelEditor): Array<[string, SeccionRegistrada]> {
+  if (parte === "secciones") return seccionesDe(slug);
+  const seo = parteDe(PAGINAS[slug], CLAVE_SEO);
+  return seo ? [[CLAVE_SEO, seo]] : [];
+}
+
 export type FilaDeLista = {
   slug: Slug;
   nombre: string;
   ruta: string;
   estado: EstadoDePagina;
-  /** Vacía si la página todavía no se edita desde el admin. */
+  /** Si tiene secciones o SEO: si no, la lista la muestra atenuada. */
+  editable: boolean;
+  /** Las secciones, para ir directo a cada una; vacía si no tiene. */
   secciones: Array<{ clave: string; nombre: string }>;
 };
 
@@ -44,6 +62,7 @@ export async function listaDePaginas(): Promise<FilaDeLista[]> {
     nombre: PAGINAS[slug].nombre,
     ruta: PAGINAS[slug].ruta,
     estado: estadoDe(porSlug.get(slug)),
+    editable: Object.values(partesEditables(slug)).some(Boolean),
     secciones: seccionesDe(slug).map(([clave, s]) => ({ clave, nombre: s.nombre })),
   }));
 }
@@ -56,8 +75,8 @@ export type PaginaParaEditar = {
   secciones: Array<{ clave: string; nombre: string; descripcion: Descripcion; contenido: unknown }>;
 };
 
-/** La página con lo que se está editando (el borrador, o lo publicado, o el inicial) y la descripción de cada sección. */
-export async function paginaParaEditar(slug: Slug): Promise<PaginaParaEditar> {
+/** La página con lo que se está editando (el borrador, o lo publicado, o el inicial) y la descripción de cada parte de esa pestaña. */
+export async function paginaParaEditar(slug: Slug, parte: ParteDelEditor): Promise<PaginaParaEditar> {
   const pagina = PAGINAS[slug];
   const fila = await base.pagina.findUnique({ where: { slug } });
   const documento = completarPagina(pagina, comoDocumento(fila?.borrador ?? fila?.publicado));
@@ -66,6 +85,6 @@ export async function paginaParaEditar(slug: Slug): Promise<PaginaParaEditar> {
     nombre: pagina.nombre,
     ruta: pagina.ruta,
     estado: estadoDe(fila),
-    secciones: seccionesDe(slug).map(([clave, s]) => ({ clave, nombre: s.nombre, descripcion: describir(s.esquema, s.nombre), contenido: documento[clave] })),
+    secciones: partesDeLaPestana(slug, parte).map(([clave, s]) => ({ clave, nombre: s.nombre, descripcion: describir(s.esquema, s.nombre), contenido: documento[clave] })),
   };
 }
