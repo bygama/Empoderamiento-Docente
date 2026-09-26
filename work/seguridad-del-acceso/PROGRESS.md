@@ -26,6 +26,49 @@ Medido sobre `275518e`:
 
 ## Verification
 
+### 2026-09-26 — L DoD después del rebase sobre `origin/main` `8b53269` — PASS
+
+Pedido por el padre antes de la revisión de cierre: `main` trae #178 (los
+patrones del admin: `Pantalla.tsx` y las tres pantallas de acceso rehechas,
+Páginas mudada a `/admin/contenido/paginas` con 308) y #179 (docs del padre).
+
+- Rebase: un solo choque, en `app/(admin)/layout.tsx`; quedaron las dos
+  intenciones (el `title.template` «%s · Admin ED» y `default` «Admin ED» de
+  la lane 1, y el comentario «del proxy», `connection()` y el docblock de
+  acá). `main` no suma migraciones: las dos de esta lane siguen últimas y no
+  hubo que regenerar nada.
+- L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
+  `node scripts/verificar-react-doctor.mjs` → exit 0, «react-doctor: 100/100,
+  sin diagnósticos (apps/sitio/src: 423 archivos · packages/db/src: 3 archivos
+  · packages/auth/src: 12 archivos)». (La primera corrida de `typecheck`,
+  antes del build, dio exit 2: `tsconfig` incluye `.next/types` y
+  `.next/dev/types`, que todavía tenían las rutas de antes del rebase; la
+  pasada entera de nuevo, en orden, dio todo en 0.)
+- L2 behavioral: `pnpm test` → exit 0 (`@ed/auth` 12 pass; `sitio` 101 pass,
+  1 skip de antes); `pnpm build` → exit 0 (22/22; entrar, olvidé y nueva `ƒ`,
+  `/` `○`); `pnpm migrate:status` → «8 migrations found… Database schema is up
+  to date!»; `next dev -p 3012` → arriba.
+- L3 end-to-end, en el navegador de Orca, sobre las pantallas de la lane 1:
+  - `/admin/entrar` («Entrar · Admin ED»), `/admin/olvide-mi-contrasena`
+    («Olvidé mi contraseña · Admin ED») y `/admin/nueva-contrasena`
+    («Nueva contraseña · Admin ED»): hidratadas, consola 0 errores, 0
+    advertencias, 0 violaciones de CSP;
+  - «Olvidé mi contraseña» para `recorrido@ed.test` → «Elegí tu contraseña»
+    por consola → el enlace → «Guardar» → `/admin/entrar` y «Tu contraseña
+    cambió» por consola → entrar → `/admin`; después `/admin/contenido`,
+    `/admin/contenido/paginas` y `/admin/contenido/paginas/inicio`: consola 0
+    errores en todo el recorrido;
+  - `curl`: las tres pantallas de acceso con nonce y `'strict-dynamic'`, COOP,
+    CORP y `X-Frame-Options: DENY`; el rebote en `/admin/contenido/paginas`
+    (`Sec-Fetch-Site: cross-site`, sin cookie) → 200, `no-store`, `DENY`,
+    `<meta http-equiv="refresh" content="0;url=/admin/contenido/paginas">`, y
+    sin esa cabecera → 307 a `/admin/entrar?volver=%2Fadmin%2Fcontenido%2Fpaginas`;
+    `/admin/paginas` → el 308 de la lane 1 a `/admin/contenido/paginas`
+    (corre antes del proxy); el bloqueo → `401 ×5, 429`; el sitio sigue con
+    `'unsafe-inline'`.
+- Close review — el cambio entero contra su SPEC (Opus 5.5, medium): la
+  lanza el padre sobre este árbol.
+
 ### 2026-09-26 — L DoD (lane del XL `mapa-del-admin`) — PASS
 
 Sobre `00669e9` (árbol limpio), en este worktree, base `ed_seguridad`:
@@ -87,10 +130,11 @@ Sobre `00669e9` (árbol limpio), en este worktree, base `ed_seguridad`:
 
 1. La revisión de cierre del padre. Si vuelve con hallazgos, se arreglan acá,
    se re-verifica desde L1 y se anota en este archivo.
-2. Con la revisión en PASS y antes del merge: rebasear sobre `main` si el
-   padre lo pide (una migración generada antes que otra ya mergeada se vuelve
-   a generar, nunca se edita a mano), y **el último commit del PR saca
-   `work/seguridad-del-acceso/`** (el cierre de la lane).
+2. Con la revisión en PASS y antes del merge: **el último commit del PR saca
+   `work/seguridad-del-acceso/`** (el cierre de la lane). Ya está rebaseada
+   sobre `8b53269`; si `main` vuelve a moverse, otro rebase (una migración
+   generada antes que otra ya mergeada se vuelve a generar, nunca se edita a
+   mano).
 3. Afuera del código, de ED (README, «Correos»): verificar el dominio en
    Resend con SPF, DKIM y DMARC, apagar el click tracking y cargar
    `RESEND_API_KEY` y `CORREO_REMITENTE` en Production.
