@@ -44,6 +44,26 @@
 - 2026-09-26 — **Sin conexión, Búsquedas no muestra el aviso de la última
   corrida fallida:** sin variables, esa corrida siempre dice «no está
   conectado», y el estado vacío ya lo explica.
+- 2026-09-26 — **Revisión r1 (Opus 5.5, medium, «el cambio entero contra su
+  SPEC»): PASS sobre `cb9195e`**, 0 Critical, 0 Important, 4 Minor y una nota
+  fuera de su lente. Resolución del padre:
+  - Minor 1 (AGENTS.md cambia más que la línea de §12: el árbol de §3 y la
+    viñeta de lo generado de §6): **ratificado**, es mantenimiento necesario
+    del árbol.
+  - Minor 2 («Actualizar ahora» pasa al secundario y se nota en el Inicio):
+    **ratificado**: su borde daba 1,77:1 y un control pide 3:1; arreglar un
+    contraste gana sobre «el Inicio no se toca».
+  - Minor 3 (comas en vez de «·» en la línea de una búsqueda): **queda con
+    comas**, sin cambios.
+  - Minor 4, a arreglar: recién conectado, antes de la próxima corrida,
+    Búsquedas mostraba «La última actualización falló: … faltan las
+    variables», que es lo primero que se vería en producción al conectar. Con
+    las variables puestas y la última corrida fallida por faltarlas, va un
+    aviso de confirmación en su lugar, con test.
+  - La nota fuera de lente, a arreglar: `correrAMano` leía la última corrida
+    y después corría, sin atomicidad, así que dos clics a la vez se salteaban
+    el freno. El freno pasa a ser atómico en la base, sin tablas nuevas, con
+    un test que dispara dos a la vez.
 - 2026-09-26 — **La copia de Search Console reemplaza cada dimensión en su
   rango** (`deleteMany` + `createMany` en una transacción) en vez de un upsert
   por fila: la primera copia son 90 días y pueden ser miles de filas, y la

@@ -2,8 +2,8 @@
 
 ## In progress
 
-- Nada: los 10 pasos están hechos y verificados. Espera la revisión de cierre
-  del padre (abajo, «Next»).
+- Nada. La revisión de cierre dio PASS y la ronda de arreglos 1 está hecha:
+  la lane se cierra en este PR (abajo, «Next»).
 
 ## Done
 
@@ -191,29 +191,47 @@
   `CabeceraDeBusquedas` y `CuerpoDeBusquedas` (`33bbcfb`) y volvió a 100. Todo
   el gate en verde sobre ese árbol.
 
+## Ronda de arreglos 1 (2026-09-26)
+
+- La revisión de cierre del padre (Opus 5.5, medium, «el cambio entero contra
+  su SPEC») dio **PASS sobre `cb9195e`**: 0 Critical, 0 Important, 4 Minor y
+  una nota fuera de su lente. El padre ratificó los Minor 1 y 2 y dejó el 3
+  como está (DECISIONS.md); pidió arreglar el 4 y la nota.
+- **La nota: el freno atómico** (`2f370e0`). `correrAMano` corre dentro de una
+  transacción que toma `pg_try_advisory_xact_lock(hashtext('corridas_de_tareas'),
+  hashtext(clave))`: el segundo clic no lo consigue y contesta «Ya se está
+  actualizando; esperá un momento.», y el lock se suelta al terminar la
+  transacción, con la corrida ya registrada. Sin tablas nuevas; de
+  transacción, así que anda detrás del pooler. Test nuevo en `a-mano.test.ts`,
+  en rojo primero («actual: 2, expected: 1»: corrían los dos) y en verde
+  después, cinco veces seguidas.
+- **Minor 4: recién conectado** (`9580ab7`). `avisoDeCorrida` en
+  `admin/busquedas/aviso.ts` (con 3 tests; en rojo primero, sin el módulo):
+  con las variables puestas y la última corrida fallida por faltarlas
+  (`SIN_CONEXION`, ahora una constante compartida en `lib/busquedas/entorno.ts`),
+  el aviso es de confirmación: «Search Console quedó conectado: la primera
+  copia llega esta noche, o antes con «Actualizar ahora».» («la próxima» si ya
+  hay días). En el navegador, con las variables falsas: `status: Search
+  Console quedó conectado: la próxima copia…`; después de «Actualizar ahora»
+  con la clave falsa, pasa a `alert: La última actualización falló: La clave
+  privada…`. Captura `recien-conectado.png` en la carpeta del padre.
+- `pnpm typecheck` → 0; `pnpm --filter sitio lint` → 0;
+  `pnpm --filter sitio test` → 0 (129 tests, 128 pass, 1 skip).
+
 ## Next
 
-- **PR #181** (https://github.com/bygama/Empoderamiento-Docente/pull/181),
-  abierto sobre `main` en `446ab51`. La lane está en **pausa**: verificada
-  (L1–L3, abajo), esperando la revisión de cierre del padre. Cuando esa
-  revisión dé PASS (con su ronda de arreglos, si la hay), la lane se cierra en
-  este mismo PR: un commit con el estado final y otro que borra
-  `work/busquedas-de-google/` (work-handoff, modo close), como hizo #178.
-- **La revisión de cierre es del padre** (1 revisor Opus 5.5, «el cambio
-  entero contra su SPEC»): esta lane reporta `worker_done` con el PR abierto y
-  no abre asientos propios. Sus hallazgos vuelven como una tarea a esta
-  terminal.
-- Nunca se mergea desde la lane. Si el padre lo pide, se rebasea sobre el
-  `main` nuevo: si `seguridad-del-acceso` entra antes, choca en el README,
-  `.env.example`, `docs/architecture/adrs/README.md` (su 0010) y un comentario
-  de `actualizar-metricas.ts`; y si otra migración quedó después, la de esta
-  lane se regenera con `--create-only` y el mismo SQL de datos.
+- **PR #181** (https://github.com/bygama/Empoderamiento-Docente/pull/181).
+  La lane se cierra en este mismo PR: el commit que sigue a este borra
+  `work/busquedas-de-google/` (work-handoff, modo close), y la historia guarda
+  los cuatro archivos. Después se rebasea sobre `origin/main`, se corre el gate
+  entero otra vez y su salida va en el `worker_done`. Nunca se mergea desde la
+  lane.
 - Fuera del repo, sin commitear: el dev server en su pestaña de Orca («dev
-  busquedas-de-google», puerto 3015), la terminal «migrate busquedas», los
-  perfiles aislados del navegador «busquedas-de-google» y «busquedas-edita»,
+  busquedas-de-google», puerto 3015), los perfiles aislados del navegador «busquedas-de-google» y «busquedas-edita»,
   las cuentas `busquedas@ed.test` (administra) y `edita-busquedas@ed.test`
   (edita), 56 días de búsquedas sembrados en `ed_busquedas`, un `CRON_SECRET`
-  local en `.env.local` y las capturas en `%TEMP%\ed-busquedas\`.
+  local en `.env.local` y las capturas en `%TEMP%\ed-busquedas\` y
+  `%TEMP%\ed-orq\capturas\busquedas-de-google\`.
 
 ## Verification
 
@@ -246,7 +264,11 @@ rebase. Sobre `33bbcfb`:
   navegador, con la sesión de `administra` y la CSP con nonce del admin nuevo,
   `/admin/metricas/busquedas` hidrata: «Actualizar ahora» sin variables
   contesta «Search Console todavía no está conectado.».
-- Close review: la abre el padre (abajo).
+- Close review — el cambio entero contra su SPEC (Opus 5.5, medium), abierta
+  por el padre sobre `cb9195e`: **PASS**, 0 Critical, 0 Important, 4 Minor y
+  una nota fuera de su lente (el veredicto lo tiene el padre; acá, su
+  resumen). Los Minor 1 y 2, ratificados; el 3, sin cambios; el 4 y la nota,
+  arreglados en la ronda 1 (arriba), con sus tests.
 
 ### 2026-09-26 — L DoD — PASS (L1–L3; la revisión de cierre es del padre)
 
