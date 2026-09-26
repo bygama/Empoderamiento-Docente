@@ -11,8 +11,8 @@
 | # | Paso | Estado |
 | --- | --- | --- |
 | 1 | `listaDePaginas()` trae el estado y las secciones | hecho, `cb6fc19` |
-| 2 | Páginas se muda a `/admin/contenido/paginas` | hecho |
-| 3 | Título de pestaña | pendiente |
+| 2 | Páginas se muda a `/admin/contenido/paginas` | hecho, `5e6eabf` |
+| 3 | Título de pestaña | hecho |
 | 4 | El índice de tarjetas, en `/admin/contenido` | pendiente |
 | 5 | Pestañas, en las cinco pantallas de Contenido | pendiente |
 | 6 | La lista, en Páginas | pendiente |
@@ -41,3 +41,14 @@
   `[modulo]`.
   - Nota: `git mv` de la carpeta entera falla con «Permission denied»
     mientras el dev server la mira; se mueve archivo por archivo.
+  Commit `5e6eabf`.
+- **Paso 3** — `(admin)/layout.tsx` con `title: { template: "%s · Admin ED",
+  default: "Admin ED" }`; las tres de acceso dan solo su nombre; `metadata`
+  en el Inicio y en Páginas; `generateMetadata` en el editor («<Página> ·
+  Páginas») y en `[modulo]` (`guia.nombre`). `pnpm --filter sitio typecheck`
+  → exit 0. `document.title` (`orca eval`, con sesión): `/admin` → «Inicio ·
+  Admin ED», `/admin/contenido/paginas` → «Páginas · Admin ED»,
+  `/admin/contenido/paginas/inicio` → «Inicio · Páginas · Admin ED»,
+  `/admin/novedades` → «Novedades · Admin ED», `/admin/contenido` →
+  «Contenido · Admin ED». `<title>` por `curl.exe`: «Entrar · Admin ED»,
+  «Olvidé mi contraseña · Admin ED», «Nueva contraseña · Admin ED».

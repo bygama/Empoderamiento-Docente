@@ -10,7 +10,9 @@ const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-int
 const manrope = Manrope({ subsets: ["latin"], display: "swap", variable: "--font-manrope", weight: ["500", "700"] });
 
 export const metadata: Metadata = {
-  title: "Empoderamiento Docente",
+  // Cada pantalla da solo su nombre y el template le suma el admin: «Páginas ·
+  // Admin ED». Vale para las de acceso y para las protegidas (DESIGN.md §11).
+  title: { template: "%s · Admin ED", default: "Admin ED" },
   // Cinturón y tiradores: el `X-Robots-Tag` del middleware es el que manda,
   // pero esto cubre el caso de que alguien sirva el HTML por otro camino.
   robots: { index: false, follow: false },

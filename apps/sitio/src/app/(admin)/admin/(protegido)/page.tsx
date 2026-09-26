@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PanelMetricas } from "@/admin/metricas/PanelMetricas";
+
+export const metadata: Metadata = { title: "Inicio" };
 
 export default function InicioDelAdmin() {
   return (
