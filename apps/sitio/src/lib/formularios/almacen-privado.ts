@@ -77,12 +77,12 @@ export function almacenPrivadoEnBlob(token: string): AlmacenPrivado {
 }
 
 /**
- * Blob privado si hay token; sin token, la carpeta local, pero **nunca en
- * producción**: ahí el disco de una función no es de nadie y se pierde, así
- * que sin token tira y quien recibe contesta que no puede.
+ * Blob privado si hay token; sin token, la carpeta local, pero **nunca donde
+ * el disco no es de nadie** (`sinDisco`: una función de Vercel, que lo pierde
+ * al terminar). Ahí, sin token, tira, y quien recibe contesta que no puede.
  */
-export function almacenPrivado({ token, carpeta, produccion }: { token?: string; carpeta: string; produccion: boolean }): AlmacenPrivado {
+export function almacenPrivado({ token, carpeta, sinDisco }: { token?: string; carpeta: string; sinDisco: boolean }): AlmacenPrivado {
   if (token) return almacenPrivadoEnBlob(token);
-  if (produccion) throw new Error("Falta el token del store privado: en producción los archivos no van al disco.");
+  if (sinDisco) throw new Error("Falta el token del store privado: acá los archivos no pueden ir al disco.");
   return almacenPrivadoEnDisco(carpeta);
 }
