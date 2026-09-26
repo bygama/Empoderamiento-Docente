@@ -80,3 +80,9 @@ test("humanizar y valorVacio", () => {
   assert.equal(vacio.tarjetas[0].cartel, null);
   assert.equal(vacio.tarjetas[1].foto.alt, "");
 });
+
+test("describir pasa el largo recomendado de un textoCorto, y solo si lo hay", () => {
+  const recomendado = { largo: 60, aviso: "Google muestra unos 60 caracteres." };
+  assert.deepEqual(describir(textoCorto({ maximo: 100, etiqueta: "Título", recomendado })), { tipo: "textoCorto", etiqueta: "Título", maximo: 100, recomendado });
+  assert.deepEqual(describir(textoCorto({ maximo: 10, etiqueta: "Corto" })), { tipo: "textoCorto", etiqueta: "Corto", maximo: 10 });
+});

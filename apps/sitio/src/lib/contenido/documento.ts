@@ -1,11 +1,26 @@
 import type { z } from "zod";
+import { CLAVE_SEO, esquemaSeo, type Seo } from "./seo";
 
-// El documento de una página es `{ [seccion]: contenido }` (SPEC §4.3). Acá
-// se completa y se valida contra el registro; no sabe de la base ni de ED.
+// El documento de una página es `{ [seccion]: contenido }` (SPEC §4.3), más su
+// SEO bajo la clave `seo` si la página lo tiene. Acá se completa y se valida
+// contra el registro; no sabe de la base ni de ED.
 
 export type SeccionRegistrada = { nombre: string; esquema: z.ZodType; inicial: unknown };
-export type PaginaRegistrada = { ruta: string; nombre: string; secciones: Record<string, SeccionRegistrada> };
+/** `seo` es el valor inicial del SEO de la página (lo de hoy); sin él, la página no tiene pestaña SEO. */
+export type PaginaRegistrada = { ruta: string; nombre: string; secciones: Record<string, SeccionRegistrada>; seo?: Seo };
 export type RegistroDePaginas = Record<string, PaginaRegistrada>;
+
+/** Una parte del documento: una sección, o el SEO con el esquema común. `undefined` si la página no la tiene. */
+export function parteDe(pagina: PaginaRegistrada, clave: string): SeccionRegistrada | undefined {
+  if (clave !== CLAVE_SEO) return propioDe(pagina.secciones, clave);
+  return pagina.seo === undefined ? undefined : { nombre: "SEO", esquema: esquemaSeo, inicial: pagina.seo };
+}
+
+/** Todas las partes del documento, en orden: las secciones y, si la página lo tiene, el SEO al final. */
+export function partesDe(pagina: PaginaRegistrada): Array<[string, SeccionRegistrada]> {
+  const seo = parteDe(pagina, CLAVE_SEO);
+  return seo ? [...Object.entries(pagina.secciones), [CLAVE_SEO, seo]] : Object.entries(pagina.secciones);
+}
 
 /** Lo que hay en una columna Json, leído como documento: un objeto por sección, o nada. */
 export function comoDocumento(json: unknown): Record<string, unknown> {
@@ -25,7 +40,7 @@ export function completarPagina(
   avisar: (mensaje: string) => void = console.warn,
 ): Record<string, unknown> {
   const completo: Record<string, unknown> = {};
-  for (const [clave, seccion] of Object.entries(pagina.secciones)) {
+  for (const [clave, seccion] of partesDe(pagina)) {
     if (!(clave in documento)) {
       completo[clave] = seccion.inicial;
       continue;

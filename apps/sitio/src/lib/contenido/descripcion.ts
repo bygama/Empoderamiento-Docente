@@ -2,10 +2,18 @@
 // etiqueta, largo y ayuda. Sin Zod adentro: sale del servidor como JSON y el
 // editor lo recorre en el navegador.
 
+/**
+ * Un largo que conviene no pasar sin que sea un tope: el SEO (Google corta el
+ * título hacia los 60 caracteres). Pasado, el admin lo dice con `aviso`, pero
+ * guarda igual. Es parte del «largo» con que se rotula el campo (AGENTS.md
+ * §12), no un tipo nuevo.
+ */
+export type Recomendado = { largo: number; aviso: string };
+
 type Base = { etiqueta: string; ayuda?: string };
 
 export type Descripcion =
-  | (Base & { tipo: "textoCorto"; maximo: number })
+  | (Base & { tipo: "textoCorto"; maximo: number; recomendado?: Recomendado })
   | (Base & { tipo: "parrafo"; maximo: number })
   | (Base & { tipo: "foto" })
   | (Base & { tipo: "rutaInterna"; opciones: string[] })
