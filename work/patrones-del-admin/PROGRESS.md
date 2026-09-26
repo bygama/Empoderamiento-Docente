@@ -17,8 +17,8 @@
 | 5 | Pestañas, en las cinco pantallas de Contenido | hecho, `7d17737` |
 | 6 | La lista, en Páginas | hecho, `7c8dde8` |
 | 7 | La guía de un módulo pasa a la Lista | hecho, `cc7ae4b` |
-| 8 | El estado vacío, en Métricas | hecho |
-| 9 | Las pantallas de acceso, con la marca | pendiente |
+| 8 | El estado vacío, en Métricas | hecho, `9935903` |
+| 9 | Las pantallas de acceso, con la marca | hecho |
 | 10 | DESIGN.md §11 y el README | pendiente |
 
 ## Registro
@@ -106,4 +106,22 @@
   typecheck` → exit 0; la búsqueda de `metricas/Estado`, `<Estado ` y
   `./Estado` en `apps/sitio/src` no encuentra nada. Con sesión, el Inicio
   muestra «Faltan las variables de Vercel» (la base local no tiene el token)
-  con el borde punteado.
+  con el borde punteado. Commit `9935903`.
+- **Paso 9** — `admin/armazon/Pantalla.tsx` recompuesto con
+  `frontend-design`: grilla de puntos (`--dots-alpha` 0,08) en todo el panel,
+  el **haz del faro** —una segunda capa de puntos (0,34) recortada por una cuña
+  cónica que sale de la lámpara del logo (110 × 70 px) y baja hacia el
+  formulario, apagada por un círculo de 250 px alrededor de la lámpara para
+  respetar el margen de seguridad del logo— solo desde `lg`, «Admin del
+  sitio» en blanco a `text-h1` del sitio (48 px, en dos líneas) abajo a la
+  izquierda, y un círculo `azul-medio` de 256 px que sale de la esquina de
+  abajo. En el celular: franja con puntos, logo a 144 px y «Admin del sitio»
+  en `text-admin-seccion` negrita blanca; el formulario va arriba. Los `page.tsx`
+  de acceso no cambian en este paso (su título ya se tocó en el paso 3) y los
+  `Formulario*.tsx` no se tocan. Iteraciones mirando capturas: el haz
+  horizontal se leía como una franja → en diagonal hacia el formulario; el
+  corte recto → arco centrado en la lámpara; a 1024 el círculo de 320 px
+  rozaba el título → 256 px. `pnpm --filter sitio typecheck` → exit 0; `pnpm
+  --filter sitio lint` → exit 0. A 390 × 844 (`orca exec "set viewport"`):
+  `scrollWidth` 390 en `entrar`, `olvide-mi-contrasena` y `nueva-contrasena`.
+  Capturas a 1568 × 921, 1024 × 768 y 390 × 844.
