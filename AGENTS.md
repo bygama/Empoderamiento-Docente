@@ -165,6 +165,9 @@ un release candidate de la 8 (ADR-0007).
             │   ├── cliente.ts   ← el PrismaClient de la app
             │   ├── auth.ts      ← la sesión, armada con esa base (y cómo salen sus correos)
             │   ├── bloqueos-de-acceso.ts ← dónde guarda el bloqueo por cuenta sus fallos
+            │   ├── sesion.ts    ← la sesión del pedido, preguntada una vez (sesionActual)
+            │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados)
+            │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
             │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, metricas, busquedas)
             │   ├── acciones/    ← Server Actions del admin (paginas, vista-previa, fotos, metricas, busquedas)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011)
