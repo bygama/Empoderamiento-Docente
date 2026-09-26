@@ -88,7 +88,7 @@
   credencial y sirve una sola vez; vencido, redirige con
   `error=INVALID_TOKEN` y el reset da 400. Aceptación: `pnpm --filter
   @ed/auth test` 43/43; `typecheck` y `lint` exit 0.
-- **Paso 6 — los correos que quedaban** (este commit). `elegiTuContrasena`
+- **Paso 6 — los correos que quedaban** (`323720a`). `elegiTuContrasena`
   suma `invitacion?: { quienInvita, rol }`: dice quién invita y con qué rol,
   y «si no esperabas esta invitación» en vez de «si no lo pediste».
   `correos/tu-correo-cambio.ts › tuCorreoCambio({ nombre, anterior, nuevo,
@@ -96,5 +96,29 @@
   `plantilla.ts` (la usan dos correos). Un test nuevo encontró «te invitó a
   el admin»: corregido a «al». Aceptación: `pnpm --filter sitio test` exit 0
   (155 pass, 1 saltado de antes); `typecheck` y `lint` exit 0.
+- **Paso 7 — entrar con código** (este commit). `FormularioEntrar`: si la
+  respuesta trae `twoFactorRedirect`, pide el código
+  (`twoFactor.sendOtp`) y va a `/admin/entrar/codigo?correo=d•••@…&volver=…`
+  con `envio=no-salio` o `envio=esperar` si no salió; el 403
+  `CUENTA_SUSPENDIDA` se dice en llano. `destinoSeguro` se mudó a
+  `entrar/destino.ts` (lo usan los dos pasos; test nuevo) y
+  `lib/correo/enmascarar.ts › enmascararCorreo` (test nuevo). La pantalla
+  `entrar/codigo/page.tsx` (`Pantalla`, título «Código para entrar», los
+  minutos desde `MINUTOS_DEL_CODIGO` del servidor) con `FormularioCodigo`:
+  el campo de 6 dígitos (`one-time-code`), la casilla «Recordar este
+  dispositivo 30 días» (la de `Campo.tsx`, `accent-azul-principal`), el
+  primario «Entrar», «Mandar otro» (terciario) y «Volver a entrar»; los
+  estados por código de error; y si el correo no salió, **no finge**: el
+  aviso de que no se pudo, a quién avisar y «Probar de nuevo». Aceptación:
+  `pnpm --filter sitio typecheck`, `lint` y `test` (158 pass, 1 saltado de
+  antes) exit 0; react-doctor 100/100 (arreglado por código un
+  `rerender-lazy-state-init`); con el dev server del 3017 y `crear-cuenta`
+  de las tres (dirige y administra quedaron con `twoFactorEnabled = t`):
+  `curl` a `/api/auth/sign-in/email` de administra →
+  `{"twoFactorRedirect":true,"twoFactorMethods":["otp"]}`; de edita → la
+  sesión; `GET /admin/entrar/codigo` → 200. Y el código de punta a punta
+  contra Postgres: `send-otp` → `{"status":true}`, el código leído de la
+  consola, `verify-otp` → la sesión; `twoFactor` con 0 filas y `actividad`
+  con un `entro` por persona.
 
 ## Abierto
