@@ -561,8 +561,9 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
   `azul-principal` en hover. El foco, el de siempre pero por dentro
   (`-outline-offset-2`): afuera lo cortaría el scroll horizontal.
 - **Sobre azul** (el encabezado del editor con cambios sin guardar): la
-  activa en blanco con su barra (13,63:1), las demás en `azul-claro`
-  (7,68:1) y el foco en `azul-claro`, porque el `azul-medio` ahí da 2,67:1.
+  activa en blanco con su barra (13,63:1 · 13,59:1 en el oscuro), las demás
+  en `azul-claro` (7,68:1 · 7,95:1) y el foco en `azul-claro`, porque el
+  `azul-medio` ahí da 2,67:1.
 - **En el celular** la fila scrollea de costado si no entra; las cinco de
   Contenido entran a 390 de ancho, las cinco de Métricas no y scrollean.
 - **El número de una pestaña llega con Mensajes**, su primer consumidor;
