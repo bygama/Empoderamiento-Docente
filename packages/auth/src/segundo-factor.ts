@@ -96,7 +96,11 @@ function alrededorDelCodigo({ registrar }: Pick<Opciones, "registrar">) {
   } satisfies BetterAuthPlugin;
 }
 
-export function segundoFactor({ mandarCodigo, registrar }: Opciones) {
+/**
+ * Una tupla y no un arreglo: better-auth deduce de cada plugin las columnas que
+ * suma a la cuenta (`twoFactorEnabled`), y en un arreglo mezclado las pierde.
+ */
+export function segundoFactor({ mandarCodigo, registrar }: Opciones): [ReturnType<typeof twoFactor>, ReturnType<typeof alrededorDelCodigo>] {
   return [
     twoFactor({
       otpOptions: {
