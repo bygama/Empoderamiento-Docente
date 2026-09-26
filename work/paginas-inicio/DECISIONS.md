@@ -39,3 +39,10 @@ Append-only: fecha — decisión — por qué.
   4. **El error en el campo mismo entra en esta lane:** es la base del editor
      que 4b y 4c consumen. Si resulta más grande de lo que parece, se le
      pregunta al padre antes de sacarlo.
+- 2026-09-26 — **Un componente del sitio importa de `features/*/contenido/`
+  solo tipos.** Los esquemas traen Zod: un valor importado desde ahí por un
+  componente cliente lo mete entero en el JS de la página (en «En números»
+  fueron +749.870 bytes en `/`, que comparar-render mostró). Lo que el
+  componente necesita correr —`partirCifra`— va en un módulo propio sin Zod
+  (`features/home/contenido/cifra.ts`). Lo mira comparar-render en cada
+  sección: los bytes de activos no pueden saltar.
