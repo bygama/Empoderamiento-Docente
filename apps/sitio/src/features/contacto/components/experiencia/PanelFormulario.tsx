@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import { ArrowRight, ArrowUpRight } from "@/components/ui/icons";
+import type { Envio } from "./contexto";
 import { MAILTO_CV, type Tema } from "./data";
 import { RailTema } from "./RailTema";
 import { CamposContacto } from "./CamposContacto";
@@ -8,6 +9,7 @@ type Props = {
   activo: boolean;
   temaActivo: Tema | undefined;
   temaIdx: number;
+  envio: Envio;
   onCambiar: () => void;
   onEnviar: (e: FormEvent<HTMLFormElement>) => void;
 };
@@ -16,7 +18,7 @@ type Props = {
  * 2 · FORMULARIO — breadcrumb de vuelta, el rail navy y el panel de campos
  * como UNA sola pieza, y la segunda puerta (sumarse al equipo) al pie.
  */
-export function PanelFormulario({ activo, temaActivo, temaIdx, onCambiar, onEnviar }: Props) {
+export function PanelFormulario({ activo, temaActivo, temaIdx, envio, onCambiar, onEnviar }: Props) {
   return (
     <div
       data-panel="formulario"
@@ -54,7 +56,7 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, onCambiar, onEnvi
           className="w-full lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-stretch"
         >
           <RailTema temaActivo={temaActivo} temaIdx={temaIdx} />
-          <CamposContacto />
+          <CamposContacto envio={envio} />
         </form>
 
         {/* Segunda puerta (sumarse al equipo): FUERA del contenedor,

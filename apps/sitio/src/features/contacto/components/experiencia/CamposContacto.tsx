@@ -1,14 +1,18 @@
 import { ArrowUpRight } from "@/components/ui/icons";
+import { MESES_DE_GUARDA } from "@/config/privacidad";
 import { siteConfig } from "@/config/site";
 import { PaisDropdown } from "../PaisDropdown";
+import type { Envio } from "./contexto";
 import { INPUT_BASE, LABEL_BASE } from "./estilos";
 
 /**
  * Panel claro de campos: emerge del navy del rail (sin borde izquierdo en
  * desktop, sin borde superior en mobile). Cada campo es un [data-campo] para
- * la cascada; la CTA de envío es el único naranja en pantalla.
+ * la cascada; la CTA de envío es el único naranja en pantalla. Mientras el
+ * mensaje viaja, la CTA dice «Enviando…»; si no salió, el error va arriba de
+ * ella, en `rojo-error` (6,57:1), y se anuncia en el acto.
  */
-export function CamposContacto() {
+export function CamposContacto({ envio }: { envio: Envio }) {
   return (
     <div className="border-azul-claro/50 grid content-center gap-x-8 gap-y-6 rounded-b-3xl border border-t-0 bg-white/80 p-6 backdrop-blur-sm md:grid-cols-2 md:p-8 lg:rounded-r-3xl lg:rounded-bl-none lg:border-t lg:border-l-0">
       <div data-campo>
@@ -51,21 +55,47 @@ export function CamposContacto() {
         />
       </div>
 
+      {/* El campo trampa: fuera de la vista, del lector y del tabulador. Una
+          persona lo deja vacío; un bot que completa todo, no. */}
+      <div aria-hidden="true" className="sr-only">
+        <label htmlFor="ct-web">No completes este campo</label>
+        <input id="ct-web" name="web" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      {envio.error ? (
+        <p role="alert" className="text-rojo-error text-center font-sans text-[0.9rem] leading-relaxed md:col-span-2">
+          {envio.error}
+        </p>
+      ) : null}
+
       {/* CTA primaria, centrada al pie del panel. */}
       <div data-campo className="mt-1 flex justify-center pt-1 md:col-span-2">
         {/* Espejo de ButtonPrimary como <button> de submit (el componente
             solo acepta href). Único naranja en pantalla. */}
         <button
           type="submit"
-          className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-[background-color,box-shadow] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
+          disabled={envio.enviando}
+          aria-busy={envio.enviando || undefined}
+          className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-[background-color,box-shadow] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 aria-busy:cursor-wait"
         >
-          <span>Enviar consulta</span>
+          <span>{envio.enviando ? "Enviando…" : "Enviar consulta"}</span>
           <ArrowUpRight
             size={16}
             className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
         </button>
       </div>
+
+      {/* Qué se hace con los datos y cuándo se borran, en llano. El plazo
+          sale de config/privacidad.ts, el mismo que usa el borrado. */}
+      <p data-campo className="text-gris-texto text-center font-sans text-[0.8rem] leading-relaxed md:col-span-2">
+        Usamos tus datos solo para responderte, y los borramos a los {MESES_DE_GUARDA.contacto} meses. Si querés que los
+        borremos antes, escribinos a{" "}
+        <a href={`mailto:${siteConfig.contacto.email}`} className="text-azul-principal underline underline-offset-2">
+          {siteConfig.contacto.email}
+        </a>
+        .
+      </p>
     </div>
   );
 }

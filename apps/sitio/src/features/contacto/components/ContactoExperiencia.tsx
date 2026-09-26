@@ -6,7 +6,7 @@ import { MathField } from "@/components/ui/MathField";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { TEMAS, type TemaKey, type Vista } from "./experiencia/data";
-import { panelDe, type Contexto, type Estado } from "./experiencia/contexto";
+import { panelDe, type Contexto, type Envio, type Estado } from "./experiencia/contexto";
 import { finIntro, montarIntro, saltarIntro } from "./experiencia/coreografia-intro";
 import { cambiarTema, elegirTema } from "./experiencia/coreografia-paneles";
 import { enviar, otraConsulta } from "./experiencia/coreografia-envio";
@@ -54,9 +54,9 @@ import { PanelCierre } from "./experiencia/PanelCierre";
  * captura (useSaltoIntro). Y si alguien no la quiere mirar, el gesto la
  * SALTEA en vez de quedar tragado — la intro se muestra, no se impone.
  *
- * Envío sin backend todavía: arma un mailto: con asunto y cuerpo precargados.
- * Cuando se integre Supabase se reemplaza por un insert (confirmar schema
- * antes — AGENTS.md §12).
+ * Envío: el formulario viaja a /api/contacto, que lo guarda para la bandeja
+ * del admin (work/mensajes/). Si sale bien, la transición al cierre de
+ * siempre; si no, se queda en el formulario con el error.
  *
  * Reduced-motion: se entra directo al selector, sin intro ni vuelos. El fondo
  * de nodos (MathField) queda vivo detrás siempre.
@@ -74,9 +74,8 @@ export function ContactoExperiencia() {
   const [vista, setVista] = useState<Vista>("hero");
   const [tema, setTema] = useState<TemaKey | null>(null);
   const [introListo, setIntroListo] = useState(false);
-  // Texto que armó el formulario: en el cierre se puede copiar tal cual y
-  // mandar por donde sea, por si el correo no se abrió.
-  const [mensajeListo, setMensajeListo] = useState("");
+  // El envío en curso y, si falló, qué decir en el formulario.
+  const [envio, setEnvio] = useState<Envio>({ enviando: false, error: null });
   // Timelines en curso, intro viva y ghosts: mutable, sin renders.
   const estado = useRef<Estado>({ animando: false, introVivo: true, introTl: null, desarmeTl: null, ghosts: [] });
 
@@ -94,7 +93,7 @@ export function ContactoExperiencia() {
     setVista,
     setTema,
     setIntroListo,
-    setMensajeListo,
+    setEnvio,
   });
 
   // ── Entrada inicial: el hero se arma y se desarma SOLO ──────────────────
@@ -180,15 +179,15 @@ export function ContactoExperiencia() {
           activo={vista === "formulario"}
           temaActivo={temaActivo}
           temaIdx={temaIdx}
+          envio={envio}
           onCambiar={() => cambiarTema(contexto())}
-          onEnviar={(e: FormEvent<HTMLFormElement>) => enviar(contexto(), e)}
+          onEnviar={(e: FormEvent<HTMLFormElement>) => void enviar(contexto(), e)}
         />
 
         {/* 3 · CIERRE */}
         <PanelCierre
           activo={vista === "cierre"}
           titulo={temaActivo?.titulo ?? "Consulta"}
-          mensaje={mensajeListo}
           onOtra={() => otraConsulta(contexto())}
         />
       </div>

@@ -15,6 +15,9 @@ export type Estado = {
   ghosts: HTMLElement[];
 };
 
+/** El envío del formulario: si está viajando y, si falló, qué decir. */
+export type Envio = { enviando: boolean; error: string | null };
+
 /**
  * Lo que las coreografías necesitan del compositor. Se arma en el momento de
  * usarlo — dentro de handlers y efectos, nunca en render: ahí no se leen refs.
@@ -29,7 +32,7 @@ export type Contexto = {
   setVista: Dispatch<SetStateAction<Vista>>;
   setTema: Dispatch<SetStateAction<TemaKey | null>>;
   setIntroListo: Dispatch<SetStateAction<boolean>>;
-  setMensajeListo: Dispatch<SetStateAction<string>>;
+  setEnvio: Dispatch<SetStateAction<Envio>>;
 };
 
 /** El panel de una vista, acotado al root de la experiencia. */

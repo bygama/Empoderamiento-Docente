@@ -4,13 +4,11 @@ type Props = {
   activo: boolean;
   /** Título del tema elegido (eco de qué conversación empezó). */
   titulo: string;
-  /** Texto que armó el formulario, para copiarlo tal cual si el correo no se abrió. */
-  mensaje: string;
   onOtra: () => void;
 };
 
 /** 3 · CIERRE — al enviar: «Cada propuesta empieza con una conversación.» */
-export function PanelCierre({ activo, titulo, mensaje, onOtra }: Props) {
+export function PanelCierre({ activo, titulo, onOtra }: Props) {
   return (
     <div
       data-panel="cierre"
@@ -38,12 +36,11 @@ export function PanelCierre({ activo, titulo, mensaje, onOtra }: Props) {
         Cada propuesta empieza con una conversación.
       </p>
       <p data-fin-bit className="text-gris-texto mt-6 max-w-[52ch] font-sans text-[0.98rem] leading-relaxed">
-        Dejamos tu mensaje listo en tu correo: revisalo y envialo cuando
-        quieras. Si no se abrió nada, copialo y mandalo por donde te quede
-        más cómodo.
+        Recibimos tu mensaje: te vamos a responder por correo. Si preferís,
+        también podés escribirnos directo.
       </p>
       <div data-fin-bit className="mt-5">
-        <CanalDirecto mensaje={mensaje} />
+        <CanalDirecto />
       </div>
       <button
         data-fin-bit
