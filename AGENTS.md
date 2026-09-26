@@ -168,12 +168,13 @@ un release candidate de la 8 (ADR-0007).
             │   ├── sesion.ts    ← la sesión del pedido, preguntada una vez (sesionActual)
             │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados)
             │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, metricas, busquedas)
-            │   ├── acciones/    ← Server Actions del admin (paginas, vista-previa, fotos, metricas, busquedas)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas)
+            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, choque)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011)
             ├── admin/         ← las pantallas del admin
             │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/)
-            │   ├── paginas/     ← «Páginas» y el editor (lista, barra, secciones)
+            │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)
             │   ├── campos/      ← los controles del formulario; se mudan a kit-admin en la fase 2
             │   └── <entidad>/   ← Lista, Formulario y sus límites (fase 2)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
@@ -576,8 +577,8 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 > `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
 > lo que hay. Lo único que todavía no existe es `packages/kit-admin`, que nace
 > en la fase 2 contra una entidad de verdad. De las tablas de contenido existen
-> `paginas` y `fotos` (`work/edicion-de-paginas/`); las de las entidades llegan
-> con ellas.
+> `paginas`, `versiones_de_paginas` y `fotos` (spec del admin §6); las de las
+> entidades llegan con ellas.
 
 Reglas para el admin y sus datos:
 
@@ -687,6 +688,11 @@ define al implementar cada fase.
       borrador, vista previa (Draft Mode) y publicar, y las fotos en Blob o en
       disco. El hero del sitio lee por props. Diseño en
       `work/edicion-de-paginas/`.
+- [x] **Páginas, fase B — Inicio entero y la base de la edición:** las seis
+      secciones que faltaban, `versiones_de_paginas` (las últimas 10, con
+      «Restaurar como borrador»), «Qué cambió», el aviso de choque en toda
+      escritura del borrador, el error en el campo y la pestaña SEO por
+      página. Las otras seis páginas la usan tal cual (spec del admin §6).
 - [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
       novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`.
 - [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
