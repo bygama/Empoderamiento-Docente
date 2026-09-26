@@ -4,9 +4,10 @@
 // documento. Es la divergencia más grande con el spec del admin (§12).
 
 /// Una fila por página del sitio. Dos versiones del contenido: la que lee el
-/// sitio y la que se está editando. Sin historial: eso quedó fuera de alcance.
-/// `publicado` en null significa «esta página todavía muestra el contenido
-/// inicial del código»; `borrador` en null, «el borrador es lo publicado».
+/// sitio y la que se está editando; cada publicación deja además su versión en
+/// `versiones_de_paginas`. `publicado` en null significa «esta página todavía
+/// muestra el contenido inicial del código»; `borrador` en null, «el borrador
+/// es lo publicado».
 model Pagina {
   slug         String    @id            // inicio | que-hacemos | …
   publicado    Json?                    // { seccion: contenido } validado
@@ -16,7 +17,26 @@ model Pagina {
   borradorEn   DateTime?
   borradorPor  String?
 
+  versiones VersionDePagina[]
+
   @@map("paginas")
+}
+
+/// Cada publicación de una página: el documento que quedó en el sitio, quién y
+/// cuándo (`work/paginas-inicio/SPEC.md` §3). Se guardan las últimas 10 por
+/// página: publicar poda las más viejas en la misma transacción. «Restaurar
+/// como borrador» lee de acá. Las columnas se llaman como las de `paginas`,
+/// que es de donde salen.
+model VersionDePagina {
+  id           String   @id @default(uuid())
+  slug         String
+  pagina       Pagina   @relation(fields: [slug], references: [slug], onDelete: Cascade)
+  documento    Json                   // el `publicado` que dejó esa publicación
+  publicadoEn  DateTime @default(now())
+  publicadoPor String                 // nombre de la cuenta, en llano
+
+  @@index([slug, publicadoEn(sort: Desc)])
+  @@map("versiones_de_paginas")
 }
 
 /// Una foto subida desde el admin. `alt` es obligatorio (AGENTS.md §6). El
