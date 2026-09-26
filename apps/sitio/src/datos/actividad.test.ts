@@ -1,0 +1,63 @@
+import { after, test } from "node:test";
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+import { config as cargarEntorno } from "dotenv";
+
+// Contra la base de verdad: la validación, la clave foránea con RESTRICT y que
+// registrar no tire nunca solo se ven con la tabla de verdad.
+cargarEntorno({ path: [".env.local"], quiet: true });
+const hayBase = Boolean(process.env.DATABASE_URL);
+const sinBase = { skip: !hayBase && "sin DATABASE_URL" };
+
+const creadas: string[] = [];
+
+async function crearCuenta(): Promise<string> {
+  const { base } = await import("@/datos/cliente");
+  const id = randomUUID();
+  creadas.push(id);
+  await base.user.create({ data: { id, name: "Prueba", email: `prueba-${id}@ed.test` } });
+  return id;
+}
+
+after(async () => {
+  if (!hayBase) return;
+  const { base } = await import("@/datos/cliente");
+  await base.actividad.deleteMany({ where: { cuentaId: { in: creadas } } });
+  await base.user.deleteMany({ where: { id: { in: creadas } } });
+  await base.$disconnect();
+});
+
+test("registra quién, qué, sobre qué y cuándo", sinBase, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { registrarActividad } = await import("./actividad");
+  const quien = await crearCuenta();
+  await registrarActividad({ tipo: "cambio-su-nombre", quien, sobre: "  Ana María  " });
+  const filas = await base.actividad.findMany({ where: { cuentaId: quien } });
+  assert.equal(filas.length, 1);
+  assert.equal(filas[0]?.tipo, "cambio-su-nombre");
+  assert.equal(filas[0]?.sobre, "Ana María");
+  assert.ok(filas[0] && Date.now() - filas[0].en.getTime() < 60_000);
+});
+
+test("un tipo que no está en la lista no se guarda, y no tira", sinBase, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { registrarActividad } = await import("./actividad");
+  const quien = await crearCuenta();
+  await registrarActividad({ tipo: "borro-todo" as never, quien });
+  assert.equal(await base.actividad.count({ where: { cuentaId: quien } }), 0);
+});
+
+test("si la base no la guarda, registrar no tira", sinBase, async () => {
+  const { registrarActividad } = await import("./actividad");
+  // Una cuenta que no existe: la clave foránea la rechaza.
+  await assert.doesNotReject(registrarActividad({ tipo: "entro", quien: randomUUID() }));
+});
+
+test("una cuenta con actividad no se puede borrar", sinBase, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { registrarActividad } = await import("./actividad");
+  const quien = await crearCuenta();
+  await registrarActividad({ tipo: "entro", quien });
+  await assert.rejects(base.user.delete({ where: { id: quien } }));
+  assert.ok(await base.user.findUnique({ where: { id: quien } }));
+});
