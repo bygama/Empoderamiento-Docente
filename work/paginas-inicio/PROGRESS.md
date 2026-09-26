@@ -30,12 +30,49 @@ Medido sobre `8b53269`:
 - 2026-09-26 — SPEC aprobado por el padre con cuatro cambios (DECISIONS);
   PLAN escrito, 19 pasos. Arranca work-run.
 - 2026-09-26 — Los 19 pasos hechos y verificados (abajo), más un arreglo de
-  la verificación (`ccad5bf`, el contraste del oscuro en DESIGN.md). Falta la
-  revisión de cierre, que lanza el padre al recibir `worker_done` (1 revisor
-  Opus 5.5, effort medium, lente «el cambio entero contra su SPEC»), y el
-  merge, que es suyo.
+  la verificación (el contraste del oscuro en DESIGN.md).
+- 2026-09-26 — **En pausa, a la espera de la revisión de cierre.** Rebaseada
+  sobre `main` `5a07368` con lo que pidió el padre (capacidades, actividad,
+  pestañas de `main`, migración regenerada) y verificada otra vez. La revisión
+  la lanza el padre al recibir `worker_done` (1 revisor Opus 5.5, effort
+  medium, lente «el cambio entero contra su SPEC»); el merge es suyo. Para
+  retomar: leer este archivo y DECISIONS; la base `ed_paginasinicio` tiene
+  las 13 migraciones y ninguna fila en `paginas`.
 
 ## Verification
+
+### 2026-09-26 — L DoD después del rebase sobre `origin/main` `5a07368`, sobre `55531db` — PASS (falta la revisión de cierre, del padre)
+
+- Rebase: 24 commits sobre `main` con roles y actividad (#182), seguridad
+  (#180) y Métricas (#181); conflictos en `ruta.ts`/`ruta.test.ts`/
+  `Pestanas.tsx` (queda la `pestanaActiva` de `main`), DESIGN.md §11, README y
+  AGENTS.md §3, resueltos juntando las dos lanes. La migración se regeneró
+  como `20260926231213_versiones_de_paginas` (DECISIONS). Commit nuevo
+  `877f1ef`: capacidades y actividad.
+- L1 static: `pnpm typecheck` → exit 0 (después de borrar `.next/types`,
+  tipos generados por un build viejo que apuntaban a `api/cron/metricas`) ·
+  `pnpm lint` → exit 0 · `node scripts/verificar-react-doctor.mjs` → exit 0
+  («100/100, sin diagnósticos (apps/sitio/src: 533 archivos · packages/db/src:
+  3 archivos · packages/auth/src: 17 archivos)»).
+- L2 behavioral: `pnpm test` → exit 0 (`@ed/auth` 28 pasan; la app «tests
+  178 · pass 177 · fail 0 · skipped 1», con `acciones-con-sesion` exigiendo
+  sesión y capacidad en todas las acciones de esta lane, ya fuera de
+  `SIN_CAPACIDAD`) · `pnpm migrate:status` → exit 0 («13 migrations found…
+  up to date», sobre `ed_paginasinicio` recreada) · `pnpm build` → exit 0.
+- L2 render: referencia nueva construida desde `origin/main` `5a07368` en este
+  checkout (`<%TEMP%>/ed-paginas-inicio/antes-main`); `node
+  scripts/comparar-render.mjs … apps/sitio` → exit 0, «11 páginas, render
+  idéntico» (`index.html` 26→28 activos, −8.320 bytes: el bundler parte
+  distinto, los bytes bajan).
+- L3 end-to-end (dev server reiniciado por el cliente de Prisma nuevo, cuenta
+  recreada, perfil aislado): publicar dos veces desde el editor, restaurar la
+  primera desde Versiones y descartar desde «Qué cambió» → avisos «Publicado…»
+  ×2, «Se restauró como borrador…», borrador descartado; la tabla `actividad`
+  tiene `publico-una-pagina` ×2, `restauro-una-version` y
+  `descarto-un-borrador`, los cuatro sobre «Inicio» / `inicio`. El resto del
+  recorrido y la pasada de temas, 390 y teclado son los del bloque de abajo:
+  esta lane no tocó UI en el rebase (solo `Pestanas.tsx` para volver a la
+  función de `main`).
 
 ### 2026-09-26 — L DoD sobre `ccad5bf` — PASS (falta la revisión de cierre, del padre)
 
