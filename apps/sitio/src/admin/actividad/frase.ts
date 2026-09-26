@@ -12,6 +12,9 @@ const pagina = (sobre: string | null | undefined) => sobre ?? "una página";
  */
 const mensaje = (sobre: string | null | undefined) => (sobre && sobre !== "Contacto" ? `un mensaje sobre ${sobre}` : "un mensaje de Contacto");
 
+/** La otra cuenta, por el nombre que tenía cuando se tocó; sin él, «alguien». */
+const persona = (sobre: string | null | undefined) => sobre ?? "alguien";
+
 // Un verbo en pasado sobre quien lo hizo, como lo diría una persona. Es un
 // Record para que un tipo nuevo no compile hasta tener su frase.
 const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
@@ -28,6 +31,19 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "marco-un-mensaje-como-spam": ({ quien }) => `${quien} marcó un mensaje como spam`,
   "borro-un-mensaje": ({ quien }) => `${quien} borró un mensaje de Contacto`,
   "borro-un-cv": ({ quien }) => `${quien} borró un CV`,
+  "activo-el-segundo-factor": ({ quien }) => `${quien} activó su segundo factor`,
+  "desactivo-el-segundo-factor": ({ quien }) => `${quien} desactivó su segundo factor`,
+  // Cuentas: `sobre` es la otra persona, como se llamaba entonces.
+  invito: ({ quien, sobre }) => `${quien} invitó a ${persona(sobre)}`,
+  "reenvio-la-invitacion": ({ quien, sobre }) => `${quien} le reenvió la invitación a ${persona(sobre)}`,
+  "cancelo-la-invitacion": ({ quien, sobre }) => `${quien} canceló la invitación de ${persona(sobre)}`,
+  "cambio-el-rol": ({ quien, sobre }) => `${quien} cambió el rol de ${persona(sobre)}`,
+  "cambio-el-correo": ({ quien, sobre }) => `${quien} cambió el correo de ${persona(sobre)}`,
+  suspendio: ({ quien, sobre }) => `${quien} suspendió a ${persona(sobre)}`,
+  reactivo: ({ quien, sobre }) => `${quien} reactivó a ${persona(sobre)}`,
+  "borro-una-cuenta": ({ quien, sobre }) => `${quien} borró la cuenta de ${persona(sobre)}`,
+  "paso-la-direccion": ({ quien, sobre }) => `${quien} le pasó la dirección a ${persona(sobre)}`,
+  "cerro-las-sesiones": ({ quien, sobre }) => `${quien} cerró las sesiones de ${persona(sobre)}`,
 };
 
 /**

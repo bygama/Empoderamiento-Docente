@@ -35,6 +35,17 @@ export const TIPOS_DE_ACTIVIDAD = [
   "borro-un-cv",
   "activo-el-segundo-factor",
   "desactivo-el-segundo-factor",
+  // Cuentas: `sobre` es el nombre de la otra persona, como era; `sobreId`, su cuenta.
+  "invito",
+  "reenvio-la-invitacion",
+  "cancelo-la-invitacion",
+  "cambio-el-rol",
+  "cambio-el-correo",
+  "suspendio",
+  "reactivo",
+  "borro-una-cuenta",
+  "paso-la-direccion",
+  "cerro-las-sesiones",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
@@ -43,8 +54,9 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * la misma regla en los dos lados. Un tipo nuevo no compila hasta decir quién
  * lo ve. Entrar, salir y lo que alguien cambia de su propia cuenta es de las
  * cuentas: lo ve quien usa Cuentas. Lo que se hace con una página lo ve quien
- * edita el contenido; con un mensaje de Contacto, quien ve Contacto; y que se
- * borró un CV, solo quien ve los CV.
+ * edita el contenido; con un mensaje de Contacto, quien ve Contacto; que se
+ * borró un CV, solo quien ve los CV; y lo que se le hace a otra cuenta, quien
+ * usa Cuentas.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -59,14 +71,26 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "marco-un-mensaje-como-spam": "verContacto",
   "borro-un-mensaje": "verContacto",
   "borro-un-cv": "verCV",
+  "activo-el-segundo-factor": "usarCuentas",
+  "desactivo-el-segundo-factor": "usarCuentas",
+  invito: "usarCuentas",
+  "reenvio-la-invitacion": "usarCuentas",
+  "cancelo-la-invitacion": "usarCuentas",
+  "cambio-el-rol": "usarCuentas",
+  "cambio-el-correo": "usarCuentas",
+  suspendio: "usarCuentas",
+  reactivo: "usarCuentas",
+  "borro-una-cuenta": "usarCuentas",
+  "paso-la-direccion": "usarCuentas",
+  "cerro-las-sesiones": "usarCuentas",
 };
 
 /**
  * Si el tipo va a la actividad reciente del Inicio. Van los que cambian algo
- * del sitio o del admin (publicar, descartar, restaurar, y lo que sumen los
- * módulos); los de la sesión y de la cuenta propia no, porque taparían lo que
- * el Inicio tiene que contar: siguen en Cuentas › Actividad. Un tipo nuevo no
- * compila hasta decidirlo.
+ * del sitio o del admin (publicar, descartar, restaurar, lo que se le hace a
+ * otra cuenta, y lo que sumen los módulos); los de la sesión y de la cuenta
+ * propia no, porque taparían lo que el Inicio tiene que contar: siguen en
+ * Cuentas › Actividad. Un tipo nuevo no compila hasta decidirlo.
  */
 export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   entro: false,
@@ -81,6 +105,18 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "marco-un-mensaje-como-spam": true,
   "borro-un-mensaje": true,
   "borro-un-cv": true,
+  "activo-el-segundo-factor": false,
+  "desactivo-el-segundo-factor": false,
+  invito: true,
+  "reenvio-la-invitacion": true,
+  "cancelo-la-invitacion": true,
+  "cambio-el-rol": true,
+  "cambio-el-correo": true,
+  suspendio: true,
+  reactivo: true,
+  "borro-una-cuenta": true,
+  "paso-la-direccion": true,
+  "cerro-las-sesiones": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */
@@ -91,6 +127,10 @@ export function tiposQueVe(rol: unknown): TipoDeActividad[] {
 /** Los que ese rol ve en el Inicio: los que puede ver y van al Inicio. */
 export function tiposDelInicio(rol: unknown): TipoDeActividad[] {
   return tiposQueVe(rol).filter((tipo) => VA_AL_INICIO[tipo]);
+}
+
+export function esTipoDeActividad(valor: string): valor is TipoDeActividad {
+  return (TIPOS_DE_ACTIVIDAD as readonly string[]).includes(valor);
 }
 
 const esquema = z.object({
