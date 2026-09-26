@@ -92,6 +92,26 @@ export const PUEDE = {
 
 export type Capacidad = keyof typeof PUEDE;
 
+/**
+ * Qué permite cada capacidad, en llano y en el orden de `PUEDE`: las filas de
+ * «Qué puede cada rol», en Cuentas, que recorre esto y `PUEDE` en vez de
+ * escribir la tabla otra vez.
+ */
+export const QUE_PERMITE = {
+  editarContenido: "Editar y publicar el contenido: páginas, casos, equipo, fotos y aliados",
+  autorizarAliados: "Marcar un aliado como autorizado, para que su logo se publique",
+  editarNovedades: "Editar y publicar las novedades",
+  editarBiblioteca: "Editar y publicar los materiales de la Biblioteca",
+  verContacto: "Leer y contestar los mensajes de contacto",
+  verCV: "Ver los CV que mandan las y los docentes",
+  verMetricas: "Ver las métricas",
+  usarCuentas: "Invitar, suspender y cambiar el rol de las cuentas, y ver la actividad",
+  tocarLaCuentaDeQuienDirige: "Cambiar el correo de la cuenta de quien dirige",
+  pasarLaDireccion: "Pasarle la dirección a otra persona",
+  usarAjustes: "Cambiar los ajustes del sitio",
+  configurarConexiones: "Conectar los servicios de afuera, como Search Console",
+} as const satisfies Record<Capacidad, string>;
+
 /** Si ese rol tiene esa capacidad. Lo que no es uno de los tres roles no puede nada. */
 export function puede(rol: unknown, capacidad: Capacidad): boolean {
   const roles: readonly Rol[] = PUEDE[capacidad];
