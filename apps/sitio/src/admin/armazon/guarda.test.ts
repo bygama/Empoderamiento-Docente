@@ -13,7 +13,9 @@ import { MODULOS } from "./barra-lateral/modulos";
 const PROTEGIDO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../app/(admin)/admin/(protegido)");
 
 /** Las carpetas de `(protegido)/` que no son un módulo de la sidebar, con su motivo. */
-const SIN_GUARDA: Record<string, string> = {};
+const SIN_GUARDA: Record<string, string> = {
+  "mi-cuenta": "la cuenta propia es de toda sesión, como el Inicio: no hay rol que no la tenga",
+};
 
 /** El código sin comentarios: una guarda comentada no es una guarda. */
 function sinComentarios(fuente: string): string {

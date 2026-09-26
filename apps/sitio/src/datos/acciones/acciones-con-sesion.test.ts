@@ -32,6 +32,10 @@ const SIN_SESION: Record<string, { acciones: string[]; motivo: string }> = {
  * la dueña suma el `puede(…)` al rebasear y saca su línea de acá.
  */
 const SIN_CAPACIDAD: Record<string, { acciones: string[]; motivo: string }> = {
+  "datos/acciones/mi-cuenta.ts": {
+    acciones: ["cambiarMiNombre"],
+    motivo: "es la cuenta propia: la tiene todo rol con sesión, como el Inicio (SPEC de roles-y-actividad §3)",
+  },
   "datos/acciones/paginas.ts": {
     acciones: ["guardarBorrador", "publicar", "descartarBorrador"],
     motivo: "es de la lane paginas-inicio (4a): suma puede(…, \"editarContenido\") y el registro de actividad al rebasear sobre roles-y-actividad",
