@@ -12,8 +12,8 @@
 | --- | --- | --- |
 | 1 | `listaDePaginas()` trae el estado y las secciones | hecho, `cb6fc19` |
 | 2 | Páginas se muda a `/admin/contenido/paginas` | hecho, `5e6eabf` |
-| 3 | Título de pestaña | hecho |
-| 4 | El índice de tarjetas, en `/admin/contenido` | pendiente |
+| 3 | Título de pestaña | hecho, `e8a280a` |
+| 4 | El índice de tarjetas, en `/admin/contenido` | hecho |
 | 5 | Pestañas, en las cinco pantallas de Contenido | pendiente |
 | 6 | La lista, en Páginas | pendiente |
 | 7 | La guía de un módulo pasa a la Lista | pendiente |
@@ -52,3 +52,16 @@
   `/admin/novedades` → «Novedades · Admin ED», `/admin/contenido` →
   «Contenido · Admin ED». `<title>` por `curl.exe`: «Entrar · Admin ED»,
   «Olvidé mi contraseña · Admin ED», «Nueva contraseña · Admin ED».
+  Commit `e8a280a`.
+- **Paso 4** — `admin/armazon/IndiceDeTarjetas.tsx` (el link es el nombre y
+  su `::after` cubre la tarjeta; lo demás va como `aria-describedby`; el foco
+  con `has-[a:focus-visible]` en el `li`), `admin/contenido/pantallas.ts` (las
+  cinco pantallas, una lista para pestañas y tarjetas), `IndiceDeContenido`,
+  `admin/paginas/resumen.ts` con su test, y `contenido/page.tsx`. La guía del
+  módulo Contenido sale de `guias.ts`. `pnpm --filter sitio typecheck` → exit
+  0; `pnpm --filter sitio test` → exit 0 (78 tests, 77 pass, 1 skipped). En
+  `/admin/contenido` (`orca snapshot` + captura): cinco tarjetas, links
+  «Páginas» y «Casos» con su nombre solo; Páginas dice «7 páginas» (la base
+  `ed` no tiene borradores hoy) y las otras cuatro «Por hacer»; con Tab desde
+  el `h1`, el foco cae en «Páginas» (`:focus-visible` true) y el anillo rodea
+  la tarjeta entera.
