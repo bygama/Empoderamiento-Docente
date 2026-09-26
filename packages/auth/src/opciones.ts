@@ -30,7 +30,7 @@ export type OpcionesDeAuth = {
     minutosDeVigencia: number;
   }) => Promise<void>;
   /** Manda el aviso de «tu contraseña cambió». */
-  avisarCambioDeContrasena: (datos: { para: string; nombre?: string }) => Promise<void>;
+  avisarCambioDeContrasena: (datos: { para: string; nombre?: string; cuando: Date }) => Promise<void>;
   /**
    * Corre una tarea después de contestar, sin que la respuesta la espere (en
    * Next, `after()`). Los correos salen por acá: si la respuesta esperara al

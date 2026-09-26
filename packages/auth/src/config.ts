@@ -71,7 +71,7 @@ export function crearAuth({
         // better-auth espera a este callback antes de contestar, así que el
         // aviso se manda a segundo plano acá mismo.
         segundoPlano(
-          avisarCambioDeContrasena({ para: user.email, nombre: user.name || undefined }).catch((e: unknown) => {
+          avisarCambioDeContrasena({ para: user.email, nombre: user.name || undefined, cuando: new Date() }).catch((e: unknown) => {
             console.error("No salió el aviso de contraseña cambiada:", e instanceof Error ? e.message : e);
           }),
         );
