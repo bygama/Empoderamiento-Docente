@@ -141,6 +141,7 @@ Siete entidades, más las páginas y los ajustes:
 | `aliados` | nombre, logo, URL, **autorizado** (sin marcar no se publica: §5.4) | `config/aliados.ts` |
 | `cuentas` | mail, nombre, rol | no existe |
 | `paginas` | una fila por página, con su pestaña de SEO | los componentes y sus `data.ts` |
+| `versiones_de_paginas` | cada publicación de una página: el documento, quién y cuándo; las últimas 10 | no existe |
 | `ajustes` | contacto, dirección, países, redes, personas de referencia | `config/site.ts` |
 
 **Estructura fija, en el modelo.** Las listas coreografiadas llevan cantidad
@@ -160,6 +161,17 @@ esquema Zod al guardar y otra vez al publicar. Sus textos no pasan a columnas
 sino a campos del esquema, con el mismo nombre en español. Las entidades
 (novedades, materiales, casos, equipo, aliados) siguen con una
 columna por texto.
+
+**Versiones de las páginas** (2026-09-26, `work/paginas-inicio/`): cada
+publicación guarda el documento que dejó, con quién y cuándo, en
+`versiones_de_paginas`, en la misma transacción que publica; quedan las
+últimas 10 por página. «Restaurar como borrador» vuelve a poner una versión
+en el borrador, validada contra los esquemas de hoy, y dice qué no entró; no
+publica. Antes de publicar, «Qué cambió» compara el borrador con lo publicado
+campo por campo. El SEO de cada página vive en el mismo documento, bajo la
+clave `seo`, así tiene borrador, versiones y «qué cambió» como las secciones.
+Toda escritura del borrador trae lo que vio la pantalla y, si otra persona
+guardó mientras tanto, no pisa: avisa y ofrece recargar.
 
 ## 7. Acceso y seguridad
 
@@ -286,9 +298,10 @@ generador se queda en la app.
 
 ## 11. Fuera de alcance
 
-- **Historial de versiones con restaurar, autoguardado y bloqueo de documento
-  concurrente.** Son cerca de un tercio del trabajo y, con tres editoras y los
-  backups de Neon, no compran lo que cuestan. Se pueden sumar después.
+- **Autoguardado y bloqueo de documento concurrente.** Con tres editoras, el
+  aviso de choque alcanza: nadie pisa lo que otra guardó sin verlo. El
+  historial de versiones con restaurar, que estaba acá, entró para las
+  páginas el 2026-09-26 (§6).
 - Editor de texto enriquecido, más de un idioma, comentarios.
 - Analíticas: quedaron afuera de este diseño y entran aparte, como módulo que
   no depende del kit, por el [ADR-0009](../adrs/0009-analitica-de-vercel-con-copia-diaria.md)

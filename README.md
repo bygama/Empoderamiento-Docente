@@ -230,7 +230,7 @@ Prisma antes de `next build`.
 Vive en `/admin`, construido a medida sobre **Prisma** y **better-auth**. Hoy
 tiene los cimientos —entrar, salir y elegir contraseña—, la portada con las
 métricas, **Métricas con sus búsquedas en Google** (ver «Las métricas y lo
-programado») y **la edición del hero de Inicio** (ver «Editar las páginas»); las
+programado») y **la edición de Inicio** (ver «Editar las páginas»); las
 novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
@@ -281,19 +281,38 @@ ahí en más, la dirección se pasa desde Cuentas.
 ### Editar las páginas
 
 En Contenido › Páginas (`/admin/contenido/paginas`) están las siete del sitio
-en el orden del menú; por ahora se
-edita el **hero de Inicio** (textos, botones y las 11 + 8 fotos con sus
-carteles), y cada sección nueva se suma escribiendo su esquema en
-`src/features/<pagina>/contenido/` y anotándola en `src/contenido/paginas.ts`.
+en el orden del menú. Por ahora se edita **Inicio entero**: el hero, «¿Quiénes
+somos?», «Misión», «En números», «Cómo trabajamos», «Áreas de especialización»
+y los textos de «Biblioteca y Novedades». Cada sección nueva se suma escribiendo
+su esquema en `src/features/<pagina>/contenido/` y anotándola en
+`src/contenido/paginas.ts`, y el SEO de una página, con su `seo` en el mismo
+registro.
+
+La pantalla de una página tiene cuatro pestañas:
+
+- **Secciones** — los textos y las fotos. Lo resaltado se escribe entre
+  **dobles asteriscos** («Somos `**una idea**`»), y cada campo que no pasa
+  muestra su error ahí mismo.
+- **SEO** — el título, la descripción y la imagen para redes, con cómo se ven
+  en Google y al compartir el link. Los contadores avisan pasados los 60 y 160
+  caracteres que muestra Google, pero no frenan.
+- **Qué cambió** — el borrador contra lo publicado, campo por campo. Se puede
+  publicar desde ahí.
+- **Versiones** — las últimas 10 publicaciones, con quién y cuándo, y
+  «Restaurar como borrador», que avisa lo que ya no entra en el esquema de hoy.
+
 Guardar **no publica**: cada página tiene un borrador y una versión publicada;
 «Vista previa» abre el sitio con el borrador (Draft Mode de Next, solo con
-sesión, con una franja abajo para volver) y «Publicar» lo pasa al sitio y
-regenera la página. Las fotos se suben desde el formulario (jpg, png o webp de
-hasta 4 MB, con texto alternativo obligatorio y punto de foco): con
+sesión, con una franja abajo para volver) y «Publicar» lo pasa al sitio,
+regenera la página y guarda la versión. Si otra persona guardó el borrador
+mientras tanto, nada se pisa: el aviso dice quién y cuándo, y ofrece
+«Recargar». Las fotos se suben desde el formulario (jpg, png o webp de hasta
+4 MB, con texto alternativo obligatorio y punto de foco): con
 `BLOB_READ_WRITE_TOKEN` van a Vercel Blob; sin él, a `apps/sitio/.fotos/`
 (git-ignorada), servida por `/api/fotos/<id>`. Sin base el sitio muestra el
-contenido inicial del código y carga igual. Diseño y decisiones en
-[`work/edicion-de-paginas/`](work/edicion-de-paginas/).
+contenido inicial del código y carga igual. El diseño está en el
+[spec del admin](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
+(§6).
 
 > **No compartas una base con fotos locales entre entornos:** una foto subida
 > sin `BLOB_READ_WRITE_TOKEN` queda con una URL de disco (`/api/fotos/<id>`
