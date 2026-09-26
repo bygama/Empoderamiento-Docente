@@ -9,8 +9,8 @@ export type { Usuario };
 type Props = {
   usuario: Usuario;
   tema: Tema;
-  /** Si ve Cuentas y Ajustes. */
-  conConfiguracion: boolean;
+  /** Las claves de los módulos que su rol puede usar (`modulos.ts`). */
+  visibles: readonly string[];
   /** Las claves de los módulos que llevan el punto de «cambios sin publicar». */
   conPunto: readonly string[];
 };
@@ -24,7 +24,7 @@ type Props = {
  * oscuro, y el nombre al lado, en texto: por eso la imagen no lleva `alt`.
  * Un divisor separa la marca del menú, igual que el que separa la cuenta.
  */
-export function ContenidoDeLaBarra({ usuario, tema, conConfiguracion, conPunto }: Props) {
+export function ContenidoDeLaBarra({ usuario, tema, visibles, conPunto }: Props) {
   return (
     <div className="flex h-full flex-col">
       <div className="px-4 pt-5">
@@ -43,7 +43,7 @@ export function ContenidoDeLaBarra({ usuario, tema, conConfiguracion, conPunto }
         </Link>
         <hr className="mx-3 mt-4 border-azul-claro/60" />
       </div>
-      <MenuDelAdmin conConfiguracion={conConfiguracion} conPunto={conPunto} />
+      <MenuDelAdmin visibles={visibles} conPunto={conPunto} />
       <MenuDeLaCuenta usuario={usuario} tema={tema} />
     </div>
   );

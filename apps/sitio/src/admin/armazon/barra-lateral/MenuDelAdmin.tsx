@@ -20,8 +20,12 @@ function PuntoSinPublicar() {
   );
 }
 
-export function MenuDelAdmin({ conConfiguracion, conPunto }: { conConfiguracion: boolean; conPunto: readonly string[] }) {
+export function MenuDelAdmin({ visibles, conPunto }: { visibles: readonly string[]; conPunto: readonly string[] }) {
   const segmento = primerSegmento(usePathname());
+  const deSuRol = (modulos: readonly Modulo[]) => modulos.filter((m) => visibles.includes(m.clave));
+  // Un grupo sin nada que su rol pueda usar no se dibuja, ni su divisor.
+  const grupos = GRUPOS.map(deSuRol).filter((g) => g.length > 0);
+  const configuracion = deSuRol(CONFIGURACION);
   const entrada = (m: Modulo) => (
     <li key={m.clave}>
       <ItemDeNavegacion href={m.href} activo={m.segmentos.includes(segmento)} Icono={m.Icono}>
@@ -33,15 +37,15 @@ export function MenuDelAdmin({ conConfiguracion, conPunto }: { conConfiguracion:
   return (
     // En columna, para que la configuración baje sola hasta el pie con `mt-auto`.
     <nav aria-label="Navegación del admin" className="flex flex-1 flex-col overflow-y-auto px-4 pt-3 pb-3">
-      {GRUPOS.map((grupo, i) => (
+      {grupos.map((grupo, i) => (
         <div key={grupo[0]?.clave}>
           {i > 0 ? <hr className={DIVISOR} /> : null}
           <ul className="space-y-1">{grupo.map(entrada)}</ul>
         </div>
       ))}
-      {conConfiguracion ? (
+      {configuracion.length > 0 ? (
         <div className="mt-auto pt-6">
-          <ul className="space-y-1">{CONFIGURACION.map(entrada)}</ul>
+          <ul className="space-y-1">{configuracion.map(entrada)}</ul>
         </div>
       ) : null}
     </nav>
