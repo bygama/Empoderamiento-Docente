@@ -152,7 +152,7 @@ un release candidate de la 8 (ADR-0007).
         ├── public/        ← assets estáticos (brand/, imágenes)
         ├── prisma/        ← el modelo de datos
         │   ├── schema/      ← base · auth · sitio (contenido: fase 2)
-        │   └── migrations/  ← generadas, se commitean, nunca a mano
+        │   └── migrations/  ← generadas, se commitean; una aplicada no se toca (§12)
         ├── (config)       ← tsconfig.json, eslint.config.mjs,
         │                     next.config.ts, postcss.config.mjs
         └── src/
@@ -165,8 +165,9 @@ un release candidate de la 8 (ADR-0007).
             │   ├── cliente.ts   ← el PrismaClient de la app
             │   ├── auth.ts      ← la sesión, armada con esa base (y cómo salen sus correos)
             │   ├── bloqueos-de-acceso.ts ← dónde guarda el bloqueo por cuenta sus fallos
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, metricas)
-            │   └── acciones/    ← Server Actions del admin (paginas, vista-previa, fotos, metricas)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, metricas, busquedas)
+            │   ├── acciones/    ← Server Actions del admin (paginas, vista-previa, fotos, metricas, busquedas)
+            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011)
             ├── admin/         ← las pantallas del admin
             │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/)
             │   ├── paginas/     ← «Páginas» y el editor (lista, barra, secciones)
@@ -188,7 +189,7 @@ un release candidate de la 8 (ADR-0007).
             │   │                   (AI_GUIDELINES §2)
             │   └── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
             ├── config/        ← site.ts (datos institucionales) + nav.ts
-            └── lib/           ← hooks/, metricas/, contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote): sin dominio de ED
+            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -430,8 +431,8 @@ esa misma guía).
       líneas más grande de lo que este párrafo declaraba, y una excepción a una
       regla dura no se sostiene con un número que nadie volvió a medir.
 - [ ] Lo **generado** no cuenta para estos topes: las migraciones de
-      `apps/sitio/prisma/migrations/` las escribe Prisma, no se editan a mano y
-      no se miden con la vara del código nuestro.
+      `apps/sitio/prisma/migrations/` las escribe Prisma (a lo sumo con el SQL
+      de datos de §12) y no se miden con la vara del código nuestro.
 - [ ] Cero `any` sin comentario justificando.
 - [ ] Cero rutas relativas largas (`../../..`) — usar `@/` alias.
 
@@ -587,10 +588,14 @@ Reglas para el admin y sus datos:
   métricas, extendido a contenido: mudarlo antes sería un package sin
   consumidor, el riesgo que anota el ADR-0006.
 - **El esquema está en `apps/sitio/prisma/schema/`** y sus migraciones se
-  generan con Prisma y **se commitean**. Nunca se editan a mano ni se aplican a
-  mano contra la base: `scripts/guarda-prisma.mjs` bloquea `prisma db push`
-  con exit 1, porque `push` crea tablas sin archivo de migración y el síntoma
-  aparece recién en producción.
+  generan con Prisma y **se commitean**. **Una migración aplicada no se edita
+  nunca**, y ninguna se aplica a mano contra la base: `scripts/guarda-prisma.mjs`
+  bloquea `prisma db push` con exit 1, porque `push` crea tablas sin archivo de
+  migración y el síntoma aparece recién en producción. Una migración **nueva**
+  se puede completar con el SQL de datos que Prisma no genera (mover filas antes
+  de un `DROP`), y solo **antes de su primera aplicación**: `pnpm migrate
+  --create-only`, el SQL comentado en el mismo archivo (qué mueve y por qué) y
+  recién ahí `pnpm migrate` (ADR-0011).
 - **Nada de meta-capa de configuración para los formularios.** Cada entidad
   escribe el suyo con los primitivos de `packages/kit-admin`. Un objeto que un
   renderizador genérico traduce a formulario es el modelo de Payload, y es cómo
