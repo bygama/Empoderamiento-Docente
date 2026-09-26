@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { ListaDePaginas } from "@/admin/paginas/ListaDePaginas";
 import { listaDePaginas } from "@/datos/consultas/editor-de-paginas";
+
+export const metadata: Metadata = { title: "Páginas" };
 
 export default async function PaginasDelAdmin() {
   const filas = await listaDePaginas();

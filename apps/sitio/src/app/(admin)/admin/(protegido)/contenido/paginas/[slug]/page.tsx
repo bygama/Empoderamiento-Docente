@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EditorDePagina } from "@/admin/paginas/EditorDePagina";
 import { esSlug, PAGINAS } from "@/contenido/paginas";
@@ -8,6 +9,13 @@ import { paginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 // de cuerpo + sharp + el put a Blob pueden superar el default de la función
 // (docs Next, route-segment-config/maxDuration). Mismo valor que el cron.
 export const maxDuration = 60;
+
+// «Inicio · Páginas»: tres páginas del sitio se llaman como un módulo del
+// admin (Inicio, Biblioteca, Novedades), y solas serían ambiguas.
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  return esSlug(slug) ? { title: `${PAGINAS[slug].nombre} · Páginas` } : {};
+}
 
 export default async function EditarPagina({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

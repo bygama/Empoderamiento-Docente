@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { Pantalla } from "@/admin/armazon/Pantalla";
 import { FormularioNueva } from "./FormularioNueva";
 
-export const metadata: Metadata = { title: "Nueva contraseña · Admin ED" };
+export const metadata: Metadata = { title: "Nueva contraseña" };
 
 export default function NuevaContrasena() {
   return (
