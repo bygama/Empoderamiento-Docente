@@ -188,7 +188,7 @@
 
 - 2026-09-26 — **work-verify** (abajo): el verificador de react-doctor dio
   93/100 por la complejidad de `PanelBusquedas` (15); se partió en
-  `CabeceraDeBusquedas` y `CuerpoDeBusquedas` (`c1654a4`) y volvió a 100. Todo
+  `CabeceraDeBusquedas` y `CuerpoDeBusquedas` (`33bbcfb`) y volvió a 100. Todo
   el gate en verde sobre ese árbol.
 
 ## Next
@@ -224,7 +224,7 @@ en `ed_busquedas`, `pnpm migrate:status` → «Database schema is up to date!»,
 `pnpm migrate --create-only --name comprobar` generó una migración vacía
 («This is an empty migration.»: el esquema y las migraciones coinciden), que
 se borró sin aplicar. Los hashes de este archivo son los de después del
-rebase. Sobre `c1654a4`:
+rebase. Sobre `33bbcfb`:
 
 - L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
   `node scripts/verificar-react-doctor.mjs` → exit 0: «react-doctor: 100/100,
