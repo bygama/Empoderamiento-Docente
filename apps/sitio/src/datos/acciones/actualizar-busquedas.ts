@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { SIN_PERMISO, puede } from "@ed/auth";
 import { auth } from "@/datos/auth";
 import { correrAMano } from "@/datos/tareas/a-mano";
 import { copiarBusquedas, copiaDeSearchConsole } from "@/datos/tareas/busquedas-de-google";
@@ -15,6 +16,7 @@ export async function actualizarBusquedasAhora(): Promise<{ ok: boolean; detalle
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para actualizar." };
+    if (!puede(sesion.user.rol, "verMetricas")) return { ok: false, detalle: SIN_PERMISO };
     // Sin conexión no hay nada que copiar, y esa corrida no se registra: no
     // tocó la API, así que no tiene por qué frenar al botón.
     if (!hayVariablesDeBusquedas()) return { ok: false, detalle: "Search Console todavía no está conectado." };
