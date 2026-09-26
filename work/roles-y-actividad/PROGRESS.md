@@ -115,6 +115,16 @@
   aislado (`roles-y-actividad`) no volvió a pasar; el mismo pedido por curl
   y dos veces más en el navegador dio 200.
 
+- **Dónde queda (2026-09-26):** los 12 pasos hechos y verificados (abajo),
+  **PR #182** abierto contra `main`
+  (https://github.com/bygama/Empoderamiento-Docente/pull/182), pre-push en
+  verde. Falta la revisión de cierre que lanza el padre (1 revisor Opus 5.5,
+  medium, «el cambio entero contra su SPEC»). **Lo que sigue:** los arreglos
+  que pida esa revisión, en esta misma rama; con su PASS, el commit que cierra
+  la lane (borra `work/roles-y-actividad/`), en este mismo PR y antes del
+  merge. El merge es del padre, rebase-only; si `main` se movió, rebasar y
+  volver a correr el gate antes.
+
 ## Verification
 
 ### 2026-09-26 — L DoD (SPEC §9 + las aceptaciones del PLAN) — PASS
