@@ -16,7 +16,7 @@ export default function InicioDelAdmin() {
           demás secciones se van sumando. Las novedades, la biblioteca, los casos y el equipo llegan en las
           fases siguientes.
         </p>
-        <Link href="/admin/contenido/paginas"className="inline-block rounded-lg border border-azul-claro px-3 py-1.5 text-admin-meta text-azul-medio transition-opacity hover:opacity-80">
+        <Link href="/admin/contenido/paginas" className="inline-block rounded-lg border border-azul-claro px-3 py-1.5 text-admin-meta text-azul-medio transition-opacity hover:opacity-80">
           Ir a Páginas
         </Link>
       </section>
