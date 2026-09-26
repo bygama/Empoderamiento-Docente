@@ -8,9 +8,9 @@ import { COOKIE_DEL_TEMA, temaDe } from "@/admin/armazon/tema";
 /**
  * **Acá se verifica la sesión de verdad.**
  *
- * El middleware solo mira que la cookie esté —corre en Edge y no puede
- * consultar la base—, así que este layout es el que pregunta si la sesión
- * existe, está firmada y no venció. Envuelve a todo lo que cuelga de `/admin`
+ * El proxy (`proxy.ts`) solo mira que la cookie esté —no va a la base a
+ * propósito—, así que este layout es el que pregunta si la sesión existe,
+ * está firmada y no venció. Envuelve a todo lo que cuelga de `/admin`
  * menos entrar, olvidé y nueva contraseña, así que ninguna pantalla del admin
  * puede olvidarse de chequear: no hay dónde olvidarse.
  *
