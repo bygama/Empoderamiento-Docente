@@ -120,7 +120,7 @@
   contra Postgres: `send-otp` → `{"status":true}`, el código leído de la
   consola, `verify-otp` → la sesión; `twoFactor` con 0 filas y `actividad`
   con un `entro` por persona.
-- **Paso 8 — Mi cuenta › Seguridad** (este commit). `admin/mi-cuenta/Seguridad.tsx`
+- **Paso 8 — Mi cuenta › Seguridad** (`8f7ba38`). `admin/mi-cuenta/Seguridad.tsx`
   (la insignia Activo/Apagado; obligatorio y sin botón para D y A) y
   `FormularioDelSegundoFactor.tsx` (edita: la contraseña y «Activar el
   segundo factor» / «Desactivarlo», por `authCliente.twoFactor`), en el
@@ -133,5 +133,14 @@
   dirige, como `ed_cuentas` desde que creé una cuenta por rol); react-doctor
   100/100; `/admin/mi-cuenta` como edita → 200 con `id="seguridad"`,
   «Apagado» y «Activar el segundo factor».
+- **Paso 9 — los tipos de actividad, su frase y quién los ve** (este commit).
+  `datos/actividad.ts`: los diez tipos de Cuentas; `QUIEN_VE` (`satisfies
+  Record<TipoDeActividad, Capacidad>`, todos `usarCuentas`, como la lectura
+  5 de la 3c), `tiposQueVe(rol)` y `esTipoDeActividad`.
+  `admin/actividad/frase.ts › fraseDe({ tipo, quien, sobre })` → «Ana Pérez
+  invitó a Juan Pérez», un `Record<TipoDeActividad, …>`. Son las piezas que
+  la 3c también crea (DECISIONS): concilia la que rebasee segunda. Test
+  `frase.test.ts`. Aceptación: `pnpm --filter sitio typecheck`, `test` (159
+  pass, 2 saltados) y `lint` exit 0.
 
 ## Abierto
