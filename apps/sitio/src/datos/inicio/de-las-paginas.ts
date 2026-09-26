@@ -21,3 +21,15 @@ export async function paginasSinPublicar(): Promise<{ titulo: string; detalle: s
   const cuantas = nombres.length === 1 ? "1 página" : `${nombres.length} páginas`;
   return { titulo: `${cuantas} con cambios sin publicar`, detalle: enLista.format(nombres) };
 }
+
+/**
+ * «se publicó Inicio», «se publicaron Inicio y Qué hacemos», o `null` si no
+ * se publicó nada desde entonces. Cuenta la última publicación de cada
+ * página, que es la que guarda la tabla.
+ */
+export async function paginasPublicadasDesde(desde: Date): Promise<string | null> {
+  const filas = await base.pagina.findMany({ where: { publicadoEn: { gt: desde } }, select: { slug: true } });
+  const nombres = nombresDe(filas.map((f) => f.slug));
+  if (!nombres.length) return null;
+  return `${nombres.length === 1 ? "se publicó" : "se publicaron"} ${enLista.format(nombres)}`;
+}
