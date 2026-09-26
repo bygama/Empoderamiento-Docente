@@ -53,6 +53,12 @@ async function agregados(dimension: DimensionDeBusqueda, desde: string, hasta: s
   return grupos.map((g) => ({ valor: g.valor, clics: g._sum.clics ?? 0, impresiones: g._sum.impresiones ?? 0, sumaDePosiciones: g._sum.sumaDePosiciones ?? 0 }));
 }
 
+/** Lo que suman todas las búsquedas del rango: la fila `total`, o `null` si no hay ningún día copiado en él. Lo lee también el Inicio. */
+export async function totalDeBusquedas(desde: string, hasta: string): Promise<Agregado | null> {
+  const [total] = await agregados("total", desde, hasta);
+  return total ?? null;
+}
+
 function lista(filas: Agregado[]): FilaDeBusquedas[] {
   return ordenarPorClics(filas)
     .slice(0, FILAS_POR_LISTA)
@@ -64,9 +70,9 @@ export async function resumenDeBusquedas(hasta: string): Promise<ResumenDeBusque
   const desde = sumarDias(hasta, -(DIAS_DEL_PERIODO - 1));
   const hastaAnterior = sumarDias(desde, -1);
   const desdeAnterior = sumarDias(hastaAnterior, -(DIAS_DEL_PERIODO - 1));
-  const [[total], [anterior], consultas, paginas, paises] = await Promise.all([
-    agregados("total", desde, hasta),
-    agregados("total", desdeAnterior, hastaAnterior),
+  const [total, anterior, consultas, paginas, paises] = await Promise.all([
+    totalDeBusquedas(desde, hasta),
+    totalDeBusquedas(desdeAnterior, hastaAnterior),
     agregados("consulta", desde, hasta),
     agregados("pagina", desde, hasta),
     agregados("pais", desde, hasta),
