@@ -6,6 +6,19 @@
   `work/mapa-del-admin/`) y aprobado por el padre con un cambio: sin número en
   las pestañas (DECISIONS.md). PLAN.md escrito: 10 pasos.
 
+## Tried and failed
+
+- 2026-09-26 — **work-verify L1, primera corrida: react-doctor 93/100.**
+  `node scripts/verificar-react-doctor.mjs` → exit 1,
+  `no-high-complexity-react-function ×1`: «`Encabezado` has cyclomatic
+  complexity 15, cognitive complexity 16» (`admin/armazon/Encabezado.tsx:39`).
+  Lo trajo el slot `pestanas` del paso 5, cuyo acceptance no corría
+  react-doctor. Arreglo por código, sin suprimir la regla: `Migas` y `Barra`
+  salen a piezas propias del mismo archivo, con los colores «sobre azul» en
+  `secundarioDe`/`fondoDe`. Después: react-doctor 100/100 sin diagnósticos; el
+  editor sigue con migas Contenido / Páginas, los tres botones y `sticky`, y
+  con un cambio sin guardar pasa al modo navy como antes (captura).
+
 ## Pasos
 
 | # | Paso | Estado |
