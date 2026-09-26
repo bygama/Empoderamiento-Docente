@@ -2,6 +2,7 @@
 
 import { cookies, draftMode, headers } from "next/headers";
 import { z } from "zod";
+import { SIN_PERMISO, puede } from "@ed/auth";
 import { PAGINAS, SLUGS } from "@/contenido/paginas";
 import { auth } from "@/datos/auth";
 
@@ -40,6 +41,7 @@ export async function abrirVistaPrevia(slug: string): Promise<{ ok: true; url: s
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para ver la vista previa." };
+    if (!puede(sesion.user.rol, "editarContenido")) return { ok: false, detalle: SIN_PERMISO };
     const valido = esquemaSlug.safeParse(slug);
     if (!valido.success) return { ok: false, detalle: "Esa página no existe." };
     (await draftMode()).enable();

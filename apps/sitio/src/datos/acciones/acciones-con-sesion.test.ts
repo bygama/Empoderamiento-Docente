@@ -9,6 +9,10 @@ import { fileURLToPath } from "node:url";
 // redirect no es una respuesta válida para una acción) y el layout protegido
 // no las cubre, así que la sesión la verifica cada acción o nadie. Este test
 // es lo que hace que la regla no dependa de acordarse.
+//
+// Y justo después de la sesión, su capacidad: `puede(rol, "…")`
+// (`@ed/auth`, permisos.ts). La guarda del layout de un módulo tampoco cubre
+// sus acciones, así que el permiso también lo verifica cada acción o nadie.
 
 /**
  * Las acciones que no piden sesión a propósito, por archivo y por nombre, con
@@ -19,6 +23,26 @@ const SIN_SESION: Record<string, { acciones: string[]; motivo: string }> = {
   "datos/acciones/salir-de-vista-previa.ts": {
     acciones: ["salirDeVistaPrevia", "apagarVistaPrevia"],
     motivo: "apagan una cookie que es de quien la tiene: quien ya salió del admin también tiene que poder salir del borrador",
+  },
+};
+
+/**
+ * Las acciones con sesión que todavía no chequean su capacidad, por archivo y
+ * por nombre, con su motivo. Son de lanes en vuelo que esta no podía tocar:
+ * la dueña suma el `puede(…)` al rebasear y saca su línea de acá.
+ */
+const SIN_CAPACIDAD: Record<string, { acciones: string[]; motivo: string }> = {
+  "datos/acciones/paginas.ts": {
+    acciones: ["guardarBorrador", "publicar", "descartarBorrador"],
+    motivo: "es de la lane paginas-inicio (4a): suma puede(…, \"editarContenido\") y el registro de actividad al rebasear sobre roles-y-actividad",
+  },
+  "datos/acciones/fotos.ts": {
+    acciones: ["subirFoto"],
+    motivo: "es de la lane paginas-inicio (4a): suma puede(…, \"editarContenido\") y el registro de actividad al rebasear sobre roles-y-actividad",
+  },
+  "datos/acciones/actualizar-metricas.ts": {
+    acciones: ["actualizarMetricasAhora"],
+    motivo: "es de la lane busquedas-de-google (5): suma puede(…, \"verMetricas\") al rebasear sobre roles-y-actividad",
   },
 };
 
@@ -56,6 +80,26 @@ function problemasDe(fuente: string, exceptuadas: string[] = []): string[] {
     if (sesion === -1) problemas.push(`${nombre} no llama a auth.api.getSession`);
     else if (sesion !== cuerpo.search(/\bawait\b/) || (primeraBase !== -1 && primeraBase < sesion)) {
       problemas.push(`${nombre} hace algo antes de auth.api.getSession`);
+    }
+  }
+  return problemas;
+}
+
+/**
+ * Las acciones que miran la sesión y no chequean su capacidad justo después:
+ * entre el final de la llamada a la sesión y `puede(` no hay otro `await` ni
+ * un `base.`. Las que no miran la sesión ya las encuentra `problemasDe`.
+ */
+function problemasDeCapacidad(fuente: string, exceptuadas: string[] = []): string[] {
+  const problemas: string[] = [];
+  for (const { nombre, cuerpo } of exportadas(sinComentarios(fuente))) {
+    const sesion = cuerpo.indexOf("await auth.api.getSession(");
+    if (exceptuadas.includes(nombre) || sesion === -1) continue;
+    const finDeLaSesion = cuerpo.indexOf(";", sesion);
+    const permiso = cuerpo.slice(finDeLaSesion).search(/\bpuede\(/);
+    if (permiso === -1) problemas.push(`${nombre} no chequea su capacidad con puede(…)`);
+    else if (/\bawait\b|\bbase\./.test(cuerpo.slice(finDeLaSesion, finDeLaSesion + permiso))) {
+      problemas.push(`${nombre} hace algo antes de chequear su capacidad`);
     }
   }
   return problemas;
@@ -108,6 +152,23 @@ test("una excepción vale para su acción y no para las otras del archivo", () =
   assert.deepEqual(problemasDe(fuente, ["apagar"]), ["borrar no llama a auth.api.getSession"]);
 });
 
+const SESION = "  const sesion = await auth.api.getSession({ headers: await headers() });\n  if (!sesion) return { ok: false };\n";
+
+test("el chequeo de capacidad encuentra una acción que no la mira", () => {
+  const fuente = `"use server";\n\nexport async function publicar() {\n${SESION}  return base.pagina.update({});\n}\n`;
+  assert.deepEqual(problemasDeCapacidad(fuente), ["publicar no chequea su capacidad con puede(…)"]);
+});
+
+test("el chequeo de capacidad encuentra una acción que escribe antes de mirarla", () => {
+  const fuente = `"use server";\n\nexport async function publicar() {\n${SESION}  await base.pagina.update({});\n  if (!puede(sesion.user.rol, "editarContenido")) return { ok: false };\n}\n`;
+  assert.deepEqual(problemasDeCapacidad(fuente), ["publicar hace algo antes de chequear su capacidad"]);
+});
+
+test("el chequeo de capacidad deja pasar la que la mira justo después de la sesión", () => {
+  const fuente = `"use server";\n\nexport async function publicar() {\n${SESION}  if (!puede(sesion.user.rol, "editarContenido")) return { ok: false };\n  return base.pagina.update({});\n}\n`;
+  assert.deepEqual(problemasDeCapacidad(fuente), []);
+});
+
 test("toda Server Action de la app vive en datos/acciones/ y empieza por la sesión", () => {
   const acciones = archivosDeAcciones();
   assert.ok(acciones.length > 0, "no encontró ningún archivo «use server»: el recorrido de src/ está roto");
@@ -118,12 +179,30 @@ test("toda Server Action de la app vive en datos/acciones/ y empieza por la sesi
   }
 });
 
+test("toda Server Action con sesión chequea su capacidad justo después", () => {
+  for (const { relativa, fuente } of archivosDeAcciones()) {
+    assert.deepEqual(problemasDeCapacidad(fuente, SIN_CAPACIDAD[relativa]?.acciones), [], `${relativa}`);
+  }
+});
+
 test("cada excepción apunta a una acción que existe", () => {
   const acciones = new Map(archivosDeAcciones().map((a) => [a.relativa, a.fuente]));
-  for (const [relativa, { acciones: nombres }] of Object.entries(SIN_SESION)) {
-    const fuente = acciones.get(relativa);
-    assert.ok(fuente, `${relativa} ya no es un archivo de acciones: sacalo de SIN_SESION`);
-    const existentes = exportadas(sinComentarios(fuente)).map((f) => f.nombre);
-    for (const nombre of nombres) assert.ok(existentes.includes(nombre), `${relativa} › ${nombre} ya no existe: sacalo de SIN_SESION`);
+  for (const [lista, excepciones] of Object.entries({ SIN_SESION, SIN_CAPACIDAD })) {
+    for (const [relativa, { acciones: nombres }] of Object.entries(excepciones)) {
+      const fuente = acciones.get(relativa);
+      assert.ok(fuente, `${relativa} ya no es un archivo de acciones: sacalo de ${lista}`);
+      const existentes = exportadas(sinComentarios(fuente)).map((f) => f.nombre);
+      for (const nombre of nombres) assert.ok(existentes.includes(nombre), `${relativa} › ${nombre} ya no existe: sacalo de ${lista}`);
+    }
+  }
+});
+
+test("una excepción de capacidad es de una acción que todavía no la chequea", () => {
+  const acciones = new Map(archivosDeAcciones().map((a) => [a.relativa, a.fuente]));
+  for (const [relativa, { acciones: nombres }] of Object.entries(SIN_CAPACIDAD)) {
+    const sinChequeo = problemasDeCapacidad(acciones.get(relativa) ?? "");
+    for (const nombre of nombres) {
+      assert.ok(sinChequeo.some((p) => p.startsWith(`${nombre} `)), `${relativa} › ${nombre} ya chequea su capacidad: sacala de SIN_CAPACIDAD`);
+    }
   }
 });
