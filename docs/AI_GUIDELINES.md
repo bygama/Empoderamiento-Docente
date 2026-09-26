@@ -277,8 +277,9 @@ diseño en
   secreto de better-auth, `BLOB_READ_WRITE_TOKEN`, `RESEND_API_KEY`) se
   prefijan con `NEXT_PUBLIC_` ni se usan en el browser. Placeholders en
   `apps/sitio/.env.example`.
-- **La sesión se verifica en el middleware, antes de renderizar**, nunca dentro
-  del componente.
+- **La sesión se corta en el proxy y se verifica en el layout del admin, antes
+  de renderizar**, nunca dentro del componente. Las Server Actions la verifican
+  ellas mismas, porque el layout no las cubre.
 - **No exponer detalles internos** en los mensajes de error al cliente, ni
   permitir enumerar usuarios: los errores de login son genéricos.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
