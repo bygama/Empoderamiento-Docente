@@ -18,8 +18,8 @@
 | 6 | La lista, en Páginas | hecho, `7c8dde8` |
 | 7 | La guía de un módulo pasa a la Lista | hecho, `cc7ae4b` |
 | 8 | El estado vacío, en Métricas | hecho, `9935903` |
-| 9 | Las pantallas de acceso, con la marca | hecho |
-| 10 | DESIGN.md §11 y el README | pendiente |
+| 9 | Las pantallas de acceso, con la marca | hecho, `95e00b7` |
+| 10 | DESIGN.md §11 y el README | hecho |
 
 ## Registro
 
@@ -124,4 +124,21 @@
   rozaba el título → 256 px. `pnpm --filter sitio typecheck` → exit 0; `pnpm
   --filter sitio lint` → exit 0. A 390 × 844 (`orca exec "set viewport"`):
   `scrollWidth` 390 en `entrar`, `olvide-mi-contrasena` y `nueva-contrasena`.
-  Capturas a 1568 × 921, 1024 × 768 y 390 × 844.
+  Capturas a 1568 × 921, 1024 × 768 y 390 × 844. Commit `95e00b7`.
+- **Paso 10** — DESIGN.md §11: la fecha de lo sumado y la nota «mixto = claro
+  en el contenido», la excepción de tipo en «Tipo», las migas en «Encabezado de
+  página», y seis secciones nuevas: Título de pestaña, Pestañas (con «el
+  número de una pestaña llega con Mensajes»), Índice de tarjetas, Lista,
+  Estado vacío (con «la acción principal llega con Novedades») y Pantalla de
+  acceso. README: «Editar las páginas» nombra `/admin/contenido/paginas`.
+  Contrastes medidos con un script descartable (fórmula WCAG 2.x):
+  `azul-principal` 13,63 (claro) · 13,59 (oscuro); `gris-texto` 4,83 · 7,08;
+  `azul-medio` 5,11 · 7,14; `azul-claro` 1,77 · 1,71 (solo bordes
+  decorativos); acceso: blanco sobre `azul-principal` 13,63, sobre un punto al
+  8 % 10,66, sobre el haz al 34 % 4,68 (no hay texto ahí), sobre
+  `azul-medio` 5,11. La búsqueda de `/admin/paginas` como ruta en `README.md`
+  y `apps/sitio/src` no encuentra nada (los `@/admin/paginas/…` que quedan son
+  imports de la carpeta de componentes). Capturas de Contenido, Páginas y el
+  editor en claro, mixto y oscuro, a 1568 y a 390: sin desborde
+  (`scrollWidth` 1568 y 375 —la barra vertical— contra `innerWidth` 1568 y
+  390); a 390 las cinco pestañas entran sin scroll (`nav` 366 / 366).
