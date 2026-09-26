@@ -68,7 +68,7 @@
   exit 0 (sitio 153 pass, 1 saltado de antes); `pnpm typecheck` exit 0;
   `pnpm lint` exit 0; `node scripts/verificar-react-doctor.mjs` → 100/100,
   sin diagnósticos.
-- **Paso 4 — una cuenta suspendida no abre sesión** (este commit).
+- **Paso 4 — una cuenta suspendida no abre sesión** (`0e22928`).
   `suspendidas.ts`: `CAMPO_SUSPENDIDA` (campo adicional de `user`, `input:
   false`, en `config.ts`) y `frenarSiEstaSuspendida(idDeCuenta, ctx)`, que
   corre primero en el gancho de la base que crea toda sesión
@@ -77,5 +77,16 @@
   buena, 403 y sin cookie; suspendida entre la contraseña y el código, el
   código también da 403; no se anota nada. Aceptación: `pnpm --filter
   @ed/auth test` 41/41; `pnpm typecheck` exit 0; `lint` exit 0.
+- **Paso 5 — el enlace de invitación** (este commit).
+  `packages/auth/src/invitacion.ts › crearEnlaceDeInvitacion(auth, {
+  idDeCuenta, horas, volverA })` → `{ enlace, vence }`, exportada por
+  `@ed/auth/servidor`: el formato del reset de better-auth
+  (`reset-password:<token>` en `verification`, hasheado por la config) con
+  otra vigencia; el enlace pasa por la ruta de better-auth que valida y lleva
+  a `volverA` con el token. `invitacion.test.ts`, contra la config de verdad:
+  el enlace lleva a `/admin/nueva-contrasena?token=…`, `resetPassword` crea la
+  credencial y sirve una sola vez; vencido, redirige con
+  `error=INVALID_TOKEN` y el reset da 400. Aceptación: `pnpm --filter
+  @ed/auth test` 43/43; `typecheck` y `lint` exit 0.
 
 ## Abierto
