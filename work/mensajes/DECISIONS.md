@@ -33,3 +33,12 @@
     deshace, casilla, y buscador y «volver» si la 3b no los dejó): aprobados.
     **Con el buscador y «volver», si la 3b ya está en `main` al rebasear, se
     consumen los suyos y se borran los de esta lane: no quedan dos.**
+- 2026-09-26 — **«Sin disco» se decide por `VERCEL`, no por `NODE_ENV`**
+  (la lane, paso 5). El SPEC §3 dice «sin token en producción, 503»; lo que
+  de verdad no se puede es escribir en el disco de una función de Vercel, que
+  se pierde. Con `NODE_ENV` un `next start` local (el build de prueba) no
+  podría recibir un CV. En Vercel, preview incluido, sin token: 503.
+- 2026-09-26 — **Los campos de Contacto también se describen como lista**
+  (`datos/formularios/contacto.ts`) y se validan con `esquemaDe`: los mismos
+  mensajes en llano que el CV, y la institución a `datos` por `datosDe`. El
+  formulario del sitio sigue dibujado a mano; la lista es solo del borde.
