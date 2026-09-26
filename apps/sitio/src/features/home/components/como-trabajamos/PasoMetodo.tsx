@@ -1,5 +1,9 @@
 import Image from "next/image";
-import type { Paso } from "@/features/home/components/como-trabajamos/data";
+import type { ComoTrabajamos } from "@/features/home/contenido/como-trabajamos";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
+
+/** Un paso del contenido, con su número («01») ya puesto por el compositor. */
+export type Paso = ComoTrabajamos["pasos"][number] & { n: string };
 
 /**
  * Un paso del recorrido: foto real a un lado del eje central y texto al otro,
@@ -28,13 +32,14 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
             }`}
           >
             <Image
-              src={paso.foto}
-              alt={paso.fotoAlt}
+              src={paso.foto.src}
+              alt={paso.foto.alt}
               width={400}
               height={533}
               className="aspect-[3/4] max-h-[66vh] w-full object-cover"
               sizes="(max-width: 768px) 90vw, 400px"
               priority={idx === 0}
+              style={estiloDeFoco(paso.foto.foco)}
             />
             {/* Overlay tenue de marca */}
             <div
@@ -85,7 +90,7 @@ export function PasoMetodo({ paso, idx }: { paso: Paso; idx: number }) {
                 línea en desktop; text-balance evita cortes feos
                 cuando igual envuelve en mobile. */}
             <p className="text-verde-concepto mt-4 font-sans text-[1rem] font-semibold leading-snug text-balance md:text-[1.05rem]">
-              {paso.resumen}
+              {paso.frase}
             </p>
 
             <p className="text-gris-texto mt-3 font-sans text-[0.97rem] leading-relaxed md:text-[1.02rem]">
