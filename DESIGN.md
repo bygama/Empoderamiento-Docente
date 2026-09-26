@@ -355,8 +355,11 @@ usa el equipo de ED unas pocas veces por mes, y pesa más la claridad que la
 velocidad. Usa la paleta y las fuentes de la marca con estas reglas propias.
 Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED.
 Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
-sidebar y los temas, el 2026-09-24. Todos los contrastes están
-medidos con la fórmula de WCAG 2.x.
+sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
+índice de tarjetas, la lista, el estado vacío y la pantalla de acceso nueva,
+el 2026-09-26 (`work/patrones-del-admin/`). Todos los contrastes están
+medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
+valores del claro, así que donde abajo dice «claro» vale para los dos.
 
 ### Fondo y armazón
 
@@ -441,6 +444,10 @@ redibuja solo.
   Su interlineado es 1,5 y no el 1,6 de §2: en el admin el cuerpo son
   controles y textos cortos, no lectura larga.
 - Los dos títulos ya traen el `-0.01em` de §2 en el token.
+- **La única excepción** es «Admin del sitio» en el panel de la marca de la
+  pantalla de acceso (abajo): `text-h1` de la escala del sitio (§2). Es el
+  único momento de marca del admin; ninguna otra pantalla la toma de
+  precedente.
 
 ### Bordes y foco
 
@@ -497,6 +504,119 @@ Fondo blanco con un divisor inferior; si es fijo, queda `sticky` arriba.
 - **En el celular** (por debajo de `lg`), el título, la insignia y el
   detalle hacen scroll con la página; las acciones y los avisos van en una
   barra fija abajo, con el mismo modo navy y el área segura del iPhone.
+- **Migas** solo donde hay tres niveles (hoy, el editor de páginas:
+  Contenido / Páginas / Inicio). Las demás pantallas las ubican la sidebar y
+  las pestañas.
+
+### Título de pestaña
+
+El layout raíz del admin declara el template `%s · Admin ED` y cada pantalla
+da solo su nombre: «Páginas · Admin ED», «Entrar · Admin ED». Una pantalla
+no repite a su padre, salvo que su nombre solo sea ambiguo: el editor dice
+«Inicio · Páginas · Admin ED» porque tres páginas del sitio se llaman como un
+módulo (Inicio, Biblioteca, Novedades).
+
+### Pestañas
+
+Las pantallas de un módulo, cuando tiene más de una (el tercer nivel del
+menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
+
+- **Son links, no el patrón ARIA de tabs:** navegan. Un `nav` con el nombre
+  del módulo como `aria-label`, una lista, y la activa con
+  `aria-current="page"`. La activa sale de la ruta (la pestaña cuya `href`
+  es la ruta o la contiene), así un layout puede ponerlas sin que cada página
+  diga cuál es.
+- **Van en el encabezado**, en su propia fila al pie y pegadas a su divisor
+  (el slot `pestanas` de `Encabezado`). El `h1` es el módulo; la pestaña
+  encendida dice la pantalla, y el título de pestaña del navegador también.
+- **Cada una:** meta medium, 44 px de alto, `px-3`; la fila corre `-mx-3`
+  para que el texto de la primera quede alineado con el título. La activa en
+  `azul-principal` con una barra de 2 px abajo (13,63:1 en el claro, 13,59:1
+  en el oscuro); las demás en `gris-texto` (4,83:1 y 7,08:1), que pasan a
+  `azul-principal` en hover. El foco, el de siempre pero por dentro
+  (`-outline-offset-2`): afuera lo cortaría el scroll horizontal.
+- **En el celular** la fila scrollea de costado si no entra; las cinco de
+  Contenido entran a 390 de ancho.
+- **El número de una pestaña llega con Mensajes**, su primer consumidor;
+  hasta entonces no existe.
+- Primer consumidor: las cinco pantallas de Contenido (Páginas, Casos,
+  Equipo, Aliados, Fotos). El índice no las lleva, porque ya son las cinco en
+  tarjetas, ni el editor, que lo ubican sus migas.
+
+### Índice de tarjetas
+
+La puerta de un módulo con varias pantallas: una grilla de tarjetas (una
+columna, dos desde `sm`, tres desde `lg`).
+`apps/sitio/src/admin/armazon/IndiceDeTarjetas.tsx`.
+
+- **Cada tarjeta entera es el link.** El link es el nombre, y su `::after` se
+  estira sobre la tarjeta: se toca en cualquier lado, pero el lector de
+  pantalla lee «Páginas» y no el párrafo entero, que va como
+  `aria-describedby`. El foco se dibuja en la tarjeta entera
+  (`has-[a:focus-visible]`), en `azul-medio` (5,11:1 · 7,14:1 en el oscuro).
+- **Adentro:** el nombre en `text-admin-seccion`; qué es, en una línea, en
+  meta `gris-texto` (4,83:1 · 7,08:1); y abajo su estado: una línea en meta
+  `azul-principal` o una insignia («Por hacer», apagada).
+- **Caja:** `rounded-xl`, `p-5`, borde `azul-claro/60` decorativo, que pasa a
+  `azul-medio` en hover. Sin sombra.
+- Primer consumidor: `/admin/contenido`. Lo reusa Ajustes.
+
+### Lista
+
+Filas separadas por un divisor, en una caja con el mismo borde
+(`azul-claro/60`, `rounded-xl`). `apps/sitio/src/admin/armazon/Lista.tsx`.
+
+- **Cada fila:** a la izquierda lo principal (cuerpo medium
+  `azul-principal`, con lo que haga falta al lado en meta `gris-texto`) y una
+  línea de detalle en meta `gris-texto` (4,83:1 · 7,08:1); a la derecha las
+  insignias y la acción, que bajan a su propia línea si no entran.
+- **Atenuada:** lo principal baja a `gris-texto` y una nota ocupa el lugar de
+  la acción («Todavía no se edita desde acá»). No se esconde: se explica.
+- **Desplegable:** un `details` debajo de la fila, sin JavaScript y anunciado
+  como botón. El resumen en meta medium `azul-medio` (5,11:1 · 7,14:1) con un
+  chevron que gira; adentro, links en meta `azul-medio` que subrayan en hover.
+- **Una acción que navega** es un link con cara de botón secundario, con el
+  nombre de la fila para el lector («Editar Inicio»).
+- Primer consumidor: la lista de Páginas. También las guías de los módulos
+  por hacer.
+
+### Estado vacío
+
+Donde todavía no hay nada: qué pasa, en el título (cuerpo medium), y qué
+hacer, en una frase en meta `gris-texto` (4,83:1 · 7,08:1). Borde punteado
+`azul-claro`, decorativo, `rounded-xl`, `p-6`: dice «acá va a haber algo» sin
+competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
+
+- **La acción principal llega con Novedades** («Todavía no hay novedades.
+  [Nueva novedad]»), su primer consumidor.
+- Primer consumidor: los tres estados sin datos del panel de métricas.
+
+### Pantalla de acceso
+
+Entrar, olvidé y nueva contraseña: el panel de la marca a la izquierda y el
+formulario a la derecha. Es **el único momento de marca del admin**, y no
+lleva tema. `apps/sitio/src/admin/armazon/Pantalla.tsx`.
+
+- **El panel** (`azul-principal`, desde `lg` 5/12 del ancho): el logo
+  negativo arriba a 240 px; la grilla de puntos de §6 en blanco al 8 %; **el
+  haz del faro**, la capa de puntos encendidos de Biblioteca (blanco al
+  34 %), quieta, recortada por una cuña que sale de la lámpara del logo y baja
+  hacia el formulario (§9: el faro guía, sin exagerar); «Admin del sitio»
+  abajo, en blanco a `text-h1` (la excepción de tipo); y **una** forma plana,
+  el círculo `azul-medio` de 256 px que sale de la esquina de abajo.
+- **El haz no toca el logo:** se apaga dentro de un círculo de 250 px
+  alrededor de la lámpara, más que el margen de seguridad de §10 (la esquina
+  más lejana del logo queda a 201 px). El logo no se redibuja ni se le suma
+  nada.
+- **Contrastes:** «Admin del sitio», blanco sobre `azul-principal` 13,63:1;
+  sobre un punto de la grilla, 10,66:1; si tocara el círculo, 5,11:1. Los
+  puntos y el círculo son decorativos (`aria-hidden`).
+- **En el celular** el panel es una franja arriba, con la grilla, el logo a
+  144 px (§10 pide 120 como mínimo) y «Admin del sitio» en
+  `text-admin-seccion` negrita blanca; sin el haz ni el círculo. El
+  formulario va arriba, no centrado.
+- El formulario: el `h1` en `text-admin-titulo`, la bajada en meta, y el
+  primario naranja a todo el ancho (§7).
 
 ### Avisos
 
