@@ -357,8 +357,8 @@ Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED.
 Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
 sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
 índice de tarjetas, la lista, el estado vacío y la pantalla de acceso nueva,
-el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso», el mismo día
-(`work/roles-y-actividad/`). Todos los contrastes están
+el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso» y el apartado, el
+mismo día (`work/roles-y-actividad/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -623,6 +623,26 @@ no se la muestra, así que llega por un link viejo o tipeando.
 - No se esconde qué sección es: la URL ya lo dijo. Se explica de quién es.
 - Primer consumidor: la guarda de cada módulo (hoy Contenido, y Cuentas y
   Ajustes mientras son una guía).
+
+### Apartado
+
+Una pantalla de ajustes partida en apartados: a la izquierda qué es y **qué
+pasa si se toca**; a la derecha, lo que se toca.
+`apps/sitio/src/admin/armazon/Apartado.tsx`.
+
+- **Desde `lg`, dos columnas**: un tercio con el título en
+  `text-admin-seccion` y una frase en meta `gris-texto` (4,83:1 · 7,08:1),
+  y dos tercios con el formulario. Por debajo, uno arriba del otro.
+- **La frase dice la consecuencia**, no repite el título: «Al cambiarla se
+  cierran tus otras sesiones y te llega un correo que lo avisa».
+- Van en una pila separados por un divisor `azul-claro/60`, `py-8`, y el
+  `id` de cada uno es su ancla (`/admin/mi-cuenta#contrasena`).
+- **Los formularios de adentro no pasan de `max-w-md`**: un nombre o una
+  contraseña a todo el ancho se leen como un párrafo.
+- **Sin primario si los apartados son independientes**: en Mi cuenta hay tres
+  formularios y ninguno es la acción de la pantalla, así que los tres botones
+  son secundarios. El aviso de cada uno va entre sus campos y su botón.
+- Primer consumidor: Mi cuenta. Lo reusa Ajustes.
 
 ### Pantalla de acceso
 
