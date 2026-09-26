@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen } from "@/components/ui/icons";
 import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
+import type { BibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
 import { CATEGORIA_LABEL, fechaCorta, NOVEDADES } from "@/features/novedades/data/novedades";
 
 // Biblioteca: los mismos cuatro destacados que abren la página Biblioteca
@@ -34,9 +35,12 @@ function trackPointer(e: MouseEvent<HTMLElement>) {
  * flecha diagonal ↗ junto a cada título lleva a su página.
  *
  * Sin reveal de scroll: el contenido está siempre presente (evita el "pop"
- * janky al bajar hacia el footer). La interacción vive en el hover.
+ * janky al bajar hacia el footer). La interacción vive en el hover. Los
+ * títulos y las bajadas llegan por props (de
+ * `features/home/contenido/biblioteca-y-novedades.ts` o de la base).
  */
-export function BibliotecaNovedades() {
+export function BibliotecaNovedades({ contenido }: { contenido: BibliotecaYNovedades }) {
+  const { biblioteca, novedades } = contenido;
   return (
     <section
       id="biblioteca-novedades"
@@ -55,21 +59,21 @@ export function BibliotecaNovedades() {
             <header>
               <Link
                 href="/biblioteca"
-                aria-label="Ir a Biblioteca"
+                aria-label={`Ir a ${biblioteca.titulo}`}
                 className="group inline-flex items-center gap-4"
               >
                 <h3
                   className="font-display text-azul-principal font-bold tracking-[-0.02em]"
                   style={{ fontSize: "clamp(2rem, 3.4vw, 2.75rem)" }}
                 >
-                  Biblioteca
+                  {biblioteca.titulo}
                 </h3>
                 <span className="text-azul-principal group-hover:text-naranja-accion transition-[color,translate] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
                   <ArrowUpRight size={28} strokeWidth={2} />
                 </span>
               </Link>
               <p className="text-gris-texto mt-3 font-sans text-[0.97rem] leading-relaxed">
-                Materiales y recursos para llevar al aula.
+                {biblioteca.bajada}
               </p>
             </header>
 
@@ -122,21 +126,21 @@ export function BibliotecaNovedades() {
             <header>
               <Link
                 href="/novedades"
-                aria-label="Ir a Novedades"
+                aria-label={`Ir a ${novedades.titulo}`}
                 className="group inline-flex items-center gap-4"
               >
                 <h3
                   className="font-display text-azul-principal font-bold tracking-[-0.02em]"
                   style={{ fontSize: "clamp(2rem, 3.4vw, 2.75rem)" }}
                 >
-                  Novedades
+                  {novedades.titulo}
                 </h3>
                 <span className="text-azul-principal group-hover:text-naranja-accion transition-[color,translate] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
                   <ArrowUpRight size={28} strokeWidth={2} />
                 </span>
               </Link>
               <p className="text-gris-texto mt-3 font-sans text-[0.97rem] leading-relaxed">
-                Lo último de la comunidad y la investigación.
+                {novedades.bajada}
               </p>
             </header>
 
