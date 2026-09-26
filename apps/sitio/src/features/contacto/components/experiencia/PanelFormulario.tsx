@@ -10,6 +10,8 @@ type Props = {
   temaActivo: Tema | undefined;
   temaIdx: number;
   envio: Envio;
+  /** Con el CV encendido, «Sumate al equipo» lleva a su formulario; si no, al correo. */
+  cvAbierto: boolean;
   onCambiar: () => void;
   onEnviar: (e: FormEvent<HTMLFormElement>) => void;
 };
@@ -18,7 +20,7 @@ type Props = {
  * 2 · FORMULARIO — breadcrumb de vuelta, el rail navy y el panel de campos
  * como UNA sola pieza, y la segunda puerta (sumarse al equipo) al pie.
  */
-export function PanelFormulario({ activo, temaActivo, temaIdx, envio, onCambiar, onEnviar }: Props) {
+export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto, onCambiar, onEnviar }: Props) {
   return (
     <div
       data-panel="formulario"
@@ -66,7 +68,7 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, envio, onCambiar,
         <div className="mt-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           <div data-campo className="flex justify-center lg:col-start-2">
             <a
-              href={MAILTO_CV}
+              href={cvAbierto ? "/sumate-al-equipo" : MAILTO_CV}
               className="group text-gris-texto hover:text-azul-principal inline-flex items-center gap-1.5 font-sans text-[0.85rem] transition-colors"
             >
               ¿Querés estar de este lado?{" "}
