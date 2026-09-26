@@ -34,16 +34,6 @@ const GUIAS: Record<string, Guia> = {
       { nombre: "Ficha de un material", ruta: "/admin/biblioteca/[id]", que: "Autores vinculados al Equipo, cita APA y el último chequeo del link." },
     ],
   },
-  mensajes: {
-    nombre: "Mensajes",
-    para: "Lo que llega por los formularios del sitio.",
-    pantallas: [
-      { nombre: "Contacto", ruta: "/admin/mensajes/contacto", que: "Nuevo, En curso, Cerrado y Spam, con «Lo tomo yo» y «Responder» por mail." },
-      { nombre: "Un mensaje", ruta: "/admin/mensajes/contacto/[id]", que: "Los datos, el mensaje, el estado y cuándo se borra: a los 24 meses." },
-      { nombre: "CV de docentes", ruta: "/admin/mensajes/cv", que: "Igual que Contacto, con el archivo privado. Solo lo ven quien dirige y quien administra." },
-      { nombre: "Un CV", ruta: "/admin/mensajes/cv/[id]", que: "El archivo no tiene URL pública y se borra a los 12 meses." },
-    ],
-  },
   cuentas: {
     nombre: "Cuentas",
     para: "Quién entra al admin y qué puede hacer. Solo para quien dirige y quien administra.",
