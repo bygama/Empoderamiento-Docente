@@ -5,6 +5,60 @@
 - 2026-09-26 — SPEC.md escrito desde el brief del padre (lane 1 del XL
   `work/mapa-del-admin/`) y aprobado por el padre con un cambio: sin número en
   las pestañas (DECISIONS.md). PLAN.md escrito: 10 pasos.
+- 2026-09-26 — Los 10 pasos hechos y la verificación L1–L3 en verde (abajo).
+  Falta la revisión de cierre, que lanza el padre al recibir `worker_done`
+  (1 revisor Opus 5.5, effort medium, lente «el cambio entero contra su
+  SPEC»), y el merge, que es del padre con el OK de Mateo.
+
+## Verification
+
+### 2026-09-26 — L DoD — PASS (L1–L3; la revisión de cierre, pendiente del padre)
+
+Sobre `8438458`, con el árbol limpio.
+
+- L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0; `node
+  scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor: 100/100, sin
+  diagnósticos (apps/sitio/src: 411 archivos · packages/db/src: 3 archivos ·
+  packages/auth/src: 5 archivos)»). La primera corrida dio 93/100: ver «Tried
+  and failed».
+- L2 behavioral: `pnpm test` → exit 0 (80 tests, 79 pass, 0 fail, 1 skipped
+  de antes: «sin respuestas grabadas: falta correr A1»); `pnpm build` → exit
+  0 (22 páginas; `/admin/contenido`, `/admin/contenido/[pantalla]`,
+  `/admin/contenido/paginas` y `/admin/contenido/paginas/[slug]` en la tabla
+  de rutas). Arranca: el dev server en el puerto 3011 contesta
+  `/admin/entrar` → 200.
+- L3 end-to-end (navegador embebido de Orca, cuenta `administra` de prueba,
+  base `ed`):
+  - `curl.exe` → `/admin/paginas -> 308 http://localhost:3011/admin/contenido/paginas`
+    y `/admin/paginas/inicio -> 308 http://localhost:3011/admin/contenido/paginas/inicio`.
+  - `document.title` y pestaña activa: `/admin` «Inicio · Admin ED»;
+    `/admin/contenido` «Contenido · Admin ED» (sin pestañas);
+    `/admin/contenido/paginas` «Páginas · Admin ED», activa Páginas;
+    `/admin/contenido/paginas/inicio` «Inicio · Páginas · Admin ED» (sin
+    pestañas, migas Contenido / Páginas); `/admin/contenido/casos`,
+    `equipo`, `aliados` y `fotos` con su nombre y su pestaña activa;
+    `/admin/novedades` «Novedades · Admin ED»; `/admin/metricas` «Métricas ·
+    Admin ED»; las tres de acceso «Entrar», «Olvidé mi contraseña» y «Nueva
+    contraseña · Admin ED»; `/admin/contenido/otra` → 404.
+  - Foco con teclado (Tab desde el `h1`): las cinco pestañas, «Editar Inicio»
+    y el desplegable «1 sección» con `:focus-visible` y contorno sólido de
+    2 px (`azul-medio` asentado, `rgb(74, 111, 165)`, por dentro en las
+    pestañas); la tarjeta «Casos» con `:focus-visible` en el link y el
+    contorno de 2 px `azul-medio` en la tarjeta entera. Capturas.
+  - El link de la sección «Hero» lleva a
+    `/admin/contenido/paginas/inicio#seccion-hero` con la sección a la vista.
+  - El editor sigue: migas, tres botones, `sticky`, y el modo navy con un
+    cambio sin guardar (sin guardar nada: Inicio sigue «Sin editar»).
+  - Capturas de Contenido, la lista de Páginas y el editor en claro, mixto y
+    oscuro, a 1568 × 921 y a 390 × 844, sin desborde horizontal; las tres de
+    acceso a 1568 × 921 y 390 × 844 (entrar también a 1024 × 768), sin
+    desborde. Las de acceso no llevan tema (SPEC §9.4).
+  - Contrastes nuevos medidos y escritos en DESIGN.md §11 (paso 10).
+- Topes: el componente más largo tocado, `Encabezado.tsx`, 98 líneas; la
+  utilidad más larga, `por-hacer/guias.ts`, 91.
+- Close review — el cambio entero contra su SPEC (Opus 5.5, medium): la
+  lanza el padre al recibir `worker_done` (work-run paso 4, hijo supervisado).
+  Pendiente.
 
 ## Tried and failed
 
@@ -32,7 +86,7 @@
 | 7 | La guía de un módulo pasa a la Lista | hecho, `cc7ae4b` |
 | 8 | El estado vacío, en Métricas | hecho, `9935903` |
 | 9 | Las pantallas de acceso, con la marca | hecho, `95e00b7` |
-| 10 | DESIGN.md §11 y el README | hecho |
+| 10 | DESIGN.md §11 y el README | hecho, `bac1e6a` y `366ec5d` |
 
 ## Registro
 
