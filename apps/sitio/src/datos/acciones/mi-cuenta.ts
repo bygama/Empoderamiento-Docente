@@ -2,19 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { z } from "zod";
 import { registrarActividad } from "@/datos/actividad";
 import { auth } from "@/datos/auth";
+import { esquemaDelNombre } from "@/datos/esquemas";
 
 // Lo que cada persona cambia de su propia cuenta. No pide capacidad: la
 // cuenta propia es de todo rol con sesión (SPEC de work/roles-y-actividad §3).
 // La contraseña y las sesiones no pasan por acá sino por el cliente de
 // better-auth, que es quien pone la cookie nueva y aplica el rate limit.
-
-const esquemaDelNombre = z
-  .string()
-  .transform((nombre) => nombre.replace(/\s+/g, " ").trim())
-  .pipe(z.string().min(1, "Escribí tu nombre.").max(80, "El nombre puede tener hasta 80 caracteres."));
 
 /** Cambia el nombre de quien tiene la sesión, lo anota y redibuja el armazón, que lo muestra abajo en la sidebar. */
 export async function cambiarMiNombre(nombre: string): Promise<{ ok: boolean; detalle: string }> {

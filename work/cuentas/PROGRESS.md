@@ -142,7 +142,7 @@
   la 3c también crea (DECISIONS): concilia la que rebasee segunda. Test
   `frase.test.ts`. Aceptación: `pnpm --filter sitio typecheck`, `test` (159
   pass, 2 saltados) y `lint` exit 0.
-- **Paso 10 — las consultas** (este commit). `datos/consultas/cuentas.ts`:
+- **Paso 10 — las consultas** (`b621ceb`). `datos/consultas/cuentas.ts`:
   `listarCuentas()` → `CuentaEnLista[]` (quien dirige primero, después por
   nombre) y `unaCuenta(id)` → `FichaDeCuenta | null` (más `segundoFactor`,
   `invitacionVence` solo si está pendiente, `tieneActividad` y `sesiones`,
@@ -156,5 +156,31 @@
   (`cuentas.test.ts`, `consultas/actividad.test.ts`: cuatro casos, corridos,
   no saltados). Aceptación: `pnpm --filter sitio test` 163 pass, 2 saltados
   (los de antes); `typecheck` y `lint` exit 0.
+- **Paso 11 — las acciones de Cuentas** (`5c07a13` y este commit). En el
+  paquete: `confirmarContrasena(auth, { headers, correo, contrasena,
+  bloqueos })` → `"bien" | "mal" | "frenada"` (`verifyPassword` desde el
+  servidor, cada fallo en el bloqueo por cuenta, con el secreto del contexto
+  de better-auth; test contra better-auth), `ROLES_QUE_SE_ASIGNAN` /
+  `seAsigna` y `ROL_AL_DEJAR_LA_DIRECCION`. En la app:
+  `datos/sobre-cuentas.ts` (lo común, sin «use server»: `sobreLaCuenta(sesion,
+  id, accion, hacer)` con `queSePuede`, `cerrarSesiones`, `borrarEnlaces`,
+  `borrarSiNuncaHizoNada` → `"borrada" | "tiene-historia"`, que intenta el
+  `DELETE` y lee el P2003 de la clave foránea), `datos/esquemas.ts` (nombre,
+  correo, id; `mi-cuenta.ts` usa el del nombre),
+  `consultas/cuentas.ts › cuentaParaActuar`, y las acciones:
+  `invitaciones.ts` (`invitar`, `reenviarInvitacion`, `cancelarInvitacion`),
+  `cuentas.ts` (`cambiarElRol`, `cambiarElCorreo`, `cerrarSusSesiones`),
+  `estado-de-cuentas.ts` (`suspender`, `reactivar`, `borrarCuenta`) y
+  `direccion.ts` (`pasarLaDireccion`, en una transacción: baja quien dirige y
+  sube la otra). Cada una: sesión, `puede`, Zod, `queSePuede`, lo suyo,
+  `registrarActividad` y `{ ok, detalle }`. El correo de la invitación y el
+  del cambio de correo se esperan y la respuesta dice si no salieron.
+  Aceptación: `pnpm typecheck` y `pnpm lint` exit 0 (sin warnings);
+  `pnpm --filter @ed/auth test` 46/46; `pnpm --filter sitio test` 165 pass, 2
+  saltados de antes, con `acciones-con-sesion.test.ts` en verde sobre las
+  diez acciones nuevas y `sobre-cuentas.test.ts` (borrar sin historia, y el
+  rechazo de la clave foránea con historia); «subir a administra prende el
+  segundo factor y cierra las sesiones» lo cubre `roles.test.ts` (paso 1);
+  react-doctor 100/100.
 
 ## Abierto
