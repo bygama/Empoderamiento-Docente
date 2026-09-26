@@ -11,11 +11,20 @@ import type { Contenido } from "./plantilla";
  * - sin clave en producción, un error que dice que no salió, **sin el enlace
  *   ni el destinatario**. Los logs de producción los lee más gente que el
  *   buzón, y un enlace de contraseña en un log es una cuenta regalada.
+ *
+ * Contesta por dónde salió, o que no salió. La mayoría de los correos lo
+ * ignora (salen en segundo plano); el código del segundo factor lo necesita
+ * para no decir «te lo mandamos» cuando no fue así. Un error de Resend tira.
+ */
+export type SalidaDelCorreo = "resend" | "consola" | "no-salio";
+
+/**
+ * Manda un correo por donde diga el entorno (arriba).
  */
 export async function mandarCorreo(
   { para, contenido }: { para: string; contenido: Contenido },
   { entorno = process.env, fetchImpl }: { entorno?: NodeJS.ProcessEnv; fetchImpl?: typeof fetch } = {},
-): Promise<void> {
+): Promise<SalidaDelCorreo> {
   const clave = entorno.RESEND_API_KEY;
   if (clave) {
     const de = entorno.CORREO_REMITENTE;
@@ -23,11 +32,12 @@ export async function mandarCorreo(
     // Una clave por correo: si el primer intento llegó pero la respuesta se
     // perdió, el reintento del cliente no lo manda dos veces.
     await crearClienteDeResend({ clave, fetchImpl }).mandar({ de, para, ...contenido, idempotencia: randomUUID() });
-    return;
+    return "resend";
   }
   if (entorno.NODE_ENV === "production") {
     console.error(`[correo] «${contenido.asunto}» no salió: falta RESEND_API_KEY.`);
-    return;
+    return "no-salio";
   }
   console.info(`[correo] Para ${para} — ${contenido.asunto}\n\n${contenido.texto}\n`);
+  return "consola";
 }

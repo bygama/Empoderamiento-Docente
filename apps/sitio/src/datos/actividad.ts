@@ -33,6 +33,8 @@ export const TIPOS_DE_ACTIVIDAD = [
   "marco-un-mensaje-como-spam",
   "borro-un-mensaje",
   "borro-un-cv",
+  "activo-el-segundo-factor",
+  "desactivo-el-segundo-factor",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 

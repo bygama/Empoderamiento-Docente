@@ -32,7 +32,7 @@
   - `pnpm migrate:status` → «Database schema is up to date!».
   - `pnpm typecheck` exit 0; `pnpm test` exit 0 (auth 29/29; sitio 152 pass,
     1 saltado de antes), con `roles.test.ts` nuevo (el `CHECK` y `ponerRol`).
-- **Paso 2 — la política** (este commit). `permisos.ts › QUE_PERMITE`: la frase
+- **Paso 2 — la política** (`c4dc354`). `permisos.ts › QUE_PERMITE`: la frase
   de cada capacidad, en el orden de `PUEDE` (`satisfies Record<Capacidad,
   string>`). `packages/auth/src/cuentas.ts`: `EstadoDeCuenta`,
   `CuentaObjetivo`, `LoQueSePuede` y `queSePuede(quien, objetivo)`, la tabla
@@ -40,5 +40,33 @@
   `index.ts`. `cuentas.test.ts`, cinco casos contra la tabla. Aceptación:
   `pnpm --filter @ed/auth test` exit 0 (34/34), `typecheck` exit 0, `lint`
   exit 0.
+- **Paso 3 — el segundo factor en `@ed/auth`** (este commit).
+  `segundo-factor.ts`: el plugin `twoFactor` solo con código por correo (6
+  dígitos, 10 min, `storeOTP: "hashed"`, 5 intentos, paso pendiente 30 min,
+  dispositivo 30 días, TOTP apagado) y el plugin propio
+  `alrededor-del-codigo`, que corre después: anota `entro` solo cuando hay
+  sesión (`/sign-in/email`, `/two-factor/verify-otp`), espera el envío en
+  `/two-factor/send-otp` y contesta 503 `CODIGO_NO_SALIO` si falló, anota
+  `activo-`/`desactivo-el-segundo-factor`, y frena `/two-factor/disable`
+  para D y A (403 `SEGUNDO_FACTOR_OBLIGATORIO`). `config.ts` se parte en
+  `configDeAuth` (sin base) + `crearAuth`, para que los tests corran la config
+  de verdad; suma el plugin y los 4 rate limits. `ganchos.ts` ya no anota
+  `entro` (el test se mudó a `segundo-factor.test.ts`). `errores.ts` con los
+  códigos que lee el navegador; `twoFactorClient` en el cliente.
+  **Corte distinto del PLAN:** `OpcionesDeAuth.mandarCodigo` es obligatoria,
+  así que la app la cablea en este mismo commit para no romper el typecheck:
+  `mandarCorreo` devuelve `"resend" | "consola" | "no-salio"`, la plantilla
+  `correos/tu-codigo.ts` (con `destacado` en `plantilla.ts` y `duracion`
+  mudada ahí), `mandarCodigo` en `datos/auth.ts` (rechaza con «no salió») y
+  los dos tipos de actividad. Al paso 6 le quedan la invitación y el cambio de
+  correo.
+  Verificado antes con un script descartable: el `ctx.context` que recibe
+  `sendOTP` es el mismo objeto que ve el gancho `after`, y el plugin verifica
+  un código con la tabla `twoFactor` vacía. Aceptación: `pnpm --filter
+  @ed/auth test` 40/40 (7 nuevos en `segundo-factor.test.ts`, con
+  `db.twoFactor.length === 0` al final de cada ida y vuelta); `pnpm test`
+  exit 0 (sitio 153 pass, 1 saltado de antes); `pnpm typecheck` exit 0;
+  `pnpm lint` exit 0; `node scripts/verificar-react-doctor.mjs` → 100/100,
+  sin diagnósticos.
 
 ## Abierto

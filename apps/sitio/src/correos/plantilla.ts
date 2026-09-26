@@ -31,19 +31,31 @@ export function saludo(nombre?: string): string {
   return nombre?.trim() ? `Hola, ${nombre.trim()}:` : "Hola:";
 }
 
+/** «1 hora», «72 horas», «10 minutos»: cuánto dura un enlace o un código. */
+export function duracion(minutos: number): string {
+  if (minutos % 60 !== 0) return `${minutos} minutos`;
+  const horas = minutos / 60;
+  return horas === 1 ? "1 hora" : `${horas} horas`;
+}
+
 type Partes = {
   asunto: string;
   nombre?: string;
   /** Párrafos antes del botón. */
   antes: string[];
+  /** Algo para copiar, grande y separado: el código del segundo factor. */
+  destacado?: string;
   boton?: { texto: string; enlace: string };
   /** Párrafos después del botón, en gris. */
   despues: string[];
 };
 
-export function armarCorreo({ asunto, nombre, antes, boton, despues }: Partes): Contenido {
+export function armarCorreo({ asunto, nombre, antes, destacado, boton, despues }: Partes): Contenido {
   const parrafo = (texto: string, color: string = COLOR.texto) =>
     `<p style="margin:0 0 16px;color:${color};font:16px/1.5 ${FUENTE}">${escapar(texto)}</p>`;
+  const destacadoHtml = destacado
+    ? `<p style="margin:24px 0;color:${COLOR.texto};font:bold 32px/1 ${FUENTE};letter-spacing:6px">${escapar(destacado)}</p>`
+    : "";
   const botonHtml = boton
     ? `<p style="margin:24px 0"><a href="${escapar(boton.enlace)}" style="display:inline-block;padding:12px 20px;border-radius:8px;background:${COLOR.accion};color:${COLOR.texto};font:bold 16px/1 ${FUENTE};text-decoration:none">${escapar(boton.texto)}</a></p>` +
       parrafo(`Si el botón no anda, copiá este enlace en el navegador: ${boton.enlace}`, COLOR.secundario)
@@ -54,10 +66,11 @@ export function armarCorreo({ asunto, nombre, antes, boton, despues }: Partes): 
 <div style="max-width:480px;margin:0 auto;padding:32px;background:${COLOR.tarjeta};border-radius:12px">
 <p style="margin:0 0 24px;color:${COLOR.texto};font:bold 18px/1.3 ${FUENTE}">${escapar(siteConfig.name)}</p>
 ${[saludo(nombre), ...antes].map((t) => parrafo(t)).join("\n")}
+${destacadoHtml}
 ${botonHtml}
 ${despues.map((t) => parrafo(t, COLOR.secundario)).join("\n")}
 </div>
 </body></html>`;
-  const texto = [saludo(nombre), ...antes, ...(boton ? [boton.enlace] : []), ...despues, `— ${siteConfig.name}`].join("\n\n");
+  const texto = [saludo(nombre), ...antes, ...(destacado ? [destacado] : []), ...(boton ? [boton.enlace] : []), ...despues, `— ${siteConfig.name}`].join("\n\n");
   return { asunto, html, texto };
 }

@@ -9,14 +9,16 @@ import {
 } from "./bloqueo";
 import { hashear, necesitaRehash } from "./contrasenas";
 import type { OpcionesDeAuth } from "./opciones";
-import { alCambiarLaContrasena, anotar, anotarLaSalida } from "./sucesos";
+import { alCambiarLaContrasena, anotarLaSalida } from "./sucesos";
 
 /**
  * Lo que corre alrededor de «entrar» (`/sign-in/email`), que better-auth no
  * trae y que tiene que pasar en el servidor, no en el formulario: el bloqueo
  * por cuenta (bloqueo.ts) y el paso de scrypt a Argon2id (contrasenas.ts).
- * Y lo que se anota de la sesión: entrar, salir y cambiar la contraseña
- * (sucesos.ts).
+ * Y lo que se anota de la sesión: salir y cambiar la contraseña (sucesos.ts).
+ * Entrar no se anota acá: con el segundo factor, la contraseña buena todavía
+ * no es una sesión, y eso lo decide el plugin, que corre después
+ * (segundo-factor.ts).
  */
 
 const ENTRAR = "/sign-in/email";
@@ -75,9 +77,9 @@ export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContr
       if (!clave) return;
       const sesion = ctx.context.newSession;
       if (sesion) {
-        // Entrar bien limpia los fallos y la escalera: era la persona.
+        // La contraseña buena limpia los fallos y la escalera: era la persona,
+        // pida o no el código después.
         await bloqueos.borrar(clave);
-        await anotar(ctx, registrar, { tipo: "entro", idDeCuenta: sesion.user.id });
         const contrasena: unknown = ctx.body?.password;
         if (typeof contrasena === "string") await rehashearSiHaceFalta(ctx, sesion.user.id, contrasena);
         return;

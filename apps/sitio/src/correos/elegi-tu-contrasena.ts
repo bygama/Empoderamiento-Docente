@@ -1,12 +1,5 @@
 import { siteConfig } from "@/config/site";
-import { armarCorreo, type Contenido } from "./plantilla";
-
-/** «1 hora», «72 horas», «30 minutos». */
-function duracion(minutos: number): string {
-  if (minutos % 60 !== 0) return `${minutos} minutos`;
-  const horas = minutos / 60;
-  return horas === 1 ? "1 hora" : `${horas} horas`;
-}
+import { armarCorreo, duracion, type Contenido } from "./plantilla";
 
 /**
  * «Elegí tu contraseña»: el enlace para elegirla. Lo manda «Olvidé mi

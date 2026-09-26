@@ -7,6 +7,7 @@
 // «Can't resolve '@node-rs/argon2-wasm32-wasi'».
 
 export { crearAuth } from "./config";
+export { MINUTOS_DEL_CODIGO } from "./segundo-factor";
 export type { Auth } from "./config";
 export type { OpcionesDeAuth, SucesoDeSesion } from "./opciones";
 export type { AlmacenDeBloqueos, EstadoDeBloqueo } from "./bloqueo";

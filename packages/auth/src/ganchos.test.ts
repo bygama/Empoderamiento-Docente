@@ -11,7 +11,8 @@ import type { SucesoDeSesion } from "./opciones";
 // Los ganchos corriendo adentro de better-auth de verdad, con su adaptador en
 // memoria: lo que se prueba es que los pedidos a `/sign-in/email`,
 // `/sign-out` y `/change-password` pasen por ellos como en producción, no una
-// copia de su lógica.
+// copia de su lógica. «Entró» lo anota el plugin del segundo factor, después
+// de estos ganchos: se prueba en segundo-factor.test.ts.
 
 const SECRETO = "un-secreto-de-prueba-que-no-sirve-para-nada-mas";
 const CONTRASENA = "la-contrasena-buena-de-prueba";
@@ -128,22 +129,14 @@ test("un reset de contraseña destraba la cuenta, escriba como escriba el correo
   assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
 });
 
-test("entrar bien anota «entro» con la cuenta; un fallo no anota nada", async () => {
-  const { cuenta, entrar, sucesos } = await armar("ana@ed.test", hashear);
-  assert.equal((await entrar("ana@ed.test", "una-contrasena-mala")).status, 401);
-  assert.deepEqual(sucesos, []);
-  assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
-  assert.deepEqual(sucesos, [{ tipo: "entro", idDeCuenta: cuenta.id }]);
-});
-
 test("salir anota «salio» antes de que la sesión deje de existir", async () => {
   const { cuenta, entrar, pedir, sucesos } = await armar("ana@ed.test", hashear);
   const cookie = cookieDe(await entrar("ana@ed.test", CONTRASENA));
   assert.equal((await pedir("/sign-out", {}, cookie)).status, 200);
-  assert.deepEqual(sucesos.at(-1), { tipo: "salio", idDeCuenta: cuenta.id });
+  assert.deepEqual(sucesos, [{ tipo: "salio", idDeCuenta: cuenta.id }]);
   // Sin sesión no hay a quién atribuírselo.
   assert.equal((await pedir("/sign-out", {})).status, 200);
-  assert.equal(sucesos.length, 2);
+  assert.equal(sucesos.length, 1);
 });
 
 test("cambiar la contraseña bien la anota y avisa por correo; con la actual mala, nada", async () => {

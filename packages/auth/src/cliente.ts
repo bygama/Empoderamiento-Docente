@@ -1,4 +1,5 @@
 import { createAuthClient } from "better-auth/client";
+import { twoFactorClient } from "better-auth/client/plugins";
 
 /**
  * El cliente del navegador.
@@ -10,7 +11,8 @@ import { createAuthClient } from "better-auth/client";
  * HTTP es lo que hace que el límite exista de verdad.
  */
 export function crearClienteDeAuth(urlDelSitio: string) {
-  return createAuthClient({ baseURL: urlDelSitio });
+  // Sin `onTwoFactorRedirect`: `FormularioEntrar` lee la respuesta y sigue él.
+  return createAuthClient({ baseURL: urlDelSitio, plugins: [twoFactorClient()] });
 }
 
 export type ClienteDeAuth = ReturnType<typeof crearClienteDeAuth>;
