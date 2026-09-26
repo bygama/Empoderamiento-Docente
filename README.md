@@ -250,12 +250,28 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 # 3. El esquema
 pnpm migrate
 
-# 4. La primera cuenta. No hay registro público: esta es la única puerta.
+# 4. Las cuentas. No hay registro público: esta es la única puerta.
 pnpm --filter sitio crear-cuenta tu@correo.org "Tu nombre" administra
 ```
 
 Después, `/admin/olvide-mi-contrasena` con ese correo. Sin `RESEND_API_KEY`
 el correo sale entero **por la consola del servidor**, con el enlace.
+
+Los roles son tres: `dirige`, `administra` y `edita` (sin rol, `edita`).
+**Dirige es una sola persona, de ED y no del desarrollo**, y la base no deja
+que haya dos. Para el desarrollo alcanza con `administra`; la primera persona
+que dirige se nombra de una de dos maneras:
+
+```bash
+# Si todavía no tiene cuenta: se da de alta directamente con ese rol.
+pnpm --filter sitio crear-cuenta quien-dirige@correo.org "Nombre y apellido" dirige
+
+# Si ya tiene cuenta (el caso de producción: ya entraba al admin con otro rol).
+pnpm --filter sitio nombrar-direccion quien-dirige@correo.org
+```
+
+Los dos se niegan, con un mensaje y sin tocar nada, si ya hay quien dirige; de
+ahí en más, la dirección se pasa desde Cuentas.
 
 > **Si ya tenías el contenedor de antes**, adentro vive una base `ed_panel` con
 > las nueve tablas que dejó Payload. Quedó huérfana con la fase 0 y no la toca
