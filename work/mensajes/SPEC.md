@@ -1,7 +1,9 @@
 # SPEC — Mensajes
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-26, con las seis propuestas y
+  tres condiciones para `/sumate-al-equipo` (§5.2) y una para las corridas
+  (§8); ver DECISIONS
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación, tablas y dependencias incluidas: DECISIONS del padre,
   2026-09-26)
@@ -179,12 +181,16 @@ lee y escribe esta misma tabla con `destinatariosDe(bandeja)` y
   formulario, el esquema Zod de `/api/cv` y lo que guarda `datos`; cambiarla
   no toca nada más. `nombre` y `correo` son fijos (sin ellos no hay a quién
   responder) y un test lo exige.
-- **La página `/sumate-al-equipo`** **[propuesta]**: una pantalla simple del
-  sitio con el mismo lenguaje del formulario de contacto (sus clases de
-  campo, el naranja solo en «Enviar mi CV»), el formulario armado desde la
-  lista, la línea de privacidad («Guardamos tu CV 12 meses y después lo
-  borramos, con el archivo…») y, al enviar, la confirmación en el lugar. No
-  entra al menú ni al sitemap mientras sea provisoria.
+- **La página `/sumate-al-equipo`** **[aprobada con condiciones]**: una
+  pantalla **del sitio, no del admin**: su diseño sale de DESIGN.md §1 a §10
+  y del lenguaje de la página de Contacto (sus componentes, sus clases de
+  campo, su forma de enviar), nada de §11. El naranja solo en «Enviar mi CV»,
+  el formulario armado desde la lista, la línea de privacidad («Guardamos tu
+  CV 12 meses y después lo borramos, con el archivo…») y, al enviar, la
+  confirmación en el lugar. Mientras `CV_ABIERTO` no esté: 404, **fuera del
+  sitemap y de todo link del sitio**.
+- **La lista de `config/cv.ts`** lleva un comentario **PROVISORIA** que dice
+  qué falta (que ED la confirme) y remite al SPEC padre §8.
 - **El borde:** lo mismo que Contacto (Zod, trampa, 3 envíos por hora por
   IP), más el archivo: obligatorio, PDF por sus bytes, hasta 4 MB (§3).
 - **Orden al guardar:** primero el archivo, después la fila; si la fila
@@ -283,7 +289,8 @@ los hace editables desde ese mismo lugar.
 | `poda-de-limites-por-ip` | las ventanas de `limites_por_ip` quietas hace más de un día |
 
 - Se suman a `TAREAS_DIARIAS`; cada corrida queda en `corridas_de_tareas` con
-  su detalle («Se borraron 2 CV con sus archivos (1 de spam).»).
+  **cuántos borró** en su detalle («Se borraron 2 CV con sus archivos (1 de
+  spam).»): rastro sin datos personales.
 - **Un CV se borra archivo primero, fila después.** Si el archivo no se pudo
   borrar, la fila queda y la corrida siguiente lo reintenta; un archivo que ya
   no está no es un error.
@@ -354,7 +361,8 @@ Cada uno nace con su primer consumidor en esta lane:
   investigación de §3, los plazos y por qué (Argentina 25.326, art. 4 inc. 7
   —se destruyen cuando dejan de ser necesarios— y art. 16 —supresión en 5
   días hábiles—; Chile 21.719, en vigor desde el 1 de diciembre de 2026;
-  México, la LFPDPPP de 2025 y sus derechos ARCO), qué no se hace (exportar a
+  México, la LFPDPPP de 2025 y sus derechos ARCO), por qué el correo de
+  aviso no lleva ningún dato de quien escribió, qué no se hace (exportar a
   planilla, responder desde el admin, el origen en el CV) y lo que queda
   abierto (la política de privacidad, los campos del CV).
 - **README:** `CV_BLOB_READ_WRITE_TOKEN`, `CV_ABIERTO`, cómo crear el store
