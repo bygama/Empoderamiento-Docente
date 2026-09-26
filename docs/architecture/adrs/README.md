@@ -37,8 +37,9 @@ internos (refactors).
 | 0006  | [Abrir `packages/` ahora, con la reutilización como requisito](0006-packages-reutilizables.md) | Accepted (enmienda 0004) |
 | 0007  | [Usar Prisma como ORM, en la versión 7.10.0 exacta](0007-prisma-como-orm.md) | Accepted (enmendado por 0008) |
 | 0008  | [Adaptador de Postgres y scrypt](0008-correcciones-de-la-fase-1.md) | Accepted (corrige 0005 y 0007; su §2, scrypt, reemplazado por 0010) |
-| 0009  | [Medir el tráfico con la analítica de Vercel y una copia diaria en Neon](0009-analitica-de-vercel-con-copia-diaria.md) | Accepted |
+| 0009  | [Medir el tráfico con la analítica de Vercel y una copia diaria en Neon](0009-analitica-de-vercel-con-copia-diaria.md) | Accepted (enmendado por 0011: su cron pasa al único) |
 | 0010  | [Seguridad del acceso al admin](0010-seguridad-del-acceso.md) | Accepted (reemplaza el §2 de 0008) |
+| 0011  | [Copiar Search Console cada día y correr todo lo programado desde un solo cron](0011-search-console-y-un-solo-cron.md) | Accepted |
 
 ---
 

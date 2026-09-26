@@ -104,8 +104,22 @@ la portada del admin lee una copia diaria de la analítica de Vercel):
   un preview ni con `NEXT_PUBLIC_`.
 - `VERCEL_ANALYTICS_PROJECT_ID` — el `prj_…` del proyecto (Settings → General).
 - `VERCEL_TEAM_ID` — vacío en una cuenta personal; el `team_…` si es un equipo.
-- `CRON_SECRET` — lo que el cron manda en `Authorization`; Vercel lo inyecta si
-  existe. Sin él, `/api/cron/metricas` responde 401 a todo.
+- `CRON_SECRET` — lo que el cron diario manda en `Authorization`; Vercel lo
+  inyecta si existe. Sin él, `/api/cron/diario` responde 401 a todo.
+
+Las tres de las **búsquedas** ([ADR-0011](docs/architecture/adrs/0011-search-console-y-un-solo-cron.md);
+Métricas › Búsquedas lee una copia diaria de Search Console). Salen del JSON
+de una cuenta de servicio de Google Cloud; los pasos para crearla están en «Las
+métricas y lo programado», más abajo:
+
+- `SEARCH_CONSOLE_CLIENT_EMAIL` — el `client_email` de ese JSON.
+- `SEARCH_CONSOLE_PRIVATE_KEY` — el `private_key`, entero y entre comillas;
+  acepta los `\n` escritos, como queda al pegarlo en una variable.
+- `SEARCH_CONSOLE_SITE_URL` — la propiedad: `sc-domain:empoderamientodocente.org`
+  si es de dominio, o `https://empoderamientodocente.org/` si es de prefijo.
+
+Sin las tres, Búsquedas dice que no está conectado y la copia no toca la API;
+en local no hace falta cargarlas.
 
 Todas menos `NEXT_PUBLIC_SITE_URL` son secretas y **solo server-side**. Los
 placeholders viven en
@@ -215,7 +229,8 @@ Prisma antes de `next build`.
 
 Vive en `/admin`, construido a medida sobre **Prisma** y **better-auth**. Hoy
 tiene los cimientos —entrar, salir y elegir contraseña—, la portada con las
-métricas y **la edición del hero de Inicio** (ver «Editar las páginas»); las
+métricas, **Métricas con sus búsquedas en Google** (ver «Las métricas y lo
+programado») y **la edición del hero de Inicio** (ver «Editar las páginas»); las
 novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
@@ -270,16 +285,42 @@ contenido inicial del código y carga igual. Diseño y decisiones en
 > (por ejemplo, al promover a producción) esa URL da 404, porque el archivo
 > nunca viajó a Blob.
 
-### Las métricas
+### Las métricas y lo programado
 
-La portada muestra cuánta gente entra al sitio y qué páginas mira: visitantes
-y vistas de los últimos 7 y 30 días, contra el período anterior. No consulta a
-Vercel al renderizar: un cron (`/api/cron/metricas`, a las 4 UTC) copia cada
-día lo que falta a las tablas `metricas_*`, y el botón «Actualizar ahora» hace
-lo mismo a mano, con un freno de diez minutos. Sin `VERCEL_TOKEN` y
-`VERCEL_ANALYTICS_PROJECT_ID` el panel lo dice y no copia nada; en local no
-hace falta cargarlos. Los días son UTC. Diseño y decisiones en
-[`work/metricas/`](work/metricas/).
+**Métricas** (`/admin/metricas`) tiene cinco pestañas. **Resumen** muestra
+cuánta gente entra al sitio: visitantes y vistas de los últimos 7 y 30 días,
+contra el período anterior (el Inicio lo muestra también, hasta que se
+rehaga). **Búsquedas** muestra qué buscó la gente en Google para llegar: clics,
+impresiones y puesto de los últimos 28 días con datos, por búsqueda, página y
+país, y «Casi nos encuentran». Origen, Qué hace la gente y Links para
+compartir todavía muestran lo que van a tener.
+
+Ninguna pantalla consulta a Vercel ni a Google al renderizar. **Un solo cron**
+(`/api/cron/diario`, a las 4 UTC) corre cada día las tareas registradas en
+`apps/sitio/src/datos/tareas/diarias.ts`, cada una aislada: la copia de Vercel
+Analytics (a las tablas `metricas_*`) y la de Search Console (a
+`busquedas_diarias`). Cada corrida, bien o con su error en llano, queda en
+`corridas_de_tareas`. «Actualizar ahora», en cada pantalla, corre su tarea a
+mano, con un freno de diez minutos por tarea. Lo que necesite correr solo más
+adelante se suma como una tarea en esa lista, no como un cron nuevo
+([ADR-0011](docs/architecture/adrs/0011-search-console-y-un-solo-cron.md)).
+
+Sin sus variables, cada copia lo dice y no toca la API; en local no hace falta
+cargarlas. Los días de Vercel son UTC; los de Google, hora del Pacífico, y
+llegan con 2 o 3 días de atraso.
+
+**Para conectar Search Console**, una vez:
+
+1. **ED:** verificar el dominio en [Search Console](https://search.google.com/search-console)
+   con su cuenta de Google (un registro TXT en el DNS). La propiedad de
+   dominio (`sc-domain:…`) cubre todas las URLs del sitio.
+2. **Desarrollo:** en Google Cloud, crear un proyecto, habilitar la «Google
+   Search Console API», crear una cuenta de servicio y bajar su clave en JSON.
+3. **ED:** en Search Console › Configuración › Usuarios y permisos, agregar el
+   correo de la cuenta de servicio (termina en `.iam.gserviceaccount.com`) con
+   permiso **Restringido**: solo puede leer.
+4. **Desarrollo:** cargar las tres variables `SEARCH_CONSOLE_*` en Vercel
+   (Production). La primera copia trae los últimos 90 días.
 
 ### Correos
 
