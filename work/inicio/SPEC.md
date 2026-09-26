@@ -1,7 +1,9 @@
 # SPEC — El Inicio del admin
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-26, con un cambio: «quién ve
+  cada tipo de actividad» vive en `datos/actividad.ts` (§2.4, §3, §4 y
+  DECISIONS)
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación: DECISIONS del padre, 2026-09-26)
 - **Tier:** M · lane 3c del XL `work/mapa-del-admin/` · worktree propio, rama
@@ -130,8 +132,9 @@ son secundarias, como en «Sin permiso» y Mi cuenta.
 - **Los últimos 8 eventos que tu rol puede ver**, de la tabla `actividad`:
   «Raquel Ayala entró», con cuándo en relativo («hace 2 horas»). Consume
   `Lista` y `Fila`.
-- **Quién ve cada tipo** es un dato: `Record<TipoDeActividad, Capacidad>`.
-  Los cuatro tipos de hoy (`entro`, `salio`, `cambio-su-contrasena`,
+- **Quién ve cada tipo** es un dato: `Record<TipoDeActividad, Capacidad>`, en
+  `datos/actividad.ts` al lado de los tipos, porque Cuentas › Actividad (3b)
+  usa la misma regla. Los cuatro tipos de hoy (`entro`, `salio`, `cambio-su-contrasena`,
   `cambio-su-nombre`) son de las cuentas: los ve `usarCuentas` (D A), como
   Cuentas › Actividad. Quien edita, hasta que un módulo registre algo de
   contenido, ve el vacío: «Todavía no hay actividad para mostrarte» · «Acá van
@@ -161,9 +164,9 @@ son secundarias, como en «Sin permiso» y Mi cuenta.
 ## 3. Los registros
 
 Cada bloque del Inicio lee un registro; cada módulo que llega suma su entrada
-ahí y no toca las pantallas del Inicio. Todos viven en `datos/inicio/` (lo que
-lee el Inicio, al lado de `datos/tareas/`, que es el registro del cron) y
-comparten la forma: una **clave de un tipo cerrado**, la **capacidad** que
+ahí y no toca las pantallas del Inicio. Viven en `datos/inicio/` (lo que lee
+el Inicio, al lado de `datos/tareas/`, que es el registro del cron), salvo
+quién ve cada tipo de actividad, que va con los tipos, y comparten la forma: una **clave de un tipo cerrado**, la **capacidad** que
 hace falta para verla, y una **consulta** por entrada.
 
 | Registro | Archivo | Una entrada es | Hoy |
@@ -171,7 +174,7 @@ hace falta para verla, y una **consulta** por entrada.
 | Pendientes | `datos/inicio/pendientes.ts` | clave, urgencia, capacidad, qué revisa (para el fallo), href, acción, `leer(): Promise<{ titulo, detalle? } \| null>` | páginas sin publicar, Search Console |
 | Esta semana | `datos/inicio/esta-semana.ts` | clave, etiqueta, capacidad, `leer(): Promise<{ valor, variacion } \| null>` | visitantes, clics; CV y materiales con `leer` que devuelve `null` hasta que llegue su módulo |
 | Lo nuevo | `datos/inicio/desde-tu-visita.ts` | clave, capacidad, qué revisa, `leer(desde: Date): Promise<string \| null>` (una frase) | páginas publicadas |
-| Quién ve la actividad | `datos/inicio/actividad-reciente.ts` | `Record<TipoDeActividad, Capacidad>` | los cuatro tipos, `usarCuentas` |
+| Quién ve la actividad | `datos/actividad.ts` (lo consume `datos/inicio/actividad-reciente.ts`) | `Record<TipoDeActividad, Capacidad>` | los cuatro tipos, `usarCuentas` |
 | Accesos rápidos | `admin/armazon/barra-lateral/modulos.ts` | `accesoRapido?` en el módulo, con la capacidad del módulo | ninguno |
 
 - **La urgencia es un dato con nombre**, una escala cerrada en el orden del
@@ -212,8 +215,11 @@ hace falta para verla, y una **consulta** por entrada.
 - **`datos/consultas/busquedas.ts`:** se exporta el total de un rango
   (`totalDeBusquedas(desde, hasta)`, hoy `agregados("total", …)` privada).
 - **`modulos.ts`:** el campo `accesoRapido?` (§2.5).
-- **Sin tocar:** `datos/actividad.ts` (3b y 4a le suman tipos; el `Record` de
-  §2.4 los obliga a pasar por acá), lo de la 4a (`admin/paginas/`,
+- **`datos/actividad.ts`:** suma `QUIEN_VE: Record<TipoDeActividad,
+  Capacidad>` al lado de los tipos (cambio del padre). 3b y 4a le suman tipos:
+  el `Record` los obliga a decir quién los ve, y el que se mergee segundo
+  concilia.
+- **Sin tocar:** lo de la 4a (`admin/paginas/`,
   `admin/campos/`, `contenido/`, `features/`, `lib/contenido/`,
   `datos/**/paginas*`, `prisma/schema/paginas.prisma`: el registro de páginas
   se importa, no se toca), `admin/cuentas/` y `admin/mensajes/`.
@@ -243,9 +249,9 @@ revisa Mateo en el PR):
 - **AGENTS.md §3**, el árbol: `datos/inicio/` (lo que lee el Inicio: los
   registros) y `admin/inicio/`, `admin/actividad/`. **§12**, una regla: lo
   que un módulo le suma al Inicio (una fila de pendientes, un número de la
-  semana, lo nuevo desde tu visita, quién ve un tipo de actividad) se
-  registra en `datos/inicio/`, y su acceso rápido en `modulos.ts`; nunca se
-  toca la pantalla del Inicio.
+  semana, lo nuevo desde tu visita) se registra en `datos/inicio/`, quién ve
+  un tipo de actividad en `datos/actividad.ts`, y su acceso rápido en
+  `modulos.ts`; nunca se toca la pantalla del Inicio.
 - **README:** las dos menciones de «la portada del admin con las métricas»
   pasan a Métricas.
 - El ADR-0009 no se toca: es la decisión de su día.
@@ -257,9 +263,13 @@ revisa Mateo en el PR):
    hasta que llegue la 3b. **Recomiendo** la regla de DECISIONS: lo pongo si
    al rebasear la 3b ya está en `main`; si no, lo suma la 3b con su pantalla.
 2. **La frase de cada tipo de actividad** (`admin/actividad/frase.ts`) y
-   **quién ve cada tipo** (`datos/inicio/actividad-reciente.ts`) nacen acá. Si
-   la 3b los necesita para Cuentas › Actividad, ¿se lo avisás para que los
-   reúse (y el que se mergee segundo concilie)?
+   **quién ve cada tipo** nacen acá. Si la 3b los necesita para Cuentas ›
+   Actividad, ¿se lo avisás para que los reúse (y el que se mergee segundo
+   concilie)?
+
+**Respuestas (padre, 2026-09-26):** 1, como se recomienda. 2, sí, se lo
+avisa; y «quién ve cada tipo» va a `datos/actividad.ts`, no a
+`datos/inicio/`.
 
 ## 8. Lecturas que tomé (para aprobar en bloque)
 
