@@ -523,9 +523,12 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
 
 - **Son links, no el patrón ARIA de tabs:** navegan. Un `nav` con el nombre
   del módulo como `aria-label`, una lista, y la activa con
-  `aria-current="page"`. La activa sale de la ruta (la pestaña cuya `href`
-  es la ruta o la contiene), así un layout puede ponerlas sin que cada página
-  diga cuál es.
+  `aria-current="page"`. La activa sale de la ruta, así un layout puede
+  ponerlas sin que cada página diga cuál es: **gana la más específica**, la
+  de `href` más largo entre las que son la ruta o la contienen (cortando en un
+  segmento: `/admin/metricas` no contiene a `/admin/metricasx`). Así la puerta
+  de un módulo puede ser una pestaña más: Resumen es `/admin/metricas` y no se
+  enciende en `/admin/metricas/busquedas`.
 - **Van en el encabezado**, en su propia fila al pie y pegadas a su divisor
   (el slot `pestanas` de `Encabezado`). El `h1` es el módulo; la pestaña
   encendida dice la pantalla, y el título de pestaña del navegador también.
@@ -541,7 +544,9 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
   hasta entonces no existe.
 - Primer consumidor: las cinco pantallas de Contenido (Páginas, Casos,
   Equipo, Aliados, Fotos). El índice no las lleva, porque ya son las cinco en
-  tarjetas, ni el editor, que lo ubican sus migas.
+  tarjetas, ni el editor, que lo ubican sus migas. Las usa también Métricas
+  (Resumen, Búsquedas, Origen, Qué hace la gente, Links para compartir), que
+  no tiene índice: su puerta es Resumen, la primera pestaña.
 
 ### Índice de tarjetas
 
