@@ -1,9 +1,10 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { hashear, verificar } from "./contrasenas";
 import { crearGanchos, destrabar } from "./ganchos";
 import type { OpcionesDeAuth } from "./opciones";
 import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
+import { segundoFactor } from "./segundo-factor";
 import { CAMPOS_DE_LA_SESION, GANCHOS_DE_LA_BASE } from "./ubicacion";
 
 /**
@@ -14,16 +15,21 @@ import { CAMPOS_DE_LA_SESION, GANCHOS_DE_LA_BASE } from "./ubicacion";
 
 const UNA_HORA = 60 * 60;
 
-export function crearAuth({
-  base,
+/**
+ * Todo lo de la sesión menos la base. Aparte de `crearAuth` para que los tests
+ * corran esta misma config contra el adaptador en memoria de better-auth, y no
+ * una copia que se desfase.
+ */
+export function configDeAuth({
   secreto,
   urlDelSitio,
   mandarResetDeContrasena,
   avisarCambioDeContrasena,
+  mandarCodigo,
   segundoPlano,
   bloqueos,
   registrar,
-}: OpcionesDeAuth) {
+}: Omit<OpcionesDeAuth, "base">) {
   if (!secreto) {
     throw new Error(
       "Falta el secreto de better-auth. Generá uno con " +
@@ -32,8 +38,7 @@ export function crearAuth({
     );
   }
 
-  return betterAuth({
-    database: prismaAdapter(base, { provider: "postgresql" }),
+  return {
     secret: secreto,
     baseURL: urlDelSitio,
 
@@ -139,8 +144,16 @@ export function crearAuth({
         // Pide la contraseña actual: sin límite propio, una sesión robada la
         // podría probar a razón del tope general, 60 por minuto.
         "/change-password": { window: 300, max: 5 },
+        // El segundo factor (segundo-factor.ts): pedir otro código, probarlo,
+        // y prenderlo o apagarlo, que piden la contraseña como el de arriba.
+        "/two-factor/send-otp": { window: 600, max: 5 },
+        "/two-factor/verify-otp": { window: 300, max: 10 },
+        "/two-factor/enable": { window: 300, max: 5 },
+        "/two-factor/disable": { window: 300, max: 5 },
       },
     },
+
+    plugins: segundoFactor({ mandarCodigo, registrar }),
 
     hooks: crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena }),
 
@@ -179,7 +192,11 @@ export function crearAuth({
         },
       },
     },
-  });
+  } satisfies Omit<BetterAuthOptions, "database">;
+}
+
+export function crearAuth({ base, ...opciones }: OpcionesDeAuth) {
+  return betterAuth({ database: prismaAdapter(base, { provider: "postgresql" }), ...configDeAuth(opciones) });
 }
 
 export type Auth = ReturnType<typeof crearAuth>;

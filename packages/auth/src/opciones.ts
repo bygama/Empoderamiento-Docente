@@ -4,11 +4,15 @@ import type { AlmacenDeBloqueos } from "./bloqueo";
 // Lo que la app le pasa a `crearAuth`: todo lo que es de ella y no del paquete.
 
 /**
- * Lo que pasa en la sesión y la app quiere anotar: entrar, salir y cambiar la
- * contraseña (desde la cuenta o con el enlace de «olvidé»). El paquete sabe
- * cuándo pasa; dónde se guarda es de la app.
+ * Lo que pasa en la sesión y la app quiere anotar: entrar, salir, cambiar la
+ * contraseña (desde la cuenta o con el enlace de «olvidé») y prender o apagar
+ * el segundo factor. El paquete sabe cuándo pasa; dónde se guarda es de la
+ * app.
  */
-export type SucesoDeSesion = { tipo: "entro" | "salio" | "cambio-su-contrasena"; idDeCuenta: string };
+export type SucesoDeSesion = {
+  tipo: "entro" | "salio" | "cambio-su-contrasena" | "activo-el-segundo-factor" | "desactivo-el-segundo-factor";
+  idDeCuenta: string;
+};
 
 /**
  * El cliente de Prisma que recibe `crearAuth`.
@@ -38,6 +42,13 @@ export type OpcionesDeAuth = {
   }) => Promise<void>;
   /** Manda el aviso de «tu contraseña cambió». */
   avisarCambioDeContrasena: (datos: { para: string; nombre?: string; cuando: Date }) => Promise<void>;
+  /**
+   * Manda el código del segundo factor. **Rechaza si el correo no salió**
+   * (también cuando no hay por dónde mandarlo): a diferencia de los otros, este
+   * se espera, y el rechazo es lo que hace que la pantalla del código diga que
+   * no llegó en vez de fingir.
+   */
+  mandarCodigo: (datos: { para: string; nombre?: string; codigo: string; minutosDeVigencia: number }) => Promise<void>;
   /**
    * Corre una tarea después de contestar, sin que la respuesta la espere (en
    * Next, `after()`). Los correos salen por acá: si la respuesta esperara al

@@ -8,6 +8,7 @@
 // el navegador y el proxy, que no pueden cargar un módulo nativo.
 
 export { hayCookieDeSesion } from "./guarda";
+export { CODIGO_NO_SALIO, CUENTA_SUSPENDIDA, SEGUNDO_FACTOR_OBLIGATORIO } from "./errores";
 export { crearClienteDeAuth } from "./cliente";
 export type { ClienteDeAuth } from "./cliente";
 export {
