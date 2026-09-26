@@ -1,4 +1,3 @@
-import { after } from "next/server";
 import { crearAuth } from "@ed/auth/servidor";
 import { registrarActividad } from "./actividad";
 import { almacenDeBloqueos } from "./bloqueos-de-acceso";
@@ -6,6 +5,8 @@ import { base } from "./cliente";
 import { elegiTuContrasena } from "@/correos/elegi-tu-contrasena";
 import { mandarCorreo } from "@/correos/mandar";
 import { tuContrasenaCambio } from "@/correos/tu-contrasena-cambio";
+import { segundoPlano } from "@/lib/segundo-plano";
+import { urlDelSitio } from "@/lib/url-del-sitio";
 
 /**
  * La sesión del admin, ya armada con la base de esta app.
@@ -15,32 +16,6 @@ import { tuContrasenaCambio } from "@/correos/tu-contrasena-cambio";
  * la URL del sitio, cómo sale un correo y dónde se anota entrar, salir y
  * cambiar la contraseña (la tabla `actividad`).
  */
-
-function urlDelSitio(): string {
-  const cruda =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    (process.env.VERCEL_ENV === "production" && process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : undefined) ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ??
-    "http://localhost:3000";
-  // Los links de los correos se arman pegando rutas: con barra final quedarían
-  // con doble barra.
-  return cruda.replace(/\/+$/, "");
-}
-
-/**
- * `after()` de Next: la tarea sigue después de contestar y la función de
- * Vercel no se apaga hasta que termine. Fuera de un request (los scripts de
- * `scripts/`) `after` tira; la promesa ya está corriendo y termina igual.
- */
-function segundoPlano(tarea: Promise<unknown>): void {
-  try {
-    after(tarea);
-  } catch {
-    // Sin request no hay a quién esperar.
-  }
-}
 
 const url = urlDelSitio();
 
