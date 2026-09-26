@@ -10,7 +10,7 @@ const fechaLarga = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "lo
 // (tira TypeError). El «UTC» de la cabecera se agrega a mano en el texto.
 const horaCorta = new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short", timeZone: "UTC" });
 
-/** Cuánta gente entra al sitio y qué páginas mira: la primera sección de la portada. */
+/** Cuánta gente entra al sitio: el Resumen de Métricas. */
 export async function PanelMetricas() {
   const estado = await estadoDeMetricas();
   const hora = estado.ultima ? horaCorta.format(estado.ultima.corridaEn) : null;
