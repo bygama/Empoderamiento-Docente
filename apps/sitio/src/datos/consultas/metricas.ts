@@ -1,4 +1,6 @@
 import { base } from "@/datos/cliente";
+import { ultimaCorrida, type UltimaCorrida } from "@/datos/tareas/corridas";
+import { copiaDeVercel } from "@/datos/tareas/metricas-de-vercel";
 import { hayVariablesDeMetricas } from "@/lib/metricas/entorno";
 import { diaISO, fechaUTC, sumarDias, variacion } from "@/lib/metricas/periodos";
 
@@ -7,13 +9,13 @@ import { diaISO, fechaUTC, sumarDias, variacion } from "@/lib/metricas/periodos"
 export type EstadoDeMetricas = {
   hayVariables: boolean;
   hastaDia: string | null;
-  ultima: { corridaEn: Date; ok: boolean; detalle: string } | null;
+  ultima: UltimaCorrida | null;
 };
 
 export async function estadoDeMetricas(): Promise<EstadoDeMetricas> {
   const [ultimoTotal, ultima] = await Promise.all([
     base.metricaDiaria.findFirst({ where: { dimension: "total" }, orderBy: { fecha: "desc" } }),
-    base.sincronizacionMetricas.findFirst({ orderBy: { corridaEn: "desc" }, select: { corridaEn: true, ok: true, detalle: true } }),
+    ultimaCorrida(copiaDeVercel.clave),
   ]);
   return { hayVariables: hayVariablesDeMetricas(), hastaDia: ultimoTotal ? diaISO(ultimoTotal.fecha) : null, ultima };
 }

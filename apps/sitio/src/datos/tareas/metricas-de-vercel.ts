@@ -3,12 +3,14 @@ import { base as baseDeLaApp } from "@/datos/cliente";
 import { clienteDesdeEntorno } from "@/lib/metricas/entorno";
 import { ayerUTC, diaISO, fechaUTC, MAXIMO_DIAS_POR_CORRIDA, rangoFaltante, sumarDias, ventanasDe } from "@/lib/metricas/periodos";
 import { DIMENSIONES } from "@/lib/metricas/tipos";
-import type { FilaDiaria, Rango } from "@/lib/metricas/tipos";
+import type { FilaDiaria } from "@/lib/metricas/tipos";
 import type { ClienteDeAnaliticas } from "@/lib/metricas/vercel";
+import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 
 // Copia a nuestra base lo que la API de Web Analytics tiene y todavía no
-// guardamos. Idempotente: correr dos veces deja lo mismo. Registra cada
-// corrida, también las fallidas, con el motivo en llano.
+// guardamos. Idempotente: correr dos veces deja lo mismo. Es una tarea del
+// cron diario (ADR-0011): devuelve qué pasó, en llano, y quien la corre lo
+// registra en `corridas_de_tareas`, también cuando falla.
 
 const PAUSA_MS = 250;
 const pausa = () => new Promise((r) => setTimeout(r, PAUSA_MS));
@@ -19,13 +21,6 @@ const pausa = () => new Promise((r) => setTimeout(r, PAUSA_MS));
 // avanzaría sin que el rango haya entrado entero. Por eso corre última, después
 // de las dimensiones de acá abajo y de las ventanas.
 const ORDEN_DIMENSIONES = DIMENSIONES.filter((d) => d !== "total");
-
-async function registrar(base: PrismaClient, corrida: Rango & { ok: boolean; detalle: string }) {
-  await base.sincronizacionMetricas.create({
-    data: { desde: fechaUTC(corrida.desde), hasta: fechaUTC(corrida.hasta), ok: corrida.ok, detalle: corrida.detalle },
-  });
-  return { ok: corrida.ok, detalle: corrida.detalle };
-}
 
 async function guardarFila(base: PrismaClient, fila: FilaDiaria) {
   const clave = { fecha: fechaUTC(fila.fecha), dimension: fila.dimension, valor: fila.valor, agrupado: fila.agrupado };
@@ -44,7 +39,7 @@ export async function sincronizarMetricas({
   hoy?: Date;
   /** El botón «Actualizar ahora» pide siempre los últimos N días, por lo que llegó tarde. */
   minimoDias?: number;
-}): Promise<{ ok: boolean; detalle: string }> {
+}): Promise<ResultadoDeTarea> {
   const ultimo = await base.metricaDiaria.findFirst({ where: { dimension: "total" }, orderBy: { fecha: "desc" } });
   const ayer = ayerUTC(hoy);
   let rango = rangoFaltante({ ultimoGuardado: ultimo ? diaISO(ultimo.fecha) : null, hoy });
@@ -55,7 +50,7 @@ export async function sincronizarMetricas({
     const desdeMinimo = sumarDias(ayer, -(minimo - 1));
     rango = { desde: rango && rango.desde < desdeMinimo ? rango.desde : desdeMinimo, hasta: ayer };
   }
-  if (!rango) return registrar(base, { desde: ayer, hasta: ayer, ok: true, detalle: "Nada nuevo: ya estaba al día." });
+  if (!rango) return { ok: true, detalle: "Nada nuevo: ya estaba al día." };
 
   try {
     let filas = 0;
@@ -83,22 +78,20 @@ export async function sincronizarMetricas({
     await Promise.all(filasTotal.map((fila) => guardarFila(base, fila)));
     filas += filasTotal.length;
     const dias = Math.round((fechaUTC(rango.hasta).getTime() - fechaUTC(rango.desde).getTime()) / 86_400_000) + 1;
-    return registrar(base, { ...rango, ok: true, detalle: `${dias} días, ${filas} filas, ${ventanas} ventanas.` });
+    return { ok: true, detalle: `Del ${rango.desde} al ${rango.hasta}: ${dias} días, ${filas} filas, ${ventanas} ventanas.` };
   } catch (e) {
-    return registrar(base, { ...rango, ok: false, detalle: e instanceof Error ? e.message : String(e) });
+    return { ok: false, detalle: e instanceof Error ? e.message : String(e) };
   }
 }
 
 /**
- * Lo que llama el cron: arma el cliente con las variables del entorno. Si
- * faltan, deja la corrida registrada como fallida (para que el panel lo
- * muestre) y no toca la API.
+ * Arma el cliente con las variables del entorno y copia. Si faltan, la
+ * corrida sale fallida (para que el panel lo muestre) y no toca la API.
  */
-export async function sincronizarDesdeEntorno(): Promise<{ ok: boolean; detalle: string }> {
+export async function copiarMetricas({ minimoDias = 0 }: { minimoDias?: number } = {}): Promise<ResultadoDeTarea> {
   const cliente = clienteDesdeEntorno();
-  if (!cliente) {
-    const hoy = diaISO(new Date());
-    return registrar(baseDeLaApp, { desde: hoy, hasta: hoy, ok: false, detalle: "Faltan VERCEL_TOKEN y/o VERCEL_ANALYTICS_PROJECT_ID: ver el README." });
-  }
-  return sincronizarMetricas({ cliente, base: baseDeLaApp });
+  if (!cliente) return { ok: false, detalle: "Faltan VERCEL_TOKEN y/o VERCEL_ANALYTICS_PROJECT_ID: ver el README." };
+  return sincronizarMetricas({ cliente, base: baseDeLaApp, minimoDias });
 }
+
+export const copiaDeVercel: Tarea = { clave: "metricas-de-vercel", nombre: "Copia de Vercel Analytics", correr: () => copiarMetricas() };

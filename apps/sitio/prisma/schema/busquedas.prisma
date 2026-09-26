@@ -1,0 +1,22 @@
+// La copia diaria de Search Console (ADR-0011, work/busquedas-de-google/).
+// La llena una tarea del cron diario; el admin lee de acá y nunca de la API
+// en el render.
+
+/// Una fila por día, dimensión y valor. `valor` es "" en la fila del total.
+/// Los días son los de Google, en hora del Pacífico.
+///
+/// `sumaDePosiciones` es la posición promedio que da Google por sus
+/// impresiones: Google la promedia por impresión, así que un agregado de
+/// varios días o filas se lee `Σ sumaDePosiciones / Σ impresiones`. Guardar
+/// el promedio solo obligaría a promediar promedios, que da mal.
+model BusquedaDiaria {
+  fecha            DateTime @db.Date
+  dimension        String   // total | consulta | pagina | pais
+  valor            String   // "" · lo que se buscó · la URL · el país (ISO alfa-3)
+  clics            Int
+  impresiones      Int
+  sumaDePosiciones Float
+
+  @@id([fecha, dimension, valor])
+  @@map("busquedas_diarias")
+}

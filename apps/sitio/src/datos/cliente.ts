@@ -14,7 +14,7 @@ import { adaptadorPostgres } from "@ed/db";
  * `next build` importa cada ruta y cada layout para leer su configuración
  * (`maxDuration`, `dynamic`…) aunque no los renderice, y lo hace con el
  * entorno que tenga: con el adaptador armado al cargar el módulo, el build sin
- * `.env.local` moría en `/api/cron/metricas` con «Falta DATABASE_URL». Prisma
+ * `.env.local` moría en la ruta del cron con «Falta DATABASE_URL». Prisma
  * llama a `adapter.connect()` recién en la primera consulta, así que el
  * adaptador de abajo posterga hasta ahí la lectura de la URL; el error, con el
  * mismo texto, aparece donde de verdad hace falta la base. El sitio compila
