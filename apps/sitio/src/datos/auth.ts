@@ -1,7 +1,10 @@
+import { after } from "next/server";
 import { crearAuth } from "@ed/auth/servidor";
 import { almacenDeBloqueos } from "./bloqueos-de-acceso";
 import { base } from "./cliente";
-import { siteConfig } from "@/config/site";
+import { elegiTuContrasena } from "@/correos/elegi-tu-contrasena";
+import { mandarCorreo } from "@/correos/mandar";
+import { tuContrasenaCambio } from "@/correos/tu-contrasena-cambio";
 
 /**
  * La sesión del admin, ya armada con la base de esta app.
@@ -24,17 +27,29 @@ function urlDelSitio(): string {
   return cruda.replace(/\/+$/, "");
 }
 
+/**
+ * `after()` de Next: la tarea sigue después de contestar y la función de
+ * Vercel no se apaga hasta que termine. Fuera de un request (los scripts de
+ * `scripts/`) `after` tira; la promesa ya está corriendo y termina igual.
+ */
+function segundoPlano(tarea: Promise<unknown>): void {
+  try {
+    after(tarea);
+  } catch {
+    // Sin request no hay a quién esperar.
+  }
+}
+
+const url = urlDelSitio();
+
 export const auth = crearAuth({
   base,
   secreto: process.env.BETTER_AUTH_SECRET ?? "",
-  urlDelSitio: urlDelSitio(),
+  urlDelSitio: url,
   bloqueos: almacenDeBloqueos,
-  // Sin clave de Resend el correo sale por la consola del servidor, que es lo
-  // que hace falta en local. El envío de verdad llega con la pantalla de
-  // «olvidé mi contraseña» (paso 8 del PLAN).
-  mandarResetDeContrasena: async ({ para, nombre, enlace }) => {
-    console.info(
-      `[${siteConfig.shortName}] Correo de contraseña nueva para ${nombre ?? para} <${para}>:\n  ${enlace}`,
-    );
-  },
+  segundoPlano,
+  mandarResetDeContrasena: ({ para, nombre, enlace, minutosDeVigencia }) =>
+    mandarCorreo({ para, contenido: elegiTuContrasena({ nombre, enlace, minutosDeVigencia }) }),
+  avisarCambioDeContrasena: ({ para, nombre }) =>
+    mandarCorreo({ para, contenido: tuContrasenaCambio({ nombre, olvideMiContrasena: `${url}/admin/olvide-mi-contrasena` }) }),
 });

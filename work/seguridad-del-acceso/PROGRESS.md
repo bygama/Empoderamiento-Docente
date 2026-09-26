@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 5 del PLAN (los correos de la contraseña).
+- Paso 6 del PLAN (tokens hasheados).
 
 ## Hecho
 
@@ -75,3 +75,18 @@ Medido sobre `275518e`:
   `Idempotency-Key`, el corte por `espera`, 4xx sin reintento, el error sin el
   enlace. `pnpm --filter sitio test` → 82 pass, 1 skip (A1), exit 0;
   `pnpm typecheck` y `pnpm --filter sitio lint` → exit 0.
+- 2026-09-26 — **Paso 5, los correos de la contraseña.**
+  `apps/sitio/src/correos/`: `plantilla.ts` (HTML escapado + texto, colores de
+  los tokens en hex), `elegi-tu-contrasena.ts`, `tu-contrasena-cambio.ts` y
+  `mandar.ts` (Resend con clave; consola sin clave fuera de producción; en
+  producción sin clave, un error sin enlace ni destinatario), con 5 tests.
+  `crearAuth` recibe `segundoPlano` (→ `advanced.backgroundTasks.handler`),
+  `avisarCambioDeContrasena` (lo manda `onPasswordReset` en segundo plano) y
+  le pasa `minutosDeVigencia` al reset; `datos/auth.ts` los arma con `after()`.
+  `CORREO_REMITENTE` y `RESEND_API_KEY` en `.env.example`. `pnpm --filter sitio
+  test` (correos) → 5/5; `pnpm typecheck` y `pnpm lint` → exit 0. En el dev
+  server sin clave: «Olvidé mi contraseña» para `otra@ed.test` imprimió
+  «Elegí tu contraseña» entero (enlace, «vence en 1 hora»), el correo
+  inexistente no imprimió nada y contestó lo mismo; elegir la contraseña
+  imprimió «Tu contraseña cambió» con el enlace a
+  `/admin/olvide-mi-contrasena`.
