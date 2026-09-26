@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { PAGINAS } from "@/contenido/paginas";
-import { comoDocumento, parteDe, primerProblema, propioDe, type PaginaRegistrada, type RegistroDePaginas, type SeccionRegistrada } from "@/lib/contenido/documento";
+import { comoDocumento, parteDe, propioDe, type PaginaRegistrada, type RegistroDePaginas, type SeccionRegistrada } from "@/lib/contenido/documento";
+import { problemasAlGuardar } from "@/lib/contenido/problemas";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 
 // Guardar y descartar el borrador en la base (SPEC §7 de la lane del hero),
@@ -21,7 +22,8 @@ export async function guardarBorradorEnBase(
   const definicion: SeccionRegistrada | undefined = pagina && parteDe(pagina, seccion);
   if (!definicion) return { ok: false, detalle: "Esa página o esa sección no se editan desde acá." };
   const valido = definicion.esquema.safeParse(contenido);
-  if (!valido.success) return { ok: false, detalle: primerProblema(valido.error) };
+  // Todos los errores, cada uno con el camino de su campo: el editor marca cada uno en su lugar.
+  if (!valido.success) return { ok: false, ...problemasAlGuardar(seccion, definicion, valido.error) };
 
   const fila = await base.pagina.findUnique({ where: { slug } });
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila);

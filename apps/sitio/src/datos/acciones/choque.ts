@@ -1,3 +1,4 @@
+import type { ErrorDeCampo } from "@/lib/contenido/errores";
 import { haceCuanto } from "@/lib/contenido/tiempo";
 
 // El aviso de choque (SPEC §5 de `work/paginas-inicio/`): cada escritura del
@@ -5,8 +6,11 @@ import { haceCuanto } from "@/lib/contenido/tiempo";
 // vio la pantalla, y si otra persona guardó desde entonces no pisa: contesta
 // quién y cuándo, y el editor ofrece recargar. Sin fusión ni bloqueo.
 
-/** Una escritura que no se hizo. `choque` dice que fue por otra persona, y que recargar lo resuelve. */
-export type Fallo = { ok: false; detalle: string; choque?: true };
+/**
+ * Una escritura que no se hizo. `choque` dice que fue por otra persona, y que
+ * recargar lo resuelve; `errores`, qué campos no pasan, cada uno con su camino.
+ */
+export type Fallo = { ok: false; detalle: string; choque?: true; errores?: ErrorDeCampo[] };
 
 type FilaVista = { borradorEn: Date | null; borradorPor: string | null } | null;
 

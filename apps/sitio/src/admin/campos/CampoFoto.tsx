@@ -24,6 +24,8 @@ type Props = {
   valor: ValorFoto;
   alCambiar: (valor: Cambio<ValorFoto>) => void;
   subir: SubirFoto;
+  /** Lo que el último guardado dijo de esta foto (casi siempre, del alt). */
+  error?: string;
 };
 
 // Cuánto mueve cada pulsación de flecha, en fracción de la caja (0..1): un
@@ -39,12 +41,13 @@ const PASO_FOCO_GRANDE = 0.25;
  * tarjeta: las once tienen once relaciones de aspecto y el campo es uno solo
  * (DECISIONS, 8); el recorte real se ve en la vista previa.
  */
-export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: Props) {
+export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, error }: Props) {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [pendiente, empezar] = useTransition();
   const refArchivo = useRef<HTMLInputElement>(null);
   const idArchivo = `${nombre}-archivo`;
+  const idError = `${nombre}-error`;
 
   const elegirFoco = (e: MouseEvent<HTMLButtonElement>) => {
     // Enter o espacio disparan un click con clientX/clientY en 0 (detail 0):
@@ -151,10 +154,14 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
       )}
       <label className="block">
         <span className="text-admin-meta font-medium">Texto alternativo (obligatorio)</span>
+        {/* `-campo`: el editor lleva el foco acá cuando la foto no pasa. */}
         <input
+          id={`${nombre}-campo`}
           type="text"
           value={valor.alt}
           maxLength={200}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? idError : undefined}
           disabled={pendiente}
           onChange={(e) => {
             const alt = e.target.value;
@@ -167,6 +174,11 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir }: 
           className={`mt-1 ${ENTRADA}`}
         />
       </label>
+      {error ? (
+        <p id={idError} className="text-admin-meta text-rojo-error">
+          {error}
+        </p>
+      ) : null}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         {/*
           El input nativo queda oculto pero enfocable (Tab llega, Enter abre el

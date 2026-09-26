@@ -2,11 +2,14 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { resolverCambio, type Cambio } from "@/admin/campos/cambio";
+import { ContextoDeErrores } from "@/admin/campos/errores";
 import { Aviso } from "@/admin/armazon/Campos";
 import { descartarBorrador, guardarBorrador, publicar } from "@/datos/acciones/paginas";
 import { abrirVistaPrevia } from "@/datos/acciones/vista-previa";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
+import { resumenDeErrores, type ErrorDeCampo } from "@/lib/contenido/errores";
 import { EncabezadoDelEditor, type EstadoPendiente } from "./EncabezadoDelEditor";
+import { useErroresDelEditor } from "./useErroresDelEditor";
 import { useFrenarSalida } from "./useFrenarSalida";
 import { Seccion } from "./Seccion";
 
@@ -55,6 +58,7 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
   const [pendiente, setPendiente] = useState<EstadoPendiente>(null);
   const haySinGuardar = pagina.secciones.some((s) => contenidos[s.clave] !== confirmados[s.clave]);
   const soltarSalida = useFrenarSalida(haySinGuardar);
+  const errores = useErroresDelEditor();
 
   const cambiar = (clave: string, cambio: Cambio<unknown>) => {
     setContenidos((c) => ({ ...c, [clave]: resolverCambio(cambio, c[clave]) }));
@@ -63,14 +67,21 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
   /**
    * Guarda las secciones con cambios, una por una. Devuelve el `borradorEn`
    * que quedó —lo que la próxima escritura tiene que traer—, o `false` si
-   * alguna falló (y ya avisó).
+   * alguna falló (y ya avisó). Una sección que no pasa su esquema no frena a
+   * las demás: se guardan las que pasan y se marcan todos los campos que no;
+   * un choque o un error del servidor sí cortan ahí.
    */
   async function guardarTodo(): Promise<string | null | false> {
     let visto = estado.borradorEn;
+    const noPasan: ErrorDeCampo[] = [];
     for (const s of pagina.secciones) {
       const valorEnviado = contenidosRef.current[s.clave];
       if (valorEnviado === confirmados[s.clave]) continue;
       const r = await guardarBorrador({ slug: pagina.slug, seccion: s.clave, contenido: valorEnviado, borradorEnVisto: visto });
+      if (!r.ok && r.errores) {
+        noPasan.push(...r.errores);
+        continue;
+      }
       if (!r.ok) {
         setAviso(r);
         return false;
@@ -84,6 +95,12 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
       // así un `setEstado` que React todavía no llamó nunca lee el valor de
       // otra sección.
       setEstado((e) => ({ ...e, borradorEn: r.borradorEn, borradorPor: r.borradorPor }));
+    }
+    if (noPasan.length > 0) {
+      // Cada campo que no pasa muestra su error, y el foco va al primero.
+      setAviso({ ok: false, detalle: resumenDeErrores(noPasan) });
+      errores.mostrar(noPasan);
+      return false;
     }
     return visto;
   }
@@ -222,9 +239,11 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
         alPublicar={publicarAhora}
         alDescartar={descartar}
       />
-      {pagina.secciones.map((s) => (
-        <Seccion key={s.clave} clave={s.clave} nombre={s.nombre} descripcion={s.descripcion} valor={contenidos[s.clave]} alCambiar={(v) => cambiar(s.clave, v)} />
-      ))}
+      <ContextoDeErrores value={errores.contexto}>
+        {pagina.secciones.map((s) => (
+          <Seccion key={s.clave} clave={s.clave} nombre={s.nombre} descripcion={s.descripcion} valor={contenidos[s.clave]} alCambiar={(v) => cambiar(s.clave, v)} />
+        ))}
+      </ContextoDeErrores>
     </div>
   );
 }

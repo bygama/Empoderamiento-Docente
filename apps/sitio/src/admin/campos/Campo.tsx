@@ -1,9 +1,11 @@
+import { use } from "react";
 import { subirFoto } from "@/datos/acciones/fotos";
 import { valorVacio, type Descripcion } from "@/lib/contenido/descripcion";
 import type { ValorFoto } from "@/lib/contenido/fotos";
 import { resumirItem } from "@/lib/contenido/resumen";
 import { resolverCambio, type Cambio } from "./cambio";
 import { CampoFoto } from "./CampoFoto";
+import { ContextoDeErrores, errorDe, estaEn } from "./errores";
 import { ListaFija } from "./ListaFija";
 import { Parrafo } from "./Parrafo";
 import { RutaInterna } from "./RutaInterna";
@@ -41,31 +43,41 @@ export type PropsDeCampo = {
  * `ListaFija`), para no pisar una edición hecha en otro campo mientras algo
  * todavía no resolvió.
  *
- * Es el único archivo de `admin/campos/` que conoce `Descripcion` y `datos/`:
- * los controles reciben props planas (etiqueta, ayuda, máximo…) y la subida
- * de fotos por prop, para mudarse a `packages/kit-admin` en la fase 2 sin
- * llevarse este dibujante (AGENTS.md §12).
+ * Es el único archivo de `admin/campos/` que conoce `Descripcion`, `datos/` y
+ * los errores del último guardado (`errores.ts`): los controles reciben props
+ * planas (etiqueta, ayuda, máximo, su `error`…) y la subida de fotos por
+ * prop, para mudarse a `packages/kit-admin` en la fase 2 sin llevarse este
+ * dibujante (AGENTS.md §12). Un control que cambia borra su error.
  */
 export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false, columnas = false }: PropsDeCampo) {
+  const { errores, limpiar } = use(ContextoDeErrores);
   const texto = typeof valor === "string" ? valor : "";
+  // Los controles de una hoja: su error y, al cambiar, lo borran.
+  const hoja = {
+    nombre,
+    etiqueta: descripcion.etiqueta,
+    ayuda: descripcion.ayuda,
+    error: errorDe(errores, nombre),
+    alCambiar: (v: Cambio<unknown>) => {
+      limpiar(nombre);
+      alCambiar(v);
+    },
+  };
   switch (descripcion.tipo) {
     case "textoCorto":
-      return <TextoCorto nombre={nombre} etiqueta={descripcion.etiqueta} maximo={descripcion.maximo} ayuda={descripcion.ayuda} valor={texto} alCambiar={alCambiar} />;
+      return <TextoCorto {...hoja} maximo={descripcion.maximo} recomendado={descripcion.recomendado} valor={texto} />;
     case "parrafo":
-      return <Parrafo nombre={nombre} etiqueta={descripcion.etiqueta} maximo={descripcion.maximo} ayuda={descripcion.ayuda} valor={texto} alCambiar={alCambiar} />;
+      return <Parrafo {...hoja} maximo={descripcion.maximo} valor={texto} />;
     case "rutaInterna":
-      return <RutaInterna nombre={nombre} etiqueta={descripcion.etiqueta} opciones={descripcion.opciones} ayuda={descripcion.ayuda} valor={texto} alCambiar={alCambiar} />;
+      return <RutaInterna {...hoja} opciones={descripcion.opciones} valor={texto} />;
     case "foto":
       // Si el valor no es un objeto (nulo, viejo, corrupto), lo reemplaza un
       // vacío del mismo tipo: los dos `as ValorFoto` son seguros porque acá
       // adentro `descripcion.tipo` ya es "foto".
       return (
         <CampoFoto
-          nombre={nombre}
-          etiqueta={descripcion.etiqueta}
-          ayuda={descripcion.ayuda}
+          {...hoja}
           valor={valor && typeof valor === "object" ? (valor as ValorFoto) : (valorVacio(descripcion) as ValorFoto)}
-          alCambiar={alCambiar}
           subir={subirFoto}
         />
       );
@@ -81,6 +93,7 @@ export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false, col
           valor={Array.isArray(valor) ? valor : []}
           alCambiar={alCambiar}
           resumenDe={(item) => resumirItem(descripcion.item, item)}
+          conError={(i) => Object.keys(errores).some((camino) => estaEn(camino, `${nombre}.${i}`))}
           porItem={(i, item, cambiarItem) => <Campo raiz columnas nombre={`${nombre}.${i}`} descripcion={descripcion.item} valor={item} alCambiar={cambiarItem} />}
         />
       );

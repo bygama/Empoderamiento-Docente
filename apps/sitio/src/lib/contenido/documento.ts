@@ -67,10 +67,3 @@ export function completarPagina(
 export function propioDe<T>(registro: Record<string, T>, clave: string): T | undefined {
   return Object.hasOwn(registro, clave) ? registro[clave] : undefined;
 }
-
-/** El primer problema de Zod, en llano y con el camino al campo. */
-export function primerProblema(error: z.ZodError): string {
-  const [problema] = error.issues;
-  const donde = problema && problema.path.length > 0 ? ` (en ${problema.path.map(String).join(" › ")})` : "";
-  return `${problema?.message ?? "Hay un dato que no pasa."}${donde}`;
-}

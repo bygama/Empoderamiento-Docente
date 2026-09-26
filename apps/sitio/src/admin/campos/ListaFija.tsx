@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { X } from "@/components/ui/icons";
+import { Alerta, X } from "@/components/ui/icons";
 import { posicionDelFoco } from "@/lib/contenido/fotos";
 import type { Resumen } from "@/lib/contenido/resumen";
 import { resolverCambio, type Cambio } from "./cambio";
@@ -20,10 +20,12 @@ type Props = {
   /** Lo que se ve de un ítem cerrado: su primera foto y una línea. */
   resumenDe: (valor: unknown) => Resumen;
   porItem: (indice: number, valor: unknown, cambiar: (valor: Cambio<unknown>) => void) => ReactNode;
+  /** ¿El último guardado encontró un error adentro de este ítem? Cerrado, lo dice. */
+  conError?: (indice: number) => boolean;
 };
 
 /** La cara de un ítem cerrado: la miniatura con su número y una línea de texto. */
-function Cerrado({ numero, etiquetaItem, resumen }: { numero: number; etiquetaItem: string; resumen: Resumen }) {
+function Cerrado({ numero, etiquetaItem, resumen, conError }: { numero: number; etiquetaItem: string; resumen: Resumen; conError: boolean }) {
   return (
     <span className="block group-open/item:hidden">
       <span className="relative block aspect-4/3 overflow-hidden rounded-lg bg-gris-fondo">
@@ -36,7 +38,15 @@ function Cerrado({ numero, etiquetaItem, resumen }: { numero: number; etiquetaIt
           {numero}
         </span>
       </span>
-      <span className={`mt-1 block truncate text-admin-meta ${resumen.texto ? "text-azul-principal" : "text-gris-texto"}`}>{resumen.texto || "Sin texto"}</span>
+      {/* Con un error adentro, el texto y el ícono lo dicen: el color solo no alcanza. */}
+      {conError ? (
+        <span className="mt-1 flex items-center gap-1 text-admin-meta font-medium text-rojo-error">
+          <Alerta size={16} className="shrink-0" />
+          Con error
+        </span>
+      ) : (
+        <span className={`mt-1 block truncate text-admin-meta ${resumen.texto ? "text-azul-principal" : "text-gris-texto"}`}>{resumen.texto || "Sin texto"}</span>
+      )}
     </span>
   );
 }
@@ -49,7 +59,7 @@ function Cerrado({ numero, etiquetaItem, resumen }: { numero: number; etiquetaIt
  * a su propia fila a todo el ancho sin reordenar nada, porque el orden de
  * lectura y de Tab es el del DOM (SPEC §5 de `work/editor-sin-pared/`).
  */
-export function ListaFija({ nombre, etiqueta, etiquetaItem, cantidad, ayuda, itemVacio, valor, alCambiar, resumenDe, porItem }: Props) {
+export function ListaFija({ nombre, etiqueta, etiquetaItem, cantidad, ayuda, itemVacio, valor, alCambiar, resumenDe, porItem, conError }: Props) {
   // Siempre la cantidad exacta: si el valor trae menos, se completa con vacíos; si trae más, se recorta.
   const items = Array.from({ length: cantidad }, (_, i) => (i < valor.length ? valor[i] : itemVacio()));
   return (
@@ -68,7 +78,7 @@ export function ListaFija({ nombre, etiqueta, etiquetaItem, cantidad, ayuda, ite
             <li key={i} className="has-open:col-span-full">
               <details name={nombre} className="group/item rounded-lg open:border open:border-azul-claro/60">
                 <summary className="block cursor-pointer list-none rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio [&::-webkit-details-marker]:hidden">
-                  <Cerrado numero={i + 1} etiquetaItem={etiquetaItem} resumen={resumen} />
+                  <Cerrado numero={i + 1} etiquetaItem={etiquetaItem} resumen={resumen} conError={conError?.(i) ?? false} />
                   {/* Abierto, el mismo `summary` es la cabecera del panel: tocarlo lo cierra. */}
                   <span className="hidden items-center justify-between gap-3 px-4 py-3 group-open/item:flex">
                     <span className="min-w-0 truncate text-admin-meta font-medium">

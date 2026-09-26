@@ -45,3 +45,31 @@ export function valorVacio(d: Descripcion): unknown {
       return null;
   }
 }
+
+// Cómo se llaman, para quien edita, las partes de una foto.
+const PARTES_DE_UNA_FOTO: Record<string, string> = { src: "Archivo", alt: "Texto alternativo", foco: "Punto de foco" };
+
+/**
+ * El camino de un campo como lo lee quien edita: las etiquetas del formulario
+ * y no las claves. `["tarjetas", 2, "foto", "alt"]` → «Tarjetas (computadora)
+ * › Tarjeta 3 › Foto › Texto alternativo». Lo usan los avisos de error y «Qué
+ * cambió». Un paso que la descripción no conoce se corta ahí.
+ */
+export function caminoLegible(d: Descripcion, camino: ReadonlyArray<PropertyKey>): string[] {
+  const [paso, ...resto] = camino;
+  if (paso === undefined) return [];
+  switch (d.tipo) {
+    case "grupo": {
+      const campo = d.campos.find((c) => c.clave === String(paso));
+      return campo ? [campo.descripcion.etiqueta, ...caminoLegible(campo.descripcion, resto)] : [];
+    }
+    case "listaFija":
+      return [`${d.item.etiqueta} ${Number(paso) + 1}`, ...caminoLegible(d.item, resto)];
+    case "opcional":
+      return caminoLegible(d.de, camino);
+    case "foto":
+      return PARTES_DE_UNA_FOTO[String(paso)] ? [PARTES_DE_UNA_FOTO[String(paso)]] : [];
+    default:
+      return [];
+  }
+}
