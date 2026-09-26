@@ -1,4 +1,4 @@
-import { crearAuth } from "@ed/auth";
+import { crearAuth } from "@ed/auth/servidor";
 import { base } from "./cliente";
 import { siteConfig } from "@/config/site";
 

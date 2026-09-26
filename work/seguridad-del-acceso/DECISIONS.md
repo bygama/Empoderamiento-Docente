@@ -19,3 +19,16 @@
   5. **`FormularioEntrar` consulta la sesión también al cargar.** Mientras
      consulta, el formulario no parpadea (se muestra entero y usable desde el
      principio), y si la consulta falla, el formulario queda usable igual.
+- 2026-09-26 — **`@node-rs/argon2` y no `crypto.argon2` de Node** (paso 1):
+  Node lo trae desde la 24.7, pero experimental, y `engines` admite Node 22,
+  que no lo tiene; tampoco arma ni lee el formato PHC (`$argon2id$…`). Va con
+  `^2.2.1` (AGENTS.md §2: majors fijos, minors flotando).
+- 2026-09-26 — **`crearAuth` pasa a `@ed/auth/servidor`** (paso 1): con el
+  módulo nativo adentro de `index.ts`, el middleware (Edge) y los bundles del
+  navegador que importan `@ed/auth` intentaban resolver
+  `@node-rs/argon2-wasm32-wasi` y el dev server se caía. El índice queda con lo
+  liviano (permisos, guarda, cliente); solo `datos/auth.ts` cambia de import.
+- 2026-09-26 — **`necesitaRehash` también mira los parámetros** (paso 1): un
+  Argon2id con otra memoria, pasadas o hilos pide rehash, además del scrypt
+  viejo. Es una línea con `parseOptions` y deja que un cambio futuro de
+  parámetros migre solo, como migra el scrypt.
