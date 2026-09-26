@@ -17,7 +17,7 @@
 - 2026-09-26 — SPEC aprobado por el padre (opción A en §9.1, nota en §9.9;
   DECISIONS.md). PLAN.md escrito: 10 pasos.
 
-- 2026-09-26 — **Paso 1** (`f1e8470`): `lib/tareas/registro.ts` (`Tarea`,
+- 2026-09-26 — **Paso 1** (`2a42684`): `lib/tareas/registro.ts` (`Tarea`,
   `ResultadoDeTarea`, `definirTareas`, que rechaza claves repetidas) y
   `lib/tareas/corredor.ts` (`correrTareas(tareas, { registrar, limiteMs })`:
   todas a la vez, aisladas, con tiempo máximo, y registrar sin frenar a las
@@ -25,7 +25,7 @@
   1 skip: el de las respuestas grabadas de Vercel, que espera a A1);
   `pnpm typecheck` → exit 0.
 
-- 2026-09-26 — **Paso 2** (`29044f4`): `tareas.prisma` (`CorridaDeTarea`) y
+- 2026-09-26 — **Paso 2** (`2879cb0`): `tareas.prisma` (`CorridaDeTarea`) y
   `busquedas.prisma` (`BusquedaDiaria`); `SincronizacionMetricas` sale de
   `metricas.prisma`. Migración `20260926213050_busquedas_y_tareas`: generada
   con `pnpm migrate --create-only --name busquedas_y_tareas` (en una terminal
@@ -57,10 +57,10 @@
   - `pnpm typecheck` → exit 0; `pnpm --filter sitio test` → exit 0 (85
     tests, 84 pass, 1 skip); `pnpm lint` → exit 0.
 
-- 2026-09-26 — **Paso 3** (`6814fe5`): `PUEDE.configurarConexiones`, hoy
+- 2026-09-26 — **Paso 3** (`d2fb7e0`): `PUEDE.configurarConexiones`, hoy
   solo `administra`. `pnpm typecheck` → exit 0; `git diff --stat main --
   packages/auth` → solo `permisos.ts` (6 líneas).
-- 2026-09-26 — **Paso 4** (`16d5166`): `lib/busquedas/` con `tipos.ts`
+- 2026-09-26 — **Paso 4** (`d79a252`): `lib/busquedas/` con `tipos.ts`
   (`DimensionDeBusqueda`, `FilaDeBusqueda`, `ErrorDeBusquedas`), `token.ts`
   (`firmarJwt`, `pedirToken`: JWT RS256 con `node:crypto`, clave con `\n`
   escritos aceptada, `invalid_grant` en llano), `search-console.ts`
@@ -73,7 +73,7 @@
   (94 tests, 93 pass, 1 skip); `pnpm --filter sitio lint` → 0; ningún
   `from "@/` en `lib/busquedas` ni `lib/tareas` (Grep, sin coincidencias).
 
-- 2026-09-26 — **Paso 5** (`653018f`): `lib/busquedas/lecturas.ts`
+- 2026-09-26 — **Paso 5** (`b591a98`): `lib/busquedas/lecturas.ts`
   (`posicionPromedio`, `ordenarPorClics`, `casiNosEncuentran` con
   `PUESTOS_CASI`, `MINIMO_DE_IMPRESIONES`, `MUCHAS_IMPRESIONES`, `POCOS_CLICS`,
   `MAXIMO_CASI` y la razón de cada fila) y `lib/busquedas/paises.ts`
@@ -81,7 +81,7 @@
   `release-48-2`, filtrados y comentados como pidió el padre). 4 tests.
   `pnpm typecheck` → 0; `pnpm --filter sitio test` → 0 (98, 97 pass, 1 skip);
   lint → 0.
-- 2026-09-26 — **Paso 6** (`c3553d8`): `datos/tareas/busquedas-de-google.ts`
+- 2026-09-26 — **Paso 6** (`0892637`): `datos/tareas/busquedas-de-google.ts`
   (`sincronizarBusquedas`, `copiarBusquedas`, `copiaDeSearchConsole`): del día
   siguiente al último `total` hasta ayer, 90 días como máximo y la primera vez,
   cada dimensión reemplazada en su rango en una transacción (`deleteMany` +
@@ -103,7 +103,7 @@
 - 2026-09-26 — **Regla del padre, por el buzón:** las pestañas encienden la
   más específica y no hay prop `exacta` (DECISIONS.md). SPEC §9.6 y PLAN paso
   7 ajustados.
-- 2026-09-26 — **Paso 7** (`94d68de`): `pestanaActiva(ruta, hrefs)` en
+- 2026-09-26 — **Paso 7** (`3b41628`): `pestanaActiva(ruta, hrefs)` en
   `admin/armazon/ruta.ts` (test en rojo primero: «does not provide an export
   named 'pestanaActiva'»; después 4 en verde: ruta exacta, subruta, prefijo que
   no corta en segmento, sin coincidencia) y `Pestanas` la usa;
@@ -125,7 +125,7 @@
   /admin/metricas/nada      → 404 («Admin ED»)
   ```
 
-- 2026-09-26 — **Paso 8** (`bc71f0b`): `datos/consultas/busquedas.ts`
+- 2026-09-26 — **Paso 8** (`e6ab824`): `datos/consultas/busquedas.ts`
   (`estadoDeBusquedas`, `resumenDeBusquedas(hasta)`, `DIAS_DEL_PERIODO = 28`):
   totales del período contra los 28 anteriores, las tres listas (hasta 10, por
   clics) y «Casi nos encuentran», todo con `groupBy` y
@@ -134,7 +134,7 @@
   posición da 3,64 y no 11, y las variaciones +100 % y +120 %.
   `pnpm typecheck` → 0; `pnpm --filter sitio test` → 0 (103, 102 pass, 1
   skip); lint → 0.
-- 2026-09-26 — **Paso 9** (`dc11fb4`): `metricas/busquedas/page.tsx` (lee el
+- 2026-09-26 — **Paso 9** (`6daea40`): `metricas/busquedas/page.tsx` (lee el
   rol para `PUEDE.configurarConexiones`), `admin/busquedas/` (`PanelBusquedas`
   62 líneas, `ConDatos` 54, `Seccion` 40, `formato.ts` 37),
   `datos/acciones/actualizar-busquedas.ts` (sesión primero, sin variables
@@ -173,7 +173,7 @@
   --msg-filter` (solo la primera línea; `git diff` contra el original, vacío).
   Los hashes de arriba son los nuevos.
 
-- 2026-09-26 — **Paso 10** (`fb2dc7d`, `d4e198e`): ADR-0011 (con la sección
+- 2026-09-26 — **Paso 10** (`c161c13`, `b9b1142`): ADR-0011 (con la sección
   «La migración con datos» que pidió el padre; las referencias externas
   responden 200, y la de Prisma apunta a la página de la v7, porque la sin
   versión ya describe el flujo de la 8) y su fila en el índice, con la 0009
@@ -188,7 +188,7 @@
 
 - 2026-09-26 — **work-verify** (abajo): el verificador de react-doctor dio
   93/100 por la complejidad de `PanelBusquedas` (15); se partió en
-  `CabeceraDeBusquedas` y `CuerpoDeBusquedas` (`04cf3ec`) y volvió a 100. Todo
+  `CabeceraDeBusquedas` y `CuerpoDeBusquedas` (`c1654a4`) y volvió a 100. Todo
   el gate en verde sobre ese árbol.
 
 ## Next
@@ -211,9 +211,41 @@
 
 ## Verification
 
+### 2026-09-26 — L DoD — PASS sobre el `main` nuevo (con `seguridad-del-acceso`)
+
+Antes del primer push entró `seguridad-del-acceso` a `main` (`446ab51`). La
+rama se rebaseó sobre él: tres conflictos, todos de texto, resueltos juntando
+los dos lados (el comentario de `actualizar-metricas.ts` dice «proxy»; el
+índice de ADRs lleva la 0010 y la 0011; el árbol de AGENTS.md §3 lleva
+`bloqueos-de-acceso.ts` y `correo/`, `seguridad/` junto a `tareas/` y
+`busquedas/`). Sus dos migraciones son de antes que la de esta lane, así que la
+nuestra sigue última y no se regeneró: `pnpm migrate:deploy` aplicó las suyas
+en `ed_busquedas`, `pnpm migrate:status` → «Database schema is up to date!», y
+`pnpm migrate --create-only --name comprobar` generó una migración vacía
+(«This is an empty migration.»: el esquema y las migraciones coinciden), que
+se borró sin aplicar. Los hashes de este archivo son los de después del
+rebase. Sobre `c1654a4`:
+
+- L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
+  `node scripts/verificar-react-doctor.mjs` → exit 0: «react-doctor: 100/100,
+  sin diagnósticos (apps/sitio/src: 458 archivos · packages/db/src: 3 archivos
+  · packages/auth/src: 13 archivos)».
+- L2 behavioral: `pnpm test` → exit 0 (`packages/auth`: 16 de 16;
+  `apps/sitio`: 125 tests, 124 pass, 0 fail, 1 skip); `pnpm build` → exit 0,
+  con `ƒ /admin/metricas`, `ƒ /admin/metricas/[pantalla]`,
+  `ƒ /admin/metricas/busquedas` y `ƒ /api/cron/diario`. El dev server,
+  reiniciado con las dependencias nuevas, arranca en el 3015.
+- L3 end-to-end: `curl /api/cron/diario` sin header → 401; con el secreto →
+  500 con las dos corridas aisladas, `corridas_de_tareas` de 8 a 10. En el
+  navegador, con la sesión de `administra` y la CSP con nonce del admin nuevo,
+  `/admin/metricas/busquedas` hidrata: «Actualizar ahora» sin variables
+  contesta «Search Console todavía no está conectado.».
+- Close review: la abre el padre (abajo).
+
 ### 2026-09-26 — L DoD — PASS (L1–L3; la revisión de cierre es del padre)
 
-Sobre `04cf3ec` (el árbol final de código), en esta sesión:
+Sobre el árbol final de código antes del rebase (entonces `04cf3ec`), en esta
+sesión:
 
 - L1 static: `pnpm typecheck` → exit 0 (`packages/db`, `packages/auth`,
   `apps/sitio`: Done); `pnpm lint` → exit 0;
