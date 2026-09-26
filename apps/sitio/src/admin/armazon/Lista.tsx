@@ -1,0 +1,56 @@
+import { ChevronDown } from "@/components/ui/icons";
+
+/**
+ * Una lista del admin (DESIGN.md §11): filas separadas por un divisor, en una
+ * caja con el mismo borde. No sabe de ED: cada fila recibe lo que muestra.
+ */
+export function Lista({ children }: { children: React.ReactNode }) {
+  return <ul className="divide-y divide-azul-claro/60 rounded-xl border border-azul-claro/60">{children}</ul>;
+}
+
+type PropsDeFila = {
+  /** Lo principal: un nombre, y si hace falta algo al lado en meta. */
+  principal: React.ReactNode;
+  /** Una línea en meta debajo. */
+  detalle?: React.ReactNode;
+  /** A la derecha, antes de la acción. */
+  insignias?: React.ReactNode;
+  /** A la derecha de todo: un link o un botón. */
+  accion?: React.ReactNode;
+  /** Si llega, la fila va atenuada: sin acción, y esta nota en su lugar. */
+  atenuada?: string;
+  /** Lo que la fila despliega debajo, con un `details`: sin JavaScript, y se anuncia como botón. */
+  desplegable?: { resumen: string; contenido: React.ReactNode };
+};
+
+/**
+ * Una fila de la `Lista`. Lo principal y el detalle a la izquierda; las
+ * insignias y la acción a la derecha, y abajo si no entran. Atenuada, lo
+ * principal baja a `gris-texto` (4,83:1) y la nota ocupa el lugar de la
+ * acción: no se esconde, se explica.
+ */
+export function Fila({ principal, detalle, insignias, accion, atenuada, desplegable }: PropsDeFila) {
+  return (
+    <li className="px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <div className="min-w-0">
+          <div className={`font-medium ${atenuada ? "text-gris-texto" : ""}`}>{principal}</div>
+          {detalle ? <div className="mt-0.5 text-admin-meta text-gris-texto">{detalle}</div> : null}
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          {insignias}
+          {atenuada ? <span className="text-admin-meta text-gris-texto">{atenuada}</span> : accion}
+        </div>
+      </div>
+      {desplegable ? (
+        <details className="group/fila mt-2">
+          <summary className="-ml-1 inline-flex min-h-8 cursor-pointer list-none items-center gap-1 rounded-sm pr-1 text-admin-meta font-medium text-azul-medio focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio [&::-webkit-details-marker]:hidden">
+            <ChevronDown size={16} className="shrink-0 -rotate-90 motion-safe:transition-transform group-open/fila:rotate-0" />
+            {desplegable.resumen}
+          </summary>
+          <div className="pt-1 pl-4">{desplegable.contenido}</div>
+        </details>
+      ) : null}
+    </li>
+  );
+}
