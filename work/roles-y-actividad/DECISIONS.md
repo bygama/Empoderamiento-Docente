@@ -27,3 +27,10 @@
   drift: `migrate diff` desde las migraciones contra el esquema da una
   migración vacía. Un preview feature cambia el cliente generado por un
   índice; no vale la pena.
+- 2026-09-26 — **Rebase sobre `c957586` (el padre):** `configurarConexiones`
+  pasa a dirige y administra, con el comentario de la lane 5; las dos acciones
+  de «Actualizar ahora» (Métricas y Búsquedas) chequean `verMetricas` —la
+  misma capacidad que ver el módulo: Métricas la ven y la actualizan los tres
+  roles (SPEC §3)— y no se anotan en la actividad (el §5.8 no lista
+  «actualizó métricas»); la poda de 12 meses es una tarea de `TAREAS_DIARIAS`.
+  Las excepciones de la 4a quedan como estaban.
