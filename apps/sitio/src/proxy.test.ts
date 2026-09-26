@@ -52,3 +52,32 @@ test("el destino del rebote es siempre una ruta de este sitio, escapada", async 
   assert.ok(html.includes('content="0;url=/otro.sitio/robar?a=1&#38;b=2"'), html);
   assert.ok(!html.includes("//otro.sitio"));
 });
+
+/** La directiva `script-src` de la CSP de una respuesta. */
+function scriptSrc(res: Response): string {
+  return (res.headers.get("content-security-policy") ?? "").split("; ").find((d) => d.startsWith("script-src")) ?? "";
+}
+
+test("el admin lleva un nonce distinto en cada respuesta, con 'strict-dynamic' y sin 'unsafe-inline'", () => {
+  const a = pedir("/admin/entrar", {});
+  const b = pedir("/admin/entrar", {});
+  assert.match(scriptSrc(a), /^script-src 'self' 'nonce-[A-Za-z0-9+/=]{24}' 'strict-dynamic'$/);
+  assert.notEqual(scriptSrc(a), scriptSrc(b));
+  // Next lee el nonce de la CSP del pedido: tiene que viajar hacia adentro.
+  assert.equal(a.headers.get("x-middleware-request-content-security-policy"), a.headers.get("content-security-policy"));
+});
+
+test("el admin no se deja abrir ni cargar desde otro sitio", () => {
+  for (const res of [pedir("/admin/entrar", {}), pedir("/admin/paginas", DEL_MISMO), pedir("/admin/paginas", DE_OTRO_SITIO)]) {
+    assert.equal(res.headers.get("cross-origin-opener-policy"), "same-origin");
+    assert.equal(res.headers.get("cross-origin-resource-policy"), "same-origin");
+    assert.equal(res.headers.get("x-frame-options"), "DENY");
+  }
+});
+
+test("el sitio público sigue con su CSP estática, sin nonce", () => {
+  const res = pedir("/", {});
+  assert.equal(scriptSrc(res), "script-src 'self' 'unsafe-inline'");
+  assert.equal(res.headers.get("cross-origin-opener-policy"), null);
+  assert.equal(res.headers.get("x-middleware-request-content-security-policy"), null);
+});
