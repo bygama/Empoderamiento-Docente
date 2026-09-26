@@ -96,7 +96,7 @@
   `plantilla.ts` (la usan dos correos). Un test nuevo encontró «te invitó a
   el admin»: corregido a «al». Aceptación: `pnpm --filter sitio test` exit 0
   (155 pass, 1 saltado de antes); `typecheck` y `lint` exit 0.
-- **Paso 7 — entrar con código** (este commit). `FormularioEntrar`: si la
+- **Paso 7 — entrar con código** (`c4660aa`). `FormularioEntrar`: si la
   respuesta trae `twoFactorRedirect`, pide el código
   (`twoFactor.sendOtp`) y va a `/admin/entrar/codigo?correo=d•••@…&volver=…`
   con `envio=no-salio` o `envio=esperar` si no salió; el 403
@@ -120,5 +120,18 @@
   contra Postgres: `send-otp` → `{"status":true}`, el código leído de la
   consola, `verify-otp` → la sesión; `twoFactor` con 0 filas y `actividad`
   con un `entro` por persona.
+- **Paso 8 — Mi cuenta › Seguridad** (este commit). `admin/mi-cuenta/Seguridad.tsx`
+  (la insignia Activo/Apagado; obligatorio y sin botón para D y A) y
+  `FormularioDelSegundoFactor.tsx` (edita: la contraseña y «Activar el
+  segundo factor» / «Desactivarlo», por `authCliente.twoFactor`), en el
+  apartado `#seguridad` de `MiCuenta.tsx`; la página pasa
+  `sesion.user.twoFactorEnabled`. Para que ese campo tenga tipo,
+  `segundoFactor()` devuelve una tupla anotada (en un arreglo mezclado
+  better-auth perdía las columnas del plugin). Aceptación: `pnpm typecheck`,
+  `lint`, `test` exit 0 (sitio: 157 pass, 2 saltados: el de siempre y
+  `nombrar-direccion`, que se saltea solo cuando la base ya tiene quien
+  dirige, como `ed_cuentas` desde que creé una cuenta por rol); react-doctor
+  100/100; `/admin/mi-cuenta` como edita → 200 con `id="seguridad"`,
+  «Apagado» y «Activar el segundo factor».
 
 ## Abierto

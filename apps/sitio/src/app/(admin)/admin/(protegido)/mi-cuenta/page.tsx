@@ -17,6 +17,7 @@ export default async function PaginaMiCuenta() {
       nombre={sesion.user.name}
       correo={sesion.user.email}
       rol={sesion.user.rol}
+      segundoFactor={sesion.user.twoFactorEnabled === true}
       sesiones={await sesionesAbiertas(sesion.user.id)}
       idDeEstaSesion={sesion.session.id}
       avisos={await avisosDe(sesion.user.id, sesion.user.rol)}
