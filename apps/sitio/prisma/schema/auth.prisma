@@ -27,8 +27,10 @@ model User {
   /// parciales sin un preview feature (migración `una_sola_dirige`).
   rol String @default("edita")
 
-  sessions Session[]
-  accounts Account[]
+  sessions  Session[]
+  accounts  Account[]
+  /// Lo que hizo en el admin (actividad.prisma). No es de better-auth.
+  actividad Actividad[]
 
   @@map("user")
 }

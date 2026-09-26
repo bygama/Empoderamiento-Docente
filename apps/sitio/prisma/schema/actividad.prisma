@@ -1,0 +1,28 @@
+// Quién hizo qué en el admin (work/roles-y-actividad/SPEC.md §4, el §5.8 del
+// mapa del admin). Se crea antes que los módulos para que cada uno registre
+// desde el día uno; se escribe solo por `datos/actividad.ts`.
+
+/// Una fila por cosa hecha. Se guarda 12 meses: la poda es una tarea del cron
+/// diario. De un CV se registra solo que se borró, nunca lo que tenía.
+model Actividad {
+  id       String   @id @default(uuid())
+  /// Quién. RESTRICT a propósito: una cuenta que hizo algo no se borra, se
+  /// suspende, y «publicado por Ana» queda en la historia.
+  cuentaId String   @map("cuenta_id")
+  cuenta   User     @relation(fields: [cuentaId], references: [id], onDelete: Restrict)
+  /// Qué: `entro`, `salio`… La lista es cerrada y vive en código
+  /// (`datos/actividad.ts`), no en un enum de Postgres: sumar un tipo no pide
+  /// migración.
+  tipo     String
+  /// Sobre qué, en llano y como era en ese momento («Inicio», «Ana Pérez»):
+  /// lo que se borró después se sigue leyendo.
+  sobre    String?
+  /// El id o el slug de eso, para linkearlo mientras exista.
+  sobreId  String?  @map("sobre_id")
+  /// Cuándo.
+  en       DateTime @default(now())
+
+  @@index([en])
+  @@index([cuentaId, en])
+  @@map("actividad")
+}
