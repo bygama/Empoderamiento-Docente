@@ -13,6 +13,7 @@ export type { ClienteDeAuth } from "./cliente";
 export {
   ROLES,
   ROL_POR_DEFECTO,
+  ROL_DE_LA_DIRECCION,
   PUEDE,
   QUE_PUEDE,
   SIN_PERMISO,

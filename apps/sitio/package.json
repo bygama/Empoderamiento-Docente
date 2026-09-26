@@ -10,7 +10,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test \"src/**/*.test.ts\"",
-    "crear-cuenta": "tsx scripts/crear-cuenta.ts"
+    "crear-cuenta": "tsx scripts/crear-cuenta.ts",
+    "nombrar-direccion": "tsx scripts/nombrar-direccion.ts"
   },
   "dependencies": {
     "@ed/auth": "workspace:*",
