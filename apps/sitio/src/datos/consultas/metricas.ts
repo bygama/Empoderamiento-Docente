@@ -29,31 +29,32 @@ export type Tarjeta = {
 };
 
 /**
- * Las cuatro tarjetas: 7 y 30 días, cada una contra la ventana anterior.
- * Toma la ventana más nueva que exista para cada `dias`, no la que coincide
- * con `hastaDia`: las ventanas se escriben con `fechaFin = ayer`, pero
- * `hastaDia` sale del último `total`, y si la API omite un día sin tráfico
- * las dos fechas se separan y la grilla quedaría vacía sin necesidad.
+ * La ventana más nueva de ese largo contra la anterior, o `null` si todavía
+ * no hay ninguna. Toma la más nueva que exista, no la que coincide con
+ * `hastaDia`: las ventanas se escriben con `fechaFin = ayer`, pero `hastaDia`
+ * sale del último `total`, y si la API omite un día sin tráfico las dos fechas
+ * se separan y la grilla quedaría vacía sin necesidad. La lee también el
+ * Inicio, en «Esta semana».
  */
+export async function tarjetaDe(dias: 7 | 30): Promise<Tarjeta | null> {
+  // Acá sí hay una dependencia real: `anterior` necesita la fecha de `actual`.
+  const actual = await base.metricaVentana.findFirst({ where: { dias }, orderBy: { fechaFin: "desc" } });
+  if (!actual) return null;
+  const anterior = await base.metricaVentana.findUnique({
+    where: { fechaFin_dias: { fechaFin: fechaUTC(sumarDias(diaISO(actual.fechaFin), -dias)), dias } },
+  });
+  return {
+    dias,
+    vistas: actual.vistas,
+    visitantes: actual.visitantes,
+    variacionVistas: variacion(actual.vistas, anterior?.vistas ?? null),
+    variacionVisitantes: variacion(actual.visitantes, anterior?.visitantes ?? null),
+  };
+}
+
+/** Las cuatro tarjetas: 7 y 30 días, cada una contra la ventana anterior. */
 export async function tarjetas(): Promise<Tarjeta[]> {
-  // Las dos ventanas (7 y 30 días) no dependen una de la otra: van juntas con
-  // Promise.all. Adentro de cada una sí hay una dependencia real (`anterior`
-  // necesita la fecha de `actual`), por eso ahí el await queda en serie.
-  const porVentana = await Promise.all(
-    ([7, 30] as const).map(async (dias): Promise<Tarjeta | null> => {
-      const actual = await base.metricaVentana.findFirst({ where: { dias }, orderBy: { fechaFin: "desc" } });
-      if (!actual) return null;
-      const anterior = await base.metricaVentana.findUnique({
-        where: { fechaFin_dias: { fechaFin: fechaUTC(sumarDias(diaISO(actual.fechaFin), -dias)), dias } },
-      });
-      return {
-        dias,
-        vistas: actual.vistas,
-        visitantes: actual.visitantes,
-        variacionVistas: variacion(actual.vistas, anterior?.vistas ?? null),
-        variacionVisitantes: variacion(actual.visitantes, anterior?.visitantes ?? null),
-      };
-    }),
-  );
+  // Las dos ventanas no dependen una de la otra: van juntas.
+  const porVentana = await Promise.all(([7, 30] as const).map(tarjetaDe));
   return porVentana.filter((t): t is Tarjeta => t !== null);
 }
