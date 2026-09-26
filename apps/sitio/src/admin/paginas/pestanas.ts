@@ -6,8 +6,12 @@ import type { Pestana } from "@/admin/armazon/Pestanas";
 
 export const EDITOR_DE_PAGINAS = "/admin/contenido/paginas";
 
-/** Las pestañas de una página: las de edición que tenga (sus secciones, su SEO). */
+/** Las pestañas de una página: las de edición que tenga (sus secciones, su SEO) y las que revisan lo guardado. */
 export function pestanasDeLaPagina(slug: string, tiene: { secciones: boolean; seo: boolean }): Pestana[] {
   const base = `${EDITOR_DE_PAGINAS}/${slug}`;
-  return [...(tiene.secciones ? [{ href: base, etiqueta: "Secciones" }] : []), ...(tiene.seo ? [{ href: `${base}/seo`, etiqueta: "SEO" }] : [])];
+  return [
+    ...(tiene.secciones ? [{ href: base, etiqueta: "Secciones" }] : []),
+    ...(tiene.seo ? [{ href: `${base}/seo`, etiqueta: "SEO" }] : []),
+    { href: `${base}/cambios`, etiqueta: "Qué cambió" },
+  ];
 }

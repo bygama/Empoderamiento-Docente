@@ -4,33 +4,16 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { resolverCambio, type Cambio } from "@/admin/campos/cambio";
 import { ContextoDeErrores } from "@/admin/campos/errores";
 import type { Pestana } from "@/admin/armazon/Pestanas";
-import { Aviso } from "@/admin/armazon/Campos";
-import { descartarBorrador, guardarBorrador, publicar } from "@/datos/acciones/paginas";
-import { abrirVistaPrevia } from "@/datos/acciones/vista-previa";
+import { guardarBorrador } from "@/datos/acciones/paginas";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 import { resumenDeErrores, type ErrorDeCampo } from "@/lib/contenido/errores";
-import { EncabezadoDelEditor, type EstadoPendiente } from "./EncabezadoDelEditor";
+import { AvisoDeLaPagina } from "./AvisoDeLaPagina";
+import { EncabezadoDelEditor } from "./EncabezadoDelEditor";
+import { Seccion } from "./Seccion";
+import { useAccionesDePagina } from "./useAccionesDePagina";
 import { useErroresDelEditor } from "./useErroresDelEditor";
 import { useFrenarSalida } from "./useFrenarSalida";
-import { Seccion } from "./Seccion";
 
-// `choque`: otra persona guardó mientras tanto, y el aviso ofrece recargar.
-type AvisoDelEditor = { ok: boolean; detalle: ReactNode; choque?: true };
-
-const SIN_RED = "No hubo respuesta del servidor. Fijate la conexión y probá de nuevo; lo que escribiste sigue en pantalla.";
-
-/**
- * El editor de una página: el encabezado fijo con el estado y las acciones, y
- * las secciones en el orden del scroll (SPEC §2). El contenido vive en el estado del navegador
- * hasta que se guarda; cada guardado encadena el `borradorEn` que devolvió el
- * anterior, así el chequeo de cambios cruzados vale sección tras sección.
- * Publicar y ver el borrador guardan primero lo que haya sin guardar: nadie
- * publica algo distinto de lo que tiene en pantalla.
- *
- * Las cuatro acciones repiten a mano `setPendiente`/try/catch/finally: un
- * `correr(fn)` compartido es la forma que react-doctor marca como updater
- * impuro (no-impure-state-updater), sin importar qué haga el callback.
- */
 type Props = {
   pagina: PaginaParaEditar;
   pestanas: readonly Pestana[];
@@ -38,6 +21,16 @@ type Props = {
   aparte?: (contenidos: Readonly<Record<string, unknown>>) => ReactNode;
 };
 
+/**
+ * El editor de una pestaña de una página (Secciones o SEO): el encabezado fijo
+ * con el estado y las acciones, y sus partes en el orden del scroll (SPEC §2).
+ * El contenido vive en el estado del navegador hasta que se guarda; cada
+ * guardado encadena el `borradorEn` que devolvió el anterior, así el chequeo
+ * de cambios cruzados vale sección tras sección. Publicar y ver el borrador
+ * guardan primero lo que haya sin guardar (`preparar`): nadie publica algo
+ * distinto de lo que tiene en pantalla. Las acciones que no escriben un
+ * campo viven en `useAccionesDePagina`, que comparten las otras pestañas.
+ */
 export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
   const [contenidos, setContenidos] = useState<Record<string, unknown>>(() =>
     Object.fromEntries(pagina.secciones.map((s) => [s.clave, s.contenido])),
@@ -58,15 +51,12 @@ export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
   useEffect(() => {
     contenidosRef.current = contenidos;
   }, [contenidos]);
-  // Perezoso como `contenidos`: son del mismo prop y así react-doctor no lo lee
-  // como un valor que se copia una vez y queda viejo (no-derived-useState). El
-  // remount real cuando cambia la página lo hace el `key` de la ruta [slug].
-  const [estado, setEstado] = useState(() => pagina.estado);
-  const [aviso, setAviso] = useState<AvisoDelEditor | null>(null);
-  const [pendiente, setPendiente] = useState<EstadoPendiente>(null);
   const haySinGuardar = pagina.secciones.some((s) => contenidos[s.clave] !== confirmados[s.clave]);
   const soltarSalida = useFrenarSalida(haySinGuardar);
   const errores = useErroresDelEditor();
+  // El remount real cuando cambia la página lo hace el `key` de la ruta [slug].
+  const acciones = useAccionesDePagina({ slug: pagina.slug, estadoInicial: pagina.estado, haySinGuardar, soltarSalida });
+  const { estado, setEstado, setAviso, setPendiente } = acciones;
 
   const cambiar = (clave: string, cambio: Cambio<unknown>) => {
     setContenidos((c) => ({ ...c, [clave]: resolverCambio(cambio, c[clave]) }));
@@ -113,18 +103,6 @@ export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
     return visto;
   }
 
-  /** Recargar tira lo que no está guardado: se pregunta antes, y después no pregunta otra vez al salir. */
-  const recargar = () => {
-    if (haySinGuardar && !window.confirm("Recargar tira lo que escribiste sin guardar. ¿Recargar igual?")) return;
-    soltarSalida();
-    window.location.reload();
-  };
-
-  /** Sin red o servidor caído: un aviso, nunca una excepción que se lleve puesto el editor. */
-  function avisarSinRed() {
-    setAviso({ ok: false, detalle: SIN_RED });
-  }
-
   const guardar = async () => {
     // Ningún botón se deshabilita para explicar algo (DESIGN.md §11): contesta.
     if (!haySinGuardar) {
@@ -135,93 +113,14 @@ export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
     try {
       if ((await guardarTodo()) !== false) setAviso({ ok: true, detalle: "Borrador guardado. El sitio sigue mostrando lo publicado." });
     } catch {
-      avisarSinRed();
+      acciones.avisarSinRed();
     } finally {
       setPendiente(null);
     }
   };
 
-  const verBorrador = async () => {
-    // Se abre en el gesto del clic, antes de cualquier `await` (después, el
-    // navegador la bloquea). Sin "noopener": con eso puesto, `window.open`
-    // devuelve `null` siempre y no se puede distinguir un bloqueo de un éxito.
-    const pestana = window.open("", "_blank");
-    setPendiente("vista-previa");
-    try {
-      if (haySinGuardar && (await guardarTodo()) === false) {
-        pestana?.close();
-        return;
-      }
-      const r = await abrirVistaPrevia(pagina.slug);
-      if (!r.ok) {
-        pestana?.close();
-        setAviso(r);
-        return;
-      }
-      if (pestana) {
-        pestana.location.href = r.url;
-        setAviso({ ok: true, detalle: "La vista previa se abrió en otra pestaña." });
-      } else {
-        setAviso({
-          ok: true,
-          detalle: (
-            <>
-              El navegador frenó la pestaña nueva:{" "}
-              <a href={r.url} target="_blank" rel="noopener noreferrer" className="underline">
-                abrí la vista previa desde acá
-              </a>
-              .
-            </>
-          ),
-        });
-      }
-    } catch {
-      pestana?.close();
-      avisarSinRed();
-    } finally {
-      setPendiente(null);
-    }
-  };
-
-  const publicarAhora = async () => {
-    if (!estado.borradorEn && !haySinGuardar) {
-      setAviso({ ok: true, detalle: "La página ya está publicada así." });
-      return;
-    }
-    setPendiente("publicar");
-    try {
-      // Publica lo que esta pantalla vio: lo recién guardado, o el borrador con el que abrió.
-      const visto = haySinGuardar ? await guardarTodo() : estado.borradorEn;
-      if (visto === false) return;
-      const r = await publicar({ slug: pagina.slug, borradorEnVisto: visto });
-      setAviso(r);
-      if (r.ok) setEstado({ borradorEn: null, borradorPor: null, publicadoEn: r.publicadoEn, publicadoPor: r.publicadoPor });
-    } catch {
-      avisarSinRed();
-    } finally {
-      setPendiente(null);
-    }
-  };
-
-  const descartar = async () => {
-    if (!window.confirm("¿Descartar los cambios sin publicar? La página vuelve a lo que está publicado.")) return;
-    setPendiente("descartar");
-    try {
-      const r = await descartarBorrador({ slug: pagina.slug, borradorEnVisto: estado.borradorEn });
-      if (!r.ok) {
-        setAviso(r);
-        return;
-      }
-      // Recargar es lo más simple para volver a lo publicado: el editor se
-      // arma de nuevo desde el servidor. Ya se confirmó: no preguntar otra vez.
-      soltarSalida();
-      window.location.reload();
-    } catch {
-      avisarSinRed();
-    } finally {
-      setPendiente(null);
-    }
-  };
+  // Publicar y ver el borrador guardan antes lo que haya en pantalla.
+  const preparar = haySinGuardar ? guardarTodo : undefined;
 
   return (
     // Abajo, en el celular, el lugar de la barra fija de las acciones (64 px): así no tapa el último campo.
@@ -231,22 +130,12 @@ export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
         pestanas={pestanas}
         estado={estado}
         haySinGuardar={haySinGuardar}
-        pendiente={pendiente}
-        aviso={
-          aviso ? (
-            <Aviso
-              tono={aviso.ok ? "bien" : "error"}
-              alCerrar={() => setAviso(null)}
-              accion={aviso.choque ? { etiqueta: "Recargar", alHacer: recargar } : undefined}
-            >
-              {aviso.detalle}
-            </Aviso>
-          ) : null
-        }
+        pendiente={acciones.pendiente}
+        aviso={<AvisoDeLaPagina aviso={acciones.aviso} alCerrar={() => setAviso(null)} alRecargar={acciones.recargar} />}
         alGuardar={guardar}
-        alVerBorrador={verBorrador}
-        alPublicar={publicarAhora}
-        alDescartar={descartar}
+        alVerBorrador={() => acciones.verBorrador(preparar)}
+        alPublicar={() => acciones.publicar(preparar)}
+        alDescartar={acciones.descartar}
       />
       <ContextoDeErrores value={errores.contexto}>
         {pagina.secciones.map((s) => (
