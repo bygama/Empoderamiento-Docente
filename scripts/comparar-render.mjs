@@ -5,12 +5,12 @@
 //   node scripts/comparar-render.mjs <appAntes> <appDespues>
 //
 // Cada argumento es una carpeta de app con un `.next` ya buildeado (el script no
-// buildea). Sale 1 si una página difiere en texto, links o <head> —lo que ve una
-// persona o un buscador— o si desapareció. Los bytes de JS se informan pero NO
-// hacen fallar: cambian por cómo el bundler reparte los chunks. Se muestran
-// porque comparar solo el HTML no ve el bundle, y esa ceguera ya escondió dos
-// cambios reales: la escisión de Payload y las clases del admin filtrándose al
-// CSS del sitio.
+// buildea). Sale 1 si una página difiere en texto, links, <head> o imágenes —lo
+// que ve una persona o un buscador— o si desapareció. Los bytes de JS se
+// informan pero NO hacen fallar: cambian por cómo el bundler reparte los chunks.
+// Se muestran porque comparar solo el HTML no ve el bundle, y esa ceguera ya
+// escondió cambios reales: la escisión de Payload, las clases del admin en el
+// CSS del sitio y Zod entero en el JS de la home.
 
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -31,13 +31,12 @@ function paginas(app) {
     process.exit(2);
   }
   const salida = [];
-  const recorrer = (dir) => {
-    for (const entrada of readdirSync(dir)) {
+  const recorrer = (dir) =>
+    readdirSync(dir).forEach((entrada) => {
       const ruta = join(dir, entrada);
       if (statSync(ruta).isDirectory()) recorrer(ruta);
       else if (entrada.endsWith(".html")) salida.push(relative(raiz, ruta));
-    }
-  };
+    });
   recorrer(raiz);
   return salida.sort();
 }
@@ -45,47 +44,31 @@ function paginas(app) {
 // El valor de un atributo dentro del texto de un tag, o "" si no está. Sirve
 // para leer <img>: el \s antes del nombre evita que "src" pise a "srcSet".
 const atributoDe = (tag, nombre) => tag.match(new RegExp(`\\s${nombre}="([^"]*)"`, "i"))?.[1] ?? "";
+const todos = (h, patron) => [...h.matchAll(patron)].map((m) => m[0]);
 
 // El <script> se saca entero: adentro viaja el payload de React, con ids de
 // módulo y de build distintos en cada corrida, que no son contenido.
 const DIMENSIONES = {
   texto: (h) =>
     h.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]*>/g, "\n").replace(/\s+/g, " ").trim(),
-  links: (h) =>
-    [...h.matchAll(/href="([^"]*)"/g)]
-      .map((m) => m[1])
-      .filter((u) => !/^\/_next\/|\.(png|ico|woff2?|css)$/.test(u))
-      .sort()
-      .join("\n"),
-  head: (h) =>
-    [...h.matchAll(/<title>[^<]*<\/title>|<meta [^>]*>/g)]
-      .map((m) => m[0])
-      .filter((t) => !/charSet|viewport|next-size-adjust/.test(t))
-      .sort()
-      .join("\n"),
-  // Cada <img>, en su orden real: acá el orden importa (dos fotos que
-  // cambiaron de lugar son una regresión aunque el conjunto sea el mismo),
-  // por eso esta dimensión no se ordena como sí hacen links y head. Guarda
-  // src, srcset, sizes, alt y style —ninguna otra dimensión los ve—; src y
-  // srcset van los dos, no uno tapando al otro, porque srcset es la
-  // escalera de anchos que arma next/image y un cambio ahí no se puede
-  // perder solo porque también haya src.
+  links: (h) => [...h.matchAll(/href="([^"]*)"/g)].map((m) => m[1]).filter((u) => !/^\/_next\/|\.(png|ico|woff2?|css)$/.test(u)).sort().join("\n"),
+  head: (h) => todos(h, /<title>[^<]*<\/title>|<meta [^>]*>/g).filter((t) => !/charSet|viewport|next-size-adjust/.test(t)).sort().join("\n"),
+  // Cada <img> en su orden real, sin ordenar: dos fotos que cambiaron de lugar
+  // son una regresión aunque el conjunto sea el mismo. src y srcset van los
+  // dos: srcset es la escalera de anchos de next/image y un cambio ahí no se
+  // puede perder porque también haya src.
   imagenes: (h) =>
-    [...h.matchAll(/<img\b[^>]*>/g)]
-      .map((m) => ["src", "srcset", "sizes", "alt", "style"].map((a) => atributoDe(m[0], a)).join("|"))
+    todos(h, /<img\b[^>]*>/g)
+      .map((tag) => ["src", "srcset", "sizes", "alt", "style"].map((a) => atributoDe(tag, a)).join("|"))
       .join("\n"),
 };
 
 // Bytes de los activos de la página, cada uno contado una vez. **Incluye el
-// CSS**, que Next también deja bajo `static/chunks/`: llamar a esto «js» ya hizo
-// que un lector concluyera que el CSS no se medía.
+// CSS**, que Next también deja bajo `static/chunks/`.
 function activos(app, html) {
   const chunks = new Set([...html.matchAll(/\/_next\/(static\/chunks\/[^"]+)/g)].map((m) => m[1]));
-  let bytes = 0;
-  for (const c of chunks) {
-    if (existsSync(join(app, ".next", c))) bytes += statSync(join(app, ".next", c)).size;
-  }
-  return { cuantos: chunks.size, bytes };
+  const existentes = [...chunks].map((c) => join(app, ".next", c)).filter((c) => existsSync(c));
+  return { cuantos: chunks.size, bytes: existentes.reduce((suma, c) => suma + statSync(c).size, 0) };
 }
 
 const deA = new Set(paginas(antes));
@@ -101,16 +84,13 @@ for (const p of [...deA].filter((x) => !deB.has(x))) {
 for (const p of [...deB].filter((x) => !deA.has(x))) console.log(`  ${p}: nueva`);
 
 for (const p of [...deA].filter((x) => deB.has(x))) {
-  const a = readFileSync(join(appDir(antes), p), "utf8");
-  const b = readFileSync(join(appDir(despues), p), "utf8");
+  const [a, b] = [antes, despues].map((app) => readFileSync(join(appDir(app), p), "utf8"));
   const distintas = Object.keys(DIMENSIONES).filter((k) => DIMENSIONES[k](a) !== DIMENSIONES[k](b));
-  const ja = activos(antes, a);
-  const jb = activos(despues, b);
+  const [ja, jb] = [activos(antes, a), activos(despues, b)];
   const delta = jb.bytes - ja.bytes;
-  const resumen = `${ja.cuantos}→${jb.cuantos} activos (js+css), ${delta >= 0 ? "+" : ""}${delta} bytes`;
   if (distintas.length > 0) fallo = true;
   const estado = distintas.length > 0 ? `DISTINTA en ${distintas.join(", ")}` : "igual";
-  console.log(`  ${p}: ${estado} — ${resumen}`);
+  console.log(`  ${p}: ${estado} — ${ja.cuantos}→${jb.cuantos} activos (js+css), ${delta >= 0 ? "+" : ""}${delta} bytes`);
 }
 
 console.log(fallo ? "\nHay diferencias de render." : `\n${deA.size} páginas, render idéntico.`);

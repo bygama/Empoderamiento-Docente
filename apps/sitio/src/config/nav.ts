@@ -18,11 +18,7 @@
  * tiene que ser el `id` real de la sección en su componente.
  */
 export type NavSubItem = { label: string; href: string };
-export type NavItem = {
-  label: string;
-  href: string;
-  submenu?: readonly NavSubItem[];
-};
+export type NavItem = { label: string; href: string; submenu?: readonly NavSubItem[] };
 
 export const NAV_LINKS: readonly NavItem[] = [
   {
@@ -98,7 +94,6 @@ export function esPaginaActiva(pathname: string, href: string): boolean {
 
 /**
  * Las siete rutas del sitio, la lista cerrada que el admin ofrece para un
- * enlace interno (SPEC §4.2, `rutaInterna`). Sale del menú para que no haya
- * dos listas: Inicio, las cinco del nav y Contacto.
+ * enlace interno (`rutaInterna`). Sale del menú para que no haya dos listas.
  */
 export const RUTAS_INTERNAS = [HOME_LINK.href, ...NAV_LINKS.map((l) => l.href), CTA_LINK.href] as const;
