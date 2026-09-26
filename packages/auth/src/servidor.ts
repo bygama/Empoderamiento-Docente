@@ -8,3 +8,4 @@
 
 export { crearAuth } from "./config";
 export type { Auth, OpcionesDeAuth } from "./config";
+export type { AlmacenDeBloqueos, EstadoDeBloqueo } from "./bloqueo";

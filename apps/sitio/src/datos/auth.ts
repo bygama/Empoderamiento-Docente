@@ -1,4 +1,5 @@
 import { crearAuth } from "@ed/auth/servidor";
+import { almacenDeBloqueos } from "./bloqueos-de-acceso";
 import { base } from "./cliente";
 import { siteConfig } from "@/config/site";
 
@@ -27,6 +28,7 @@ export const auth = crearAuth({
   base,
   secreto: process.env.BETTER_AUTH_SECRET ?? "",
   urlDelSitio: urlDelSitio(),
+  bloqueos: almacenDeBloqueos,
   // Sin clave de Resend el correo sale por la consola del servidor, que es lo
   // que hace falta en local. El envío de verdad llega con la pantalla de
   // «olvidé mi contraseña» (paso 8 del PLAN).

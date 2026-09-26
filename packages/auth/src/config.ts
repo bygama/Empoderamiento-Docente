@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import type { AlmacenDeBloqueos } from "./bloqueo";
 import { hashear, verificar } from "./contrasenas";
-import { crearGanchos } from "./ganchos";
+import { crearGanchos, destrabar } from "./ganchos";
 import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
 
 /**
@@ -38,6 +39,8 @@ export type OpcionesDeAuth = {
     nombre?: string;
     enlace: string;
   }) => Promise<void>;
+  /** Dónde guarda el bloqueo por cuenta sus fallos (bloqueo.ts). */
+  bloqueos: AlmacenDeBloqueos;
 };
 
 export function crearAuth({
@@ -45,6 +48,7 @@ export function crearAuth({
   secreto,
   urlDelSitio,
   mandarResetDeContrasena,
+  bloqueos,
 }: OpcionesDeAuth) {
   if (!secreto) {
     throw new Error(
@@ -86,6 +90,9 @@ export function crearAuth({
           enlace: url,
         });
       },
+      onPasswordReset: async ({ user }) => {
+        await destrabar(bloqueos, user.email, secreto);
+      },
     },
 
     session: {
@@ -100,8 +107,11 @@ export function crearAuth({
      *
      * El límite de `signIn` es deliberadamente más duro que el general: tres
      * intentos por minuto desde una IP frena la fuerza bruta sin molestar a
-     * quien escribió mal la contraseña una vez. El de `forgetPassword` frena
-     * usar el envío de correos como manguera contra buzones ajenos.
+     * quien escribió mal la contraseña una vez. El de `requestPasswordReset`
+     * frena usar el envío de correos como manguera contra buzones ajenos.
+     *
+     * Lo contrario —muchas IP contra una sola cuenta— lo cubre el bloqueo por
+     * cuenta de los `hooks` de abajo (bloqueo.ts).
      */
     rateLimit: {
       enabled: true,
@@ -121,7 +131,7 @@ export function crearAuth({
       },
     },
 
-    hooks: crearGanchos(),
+    hooks: crearGanchos({ bloqueos, secreto }),
 
     advanced: {
       ipAddress: {
