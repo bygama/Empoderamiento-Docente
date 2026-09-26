@@ -22,3 +22,13 @@
   un dato, no lógica. Compacta (una sola cadena o un objeto por línea larga)
   para no pasar el tope de 100 líneas, con un comentario que diga de qué
   versión de CLDR sale y cómo regenerarla. Sin dependencias.
+- 2026-09-26 — **§9.6 cambia: gana la pestaña más específica, sin `exacta`**
+  (el padre, al aprobar el SPEC de `paginas-inicio`, que también resuelve la
+  pestaña activa). Se enciende la pestaña cuya `href` es el prefijo **más
+  largo** de la ruta, cortando en un límite de segmento (`/admin/metricas` no
+  es prefijo de `/admin/metricasx`): en `/admin/metricas/busquedas` gana
+  Búsquedas y en `/admin/metricas`, Resumen. Se implementa acá, en
+  `admin/armazon/Pestanas.tsx` (esta lane es la primera que la necesita), con
+  un test de la función que elige la activa (ruta exacta, subruta, prefijo que
+  no corta en segmento, sin coincidencia) y una línea en DESIGN.md §11. Si la
+  4a llega antes, la implementa con el mismo algoritmo y el rebase las une.

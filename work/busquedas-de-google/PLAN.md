@@ -111,8 +111,10 @@ commit.
    `metricas/[pantalla]/page.tsx` (las guías de Origen, Qué hace la gente y
    Links para compartir, con `guias-de-metricas.ts` y `GuiaDeMetricas.tsx`) y
    `metricas/error.tsx`; la entrada `metricas` sale de `guias.ts`.
-   `Pestanas` suma `exacta` (la lógica en `ruta.ts`, con test) y DESIGN.md
-   §11 lo registra. Acceptance: `pnpm typecheck` y `pnpm --filter sitio test`
+   `Pestanas` enciende la más específica (DECISIONS.md: `pestanaActiva` en
+   `ruta.ts`, la de prefijo más largo cortando en segmento, con test de ruta
+   exacta, subruta, prefijo que no corta y sin coincidencia) y DESIGN.md §11
+   lo registra. Acceptance: `pnpm typecheck` y `pnpm --filter sitio test`
    salen 0; en el navegador, con sesión, `/admin/metricas` enciende solo
    Resumen, `/admin/metricas/origen` solo Origen, y el título dice «Métricas ·
    Admin ED» y «Origen · Admin ED». *(integration · medium)*
