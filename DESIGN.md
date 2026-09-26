@@ -358,7 +358,10 @@ Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
 sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
 índice de tarjetas, la lista, el estado vacío y la pantalla de acceso nueva,
 el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso» y el apartado, el
-mismo día (`work/roles-y-actividad/`). Todos los contrastes están
+mismo día (`work/roles-y-actividad/`); las pestañas de una página, el error en
+el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
+vista previa de buscador y redes, también (`work/paginas-inicio/`). Todos los
+contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -461,6 +464,22 @@ redibuja solo.
   `azul-principal` va en `azul-claro` (7,68:1): `azul-medio` ahí da 2,67:1.
 - **Un campo con error** (`aria-invalid`): borde `rojo-error` (6,57:1).
 
+### Campos: el error y el largo
+
+- **El error va en el campo mismo**, debajo, en meta `rojo-error` (6,57:1),
+  con `aria-invalid` y apuntado por `aria-describedby`; se borra en cuanto
+  se edita el campo. El aviso del encabezado lo resume con las etiquetas del
+  formulario («Hay 2 campos para revisar. El primero: Hero › Tarjetas › …»),
+  nunca con claves, y el foco va al primero, abriendo lo que lo tape.
+- **En una lista fija**, el ítem cerrado con un error lo dice: el ícono
+  `Alerta` y «Con error» en meta medium `rojo-error`, en el lugar de su
+  resumen. El color solo no alcanza.
+- **El contador** cuenta contra el tope y se ve desde el 80 %. Si el campo
+  tiene un **largo recomendado** (el SEO: 60 y 160, lo que muestra Google),
+  cuenta contra ese y se ve siempre; pasado, un aviso en meta medium
+  `azul-principal` (13,63:1) debajo del campo. No es un error: no pone
+  `aria-invalid` ni frena el guardado, así que no va en rojo.
+
 ### Insignias de estado
 
 Una pastilla `rounded-full` en meta medium, **siempre con texto**: el color
@@ -515,7 +534,8 @@ El layout raíz del admin declara el template `%s · Admin ED` y cada pantalla
 da solo su nombre: «Páginas · Admin ED», «Entrar · Admin ED». Una pantalla
 no repite a su padre, salvo que su nombre solo sea ambiguo: el editor dice
 «Inicio · Páginas · Admin ED» porque tres páginas del sitio se llaman como un
-módulo (Inicio, Biblioteca, Novedades).
+módulo (Inicio, Biblioteca, Novedades), y sus otras pestañas anteponen la
+suya: «SEO · Inicio · Páginas · Admin ED».
 
 ### Pestañas
 
@@ -529,7 +549,8 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
   de `href` más largo entre las que son la ruta o la contienen (cortando en un
   segmento: `/admin/metricas` no contiene a `/admin/metricasx`). Así la puerta
   de un módulo puede ser una pestaña más: Resumen es `/admin/metricas` y no se
-  enciende en `/admin/metricas/busquedas`.
+  enciende en `/admin/metricas/busquedas`. En el
+  editor, `/…/inicio/seo` enciende «SEO» y no también «Secciones».
 - **Van en el encabezado**, en su propia fila al pie y pegadas a su divisor
   (el slot `pestanas` de `Encabezado`). El `h1` es el módulo; la pestaña
   encendida dice la pantalla, y el título de pestaña del navegador también.
@@ -539,6 +560,9 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
   en el oscuro); las demás en `gris-texto` (4,83:1 y 7,08:1), que pasan a
   `azul-principal` en hover. El foco, el de siempre pero por dentro
   (`-outline-offset-2`): afuera lo cortaría el scroll horizontal.
+- **Sobre azul** (el encabezado del editor con cambios sin guardar): la
+  activa en blanco con su barra (13,63:1), las demás en `azul-claro`
+  (7,68:1) y el foco en `azul-claro`, porque el `azul-medio` ahí da 2,67:1.
 - **En el celular** la fila scrollea de costado si no entra; las cinco de
   Contenido entran a 390 de ancho, las cinco de Métricas no y scrollean.
 - **El número de una pestaña llega con Mensajes**, su primer consumidor;
@@ -548,6 +572,10 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
   tarjetas, ni el editor, que lo ubican sus migas. Las usa también Métricas
   (Resumen, Búsquedas, Origen, Qué hace la gente, Links para compartir), que
   no tiene índice: su puerta es Resumen, la primera pestaña.
+- Segundo consumidor: las pantallas de una página en el editor —Secciones ·
+  SEO · Qué cambió · Versiones—, cada una su ruta. El `h1` es la página, con
+  sus migas; la pestaña dice la pantalla. Cambiar de pestaña con algo sin
+  guardar pregunta, como cualquier salida del editor.
 
 ### Índice de tarjetas
 
@@ -584,8 +612,10 @@ Filas separadas por un divisor, en una caja con el mismo borde
 - **Una acción que navega** es un link con cara de botón secundario, con el
   nombre de la fila para el lector («Editar Inicio»).
 - Primer consumidor: la lista de Páginas. También las guías de los módulos
-  por hacer y las cuatro listas de Métricas › Búsquedas (sin acción: lo
-  principal y sus cifras en el detalle).
+  por hacer, las cuatro listas de Métricas › Búsquedas (sin acción: lo
+  principal y sus cifras en el detalle) y las versiones de una página (la más
+  nueva con la insignia «En el sitio», normal, y sin acción; las demás,
+  «Restaurar como borrador»).
 
 ### Estado vacío
 
@@ -683,4 +713,45 @@ que lo lea quien usa lector de pantalla o quien lee despacio.
 
 - Sin verde: al lado de «Publicar» rompería la regla 4 de §1.
 - Una × opcional lo cierra, y el aviso siguiente reemplaza al anterior.
+- **Una acción adentro**, si hay algo que la resuelva («Recargar», cuando otra
+  persona guardó mientras tanto): un botón de texto subrayado en meta medium,
+  en el color del aviso (5,75:1 en el error, 11,63:1 en la confirmación), fuera
+  del texto con el `role`, para que no se anuncie como parte del mensaje.
 - `gris-texto` no va sobre `azul-claro/30`: da 4,12:1.
+
+### Qué cambió
+
+El borrador contra lo publicado, antes de publicar (la pestaña «Qué cambió»
+del editor). `apps/sitio/src/admin/paginas/ListaDeCambios.tsx`.
+
+- **Por parte**: el nombre en `text-admin-seccion` con el divisor de las
+  secciones, y debajo una fila por campo que cambió, separadas por el divisor
+  `azul-claro/60`.
+- **Cada fila**: dónde, en meta medium y con las etiquetas del formulario
+  («Tarjetas › Tarjeta 3 › Foto»); debajo, «Antes» y «Ahora» uno al lado del
+  otro desde `md`. Antes va en `gris-texto` (4,83:1 · 7,08:1) y ahora en
+  `azul-principal`: la jerarquía sale del contraste. **Sin rojo ni verde**:
+  cambiar no es un error ni un concepto, y al lado de «Publicar» el verde
+  rompería la regla 4 de §1.
+- **Una foto**: la miniatura 4/3 de 160 px con su foco, alt vacío, y su texto
+  alternativo escrito debajo. Lo que no había o ya no está dice «Nada».
+- **Vacía**: el `EstadoVacio`, «No hay cambios sin publicar», o «El borrador
+  es igual a lo publicado» si lo hay pero no cambia nada.
+
+### Vista previa de buscador y redes
+
+Cómo se ve una página en Google y al compartir el link, en vivo con lo que
+está en el formulario (la pestaña SEO). `VistaPreviaSeo.tsx`.
+
+- **Dos figuras**, una al lado de la otra desde `lg`, con su `figcaption`
+  en meta medium, en cajas `rounded-xl` con borde `azul-claro/60`.
+- **Google**: el dominio (y el camino) en meta `gris-texto`, el título en
+  `text-admin-seccion` `azul-medio` (5,11:1), como el link de un
+  resultado sin serlo, y la descripción en meta `gris-texto`. Los dos se
+  cortan donde corta el buscador (60 y 160), en una palabra, con «…».
+- **Redes**: la imagen en `aspect-40/21` (1200 × 630), recortada desde el
+  centro como la recortan las redes, y abajo el dominio, el título en cuerpo
+  medium y la descripción en dos renglones. Sin imagen propia va la del
+  sitio (`opengraph-image`), y lo dice.
+- Es ilustración: la imagen va con alt vacío y lo que es va escrito debajo
+  («Imagen propia: …» o «Sin imagen propia: va la del sitio.»).
