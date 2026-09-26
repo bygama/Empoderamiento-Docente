@@ -15,8 +15,8 @@
 | 3 | Título de pestaña | hecho, `e8a280a` |
 | 4 | El índice de tarjetas, en `/admin/contenido` | hecho, `c00384f` |
 | 5 | Pestañas, en las cinco pantallas de Contenido | hecho, `7d17737` |
-| 6 | La lista, en Páginas | hecho |
-| 7 | La guía de un módulo pasa a la Lista | pendiente |
+| 6 | La lista, en Páginas | hecho, `7c8dde8` |
+| 7 | La guía de un módulo pasa a la Lista | hecho |
 | 8 | El estado vacío, en Métricas | pendiente |
 | 9 | Las pantallas de acceso, con la marca | pendiente |
 | 10 | DESIGN.md §11 y el README | pendiente |
@@ -92,4 +92,11 @@
   --filter sitio typecheck` → exit 0; `pnpm --filter sitio lint` → exit 0.
   Con sesión: clic en «Hero» → `/admin/contenido/paginas/inicio#seccion-hero`,
   la sección a 112 px del borde (debajo del encabezado fijo), título «Inicio ·
-  Páginas · Admin ED».
+  Páginas · Admin ED». Commit `7c8dde8`.
+- **Paso 7** — `LoQueVaATener` (`por-hacer/GuiaDelModulo.tsx`) dibuja sus
+  pantallas con `Lista`/`Fila`: nombre y ruta como principal, «qué» como
+  detalle, «Por hacer» como insignia o el link de hoy como acción
+  (`BotonEnlace` secundario). `pnpm --filter sitio typecheck` → exit 0. Con
+  sesión: `/admin/metricas` lista sus cinco pantallas (Resumen con «Hoy, en el
+  Inicio», las otras «Por hacer») y `/admin/contenido/casos` sus dos, con la
+  pestaña Casos encendida.
