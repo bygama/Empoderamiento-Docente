@@ -46,3 +46,24 @@ Append-only: fecha — decisión — por qué.
   componente necesita correr —`partirCifra`— va en un módulo propio sin Zod
   (`features/home/contenido/cifra.ts`). Lo mira comparar-render en cada
   sección: los bytes de activos no pueden saltar.
+- 2026-09-26 — **Rebase sobre `main` `5a07368`, con lo que pidió el padre**
+  (mensaje «main trae permisos y actividad: sumalos en tu rebase»):
+  1. Cada acción de esta lane chequea `puede(rol, "editarContenido")` justo
+     después de la sesión —guardar, publicar, descartar, restaurar y subir
+     una foto— y salen de `SIN_CAPACIDAD` las de `paginas.ts` y `fotos.ts`.
+  2. En la actividad quedan publicar, descartar un borrador (solo si había
+     uno) y restaurar una versión, con tres tipos nuevos en el registro
+     cerrado (`publico-una-pagina`, `descarto-un-borrador`,
+     `restauro-una-version`), sobre la página y su slug. **Guardar un
+     borrador y subir una foto no se anotan:** el §5.8 del SPEC padre lista
+     «publicó, descartó, restauró», y ninguno de los dos cambia el sitio;
+     anotar cada guardado llenaría la historia de ruido. Fotos (lane 9)
+     decide si subir una foto se anota.
+  3. `pestanaActiva` es la de `main` (lane 5, mismo algoritmo y nombre): la
+     mía se descartó en el rebase y quedó mi variante `sobreAzul` de
+     `Pestanas` y un test del caso del editor.
+  4. La migración quedaba antes de `20260926221013_sesion_ubicacion`: se
+     regeneró sobre el `main` nuevo (base `ed_paginasinicio` recreada, las de
+     `main` aplicadas, `pnpm migrate`) como
+     `20260926231213_versiones_de_paginas`, con el mismo SQL, adentro del
+     commit de versiones.
