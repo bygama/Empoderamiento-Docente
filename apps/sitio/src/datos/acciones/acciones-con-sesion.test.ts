@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // AGENTS.md §12: toda Server Action del admin empieza por
-// `auth.api.getSession`. El middleware deja pasar las acciones sin cookie (un
+// `auth.api.getSession`. El proxy deja pasar las acciones sin cookie (un
 // redirect no es una respuesta válida para una acción) y el layout protegido
 // no las cubre, así que la sesión la verifica cada acción o nadie. Este test
 // es lo que hace que la regla no dependa de acordarse.

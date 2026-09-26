@@ -5,9 +5,9 @@ import { hayCookieDeSesion } from "@ed/auth";
  * Las cabeceras de seguridad de todo el sitio, y las que solo valen para el
  * admin.
  *
- * Va en el middleware y no en `headers()` de `next.config.ts` porque el admin
- * necesita las suyas propias y porque acá mismo se monta, en el paso siguiente,
- * la guarda de sesión: una sola pasada por request.
+ * Va en el proxy (el que en Next 15 se llamaba `middleware.ts`) y no en
+ * `headers()` de `next.config.ts` porque el admin necesita las suyas propias
+ * y porque acá mismo se monta la guarda de sesión: una sola pasada por request.
  */
 
 const ADMIN = "/admin";
@@ -60,13 +60,13 @@ function aEntrar(req: NextRequest, ruta: string): URL {
   return destino;
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const ruta = req.nextUrl.pathname;
   const esAdmin = ruta.startsWith(ADMIN);
 
   // Del admin sin sesión no sale ni una página a medio renderizar: se corta
-  // acá y se redirige. Es un filtro optimista —Edge no puede consultar la
-  // base—; la comprobación de verdad la hace el layout del admin.
+  // acá y se redirige. Es un filtro optimista —solo mira que la cookie
+  // esté, sin ir a la base—; la comprobación de verdad la hace el layout.
   const cerrada =
     esAdmin && !ABIERTAS.some((a) => ruta === a || ruta.startsWith(`${a}/`));
   // Una Server Action sin cookie no se redirige: un redirect no es una
@@ -104,6 +104,6 @@ export const config = {
   // Todo menos los assets y el favicon: ponerle cabeceras a cada chunk de JS
   // no aporta nada y se paga en cada request. `_vercel` es el script y los
   // envíos de la analítica (`/_vercel/insights/…`): pasarlos por el
-  // middleware gastaba una invocación por vista y no aportaba nada.
+  // proxy gastaba una invocación por vista y no aportaba nada.
   matcher: ["/((?!_next/static|_next/image|_vercel|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|avif|woff2)$).*)"],
 };
