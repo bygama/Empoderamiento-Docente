@@ -144,6 +144,16 @@
   merge. El merge es del padre, rebase-only; si `main` se movió, rebasar y
   volver a correr el gate antes.
 
+- **Revisión de cierre r1** (Opus 5.5, medium, «el cambio entero contra su
+  SPEC», lanzada por el padre sobre `6f4d834`): **PASS**, 0 Critical, 0
+  Important, 4 Minor. Tres ratificados sin cambio de código y tres arreglos
+  de una línea (DECISIONS): `crear-cuenta` con `ROL_POR_DEFECTO` (`c77c09a`;
+  probado: sin rol da de alta con `edita`), Métricas en «Sin permiso» de
+  DESIGN.md §11 (`38cabc2`), y `sesion.ts`, `actividad.ts` y `direccion.ts`
+  en el árbol de AGENTS.md §3 (`28dc29b`). **La lane cierra** con el commit
+  que borra esta carpeta, en el PR #182; después, el gate sobre `main`
+  fresco, que va en el PR y en el `worker_done`.
+
 ## Verification
 
 ### 2026-09-26 — L DoD después del rebase sobre `c957586` — PASS
