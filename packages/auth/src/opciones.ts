@@ -4,6 +4,13 @@ import type { AlmacenDeBloqueos } from "./bloqueo";
 // Lo que la app le pasa a `crearAuth`: todo lo que es de ella y no del paquete.
 
 /**
+ * Lo que pasa en la sesión y la app quiere anotar: entrar, salir y cambiar la
+ * contraseña (desde la cuenta o con el enlace de «olvidé»). El paquete sabe
+ * cuándo pasa; dónde se guarda es de la app.
+ */
+export type SucesoDeSesion = { tipo: "entro" | "salio" | "cambio-su-contrasena"; idDeCuenta: string };
+
+/**
  * El cliente de Prisma que recibe `crearAuth`.
  *
  * **No restringe nada, y conviene saberlo**: se deriva del tipo de better-auth,
@@ -39,4 +46,9 @@ export type OpcionesDeAuth = {
   segundoPlano: (tarea: Promise<unknown>) => void;
   /** Dónde guarda el bloqueo por cuenta sus fallos (bloqueo.ts). */
   bloqueos: AlmacenDeBloqueos;
+  /**
+   * Anota un suceso de la sesión. Corre en segundo plano y no puede frenar
+   * nada: si no se guarda, quien lo implementa lo loguea y no tira.
+   */
+  registrar: (suceso: SucesoDeSesion) => Promise<void>;
 };

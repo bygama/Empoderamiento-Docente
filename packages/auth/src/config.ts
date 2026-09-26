@@ -21,6 +21,7 @@ export function crearAuth({
   avisarCambioDeContrasena,
   segundoPlano,
   bloqueos,
+  registrar,
 }: OpcionesDeAuth) {
   if (!secreto) {
     throw new Error(
@@ -69,7 +70,12 @@ export function crearAuth({
       onPasswordReset: async ({ user }) => {
         await destrabar(bloqueos, user.email, secreto);
         // better-auth espera a este callback antes de contestar, así que el
-        // aviso se manda a segundo plano acá mismo.
+        // registro y el aviso van a segundo plano acá mismo.
+        segundoPlano(
+          registrar({ tipo: "cambio-su-contrasena", idDeCuenta: user.id }).catch((e: unknown) => {
+            console.error("No se anotó «cambio-su-contrasena»:", e instanceof Error ? e.message : e);
+          }),
+        );
         segundoPlano(
           avisarCambioDeContrasena({ para: user.email, nombre: user.name || undefined, cuando: new Date() }).catch((e: unknown) => {
             console.error("No salió el aviso de contraseña cambiada:", e instanceof Error ? e.message : e);
@@ -88,8 +94,9 @@ export function crearAuth({
      * Una sesión dura 12 horas sin uso: una jornada. Cada hora de uso la
      * renueva (`updateAge`), así que quien trabaja no se queda afuera a mitad
      * de algo, y una computadora olvidada abierta se cierra sola a la noche.
-     * `freshAge`: lo delicado (cambiar la contraseña, las cuentas) pide haber
-     * entrado hace menos de 10 minutos.
+     * `freshAge`: las rutas que better-auth marca como frescas (listar las
+     * sesiones por su API, borrar la cuenta) piden haber entrado hace menos de
+     * 10 minutos. Cambiar la contraseña no: pide la actual.
      */
     session: {
       expiresIn: 12 * UNA_HORA,
@@ -125,10 +132,13 @@ export function crearAuth({
         // usa), y la regla que la limitaba no limitaba nada.
         "/request-password-reset": { window: 300, max: 3 },
         "/reset-password": { window: 300, max: 5 },
+        // Pide la contraseña actual: sin límite propio, una sesión robada la
+        // podría probar a razón del tope general, 60 por minuto.
+        "/change-password": { window: 300, max: 5 },
       },
     },
 
-    hooks: crearGanchos({ bloqueos, secreto }),
+    hooks: crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena }),
 
     advanced: {
       // better-auth manda acá el correo del reset (`runInBackgroundOrAwait`).

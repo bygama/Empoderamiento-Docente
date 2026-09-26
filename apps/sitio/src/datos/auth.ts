@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { crearAuth } from "@ed/auth/servidor";
+import { registrarActividad } from "./actividad";
 import { almacenDeBloqueos } from "./bloqueos-de-acceso";
 import { base } from "./cliente";
 import { elegiTuContrasena } from "@/correos/elegi-tu-contrasena";
@@ -11,7 +12,8 @@ import { tuContrasenaCambio } from "@/correos/tu-contrasena-cambio";
  *
  * `@ed/auth` trae la configuración —qué se permite, cuánto dura, qué campos
  * tiene una cuenta— y nada de ED. Lo de ED se junta acá: el cliente de Prisma,
- * la URL del sitio y cómo sale un correo.
+ * la URL del sitio, cómo sale un correo y dónde se anota entrar, salir y
+ * cambiar la contraseña (la tabla `actividad`).
  */
 
 function urlDelSitio(): string {
@@ -47,6 +49,7 @@ export const auth = crearAuth({
   secreto: process.env.BETTER_AUTH_SECRET ?? "",
   urlDelSitio: url,
   bloqueos: almacenDeBloqueos,
+  registrar: ({ tipo, idDeCuenta }) => registrarActividad({ tipo, quien: idDeCuenta }),
   segundoPlano,
   mandarResetDeContrasena: ({ para, nombre, enlace, minutosDeVigencia }) =>
     mandarCorreo({ para, contenido: elegiTuContrasena({ nombre, enlace, minutosDeVigencia }) }),
