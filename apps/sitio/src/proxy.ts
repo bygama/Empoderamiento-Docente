@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { hayCookieDeSesion } from "@ed/auth";
+import { esLlegadaDeOtroSitio, paginaDeRebote } from "@/lib/seguridad/rebote";
 
 /**
  * Las cabeceras de seguridad de todo el sitio, y las que solo valen para el
@@ -74,8 +75,15 @@ export function proxy(req: NextRequest) {
   // response». La acción verifica la sesión ella misma —toda acción del admin
   // lo hace, porque el layout no las cubre— y contesta en llano.
   const esAccion = req.headers.has("next-action");
-  const res =
-    cerrada && !esAccion && !hayCookieDeSesion(req) ? NextResponse.redirect(aEntrar(req, ruta)) : NextResponse.next();
+  const sinSesion = cerrada && !esAccion && !hayCookieDeSesion(req);
+  // Sin cookie puede ser que no haya sesión, o que la cookie (`Strict`) no
+  // haya viajado porque el link estaba en otro sitio: esa navegación se
+  // rebota a la misma URL antes de mandarla a «entrar» (lib/seguridad/rebote.ts).
+  const res = !sinSesion
+    ? NextResponse.next()
+    : esLlegadaDeOtroSitio(req)
+      ? paginaDeRebote(req.nextUrl)
+      : NextResponse.redirect(aEntrar(req, ruta));
 
   res.headers.set("Content-Security-Policy", politicaDeContenido(esAdmin));
   // Dos años y subdominios: el valor que pide la lista de precarga de HSTS.

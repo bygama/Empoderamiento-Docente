@@ -10,7 +10,10 @@ export function tuContrasenaCambio({ nombre, olvideMiContrasena }: { nombre?: st
   return armarCorreo({
     asunto: "Tu contraseña cambió",
     nombre,
-    antes: [`Se acaba de elegir una contraseña nueva para tu cuenta en el admin del sitio de ${siteConfig.name}.`],
+    antes: [
+      `Se acaba de elegir una contraseña nueva para tu cuenta en el admin del sitio de ${siteConfig.name}.`,
+      "Cerramos todas las sesiones que estaban abiertas con tu cuenta: para volver a entrar hace falta la contraseña nueva.",
+    ],
     despues: [
       "Si fuiste vos, no tenés que hacer nada.",
       `Si no fuiste vos, elegí otra ya mismo desde ${olvideMiContrasena} y avisale a quien administra el sitio.`,
