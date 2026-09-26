@@ -137,10 +137,10 @@ export function crearAuth({
        * `SameSite=Strict`: la cookie de sesión no viaja en nada que empiece
        * en otro sitio, ni siquiera en un link. Es la defensa de CSRF que no
        * depende de que el origen se valide bien. El costo: quien llega al
-       * admin desde un link de un correo cae en «entrar» aunque tenga sesión,
-       * y por eso `FormularioEntrar` pregunta por la sesión con un `fetch`
-       * propio, que sí la lleva. `__Host-` no se puede: better-auth 1.7
-       * siempre antepone `__Secure-`.
+       * admin desde un link de un correo no la manda en esa navegación, y
+       * por eso el proxy de la app rebota esa navegación a la misma URL: la
+       * segunda vuelta ya es del mismo sitio y la lleva. `__Host-` no se
+       * puede: better-auth 1.7 siempre antepone `__Secure-`.
        */
       defaultCookieAttributes: { sameSite: "strict" },
       ipAddress: {
