@@ -11,18 +11,26 @@ export type Pestana = { href: string; etiqueta: string };
 // El foco va por dentro (`-outline-offset-2`): afuera lo cortaría el scroll
 // horizontal del celular.
 const BASE =
-  "relative flex h-11 items-center whitespace-nowrap rounded-md px-3 text-admin-meta font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-azul-medio";
-const ACTIVA = "text-azul-principal after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-azul-principal";
-const INACTIVA = "text-gris-texto hover:text-azul-principal";
+  "relative flex h-11 items-center whitespace-nowrap rounded-md px-3 text-admin-meta font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2";
+const ACTIVA = "text-azul-principal after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-azul-principal focus-visible:outline-azul-medio";
+const INACTIVA = "text-gris-texto hover:text-azul-principal focus-visible:outline-azul-medio";
+// Sobre `azul-principal` (el encabezado del editor con cambios sin guardar):
+// la activa en blanco con su barra (13,63:1), las demás en `azul-claro`
+// (7,68:1) y el foco en `azul-claro`, porque el `azul-medio` ahí da 2,67:1.
+const ACTIVA_SOBRE_AZUL = "text-white after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-white focus-visible:outline-azul-claro";
+const INACTIVA_SOBRE_AZUL = "text-azul-claro hover:text-white focus-visible:outline-azul-claro";
 
 /**
  * Las pantallas de un módulo, debajo de su encabezado (DESIGN.md §11). Son
  * links que navegan, no el patrón ARIA de tabs: un `nav` y una lista, con la
  * activa anunciada por `aria-current`. La activa sale de la ruta —la más
  * específica de las que la contienen (`pestanaActiva`)—, así un layout puede
- * ponerlas sin que cada página diga cuál es. Cliente solo por `usePathname`.
+ * ponerlas sin que cada página diga cuál es, y las de una página del editor
+ * (`/inicio` y `/inicio/seo`) no se encienden de a dos. Cliente solo por
+ * `usePathname`.
  */
-export function Pestanas({ etiqueta, pestanas }: { etiqueta: string; pestanas: readonly Pestana[] }) {
+export function Pestanas({ etiqueta, pestanas, sobreAzul = false }: { etiqueta: string; pestanas: readonly Pestana[]; sobreAzul?: boolean }) {
+  const [activaClase, inactivaClase] = sobreAzul ? [ACTIVA_SOBRE_AZUL, INACTIVA_SOBRE_AZUL] : [ACTIVA, INACTIVA];
   const activa = pestanaActiva(
     usePathname(),
     pestanas.map((p) => p.href),
@@ -35,7 +43,7 @@ export function Pestanas({ etiqueta, pestanas }: { etiqueta: string; pestanas: r
           const encendida = p.href === activa;
           return (
             <li key={p.href}>
-              <Link href={p.href} aria-current={encendida ? "page" : undefined} className={`${BASE} ${encendida ? ACTIVA : INACTIVA}`}>
+              <Link href={p.href} aria-current={encendida ? "page" : undefined} className={`${BASE} ${encendida ? activaClase : inactivaClase}`}>
                 {p.etiqueta}
               </Link>
             </li>
