@@ -1,0 +1,103 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { betterAuth } from "better-auth";
+import { memoryAdapter } from "better-auth/adapters/memory";
+import { hashPassword as hashearConScrypt } from "better-auth/crypto";
+import { claveDeBloqueo, type AlmacenDeBloqueos, type EstadoDeBloqueo } from "./bloqueo";
+import { hashear, verificar } from "./contrasenas";
+import { crearGanchos, destrabar } from "./ganchos";
+
+// Los ganchos corriendo adentro de better-auth de verdad, con su adaptador en
+// memoria: lo que se prueba es que los pedidos a `/sign-in/email` pasen por
+// ellos como en producción, no una copia de su lógica.
+
+const SECRETO = "un-secreto-de-prueba-que-no-sirve-para-nada-mas";
+const CONTRASENA = "la-contrasena-buena-de-prueba";
+
+function almacenEnMemoria(): AlmacenDeBloqueos & { filas: Map<string, EstadoDeBloqueo> } {
+  const filas = new Map<string, EstadoDeBloqueo>();
+  return {
+    filas,
+    async leer(clave) {
+      return filas.get(clave) ?? null;
+    },
+    async actualizar(clave, cambio) {
+      const siguiente = cambio(filas.get(clave) ?? null);
+      filas.set(clave, siguiente);
+      return siguiente;
+    },
+    async borrar(clave) {
+      filas.delete(clave);
+    },
+    async podar() {},
+  };
+}
+
+/** Una instancia con una cuenta, cuya contraseña se guarda con `hash`. */
+async function armar(correo: string, hash: (contrasena: string) => Promise<string>) {
+  const bloqueos = almacenEnMemoria();
+  const auth = betterAuth({
+    database: memoryAdapter({ user: [], session: [], account: [], verification: [] }),
+    secret: SECRETO,
+    baseURL: "http://localhost",
+    telemetry: { enabled: false },
+    // Los «Invalid password» de cada fallo son el caso que se prueba, no ruido que leer.
+    logger: { disabled: true },
+    rateLimit: { enabled: false },
+    emailAndPassword: { enabled: true, password: { hash: hashear, verify: verificar } },
+    hooks: crearGanchos({ bloqueos, secreto: SECRETO }),
+  });
+  const ctx = await auth.$context;
+  const cuenta = await ctx.internalAdapter.createUser({ email: correo, name: "Ana", emailVerified: true }, { method: "admin" });
+  await ctx.internalAdapter.createAccount({ userId: cuenta.id, providerId: "credential", accountId: cuenta.id, password: await hash(CONTRASENA) });
+  const entrar = (email: string, password: string) =>
+    auth.handler(
+      new Request("http://localhost/api/auth/sign-in/email", {
+        method: "POST",
+        headers: { "content-type": "application/json", origin: "http://localhost" },
+        body: JSON.stringify({ email, password }),
+      }),
+    );
+  return { bloqueos, ctx, cuenta, entrar, clave: claveDeBloqueo(correo, SECRETO) };
+}
+
+test("un 401 cuenta un fallo, y entrar bien borra la fila", async () => {
+  const { bloqueos, entrar, clave } = await armar("ana@ed.test", hashear);
+  assert.equal((await entrar("ana@ed.test", "una-contrasena-mala")).status, 401);
+  assert.equal(bloqueos.filas.get(clave)?.fallos, 1);
+  assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
+  assert.equal(bloqueos.filas.has(clave), false);
+});
+
+test("solo el 401 cuenta: un correo mal escrito no es un intento", async () => {
+  const { bloqueos, entrar } = await armar("ana@ed.test", hashear);
+  assert.equal((await entrar("esto-no-es-un-correo", "una-contrasena-mala")).status, 400);
+  assert.equal(bloqueos.filas.size, 0);
+});
+
+test("una cuenta frenada contesta 429 antes de mirar la contraseña, aunque sea la buena", async () => {
+  const { entrar } = await armar("ana@ed.test", hashear);
+  for (let i = 0; i < 5; i++) assert.equal((await entrar("Ana@ED.test", "una-contrasena-mala")).status, 401);
+  const res = await entrar("ana@ed.test", CONTRASENA);
+  assert.equal(res.status, 429);
+  assert.deepEqual(await res.json(), { message: "Too many requests. Please try again later." });
+  assert.equal(res.headers.get("x-retry-after"), "900");
+});
+
+test("entrar bien con un hash scrypt lo pasa a Argon2id", async () => {
+  const { ctx, cuenta, entrar } = await armar("ana@ed.test", hashearConScrypt);
+  assert.ok(!(await ctx.internalAdapter.findCredentialAccount(cuenta.id))?.password?.startsWith("$argon2id$"));
+  assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
+  const guardado = (await ctx.internalAdapter.findCredentialAccount(cuenta.id))?.password ?? "";
+  assert.ok(guardado.startsWith("$argon2id$v=19$m=19456,t=2,p=1$"), guardado);
+  assert.equal(await verificar({ hash: guardado, password: CONTRASENA }), true);
+});
+
+test("un reset de contraseña destraba la cuenta, escriba como escriba el correo", async () => {
+  const { bloqueos, entrar, clave } = await armar("ana@ed.test", hashear);
+  for (let i = 0; i < 5; i++) await entrar("ana@ed.test", "una-contrasena-mala");
+  assert.notEqual(bloqueos.filas.get(clave)?.hasta ?? null, null);
+  await destrabar(bloqueos, "Ana@ED.test", SECRETO);
+  assert.equal(bloqueos.filas.has(clave), false);
+  assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
+});
