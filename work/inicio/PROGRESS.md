@@ -62,6 +62,36 @@
   aisladas con `oNull` (en `null`, el bloque dice que no se pudo leer). Sin
   `verTodaLaActividad`: la 3b no está en `main` (`git log HEAD..origin/main`
   vacío), así que el link lo suma ella (DECISIONS). typecheck y lint exit 0.
+- **7. La pantalla del Inicio** — `c96e9f2`. `admin/inicio/`: `Inicio.tsx`
+  (encabezado «Hola, <nombre>» con `DesdeTuVisita` en el detalle y los
+  accesos rápidos en las acciones; grilla `lg:grid-cols-5`: pendientes y
+  actividad en 3, esta semana en 2 con `row-span-2`, así el DOM y el celular
+  van pendientes → semana → actividad), `Pendientes.tsx` (`Lista`/`Fila`, la
+  insignia fuerte con la cuenta en el `h2`, «Todo al día» con `EstadoVacio`),
+  `EstaSemana.tsx` (`Numero` de a dos, el impar a lo ancho, «Ver métricas»
+  terciario), `ActividadReciente.tsx` (`fraseDe` y `Momento` relativo; vacío
+  y aviso de error), `DesdeTuVisita.tsx` (un solo `<p>`). `modulos.ts` suma
+  `accesoRapido?`. `(protegido)/page.tsx`: sesión → `inicioPara` →
+  `<Inicio>`. `PanelMetricas` y el link a Páginas salen; comentarios de
+  `metricas/page.tsx` y `PanelMetricas` al día. `pnpm typecheck` y
+  `pnpm lint` exit 0; `node scripts/verificar-react-doctor.mjs` exit 0,
+  100/100 sin diagnósticos (con los archivos nuevos en el índice).
+  Dirección visual con `frontend-design` dentro de §11: la única pieza con
+  peso fuerte es la insignia de la cuenta de pendientes; lo demás, callado.
+- **8. DESIGN.md §11** — `48f62db`. «### Número» (etiqueta, cifra y
+  comparación con sus contrastes, sin color en la comparación, «—» sin
+  datos) y «### Inicio» (orden de lectura, dos columnas desde `lg`, sin
+  primario, la insignia fuerte como único peso, lo que falla lo dice en su
+  lugar); `Lista` y `Estado vacío` suman el Inicio a sus consumidores; la
+  línea de fechas de §11 suma `work/inicio/`. `git diff --stat -- DESIGN.md`:
+  61+ 5−; `grep` encuentra las dos secciones (líneas 650 y 674).
+- **9. AGENTS.md §3 y §12** — `85c5043`. El árbol suma `datos/inicio/`,
+  `admin/inicio/`, `admin/actividad/`, el número en `armazon/` y `QUIEN_VE`
+  en `actividad.ts`; §12 suma la regla de sumar al Inicio por registro.
+  `grep -n "datos/inicio\|inicio/  " AGENTS.md`: líneas 173, 177 y 661.
+- **10. README** — `53d7b7a`. «La portada del admin» → Métricas (variables)
+  y «un Inicio con lo pendiente, los números de la semana y la actividad
+  reciente» (Admin). `grep -n "portada" README.md`: sin resultados.
 
 ## Hecho
 
