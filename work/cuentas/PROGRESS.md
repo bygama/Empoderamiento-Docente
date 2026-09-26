@@ -77,7 +77,7 @@
   buena, 403 y sin cookie; suspendida entre la contraseña y el código, el
   código también da 403; no se anota nada. Aceptación: `pnpm --filter
   @ed/auth test` 41/41; `pnpm typecheck` exit 0; `lint` exit 0.
-- **Paso 5 — el enlace de invitación** (este commit).
+- **Paso 5 — el enlace de invitación** (`2ee0ea4`).
   `packages/auth/src/invitacion.ts › crearEnlaceDeInvitacion(auth, {
   idDeCuenta, horas, volverA })` → `{ enlace, vence }`, exportada por
   `@ed/auth/servidor`: el formato del reset de better-auth
@@ -88,5 +88,13 @@
   credencial y sirve una sola vez; vencido, redirige con
   `error=INVALID_TOKEN` y el reset da 400. Aceptación: `pnpm --filter
   @ed/auth test` 43/43; `typecheck` y `lint` exit 0.
+- **Paso 6 — los correos que quedaban** (este commit). `elegiTuContrasena`
+  suma `invitacion?: { quienInvita, rol }`: dice quién invita y con qué rol,
+  y «si no esperabas esta invitación» en vez de «si no lo pediste».
+  `correos/tu-correo-cambio.ts › tuCorreoCambio({ nombre, anterior, nuevo,
+  cuando })`, para las dos direcciones. `enHoraUniversal` se mudó a
+  `plantilla.ts` (la usan dos correos). Un test nuevo encontró «te invitó a
+  el admin»: corregido a «al». Aceptación: `pnpm --filter sitio test` exit 0
+  (155 pass, 1 saltado de antes); `typecheck` y `lint` exit 0.
 
 ## Abierto
