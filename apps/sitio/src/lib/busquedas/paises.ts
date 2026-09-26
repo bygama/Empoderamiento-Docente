@@ -1,0 +1,43 @@
+// El nombre de un país en español, a partir del código que da Search Console
+// (ISO 3166-1 alfa-3, en minúscula). `Intl.DisplayNames` solo acepta el
+// alfa-2, así que hace falta la tabla de abajo: es un dato, no lógica.
+//
+// Sale de CLDR 48.2 (`common/supplemental/supplementalData.xml`, tag
+// `release-48-2` de github.com/unicode-org/cldr): cada `territoryCodes` de dos
+// letras con `alpha3`, sin los de uso privado (AAA, ZZZ, Q** salvo QAT y X**
+// salvo XKK) ni los que `Intl.DisplayNames` no sabe nombrar, ordenados por el
+// alfa-3. Cada entrada es el alfa-3 pegado al alfa-2. Para regenerarla, repetir
+// ese filtro sobre el XML de la versión nueva.
+const TABLA = `
+ABWAW AFGAF AGOAO AIAAI ALAAX ALBAL ANDAD ANTAN AREAE ARGAR ARMAM ASCAC ASMAS ATAAQ ATFTF ATGAG AUSAU AUTAT
+AZEAZ BDIBI BELBE BENBJ BESBQ BFABF BGDBD BGRBG BHRBH BHSBS BIHBA BLMBL BLRBY BLZBZ BMUBM BOLBO BRABR BRBBB
+BRNBN BTNBT BURBU BVTBV BWABW CAFCF CANCA CCKCC CHECH CHLCL CHNCN CIVCI CMRCM CODCD COGCG COKCK COLCO COMKM
+CPTCP CPVCV CRICR CUBCU CUWCW CXRCX CYMKY CYPCY CZECZ DDRDD DEUDE DGADG DJIDJ DMADM DNKDK DOMDO DZADZ ECUEC
+EGYEG ERIER ESHEH ESPES ESTEE ETHET FINFI FJIFJ FLKFK FRAFR FROFO FSMFM FXXFX GABGA GBRGB GEOGE GGYGG GHAGH
+GIBGI GINGN GLPGP GMBGM GNBGW GNQGQ GRCGR GRDGD GRLGL GTMGT GUFGF GUMGU GUYGY HKGHK HMDHM HNDHN HRVHR HTIHT
+HUNHU IDNID IMNIM INDIN IOTIO IRLIE IRNIR IRQIQ ISLIS ISRIL ITAIT JAMJM JEYJE JORJO JPNJP KAZKZ KENKE KGZKG
+KHMKH KIRKI KNAKN KORKR KWTKW LAOLA LBNLB LBRLR LBYLY LCALC LIELI LKALK LSOLS LTULT LUXLU LVALV MACMO MAFMF
+MARMA MCOMC MDAMD MDGMG MDVMV MEXMX MHLMH MKDMK MLIML MLTMT MMRMM MNEME MNGMN MNPMP MOZMZ MRTMR MSRMS MTQMQ
+MUSMU MWIMW MYSMY MYTYT NAMNA NCLNC NERNE NFKNF NGANG NICNI NIUNU NLDNL NORNO NPLNP NRUNR NZLNZ OMNOM PAKPK
+PANPA PCNPN PERPE PHLPH PLWPW PNGPG POLPL PRIPR PRKKP PRTPT PRYPY PSEPS PYFPF QATQA REURE ROURO RUSRU RWARW
+SAUSA SCGCS SDNSD SENSN SGPSG SGSGS SHNSH SJMSJ SLBSB SLESL SLVSV SMRSM SOMSO SPMPM SRBRS SSDSS STPST SUNSU
+SURSR SVKSK SVNSI SWESE SWZSZ SXMSX SYCSC SYRSY TAATA TCATC TCDTD TGOTG THATH TJKTJ TKLTK TKMTM TLSTL TMPTP
+TONTO TTOTT TUNTN TURTR TUVTV TWNTW TZATZ UGAUG UKRUA UMIUM URYUY USAUS UZBUZ VATVA VCTVC VENVE VGBVG VIRVI
+VNMVN VUTVU WLFWF WSMWS XKKXK YEMYE YMDYD YUGYU ZAFZA ZARZR ZMBZM ZWEZW
+`;
+
+const ALFA_2 = new Map(
+  TABLA.trim()
+    .split(/\s+/)
+    .map((par) => [par.slice(0, 3), par.slice(3)]),
+);
+
+const nombres = new Intl.DisplayNames(["es"], { type: "region" });
+
+/** «Argentina» para `arg`. Sin país (`zzz`), «Sin identificar»; un código que no está en la tabla, tal cual. */
+export function nombreDelPais(alfa3: string): string {
+  const codigo = alfa3.toUpperCase();
+  if (!codigo || codigo === "ZZZ") return "Sin identificar";
+  const alfa2 = ALFA_2.get(codigo);
+  return (alfa2 && nombres.of(alfa2)) || codigo;
+}
