@@ -1,4 +1,4 @@
-import { esRol, PUEDE } from "@ed/auth";
+import { puede } from "@ed/auth";
 import { listaDePaginas } from "@/datos/consultas/editor-de-paginas";
 import { ContenidoDeLaBarra, type Usuario } from "./barra-lateral/ContenidoDeLaBarra";
 import { PanelMovil } from "./barra-lateral/PanelMovil";
@@ -27,7 +27,7 @@ async function hayPaginasSinPublicar(): Promise<boolean> {
  * mixto pinta con el azul de la marca (globals.css).
  */
 export async function BarraLateral({ usuario, tema }: { usuario: Usuario; tema: Tema }) {
-  const conConfiguracion = esRol(usuario.rol) && PUEDE.tocarCuentas(usuario.rol);
+  const conConfiguracion = puede(usuario.rol, "usarCuentas");
   const conPunto = (await hayPaginasSinPublicar()) ? ["contenido"] : [];
   const contenido = <ContenidoDeLaBarra usuario={usuario} tema={tema} conConfiguracion={conConfiguracion} conPunto={conPunto} />;
   return (

@@ -10,5 +10,16 @@
 export { hayCookieDeSesion } from "./guarda";
 export { crearClienteDeAuth } from "./cliente";
 export type { ClienteDeAuth } from "./cliente";
-export { ROLES, ROL_POR_DEFECTO, PUEDE, SIN_PERMISO, esRol, LARGO_MINIMO_CONTRASENA } from "./permisos";
-export type { Rol } from "./permisos";
+export {
+  ROLES,
+  ROL_POR_DEFECTO,
+  PUEDE,
+  QUE_PUEDE,
+  SIN_PERMISO,
+  esRol,
+  esUnaSola,
+  puede,
+  quienPuede,
+  LARGO_MINIMO_CONTRASENA,
+} from "./permisos";
+export type { Capacidad, Rol } from "./permisos";

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { esRol, PUEDE } from "@ed/auth";
+import { puede } from "@ed/auth";
 import { PanelBusquedas } from "@/admin/busquedas/PanelBusquedas";
 import { EncabezadoDeMetricas } from "@/admin/metricas/EncabezadoDeMetricas";
 import { pantallaDeMetricas } from "@/admin/metricas/pantallas";
@@ -15,7 +15,7 @@ export default async function Busquedas() {
   return (
     <div className="space-y-8">
       <EncabezadoDeMetricas detalle={pantallaDeMetricas("busquedas").que} />
-      <PanelBusquedas puedeConectar={esRol(rol) && PUEDE.configurarConexiones(rol)} />
+      <PanelBusquedas puedeConectar={puede(rol, "configurarConexiones")} />
     </div>
   );
 }
