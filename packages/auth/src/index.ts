@@ -3,11 +3,12 @@
 // Regla del paquete, igual que en @ed/db: **nada de dominio de ED adentro.**
 // No importa el cliente generado de Prisma ni sabe qué tablas de contenido
 // existen; recibe la base ya construida (AGENTS.md §3, la primera frontera).
+//
+// Lo que arma la sesión vive en `@ed/auth/servidor`: esto lo importan también
+// el navegador y el proxy, que no pueden cargar un módulo nativo.
 
-export { crearAuth } from "./config";
 export { hayCookieDeSesion } from "./guarda";
 export { crearClienteDeAuth } from "./cliente";
 export type { ClienteDeAuth } from "./cliente";
-export type { Auth, OpcionesDeAuth } from "./config";
 export { ROLES, ROL_POR_DEFECTO, PUEDE, SIN_PERMISO, esRol, LARGO_MINIMO_CONTRASENA } from "./permisos";
 export type { Rol } from "./permisos";

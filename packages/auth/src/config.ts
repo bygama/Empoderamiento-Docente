@@ -1,5 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { hashear, verificar } from "./contrasenas";
+import { crearGanchos } from "./ganchos";
 import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
 
 /**
@@ -73,6 +75,9 @@ export function crearAuth({
       disableSignUp: true,
       minPasswordLength: LARGO_MINIMO_CONTRASENA,
       maxPasswordLength: 128,
+      // Argon2id en vez del scrypt de fábrica; los hashes viejos verifican y
+      // se reemplazan al entrar (contrasenas.ts, ganchos.ts).
+      password: { hash: hashear, verify: verificar },
       resetPasswordTokenExpiresIn: UNA_HORA,
       sendResetPassword: async ({ user, url }) => {
         await mandarResetDeContrasena({
@@ -111,6 +116,8 @@ export function crearAuth({
         "/reset-password": { window: 300, max: 5 },
       },
     },
+
+    hooks: crearGanchos(),
 
     advanced: {
       ipAddress: {
