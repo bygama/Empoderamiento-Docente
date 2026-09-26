@@ -1,7 +1,10 @@
 # SPEC — Cuentas y segundo factor
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-26, con tres condiciones que
+  ya están escritas abajo (DECISIONS): el test del plugin con la tabla
+  `twoFactor` vacía, el aviso y el cierre de sesiones al cambiar el correo, y
+  que la pantalla del código nunca finja
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación, tablas y columnas incluidas: DECISIONS del padre, 2026-09-26)
 - **Tier:** L · lane 3b del XL `work/mapa-del-admin/` · worktree propio, rama
@@ -120,11 +123,13 @@ Cuentas sale de `admin/por-hacer/guias.ts`. Los componentes, en
   da 404.
 - **Apartados** (`Apartado`), cada uno solo si `queSePuede` lo permite o si
   hay algo que mostrar:
-  - **Datos:** nombre y correo; el correo se puede cambiar (§3). **Lectura:**
-    Mi cuenta ya le promete a cada persona que «si cambió tu correo» se
-    cambia desde Cuentas; sin esto esa frase miente. Cambiarlo valida y
-    verifica que no esté en otra cuenta, y anota `cambio-el-correo`. Es
-    también cómo se recupera alguien que perdió su buzón (§5).
+  - **Datos:** nombre y correo; el correo se puede cambiar (§3), porque Mi
+    cuenta ya le promete a cada persona que «si cambió tu correo» se cambia
+    desde Cuentas. Cambiarlo valida y verifica que no esté en otra cuenta,
+    **cierra sus sesiones**, le manda «El correo de tu cuenta del admin
+    cambió» **a la dirección vieja y a la nueva** (`correos/tu-correo-cambio.ts`)
+    y anota `cambio-el-correo`. Es también cómo se recupera alguien que perdió
+    su buzón (§5).
   - **Rol:** el rol y su frase; el selector administra · edita y «Cambiar el
     rol». Anota `cambio-el-rol` («Juan Pérez, de edita a administra»).
   - **Estado:** «Suspender» (cierra sus sesiones al instante; anota
@@ -166,11 +171,15 @@ Cuentas sale de `admin/por-hacer/guias.ts`. Los componentes, en
   que se tocó todavía tiene pantalla, es un link. **50 por página, paginado
   en el servidor** (`?pagina=`), la más nueva arriba; la tabla guarda 12
   meses.
-- **Cómo se lee cada tipo** vive en `admin/actividad/como-se-lee.ts`: por
-  tipo, su módulo y su frase, con `satisfies Record<TipoDeActividad, …>`
-  para que un tipo nuevo sin frase no compile. El filtro de módulo se
-  traduce ahí a la lista de tipos y la consulta recibe tipos, no módulos. El
-  Inicio (lane 3c) puede leer sus «últimos 8 eventos» con la misma función.
+- **Cómo se lee cada tipo** es de la lane 3c (DECISIONS): la frase, en
+  `admin/actividad/frase.ts`, y quién ve cada tipo, un
+  `Record<TipoDeActividad, Capacidad>` en `datos/actividad.ts`. Mis tipos
+  suman ahí su frase y su visibilidad; si llego antes que la 3c, los creo yo
+  con esa forma. La lista muestra solo los tipos que el rol de quien mira
+  puede ver. El módulo de cada tipo, para el filtro, es de esta pantalla
+  (`admin/cuentas/`), también un `Record<TipoDeActividad, …>`: un tipo nuevo
+  sin módulo no compila. El filtro se traduce ahí a la lista de tipos y la
+  consulta recibe tipos, no módulos.
 - **Vacía** (sin filas con esos filtros): `EstadoVacio` «No hay actividad con
   esos filtros».
 
@@ -183,11 +192,18 @@ Con el plugin `twoFactor` de better-auth 1.7.5, que ya está en el paquete:
 ### 5.1. Cómo se configura (`@ed/auth`)
 
 - **Solo código por correo:** `otpOptions` con `sendOTP` (la app lo manda por
-  Resend, en segundo plano como los otros correos), **6 dígitos**, **vence a
+  Resend), **6 dígitos**, **vence a
   los 10 minutos** (`period: 10`), **guardado hasheado** (`storeOTP:
   "hashed"`, como los tokens de ADR-0010) y **5 intentos por código**
   (`allowedAttempts`). `totpOptions.disable: true`: sin app de
   autenticación ni códigos de respaldo.
+- **El código no sale en segundo plano** (condición del padre): quien lo pide
+  ya puso bien la contraseña, así que el tiempo no delata nada, y esperar el
+  envío es lo único que deja saber si salió. `mandarCorreo` pasa a decir si
+  salió (por Resend, por la consola en desarrollo, o no salió), y un gancho
+  de `/two-factor/send-otp` espera el envío y convierte un «no salió» —falta
+  `RESEND_API_KEY` en producción o Resend contestó un error— en un error
+  `CODIGO_NO_SALIO`.
 - **El paso pendiente** (la contraseña ya dio bien y falta el código) dura
   **30 minutos** (`twoFactorCookieMaxAge`), para que «Mandar otro» tenga
   sentido después de un código vencido; pasado eso, se vuelve a entrar.
@@ -230,6 +246,12 @@ Con el plugin `twoFactor` de better-auth 1.7.5, que ya está en el paquete:
   pendiente vencido o ausente («Pasó mucho tiempo desde que pusiste la
   contraseña. Volvé a entrar.») y el 429 («Demasiados intentos. Esperá unos
   minutos.»). «Mandar otro» confirma con un aviso.
+- **Nunca finge** (condición del padre): si el código no salió
+  (`CODIGO_NO_SALIO`, al entrar o con «Mandar otro»), la pantalla no dice «Te
+  mandamos un código»: dice en llano que no se pudo mandar, que sin correo no
+  se puede entrar con este rol y a quién avisar, con «Probar de nuevo».
+  `FormularioEntrar` le pasa ese resultado en la URL; quien la falsifique solo
+  cambia lo que ve él.
 - **El correo**, `correos/tu-codigo.ts`: asunto «Tu código para entrar»; el
   código grande, que vence en 10 minutos, y «si no fuiste vos, alguien tiene
   tu contraseña: cambiala ya desde … y avisale a quien administra».
@@ -267,8 +289,10 @@ sin código no tiene que sobrevivir al cambio de regla:
 **Riesgo, para el deploy:** desde esta lane, quien dirige y administra
 dependen de que salga un correo para entrar. Sin `RESEND_API_KEY` en
 producción no llega ningún código y **no pueden entrar**. Hoy no hay
-producción (lane 0); el README lo deja escrito en «Correos» y en el deploy:
-Resend andando antes del primer deploy que traiga esta lane. Si alguien
+producción (lane 0); el README y el ADR-0012 lo dejan escrito como
+condición del primer deploy: Resend configurado y probado antes de que esta
+lane llegue a producción. Mientras tanto, la pantalla del código lo dice en
+vez de fingir (§5.2). Si alguien
 pierde su buzón, quien dirige o administra le cambia el correo desde Cuentas
 (§4.3).
 
@@ -373,8 +397,9 @@ Cada uno con sus contrastes medidos, en los tres temas.
 
 - El Inicio (3c), Mensajes y la sección Avisos de Mi cuenta (lane 7), el
   resumen semanal (lane 11).
-- Avisarle por correo a una persona que le cambiaron el rol, el correo o que
-  la suspendieron; «olvidar este dispositivo» por separado; la app de
+- Avisarle por correo a una persona que le cambiaron el rol o que la
+  suspendieron (el cambio de correo sí avisa, §4.3); «olvidar este
+  dispositivo» por separado; la app de
   autenticación y los códigos de respaldo.
 - Cambiar la pantalla de «nueva contraseña»: su `h1` ya es «Elegí tu
   contraseña».
@@ -386,9 +411,11 @@ Cada uno con sus contrastes medidos, en los tres temas.
   diagnósticos), `pnpm test`, `pnpm build`. Componentes ≤ 200 líneas,
   utilidades ≤ 100.
 - **Tests**, del tamaño de los de al lado: contra better-auth de verdad (su
-  adaptador en memoria), el ida y vuelta del código (la contraseña no anota
-  `entro`, el código sí; el dispositivo recordado saltea el código;
-  administra no puede apagarlo; una cuenta suspendida no entra) y el enlace
+  adaptador en memoria), el ida y vuelta del código **con la tabla
+  `twoFactor` vacía de punta a punta** (la contraseña no anota `entro`, el
+  código sí; el dispositivo recordado saltea el código; administra no puede
+  apagarlo; un correo que no sale contesta `CODIGO_NO_SALIO`; una cuenta
+  suspendida no entra) y el enlace
   de invitación que `resetPassword` acepta y vencido no; `queSePuede` contra
   la tabla de §3; `segundoFactorObligatorio`; contra la base, el `CHECK` y
   que borrar una cuenta con actividad choque; la consulta de actividad con sus
