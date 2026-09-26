@@ -172,6 +172,19 @@
   --msg-filter` (solo la primera línea; `git diff` contra el original, vacío).
   Los hashes de arriba son los nuevos.
 
+- 2026-09-26 — **Paso 10** (`fb2dc7d`, `d4e198e`): ADR-0011 (con la sección
+  «La migración con datos» que pidió el padre; las referencias externas
+  responden 200, y la de Prisma apunta a la página de la v7, porque la sin
+  versión ya describe el flujo de la 8) y su fila en el índice, con la 0009
+  «enmendada por 0011»; el README (las tres variables, los cuatro pasos para
+  conectar, «Las métricas y lo programado»; el link viejo a `work/metricas/`,
+  que ya no existe, se fue con el párrafo); AGENTS.md §12 precisado, y para
+  que diga lo mismo en todos lados también la línea de `migrations/` del árbol
+  de §3 y la de lo generado en §6, más `datos/tareas/` y los `lib/` nuevos en
+  el árbol. `grep -rnE "api/cron/metricas|metricas_sincronizaciones" README.md
+  AGENTS.md apps/sitio/src apps/sitio/vercel.json` → sin coincidencias (exit
+  1); cada link relativo nuevo apunta a un archivo que existe.
+
 ## Next
 
-- El paso 10 (docs); después work-verify y el PR.
+- work-verify (el gate entero) y el PR.
