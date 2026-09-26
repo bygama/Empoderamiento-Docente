@@ -49,18 +49,18 @@ export async function descartarBorradorEnBase(
   base: PrismaClient,
   { slug, borradorEnVisto }: { slug: string; borradorEnVisto: string | null },
   registro: RegistroDePaginas = PAGINAS,
-): Promise<{ ok: true; detalle: string } | Fallo> {
+): Promise<{ ok: true; detalle: string; descarto: boolean } | Fallo> {
   if (!propioDe(registro, slug)) return { ok: false, detalle: "Esa página no se edita desde acá." };
   const fila = await base.pagina.findUnique({ where: { slug } });
   if (!fila) return { ok: false, detalle: "Esa página todavía no tiene nada guardado." };
   // Descartar un borrador que otra persona guardó sin haberlo visto también es pisar.
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila);
   // M-4: `updateMany` cuenta la fila, no el cambio; sin esto contestaba «se descartó» aunque `borradorEn` ya fuera null.
-  if (!fila.borradorEn) return { ok: true, detalle: "No había borrador que descartar." };
+  if (!fila.borradorEn) return { ok: true, detalle: "No había borrador que descartar.", descarto: false };
   const { count } = await base.pagina.updateMany({
     where: { slug, borradorEn: fila.borradorEn },
     data: { borrador: Prisma.DbNull, borradorEn: null, borradorPor: null },
   });
   if (count === 0) return choqueCon(await base.pagina.findUnique({ where: { slug } }));
-  return { ok: true, detalle: "Se descartó el borrador: la página vuelve a lo publicado." };
+  return { ok: true, detalle: "Se descartó el borrador: la página vuelve a lo publicado.", descarto: true };
 }

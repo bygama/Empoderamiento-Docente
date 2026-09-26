@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { SLUGS } from "@/contenido/paginas";
+import { SIN_PERMISO, puede } from "@ed/auth";
+import { PAGINAS, SLUGS } from "@/contenido/paginas";
+import { registrarActividad } from "@/datos/actividad";
 import { auth } from "@/datos/auth";
 import { base } from "@/datos/cliente";
 import type { Fallo } from "./choque";
@@ -18,6 +20,9 @@ import { publicarEnBase, type ResultadoDePublicar } from "./publicar-paginas";
 // actualizar-metricas.ts). El contenido lo valida editar-paginas.ts contra el
 // esquema de la sección. Las tres llevan el `borradorEn` que vio la pantalla:
 // si otra persona guardó mientras tanto, contestan el choque (choque.ts).
+// Después de la sesión, la capacidad: el Contenido lo editan los tres roles
+// (`editarContenido`). Publicar y descartar quedan en la actividad; guardar
+// un borrador no, porque no cambia el sitio (SPEC padre §5.8).
 
 const esquemaSlug = z.enum(SLUGS);
 const esquemaDeLaPagina = z.object({ slug: esquemaSlug, borradorEnVisto: z.string().nullable() });
@@ -33,6 +38,7 @@ export async function guardarBorrador(pedido: { slug: string; seccion: string; c
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para guardar." };
+    if (!puede(sesion.user.rol, "editarContenido")) return { ok: false, detalle: SIN_PERMISO };
     const valido = esquemaPedido.safeParse(pedido);
     if (!valido.success) return { ok: false, detalle: "El pedido no tiene la forma esperada." };
     const resultado = await guardarBorradorEnBase(base, { ...valido.data, contenido: pedido.contenido, quien: sesion.user.name });
@@ -48,6 +54,7 @@ export async function publicar(pedido: { slug: string; borradorEnVisto: string |
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para publicar." };
+    if (!puede(sesion.user.rol, "editarContenido")) return { ok: false, detalle: SIN_PERMISO };
     const valido = esquemaDeLaPagina.safeParse(pedido);
     if (!valido.success) return { ok: false, detalle: "Esa página no existe." };
     const resultado = await publicarEnBase(base, { ...valido.data, quien: sesion.user.name });
@@ -55,6 +62,7 @@ export async function publicar(pedido: { slug: string; borradorEnVisto: string |
     if (resultado.ok) {
       revalidatePath(resultado.ruta);
       revalidatePath(ARMAZON_DEL_ADMIN, "layout");
+      await registrarActividad({ tipo: "publico-una-pagina", quien: sesion.user.id, sobre: PAGINAS[valido.data.slug].nombre, sobreId: valido.data.slug });
     }
     return resultado;
   } catch (e) {
@@ -63,14 +71,18 @@ export async function publicar(pedido: { slug: string; borradorEnVisto: string |
   }
 }
 
-export async function descartarBorrador(pedido: { slug: string; borradorEnVisto: string | null }): Promise<{ ok: true; detalle: string } | Fallo> {
+export async function descartarBorrador(pedido: { slug: string; borradorEnVisto: string | null }): Promise<{ ok: true; detalle: string; descarto: boolean } | Fallo> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para descartar." };
+    if (!puede(sesion.user.rol, "editarContenido")) return { ok: false, detalle: SIN_PERMISO };
     const valido = esquemaDeLaPagina.safeParse(pedido);
     if (!valido.success) return { ok: false, detalle: "Esa página no existe." };
     const resultado = await descartarBorradorEnBase(base, valido.data);
     if (resultado.ok) revalidatePath(ARMAZON_DEL_ADMIN, "layout");
+    if (resultado.ok && resultado.descarto) {
+      await registrarActividad({ tipo: "descarto-un-borrador", quien: sesion.user.id, sobre: PAGINAS[valido.data.slug].nombre, sobreId: valido.data.slug });
+    }
     return resultado;
   } catch (e) {
     console.error("descartarBorrador:", e);

@@ -36,14 +36,6 @@ const SIN_CAPACIDAD: Record<string, { acciones: string[]; motivo: string }> = {
     acciones: ["cambiarMiNombre"],
     motivo: "es la cuenta propia: la tiene todo rol con sesión, como el Inicio (SPEC de roles-y-actividad §3)",
   },
-  "datos/acciones/paginas.ts": {
-    acciones: ["guardarBorrador", "publicar", "descartarBorrador"],
-    motivo: "es de la lane paginas-inicio (4a): suma puede(…, \"editarContenido\") y el registro de actividad al rebasear sobre roles-y-actividad",
-  },
-  "datos/acciones/fotos.ts": {
-    acciones: ["subirFoto"],
-    motivo: "es de la lane paginas-inicio (4a): suma puede(…, \"editarContenido\") y el registro de actividad al rebasear sobre roles-y-actividad",
-  },
 };
 
 const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
