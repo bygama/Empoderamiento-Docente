@@ -7,6 +7,7 @@ import { MisionPanel } from "./MisionPanel";
 import { MathField } from "@/components/ui/MathField";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import type { Hero as ContenidoDelHero } from "@/features/home/contenido/hero";
+import type { QuienesSomos } from "@/features/home/contenido/quienes-somos";
 import { crearQuienes } from "./hero-quienes/coreografia-quienes";
 import { IndicadorQuienes } from "./hero-quienes/IndicadorQuienes";
 
@@ -21,7 +22,7 @@ import { IndicadorQuienes } from "./hero-quienes/IndicadorQuienes";
  * en píxeles para que línea y borrado vayan pegados.
  * Respeta prefers-reduced-motion (capas apiladas en flow, sin animación).
  */
-export function HeroQuienes({ hero }: { hero: ContenidoDelHero }) {
+export function HeroQuienes({ hero, quienesSomos }: { hero: ContenidoDelHero; quienesSomos: QuienesSomos }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const zoneRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -68,7 +69,7 @@ export function HeroQuienes({ hero }: { hero: ContenidoDelHero }) {
           <div ref={panelRef} className="relative h-full w-full motion-reduce:h-auto">
             {/* Capa 1: Quiénes somos (se borra). */}
             <div data-about-layer className="h-full w-full motion-reduce:h-auto">
-              <Manifiesto />
+              <Manifiesto contenido={quienesSomos} />
             </div>
             {/* Capa 2: Misión (se revela en el mismo lugar). */}
             <div data-mision-layer className="h-full w-full motion-reduce:h-auto">

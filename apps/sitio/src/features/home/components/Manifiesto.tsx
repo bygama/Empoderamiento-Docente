@@ -7,39 +7,18 @@
  * Debajo del cuerpo, la salida a Quiénes somos: cada bloque del inicio tiene
  * una sola salida, hacia la página que lo amplía (Gastón, 2026-09-11).
  * NO parafrasear. Respeta prefers-reduced-motion (capas apiladas, sin animación).
+ * El contenido llega por props desde `features/home/contenido/quienes-somos.ts`
+ * o desde la base: es lo que se edita en el admin.
  */
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "@/components/ui/icons";
-import { ScrollFillText, type FillSeg } from "./ScrollFillText";
+import type { QuienesSomos } from "@/features/home/contenido/quienes-somos";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { ScrollFillText } from "./ScrollFillText";
+import { segmentosDe } from "./segmentos-de-relleno";
 
-// Acentos en AZUL: conceptos clave; el resto se rellena en verde. Copy del
-// cliente condensado a ~la mitad [[ed-copy-oficial]].
-const QS_PARAGRAPHS: FillSeg[][] = [
-  [
-    { t: "Somos una manera distinta de comprender" },
-    {
-      t: "las matemáticas, la educación y el desarrollo profesional docente.",
-      accent: true,
-    },
-    { t: "Una convicción hecha acción." },
-  ],
-  [
-    {
-      t: "Partimos de lo construido para seguir construyendo, junto a las comunidades educativas. Empoderamiento Docente",
-    },
-    { t: "instituye lo instituido:", accent: true },
-    {
-      t: "parte de los saberes existentes y los resignifica, desde la experiencia compartida, en",
-    },
-    {
-      t: "nuevos modos de comprender, enseñar y construir conocimiento.",
-      accent: true,
-    },
-  ],
-];
-
-export function Manifiesto() {
+export function Manifiesto({ contenido }: { contenido: QuienesSomos }) {
   return (
     <section
       className="relative flex h-full w-full items-center overflow-hidden py-8 md:py-16 motion-reduce:h-auto motion-reduce:py-24"
@@ -58,19 +37,19 @@ export function Manifiesto() {
               className="bg-verde-concepto mb-4 block h-px w-10"
             />
             <h2 className="font-display text-azul-principal font-bold leading-[1.04] tracking-[-0.02em] [font-size:clamp(2rem,3.2vw,3.1rem)]">
-              ¿Quiénes somos?
+              {contenido.titulo}
             </h2>
           </div>
 
           {/* Cuerpo (verbatim) — se rellena con el scroll: verde base, acentos
-              en azul (ver QS_PARAGRAPHS). */}
+              en azul (lo que va entre dobles asteriscos). */}
           <ScrollFillText
-            paragraphs={QS_PARAGRAPHS}
+            paragraphs={segmentosDe(contenido.cuerpo)}
             className="font-sans text-verde-concepto font-medium leading-relaxed [font-size:clamp(0.92rem,1.1vw,1.15rem)]"
           />
 
           <Link
-            href="/quienes-somos"
+            href={contenido.enlace.ruta}
             className="group focus-visible:outline-naranja-accion mt-2 inline-flex w-fit items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4"
           >
             <span className="border-azul-principal/15 text-azul-principal group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
@@ -80,7 +59,7 @@ export function Manifiesto() {
               />
             </span>
             <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.9rem] font-medium tracking-wide transition-colors duration-500">
-              Conocé al equipo
+              {contenido.enlace.texto}
             </span>
           </Link>
         </div>
@@ -88,11 +67,12 @@ export function Manifiesto() {
         {/* Imagen (derecha) */}
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-[0_24px_60px_-28px_rgba(15,32,64,0.4)] lg:aspect-[5/4]">
           <Image
-            src="/fotos/formadoras-pizarra-umce.webp"
-            alt="Tres formadoras junto a la pizarra de una sesión en la Universidad Metropolitana de Ciencias de la Educación"
+            src={contenido.foto.src}
+            alt={contenido.foto.alt}
             fill
             sizes="(max-width: 1024px) 100vw, 44vw"
             className="object-cover"
+            style={estiloDeFoco(contenido.foto.foco)}
           />
         </div>
       </div>
