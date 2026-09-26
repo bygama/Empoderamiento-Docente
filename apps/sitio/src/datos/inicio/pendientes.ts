@@ -61,7 +61,7 @@ export const PENDIENTES: Record<ClaveDePendiente, Pendiente> = {
     accion: "Ver los pasos",
     // «Conectado» es lo mismo que dice Búsquedas: las tres variables.
     leer: async () =>
-      hayVariablesDeBusquedas() ? null : { titulo: "Conectá Search Console", detalle: "Para saber qué busca la gente en Google antes de llegar al sitio." },
+      hayVariablesDeBusquedas() ? null : { titulo: "Conectá Search Console", detalle: "Para ver qué busca la gente en Google." },
   },
 };
 

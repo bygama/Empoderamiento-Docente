@@ -40,8 +40,14 @@ export function Inicio({ datos, rol }: { datos: DatosDelInicio; rol: unknown }) 
             : undefined
         }
       />
-      {/* Esta semana ocupa las dos filas de la derecha: en el DOM (y en el celular) va entre los pendientes y la actividad. */}
-      <div className="mt-8 grid gap-10 lg:grid-cols-5 lg:items-start lg:gap-x-8">
+      {/*
+        Esta semana ocupa las dos filas de la derecha: en el DOM (y en el
+        celular) va entre los pendientes y la actividad. La segunda fila es
+        flexible para que, si la semana es más alta que la columna de la
+        izquierda, el sobrante vaya abajo y no entre los pendientes y la
+        actividad.
+      */}
+      <div className="mt-8 grid gap-10 lg:grid-cols-5 lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-8">
         <div className="lg:col-span-3">
           <Pendientes filas={datos.pendientes} />
         </div>

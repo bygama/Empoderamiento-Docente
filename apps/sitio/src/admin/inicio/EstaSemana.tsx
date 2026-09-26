@@ -21,8 +21,14 @@ export function EstaSemana({ numeros, verMetricas }: { numeros: readonly NumeroD
           </BotonEnlace>
         ) : null}
       </div>
-      {/* Con un número impar (quien edita no ve los CV), el último toma las dos columnas: sin un hueco al lado. */}
-      <div className="grid grid-cols-2 gap-3 [&>:last-child:nth-child(odd)]:col-span-2">
+      {/*
+        Uno abajo del otro en el celular y en la columna de la derecha desde
+        `lg`, donde de a dos las etiquetas largas bajan a otra línea y los
+        números quedan a distinta altura; de a dos solo entre `sm` y `lg`, a
+        todo el ancho. Con un número impar (quien edita no ve los CV), el
+        último toma las dos columnas: sin un hueco al lado.
+      */}
+      <div className="grid gap-3 sm:grid-cols-2 sm:[&>:last-child:nth-child(odd)]:col-span-2 lg:grid-cols-1 lg:[&>:last-child:nth-child(odd)]:col-span-1">
         {numeros.map((n) => (
           <Cifra key={n.clave} etiqueta={n.etiqueta} valor={n.valor} variacion={n.variacion} periodo="la semana anterior" nota={n.fallo ? "No se pudo leer" : undefined} />
         ))}
