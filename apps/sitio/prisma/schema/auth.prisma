@@ -100,3 +100,23 @@ model RateLimit {
 
   @@map("rateLimit")
 }
+
+/// El bloqueo por cuenta (packages/auth/src/bloqueo.ts): una fila por correo
+/// con fallos recientes. **Nunca el correo en claro**: la clave es su HMAC con
+/// el secreto de better-auth, así que esta tabla no sirve para saber quién
+/// tiene cuenta ni quién estuvo probando. Sale de acá entrando bien, con un
+/// reset de contraseña o tras un día sin fallos.
+model BloqueoDeAcceso {
+  /// HMAC-SHA256 del correo normalizado, en hexadecimal.
+  clave    String    @id
+  /// Fallos en la ventana de 15 minutos que corre.
+  fallos   Int
+  /// Cuándo empezó esa ventana, o el último freno.
+  desde    DateTime
+  /// Cuántas veces seguidas se frenó: 15, 30 y 60 minutos, y no más.
+  bloqueos Int
+  /// Frenada hasta; null si no.
+  hasta    DateTime?
+
+  @@map("bloqueos_de_acceso")
+}

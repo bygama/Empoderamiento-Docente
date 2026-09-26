@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 3 del PLAN (el bloqueo por cuenta).
+- Paso 4 del PLAN (el cliente de Resend).
 
 ## Hecho
 
@@ -48,3 +48,22 @@ Medido sobre `275518e`:
   regenera el cliente en `migrate dev`, y better-auth valida el esquema contra
   el cliente cargado: después de migrar hace falta `pnpm generate` y
   reiniciar el dev server (el cliente vive en `globalThis` entre recargas).
+- 2026-09-26 — **Paso 3, el bloqueo por cuenta.** `packages/auth/src/bloqueo.ts`
+  (reglas, escalera, HMAC, el 429) con 7 tests; `ganchos.ts` suma el `before`
+  (cuenta frenada → 429 antes de mirar la contraseña) y el `after` (401 cuenta
+  y poda en segundo plano; entrar bien borra la fila) y exporta `destrabar`,
+  que `onPasswordReset` llama; `crearAuth` recibe `bloqueos`. Modelo
+  `BloqueoDeAcceso` y la migración `20260926203107_bloqueos_de_acceso`;
+  `apps/sitio/src/datos/bloqueos-de-acceso.ts` (fila bloqueada con
+  `FOR UPDATE` en una transacción) con 2 tests de integración.
+  `pnpm --filter @ed/auth test` → 12/12; `pnpm --filter sitio test` → 76 pass,
+  1 skip (el de A1 de métricas, de antes), incluidos «diez fallos al mismo
+  tiempo cuentan diez» y «podar borra lo quieto y deja lo frenado»;
+  `pnpm typecheck` y `pnpm lint` → exit 0. De punta a punta, una IP distinta
+  por intento: `prueba@ed.test` → `401 ×5, 429`; `fantasma@ed.test` (no
+  existe) → `401 ×5, 429`; la contraseña buena, frenada → 429. El cuerpo del
+  429 del bloqueo y el del rate limit son el mismo
+  (`{"message":"Too many requests. Please try again later."}`), con
+  `x-retry-after: 900` y `60`. Un reset completo borró la fila de
+  `prueba@ed.test` y entró con la contraseña nueva (200); la de `fantasma`
+  sigue.
