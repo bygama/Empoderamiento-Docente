@@ -7,6 +7,7 @@ const hayBase = Boolean(process.env.DATABASE_URL);
 
 const RECIEN = "prueba-a-mano-recien";
 const OTRA = "prueba-a-mano-otra";
+const A_LA_VEZ = "prueba-a-mano-a-la-vez";
 
 test("el freno es por tarea: una corrida reciente frena a su tarea y no a otra", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
@@ -29,9 +30,26 @@ test("el freno es por tarea: una corrida reciente frena a su tarea y no a otra",
   assert.deepEqual(registradas, [{ ok: true, detalle: "Copiado." }]);
 });
 
+test("dos clics a la vez corren la tarea una sola vez", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { correrAMano } = await import("./a-mano");
+  let corridas = 0;
+  const correr = async () => {
+    corridas++;
+    await new Promise((r) => setTimeout(r, 300));
+    return { ok: true, detalle: "Copiado." };
+  };
+
+  const resultados = await Promise.all([correrAMano(A_LA_VEZ, correr), correrAMano(A_LA_VEZ, correr)]);
+  assert.equal(corridas, 1);
+  assert.deepEqual(resultados.map((r) => r.ok).sort(), [false, true]);
+  assert.match(resultados.find((r) => !r.ok)!.detalle, /esperá/);
+  assert.equal(await base.corridaDeTarea.count({ where: { tarea: A_LA_VEZ } }), 1);
+});
+
 after(async () => {
   if (!hayBase) return;
   const { base } = await import("@/datos/cliente");
-  await base.corridaDeTarea.deleteMany({ where: { tarea: { in: [RECIEN, OTRA] } } });
+  await base.corridaDeTarea.deleteMany({ where: { tarea: { in: [RECIEN, OTRA, A_LA_VEZ] } } });
   await base.$disconnect();
 });
