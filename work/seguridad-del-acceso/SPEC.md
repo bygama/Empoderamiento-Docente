@@ -117,12 +117,18 @@ no usamos), así que la regla no limitaba nada.
 - **`SameSite=Strict`** en todas las cookies de better-auth, por
   `advanced.defaultCookieAttributes`. Consecuencia: quien llega al admin desde
   un link de otro sitio (un correo, un chat) no manda la cookie en esa primera
-  navegación y cae en `/admin/entrar` aunque tenga sesión. Por eso
-  **`FormularioEntrar` consulta la sesión por un `fetch` al mismo origen**
-  (`authCliente.getSession()`, que sí lleva la cookie): al cargar, si ya hay
-  sesión sigue a `volver`; y después de entrar, confirma que la sesión quedó
-  antes de seguir a `volver` (si no quedó, lo dice en vez de volver a
-  `entrar`). `volver` sigue aceptando solo rutas de `/admin`.
+  navegación y cae en `/admin/entrar` aunque tenga sesión. Por eso **el proxy
+  rebota esa navegación**: un `GET` de documento a una pantalla protegida,
+  sin la cookie y con `Sec-Fetch-Site: cross-site`, recibe una página mínima
+  con `<meta http-equiv="refresh">` a la misma URL (y un link «Seguir»); la
+  segunda navegación ya es del mismo origen y lleva la cookie. Sin sesión,
+  sigue el 307 a `/admin/entrar` de siempre. Y **`FormularioEntrar`, después
+  de entrar, confirma la sesión por un `fetch` al mismo origen**
+  (`authCliente.getSession()`) antes de seguir a `volver` (si no quedó, lo
+  dice en vez de volver a `entrar`). `volver` sigue aceptando solo rutas de
+  `/admin`. *(Cambiado el 2026-09-26: decía que `FormularioEntrar` consultaba
+  también al cargar; react-doctor lo frenó y el padre eligió el proxy, con las
+  condiciones de DECISIONS.)*
 - **`__Host-` queda descartado:** better-auth 1.7.5 siempre antepone
   `__Secure-` a sus cookies en HTTPS y no deja cambiar el prefijo.
 - **La cookie de vista previa:** después de `draftMode().enable()`,
@@ -240,8 +246,8 @@ proxy.
 ## 8. Supuestos y preguntas
 
 Los cinco quedaron resueltos el 2026-09-26, todos como están escritos acá
-(DECISIONS.md). El 5 con dos condiciones: mientras consulta, el formulario no
-parpadea, y si la consulta falla, queda usable igual.
+(DECISIONS.md). El 5 se reemplazó el mismo día por el rebote en el proxy
+(§4): react-doctor frena las dos formas de redirigir desde el cliente.
 
 1. **Las columnas de `bloqueos_de_acceso`** (§6.1): Mateo nombró la tabla y el
    HMAC; `fallos`, `desde`, `bloqueos` y `hasta` son lo mínimo para sus reglas.
