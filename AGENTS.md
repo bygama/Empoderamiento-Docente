@@ -166,7 +166,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── auth.ts      ← la sesión, armada con esa base (y cómo salen sus correos)
             │   ├── bloqueos-de-acceso.ts ← dónde guarda el bloqueo por cuenta sus fallos
             │   ├── sesion.ts    ← la sesión del pedido, preguntada una vez (sesionActual)
-            │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados)
+            │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados, QUIEN_VE)
             │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
             │   ├── avisos.ts    ← quién recibe el correo de cada mensaje nuevo, y mandarlo (tabla avisos)
             │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
@@ -174,9 +174,12 @@ un release candidate de la 8 (ADR-0007).
             │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv)
             │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos)
             │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, choque, mover-mensajes)
+            │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes
             ├── admin/         ← las pantallas del admin
-            │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/)
+            │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/), el número de sin leer, la cifra
+            │   ├── inicio/      ← el Inicio: el saludo, los pendientes, la semana y la actividad
+            │   ├── actividad/   ← cómo se lee cada tipo de actividad (frase.ts), para el Inicio y Cuentas
             │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)
             │   ├── mensajes/    ← las bandejas de Contacto y CV y la ficha de cada mensaje
             │   ├── campos/      ← los controles del formulario; se mudan a kit-admin en la fase 2
@@ -658,6 +661,13 @@ Reglas para el admin y sus datos:
   Server Action chequea su capacidad justo después de la sesión, y lo que se
   hace se anota con `registrarActividad` (`datos/actividad.ts`).
   `guarda.test.ts` y `acciones-con-sesion.test.ts` fallan si algo se olvida.
+- **Lo que un módulo le suma al Inicio va por registro, nunca tocando su
+  pantalla:** una fila de pendientes (con su urgencia y su capacidad), un
+  número de la semana o lo nuevo desde tu visita, en `datos/inicio/`; quién
+  ve un tipo de actividad, en `QUIEN_VE` (`datos/actividad.ts`), y cómo se
+  lee, en `admin/actividad/frase.ts`; su acceso rápido, en su línea de
+  `modulos.ts`. Cada registro filtra por capacidad antes de consultar y lee
+  cada entrada aislada: la que tira lo dice en su lugar y las demás siguen.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
   tablas. No inventar tablas ni columnas que no estén acordadas.
 
