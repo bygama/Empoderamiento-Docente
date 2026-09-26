@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 4 del PLAN (el cliente de Resend).
+- Paso 5 del PLAN (los correos de la contraseña).
 
 ## Hecho
 
@@ -67,3 +67,11 @@ Medido sobre `275518e`:
   `x-retry-after: 900` y `60`. Un reset completo borró la fila de
   `prueba@ed.test` y entró con la contraseña nueva (200); la de `fantasma`
   sigue.
+- 2026-09-26 — **Paso 4, el cliente de Resend.**
+  `apps/sitio/src/lib/correo/resend.ts` (`crearClienteDeResend({ clave,
+  fetchImpl, espera })` → `mandar(correo)`; `ErrorDeCorreo` con el estado y el
+  mensaje de Resend, nunca el cuerpo enviado) y 6 tests con el `fetch`
+  inyectado: cabeceras y cuerpo, 5xx y red se reintentan una vez con la misma
+  `Idempotency-Key`, el corte por `espera`, 4xx sin reintento, el error sin el
+  enlace. `pnpm --filter sitio test` → 82 pass, 1 skip (A1), exit 0;
+  `pnpm typecheck` y `pnpm --filter sitio lint` → exit 0.
