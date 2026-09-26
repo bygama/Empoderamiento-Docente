@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import { esquemaHero, heroInicial } from "@/features/home/contenido/hero";
+import { esquemaQuienesSomos, quienesSomosInicial } from "@/features/home/contenido/quienes-somos";
 import type { RegistroDePaginas } from "@/lib/contenido/documento";
 
 // Qué secciones tiene cada página y en qué orden (SPEC §4.1). Es lo que el
@@ -10,7 +11,14 @@ import type { RegistroDePaginas } from "@/lib/contenido/documento";
 // del admin como «todavía no se edita».
 
 export const PAGINAS = {
-  inicio: { ruta: "/", nombre: "Inicio", secciones: { hero: { nombre: "Hero", esquema: esquemaHero, inicial: heroInicial } } },
+  inicio: {
+    ruta: "/",
+    nombre: "Inicio",
+    secciones: {
+      hero: { nombre: "Hero", esquema: esquemaHero, inicial: heroInicial },
+      quienesSomos: { nombre: "¿Quiénes somos?", esquema: esquemaQuienesSomos, inicial: quienesSomosInicial },
+    },
+  },
   "que-hacemos": { ruta: "/que-hacemos", nombre: "Qué hacemos", secciones: {} },
   "quienes-somos": { ruta: "/quienes-somos", nombre: "Quiénes somos", secciones: {} },
   investigacion: { ruta: "/investigacion", nombre: "Investigación", secciones: {} },
