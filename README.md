@@ -246,7 +246,8 @@ poner la clave no cambia nada por ahora.
 
 ### Editar las páginas
 
-En «Páginas» están las siete del sitio en el orden del menú; por ahora se
+En Contenido › Páginas (`/admin/contenido/paginas`) están las siete del sitio
+en el orden del menú; por ahora se
 edita el **hero de Inicio** (textos, botones y las 11 + 8 fotos con sus
 carteles), y cada sección nueva se suma escribiendo su esquema en
 `src/features/<pagina>/contenido/` y anotándola en `src/contenido/paginas.ts`.
