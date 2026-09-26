@@ -1,8 +1,8 @@
 # DECISIONS — Los patrones del admin
 
 - 2026-09-26 — **SPEC aprobado por el padre, con un cambio** (respuesta a
-  `orca orchestration ask`). Las lecturas 1, 2, 4, 5, 6 y 7 del SPEC §9,
-  aprobadas tal cual.
+  `orca orchestration ask`). Las lecturas 1, 2, 4 y 5 del SPEC §9 y las
+  lecturas 6 y 7 de la pregunta de aprobación, aprobadas tal cual.
 - 2026-09-26 — **Las pestañas no llevan número en esta lane** (el padre, al
   aprobar la lectura 3): construirlo «para las lanes 6 y 7» es un patrón sin
   consumidor, código muerto, lo que prohíbe la regla del padre («un patrón
@@ -26,7 +26,12 @@
   una cuña de puntos más brillantes que sale de la lámpara del logo hacia el
   formulario. Sin ilustración ni dibujo del faro (§10: el logo no se redibuja).
   «Admin del sitio» usa `text-h1` del sitio, la excepción de tipo que el padre
-  aprobó (SPEC §9.6).
+  aprobó (la lectura 6 de la pregunta de aprobación).
 - 2026-09-26 — **Las migas del editor siguen con «/»**, el separador que ya
   tiene `Encabezado`: el «›» del brief es cómo se escriben unas migas en
   prosa, no un cambio de diseño pedido.
+- 2026-09-26 — **El padre ratificó la página sin secciones sin insignia**
+  (ronda de arreglos 1, sobre el Important 1 del revisor r1): el SPEC padre
+  §5.3 ya le da a esa fila su propio estado —atenuada, con «Todavía no se
+  edita desde acá»— y «Sin editar» sobre algo que no se puede editar
+  confunde. El código queda como está; el body del PR #178 lo dice así.
