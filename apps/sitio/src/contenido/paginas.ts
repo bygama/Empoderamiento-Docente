@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import { comoTrabajamosInicial, esquemaComoTrabajamos } from "@/features/home/contenido/como-trabajamos";
 import { enNumerosInicial, esquemaEnNumeros } from "@/features/home/contenido/en-numeros";
 import { esquemaHero, heroInicial } from "@/features/home/contenido/hero";
 import { esquemaMision, misionInicial } from "@/features/home/contenido/mision";
@@ -21,6 +22,7 @@ export const PAGINAS = {
       quienesSomos: { nombre: "¿Quiénes somos?", esquema: esquemaQuienesSomos, inicial: quienesSomosInicial },
       mision: { nombre: "Misión", esquema: esquemaMision, inicial: misionInicial },
       enNumeros: { nombre: "En números", esquema: esquemaEnNumeros, inicial: enNumerosInicial },
+      comoTrabajamos: { nombre: "Cómo trabajamos", esquema: esquemaComoTrabajamos, inicial: comoTrabajamosInicial },
     },
   },
   "que-hacemos": { ruta: "/que-hacemos", nombre: "Qué hacemos", secciones: {} },

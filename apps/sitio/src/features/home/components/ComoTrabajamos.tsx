@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { PASOS } from "@/features/home/components/como-trabajamos/data";
+import type { ComoTrabajamos as ContenidoDeComoTrabajamos } from "@/features/home/contenido/como-trabajamos";
 import { crearMetodo } from "./como-trabajamos/coreografia-metodo";
 import { IndicadorPasos } from "./como-trabajamos/IndicadorPasos";
 import { PasoMetodo } from "./como-trabajamos/PasoMetodo";
@@ -12,16 +12,17 @@ import { PasoMetodo } from "./como-trabajamos/PasoMetodo";
  * pantallas para cinco pasos se hacían largas con el dedo) + sticky top-0 h-screen
  * (sin pin:true — compatible con Lenis). 5 pasos con fotos reales que
  * se cross-fadean con el progreso del scroll. Timeline scrubbed mapea
- * 0→1 a las N fases (el número de pasos se lee de PASOS). Nav lateral de
+ * 0→1 a las N fases (el número de pasos se lee del contenido). Nav lateral de
  * puntos sincronizado. Mask reveal del título de cada paso. Foto alterna
  * izq/der por índice.
  *
- * Piezas: datos en `home/data.ts`, coreografía en `como-trabajamos/
- * coreografia-metodo.ts`, cada paso en `PasoMetodo`, los puntos en
- * `IndicadorPasos`. Este compositor solo arma la sección y dispara la
- * coreografía.
+ * Piezas: el contenido llega por props (de
+ * `features/home/contenido/como-trabajamos.ts` o de la base), la coreografía
+ * en `como-trabajamos/coreografia-metodo.ts`, cada paso en `PasoMetodo`, los
+ * puntos en `IndicadorPasos`. Este compositor solo arma la sección y dispara
+ * la coreografía.
  */
-export function ComoTrabajamos() {
+export function ComoTrabajamos({ contenido }: { contenido: ContenidoDeComoTrabajamos }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reducedMotion = useReducedMotion();
 
@@ -31,6 +32,9 @@ export function ComoTrabajamos() {
     if (!el) return;
     return crearMetodo(el);
   }, [reducedMotion]);
+
+  // El número de cada paso («01»…) sale de su lugar: es estructura, no copy.
+  const pasos = contenido.pasos.map((paso, i) => ({ ...paso, n: String(i + 1).padStart(2, "0") }));
 
   return (
     <section
@@ -58,11 +62,11 @@ export function ComoTrabajamos() {
           {/* ── Recorrido de pasos (foto + indicador + texto). Sin encabezado:
               la composición ocupa todo el alto y se centra verticalmente. ── */}
           <div className="relative z-10 min-h-0 flex-1 overflow-hidden">
-            <IndicadorPasos pasos={PASOS} />
+            <IndicadorPasos pasos={pasos} />
 
             {/* Pasos apilados */}
             <div className="absolute inset-0 flex items-center">
-              {PASOS.map((paso, idx) => (
+              {pasos.map((paso, idx) => (
                 <PasoMetodo key={paso.n} paso={paso} idx={idx} />
               ))}
             </div>
