@@ -1,6 +1,6 @@
 "use server";
 
-import { draftMode, headers } from "next/headers";
+import { cookies, draftMode, headers } from "next/headers";
 import { z } from "zod";
 import { PAGINAS, SLUGS } from "@/contenido/paginas";
 import { auth } from "@/datos/auth";
@@ -13,6 +13,28 @@ import { auth } from "@/datos/auth";
 
 const esquemaSlug = z.enum(SLUGS);
 
+/** La cookie que pone `draftMode().enable()`: el nombre es de Next y no lo exporta. */
+const COOKIE_DE_VISTA_PREVIA = "__prerender_bypass";
+
+/**
+ * Next pone la cookie sin vencimiento (dura lo que dure el navegador, que con
+ * «restaurar pestañas» es para siempre) y con `SameSite=None`. Se reescribe
+ * con el mismo valor para que venza en una hora y no viaje en pedidos de otros
+ * sitios; `Lax` alcanza, porque la vista previa se abre con un link del admin.
+ */
+async function acotarCookieDeVistaPrevia() {
+  const galletas = await cookies();
+  const puesta = galletas.get(COOKIE_DE_VISTA_PREVIA);
+  if (!puesta) return;
+  galletas.set(COOKIE_DE_VISTA_PREVIA, puesta.value, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60,
+  });
+}
+
 /** Habilita el Draft Mode para quien edita y devuelve adónde ir; el botón abre esa URL en otra pestaña. */
 export async function abrirVistaPrevia(slug: string): Promise<{ ok: true; url: string } | { ok: false; detalle: string }> {
   try {
@@ -21,6 +43,7 @@ export async function abrirVistaPrevia(slug: string): Promise<{ ok: true; url: s
     const valido = esquemaSlug.safeParse(slug);
     if (!valido.success) return { ok: false, detalle: "Esa página no existe." };
     (await draftMode()).enable();
+    await acotarCookieDeVistaPrevia();
     return { ok: true, url: PAGINAS[valido.data].ruta };
   } catch (e) {
     console.error("abrirVistaPrevia:", e);

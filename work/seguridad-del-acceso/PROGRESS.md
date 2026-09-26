@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 8 del PLAN (la cookie de vista previa vence).
+- Paso 10 del PLAN (la CSP del admin con nonce).
 
 ## Hecho
 
@@ -140,3 +140,13 @@ Medido sobre `275518e`:
     `select count(*) from session …` en 0, la cookie vieja volvió a «entrar»
     (307) y la consola imprimió «Tu contraseña cambió» con «Cerramos todas las
     sesiones…».
+- 2026-09-26 — **Paso 8, la cookie de vista previa vence.** `abrirVistaPrevia`
+  reescribe `__prerender_bypass` después de `enable()` con el mismo valor,
+  `maxAge` 1 h, `SameSite=Lax`, `httpOnly`, `secure` en producción, `path=/`.
+  **Next deja pisarla**: `cookies().get` ve la que acaba de poner `enable()`
+  en la misma acción, y el `set` la reemplaza. `pnpm typecheck` → exit 0;
+  `acciones-con-sesion.test.ts` → 8/8 (la acción sigue empezando por la
+  sesión). En el navegador de Orca, «Vista previa» desde el editor de Inicio
+  dejó la cookie `path=/ httpOnly=True sameSite=Lax session=False` con 3589 s
+  por delante, y `/` mostró «Estás viendo un borrador» con «Volver al sitio
+  publicado».
