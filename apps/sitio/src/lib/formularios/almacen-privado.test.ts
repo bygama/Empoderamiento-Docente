@@ -36,7 +36,7 @@ test("una clave que no es carpeta/uuid.ext no llega al disco", async () => {
   await assert.rejects(almacen.leer("cv/../../.env.local"), /no tiene la forma/);
 });
 
-test("sin token en producción no hay almacén: nunca el disco de una función", () => {
-  assert.throws(() => almacenPrivado({ carpeta: ".cv", produccion: true }), /Falta el token/);
-  assert.doesNotThrow(() => almacenPrivado({ carpeta: ".cv", produccion: false }));
+test("sin token y sin disco propio no hay almacén: nunca el disco de una función", () => {
+  assert.throws(() => almacenPrivado({ carpeta: ".cv", sinDisco: true }), /Falta el token/);
+  assert.doesNotThrow(() => almacenPrivado({ carpeta: ".cv", sinDisco: false }));
 });
