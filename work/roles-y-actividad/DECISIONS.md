@@ -34,3 +34,13 @@
   roles (SPEC §3)— y no se anotan en la actividad (el §5.8 no lista
   «actualizó métricas»); la poda de 12 meses es una tarea de `TAREAS_DIARIAS`.
   Las excepciones de la 4a quedan como estaban.
+- 2026-09-26 — **Revisión r1 (Opus 5.5, medium, «el cambio entero contra su
+  SPEC») sobre `6f4d834`: PASS**, 0 Critical, 0 Important, 4 Minor. El padre
+  ratifica tres sin cambiar código: (1) la contraseña va en su propio apartado
+  de Mi cuenta y no dentro de Perfil: el ancla `#contrasena` y el
+  comportamiento se cumplen; (3) la sesión actual dice «Activa ahora» en vez
+  de la última actividad relativa; (4) el recorrido posterior al rebase lo
+  cubrió el revisor. Y pide arreglar, una línea cada uno: (2) «Sin permiso»
+  en DESIGN.md §11 suma a Métricas como consumidor; el árbol de AGENTS.md §3
+  lista `datos/actividad.ts`, `datos/direccion.ts` y `datos/sesion.ts`; y
+  `crear-cuenta` usa `ROL_POR_DEFECTO` en vez del literal `"edita"`.
