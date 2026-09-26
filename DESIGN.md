@@ -841,9 +841,16 @@ el sitio?» de un vistazo. `apps/sitio/src/admin/inicio/`.
   pendientes no está, y en su lugar va «Todo al día» con el estado vacío.
 - **Los pendientes** son una `Lista`, ordenada por urgencia: qué pasa, el
   detalle y el link a la pantalla que lo resuelve, con el nombre de la fila
-  para el lector. **La semana**, `Cifra` de a dos; si quedan impares (quien
-  edita no ve los CV), el último toma las dos columnas. Debajo, el período
-  una sola vez. **La actividad**, una `Lista` de una línea por evento.
+  para el lector. **La semana**, `Cifra` uno abajo del otro en el celular y
+  en la columna de la derecha (de a dos, ahí las etiquetas largas bajan de
+  línea y los números quedan a distinta altura); de a dos solo entre `sm` y
+  `lg`, y si quedan impares (quien edita no ve los CV), el último toma las
+  dos columnas. Debajo, el período una sola vez. **La actividad**, una
+  `Lista` de una línea por evento.
+- **Los dos títulos de arriba van a la misma altura:** «Pendientes» tiene 40
+  px de alto, como la fila de «Esta semana» con su link. Si la semana es más
+  alta que la columna de la izquierda, el sobrante va abajo, nunca entre los
+  pendientes y la actividad.
 - **Lo que un bloque no pudo leer lo dice en su lugar** («No se pudo revisar
   las páginas», «No se pudo leer»): un módulo con un problema no tumba la
   pantalla, y un pendiente que falló nunca se lee como «Todo al día».
