@@ -65,17 +65,6 @@ const GUIAS: Record<string, Guia> = {
       { nombre: "Conexiones", ruta: "/admin/ajustes/conexiones", que: "El estado de Vercel Analytics, Search Console, Resend y Blob." },
     ],
   },
-  "mi-cuenta": {
-    nombre: "Mi cuenta",
-    para: "Tus datos, tu contraseña y dónde tenés abierto el admin.",
-    pantallas: [
-      { nombre: "Perfil", ruta: "/admin/mi-cuenta#perfil", que: "Nombre y correo. La contraseña se cambia pidiendo la actual." },
-      { nombre: "Tu rol", ruta: "/admin/mi-cuenta#rol", que: "Qué podés hacer, en una frase." },
-      { nombre: "Sesiones", ruta: "/admin/mi-cuenta#sesiones", que: "Dónde tenés el admin abierto, con «Cerrar las demás»." },
-      { nombre: "Avisos", ruta: "/admin/mi-cuenta#avisos", que: "Qué mails recibís: mensajes nuevos y el resumen semanal." },
-      { nombre: "Seguridad", ruta: "/admin/mi-cuenta#seguridad", que: "El segundo factor por mail, obligatorio para quien dirige y quien administra." },
-    ],
-  },
 };
 
 /** La guía de un módulo, o `undefined` si esa clave no es un módulo por hacer. */

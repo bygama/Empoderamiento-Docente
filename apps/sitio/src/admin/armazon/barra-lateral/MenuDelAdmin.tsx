@@ -22,7 +22,8 @@ function PuntoSinPublicar() {
 
 export function MenuDelAdmin({ visibles, conPunto }: { visibles: readonly string[]; conPunto: readonly string[] }) {
   const segmento = primerSegmento(usePathname());
-  const deSuRol = (modulos: readonly Modulo[]) => modulos.filter((m) => visibles.includes(m.clave));
+  const suyos = new Set(visibles);
+  const deSuRol = (modulos: readonly Modulo[]) => modulos.filter((m) => suyos.has(m.clave));
   // Un grupo sin nada que su rol pueda usar no se dibuja, ni su divisor.
   const grupos = GRUPOS.map(deSuRol).filter((g) => g.length > 0);
   const configuracion = deSuRol(CONFIGURACION);
