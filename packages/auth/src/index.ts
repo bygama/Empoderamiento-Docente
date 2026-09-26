@@ -16,6 +16,7 @@ export {
   ROL_DE_LA_DIRECCION,
   PUEDE,
   QUE_PUEDE,
+  QUE_PERMITE,
   SIN_PERMISO,
   esRol,
   esUnaSola,
@@ -25,3 +26,5 @@ export {
   LARGO_MINIMO_CONTRASENA,
 } from "./permisos";
 export type { Capacidad, Rol } from "./permisos";
+export { queSePuede } from "./cuentas";
+export type { CuentaObjetivo, EstadoDeCuenta, LoQueSePuede } from "./cuentas";
