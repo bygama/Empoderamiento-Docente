@@ -363,7 +363,8 @@ el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
 vista previa de buscador y redes, también (`work/paginas-inicio/`); el
 número, el filtro, el buscador, «volver», confirmar lo que no se deshace y
 la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
-(`work/inicio/`). Todos los contrastes están
+(`work/inicio/`); el paginado y la tabla, también (`work/cuentas/`). Todos
+los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -717,6 +718,19 @@ Una caja en las listas largas, a la derecha del filtro.
   coincide con «zzz» en Cerrado»). En el celular, la caja ocupa el ancho.
 - Primer consumidor: las bandejas de Mensajes. Si otra lane deja uno antes
   en `main`, queda uno solo (DECISIONS de `work/mensajes/`).
+
+### Paginado
+
+Las páginas de una lista paginada en el servidor.
+`apps/sitio/src/admin/armazon/Paginado.tsx`.
+
+- **«Más nuevas» · «Página 2 de 7» · «Más viejas»**: las listas largas del
+  admin van de la más nueva a la más vieja, y así se dice. Los dos son links
+  con cara de botón secundario; en una punta, el que no va no aparece (no se
+  deshabilita). El medio, en meta `gris-texto` (4,83:1 · 7,08:1).
+- Cada página es una URL que conserva los filtros. Con una sola página no se
+  dibuja.
+- Primer consumidor: Cuentas › Actividad, de a 50.
 
 ### Estado vacío
 
