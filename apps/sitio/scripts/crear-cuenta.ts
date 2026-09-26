@@ -19,9 +19,8 @@ cargarEntorno({ path: [".env.local", ".env"], quiet: true });
  * mi contraseña». Así la contraseña no viaja por el historial del shell ni la
  * conoce quien da el alta.
  */
-const [correo, nombre, rolPedido = "edita"] = process.argv.slice(2);
-
-const { ROLES, esRol, esUnaSola } = await import("@ed/auth");
+const { ROLES, ROL_POR_DEFECTO, esRol, esUnaSola } = await import("@ed/auth");
+const [correo, nombre, rolPedido = ROL_POR_DEFECTO] = process.argv.slice(2);
 const USO = `Uso: pnpm --filter sitio crear-cuenta <correo> "<nombre>" [${ROLES.join("|")}]`;
 
 if (!correo || !nombre) {
