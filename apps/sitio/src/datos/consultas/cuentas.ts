@@ -60,15 +60,15 @@ async function ultimosAccesos(ids?: string[]): Promise<Map<string, Date>> {
   return accesos;
 }
 
+/** Una cuenta sin su último acceso: lo que sale de su fila sola. */
+export type DatosDeCuenta = Omit<CuentaEnLista, "ultimoAcceso">;
+
+function datosDe(fila: Fila): DatosDeCuenta {
+  return { id: fila.id, nombre: fila.name, correo: fila.email, rol: esRol(fila.rol) ? fila.rol : null, estado: estadoDe(fila) };
+}
+
 function enLista(fila: Fila, accesos: Map<string, Date>): CuentaEnLista {
-  return {
-    id: fila.id,
-    nombre: fila.name,
-    correo: fila.email,
-    rol: esRol(fila.rol) ? fila.rol : null,
-    estado: estadoDe(fila),
-    ultimoAcceso: accesos.get(fila.id)?.toISOString() ?? null,
-  };
+  return { ...datosDe(fila), ultimoAcceso: accesos.get(fila.id)?.toISOString() ?? null };
 }
 
 /** Todas las cuentas: quien dirige primero, después por nombre. */
@@ -76,6 +76,12 @@ export async function listarCuentas(): Promise<CuentaEnLista[]> {
   const [filas, accesos] = await Promise.all([base.user.findMany({ select: SELECCION }), ultimosAccesos()]);
   const primero = (c: CuentaEnLista) => (c.rol && esUnaSola(c.rol) ? 0 : 1);
   return filas.map((f) => enLista(f, accesos)).sort((a, b) => primero(a) - primero(b) || a.nombre.localeCompare(b.nombre, "es"));
+}
+
+/** Lo que una acción necesita saber de la cuenta sobre la que actúa, o `null` si no existe. */
+export async function cuentaParaActuar(id: string): Promise<DatosDeCuenta | null> {
+  const fila = await base.user.findUnique({ where: { id }, select: SELECCION });
+  return fila && datosDe(fila);
 }
 
 /** Una cuenta con su pantalla entera, o `null` si no existe. */
