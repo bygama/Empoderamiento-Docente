@@ -1,3 +1,4 @@
+import type { Pagina } from "@/../prisma/generado/client";
 import { PAGINAS, type Slug } from "@/contenido/paginas";
 import { base } from "@/datos/cliente";
 import { compararSeccion, type Diferencia } from "@/lib/contenido/comparar";
@@ -10,6 +11,10 @@ import { estadoDe, type EstadoDePagina } from "./editor-de-paginas";
 
 /** La página tal como la muestra el encabezado de una pestaña que no edita. */
 export type PaginaEnRevision = { slug: Slug; nombre: string; ruta: string; estado: EstadoDePagina };
+
+function enRevision(slug: Slug, fila: Pagina | null): PaginaEnRevision {
+  return { slug, nombre: PAGINAS[slug].nombre, ruta: PAGINAS[slug].ruta, estado: estadoDe(fila) };
+}
 
 /** Las diferencias de una parte del documento (una sección o el SEO), con su nombre. */
 export type CambiosDeUnaParte = { clave: string; nombre: string; diferencias: Diferencia[] };
@@ -29,5 +34,17 @@ export async function cambiosDe(slug: Slug): Promise<{ pagina: PaginaEnRevision;
   const cambios = partesDe(registrada)
     .map(([clave, parte]) => ({ clave, nombre: parte.nombre, diferencias: compararSeccion(describir(parte.esquema, parte.nombre), publicado[clave], borrador[clave]) }))
     .filter((c) => c.diferencias.length > 0);
-  return { pagina: { slug, nombre: registrada.nombre, ruta: registrada.ruta, estado: estadoDe(fila) }, cambios };
+  return { pagina: enRevision(slug, fila), cambios };
+}
+
+/** Una publicación en la lista de Versiones. */
+export type VersionEnLista = { id: string; publicadoEn: string; publicadoPor: string };
+
+/** Las versiones guardadas de una página, la más nueva primero: es la que está en el sitio (publicar guarda las dos juntas). */
+export async function versionesDe(slug: Slug): Promise<{ pagina: PaginaEnRevision; versiones: VersionEnLista[] }> {
+  const [fila, versiones] = await Promise.all([
+    base.pagina.findUnique({ where: { slug } }),
+    base.versionDePagina.findMany({ where: { slug }, orderBy: [{ publicadoEn: "desc" }, { id: "desc" }], select: { id: true, publicadoEn: true, publicadoPor: true } }),
+  ]);
+  return { pagina: enRevision(slug, fila), versiones: versiones.map((v) => ({ ...v, publicadoEn: v.publicadoEn.toISOString() })) };
 }

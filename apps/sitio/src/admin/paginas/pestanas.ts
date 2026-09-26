@@ -13,5 +13,6 @@ export function pestanasDeLaPagina(slug: string, tiene: { secciones: boolean; se
     ...(tiene.secciones ? [{ href: base, etiqueta: "Secciones" }] : []),
     ...(tiene.seo ? [{ href: `${base}/seo`, etiqueta: "SEO" }] : []),
     { href: `${base}/cambios`, etiqueta: "Qué cambió" },
+    { href: `${base}/versiones`, etiqueta: "Versiones" },
   ];
 }
