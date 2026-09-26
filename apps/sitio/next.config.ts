@@ -36,6 +36,10 @@ const nextConfig: NextConfig = {
       // 308: un marcador o un link viejo al editor sigue llegando.
       { source: "/admin/paginas", destination: "/admin/contenido/paginas", permanent: true },
       { source: "/admin/paginas/:slug", destination: "/admin/contenido/paginas/:slug", permanent: true },
+      // La URL conocida para cambiar la contraseña (W3C, «A Well-Known URL for
+      // Changing Passwords»): los gestores de contraseñas llevan acá. La
+      // única ruta en inglés del admin.
+      { source: "/.well-known/change-password", destination: "/admin/mi-cuenta#contrasena", permanent: true },
     ];
   },
 };
