@@ -15,6 +15,8 @@ type Props = {
   acciones?: React.ReactNode;
   /** Abajo, adentro del encabezado: así un aviso se ve aunque la pantalla esté scrolleada. */
   avisos?: React.ReactNode;
+  /** Las `Pestanas` del módulo, en su propia fila y pegadas al divisor de abajo. */
+  pestanas?: React.ReactNode;
   /**
    * Las acciones y los avisos quedan siempre a la vista: en escritorio, todo
    * el encabezado pegado arriba; por debajo de `lg`, el título hace scroll y
@@ -34,7 +36,7 @@ type Props = {
  * título, el estado, el detalle y las acciones. No sabe de ED. El `-mx-6`
  * lo lleva hasta los bordes del `main` del armazón, que tiene `px-6`.
  */
-export function Encabezado({ titulo, migas, estado, detalle, acciones, avisos, fijo = false, resaltado = false }: Props) {
+export function Encabezado({ titulo, migas, estado, detalle, acciones, avisos, pestanas, fijo = false, resaltado = false }: Props) {
   // Sobre azul: el texto en blanco (13,63:1) y lo secundario en `azul-claro`
   // (7,68:1), incluido el foco, porque el `azul-medio` ahí da 2,67:1.
   const secundario = resaltado ? "text-azul-claro" : "text-gris-texto";
@@ -82,6 +84,8 @@ export function Encabezado({ titulo, migas, estado, detalle, acciones, avisos, f
           {avisos ? <div className="w-full rounded-lg bg-white">{avisos}</div> : null}
         </div>
       ) : null}
+      {/* A todo el ancho, y el `-mb-3` se come el `py-3`: la barra de la activa queda sobre el divisor. */}
+      {pestanas ? <div className="-mb-3 w-full min-w-0">{pestanas}</div> : null}
     </header>
   );
 }
