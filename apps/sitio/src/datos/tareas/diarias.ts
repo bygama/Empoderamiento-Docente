@@ -1,5 +1,6 @@
 import { correrTareas, type Corrida } from "@/lib/tareas/corredor";
 import { definirTareas } from "@/lib/tareas/registro";
+import { copiaDeSearchConsole } from "./busquedas-de-google";
 import { registrarCorrida } from "./corridas";
 import { copiaDeVercel } from "./metricas-de-vercel";
 
@@ -9,7 +10,7 @@ import { copiaDeVercel } from "./metricas-de-vercel";
  * algo programado (el chequeo de links, la retención, el resumen semanal)
  * suma su tarea acá, no un cron nuevo (ADR-0011).
  */
-export const TAREAS_DIARIAS = definirTareas([copiaDeVercel]);
+export const TAREAS_DIARIAS = definirTareas([copiaDeVercel, copiaDeSearchConsole]);
 
 /**
  * Cada tarea tiene 50 segundos: la función tiene 60, y así una que se cuelga
