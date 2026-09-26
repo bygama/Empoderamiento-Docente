@@ -7,7 +7,7 @@ import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNoveda
 
 export default async function Home() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, quienesSomos, mision } = await contenidoDe("inicio");
+  const { hero, quienesSomos, mision, enNumeros } = await contenidoDe("inicio");
   return (
     <main>
       {/* Se entra directo al Inicio: el portón «Comenzá la experiencia»
@@ -20,7 +20,7 @@ export default async function Home() {
       {/* Acá hubo un bloque «Qué hacemos» en texto plano (QueHacemosResumen):
           entró el 2026-09-08 y Gastón lo sacó al día siguiente. Su código se
           borró el 2026-09-18; está en el historial si vuelve a hacer falta. */}
-      <DatosDuros />
+      <DatosDuros contenido={enNumeros} />
       <ComoTrabajamos />
       {/* Áreas de especialización (el abanico de siete cartas). Había salido
           de la home junto con la llegada del bloque plano y vuelve a su lugar

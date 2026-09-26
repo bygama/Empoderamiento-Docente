@@ -6,6 +6,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ALIADOS } from "@/config/aliados";
+import { partirCifra } from "@/features/home/contenido/cifra";
+import type { EnNumeros } from "@/features/home/contenido/en-numeros";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,32 +19,16 @@ if (typeof window !== "undefined") {
  * (count-up) al entrar al viewport. Respeta prefers-reduced-motion (valores
  * finales, sin animación).
  *
- * Las cifras salen de los proyectos documentados en el CV de Daniela, uno por
- * uno en docs/content/que-hace-ed-fuentes.md §6: los cuatro programas con la
- * Subsecretaría de Educación Media Superior de México (5.900 + 1.900 + 3.060 +
- * 3.500), Yucatán (75) y Techint (15) suman 14.450 docentes en cursos propios;
- * el Plan Nacional Aprender Matemática formó 500 formadores que llegaron a
- * 75.000 docentes. Los cinco países son los de siteConfig.paises.
- *
- * Antes acá había cifras inventadas («+2.000 docentes», «+120 escuelas») que
- * además quedaban cortas. Falta que Daniela confirme dos cosas: si cuenta la
- * etapa 2018-2020, hecha desde el Cinvestav con ella como coordinadora (Raquel
- * ya cuenta «más de 15 años», que la incluye), y cuántas escuelas son, que es
- * el único dato que no aparece en ningún documento.
+ * Las cuatro métricas llegan por props desde
+ * `features/home/contenido/en-numeros.ts` (con de dónde sale cada cifra) o
+ * desde la base: se editan en el admin.
  *
  * Logos de aliados: la lista y sus alturas viven en @/config/aliados y son
  * las mismas que usa el Footer.
  */
-const DATOS = [
-  { value: 15, prefix: "+", suffix: "", label: "Años de trayectoria", nota: "Diseñando intervenciones situadas." },
-  { value: 14000, prefix: "+", suffix: "", label: "Docentes", nota: "En programas de desarrollo profesional en Matemáticas." },
-  { value: 500, prefix: "", suffix: "", label: "Formadoras y formadores", nota: "Que llevaron el Plan Nacional Aprender Matemática a 75.000 docentes." },
-  { value: 5, prefix: "", suffix: "", label: "Países", nota: "Argentina, México, Chile, Colombia y Brasil." },
-] as const;
-
 const fmt = (n: number) => n.toLocaleString("es-AR");
 
-export function DatosDuros() {
+export function DatosDuros({ contenido }: { contenido: EnNumeros }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -79,6 +65,13 @@ export function DatosDuros() {
     return () => ctx.revert();
   }, [reduced]);
 
+  // La cifra ya pasó el esquema, así que se parte siempre; el `flatMap` solo
+  // descarta un dato que llegue roto en vez de romper la franja.
+  const datos = contenido.datos.flatMap(({ cifra, etiqueta, nota }) => {
+    const partes = partirCifra(cifra);
+    return partes ? [{ ...partes, etiqueta, nota }] : [];
+  });
+
   return (
     <section
       ref={rootRef}
@@ -96,9 +89,9 @@ export function DatosDuros() {
       <div className="relative z-10 mx-auto w-full max-w-[88rem] px-5 md:px-10">
         {/* Métricas */}
         <ul className="grid grid-cols-2 gap-y-10 md:grid-cols-4">
-          {DATOS.map((d, i) => (
+          {datos.map((d, i) => (
             <li
-              key={d.label}
+              key={d.etiqueta}
               className={`flex flex-col items-center px-2 text-center ${
                 i > 0 ? "md:border-white/12 md:border-l" : ""
               }`}
@@ -107,18 +100,18 @@ export function DatosDuros() {
                 className="font-display flex items-baseline font-bold tracking-[-0.02em] text-white tabular-nums"
                 style={{ fontSize: "clamp(2.4rem, 4.4vw, 4rem)" }}
               >
-                {d.prefix && (
-                  <span className="text-verde-concepto">{d.prefix}</span>
+                {d.prefijo && (
+                  <span className="text-verde-concepto">{d.prefijo}</span>
                 )}
-                <span data-dato-num data-dato-value={d.value}>
-                  {fmt(d.value)}
+                <span data-dato-num data-dato-value={d.valor}>
+                  {fmt(d.valor)}
                 </span>
-                {d.suffix && (
-                  <span className="text-verde-concepto">{d.suffix}</span>
+                {d.sufijo && (
+                  <span className="text-verde-concepto">{d.sufijo}</span>
                 )}
               </p>
               <p className="mt-2 font-sans text-[0.82rem] font-semibold tracking-[0.16em] text-white uppercase">
-                {d.label}
+                {d.etiqueta}
               </p>
               <p className="text-azul-claro/80 mt-1.5 max-w-[14rem] font-sans text-[0.85rem] leading-snug">
                 {d.nota}
