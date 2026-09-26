@@ -15,8 +15,9 @@ const BASE =
 const ACTIVA = "text-azul-principal after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-azul-principal focus-visible:outline-azul-medio";
 const INACTIVA = "text-gris-texto hover:text-azul-principal focus-visible:outline-azul-medio";
 // Sobre `azul-principal` (el encabezado del editor con cambios sin guardar):
-// la activa en blanco con su barra (13,63:1), las demás en `azul-claro`
-// (7,68:1) y el foco en `azul-claro`, porque el `azul-medio` ahí da 2,67:1.
+// la activa en blanco con su barra (13,63:1; 13,59:1 en el oscuro), las demás
+// en `azul-claro` (7,68:1; 7,95:1) y el foco en `azul-claro`, porque el
+// `azul-medio` ahí da 2,67:1.
 const ACTIVA_SOBRE_AZUL = "text-white after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-white focus-visible:outline-azul-claro";
 const INACTIVA_SOBRE_AZUL = "text-azul-claro hover:text-white focus-visible:outline-azul-claro";
 
