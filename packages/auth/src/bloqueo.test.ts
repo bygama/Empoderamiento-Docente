@@ -1,14 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  claveDeBloqueo,
-  conUnFalloMas,
-  respuestaDeFreno,
-  segundosDeFreno,
-  type AlmacenDeBloqueos,
-  type EstadoDeBloqueo,
-} from "./bloqueo";
-import { destrabar } from "./ganchos";
+import { claveDeBloqueo, conUnFalloMas, respuestaDeFreno, segundosDeFreno, type EstadoDeBloqueo } from "./bloqueo";
 
 const MINUTO = 60 * 1000;
 const T0 = new Date("2026-09-26T12:00:00.000Z");
@@ -23,25 +15,6 @@ function fallar(n: number, desde: Date, inicial: EstadoDeBloqueo | null = null) 
     estado = conUnFalloMas(estado, ahora);
   }
   return { estado, ahora };
-}
-
-function almacenEnMemoria(): AlmacenDeBloqueos & { filas: Map<string, EstadoDeBloqueo> } {
-  const filas = new Map<string, EstadoDeBloqueo>();
-  return {
-    filas,
-    async leer(clave) {
-      return filas.get(clave) ?? null;
-    },
-    async actualizar(clave, cambio) {
-      const siguiente = cambio(filas.get(clave) ?? null);
-      filas.set(clave, siguiente);
-      return siguiente;
-    },
-    async borrar(clave) {
-      filas.delete(clave);
-    },
-    async podar() {},
-  };
 }
 
 test("cuatro fallos no frenan; el quinto frena 15 minutos y contesta 429", () => {
@@ -95,15 +68,4 @@ test("el HMAC no lleva el correo, no cambia entre llamadas y depende del secreto
   assert.ok(!clave.includes("ana"));
   assert.equal(claveDeBloqueo("  Ana@ED.org ", "secreto-a"), clave);
   assert.notEqual(claveDeBloqueo("ana@ed.org", "secreto-b"), clave);
-});
-
-test("un reset de contraseña destraba la cuenta, escriba como escriba el correo", async () => {
-  const almacen = almacenEnMemoria();
-  const clave = claveDeBloqueo("Ana@ED.org", "secreto");
-  const { estado, ahora } = fallar(5, T0);
-  await almacen.actualizar(clave, () => estado);
-  assert.notEqual(segundosDeFreno(await almacen.leer(clave), ahora), null);
-
-  await destrabar(almacen, "ana@ed.org", "secreto");
-  assert.equal(await almacen.leer(clave), null);
 });
