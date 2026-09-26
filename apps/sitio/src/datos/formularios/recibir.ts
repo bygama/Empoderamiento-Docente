@@ -1,5 +1,6 @@
 import { siteConfig } from "@/config/site";
 import type { Bandeja } from "@/config/mensajes";
+import type { Respuesta } from "@/lib/formularios/enviar";
 import { claveDeLimite, ipDelPedido } from "@/lib/formularios/limite";
 import { segundoPlano } from "@/lib/segundo-plano";
 import { avisarMensajeNuevo } from "@/datos/avisos";
@@ -8,9 +9,8 @@ import { sumarEnvio } from "@/datos/limites-por-ip";
 // Lo común a los formularios públicos (`/api/contacto`, `/api/cv`): la forma
 // de la respuesta, el tope por IP y los errores en llano. La respuesta es la
 // que espera la coreografía de envío del sitio: `{ ok: true }` sigue al
-// cierre, `{ ok: false, error }` se queda en el formulario y lo muestra.
-
-export type Respuesta = { ok: true } | { ok: false; error: string };
+// cierre, `{ ok: false, error }` se queda en el formulario y lo muestra
+// (`lib/formularios/enviar.ts`, del lado del navegador).
 
 export const ESCRIBINOS = `escribinos a ${siteConfig.contacto.email}`;
 

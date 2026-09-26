@@ -6,36 +6,27 @@ import { siteConfig } from "@/config/site";
 
 /**
  * Canal directo de contacto: el mail para copiar de un toque y, cuando el
- * cliente confirme un número, WhatsApp. Existe porque el formulario, hasta
- * que haya backend, arma un `mailto:`, y en un celular sin app de correo eso
- * no abre nada. Con `mensaje`, además del mail se puede copiar el texto ya
- * redactado para pegarlo donde sea (y WhatsApp lo lleva precargado).
+ * cliente confirme un número, WhatsApp. Acompaña al formulario para quien
+ * prefiere escribir por su cuenta: en un celular sin app de correo, un
+ * `mailto:` no abre nada, y copiar el mail sí sirve.
  */
-export function CanalDirecto({
-  mensaje,
-  className,
-}: {
-  mensaje?: string;
-  className?: string;
-}) {
-  const [copiado, setCopiado] = useState<"mail" | "mensaje" | null>(null);
+export function CanalDirecto({ className }: { className?: string }) {
+  const [copiado, setCopiado] = useState(false);
 
   useEffect(() => {
     if (!copiado) return;
-    const t = window.setTimeout(() => setCopiado(null), 1800);
+    const t = window.setTimeout(() => setCopiado(false), 1800);
     return () => window.clearTimeout(t);
   }, [copiado]);
 
   const email = siteConfig.contacto.email;
   const whatsapp = siteConfig.contacto.whatsapp;
-  const waHref = whatsapp
-    ? `https://wa.me/${whatsapp}${mensaje ? `?text=${encodeURIComponent(mensaje)}` : ""}`
-    : null;
+  const waHref = whatsapp ? `https://wa.me/${whatsapp}` : null;
 
-  const copiar = async (que: "mail" | "mensaje", texto: string) => {
+  const copiar = async (texto: string) => {
     try {
       await navigator.clipboard.writeText(texto);
-      setCopiado(que);
+      setCopiado(true);
     } catch {
       // Sin permiso de portapapeles (http, iframe): al menos que lo vea entero.
       window.prompt("Copiá el texto:", texto);
@@ -57,22 +48,12 @@ export function CanalDirecto({
       </a>
       <button
         type="button"
-        onClick={() => copiar("mail", email)}
+        onClick={() => copiar(email)}
         className={chip}
         aria-live="polite"
       >
-        {copiado === "mail" ? "Copiado" : "Copiar mail"}
+        {copiado ? "Copiado" : "Copiar mail"}
       </button>
-      {mensaje && (
-        <button
-          type="button"
-          onClick={() => copiar("mensaje", mensaje)}
-          className={chip}
-          aria-live="polite"
-        >
-          {copiado === "mensaje" ? "Copiado" : "Copiar mensaje"}
-        </button>
-      )}
       {waHref && (
         <a
           href={waHref}

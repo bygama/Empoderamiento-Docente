@@ -1,36 +1,36 @@
 import gsap from "gsap";
 import type { FormEvent } from "react";
 import { siteConfig } from "@/config/site";
+import { enviarFormulario } from "@/lib/formularios/enviar";
 import { panelDe, type Contexto } from "./contexto";
 
-// ── FORMULARIO → CIERRE (mailto + confirmación) ───────────────────────────
-export function enviar(c: Contexto, e: FormEvent<HTMLFormElement>) {
+const SIN_RESPUESTA = `No pudimos enviar tu mensaje. Revisá tu conexión y probá de nuevo, o escribinos a ${siteConfig.contacto.email}.`;
+
+// ── FORMULARIO → CIERRE (envío + confirmación) ────────────────────────────
+// El mensaje viaja a /api/contacto, que lo guarda para el admin. Con
+// `{ ok: true }` sigue la transición al cierre de siempre; si no, se queda en
+// el formulario, con lo tipeado, y el error dice qué pasó.
+export async function enviar(c: Contexto, e: FormEvent<HTMLFormElement>) {
   e.preventDefault();
   const data = new FormData(e.currentTarget);
-  const nombre = String(data.get("nombre") ?? "").trim();
-  const email = String(data.get("email") ?? "").trim();
-  const institucion = String(data.get("institucion") ?? "").trim();
-  const pais = String(data.get("pais") ?? "").trim();
-  const mensaje = String(data.get("mensaje") ?? "").trim();
-
-  const asunto = `[Web] ${c.temaActivo?.titulo ?? "Consulta"} — ${nombre}`;
-  const cuerpo = [
-    mensaje,
-    "",
-    "—",
-    `Nombre: ${nombre}`,
-    `Email: ${email}`,
-    institucion ? `Institución: ${institucion}` : null,
-    pais ? `País: ${pais}` : null,
-  ]
-    .filter((l) => l !== null)
-    .join("\n");
-
-  c.setMensajeListo(`${asunto}\n\n${cuerpo}`);
-  // mientras no haya backend, abre el correo con todo precargado
-  window.location.href = `mailto:${siteConfig.contacto.email}?subject=${encodeURIComponent(
-    asunto,
-  )}&body=${encodeURIComponent(cuerpo)}`;
+  const campo = (clave: string) => String(data.get(clave) ?? "").trim();
+  c.setEnvio({ enviando: true, error: null });
+  const respuesta = await enviarFormulario(
+    "/api/contacto",
+    {
+      tema: c.temaActivo?.key,
+      nombre: campo("nombre"),
+      email: campo("email"),
+      institucion: campo("institucion"),
+      pais: campo("pais"),
+      mensaje: campo("mensaje"),
+      // El campo trampa: una persona lo deja vacío.
+      web: campo("web"),
+    },
+    SIN_RESPUESTA,
+  );
+  c.setEnvio({ enviando: false, error: respuesta.ok ? null : respuesta.error });
+  if (!respuesta.ok) return;
 
   c.setVista("cierre");
   if (c.reduced) {
