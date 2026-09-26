@@ -11,8 +11,17 @@ import { GEOMETRIA_CARDS, GEOMETRIA_MOBILE } from "../components/hero/geometria-
 const boton = (etiqueta: string) =>
   grupo({ texto: textoCorto({ maximo: 18, etiqueta: "Texto" }), ruta: rutaInterna(RUTAS_INTERNAS, { etiqueta: "Adónde lleva" }) }, { etiqueta });
 
+// Las fotos del hero son un collage decorativo: el campo vive en un
+// `aria-hidden` y el mensaje lo da el texto (DECISIONS de
+// `work/paginas-inicio/`). El alt se pide igual porque es de la foto.
+const fotoDelCollage = () =>
+  foto({
+    etiqueta: "Foto",
+    ayuda: "Acá la foto es decorativa: el lector de pantalla saltea el collage del hero. El texto alternativo igual queda con la foto, para donde se use.",
+  });
+
 const tarjeta = grupo({
-  foto: foto({ etiqueta: "Foto" }),
+  foto: fotoDelCollage(),
   // Los máximos del cartel llevan aire a propósito (24→30, 48→60): con el
   // tope al ras, quien edita chocaba contra `maxLength` en el primer intento
   // de escribir casi cualquier otra cosa. La escena sigue calibrada para
@@ -34,7 +43,7 @@ export const esquemaHero = z.object({
     etiquetaDelItem: "Tarjeta",
     ayuda: `Son ${GEOMETRIA_CARDS.length} tarjetas: la escena del hero está armada para exactamente esa cantidad. Seis llevan cartel (la 1, 3, 5, 6, 8 y 11).`,
   }),
-  tarjetasCelular: listaFija(GEOMETRIA_MOBILE.length, grupo({ foto: foto({ etiqueta: "Foto" }) }), {
+  tarjetasCelular: listaFija(GEOMETRIA_MOBILE.length, grupo({ foto: fotoDelCollage() }), {
     etiqueta: "Tarjetas (celular)",
     etiquetaDelItem: "Tarjeta",
     ayuda: `Son ${GEOMETRIA_MOBILE.length} tarjetas: en el celular la escena muestra exactamente esa cantidad, casi todas repetidas de las de computadora.`,
