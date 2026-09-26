@@ -27,4 +27,5 @@ Medido sobre `8b53269`:
 
 ## In progress
 
-- STATE: design-first approval window, waiting for owner approval of SPEC.md before PLAN.md
+- 2026-09-26 — SPEC aprobado por el padre con cuatro cambios (DECISIONS);
+  PLAN escrito, 19 pasos. Arranca work-run.
