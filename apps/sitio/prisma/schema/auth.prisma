@@ -19,9 +19,12 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 
-  /// administra | edita. Lo valida `@ed/auth` en el borde (`esRol`), y la
-  /// columna es texto: un enum de Postgres acá ataría el esquema a lo que el
-  /// adaptador de better-auth decida generar, que cambia entre versiones.
+  /// dirige | administra | edita. Lo valida `@ed/auth` en el borde (`esRol`),
+  /// y la columna es texto: un enum de Postgres acá ataría el esquema a lo que
+  /// el adaptador de better-auth decida generar, que cambia entre versiones.
+  /// Dirige es una, siempre: lo garantiza el índice único parcial
+  /// `user_una_sola_dirige`, que no está acá porque Prisma no escribe índices
+  /// parciales sin un preview feature (migración `una_sola_dirige`).
   rol String @default("edita")
 
   sessions Session[]

@@ -31,12 +31,18 @@ export function esRol(valor: unknown): valor is Rol {
 }
 
 /**
+ * El rol de quien dirige: el que se le da a quien se nombra
+ * (`nombrar-direccion`). Para preguntar si un rol es este, `esUnaSola`.
+ */
+export const ROL_DE_LA_DIRECCION: Rol = "dirige";
+
+/**
  * Si de ese rol hay una sola persona. Dirige es una, siempre, y no solo acá:
  * la base lo garantiza con un índice único parcial (`user_una_sola_dirige`,
  * migración `una_sola_dirige`), también contra dos altas a la vez.
  */
 export function esUnaSola(rol: Rol): boolean {
-  return rol === "dirige";
+  return rol === ROL_DE_LA_DIRECCION;
 }
 
 const DIRIGE_Y_ADMINISTRA: readonly Rol[] = ["dirige", "administra"];

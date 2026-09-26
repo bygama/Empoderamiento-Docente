@@ -4,12 +4,16 @@ cargarEntorno({ path: [".env.local", ".env"], quiet: true });
 /**
  * Da de alta una cuenta del admin.
  *
- *   pnpm --filter sitio crear-cuenta <correo> "<nombre>" [administra|edita]
+ *   pnpm --filter sitio crear-cuenta <correo> "<nombre>" [dirige|administra|edita]
  *
  * Existe porque **no hay registro público**: `disableSignUp` está prendido a
- * propósito, así que la primera cuenta —la de quien administra— tiene que
- * entrar por algún lado, y ese lado es un comando con acceso a la base y no
- * una pantalla abierta en internet.
+ * propósito, así que la primera cuenta —la de quien dirige— tiene que entrar
+ * por algún lado, y ese lado es un comando con acceso a la base y no una
+ * pantalla abierta en internet.
+ *
+ * Dirige es una sola: si ya hay quien dirige, se niega (la dirección se pasa
+ * desde Cuentas). Para nombrar a alguien que ya tiene cuenta,
+ * `nombrar-direccion`.
  *
  * No pide contraseña: crea la cuenta y la persona elige la suya por «olvidé
  * mi contraseña». Así la contraseña no viaja por el historial del shell ni la
@@ -17,23 +21,32 @@ cargarEntorno({ path: [".env.local", ".env"], quiet: true });
  */
 const [correo, nombre, rolPedido = "edita"] = process.argv.slice(2);
 
+const { ROLES, esRol, esUnaSola } = await import("@ed/auth");
+const USO = `Uso: pnpm --filter sitio crear-cuenta <correo> "<nombre>" [${ROLES.join("|")}]`;
+
 if (!correo || !nombre) {
-  console.error('Uso: pnpm --filter sitio crear-cuenta <correo> "<nombre>" [administra|edita]');
+  console.error(USO);
+  process.exit(2);
+}
+
+if (!esRol(rolPedido)) {
+  console.error(`Rol inválido: ${rolPedido}. Tiene que ser ${ROLES.slice(0, -1).join(", ")} o ${ROLES[ROLES.length - 1]}.`);
   process.exit(2);
 }
 
 const { auth } = await import("../src/datos/auth");
 const { base } = await import("../src/datos/cliente");
-const { esRol } = await import("@ed/auth");
-
-if (!esRol(rolPedido)) {
-  console.error(`Rol inválido: ${rolPedido}. Tiene que ser "administra" o "edita".`);
-  process.exit(2);
-}
+const { quienDirige } = await import("../src/datos/direccion");
 
 const ya = await base.user.findUnique({ where: { email: correo } });
 if (ya) {
   console.error(`Ya existe una cuenta con ${correo}.`);
+  process.exit(1);
+}
+
+const direccion = esUnaSola(rolPedido) ? await quienDirige() : null;
+if (direccion) {
+  console.error(`Ya dirige ${direccion.nombre} (${direccion.correo}): dirige es una sola. La dirección se pasa desde Cuentas.`);
   process.exit(1);
 }
 
