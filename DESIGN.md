@@ -621,8 +621,8 @@ no se la muestra, así que llega por un link viejo o tipeando.
 - **Sin primario**: acá no hay nada que hacer. Sin ícono de candado ni tono
   de error: no es una falla, es un lugar que no es tuyo.
 - No se esconde qué sección es: la URL ya lo dijo. Se explica de quién es.
-- Primer consumidor: la guarda de cada módulo (hoy Contenido, y Cuentas y
-  Ajustes mientras son una guía).
+- Primer consumidor: la guarda de cada módulo (hoy Contenido y Métricas, y
+  Cuentas y Ajustes mientras son una guía).
 
 ### Apartado
 
