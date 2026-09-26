@@ -19,6 +19,14 @@
   muestra el contenido inicial del código» repetirían lo que ya dice la nota
   «Todavía no se edita desde acá». Las que tienen secciones llevan las tres
   insignias del SPEC §2.4.
+- 2026-09-26 — **El faro del login es el haz de Biblioteca, quieto.** El sitio
+  ya tiene su metáfora del faro en puntos: una capa «encendida» por el haz
+  (`PuntosFaro`, Biblioteca y Novedades). El panel de acceso la reusa sin
+  movimiento ni cursor —el admin es sobrio y una animación al entrar no suma—:
+  una cuña de puntos más brillantes que sale de la lámpara del logo hacia el
+  formulario. Sin ilustración ni dibujo del faro (§10: el logo no se redibuja).
+  «Admin del sitio» usa `text-h1` del sitio, la excepción de tipo que el padre
+  aprobó (SPEC §9.6).
 - 2026-09-26 — **Las migas del editor siguen con «/»**, el separador que ya
   tiene `Encabezado`: el «›» del brief es cómo se escriben unas migas en
   prosa, no un cambio de diseño pedido.
