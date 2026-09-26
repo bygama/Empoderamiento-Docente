@@ -163,9 +163,29 @@ columna por texto.
 
 ## 7. Acceso y seguridad
 
-**Dos roles:** `administrador` (todo, incluidas las cuentas) y `editor` (crea,
-edita, publica y borra contenido; de las cuentas solo la propia). Los dos
-publican. No hay registro público. «Olvidé mi contraseña» manda un correo por
+**Tres roles, fijos:** `dirige` (todo, incluidas las cuentas y los CV; es una
+sola persona, la única que pasa la dirección a otra, y su cuenta no la toca
+nadie más), `administra` (todo lo de quien dirige, menos tocar esa cuenta o
+pasarse la dirección) y `edita` (edita y publica el contenido, las novedades y
+la Biblioteca, contesta los contactos y ve las métricas; no ve CV, Cuentas ni
+Ajustes). Todos publican. La tabla, capacidad por capacidad, vive en
+`packages/auth/src/permisos.ts`, el único archivo que compara contra el string
+de un rol: el resto pregunta `puede(rol, "usarCuentas")`. Que dirige sea una
+sola lo garantiza la base, con el índice único parcial `user_una_sola_dirige`.
+La primera se nombra con `crear-cuenta … dirige`, o con `nombrar-direccion` si
+ya tiene cuenta (README). No hay registro público.
+
+**Lo que un rol no usa no aparece**, y el servidor lo verifica igual: la
+sidebar muestra los módulos de sus capacidades; cada módulo pasa por su guarda
+(`admin/armazon/Guarda.tsx`), que a quien entra por URL le muestra «Esta
+sección es de quien dirige o administra»; y cada Server Action chequea su
+capacidad después de la sesión. `guarda.test.ts` y
+`acciones-con-sesion.test.ts` fallan si un módulo o una acción se olvida.
+
+**La actividad** (tabla `actividad`: quién, qué, sobre qué, cuándo) se anota
+desde `datos/actividad.ts`, con una lista cerrada de tipos; se guarda 12 meses
+y de un CV registra solo que se borró. Entrar, salir y cambiar la contraseña
+los anotan los ganchos de `@ed/auth`. «Olvidé mi contraseña» manda un correo por
 Resend, en segundo plano, y elegir una contraseña nueva avisa con otro («Tu
 contraseña cambió»); sin `RESEND_API_KEY`, en local salen por la consola y en
 producción no salen, sin loguear nunca el enlace.
@@ -190,9 +210,12 @@ solo uso, con expiración y **guardados hasheados**, errores genéricos para no
 permitir enumerar usuarios, y protección CSRF por validación de origen y por
 cookies `SameSite=Strict`.
 
-**La sesión dura 12 horas sin uso** y se renueva cada hora de uso; lo delicado
-pide haber entrado hace menos de 10 minutos (`freshAge`). Elegir una
-contraseña nueva cierra todas las sesiones de la cuenta.
+**La sesión dura 12 horas sin uso** y se renueva cada hora de uso; las rutas
+que better-auth marca como frescas piden haber entrado hace menos de 10
+minutos (`freshAge`). Elegir una contraseña nueva cierra todas las sesiones de
+la cuenta, y cambiarla desde Mi cuenta (pidiendo la actual, 5 intentos cada 5
+minutos) cierra las demás y manda el mismo aviso. Cada sesión guarda la ciudad
+y el país de las cabeceras de Vercel, para reconocerla en Mi cuenta.
 
 **La sesión se corta en el proxy y se verifica en el layout del admin.** El
 proxy solo mira que la cookie esté, sin ir a la base; la comprobación de
@@ -206,9 +229,9 @@ lleva.
 **Las Server Actions son la excepción:** el proxy las deja pasar sin
 cookie, porque un redirect no es una respuesta válida para una acción, y el
 layout no las cubre. Por eso toda acción empieza por `auth.api.getSession` y
-contesta en llano si no hay sesión, y
+contesta en llano si no hay sesión, sigue con `puede(rol, capacidad)`, y
 `apps/sitio/src/datos/acciones/acciones-con-sesion.test.ts` falla si una no
-empieza por esa llamada.
+empieza por esas dos cosas.
 
 **Lo que cubre cada freno:** el rate limit es por IP, y eso cierra la
 enumeración de usuarios; el bloqueo por cuenta cierra el ataque repartido entre
