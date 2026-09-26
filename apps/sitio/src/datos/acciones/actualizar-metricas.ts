@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { SIN_PERMISO, puede } from "@ed/auth";
 import { auth } from "@/datos/auth";
 import { correrAMano } from "@/datos/tareas/a-mano";
 import { copiaDeVercel, copiarMetricas } from "@/datos/tareas/metricas-de-vercel";
@@ -15,6 +16,7 @@ export async function actualizarMetricasAhora(): Promise<{ ok: boolean; detalle:
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para actualizar." };
+    if (!puede(sesion.user.rol, "verMetricas")) return { ok: false, detalle: SIN_PERMISO };
     // Sin variables no hay nada que copiar, y esa corrida no se registra: no
     // tocó la API, así que no tiene por qué frenar al botón.
     if (!hayVariablesDeMetricas()) return { ok: false, detalle: "Faltan las variables de Vercel: ver el README." };

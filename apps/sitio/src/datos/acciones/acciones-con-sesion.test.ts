@@ -44,10 +44,6 @@ const SIN_CAPACIDAD: Record<string, { acciones: string[]; motivo: string }> = {
     acciones: ["subirFoto"],
     motivo: "es de la lane paginas-inicio (4a): suma puede(…, \"editarContenido\") y el registro de actividad al rebasear sobre roles-y-actividad",
   },
-  "datos/acciones/actualizar-metricas.ts": {
-    acciones: ["actualizarMetricasAhora"],
-    motivo: "es de la lane busquedas-de-google (5): suma puede(…, \"verMetricas\") al rebasear sobre roles-y-actividad",
-  },
 };
 
 const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");

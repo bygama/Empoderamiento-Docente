@@ -64,6 +64,7 @@ export const PUEDE = {
   verContacto: ROLES,
   /** Mensajes › CV, con el archivo privado. Lo usa la lane 7, mensajes. */
   verCV: DIRIGE_Y_ADMINISTRA,
+  /** Métricas y sus pestañas: verlas y pedir «Actualizar ahora». */
   verMetricas: ROLES,
   /** Cuentas y Actividad. */
   usarCuentas: DIRIGE_Y_ADMINISTRA,
