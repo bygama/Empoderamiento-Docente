@@ -1,5 +1,6 @@
 import { ROL_DE_LA_DIRECCION } from "@ed/auth";
 import { base } from "./cliente";
+import { ponerRol } from "./roles";
 
 /**
  * Quién dirige, y cómo se nombra a la primera persona que dirige cuando ya
@@ -31,7 +32,8 @@ export async function nombrarDireccion(correo: string): Promise<ResultadoDeNombr
   const ya = await quienDirige();
   if (ya) return { ok: false, motivo: `Ya dirige ${ya.nombre} (${ya.correo}). La dirección se pasa desde Cuentas.` };
   try {
-    await base.user.update({ where: { id: cuenta.id }, data: { rol: ROL_DE_LA_DIRECCION } });
+    // Con el segundo factor, que dirige no entra sin él (roles.ts).
+    await ponerRol(cuenta.id, ROL_DE_LA_DIRECCION);
   } catch (error) {
     // Entre la pregunta y el cambio alguien nombró a otra persona: lo frenó el índice.
     if (chocoUnIndiceUnico(error)) return { ok: false, motivo: "Recién se nombró a otra persona para dirigir. La dirección se pasa desde Cuentas." };

@@ -48,6 +48,15 @@ export function esUnaSola(rol: Rol): boolean {
 const DIRIGE_Y_ADMINISTRA: readonly Rol[] = ["dirige", "administra"];
 
 /**
+ * Si el rol entra con segundo factor sí o sí: quien ve los CV y las cuentas
+ * (SPEC de `work/cuentas/` §5.3). La base lo garantiza con el CHECK
+ * `user_segundo_factor_obligatorio`, que repite esta lista en SQL.
+ */
+export function segundoFactorObligatorio(rol: unknown): boolean {
+  return esRol(rol) && DIRIGE_Y_ADMINISTRA.includes(rol);
+}
+
+/**
  * Las capacidades, fila por fila de la tabla de permisos del §3. Inicio y Mi
  * cuenta no están: son el piso de toda sesión. Una capacidad que todavía no
  * usa nadie dice qué lane la va a usar; la tabla está entera igual, porque

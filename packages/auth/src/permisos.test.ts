@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { PUEDE, QUE_PUEDE, ROLES, esUnaSola, puede, quienPuede, type Capacidad, type Rol } from "./permisos";
+import { PUEDE, QUE_PUEDE, ROLES, esUnaSola, puede, quienPuede, segundoFactorObligatorio, type Capacidad, type Rol } from "./permisos";
 
 // La tabla de permisos del SPEC de `work/mapa-del-admin/` §3, escrita de
 // nuevo a mano: si alguien cambia una capacidad en permisos.ts sin cambiar la
@@ -46,4 +46,9 @@ test("quienPuede dice de quién es algo, en llano", () => {
 test("dirige es la única de a una, y cada rol tiene su frase", () => {
   assert.deepEqual(ROLES.filter(esUnaSola), ["dirige"]);
   for (const rol of ROLES) assert.ok(QUE_PUEDE[rol].length > 0, rol);
+});
+
+test("el segundo factor es obligatorio para dirige y administra, y nada más", () => {
+  assert.deepEqual(ROLES.filter(segundoFactorObligatorio), ["dirige", "administra"]);
+  for (const rol of [undefined, null, "", "DIRIGE", 1]) assert.equal(segundoFactorObligatorio(rol), false);
 });

@@ -36,6 +36,7 @@ if (!esRol(rolPedido)) {
 const { auth } = await import("../src/datos/auth");
 const { base } = await import("../src/datos/cliente");
 const { quienDirige } = await import("../src/datos/direccion");
+const { ponerRol } = await import("../src/datos/roles");
 
 const ya = await base.user.findUnique({ where: { email: correo } });
 if (ya) {
@@ -50,12 +51,25 @@ if (direccion) {
 }
 
 const ctx = await auth.$context;
-await ctx.internalAdapter.createUser(
-  { email: correo, name: nombre, emailVerified: false, rol: rolPedido },
+const cuenta = await ctx.internalAdapter.createUser(
+  // Nace con el rol de fábrica y recién después toma el pedido, por
+  // `ponerRol`: better-auth no escribe columnas que no conoce, y dirige y
+  // administra no pueden existir sin el segundo factor (el CHECK
+  // `user_segundo_factor_obligatorio`).
+  { email: correo, name: nombre, emailVerified: false, rol: ROL_POR_DEFECTO },
   // El segundo argumento dice de dónde salió la cuenta. No es un OAuth ni un
   // SSO: la crea alguien con acceso a la base, desde una terminal.
   { method: "admin" },
 );
+try {
+  await ponerRol(cuenta.id, rolPedido);
+} catch (error) {
+  // Entre la pregunta y el alta alguien nombró a otra persona para dirigir:
+  // lo frenó el índice. No queda una cuenta a medias.
+  await base.user.delete({ where: { id: cuenta.id } });
+  console.error("No se pudo dar el rol:", error instanceof Error ? error.message : error);
+  process.exit(1);
+}
 
 console.log(`Cuenta creada: ${correo} (${rolPedido})`);
 console.log("Ahora entrá a /admin/olvide-mi-contrasena con ese correo para elegir la contraseña.");

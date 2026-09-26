@@ -21,6 +21,7 @@ export {
   esUnaSola,
   puede,
   quienPuede,
+  segundoFactorObligatorio,
   LARGO_MINIMO_CONTRASENA,
 } from "./permisos";
 export type { Capacidad, Rol } from "./permisos";
