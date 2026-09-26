@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { Capacidad } from "@ed/auth";
 import { Bandeja, BookOpen, Casa, Controles, Documento, Grafico, Periodico, Users, type IconProps } from "@/components/ui/icons";
 
 // Las entradas de la sidebar, en grupos separados por un divisor: lo que se
@@ -13,26 +14,35 @@ export type Modulo = {
   Icono: ComponentType<IconProps>;
   /** Los primeros segmentos después de `/admin` que la encienden. */
   segmentos: readonly string[];
+  /**
+   * Lo que hay que poder para verlo en la sidebar, y lo que pide la guarda del
+   * módulo (`Guarda.tsx`; `guarda.test.ts` los cruza). Sin capacidad, lo ve
+   * toda sesión: hoy, solo el Inicio.
+   */
+  capacidad?: Capacidad;
 };
 
 export const GRUPOS: readonly (readonly Modulo[])[] = [
   [
     { clave: "inicio", nombre: "Inicio", href: "/admin", Icono: Casa, segmentos: [""] },
-    { clave: "mensajes", nombre: "Mensajes", href: "/admin/mensajes", Icono: Bandeja, segmentos: ["mensajes"] },
-    { clave: "metricas", nombre: "Métricas", href: "/admin/metricas", Icono: Grafico, segmentos: ["metricas"] },
+    { clave: "mensajes", nombre: "Mensajes", href: "/admin/mensajes", Icono: Bandeja, segmentos: ["mensajes"], capacidad: "verContacto" },
+    { clave: "metricas", nombre: "Métricas", href: "/admin/metricas", Icono: Grafico, segmentos: ["metricas"], capacidad: "verMetricas" },
   ],
   [
-    { clave: "contenido", nombre: "Contenido", href: "/admin/contenido", Icono: Documento, segmentos: ["contenido"] },
-    { clave: "novedades", nombre: "Novedades", href: "/admin/novedades", Icono: Periodico, segmentos: ["novedades"] },
-    { clave: "biblioteca", nombre: "Biblioteca", href: "/admin/biblioteca", Icono: BookOpen, segmentos: ["biblioteca"] },
+    { clave: "contenido", nombre: "Contenido", href: "/admin/contenido", Icono: Documento, segmentos: ["contenido"], capacidad: "editarContenido" },
+    { clave: "novedades", nombre: "Novedades", href: "/admin/novedades", Icono: Periodico, segmentos: ["novedades"], capacidad: "editarNovedades" },
+    { clave: "biblioteca", nombre: "Biblioteca", href: "/admin/biblioteca", Icono: BookOpen, segmentos: ["biblioteca"], capacidad: "editarBiblioteca" },
   ],
 ];
 
-/** Pegado abajo, y solo para quien puede tocar cuentas: a quien edita no le aparece. */
+/** Pegado abajo: lo que se configura una vez. A quien edita no le aparece (sus capacidades lo dicen). */
 export const CONFIGURACION: readonly Modulo[] = [
-  { clave: "cuentas", nombre: "Cuentas", href: "/admin/cuentas", Icono: Users, segmentos: ["cuentas"] },
-  { clave: "ajustes", nombre: "Ajustes", href: "/admin/ajustes", Icono: Controles, segmentos: ["ajustes"] },
+  { clave: "cuentas", nombre: "Cuentas", href: "/admin/cuentas", Icono: Users, segmentos: ["cuentas"], capacidad: "usarCuentas" },
+  { clave: "ajustes", nombre: "Ajustes", href: "/admin/ajustes", Icono: Controles, segmentos: ["ajustes"], capacidad: "usarAjustes" },
 ];
+
+/** Todos los módulos, en el orden de la sidebar. */
+export const MODULOS: readonly Modulo[] = [...GRUPOS.flat(), ...CONFIGURACION];
 
 /** El segmento que decide la entrada activa: `/admin/novedades/3` → `novedades`, `/admin` → `""`. */
 export function primerSegmento(ruta: string): string {
