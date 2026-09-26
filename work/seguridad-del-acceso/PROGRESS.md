@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 13 del PLAN (AGENTS.md).
+- work-verify: el gate completo y el recorrido de punta a punta.
 
 ## Hecho
 
@@ -205,3 +205,9 @@ Medido sobre `275518e`:
   el layout. `git grep -n "middleware" -- README.md docs/AI_GUIDELINES.md` →
   nada (exit 1); `git grep -n "CORREO_REMITENTE" -- README.md
   apps/sitio/.env.example` → las dos.
+- 2026-09-26 — **Paso 13, AGENTS.md** (lo revisa Mateo en el PR, §5.6). §3: el
+  árbol con `proxy.ts`, `correos/`, `datos/bloqueos-de-acceso.ts` y
+  `lib/correo/`, `lib/seguridad/`; §12: la nota «Qué de esto ya existe» dice
+  `proxy.ts`, y la línea de la sesión suma las 12 h, `SameSite=Strict` con el
+  rebote y el puntero al ADR-0010. `git grep -n "middleware" -- AGENTS.md` →
+  solo la línea histórica de §13 (fase 1).
