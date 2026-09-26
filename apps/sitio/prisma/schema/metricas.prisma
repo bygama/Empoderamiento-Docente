@@ -1,5 +1,6 @@
 // La copia diaria de la analítica de Vercel (ADR-0009, work/metricas/SPEC.md).
-// La llena un cron; el admin lee de acá y nunca de la API en el render.
+// La llena una tarea del cron diario (ADR-0011), que registra cada corrida en
+// `corridas_de_tareas`; el admin lee de acá y nunca de la API en el render.
 
 /// Una fila por día, dimensión y valor. `valor` es "" en la fila del total y
 /// en la fila «el resto» (que además lleva `agrupado = true`). `agrupado`
@@ -29,16 +30,4 @@ model MetricaVentana {
 
   @@id([fechaFin, dias])
   @@map("metricas_ventanas")
-}
-
-/// Qué pasó en cada sincronización: el panel muestra la última y sus errores.
-model SincronizacionMetricas {
-  id        Int      @id @default(autoincrement())
-  corridaEn DateTime @default(now())
-  desde     DateTime @db.Date
-  hasta     DateTime @db.Date
-  ok        Boolean
-  detalle   String   // "3 días, 187 filas, 4 ventanas" o el error, en llano
-
-  @@map("metricas_sincronizaciones")
 }

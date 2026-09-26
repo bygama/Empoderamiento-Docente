@@ -1,0 +1,17 @@
+// Lo programado: un solo cron diario corre cada tarea registrada y deja acá
+// cada corrida (ADR-0011, work/busquedas-de-google/SPEC.md §5). Lo lee el
+// admin: el panel de cada copia y, después, Ajustes › Conexiones.
+
+/// Una corrida de una tarea, del cron o de «Actualizar ahora», también las
+/// fallidas. `detalle` es lo que pasó en llano: cuántos días y filas, o el
+/// error. Sin columnas de rango, porque no toda tarea copia días.
+model CorridaDeTarea {
+  id        Int      @id @default(autoincrement())
+  tarea     String   // la clave de la tarea: metricas-de-vercel | busquedas-de-google
+  corridaEn DateTime @default(now())
+  ok        Boolean
+  detalle   String
+
+  @@index([tarea, corridaEn])
+  @@map("corridas_de_tareas")
+}

@@ -28,10 +28,9 @@ const clienteRoto: ClienteDeAnaliticas = {
   },
 };
 
-test("correr dos veces deja las mismas filas y registra cada corrida", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+test("correr dos veces deja las mismas filas y dice qué días copió", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
-  const { sincronizarMetricas } = await import("./sincronizar-metricas");
-  const antes = await base.sincronizacionMetricas.count();
+  const { sincronizarMetricas } = await import("./metricas-de-vercel");
   // minimoDias en las dos corridas: si la base ya tiene una fila `total` real
   // (mucho más nueva que 2001), rangoFaltante da null y sin esto el test
   // dependería de qué haya sincronizado el cron antes. Con minimoDias el
@@ -40,16 +39,16 @@ test("correr dos veces deja las mismas filas y registra cada corrida", { skip: !
   const r2 = await sincronizarMetricas({ cliente: clienteFalso, base, hoy: HOY, minimoDias: 3 });
   assert.equal(r1.ok, true);
   assert.equal(r2.ok, true);
+  assert.equal(r2.detalle, "Del 2001-01-08 al 2001-01-10: 3 días, 1 filas, 4 ventanas.");
   const filas = await base.metricaDiaria.count({ where: { fecha: { gte: fechaUTC("2000-12-01"), lte: fechaUTC("2001-01-10") } } });
   assert.equal(filas, 1);
   const ventanas = await base.metricaVentana.count({ where: { fechaFin: { gte: fechaUTC("2000-12-01"), lte: fechaUTC("2001-01-10") } } });
   assert.equal(ventanas, 4);
-  assert.equal(await base.sincronizacionMetricas.count(), antes + 2);
 });
 
-test("si la API falla, queda la fila de error y nada más", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+test("si la API falla, la corrida sale fallida y no se copia nada", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
-  const { sincronizarMetricas } = await import("./sincronizar-metricas");
+  const { sincronizarMetricas } = await import("./metricas-de-vercel");
   // minimoDias por la misma razón que arriba: sin esto, una marca de agua
   // real y lejana haría "Nada nuevo" antes de llamar a la API rota, y el
   // error nunca se vería.
@@ -67,6 +66,5 @@ after(async () => {
   const { base } = await import("@/datos/cliente");
   await base.metricaDiaria.deleteMany({ where: { fecha: { lte: fechaUTC("2001-12-31") } } });
   await base.metricaVentana.deleteMany({ where: { fechaFin: { lte: fechaUTC("2001-12-31") } } });
-  await base.sincronizacionMetricas.deleteMany({ where: { hasta: { lte: fechaUTC("2001-12-31") } } });
   await base.$disconnect();
 });
