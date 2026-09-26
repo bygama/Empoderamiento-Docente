@@ -31,6 +31,9 @@ model User {
   accounts  Account[]
   /// Lo que hizo en el admin (actividad.prisma). No es de better-auth.
   actividad Actividad[]
+  /// Los mensajes que tomó y los avisos que eligió (mensajes.prisma). Tampoco.
+  mensajesTomados Mensaje[] @relation("MensajesTomados")
+  avisos          Aviso[]
 
   @@map("user")
 }

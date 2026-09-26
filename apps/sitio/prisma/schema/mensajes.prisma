@@ -1,0 +1,71 @@
+// Lo que llega por los formularios públicos del sitio: Contacto y CV
+// (work/mensajes/SPEC.md §4, el §5.6 del mapa del admin). Se escribe por
+// `datos/formularios/` y `datos/acciones/mensajes.ts`, y se borra solo según
+// los plazos de `config/privacidad.ts`.
+
+/// Un mensaje de Contacto o un CV. Las dos bandejas comparten todo —estados,
+/// «tomado por», retención, avisos— menos el archivo, así que van en una sola
+/// tabla con su `bandeja`.
+model Mensaje {
+  id           String   @id @default(uuid())
+  /// contacto | cv. La lista es cerrada y vive en código (`config/mensajes.ts`),
+  /// no en un enum de Postgres: sumar una bandeja no pide migración.
+  bandeja      String
+  /// nuevo | en-curso | cerrado | spam. Nuevo es «sin leer»: nadie lo tomó.
+  estado       String   @default("nuevo")
+  /// Desde cuándo está en ese estado: el plazo del spam cuenta desde acá.
+  estadoEn     DateTime @default(now()) @map("estado_en")
+  /// El plazo de Contacto y de CV cuenta desde acá.
+  recibidoEn   DateTime @default(now()) @map("recibido_en")
+  nombre       String
+  /// A dónde se responde.
+  correo       String
+  pais         String?
+  /// Contacto: el tema elegido, como se lee («Investigación»). CV: null.
+  tema         String?
+  mensaje      String?
+  /// Lo demás que pidió el formulario, en su orden: `[{ etiqueta, valor }]`.
+  /// Congela lo que se preguntó: si la lista del CV cambia, las fichas viejas
+  /// se siguen leyendo igual.
+  datos        Json     @default("[]")
+  /// Quién lo tomó. SET NULL: si esa cuenta se borra, el mensaje queda.
+  tomadoPorId  String?  @map("tomado_por_id")
+  tomadoPor    User?    @relation("MensajesTomados", fields: [tomadoPorId], references: [id], onDelete: SetNull)
+  /// CV: la clave del archivo en el almacén privado (`cv/<id>.pdf`), nunca
+  /// una URL pública. Contacto: null.
+  archivo      String?
+  /// El peso del archivo, para mostrarlo.
+  archivoBytes Int?     @map("archivo_bytes")
+
+  @@index([bandeja, estado, recibidoEn])
+  @@index([estado, estadoEn])
+  @@map("mensajes")
+}
+
+/// El tope de envíos por IP de los formularios públicos. En la base y no en
+/// memoria porque el sitio corre en varias instancias. **Nunca la IP en
+/// claro**: la clave es su HMAC (`lib/formularios/limite.ts`).
+model LimitePorIp {
+  /// HMAC-SHA256 de «formulario:IP» con el secreto de better-auth, en hexadecimal.
+  clave  String   @id
+  /// Cuántos envíos en la ventana que corre.
+  envios Int
+  /// Cuándo empezó esa ventana, fija, de una hora.
+  desde  DateTime
+
+  @@map("limites_por_ip")
+}
+
+/// Quién quiere un correo por cada mensaje nuevo de una bandeja. **Sin fila,
+/// activado**: así viene de fábrica. Reciben las cuentas cuyo rol puede ver la
+/// bandeja (`datos/avisos.ts`); Ajustes › Avisos lee esta misma tabla.
+model Aviso {
+  cuentaId String  @map("cuenta_id")
+  cuenta   User    @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+  /// contacto | cv. Lista cerrada en código, como `mensajes.bandeja`.
+  aviso    String
+  activo   Boolean
+
+  @@id([cuentaId, aviso])
+  @@map("avisos")
+}
