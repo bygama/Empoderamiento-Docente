@@ -2,7 +2,8 @@
 
 ## In progress
 
-- Paso 1 del PLAN.
+- Nada: los 10 pasos están hechos y verificados. Espera la revisión de cierre
+  del padre (abajo, «Next»).
 
 ## Done
 
@@ -185,6 +186,58 @@
   AGENTS.md apps/sitio/src apps/sitio/vercel.json` → sin coincidencias (exit
   1); cada link relativo nuevo apunta a un archivo que existe.
 
+- 2026-09-26 — **work-verify** (abajo): el verificador de react-doctor dio
+  93/100 por la complejidad de `PanelBusquedas` (15); se partió en
+  `CabeceraDeBusquedas` y `CuerpoDeBusquedas` (`04cf3ec`) y volvió a 100. Todo
+  el gate en verde sobre ese árbol.
+
 ## Next
 
-- work-verify (el gate entero) y el PR.
+- **La revisión de cierre es del padre** (1 revisor Opus 5.5, «el cambio
+  entero contra su SPEC»): esta lane reporta `worker_done` con el PR abierto y
+  no abre asientos propios. Sus hallazgos vuelven como una tarea a esta
+  terminal.
+- Nunca se mergea desde la lane. Si el padre lo pide, se rebasea sobre el
+  `main` nuevo: si `seguridad-del-acceso` entra antes, choca en el README,
+  `.env.example`, `docs/architecture/adrs/README.md` (su 0010) y un comentario
+  de `actualizar-metricas.ts`; y si otra migración quedó después, la de esta
+  lane se regenera con `--create-only` y el mismo SQL de datos.
+- Fuera del repo, sin commitear: el dev server en su pestaña de Orca («dev
+  busquedas-de-google», puerto 3015), la terminal «migrate busquedas», los
+  perfiles aislados del navegador «busquedas-de-google» y «busquedas-edita»,
+  las cuentas `busquedas@ed.test` (administra) y `edita-busquedas@ed.test`
+  (edita), 56 días de búsquedas sembrados en `ed_busquedas`, un `CRON_SECRET`
+  local en `.env.local` y las capturas en `%TEMP%\ed-busquedas\`.
+
+## Verification
+
+### 2026-09-26 — L DoD — PASS (L1–L3; la revisión de cierre es del padre)
+
+Sobre `04cf3ec` (el árbol final de código), en esta sesión:
+
+- L1 static: `pnpm typecheck` → exit 0 (`packages/db`, `packages/auth`,
+  `apps/sitio`: Done); `pnpm lint` → exit 0;
+  `node scripts/verificar-react-doctor.mjs` → exit 0: «react-doctor: 100/100,
+  sin diagnósticos (apps/sitio/src: 446 archivos · packages/db/src: 3 archivos
+  · packages/auth/src: 5 archivos)».
+- L2 behavioral: `pnpm test` → exit 0 (`apps/sitio`: 103 tests, 102 pass, 0
+  fail, 1 skip: las respuestas grabadas de Vercel, que esperan a A1 de la lane
+  de métricas); `pnpm build` → exit 0 («Compiled successfully»; rutas
+  `ƒ /admin/metricas`, `ƒ /admin/metricas/[pantalla]`,
+  `ƒ /admin/metricas/busquedas`, `ƒ /api/cron/diario`). Arranca: el dev server
+  en el 3015 contesta y recompila con cada cambio.
+- L3 end-to-end, sobre el mismo árbol: `curl /api/cron/diario` sin header →
+  401; con el `CRON_SECRET` local → 500 con las dos corridas aisladas
+  (`metricas-de-vercel`: faltan las variables; `busquedas-de-google`: la
+  clave falsa no se pudo leer) y `corridas_de_tareas` de 6 a 8 filas. En el
+  navegador de Orca, `/admin/metricas/busquedas`: con las variables y 56 días
+  sembrados, activa solo «Búsquedas», las cinco secciones, el aviso de la
+  corrida fallida y las tarjetas 101 · 3.217 · 7,1; sin las variables,
+  `administra` ve «Conectá Search Console» con 4 pasos y Ajustes en la
+  sidebar, y `edita` ve «Todavía no está conectado», sin pasos ni Ajustes. Los
+  seis estados, los tres temas, 390 de ancho y el foco con teclado, en el
+  paso 9 (arriba). La migración con el historial, en el paso 2.
+- Close review: **no la abre esta lane** (hija supervisada): la abre el padre
+  con `worker_done` (un revisor Opus 5.5, lente «el cambio entero contra su
+  SPEC»). Las marcas del PLAN que la dimensionan: `high` en los pasos 1, 2 y
+  4; `medium` en 5 a 10; `low` en 3.
