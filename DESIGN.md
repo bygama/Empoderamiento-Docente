@@ -357,7 +357,8 @@ Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED.
 Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
 sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
 índice de tarjetas, la lista, el estado vacío y la pantalla de acceso nueva,
-el 2026-09-26 (`work/patrones-del-admin/`). Todos los contrastes están
+el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso», el mismo día
+(`work/roles-y-actividad/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -604,6 +605,24 @@ competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
 - Primer consumidor: los tres estados sin datos del panel de métricas. Lo
   usan también las secciones de Búsquedas sin filas: nunca una lista vacía
   muda.
+
+### Sin permiso
+
+Lo que ve quien entra por URL a una sección que su rol no usa: la sidebar ya
+no se la muestra, así que llega por un link viejo o tipeando.
+`apps/sitio/src/admin/armazon/SinPermiso.tsx`, que dibuja
+`apps/sitio/src/admin/armazon/Guarda.tsx`.
+
+- **Es solo un encabezado**, adentro del armazón y con la sidebar: el `h1`
+  dice de quién es la sección («Esta sección es de quien dirige o
+  administra», armado desde la tabla de permisos, no escrito a mano); el
+  detalle, en meta `gris-texto` (4,83:1 · 7,08:1), tu rol y su frase; y a la
+  derecha **«Ir al Inicio»**, secundario.
+- **Sin primario**: acá no hay nada que hacer. Sin ícono de candado ni tono
+  de error: no es una falla, es un lugar que no es tuyo.
+- No se esconde qué sección es: la URL ya lo dijo. Se explica de quién es.
+- Primer consumidor: la guarda de cada módulo (hoy Contenido, y Cuentas y
+  Ajustes mientras son una guía).
 
 ### Pantalla de acceso
 
