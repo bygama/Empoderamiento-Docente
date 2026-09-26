@@ -38,7 +38,17 @@ export type OpcionesDeAuth = {
     para: string;
     nombre?: string;
     enlace: string;
+    /** Cuánto dura el enlace, para decirlo en el correo. */
+    minutosDeVigencia: number;
   }) => Promise<void>;
+  /** Manda el aviso de «tu contraseña cambió». */
+  avisarCambioDeContrasena: (datos: { para: string; nombre?: string }) => Promise<void>;
+  /**
+   * Corre una tarea después de contestar, sin que la respuesta la espere (en
+   * Next, `after()`). Los correos salen por acá: si la respuesta esperara al
+   * envío, tardaría más cuando el correo existe, y el tiempo lo delataría.
+   */
+  segundoPlano: (tarea: Promise<unknown>) => void;
   /** Dónde guarda el bloqueo por cuenta sus fallos (bloqueo.ts). */
   bloqueos: AlmacenDeBloqueos;
 };
@@ -48,6 +58,8 @@ export function crearAuth({
   secreto,
   urlDelSitio,
   mandarResetDeContrasena,
+  avisarCambioDeContrasena,
+  segundoPlano,
   bloqueos,
 }: OpcionesDeAuth) {
   if (!secreto) {
@@ -88,10 +100,18 @@ export function crearAuth({
           para: user.email,
           nombre: user.name || undefined,
           enlace: url,
+          minutosDeVigencia: UNA_HORA / 60,
         });
       },
       onPasswordReset: async ({ user }) => {
         await destrabar(bloqueos, user.email, secreto);
+        // better-auth espera a este callback antes de contestar, así que el
+        // aviso se manda a segundo plano acá mismo.
+        segundoPlano(
+          avisarCambioDeContrasena({ para: user.email, nombre: user.name || undefined }).catch((e: unknown) => {
+            console.error("No salió el aviso de contraseña cambiada:", e instanceof Error ? e.message : e);
+          }),
+        );
       },
     },
 
@@ -134,6 +154,8 @@ export function crearAuth({
     hooks: crearGanchos({ bloqueos, secreto }),
 
     advanced: {
+      // better-auth manda acá el correo del reset (`runInBackgroundOrAwait`).
+      backgroundTasks: { handler: segundoPlano },
       ipAddress: {
         // En Vercel la IP real viene acá; sin decirlo, todas las requests
         // parecerían venir del proxy y compartirían un solo cupo.
