@@ -133,7 +133,7 @@
   dirige, como `ed_cuentas` desde que creé una cuenta por rol); react-doctor
   100/100; `/admin/mi-cuenta` como edita → 200 con `id="seguridad"`,
   «Apagado» y «Activar el segundo factor».
-- **Paso 9 — los tipos de actividad, su frase y quién los ve** (este commit).
+- **Paso 9 — los tipos de actividad, su frase y quién los ve** (`d302d7c`).
   `datos/actividad.ts`: los diez tipos de Cuentas; `QUIEN_VE` (`satisfies
   Record<TipoDeActividad, Capacidad>`, todos `usarCuentas`, como la lectura
   5 de la 3c), `tiposQueVe(rol)` y `esTipoDeActividad`.
@@ -142,5 +142,19 @@
   la 3c también crea (DECISIONS): concilia la que rebasee segunda. Test
   `frase.test.ts`. Aceptación: `pnpm --filter sitio typecheck`, `test` (159
   pass, 2 saltados) y `lint` exit 0.
+- **Paso 10 — las consultas** (este commit). `datos/consultas/cuentas.ts`:
+  `listarCuentas()` → `CuentaEnLista[]` (quien dirige primero, después por
+  nombre) y `unaCuenta(id)` → `FichaDeCuenta | null` (más `segundoFactor`,
+  `invitacionVence` solo si está pendiente, `tieneActividad` y `sesiones`,
+  con `sesionesAbiertas` de Mi cuenta). Estado: `suspendida` gana; si no,
+  activa con credencial con contraseña, pendiente sin. Último acceso: lo más
+  nuevo entre el último `entro` y las sesiones abiertas (dos `groupBy`).
+  `datos/consultas/actividad.ts`: `listarActividad({ tipos, persona?,
+  desde?, texto?, pagina })` → `{ filas, total, pagina, paginas }`,
+  `POR_PAGINA = 50`, `contains` sin distinguir mayúsculas en `sobre` y en el
+  nombre, y una página de más muestra la última. Tests contra `ed_cuentas`
+  (`cuentas.test.ts`, `consultas/actividad.test.ts`: cuatro casos, corridos,
+  no saltados). Aceptación: `pnpm --filter sitio test` 163 pass, 2 saltados
+  (los de antes); `typecheck` y `lint` exit 0.
 
 ## Abierto
