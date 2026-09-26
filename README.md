@@ -107,7 +107,7 @@ cambió»; ver «Correos» más abajo):
   Con clave y sin remitente, el correo no sale.
 
 Las cuatro de las **métricas** ([ADR-0009](docs/architecture/adrs/0009-analitica-de-vercel-con-copia-diaria.md);
-la portada del admin lee una copia diaria de la analítica de Vercel):
+Métricas, en el admin, lee una copia diaria de la analítica de Vercel):
 
 - `VERCEL_TOKEN` — token de la cuenta de Vercel para la API de Web Analytics.
   **Abre toda la cuenta**: solo en Production y en tu `.env.local`, nunca en
@@ -238,10 +238,11 @@ Prisma antes de `next build`.
 ## Admin
 
 Vive en `/admin`, construido a medida sobre **Prisma** y **better-auth**. Hoy
-tiene los cimientos —entrar, salir y elegir contraseña—, la portada con las
-métricas, **Métricas con sus búsquedas en Google** (ver «Las métricas y lo
-programado»), **la edición de Inicio** (ver «Editar las páginas») y
-**Mensajes**, lo que llega por los formularios del sitio (ver «Mensajes»); las
+tiene los cimientos —entrar, salir y elegir contraseña—, **un Inicio** con lo
+pendiente, los números de la semana y la actividad reciente, **Métricas con
+sus búsquedas en Google** (ver «Las métricas y lo programado»), **la edición
+de Inicio** (ver «Editar las páginas») y **Mensajes**, lo que llega por los
+formularios del sitio (ver «Mensajes»); las
 novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
