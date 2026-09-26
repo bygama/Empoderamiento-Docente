@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MenuDeLaCuenta, type Usuario } from "./MenuDeLaCuenta";
 import { MenuDelAdmin } from "./MenuDelAdmin";
+import type { Cuenta } from "../Numero";
 import type { Tema } from "../tema";
 
 export type { Usuario };
@@ -13,6 +14,8 @@ type Props = {
   visibles: readonly string[];
   /** Las claves de los módulos que llevan el punto de «cambios sin publicar». */
   conPunto: readonly string[];
+  /** Por clave de módulo, cuántos esperan: el número de la entrada. */
+  numeros: Readonly<Record<string, Cuenta>>;
 };
 
 /**
@@ -24,7 +27,7 @@ type Props = {
  * oscuro, y el nombre al lado, en texto: por eso la imagen no lleva `alt`.
  * Un divisor separa la marca del menú, igual que el que separa la cuenta.
  */
-export function ContenidoDeLaBarra({ usuario, tema, visibles, conPunto }: Props) {
+export function ContenidoDeLaBarra({ usuario, tema, visibles, conPunto, numeros }: Props) {
   return (
     <div className="flex h-full flex-col">
       <div className="px-4 pt-5">
@@ -43,7 +46,7 @@ export function ContenidoDeLaBarra({ usuario, tema, visibles, conPunto }: Props)
         </Link>
         <hr className="mx-3 mt-4 border-azul-claro/60" />
       </div>
-      <MenuDelAdmin visibles={visibles} conPunto={conPunto} />
+      <MenuDelAdmin visibles={visibles} conPunto={conPunto} numeros={numeros} />
       <MenuDeLaCuenta usuario={usuario} tema={tema} />
     </div>
   );

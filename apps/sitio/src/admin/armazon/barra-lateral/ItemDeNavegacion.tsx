@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ComponentType } from "react";
 import type { IconProps } from "@/components/ui/icons";
+import { Numero, type Cuenta } from "../Numero";
 
 // Sobre gris-fondo: el texto en azul-principal al 80 % da 6,78:1 y el activo,
 // azul-principal sobre la pastilla blanca, 13,63:1. Ni naranja ni verde en la
@@ -11,22 +12,33 @@ const BASE =
 const ACTIVO = "bg-white font-medium text-azul-principal shadow-sm shadow-azul-principal/10";
 const INACTIVO = "text-azul-principal/80 hover:bg-white/60 hover:text-azul-principal";
 
-/** Un link de la sidebar. El activo lleva `aria-current="page"`: se anuncia, no solo se ve. */
+/**
+ * Un link de la sidebar. El activo lleva `aria-current="page"`: se anuncia, no
+ * solo se ve. Con `numero`, cuántos esperan, empujado a la derecha
+ * (DESIGN.md §11, «El número»).
+ */
 export function ItemDeNavegacion({
   href,
   activo,
   Icono,
+  numero,
   children,
 }: {
   href: string;
   activo: boolean;
   Icono: ComponentType<IconProps>;
+  numero?: Cuenta;
   children: React.ReactNode;
 }) {
   return (
     <Link href={href} aria-current={activo ? "page" : undefined} className={`${BASE} ${activo ? ACTIVO : INACTIVO}`}>
       <Icono size={20} className="shrink-0" />
       {children}
+      {numero && numero.cuantos > 0 ? (
+        <span className="ml-auto flex">
+          <Numero {...numero} />
+        </span>
+      ) : null}
     </Link>
   );
 }

@@ -1,12 +1,13 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import type { Cuenta } from "../Numero";
 import { ItemDeNavegacion } from "./ItemDeNavegacion";
 import { CONFIGURACION, GRUPOS, primerSegmento, type Modulo } from "./modulos";
 
 // Cliente solo por `usePathname`: el layout no conoce la ruta, y la entrada
-// activa sale de ella. Lo que depende de la base (el punto) y del rol llega
-// del servidor ya resuelto (BarraLateral).
+// activa sale de ella. Lo que depende de la base (el punto, los números) y
+// del rol llega del servidor ya resuelto (BarraLateral).
 
 const DIVISOR = "mx-3 my-3 border-azul-claro/60";
 
@@ -20,7 +21,16 @@ function PuntoSinPublicar() {
   );
 }
 
-export function MenuDelAdmin({ visibles, conPunto }: { visibles: readonly string[]; conPunto: readonly string[] }) {
+export function MenuDelAdmin({
+  visibles,
+  conPunto,
+  numeros,
+}: {
+  visibles: readonly string[];
+  conPunto: readonly string[];
+  /** Por clave de módulo, cuántos esperan (Mensajes: los sin leer). */
+  numeros: Readonly<Record<string, Cuenta>>;
+}) {
   const segmento = primerSegmento(usePathname());
   const suyos = new Set(visibles);
   const deSuRol = (modulos: readonly Modulo[]) => modulos.filter((m) => suyos.has(m.clave));
@@ -29,7 +39,7 @@ export function MenuDelAdmin({ visibles, conPunto }: { visibles: readonly string
   const configuracion = deSuRol(CONFIGURACION);
   const entrada = (m: Modulo) => (
     <li key={m.clave}>
-      <ItemDeNavegacion href={m.href} activo={m.segmentos.includes(segmento)} Icono={m.Icono}>
+      <ItemDeNavegacion href={m.href} activo={m.segmentos.includes(segmento)} Icono={m.Icono} numero={numeros[m.clave]}>
         {m.nombre}
         {conPunto.includes(m.clave) ? <PuntoSinPublicar /> : null}
       </ItemDeNavegacion>

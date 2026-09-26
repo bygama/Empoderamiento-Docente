@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Numero, type Cuenta } from "./Numero";
 import { pestanaActiva } from "./ruta";
 
-export type Pestana = { href: string; etiqueta: string };
+/** Con `numero`, cuántos esperan en esa pantalla (DESIGN.md §11, «El número»). */
+export type Pestana = { href: string; etiqueta: string; numero?: Cuenta };
 
 // La activa en `azul-principal` con una barra de 2 px abajo (13,63:1 en el
 // claro, 13,59:1 en el oscuro); las demás en `gris-texto` (4,83:1 y 7,08:1).
 // El foco va por dentro (`-outline-offset-2`): afuera lo cortaría el scroll
 // horizontal del celular.
 const BASE =
-  "relative flex h-11 items-center whitespace-nowrap rounded-md px-3 text-admin-meta font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2";
+  "relative flex h-11 items-center gap-2 whitespace-nowrap rounded-md px-3 text-admin-meta font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2";
 const ACTIVA = "text-azul-principal after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-azul-principal focus-visible:outline-azul-medio";
 const INACTIVA = "text-gris-texto hover:text-azul-principal focus-visible:outline-azul-medio";
 // Sobre `azul-principal` (el encabezado del editor con cambios sin guardar):
@@ -46,6 +48,7 @@ export function Pestanas({ etiqueta, pestanas, sobreAzul = false }: { etiqueta: 
             <li key={p.href}>
               <Link href={p.href} aria-current={encendida ? "page" : undefined} className={`${BASE} ${encendida ? activaClase : inactivaClase}`}>
                 {p.etiqueta}
+                {p.numero ? <Numero {...p.numero} /> : null}
               </Link>
             </li>
           );
