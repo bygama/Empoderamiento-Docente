@@ -360,8 +360,8 @@ sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
 el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso» y el apartado, el
 mismo día (`work/roles-y-actividad/`); las pestañas de una página, el error en
 el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
-vista previa de buscador y redes, también (`work/paginas-inicio/`). Todos los
-contrastes están
+vista previa de buscador y redes, también (`work/paginas-inicio/`); el
+número, ese mismo día (`work/mensajes/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -395,6 +395,29 @@ valores del claro, así que donde abajo dice «claro» vale para los dos.
   Salir. Un divisor separa cada una del menú.
 - Ni naranja ni verde: el naranja es el CTA de cada pantalla y el verde, los
   conceptos.
+- **Las marcas de una entrada**, empujadas a la derecha: el punto de
+  «cambios sin publicar» (Contenido) o el número (abajo, «El número»:
+  Mensajes, con los sin leer que tu rol ve).
+
+### El número
+
+Cuántos de algo esperan, en una entrada de la sidebar o en una pestaña.
+`apps/sitio/src/admin/armazon/Numero.tsx`.
+
+- **Una pastilla** `rounded-full`, 20 px de alto y de ancho mínimo, `px-1.5`,
+  en meta medium con cifras tabulares: relleno `azul-principal` y el número
+  en `white`, el tono fuerte de las insignias, porque pide atención. Con los
+  tokens del tema se invierte sola: claro 13,63:1, mixto (la sidebar)
+  9,40:1, oscuro 13,59:1; la pastilla contra su fondo, 9,40:1 o más en los
+  tres.
+- **Se ve el número y se anuncia la frase**: la cifra va `aria-hidden` y al
+  lado un `sr-only` «(3 sin leer)», como el punto dice «(cambios sin
+  publicar)». Quien la usa dice qué cuenta.
+- **Con 0 no se dibuja**; de 100 para arriba, «99+».
+- **Cuenta solo lo que tu rol ve**: el de Mensajes suma los nuevos de
+  Contacto, y los de CV solo para quien dirige o administra.
+- Primer consumidor: la entrada de Mensajes y sus pestañas Contacto · CV
+  (sumado el 2026-09-26, `work/mensajes/`).
 
 ### Temas: claro, mixto y oscuro
 
@@ -566,8 +589,8 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
   `azul-medio` ahí da 2,67:1.
 - **En el celular** la fila scrollea de costado si no entra; las cinco de
   Contenido entran a 390 de ancho, las cinco de Métricas no y scrollean.
-- **El número de una pestaña llega con Mensajes**, su primer consumidor;
-  hasta entonces no existe.
+- **Una pestaña puede llevar su número** (abajo, «El número»), después de la
+  etiqueta: Mensajes › Contacto 3 · CV 1.
 - Primer consumidor: las cinco pantallas de Contenido (Páginas, Casos,
   Equipo, Aliados, Fotos). El índice no las lleva, porque ya son las cinco en
   tarjetas, ni el editor, que lo ubican sus migas. Las usa también Métricas
