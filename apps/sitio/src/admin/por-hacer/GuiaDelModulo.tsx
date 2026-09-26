@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { claseDeBoton } from "@/admin/armazon/clases";
+import { BotonEnlace } from "@/admin/armazon/Boton";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia } from "@/admin/armazon/Insignia";
+import { Fila, Lista } from "@/admin/armazon/Lista";
 import type { Guia } from "./guias";
 
 /** Lo que va a tener un módulo o una pestaña que todavía no existe, pantalla por pantalla. */
@@ -11,25 +11,27 @@ export function LoQueVaATener({ guia }: { guia: Guia }) {
       <h2 id="lo-que-va-a-tener" className="font-display text-admin-seccion font-bold">
         Lo que va a tener
       </h2>
-      <ul className="divide-y divide-azul-claro/60 rounded-xl border border-azul-claro/60">
+      <Lista>
         {guia.pantallas.map((p) => (
-          <li key={p.ruta} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-            <div className="min-w-0">
-              <p className="font-medium">
+          <Fila
+            key={p.ruta}
+            principal={
+              <>
                 {p.nombre} <span className="text-admin-meta font-normal text-gris-texto">{p.ruta}</span>
-              </p>
-              <p className="text-admin-meta text-gris-texto">{p.que}</p>
-            </div>
-            {p.hoy ? (
-              <Link href={p.hoy.href} className={claseDeBoton("secundario")}>
-                {p.hoy.etiqueta}
-              </Link>
-            ) : (
-              <Insignia tono="apagado">Por hacer</Insignia>
-            )}
-          </li>
+              </>
+            }
+            detalle={p.que}
+            insignias={p.hoy ? null : <Insignia tono="apagado">Por hacer</Insignia>}
+            accion={
+              p.hoy ? (
+                <BotonEnlace variante="secundario" href={p.hoy.href}>
+                  {p.hoy.etiqueta}
+                </BotonEnlace>
+              ) : null
+            }
+          />
         ))}
-      </ul>
+      </Lista>
       <p className="text-admin-meta text-gris-texto">Sale del mapa del admin aprobado el 23 de septiembre de 2026.</p>
     </section>
   );
