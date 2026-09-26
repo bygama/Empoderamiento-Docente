@@ -10,6 +10,23 @@
   (1 revisor Opus 5.5, effort medium, lente «el cambio entero contra su
   SPEC»), y el merge, que es del padre con el OK de Mateo.
 
+## Next
+
+- **PR #178** (https://github.com/bygama/Empoderamiento-Docente/pull/178),
+  abierto contra `main` en `eaf8fd9`. Nunca se mergea desde acá.
+- La revisión de cierre la lanza el padre. Si trae hallazgos, vuelven a esta
+  lane como Task: se arreglan acá, se re-verifica desde L1 y se pega el
+  veredicto en `## Verification`.
+- Cuando la revisión pase: el commit que cierra la lane **borra
+  `work/patrones-del-admin/`** y va en este mismo PR, antes del merge
+  (work-handoff, modo close). Si el padre pide rebasear sobre `main` nuevo,
+  se concilian los archivos compartidos (`guias.ts`, `modulos.ts`,
+  DESIGN.md §11, el README) y se corre el gate otra vez.
+- Lo que quedó andando para esa vuelta, fuera del repo: el dev server en su
+  pestaña de Orca («dev patrones-del-admin», puerto 3011), el perfil aislado
+  del navegador «patrones-del-admin» y la cuenta de prueba
+  `patrones@ed.test` (administra) en la base local `ed`, que no se commitea.
+
 ## Verification
 
 ### 2026-09-26 — L DoD — PASS (L1–L3; la revisión de cierre, pendiente del padre)
