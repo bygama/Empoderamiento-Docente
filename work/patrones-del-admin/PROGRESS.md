@@ -13,8 +13,8 @@
 | 1 | `listaDePaginas()` trae el estado y las secciones | hecho, `cb6fc19` |
 | 2 | Páginas se muda a `/admin/contenido/paginas` | hecho, `5e6eabf` |
 | 3 | Título de pestaña | hecho, `e8a280a` |
-| 4 | El índice de tarjetas, en `/admin/contenido` | hecho |
-| 5 | Pestañas, en las cinco pantallas de Contenido | pendiente |
+| 4 | El índice de tarjetas, en `/admin/contenido` | hecho, `c00384f` |
+| 5 | Pestañas, en las cinco pantallas de Contenido | hecho |
 | 6 | La lista, en Páginas | pendiente |
 | 7 | La guía de un módulo pasa a la Lista | pendiente |
 | 8 | El estado vacío, en Métricas | pendiente |
@@ -64,4 +64,19 @@
   «Páginas» y «Casos» con su nombre solo; Páginas dice «7 páginas» (la base
   `ed` no tiene borradores hoy) y las otras cuatro «Por hacer»; con Tab desde
   el `h1`, el foco cae en «Páginas» (`:focus-visible` true) y el anillo rodea
-  la tarjeta entera.
+  la tarjeta entera. Commit `c00384f`.
+- **Paso 5** — `admin/armazon/Pestanas.tsx` (cliente por `usePathname`;
+  `nav` + lista de links, la activa con `aria-current="page"` y una barra de
+  2 px; foco por dentro para que no lo corte el scroll horizontal),
+  `admin/armazon/ruta.ts` (`estaEn`) con su test, el slot `pestanas` de
+  `Encabezado` (fila propia, `-mb-3` para quedar sobre el divisor),
+  `admin/contenido/EncabezadoDeContenido.tsx`, la lista de Páginas con ese
+  encabezado, `por-hacer/guias-de-contenido.ts` (Casos, Equipo, Aliados, Fotos;
+  nombre y «qué es» salen de `pantallas.ts`), `por-hacer/GuiaDeContenido.tsx`,
+  `LoQueVaATener` exportado de `GuiaDelModulo`, y `contenido/[pantalla]/page.tsx`
+  con `generateMetadata`. `pnpm --filter sitio typecheck` → exit 0; `pnpm
+  --filter sitio test` → exit 0 (80 tests, 79 pass, 1 skipped). Con sesión:
+  en `/admin/contenido/paginas` las pestañas dan `Páginas:page Casos:-
+  Equipo:- Aliados:- Fotos:-`, en `/admin/contenido/fotos` `… Fotos:page`;
+  `/admin/contenido/otra` → «404: This page could not be found.» El texto de
+  la primera pestaña queda alineado con el `h1` (x = 440 los dos).
