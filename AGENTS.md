@@ -163,7 +163,8 @@ un release candidate de la 8 (ADR-0007).
             │   └── globals.css
             ├── datos/         ← la ÚNICA puerta a la base
             │   ├── cliente.ts   ← el PrismaClient de la app
-            │   ├── auth.ts      ← la sesión, armada con esa base
+            │   ├── auth.ts      ← la sesión, armada con esa base (y cómo salen sus correos)
+            │   ├── bloqueos-de-acceso.ts ← dónde guarda el bloqueo por cuenta sus fallos
             │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, metricas)
             │   └── acciones/    ← Server Actions del admin (paginas, vista-previa, fotos, metricas)
             ├── admin/         ← las pantallas del admin
@@ -172,7 +173,8 @@ un release candidate de la 8 (ADR-0007).
             │   ├── campos/      ← los controles del formulario; se mudan a kit-admin en la fase 2
             │   └── <entidad>/   ← Lista, Formulario y sus límites (fase 2)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
-            ├── middleware.ts  ← sesión · cabeceras · rate limit
+            ├── proxy.ts       ← sesión · cabeceras (CSP con nonce en el admin) · rebote Strict
+            ├── correos/       ← las plantillas de los correos y por dónde salen (Resend o consola)
             ├── components/    ← UI reutilizable
             │   ├── brand/       ← logotipo / marca
             │   ├── layout/      ← Header, Footer, MobileNav, etc.
@@ -186,7 +188,7 @@ un release candidate de la 8 (ADR-0007).
             │   │                   (AI_GUIDELINES §2)
             │   └── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
             ├── config/        ← site.ts (datos institucionales) + nav.ts
-            └── lib/           ← hooks/, metricas/, contenido/ (tipos de campo, fotos, almacén: sin dominio de ED)
+            └── lib/           ← hooks/, metricas/, contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -566,7 +568,7 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 
 > **Qué de esto ya existe.** Las fases 0 y 1 están hechas (§13): `packages/db`,
 > `packages/auth`, `apps/sitio/prisma/` con sus migraciones,
-> `apps/sitio/src/datos/`, `apps/sitio/src/admin/`, `middleware.ts` y
+> `apps/sitio/src/datos/`, `apps/sitio/src/admin/`, `proxy.ts` y
 > `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
 > lo que hay. Lo único que todavía no existe es `packages/kit-admin`, que nace
 > en la fase 2 contra una entidad de verdad. De las tablas de contenido existen
@@ -626,12 +628,16 @@ Reglas para el admin y sus datos:
 - **Secretos solo server-side:** `DATABASE_URL`, el secreto de better-auth,
   `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan `NEXT_PUBLIC_` ni
   llegan al browser. Placeholders en `apps/sitio/.env.example`.
-- **La sesión se verifica antes de renderizar:** el middleware solo mira que la
-  cookie exista, el layout protegido la comprueba de verdad para las páginas, y
-  **toda Server Action del admin empieza por `auth.api.getSession`** y contesta
-  en llano si no hay sesión, porque el layout no las cubre (el middleware las
-  deja pasar: un redirect no es una respuesta válida para una acción). Dos
-  roles, administra y edita; nada del admin es público.
+- **La sesión se verifica antes de renderizar:** el proxy (`proxy.ts`) solo
+  mira que la cookie exista, el layout protegido la comprueba de verdad para
+  las páginas, y **toda Server Action del admin empieza por
+  `auth.api.getSession`** y contesta en llano si no hay sesión, porque el
+  layout no las cubre (el proxy las deja pasar: un redirect no es una
+  respuesta válida para una acción). La sesión dura 12 h sin uso y su cookie es
+  `SameSite=Strict`: por eso el proxy rebota a la misma URL la navegación que
+  llega de otro sitio sin ella. Contraseñas en Argon2id, bloqueo por cuenta,
+  tokens hasheados y la CSP del admin con nonce: ADR-0010. Dos roles, administra
+  y edita; nada del admin es público.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
   tablas. No inventar tablas ni columnas que no estén acordadas.
 
