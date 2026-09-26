@@ -15,6 +15,7 @@ export {
   ROLES,
   ROL_POR_DEFECTO,
   ROL_DE_LA_DIRECCION,
+  ROL_AL_DEJAR_LA_DIRECCION,
   PUEDE,
   QUE_PUEDE,
   QUE_PERMITE,
@@ -27,5 +28,5 @@ export {
   LARGO_MINIMO_CONTRASENA,
 } from "./permisos";
 export type { Capacidad, Rol } from "./permisos";
-export { queSePuede } from "./cuentas";
+export { ROLES_QUE_SE_ASIGNAN, queSePuede, seAsigna } from "./cuentas";
 export type { CuentaObjetivo, EstadoDeCuenta, LoQueSePuede } from "./cuentas";

@@ -9,6 +9,8 @@
 export { crearAuth } from "./config";
 export { MINUTOS_DEL_CODIGO } from "./segundo-factor";
 export { crearEnlaceDeInvitacion } from "./invitacion";
+export { confirmarContrasena } from "./confirmar";
+export type { Confirmacion } from "./confirmar";
 export type { Auth } from "./config";
 export type { OpcionesDeAuth, SucesoDeSesion } from "./opciones";
 export type { AlmacenDeBloqueos, EstadoDeBloqueo } from "./bloqueo";

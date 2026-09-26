@@ -1,4 +1,4 @@
-import { esUnaSola, puede, type Rol } from "./permisos";
+import { ROLES, esRol, esUnaSola, puede, type Rol } from "./permisos";
 
 /**
  * Quién puede hacer qué sobre una cuenta, en Cuentas (SPEC de `work/cuentas/`
@@ -8,6 +8,16 @@ import { esUnaSola, puede, type Rol } from "./permisos";
  * Como en `permisos.ts`, sin comparar contra el string de un rol: pregunta
  * `puede(…)` y `esUnaSola(…)`.
  */
+
+/**
+ * Los roles que se dan al invitar o con el selector de rol: todos menos el de
+ * a una, que no se asigna, se pasa.
+ */
+export const ROLES_QUE_SE_ASIGNAN: readonly Rol[] = ROLES.filter((rol) => !esUnaSola(rol));
+
+export function seAsigna(valor: unknown): valor is Rol {
+  return esRol(valor) && ROLES_QUE_SE_ASIGNAN.includes(valor);
+}
 
 /** El estado de una cuenta: eligió su contraseña, todavía no, o no puede entrar. */
 export type EstadoDeCuenta = "activa" | "pendiente" | "suspendida";

@@ -36,6 +36,9 @@ export function esRol(valor: unknown): valor is Rol {
  */
 export const ROL_DE_LA_DIRECCION: Rol = "dirige";
 
+/** El rol que queda quien pasa la dirección: todo lo de antes, menos dirigir. */
+export const ROL_AL_DEJAR_LA_DIRECCION: Rol = "administra";
+
 /**
  * Si de ese rol hay una sola persona. Dirige es una, siempre, y no solo acá:
  * la base lo garantiza con un índice único parcial (`user_una_sola_dirige`,
