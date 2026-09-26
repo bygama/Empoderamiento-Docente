@@ -32,3 +32,19 @@
   un test de la función que elige la activa (ruta exacta, subruta, prefijo que
   no corta en segmento, sin coincidencia) y una línea en DESIGN.md §11. Si la
   4a llega antes, la implementa con el mismo algoritmo y el rebase las une.
+- 2026-09-26 — **«Actualizar ahora» pasa al `Boton` secundario del armazón.**
+  Su borde era `azul-claro` (1,77:1) y un control pide 3:1 (DESIGN.md §11,
+  «Bordes y foco»); tampoco tenía el foco de la casa. Búsquedas lo muestra, y
+  toda UI del admin sigue §11. Efecto de lado: en el Inicio, que esta lane no
+  toca, el mismo botón del panel se ve con el borde `azul-principal`. El link
+  «Ir a Páginas» del Inicio sigue con su estilo viejo: es de la lane 3.
+- 2026-09-26 — **Los pasos del estado vacío son strings**, no nodos: la clave
+  de cada `li` es el texto del paso. Con nodos, la única clave posible era el
+  índice, que react-doctor marca, y el gate se arregla por código.
+- 2026-09-26 — **Sin conexión, Búsquedas no muestra el aviso de la última
+  corrida fallida:** sin variables, esa corrida siempre dice «no está
+  conectado», y el estado vacío ya lo explica.
+- 2026-09-26 — **La copia de Search Console reemplaza cada dimensión en su
+  rango** (`deleteMany` + `createMany` en una transacción) en vez de un upsert
+  por fila: la primera copia son 90 días y pueden ser miles de filas, y la
+  función tiene 50 segundos. Idempotente igual.

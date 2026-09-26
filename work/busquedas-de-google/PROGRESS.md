@@ -24,7 +24,7 @@
   1 skip: el de las respuestas grabadas de Vercel, que espera a A1);
   `pnpm typecheck` → exit 0.
 
-- 2026-09-26 — **Paso 2** (`65fb2a8`): `tareas.prisma` (`CorridaDeTarea`) y
+- 2026-09-26 — **Paso 2** (`29044f4`): `tareas.prisma` (`CorridaDeTarea`) y
   `busquedas.prisma` (`BusquedaDiaria`); `SincronizacionMetricas` sale de
   `metricas.prisma`. Migración `20260926213050_busquedas_y_tareas`: generada
   con `pnpm migrate --create-only --name busquedas_y_tareas` (en una terminal
@@ -56,10 +56,10 @@
   - `pnpm typecheck` → exit 0; `pnpm --filter sitio test` → exit 0 (85
     tests, 84 pass, 1 skip); `pnpm lint` → exit 0.
 
-- 2026-09-26 — **Paso 3** (`94d8528`): `PUEDE.configurarConexiones`, hoy
+- 2026-09-26 — **Paso 3** (`6814fe5`): `PUEDE.configurarConexiones`, hoy
   solo `administra`. `pnpm typecheck` → exit 0; `git diff --stat main --
   packages/auth` → solo `permisos.ts` (6 líneas).
-- 2026-09-26 — **Paso 4** (`cbb7308`): `lib/busquedas/` con `tipos.ts`
+- 2026-09-26 — **Paso 4** (`16d5166`): `lib/busquedas/` con `tipos.ts`
   (`DimensionDeBusqueda`, `FilaDeBusqueda`, `ErrorDeBusquedas`), `token.ts`
   (`firmarJwt`, `pedirToken`: JWT RS256 con `node:crypto`, clave con `\n`
   escritos aceptada, `invalid_grant` en llano), `search-console.ts`
@@ -72,7 +72,7 @@
   (94 tests, 93 pass, 1 skip); `pnpm --filter sitio lint` → 0; ningún
   `from "@/` en `lib/busquedas` ni `lib/tareas` (Grep, sin coincidencias).
 
-- 2026-09-26 — **Paso 5** (`aced4ee`): `lib/busquedas/lecturas.ts`
+- 2026-09-26 — **Paso 5** (`653018f`): `lib/busquedas/lecturas.ts`
   (`posicionPromedio`, `ordenarPorClics`, `casiNosEncuentran` con
   `PUESTOS_CASI`, `MINIMO_DE_IMPRESIONES`, `MUCHAS_IMPRESIONES`, `POCOS_CLICS`,
   `MAXIMO_CASI` y la razón de cada fila) y `lib/busquedas/paises.ts`
@@ -80,7 +80,7 @@
   `release-48-2`, filtrados y comentados como pidió el padre). 4 tests.
   `pnpm typecheck` → 0; `pnpm --filter sitio test` → 0 (98, 97 pass, 1 skip);
   lint → 0.
-- 2026-09-26 — **Paso 6** (`6cba1f1`): `datos/tareas/busquedas-de-google.ts`
+- 2026-09-26 — **Paso 6** (`c3553d8`): `datos/tareas/busquedas-de-google.ts`
   (`sincronizarBusquedas`, `copiarBusquedas`, `copiaDeSearchConsole`): del día
   siguiente al último `total` hasta ayer, 90 días como máximo y la primera vez,
   cada dimensión reemplazada en su rango en una transacción (`deleteMany` +
@@ -102,7 +102,7 @@
 - 2026-09-26 — **Regla del padre, por el buzón:** las pestañas encienden la
   más específica y no hay prop `exacta` (DECISIONS.md). SPEC §9.6 y PLAN paso
   7 ajustados.
-- 2026-09-26 — **Paso 7** (`1be1c32`): `pestanaActiva(ruta, hrefs)` en
+- 2026-09-26 — **Paso 7** (`94d68de`): `pestanaActiva(ruta, hrefs)` en
   `admin/armazon/ruta.ts` (test en rojo primero: «does not provide an export
   named 'pestanaActiva'»; después 4 en verde: ruta exacta, subruta, prefijo que
   no corta en segmento, sin coincidencia) y `Pestanas` la usa;
@@ -124,6 +124,54 @@
   /admin/metricas/nada      → 404 («Admin ED»)
   ```
 
+- 2026-09-26 — **Paso 8** (`bc71f0b`): `datos/consultas/busquedas.ts`
+  (`estadoDeBusquedas`, `resumenDeBusquedas(hasta)`, `DIAS_DEL_PERIODO = 28`):
+  totales del período contra los 28 anteriores, las tres listas (hasta 10, por
+  clics) y «Casi nos encuentran», todo con `groupBy` y
+  `posicionPromedio(Σ sumaDePosiciones, Σ impresiones)`. Test contra la base
+  con filas de 1999 (los de la copia usan 2001 y corren a la vez): la
+  posición da 3,64 y no 11, y las variaciones +100 % y +120 %.
+  `pnpm typecheck` → 0; `pnpm --filter sitio test` → 0 (103, 102 pass, 1
+  skip); lint → 0.
+- 2026-09-26 — **Paso 9** (`dc11fb4`): `metricas/busquedas/page.tsx` (lee el
+  rol para `PUEDE.configurarConexiones`), `admin/busquedas/` (`PanelBusquedas`
+  62 líneas, `ConDatos` 54, `Seccion` 40, `formato.ts` 37),
+  `datos/acciones/actualizar-busquedas.ts` (sesión primero, sin variables
+  contesta sin registrar, `correrAMano` con 5 días); `EstadoVacio` con
+  `pasos` (strings: la clave de cada `li` es el paso, sin índices);
+  `ActualizarAhora` recibe su acción y pasa a `Boton` secundario;
+  `Tarjeta` con `variacion` opcional; DESIGN.md §11 (estado vacío con pasos,
+  las pestañas de Métricas a 390, las listas de Búsquedas). Corrige además la
+  limpieza del test de la copia: con la base vacía, la primera corrida
+  arranca 90 días antes y dejaba filas de 2000.
+  - En el navegador, con 56 días sembrados en `ed_busquedas` y las variables
+    puestas y sacadas: **sin conectar, administra** → «Conectá Search Console»
+    con los cuatro pasos; **sin conectar, edita** (`edita-busquedas@ed.test`,
+    perfil «busquedas-edita») → «Todavía no está conectado», sin Cuentas ni
+    Ajustes; **conectado sin días** → «Los datos llegan con la primera
+    copia»; **sin impresiones** (una fila `total` en 0) → «Todavía no
+    aparecemos en Google en estos 28 días»; **listas sin filas** (solo
+    `total` y `pagina`) → «Nada por ahora», «Todavía no hay búsquedas para
+    mostrar», «Todavía ningún país»; **con datos** → 101 clics (+130 %),
+    3.217 impresiones (+36 %), puesto 7,1; Casi nos encuentran: «matemática
+    educativa» (puesto 14), «formación docente chile» (140 veces, nadie hizo
+    clic), «talleres para docentes de matemática» (puesto 9); países en
+    español con «Sin identificar» para `zzz`; **última corrida fallida** →
+    el Aviso con el motivo, arriba de los datos.
+  - «Actualizar ahora» con una clave falsa → «La clave privada de la cuenta
+    de servicio no se pudo leer…», registrado en `corridas_de_tareas`; el
+    segundo toque → «La última corrida fue hace 1 minuto; esperá un rato.»
+  - Temas claro, mixto y oscuro (cookie `tema-del-admin`): todo con tokens,
+    sin colores nuevos. A 390 de ancho: sin scroll horizontal de la página
+    (`scrollWidth` 375), las pestañas scrollean de costado. Teclado: Tab
+    recorre las cinco pestañas y «Actualizar ahora», todos con
+    `:focus-visible` y outline sólido de 2 px `rgb(74, 111, 165)`
+    (`azul-medio`) separado 2 px.
+- 2026-09-26 — Los encabezados de 9 commits pasaban los 72 caracteres de
+  AGENTS.md §9: reescritos antes del primer push con `git filter-branch
+  --msg-filter` (solo la primera línea; `git diff` contra el original, vacío).
+  Los hashes de arriba son los nuevos.
+
 ## Next
 
-- Los pasos 1 a 10 del PLAN, en orden; después work-verify y el PR.
+- El paso 10 (docs); después work-verify y el PR.
