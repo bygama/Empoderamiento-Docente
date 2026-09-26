@@ -1,7 +1,9 @@
 # SPEC — Páginas: Inicio completo y la base de la edición
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-26 con cuatro cambios, ya
+  escritos acá (§6, §7, §7.1, §8; rulings en [`DECISIONS.md`](DECISIONS.md));
+  plan en [`PLAN.md`](PLAN.md)
 - **Decide:** Mateo; aprueba el padre (`work/mapa-del-admin/DECISIONS.md`,
   2026-09-26: «procede en automatico», tablas incluidas)
 - **Tier:** L · lane 4a de 12 del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md)
@@ -173,9 +175,10 @@ Título, descripción e imagen para redes por página, con su vista previa.
   SEO tiene borrador y publicado, entra en las versiones y en «qué cambió» sin
   código aparte. El esquema es uno para todas las páginas, en
   `apps/sitio/src/lib/contenido/seo.ts` (sin ED):
-  - `titulo`: `textoCorto`, **60** (lo que Google muestra antes de cortar).
-    Es el `<title>` entero, y también `og:title`.
-  - `descripcion`: `textoCorto`, **160** (lo mismo para la descripción).
+  - `titulo`: `textoCorto`, tope duro **100**, recomendado **60** (lo que
+    Google muestra antes de cortar). Es el `<title>` entero, y también
+    `og:title`.
+  - `descripcion`: `textoCorto`, tope duro **300**, recomendada **160**.
     También `og:description`.
   - `imagen`: `foto().nullable()`: sin imagen propia, la del sitio
     (`app/(sitio)/opengraph-image.png`, 1200 × 630).
@@ -184,12 +187,16 @@ Título, descripción e imagen para redes por página, con su vista previa.
   suyas con una línea. En esta lane, solo Inicio: su `seo` inicial es su
   metadata de hoy (el título por defecto del layout y
   `siteConfig.description`, sin imagen propia), y el HTML de `/` no cambia.
-- **Validado con los largos de buscador, con lo de hoy como inicial:** el
-  título de hoy tiene 72 caracteres y la descripción 241, por arriba de los
-  60 y 160. El valor inicial es el de hoy igual —el sitio no cambia hasta que
-  alguien lo edite—, y el editor lo muestra en rojo con su contador («72/60»):
-  la pestaña SEO no se guarda hasta acortarlos. Es la única parte cuyo inicial
-  no pasa su esquema, y el test que lo exige para las secciones lo dice.
+- **Los largos de buscador son una recomendación, no un tope** (padre,
+  DECISIONS): el título de hoy tiene 72 caracteres y la descripción 241, y
+  valida igual (el tope duro es generoso). Pasado lo recomendado, el contador
+  lo dice («72/60») con un aviso en llano debajo del campo («Google muestra
+  unos 60 caracteres: lo que sigue se corta»), que no es un error ni frena
+  nada. Para eso `textoCorto` acepta un `recomendado: { largo, aviso }`
+  opcional: es parte del «largo» con que se rotula un campo (AGENTS.md §12),
+  no un tipo nuevo, y `describir()` lo pasa a la `Descripcion`. Guardar nunca
+  se frena por el SEO no tocado (solo se guarda la parte que cambió), y
+  guardar una sección jamás valida el SEO.
 - **Lo lee el `generateMetadata` de cada página:** `/` suma uno que lee
   `contenidoDe("inicio").seo` (publicado, o el borrador en vista previa) y lo
   pasa por `metadataDeSeo(seo, comunes)`, que arma `title.absolute`,
@@ -230,26 +237,51 @@ La pantalla de una página pasa a tener **cuatro pestañas, que son links**
 - **Títulos de pestaña:** «Inicio · Páginas» (Secciones, como hoy), «SEO ·
   Inicio · Páginas», «Qué cambió · Inicio · Páginas», «Versiones · Inicio ·
   Páginas».
-- **`Pestanas` se extiende en su archivo**, porque este es su consumidor
-  real: con las rutas anidadas, `/…/inicio/seo` cuelga de `/…/inicio` y hoy
-  se encenderían las dos. La activa pasa a ser **la más específica** (la de
-  `href` más largo que contiene la ruta). Las cinco de Contenido no cambian.
+- **`Pestanas`: gana la más específica** (padre, DECISIONS): con las rutas
+  anidadas, `/…/inicio/seo` cuelga de `/…/inicio` y hoy se encenderían las
+  dos. La activa es la de `href` más larga que es prefijo de la ruta,
+  cortando en un límite de segmento. Es LA regla (reemplaza la prop `exacta`
+  de la lane 5, que la implementa); si esta lane llega antes, la implementa
+  en `admin/armazon/Pestanas.tsx` y `ruta.ts` con ese mismo algoritmo, con
+  test, y el rebase las une. Las cinco de Contenido no cambian.
 - Una página es editable si tiene secciones **o** `seo`: la lista de Páginas y
   la ruta lo preguntan así, para que 4c pueda sumar una página solo con SEO.
 
+### 7.1. El error en el campo mismo
+
+El SPEC padre §5.3 lo pide y entra acá porque es la base del editor que 4b y
+4c consumen (padre, DECISIONS). Hoy un contenido que no pasa vuelve como un
+aviso en el encabezado con el camino en claves («en tarjetas › 0 › foto»).
+
+- **Guardar devuelve todos los problemas, no solo el primero:** `{ ok: false,
+  detalle, errores: Array<{ camino: string; mensaje: string }> }`, donde
+  `camino` es el del formulario («quienesSomos.cuerpo»,
+  «hero.tarjetas.2.foto.alt»): el mismo `nombre` que ya arma `Campo`.
+- **Cada control muestra el suyo** debajo, en `rojo-error`, con
+  `aria-invalid` y `aria-describedby`, y lo borra en cuanto se lo edita. Una
+  foto muestra el de su archivo o su alt en el propio control; en una lista
+  fija, el ítem cerrado con un error lo marca («Con error») y el primero se
+  abre solo.
+- **El aviso del encabezado lo resume con etiquetas**, no claves: «Hay 2
+  campos para revisar. El primero: ¿Quiénes somos? › Cuerpo — Falta cerrar un
+  resaltado.» `caminoLegible(descripcion, camino)` en
+  `lib/contenido/descripcion.ts` hace la traducción; la usan también publicar
+  y restaurar en sus avisos.
+- **Los controles no conocen el generador** (AGENTS.md §12): los errores
+  viajan en un contexto que solo lee `Campo.tsx`, y cada control recibe su
+  `error?: string` como una prop plana más.
+
 ## 8. Deudas de la lane anterior
 
-- **Los 19 alts del hero se leen.** Hoy se escriben y viven dentro de
-  `aria-hidden`. Se decide leerlos y no dejar de pedirlos: el valor `foto()`
-  exige alt en todo el sitio (y Fotos, lane 9, lo hace obligatorio por foto);
-  dejar de pedirlo pediría un modo «decorativa» en el tipo `foto`, que es
-  justo lo que AGENTS.md §12 cierra. Las fotos del hero muestran a ED
-  trabajando —no son textura— y sus alts están escritos con ese cuidado. Se
-  saca el `aria-hidden` de los dos campos de tarjetas (a cualquier ancho se ve
-  uno solo: el otro es `display: none`); los carteles también se leen. El
-  orden del DOM no cambia: las fotos quedan antes del `h1`, y se llega al
-  título por encabezados. `comparar-render.mjs` no ve el atributo (no está
-  en sus dimensiones): se prueba con el árbol de accesibilidad del navegador.
+- **Los 19 alts del hero: el `aria-hidden` se queda** (padre, DECISIONS). Es
+  un collage decorativo: 19 imágenes seguidas en un lector de pantalla son
+  ruido, el mensaje lo da el texto del hero, y sacarlo cambiaría el HTML del
+  sitio. El alt se sigue pidiendo porque es de la foto (la tabla `fotos`) y
+  sirve donde la foto aporta (Fotos, lane 9). La deuda se cierra con esa
+  decisión escrita y una línea de ayuda en el campo de foto de cada tarjeta
+  que lo dice en llano («Acá la foto es decorativa: el lector de pantalla
+  saltea el collage. El texto alternativo igual queda con la foto, para donde
+  se use.»).
 - **`config/nav.ts` baja de 104 a ≤ 100 líneas**, apretando comentarios sin
   perder el porqué.
 - **`scripts/comparar-render.mjs` baja de 117 a ≤ 100 líneas** —sin sumar
@@ -279,7 +311,11 @@ apps/sitio/
 │   ├── resaltado.ts (+ .test.ts)           «**así**» → fragmentos, y su validación
 │   ├── comparar.ts (+ .test.ts)            ver qué cambió
 │   ├── seo.ts (+ .test.ts)                 esquemaSeo, largos, metadataDeSeo
+│   ├── campos.ts · describir.ts            textoCorto({ recomendado })
+│   ├── descripcion.ts                      caminoLegible(descripcion, camino)
 │   └── documento.ts                        partesDe(pagina): secciones + seo
+├── src/admin/campos/                       el error de cada control y el aviso de
+│                                           largo; el contexto de errores lo lee Campo.tsx
 ├── src/datos/acciones/
 │   ├── editar-paginas.ts                   guardar y descartar, con el choque y el ON CONFLICT
 │   ├── publicar-paginas.ts                 publicar + versión + poda, en una transacción
@@ -310,7 +346,8 @@ props. Toda Server Action nueva empieza por `auth.api.getSession` (el test
 - **DESIGN.md §11** (lo revisa Mateo en el PR): las pestañas de una página del
   editor y la activa más específica; «Qué cambió» (antes y ahora, sin rojo ni
   verde); la vista previa de buscador y redes; el aviso con una acción
-  adentro («Recargar»).
+  adentro («Recargar»); el error debajo del campo y el aviso de largo
+  recomendado.
 - **AGENTS.md** (lo revisa Mateo en el PR): §3, los archivos nuevos de
   `datos/consultas/` y `datos/acciones/`; §13, la línea de esta fase.
 
@@ -319,8 +356,9 @@ props. Toda Server Action nueva empieza por `auth.api.getSession` (el test
 - **Unitarias** (`pnpm test`): `resaltado` (fragmentos ida y vuelta,
   espacios, marcas sin cerrar, exactamente uno), `comparar` (texto, foto,
   lista, opcional que aparece y se va, sin cambios), `seo` (metadata con y sin
-  imagen), `Pestanas` (la activa más específica) y un test del registro: cada
-  sección de cada página pasa su propio esquema con su inicial.
+  imagen), `caminoLegible`, la activa más específica de las pestañas y un
+  test del registro: cada sección y cada `seo` de cada página pasan su propio
+  esquema con su inicial.
 - **De integración contra el Postgres local** (`editar-paginas.test.ts` y
   vecinos): publicar guarda la versión y poda a 10; restaurar mete lo que pasa
   y avisa lo que no; el choque en guardar, publicar, descartar y restaurar; y
@@ -332,7 +370,8 @@ props. Toda Server Action nueva empieza por `auth.api.getSession` (el test
   teclado): editar una sección nueva, guardar, «Qué cambió», publicar, ver la
   versión, restaurar una anterior y ver qué no entró; el choque entre dos
   pestañas con «Recargar»; SEO con la vista previa y el `<title>` en la vista
-  previa del sitio; el árbol de accesibilidad del hero con los alts.
+  previa del sitio y el aviso de largo; un error de resaltado sin cerrar en
+  su campo, con el aviso del encabezado en etiquetas.
 
 ## 12. Fuera de alcance
 
@@ -340,9 +379,6 @@ props. Toda Server Action nueva empieza por `auth.api.getSession` (el test
   una sola fuente (4b).
 - Borrar la foto reemplazada y «Se usa en» (lane 9, Fotos); el Inicio del
   admin (lane 3).
-- **El error en el campo mismo** (SPEC padre §5.3): los errores siguen en el
-  aviso del encabezado, con el camino del campo. Lo anoto para 4b/4c o una
-  lane propia; no lo pide este brief.
 - Autoguardado, bloqueo de documento, fusión de cambios, texto enriquecido.
 - `publicar` revalida solo la ruta de su página: la sección repetida en dos
   páginas llega con la fuente única de 4b.
