@@ -31,7 +31,7 @@ Medido sobre `8b53269`:
   PLAN escrito, 19 pasos. Arranca work-run.
 - 2026-09-26 — Los 19 pasos hechos y verificados (abajo), más un arreglo de
   la verificación (el contraste del oscuro en DESIGN.md).
-- 2026-09-26 — **En pausa, a la espera de la revisión de cierre.** Rebaseada
+- 2026-09-26 — **En pausa, a la espera de la revisión de cierre, con el PR #183 abierto.** Rebaseada
   sobre `main` `5a07368` con lo que pidió el padre (capacidades, actividad,
   pestañas de `main`, migración regenerada) y verificada otra vez. La revisión
   la lanza el padre al recibir `worker_done` (1 revisor Opus 5.5, effort
