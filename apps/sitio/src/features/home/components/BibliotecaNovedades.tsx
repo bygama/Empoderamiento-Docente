@@ -47,7 +47,8 @@ export function BibliotecaNovedades({ contenido }: { contenido: BibliotecaYNoved
       data-indice="Biblioteca y novedades"
       data-section="biblioteca-novedades"
       className="bg-grain-light relative bg-white py-24 md:py-32"
-      aria-label="Biblioteca y Novedades"
+      // Dos títulos editables: el nombre de la sección los junta, así sigue a lo que se publica.
+      aria-label={`${biblioteca.titulo} y ${novedades.titulo}`}
     >
       <div className="relative z-10 mx-auto max-w-screen-xl px-5 md:px-10">
         <div className="grid gap-y-14 md:grid-cols-[1fr_auto_1fr] md:gap-x-16">

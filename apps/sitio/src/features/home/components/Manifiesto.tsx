@@ -22,7 +22,7 @@ export function Manifiesto({ contenido }: { contenido: QuienesSomos }) {
   return (
     <section
       className="relative flex h-full w-full items-center overflow-hidden py-8 md:py-16 motion-reduce:h-auto motion-reduce:py-24"
-      aria-label="Quiénes somos"
+      aria-labelledby="titulo-quienes-somos"
     >
       <div
         data-wipe-bounds
@@ -36,7 +36,8 @@ export function Manifiesto({ contenido }: { contenido: QuienesSomos }) {
               aria-hidden="true"
               className="bg-verde-concepto mb-4 block h-px w-10"
             />
-            <h2 className="font-display text-azul-principal font-bold leading-[1.04] tracking-[-0.02em] [font-size:clamp(2rem,3.2vw,3.1rem)]">
+            {/* Nombra la sección (aria-labelledby): el nombre accesible es el título que se publica. */}
+            <h2 id="titulo-quienes-somos" className="font-display text-azul-principal font-bold leading-[1.04] tracking-[-0.02em] [font-size:clamp(2rem,3.2vw,3.1rem)]">
               {contenido.titulo}
             </h2>
           </div>
