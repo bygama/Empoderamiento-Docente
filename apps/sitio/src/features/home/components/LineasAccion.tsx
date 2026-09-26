@@ -7,8 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "@/components/ui/icons";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
+import type { Areas } from "@/features/home/contenido/areas";
 import { CartaArea } from "./lineas-accion/CartaArea";
-import { AREAS } from "./lineas-accion/data";
 import { crearManoCartas } from "./lineas-accion/mano-cartas";
 
 if (typeof window !== "undefined") {
@@ -27,11 +27,13 @@ const CARD_W = 360; // px — fallback del ancho de carta (el real se mide en ru
  * Desktop + motion → escenario sticky animado con GSAP (integrado con
  * Lenis vía el ticker global). Mobile / tablet / reduced-motion → grilla
  * estática legible (la clase .is-live se agrega pre-paint solo cuando hay
- * que animar, así no hay flash grilla→abanico).
+ * que animar, así no hay flash grilla→abanico). Los textos llegan por props
+ * (de `features/home/contenido/areas.ts` o de la base).
  */
-export function LineasAccion() {
+export function LineasAccion({ contenido }: { contenido: Areas }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
+  const cantidad = contenido.areas.length;
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -48,7 +50,7 @@ export function LineasAccion() {
     const stage = root.querySelector<HTMLElement>("[data-deck-stage]");
     const cta = root.querySelector<HTMLElement>("[data-deck-cta]");
     const cards = gsap.utils.toArray<HTMLElement>("[data-deck-card]", root);
-    if (!scroll || !stage || cards.length !== AREAS.length) return;
+    if (!scroll || !stage || cards.length !== cantidad) return;
 
     root.classList.add("is-live");
 
@@ -168,7 +170,7 @@ export function LineasAccion() {
       ctx.revert();
       root.classList.remove("is-live");
     };
-  }, [reduced]);
+  }, [reduced, cantidad]);
 
   return (
     <section
@@ -194,19 +196,18 @@ export function LineasAccion() {
                 lineHeight: 1.03,
               }}
             >
-              Áreas de especialización
+              {contenido.titulo}
             </h2>
             <p className="deck-caption text-gris-texto mx-auto mt-5 max-w-xl font-sans text-[0.97rem] leading-relaxed">
-              Los ámbitos desde los cuales diseñamos soluciones educativas
-              fundamentadas en la investigación y construidas para cada realidad.
+              {contenido.bajada}
             </p>
           </div>
 
           {/* Las cartas. */}
           <ul className="deck-cards mt-14 md:mt-16">
-            {AREAS.map((area, i) => (
-              <li key={area.n} data-deck-card className="deck-card">
-                <CartaArea area={area} total={AREAS.length} azulBase={i % 2 === 1} />
+            {contenido.areas.map((area, i) => (
+              <li key={area.titulo} data-deck-card className="deck-card">
+                <CartaArea area={area} indice={i} total={cantidad} azulBase={i % 2 === 1} />
               </li>
             ))}
           </ul>
@@ -220,14 +221,14 @@ export function LineasAccion() {
             className="deck-cta mt-12 flex justify-center md:justify-start"
           >
             <Link
-              href="/investigacion"
+              href={contenido.enlace.ruta}
               className="group inline-flex items-center gap-3"
             >
               <span className="border-azul-principal/15 group-hover:border-naranja-accion group-hover:bg-naranja-accion inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-500 group-hover:text-white">
                 <ArrowRight size={17} />
               </span>
               <span className="text-azul-principal group-hover:text-naranja-accion font-sans text-[0.93rem] font-medium tracking-wide transition-colors duration-500">
-                Mirá los casos donde lo aplicamos
+                {contenido.enlace.texto}
               </span>
             </Link>
           </div>

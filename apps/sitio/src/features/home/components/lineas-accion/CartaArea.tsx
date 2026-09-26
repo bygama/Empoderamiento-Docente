@@ -1,4 +1,31 @@
-import type { Area } from "./data";
+import {
+  BookOpen,
+  Compass,
+  Lightbulb,
+  School,
+  Target,
+  TrendingUp,
+  Users,
+} from "@/components/ui/icons";
+import type { Areas } from "@/features/home/contenido/areas";
+import { fragmentos } from "@/lib/contenido/resaltado";
+
+// Un ícono de marca por área, en el orden de la lista: la identidad de cada
+// carta es estructura, no copy.
+const ICONOS = [Users, Lightbulb, Compass, TrendingUp, BookOpen, School, Target];
+
+/**
+ * El detalle se escribe con su idea en negrita entre dobles asteriscos (el
+ * esquema pide exactamente una) y se dibuja como antes: lo de antes, la idea en
+ * `strong`, lo de después. Sin marca, va todo como texto.
+ */
+function partirDetalle(detalle: string): { antes: string; clave: string | null; despues: string } {
+  const partes = fragmentos(detalle);
+  const i = partes.findIndex((f) => f.resaltado);
+  if (i === -1) return { antes: detalle, clave: null, despues: "" };
+  const unir = (lista: typeof partes) => lista.map((f) => f.texto).join("");
+  return { antes: unir(partes.slice(0, i)), clave: partes[i].texto, despues: unir(partes.slice(i + 1)) };
+}
 
 /**
  * Una carta del abanico de Áreas, en tres capas para que ningún transform
@@ -10,14 +37,19 @@ import type { Area } from "./data";
  * (mobile, reduced-motion) no existen a la vista.
  */
 export function CartaArea({
-  area: { n, titulo, frase, detalle, Icon },
+  area: { titulo, frase, detalle: texto },
+  indice,
   total,
   azulBase,
 }: {
-  area: Area;
+  area: Areas["areas"][number];
+  indice: number;
   total: number;
   azulBase: boolean;
 }) {
+  const n = String(indice + 1).padStart(2, "0");
+  const Icon = ICONOS[indice % ICONOS.length];
+  const detalle = partirDetalle(texto);
   return (
     <div data-deck-mano className="relative h-full">
       {/* Sombra larga de la carta elegida: se enciende por opacidad. */}
@@ -51,9 +83,11 @@ export function CartaArea({
           </p>
           <p className="text-gris-texto mt-2 font-sans text-[0.85rem] leading-relaxed">
             {detalle.antes}
-            <strong className="text-azul-principal font-semibold">
-              {detalle.clave}
-            </strong>
+            {detalle.clave !== null && (
+              <strong className="text-azul-principal font-semibold">
+                {detalle.clave}
+              </strong>
+            )}
             {detalle.despues}
           </p>
         </div>

@@ -7,7 +7,7 @@ import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNoveda
 
 export default async function Home() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, quienesSomos, mision, enNumeros, comoTrabajamos } = await contenidoDe("inicio");
+  const { hero, quienesSomos, mision, enNumeros, comoTrabajamos, areas } = await contenidoDe("inicio");
   return (
     <main>
       {/* Se entra directo al Inicio: el portón «Comenzá la experiencia»
@@ -25,7 +25,7 @@ export default async function Home() {
       {/* Áreas de especialización (el abanico de siete cartas). Había salido
           de la home junto con la llegada del bloque plano y vuelve a su lugar
           original, después de «Cómo trabajamos» (2026-09-09). */}
-      <LineasAccion />
+      <LineasAccion contenido={areas} />
       <BibliotecaNovedades />
     </main>
   );
