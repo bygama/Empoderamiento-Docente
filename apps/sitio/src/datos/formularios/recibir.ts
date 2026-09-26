@@ -1,6 +1,8 @@
 import { siteConfig } from "@/config/site";
 import type { Bandeja } from "@/config/mensajes";
 import { claveDeLimite, ipDelPedido } from "@/lib/formularios/limite";
+import { segundoPlano } from "@/lib/segundo-plano";
+import { avisarMensajeNuevo } from "@/datos/avisos";
 import { sumarEnvio } from "@/datos/limites-por-ip";
 
 // Lo común a los formularios públicos (`/api/contacto`, `/api/cv`): la forma
@@ -54,6 +56,14 @@ export function motivoSinDatos(e: unknown): string {
   if (!(e instanceof Error)) return "error desconocido";
   const codigo = (e as { code?: unknown }).code;
   return typeof codigo === "string" ? `${e.name} ${codigo}` : e.name;
+}
+
+/**
+ * Avisa por correo, después de contestar: quien mandó el formulario no espera
+ * a Resend, y un aviso que falla no convierte en error un mensaje guardado.
+ */
+export function avisarDespues(mensaje: { id: string; bandeja: Bandeja }): void {
+  segundoPlano(avisarMensajeNuevo(mensaje).catch((e) => console.error("avisarMensajeNuevo:", motivoSinDatos(e))));
 }
 
 /** Lo que pesa el cuerpo según quien lo manda, o 0 si no lo dice. */

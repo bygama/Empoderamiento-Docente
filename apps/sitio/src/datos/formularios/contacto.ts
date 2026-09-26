@@ -3,7 +3,7 @@ import { siteConfig } from "@/config/site";
 import { TEMAS } from "@/features/contacto/components/experiencia/data";
 import { datosDe, esquemaDe, valoresDe, type CampoDeFormulario } from "@/lib/formularios/campos";
 import { base } from "@/datos/cliente";
-import { dentroDelTope, demasiados, largoDelPedido, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
+import { avisarDespues, dentroDelTope, demasiados, largoDelPedido, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
 
 // `POST /api/contacto`: lo que manda el formulario de Contacto del sitio
 // (work/mensajes/SPEC.md §5.1). Llega como JSON; se valida, se cuenta contra
@@ -45,7 +45,7 @@ export async function recibirContacto(pedido: Request): Promise<Response> {
   try {
     if (!(await dentroDelTope("contacto", pedido, TOPE_DE_CONTACTO))) return demasiados();
     const { nombre, email, pais, mensaje } = valores.data;
-    await base.mensaje.create({
+    const { id } = await base.mensaje.create({
       data: {
         bandeja: "contacto",
         nombre,
@@ -55,7 +55,9 @@ export async function recibirContacto(pedido: Request): Promise<Response> {
         mensaje,
         datos: datosDe(CAMPOS, valores.data, ["nombre", "email", "pais", "mensaje"]),
       },
+      select: { id: true },
     });
+    avisarDespues({ id, bandeja: "contacto" });
     return recibido();
   } catch (e) {
     console.error("recibirContacto: no se guardó:", motivoSinDatos(e));

@@ -5,7 +5,7 @@ import { almacenPrivado, type AlmacenPrivado } from "@/lib/formularios/almacen-p
 import { datosDe, esquemaDe, valoresDe } from "@/lib/formularios/campos";
 import { esPdf } from "@/lib/formularios/pdf";
 import { base } from "@/datos/cliente";
-import { ESCRIBINOS, dentroDelTope, demasiados, largoDelPedido, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
+import { ESCRIBINOS, avisarDespues, dentroDelTope, demasiados, largoDelPedido, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
 
 // `POST /api/cv`: el formulario de /sumate-al-equipo (work/mensajes/SPEC.md
 // §5.2). Llega como multipart con el PDF. El archivo va al almacén privado
@@ -90,6 +90,7 @@ export async function recibirCV(pedido: Request, entorno: Entorno = process.env)
       await almacen.borrar(archivo).catch(() => undefined);
       throw e;
     }
+    avisarDespues({ id, bandeja: "cv" });
     return recibido();
   } catch (e) {
     console.error("recibirCV: no se guardó:", motivoSinDatos(e));
