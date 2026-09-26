@@ -6,10 +6,12 @@ import { hashPassword as hashearConScrypt } from "better-auth/crypto";
 import { claveDeBloqueo, type AlmacenDeBloqueos, type EstadoDeBloqueo } from "./bloqueo";
 import { hashear, verificar } from "./contrasenas";
 import { crearGanchos, destrabar } from "./ganchos";
+import type { SucesoDeSesion } from "./opciones";
 
 // Los ganchos corriendo adentro de better-auth de verdad, con su adaptador en
-// memoria: lo que se prueba es que los pedidos a `/sign-in/email` pasen por
-// ellos como en producción, no una copia de su lógica.
+// memoria: lo que se prueba es que los pedidos a `/sign-in/email`,
+// `/sign-out` y `/change-password` pasen por ellos como en producción, no una
+// copia de su lógica.
 
 const SECRETO = "un-secreto-de-prueba-que-no-sirve-para-nada-mas";
 const CONTRASENA = "la-contrasena-buena-de-prueba";
@@ -33,9 +35,19 @@ function almacenEnMemoria(): AlmacenDeBloqueos & { filas: Map<string, EstadoDeBl
   };
 }
 
-/** Una instancia con una cuenta, cuya contraseña se guarda con `hash`. */
-async function armar(correo: string, hash: (contrasena: string) => Promise<string>) {
+/**
+ * Una instancia con una cuenta, cuya contraseña se guarda con `hash`. Lo que
+ * se anota y los avisos que salen quedan en `sucesos` y `avisos`; `registrar`
+ * se puede reemplazar para probar uno que falla.
+ */
+async function armar(
+  correo: string,
+  hash: (contrasena: string) => Promise<string>,
+  registrar?: (suceso: SucesoDeSesion) => Promise<void>,
+) {
   const bloqueos = almacenEnMemoria();
+  const sucesos: SucesoDeSesion[] = [];
+  const avisos: string[] = [];
   const auth = betterAuth({
     database: memoryAdapter({ user: [], session: [], account: [], verification: [] }),
     secret: SECRETO,
@@ -45,20 +57,34 @@ async function armar(correo: string, hash: (contrasena: string) => Promise<strin
     logger: { disabled: true },
     rateLimit: { enabled: false },
     emailAndPassword: { enabled: true, password: { hash: hashear, verify: verificar } },
-    hooks: crearGanchos({ bloqueos, secreto: SECRETO }),
+    hooks: crearGanchos({
+      bloqueos,
+      secreto: SECRETO,
+      registrar: registrar ?? (async (suceso) => void sucesos.push(suceso)),
+      avisarCambioDeContrasena: async ({ para }) => void avisos.push(para),
+    }),
   });
   const ctx = await auth.$context;
   const cuenta = await ctx.internalAdapter.createUser({ email: correo, name: "Ana", emailVerified: true }, { method: "admin" });
   await ctx.internalAdapter.createAccount({ userId: cuenta.id, providerId: "credential", accountId: cuenta.id, password: await hash(CONTRASENA) });
-  const entrar = (email: string, password: string) =>
+  /** Un POST a la API de better-auth, como lo manda el navegador; con `cookie`, con sesión. */
+  const pedir = (ruta: string, cuerpo: object, cookie?: string) =>
     auth.handler(
-      new Request("http://localhost/api/auth/sign-in/email", {
+      new Request(`http://localhost/api/auth${ruta}`, {
         method: "POST",
-        headers: { "content-type": "application/json", origin: "http://localhost" },
-        body: JSON.stringify({ email, password }),
+        headers: { "content-type": "application/json", origin: "http://localhost", ...(cookie ? { cookie } : {}) },
+        body: JSON.stringify(cuerpo),
       }),
     );
-  return { bloqueos, ctx, cuenta, entrar, clave: claveDeBloqueo(correo, SECRETO) };
+  const entrar = (email: string, password: string) => pedir("/sign-in/email", { email, password });
+  return { bloqueos, ctx, cuenta, entrar, pedir, sucesos, avisos, clave: claveDeBloqueo(correo, SECRETO) };
+}
+
+/** La cookie de sesión que puso una respuesta, lista para mandarla de vuelta. */
+function cookieDe(res: Response): string {
+  const cookie = res.headers.getSetCookie().find((c) => c.startsWith("better-auth.session_token="));
+  assert.ok(cookie, "la respuesta no puso la cookie de sesión");
+  return cookie.split(";")[0] ?? "";
 }
 
 test("un 401 cuenta un fallo, y entrar bien borra la fila", async () => {
@@ -100,4 +126,43 @@ test("un reset de contraseña destraba la cuenta, escriba como escriba el correo
   await destrabar(bloqueos, "Ana@ED.test", SECRETO);
   assert.equal(bloqueos.filas.has(clave), false);
   assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
+});
+
+test("entrar bien anota «entro» con la cuenta; un fallo no anota nada", async () => {
+  const { cuenta, entrar, sucesos } = await armar("ana@ed.test", hashear);
+  assert.equal((await entrar("ana@ed.test", "una-contrasena-mala")).status, 401);
+  assert.deepEqual(sucesos, []);
+  assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
+  assert.deepEqual(sucesos, [{ tipo: "entro", idDeCuenta: cuenta.id }]);
+});
+
+test("salir anota «salio» antes de que la sesión deje de existir", async () => {
+  const { cuenta, entrar, pedir, sucesos } = await armar("ana@ed.test", hashear);
+  const cookie = cookieDe(await entrar("ana@ed.test", CONTRASENA));
+  assert.equal((await pedir("/sign-out", {}, cookie)).status, 200);
+  assert.deepEqual(sucesos.at(-1), { tipo: "salio", idDeCuenta: cuenta.id });
+  // Sin sesión no hay a quién atribuírselo.
+  assert.equal((await pedir("/sign-out", {})).status, 200);
+  assert.equal(sucesos.length, 2);
+});
+
+test("cambiar la contraseña bien la anota y avisa por correo; con la actual mala, nada", async () => {
+  const { cuenta, entrar, pedir, sucesos, avisos } = await armar("ana@ed.test", hashear);
+  const cookie = cookieDe(await entrar("ana@ed.test", CONTRASENA));
+  const cambiar = (actual: string) =>
+    pedir("/change-password", { currentPassword: actual, newPassword: "otra-contrasena-de-prueba", revokeOtherSessions: true }, cookie);
+  assert.equal((await cambiar("una-contrasena-mala")).status, 400);
+  assert.deepEqual(avisos, []);
+  assert.equal((await cambiar(CONTRASENA)).status, 200);
+  assert.deepEqual(sucesos.at(-1), { tipo: "cambio-su-contrasena", idDeCuenta: cuenta.id });
+  assert.deepEqual(avisos, ["ana@ed.test"]);
+});
+
+test("si anotar falla, entrar y salir andan igual", async () => {
+  const { entrar, pedir } = await armar("ana@ed.test", hashear, async () => {
+    throw new Error("la base no contesta");
+  });
+  const res = await entrar("ana@ed.test", CONTRASENA);
+  assert.equal(res.status, 200);
+  assert.equal((await pedir("/sign-out", {}, cookieDe(res))).status, 200);
 });

@@ -8,18 +8,27 @@ import {
   type AlmacenDeBloqueos,
 } from "./bloqueo";
 import { hashear, necesitaRehash } from "./contrasenas";
+import type { OpcionesDeAuth } from "./opciones";
+import { alCambiarLaContrasena, anotar, anotarLaSalida } from "./sucesos";
 
 /**
  * Lo que corre alrededor de «entrar» (`/sign-in/email`), que better-auth no
  * trae y que tiene que pasar en el servidor, no en el formulario: el bloqueo
  * por cuenta (bloqueo.ts) y el paso de scrypt a Argon2id (contrasenas.ts).
+ * Y lo que se anota de la sesión: entrar, salir y cambiar la contraseña
+ * (sucesos.ts).
  */
 
 const ENTRAR = "/sign-in/email";
+const SALIR = "/sign-out";
+const CAMBIAR_LA_CONTRASENA = "/change-password";
 
 type Contexto = Parameters<Parameters<typeof createAuthMiddleware>[0]>[0];
 
-export type OpcionesDeGanchos = { bloqueos: AlmacenDeBloqueos; secreto: string };
+export type OpcionesDeGanchos = { bloqueos: AlmacenDeBloqueos; secreto: string } & Pick<
+  OpcionesDeAuth,
+  "registrar" | "avisarCambioDeContrasena"
+>;
 
 /**
  * Pasa a Argon2id el hash de quien acaba de entrar bien, si todavía es el
@@ -43,7 +52,7 @@ export function destrabar(bloqueos: AlmacenDeBloqueos, correo: string, secreto: 
   return bloqueos.borrar(claveDeBloqueo(correo, secreto));
 }
 
-export function crearGanchos({ bloqueos, secreto }: OpcionesDeGanchos) {
+export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena }: OpcionesDeGanchos) {
   function claveDe(ctx: Contexto): string | null {
     const correo: unknown = ctx.body?.email;
     return typeof correo === "string" ? claveDeBloqueo(correo, secreto) : null;
@@ -53,6 +62,7 @@ export function crearGanchos({ bloqueos, secreto }: OpcionesDeGanchos) {
     // Antes de mirar la contraseña: una cuenta frenada no se prueba, ni con
     // la contraseña buena. Si no, el freno no frenaría nada.
     before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === SALIR) return anotarLaSalida(ctx, registrar);
       const clave = ctx.path === ENTRAR ? claveDe(ctx) : null;
       if (!clave) return;
       const segundos = segundosDeFreno(await bloqueos.leer(clave), new Date());
@@ -60,12 +70,14 @@ export function crearGanchos({ bloqueos, secreto }: OpcionesDeGanchos) {
     }),
 
     after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === CAMBIAR_LA_CONTRASENA) return alCambiarLaContrasena(ctx, { registrar, avisarCambioDeContrasena });
       const clave = ctx.path === ENTRAR ? claveDe(ctx) : null;
       if (!clave) return;
       const sesion = ctx.context.newSession;
       if (sesion) {
         // Entrar bien limpia los fallos y la escalera: era la persona.
         await bloqueos.borrar(clave);
+        await anotar(ctx, registrar, { tipo: "entro", idDeCuenta: sesion.user.id });
         const contrasena: unknown = ctx.body?.password;
         if (typeof contrasena === "string") await rehashearSiHaceFalta(ctx, sesion.user.id, contrasena);
         return;
