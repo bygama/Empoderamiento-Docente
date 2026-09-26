@@ -3,6 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { headers } from "next/headers";
 import { z } from "zod";
+import { SIN_PERMISO, puede } from "@ed/auth";
 import { auth } from "@/datos/auth";
 import { base } from "@/datos/cliente";
 import { almacenDesdeEntorno } from "@/lib/contenido/almacen";
@@ -33,6 +34,8 @@ export async function subirFoto(datos: FormData): Promise<ResultadoDeSubida> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para subir fotos." };
+    // Subir una foto no queda en la actividad: no cambia el sitio hasta que se publica (SPEC padre §5.8).
+    if (!puede(sesion.user.rol, "editarContenido")) return { ok: false, detalle: SIN_PERMISO };
 
     const entrada = esquemaSubida.safeParse({ archivo: datos.get("archivo"), alt: datos.get("alt") });
     if (!entrada.success) return { ok: false, detalle: entrada.error.issues[0]?.message ?? "Faltan datos de la foto." };

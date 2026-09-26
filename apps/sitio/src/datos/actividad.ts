@@ -16,7 +16,16 @@ import { base } from "./cliente";
  * pasado sobre quien lo hizo («Ana entró», «Ana cambió su nombre»). De un CV
  * se registra solo que se borró, sin `sobre`.
  */
-export const TIPOS_DE_ACTIVIDAD = ["entro", "salio", "cambio-su-contrasena", "cambio-su-nombre"] as const;
+export const TIPOS_DE_ACTIVIDAD = [
+  "entro",
+  "salio",
+  "cambio-su-contrasena",
+  "cambio-su-nombre",
+  // Las páginas (work/paginas-inicio/): sobre la página, con su slug.
+  "publico-una-pagina",
+  "descarto-un-borrador",
+  "restauro-una-version",
+] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
 const esquema = z.object({
