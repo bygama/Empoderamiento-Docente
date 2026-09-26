@@ -10,7 +10,8 @@ import { EncabezadoDelEditor, type EstadoPendiente } from "./EncabezadoDelEditor
 import { useFrenarSalida } from "./useFrenarSalida";
 import { Seccion } from "./Seccion";
 
-type AvisoDelEditor = { ok: boolean; detalle: ReactNode };
+// `choque`: otra persona guardó mientras tanto, y el aviso ofrece recargar.
+type AvisoDelEditor = { ok: boolean; detalle: ReactNode; choque?: true };
 
 const SIN_RED = "No hubo respuesta del servidor. Fijate la conexión y probá de nuevo; lo que escribiste sigue en pantalla.";
 
@@ -59,8 +60,12 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
     setContenidos((c) => ({ ...c, [clave]: resolverCambio(cambio, c[clave]) }));
   };
 
-  /** Guarda las secciones con cambios, una por una. Devuelve false si alguna falló (y ya avisó). */
-  async function guardarTodo(): Promise<boolean> {
+  /**
+   * Guarda las secciones con cambios, una por una. Devuelve el `borradorEn`
+   * que quedó —lo que la próxima escritura tiene que traer—, o `false` si
+   * alguna falló (y ya avisó).
+   */
+  async function guardarTodo(): Promise<string | null | false> {
     let visto = estado.borradorEn;
     for (const s of pagina.secciones) {
       const valorEnviado = contenidosRef.current[s.clave];
@@ -80,8 +85,15 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
       // otra sección.
       setEstado((e) => ({ ...e, borradorEn: r.borradorEn, borradorPor: r.borradorPor }));
     }
-    return true;
+    return visto;
   }
+
+  /** Recargar tira lo que no está guardado: se pregunta antes, y después no pregunta otra vez al salir. */
+  const recargar = () => {
+    if (haySinGuardar && !window.confirm("Recargar tira lo que escribiste sin guardar. ¿Recargar igual?")) return;
+    soltarSalida();
+    window.location.reload();
+  };
 
   /** Sin red o servidor caído: un aviso, nunca una excepción que se lleve puesto el editor. */
   function avisarSinRed() {
@@ -96,7 +108,7 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
     }
     setPendiente("guardar");
     try {
-      if (await guardarTodo()) setAviso({ ok: true, detalle: "Borrador guardado. El sitio sigue mostrando lo publicado." });
+      if ((await guardarTodo()) !== false) setAviso({ ok: true, detalle: "Borrador guardado. El sitio sigue mostrando lo publicado." });
     } catch {
       avisarSinRed();
     } finally {
@@ -111,7 +123,7 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
     const pestana = window.open("", "_blank");
     setPendiente("vista-previa");
     try {
-      if (haySinGuardar && !(await guardarTodo())) {
+      if (haySinGuardar && (await guardarTodo()) === false) {
         pestana?.close();
         return;
       }
@@ -153,8 +165,10 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
     }
     setPendiente("publicar");
     try {
-      if (haySinGuardar && !(await guardarTodo())) return;
-      const r = await publicar(pagina.slug);
+      // Publica lo que esta pantalla vio: lo recién guardado, o el borrador con el que abrió.
+      const visto = haySinGuardar ? await guardarTodo() : estado.borradorEn;
+      if (visto === false) return;
+      const r = await publicar({ slug: pagina.slug, borradorEnVisto: visto });
       setAviso(r);
       if (r.ok) setEstado({ borradorEn: null, borradorPor: null, publicadoEn: r.publicadoEn, publicadoPor: r.publicadoPor });
     } catch {
@@ -168,7 +182,7 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
     if (!window.confirm("¿Descartar los cambios sin publicar? La página vuelve a lo que está publicado.")) return;
     setPendiente("descartar");
     try {
-      const r = await descartarBorrador(pagina.slug);
+      const r = await descartarBorrador({ slug: pagina.slug, borradorEnVisto: estado.borradorEn });
       if (!r.ok) {
         setAviso(r);
         return;
@@ -194,7 +208,11 @@ export function EditorDePagina({ pagina }: { pagina: PaginaParaEditar }) {
         pendiente={pendiente}
         aviso={
           aviso ? (
-            <Aviso tono={aviso.ok ? "bien" : "error"} alCerrar={() => setAviso(null)}>
+            <Aviso
+              tono={aviso.ok ? "bien" : "error"}
+              alCerrar={() => setAviso(null)}
+              accion={aviso.choque ? { etiqueta: "Recargar", alHacer: recargar } : undefined}
+            >
               {aviso.detalle}
             </Aviso>
           ) : null

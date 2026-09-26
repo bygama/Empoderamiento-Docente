@@ -45,6 +45,8 @@ type PropsDeAviso = {
   id?: string;
   /** Si llega, el aviso lleva una × que lo cierra. */
   alCerrar?: () => void;
+  /** Lo que resuelve el aviso, si hay algo que hacer («Recargar»): un botón de texto en el color del aviso. */
+  accion?: { etiqueta: string; alHacer: () => void };
   children: React.ReactNode;
 };
 
@@ -55,9 +57,9 @@ type PropsDeAviso = {
  * el lector termina lo que dice (`role="status"`), en `azul-principal` sobre
  * `azul-claro/30` (11,63:1). Sin verde: al lado de «Publicar» rompería la
  * regla 4 de DESIGN.md §1. El rol va en el texto y la × queda afuera, para
- * que no se anuncie como parte del mensaje.
+ * que no se anuncie como parte del mensaje; la acción, si la hay, también.
  */
-export function Aviso({ tono, id, alCerrar, children }: PropsDeAviso) {
+export function Aviso({ tono, id, alCerrar, accion, children }: PropsDeAviso) {
   const error = tono === "error";
   const Icono = error ? Alerta : Check;
   return (
@@ -68,6 +70,16 @@ export function Aviso({ tono, id, alCerrar, children }: PropsDeAviso) {
       <p id={id} role={error ? "alert" : "status"} className="flex-1">
         {children}
       </p>
+      {accion ? (
+        // Hereda el color del aviso (5,75:1 en el error, 11,63:1 en la confirmación) y lo marca el subrayado.
+        <button
+          type="button"
+          onClick={accion.alHacer}
+          className="-my-1 shrink-0 rounded-sm py-1 font-medium underline underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio"
+        >
+          {accion.etiqueta}
+        </button>
+      ) : null}
       {alCerrar ? (
         <button
           type="button"
