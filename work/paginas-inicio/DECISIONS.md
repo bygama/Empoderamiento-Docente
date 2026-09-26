@@ -67,3 +67,33 @@ Append-only: fecha — decisión — por qué.
      `main` aplicadas, `pnpm migrate`) como
      `20260926231213_versiones_de_paginas`, con el mismo SQL, adentro del
      commit de versiones.
+- 2026-09-26 — **Revisión r1 (Opus 5.5, medium, «el cambio entero contra su
+  SPEC»): PASS** con 1 Important, 2 Minor y dos notas fuera de su lente.
+  Rulings del padre:
+  1. **Important — la imagen de redes por defecto en `VistaPreviaSeo`.** Su
+     import estático no tipaba en un clon limpio: el tipo lo trae
+     `next-env.d.ts`, que es generado y está en .gitignore (`pnpm typecheck`
+     salía 2, TS2307, antes del primer build). El padre pidió usar
+     `/opengraph-image.png`, pero esa URL da 404: el archivo vive en el route
+     group `(sitio)` y Next lo sirve con un sufijo hasheado
+     (`/opengraph-image-1whei1.png`). Se le preguntó con tres opciones y
+     eligió una cuarta: **D, el import estático queda y un `.d.ts` commiteado
+     (`src/tipos/imagenes.d.ts`) referencia `next/image-types/global`**, que
+     es de donde Next lo saca (corrigió su «no sumes un .d.ts»). Descartadas:
+     **A**, la URL hasheada como constante con un test contra el sufijo de
+     Next, porque se ata a un detalle interno de Next; **B**, no mostrar la
+     imagen del sitio en la vista previa, porque la empeora; **C**, mover la
+     imagen a `app/`, porque cambia el `og:image` de todo el sitio y el admin
+     la heredaría. (`20ec922`)
+  2. **Fuera de lente — los nombres de las secciones de Inicio.** Con los
+     títulos editables, los `aria-label` fijos ya no los seguían: «¿Quiénes
+     somos?», «Misión» y «Áreas» pasan a `aria-labelledby` con el id de su
+     `h2`; «Biblioteca y Novedades», con dos títulos editables, arma su
+     `aria-label` con los dos (queda el mismo texto de hoy); «Cómo
+     trabajamos» y «En números» no tienen título editable y no cambian. El
+     HTML de `/` cambia solo en esos atributos, a propósito. (`b794654`)
+  3. **Minor:** la línea de la base en PROGRESS (`8b53269`, era la base de
+     arranque) y la clave «borrada» en el aviso de restaurar quedan como
+     están: la carpeta se borra al cerrar.
+  4. **No es de esta lane:** el `scrub: true` de `HeroQuienes` sigue en
+     «Abierto»; lo levanta el padre aparte, con su verificación visual.
