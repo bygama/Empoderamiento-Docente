@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "keys": ["2026-09-20", "empoderamiento docente"],
+      "clicks": 3,
+      "impressions": 41,
+      "ctr": 0.07317073170731707,
+      "position": 1.4390243902439024
+    },
+    {
+      "keys": ["2026-09-20", "matemática educativa talleres docentes"],
+      "clicks": 0,
+      "impressions": 12,
+      "ctr": 0,
+      "position": 11.5
+    },
+    {
+      "keys": ["2026-09-21", "empoderamiento docente"],
+      "clicks": 1,
+      "impressions": 17,
+      "ctr": 0.058823529411764705,
+      "position": 2
+    }
+  ],
+  "responseAggregationType": "byProperty"
+}
