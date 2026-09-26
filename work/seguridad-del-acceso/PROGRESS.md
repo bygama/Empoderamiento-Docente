@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 11 del PLAN (ADR-0010 y el spec del admin §7).
+- Paso 12 del PLAN (README y la guía).
 
 ## Hecho
 
@@ -185,3 +185,12 @@ Medido sobre `275518e`:
     Next (`no-cache, must-revalidate` en dev), no el proxy; era así antes de
     esta lane. El `no-store` del proxy queda en sus propias respuestas (el 307
     y el rebote).
+- 2026-09-26 — **Paso 11, ADR-0010 y el spec del admin §7.**
+  `docs/architecture/adrs/0010-seguridad-del-acceso.md` (contexto, las ocho
+  decisiones, consecuencias con el freno de molestia, los enlaces viejos, la
+  rotación del secreto y lo que hace ED en Resend; alternativas); su fila en el
+  índice y la de 0008 marcada «su §2, scrypt, reemplazado por 0010»; el spec
+  del admin al día en el encabezado, el árbol (`proxy.ts`) y el §7 entero. El
+  `node -e` de aceptación → `{ indice: true, sinMiddlewareEn7: true,
+  sinScrypt: true }`, exit 0. La mención de «middleware» en la fila de la fase
+  1 del §9 queda: es lo que se construyó entonces.

@@ -6,7 +6,8 @@
 - **Reemplaza:** `2026-09-15-panel-admin-diseno.md` (el panel con Payload)
 - **Registra:** [ADR-0005](../adrs/0005-admin-a-medida.md) ·
   [ADR-0006](../adrs/0006-packages-reutilizables.md) ·
-  [ADR-0007](../adrs/0007-prisma-como-orm.md)
+  [ADR-0007](../adrs/0007-prisma-como-orm.md) ·
+  [ADR-0010](../adrs/0010-seguridad-del-acceso.md) (§7, desde el 2026-09-26)
 
 ---
 
@@ -66,7 +67,7 @@ apps/sitio/
     ├── datos/                consultas/ (lee el sitio) · acciones/ (escribe el admin)
     ├── admin/                una carpeta por entidad + armazon/
     ├── features/             el sitio, sin cambios de contrato
-    └── middleware.ts         sesión · cabeceras · rate limit
+    └── proxy.ts              sesión · cabeceras (el middleware.ts de antes de Next 16)
 ```
 
 **Las cuatro fronteras** — son el criterio de review, no una sugerencia:
@@ -165,41 +166,56 @@ columna por texto.
 **Dos roles:** `administrador` (todo, incluidas las cuentas) y `editor` (crea,
 edita, publica y borra contenido; de las cuentas solo la propia). Los dos
 publican. No hay registro público. «Olvidé mi contraseña» manda un correo por
-Resend.
+Resend, en segundo plano, y elegir una contraseña nueva avisa con otro («Tu
+contraseña cambió»); sin `RESEND_API_KEY`, en local salen por la consola y en
+producción no salen, sin loguear nunca el enlace.
+
+Todo lo de esta sección que cambió el 2026-09-26 está decidido en el
+[ADR-0010](../adrs/0010-seguridad-del-acceso.md).
 
 Lo que cierra respecto del estado anterior:
 
 | Hallazgo | Cómo queda |
 | --- | --- |
-| Cero cabeceras de seguridad | `middleware.ts` + `headers()`: CSP, HSTS, `frame-ancestors` en `none` para `/admin`, `Referrer-Policy`, `Permissions-Policy` |
+| Cero cabeceras de seguridad | `proxy.ts`: CSP, HSTS, `frame-ancestors` en `none`, `Referrer-Policy`, `Permissions-Policy`. En `/admin`, la CSP lleva **un nonce por respuesta con `'strict-dynamic'`** (sin `'unsafe-inline'` en los scripts; `'unsafe-eval'` solo en desarrollo), y además COOP y CORP `same-origin` y `X-Frame-Options: DENY`. El sitio público sigue con `'unsafe-inline'`: es estático a propósito |
 | `GET /api/fotos` público y enumerable | desaparece: sin REST autogenerada no hay qué enumerar |
 | `/api` tomado por un catch-all | liberado para `/api/contacto` y `/api/cv` |
-| El secreto de la vista previa en el query string (queda en logs y en el `Referer`) | el Draft Mode de Next: la cookie la pone una Server Action con sesión, `httpOnly` y `secure`. **No es de un solo uso ni vence sola** (vale lo mismo para todos hasta el próximo deploy), así que se apaga con «Volver al sitio publicado» y al salir del admin. Corregido el 2026-09-22: acá decía «cookie firmada de un solo uso, con expiración», y la fase A no la construyó así |
-| Rate limit solo por cuenta | **por IP**, en la config de better-auth: 3 intentos por minuto en sign-in |
+| El secreto de la vista previa en el query string (queda en logs y en el `Referer`) | el Draft Mode de Next: la cookie la pone una Server Action con sesión, `httpOnly` y `secure`, y **vence en una hora**, con `SameSite=Lax` (se reescribe después de `enable()`). No es de un solo uso (vale lo mismo para todos hasta el próximo deploy), así que también se apaga con «Volver al sitio publicado» y al salir del admin |
+| Rate limit solo por cuenta | **por IP**, en la tabla `rateLimit` (una cuenta para todas las instancias): 3 intentos por minuto en sign-in. Y **por cuenta**: 5 fallos en 15 minutos frenan la cuenta 15 minutos, el doble cada vez hasta 1 hora, con el mismo 429 |
 | `/admin` dependía de `robots.txt` | `X-Robots-Tag: noindex` real en la respuesta |
 
-Y lo que trae la capa nueva: **scrypt** para el hasheo (el default de
-better-auth; Argon2id quedó afuera por pedir una dependencia sin aprobar, ver
-[ADR-0008](../adrs/0008-correcciones-de-la-fase-1.md)), tokens de reset de un
-solo uso con expiración, errores genéricos para no permitir enumerar usuarios, y
-protección CSRF por validación de origen.
+Y lo que trae la capa nueva: **Argon2id** para el hasheo (19 MiB, t=2, p=1; los
+hashes scrypt de antes se reemplazan solos al entrar), tokens de reset de un
+solo uso, con expiración y **guardados hasheados**, errores genéricos para no
+permitir enumerar usuarios, y protección CSRF por validación de origen y por
+cookies `SameSite=Strict`.
 
-**La sesión se corta en el middleware y se verifica en el layout del admin.**
-El middleware corre en Edge y no puede consultar la base, así que ahí solo se
-mira que la cookie esté; la comprobación de verdad —firma, expiración, que la
-sesión exista— la hace el layout de `(protegido)` antes de renderizar. Ningún
-componente pregunta por su cuenta.
+**La sesión dura 12 horas sin uso** y se renueva cada hora de uso; lo delicado
+pide haber entrado hace menos de 10 minutos (`freshAge`). Elegir una
+contraseña nueva cierra todas las sesiones de la cuenta.
 
-**Las Server Actions son la excepción:** el middleware las deja pasar sin
+**La sesión se corta en el proxy y se verifica en el layout del admin.** El
+proxy solo mira que la cookie esté, sin ir a la base; la comprobación de
+verdad —firma, expiración, que la sesión exista— la hace el layout de
+`(protegido)` antes de renderizar. Ningún componente pregunta por su cuenta.
+Como la cookie es `Strict`, un link al admin desde un correo llega sin ella:
+el proxy rebota esa navegación (`Sec-Fetch-Site: cross-site`, sin cookie) a la
+misma URL con un `<meta http-equiv="refresh">`, y la segunda vuelta ya la
+lleva.
+
+**Las Server Actions son la excepción:** el proxy las deja pasar sin
 cookie, porque un redirect no es una respuesta válida para una acción, y el
 layout no las cubre. Por eso toda acción empieza por `auth.api.getSession` y
 contesta en llano si no hay sesión, y
 `apps/sitio/src/datos/acciones/acciones-con-sesion.test.ts` falla si una no
 empieza por esa llamada.
 
-**Lo que el rate limit NO cubre:** es por IP, y eso cierra la enumeración de
-usuarios. Un ataque repartido entre muchas IPs contra una sola cuenta queda
-afuera: el bloqueo por cuenta no está en better-auth y sería trabajo propio.
+**Lo que cubre cada freno:** el rate limit es por IP, y eso cierra la
+enumeración de usuarios; el bloqueo por cuenta cierra el ataque repartido entre
+muchas IP contra una sola cuenta. Cuenta también los correos que no existen,
+guarda un HMAC del correo y nunca el correo, y se destraba con un reset
+completo. Lo que queda abierto, y está escrito en el ADR-0010: quien conozca un
+correo puede frenar esa cuenta hasta una hora.
 
 **Secretos solo del lado del servidor**: `DATABASE_URL`, el secreto de
 better-auth, `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan
