@@ -31,6 +31,16 @@ export function saludo(nombre?: string): string {
   return nombre?.trim() ? `Hola, ${nombre.trim()}:` : "Hola:";
 }
 
+// En hora universal y dicho así, como el panel de métricas: quien lee puede
+// estar en Chile, en México o en Argentina, y el servidor no sabe dónde.
+const dia = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const hora = new Intl.DateTimeFormat("es-AR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
+
+/** «el 26 de septiembre de 2026 a las 20:15, hora universal»: cuándo pasó algo que avisa un correo. */
+export function enHoraUniversal(cuando: Date): string {
+  return `el ${dia.format(cuando)} a las ${hora.format(cuando)}, hora universal`;
+}
+
 /** «1 hora», «72 horas», «10 minutos»: cuánto dura un enlace o un código. */
 export function duracion(minutos: number): string {
   if (minutos % 60 !== 0) return `${minutos} minutos`;

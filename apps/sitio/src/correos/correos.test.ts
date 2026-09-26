@@ -4,6 +4,7 @@ import { elegiTuContrasena } from "./elegi-tu-contrasena";
 import { mandarCorreo } from "./mandar";
 import { tuCodigo } from "./tu-codigo";
 import { tuContrasenaCambio } from "./tu-contrasena-cambio";
+import { tuCorreoCambio } from "./tu-correo-cambio";
 
 const ENLACE = "https://ed.test/api/auth/reset-password/token-secreto?callbackURL=%2Fadmin%2Fnueva-contrasena";
 const PARA = "ana@ed.test";
@@ -74,4 +75,22 @@ test("«Tu código para entrar» lleva el código a la vista, cuánto dura y qu�
   assert.ok(correo.html.includes(">048213</p>"));
   assert.match(correo.texto, /Vence en 10 minutos y sirve una sola vez\./);
   assert.ok(correo.texto.includes("alguien tiene tu contraseña: elegí otra ya mismo desde https://ed.test/admin/olvide-mi-contrasena"));
+});
+
+test("la invitación dice quién invita, con qué rol y cuánto dura, sin el «si no lo pediste» del reset", () => {
+  const correo = elegiTuContrasena({ nombre: "Juan", enlace: ENLACE, minutosDeVigencia: 72 * 60, invitacion: { quienInvita: "Ana Pérez", rol: "edita" } });
+  assert.equal(correo.asunto, "Elegí tu contraseña");
+  assert.ok(correo.texto.includes("Ana Pérez te invitó al admin del sitio de"));
+  assert.ok(correo.texto.includes("con el rol «edita»"));
+  assert.match(correo.texto, /vence en 72 horas/);
+  assert.ok(correo.texto.includes("Si no esperabas esta invitación"));
+  assert.ok(!correo.texto.includes("Si no lo pediste"));
+});
+
+test("«El correo de tu cuenta del admin cambió» dice de cuál a cuál y cuándo, y que se cerraron las sesiones", () => {
+  const correo = tuCorreoCambio({ nombre: "Juan", anterior: "juan@viejo.test", nuevo: "juan@nuevo.test", cuando: new Date("2026-09-26T20:15:42.000Z") });
+  assert.equal(correo.asunto, "El correo de tu cuenta del admin cambió");
+  assert.ok(correo.texto.includes("cambió el 26 de septiembre de 2026 a las 20:15, hora universal: era juan@viejo.test y ahora es juan@nuevo.test."));
+  assert.ok(correo.texto.includes("Cerramos las sesiones"));
+  assert.ok(correo.texto.includes("Si no lo pediste, avisale ya mismo a quien administra el sitio."));
 });
