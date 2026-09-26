@@ -45,3 +45,34 @@
   un `next start` local pueda guardar (DECISIONS). `tsx --test
   src/datos/formularios/*.test.ts src/lib/formularios/*.test.ts` → 19 pasan;
   las pruebas dejan `mensajes` y `limites_por_ip` en 0 filas.
+- **Paso 6 — los avisos por correo** (`b93422c` refactor, `6ed8c6d`).
+  `segundoPlano` y `urlDelSitio` salen de `datos/auth.ts` a `lib/` para
+  compartirse (sin cambio de comportamiento); `correos/mensaje-nuevo.ts`
+  (recibe solo la bandeja y el link), `datos/avisos.ts`
+  (`destinatariosDe`, `avisosDe`, `guardarAviso`, `avisarMensajeNuevo`) y el
+  envío después de contestar desde `recibir.ts`. `tsx --test
+  src/datos/avisos.test.ts src/correos/*.test.ts src/datos/formularios/*.test.ts`
+  → 18 pasan (el aviso a tres cuentas no lleva «Zoe», su correo ni su texto).
+- **Paso 7 — Contacto envía de verdad** (`74e6c64`).
+  `lib/formularios/enviar.ts` (`enviarFormulario`, la respuesta `{ ok }` del
+  lado del navegador); `features/contacto/`: envío por `fetch`, «Enviando…»
+  con `aria-busy`, el error `role="alert"` en `rojo-error`, el campo trampa,
+  la línea de privacidad con `MESES_DE_GUARDA`, el cierre sin «listo en tu
+  correo» ni «Copiar mensaje». En el navegador de Orca (3019, perfil aislado
+  `mensajes`): un envío llegó al cierre («Recibimos tu mensaje…») y dejó la
+  fila (`POST /api/contacto 200`; tema «Investigación», la institución en
+  `datos`); con el tope agotado (4 envíos por `fetch` + el del formulario) el
+  formulario se quedó con lo tipeado, el botón volvió a «Enviar consulta» y el
+  error dijo «Ya nos mandaste varios seguidos…». No se probó con la base
+  apagada: `ed-postgres` es compartido con otras lanes.
+- **Paso 8 — `/sumate-al-equipo`** (`c89f2df`). `features/cv/` (la página
+  con el lenguaje de Contacto, `FormularioCV` desde `CAMPOS_DEL_CV`, la
+  confirmación que toma el foco), la ruta con 404 si `!cvAbierto()`, el link
+  de Contacto por prop; `PaisDropdown` suma `etiqueta` para anunciar «Nivel
+  en que enseñás». Sin `CV_ABIERTO`: `/sumate-al-equipo` 404, `POST /api/cv`
+  404, el HTML de `/contacto` con 0 links a la página y el `mailto:` del CV.
+  Con `CV_ABIERTO=si` en el `.env.local` local: 200, 1 link; un CV mandado
+  desde el navegador (México, «Secundaria o media», un PDF de 193 bytes) dejó
+  la fila con `datos` y el archivo en `.cv/cv/<id>.pdf`; el archivo da 404 por
+  `/.cv/…` y `/cv/…`. Las capturas del navegador embebido fallan («the
+  browser tab may not be visible»): la evidencia es por DOM y por la base.
