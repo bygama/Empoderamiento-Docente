@@ -16,8 +16,8 @@
 | 4 | El índice de tarjetas, en `/admin/contenido` | hecho, `c00384f` |
 | 5 | Pestañas, en las cinco pantallas de Contenido | hecho, `7d17737` |
 | 6 | La lista, en Páginas | hecho, `7c8dde8` |
-| 7 | La guía de un módulo pasa a la Lista | hecho |
-| 8 | El estado vacío, en Métricas | pendiente |
+| 7 | La guía de un módulo pasa a la Lista | hecho, `cc7ae4b` |
+| 8 | El estado vacío, en Métricas | hecho |
 | 9 | Las pantallas de acceso, con la marca | pendiente |
 | 10 | DESIGN.md §11 y el README | pendiente |
 
@@ -99,4 +99,11 @@
   (`BotonEnlace` secundario). `pnpm --filter sitio typecheck` → exit 0. Con
   sesión: `/admin/metricas` lista sus cinco pantallas (Resumen con «Hoy, en el
   Inicio», las otras «Por hacer») y `/admin/contenido/casos` sus dos, con la
-  pestaña Casos encendida.
+  pestaña Casos encendida. Commit `cc7ae4b`.
+- **Paso 8** — `admin/armazon/EstadoVacio.tsx` (`{ titulo, texto }`, sin
+  acción: DECISIONS.md) reemplaza a `admin/metricas/Estado.tsx` (borrado con
+  `git rm`) en los tres estados de `PanelMetricas`. `pnpm --filter sitio
+  typecheck` → exit 0; la búsqueda de `metricas/Estado`, `<Estado ` y
+  `./Estado` en `apps/sitio/src` no encuentra nada. Con sesión, el Inicio
+  muestra «Faltan las variables de Vercel» (la base local no tiene el token)
+  con el borde punteado.
