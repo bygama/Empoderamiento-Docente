@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 10 del PLAN (la CSP del admin con nonce).
+- Paso 11 del PLAN (ADR-0010 y el spec del admin §7).
 
 ## Hecho
 
@@ -150,3 +150,38 @@ Medido sobre `275518e`:
   dejó la cookie `path=/ httpOnly=True sameSite=Lax session=False` con 3589 s
   por delante, y `/` mostró «Estás viendo un borrador» con «Volver al sitio
   publicado».
+- 2026-09-26 — **Paso 10, la CSP del admin con nonce.**
+  `apps/sitio/src/lib/seguridad/cabeceras.ts` (`nuevoNonce`,
+  `politicaDeContenido`, `ponerCabeceras`: COOP y CORP `same-origin` y
+  `X-Frame-Options: DENY` en `/admin`); `proxy.ts` arma la CSP por request y,
+  en el admin, la pasa también en el pedido (`NextResponse.next({ request })`)
+  para que Next ponga el nonce en sus scripts; `app/(admin)/layout.tsx` hace
+  `await connection()`. `proxy.test.ts` suma 3 tests (nonce distinto con
+  `'strict-dynamic'` y la CSP también hacia adentro; COOP, CORP y XFO en las
+  tres respuestas del admin, el rebote incluido; el sitio sin cambios): 9/9.
+  `pnpm test` → auth 12/12, sitio 96 pass + 1 skip (A1); `pnpm typecheck`,
+  `pnpm lint` → exit 0; react-doctor → «100/100, sin diagnósticos»;
+  `pnpm build` → exit 0, con `/admin/entrar`, `/admin/olvide-mi-contrasena` y
+  `/admin/nueva-contrasena` ahora `ƒ` y el sitio `○` como antes. De punta a
+  punta:
+  - dos `curl -sI http://localhost:3012/admin/entrar` → nonces distintos
+    (`wL7iThvry9zgh1JP9xUI7Q==`, `abKMfA39HXHapBOtSzdvbw==`),
+    `'strict-dynamic'`, `'unsafe-eval'` (dev), `cross-origin-opener-policy:
+    same-origin`, `cross-origin-resource-policy: same-origin`,
+    `x-frame-options: DENY`; el HTML lleva ese nonce en cada `<script>`;
+  - `curl -sI http://localhost:3012/` → la CSP del sitio igual que antes
+    (`'unsafe-inline' 'unsafe-eval'`, `upgrade-insecure-requests`), sin COOP;
+  - navegador de Orca, dev: `/admin`, `/admin/paginas`,
+    `/admin/paginas/inicio` y `/admin/metricas` en claro, mixto y oscuro →
+    consola 0 errores, 0 advertencias, 0 violaciones de CSP; salir desde el
+    menú de la cuenta y volver a entrar con `volver=/admin/paginas` → llega a
+    `/admin/paginas`; «Vista previa» → «La vista previa se abrió en otra
+    pestaña.», sin errores;
+  - `next start` en el 3013 (build con `NEXT_PUBLIC_SITE_URL` de ese puerto,
+    porque se inlinea): la CSP sin `'unsafe-eval'`; entrar con
+    `volver=/admin/paginas/inicio` llegó ahí, el editor hidrató y `/admin`,
+    `/admin/paginas` y `/admin/metricas` no dejaron nada en la consola.
+  - Anotado: en las páginas del admin, `Cache-Control` lo termina escribiendo
+    Next (`no-cache, must-revalidate` en dev), no el proxy; era así antes de
+    esta lane. El `no-store` del proxy queda en sus propias respuestas (el 307
+    y el rebote).
