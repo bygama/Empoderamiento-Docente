@@ -12,6 +12,9 @@ const hayBase = Boolean(process.env.DATABASE_URL);
 // vacío y el test dependería de lo que haya copiado el cron antes.
 const HOY = new Date("2001-01-11T12:00:00.000Z");
 const EN_2001 = { fecha: { gte: fechaUTC("2001-01-01"), lte: fechaUTC("2001-12-31") } };
+// Con la base vacía, la primera corrida arranca 90 días antes, en octubre de
+// 2000: la limpieza abarca desde ahí.
+const DE_PRUEBA = { fecha: { gte: fechaUTC("2000-01-01"), lte: fechaUTC("2001-12-31") } };
 
 /** Un cliente que devuelve una fila por día del rango en cada dimensión. */
 function clienteFalso(rota?: string): ClienteDeBusquedas {
@@ -27,6 +30,7 @@ function clienteFalso(rota?: string): ClienteDeBusquedas {
 test("correr dos veces deja las mismas filas y dice qué días copió", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
   const { sincronizarBusquedas } = await import("./busquedas-de-google");
+  await base.busquedaDiaria.deleteMany({ where: DE_PRUEBA });
   const r1 = await sincronizarBusquedas({ cliente: clienteFalso(), base, hoy: HOY, minimoDias: 2 });
   const r2 = await sincronizarBusquedas({ cliente: clienteFalso(), base, hoy: HOY, minimoDias: 2 });
   assert.equal(r1.ok, true);
@@ -39,7 +43,7 @@ test("correr dos veces deja las mismas filas y dice qué días copió", { skip: 
 test("si una dimensión falla, la corrida sale fallida y la marca de agua no avanza", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
   const { sincronizarBusquedas } = await import("./busquedas-de-google");
-  await base.busquedaDiaria.deleteMany({ where: EN_2001 });
+  await base.busquedaDiaria.deleteMany({ where: DE_PRUEBA });
   const r = await sincronizarBusquedas({ cliente: clienteFalso("pais"), base, hoy: HOY, minimoDias: 2 });
   assert.equal(r.ok, false);
   assert.match(r.detalle, /429/);
@@ -49,6 +53,6 @@ test("si una dimensión falla, la corrida sale fallida y la marca de agua no ava
 after(async () => {
   if (!hayBase) return;
   const { base } = await import("@/datos/cliente");
-  await base.busquedaDiaria.deleteMany({ where: EN_2001 });
+  await base.busquedaDiaria.deleteMany({ where: DE_PRUEBA });
   await base.$disconnect();
 });

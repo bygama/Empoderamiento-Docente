@@ -539,7 +539,7 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
   `azul-principal` en hover. El foco, el de siempre pero por dentro
   (`-outline-offset-2`): afuera lo cortaría el scroll horizontal.
 - **En el celular** la fila scrollea de costado si no entra; las cinco de
-  Contenido entran a 390 de ancho.
+  Contenido entran a 390 de ancho, las cinco de Métricas no y scrollean.
 - **El número de una pestaña llega con Mensajes**, su primer consumidor;
   hasta entonces no existe.
 - Primer consumidor: las cinco pantallas de Contenido (Páginas, Casos,
@@ -583,7 +583,8 @@ Filas separadas por un divisor, en una caja con el mismo borde
 - **Una acción que navega** es un link con cara de botón secundario, con el
   nombre de la fila para el lector («Editar Inicio»).
 - Primer consumidor: la lista de Páginas. También las guías de los módulos
-  por hacer.
+  por hacer y las cuatro listas de Métricas › Búsquedas (sin acción: lo
+  principal y sus cifras en el detalle).
 
 ### Estado vacío
 
@@ -594,7 +595,15 @@ competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
 
 - **La acción principal llega con Novedades** («Todavía no hay novedades.
   [Nueva novedad]»), su primer consumidor.
-- Primer consumidor: los tres estados sin datos del panel de métricas.
+- **Con pasos**, cuando lo que falta es configurar algo: una lista ordenada
+  debajo de la frase, en meta `azul-principal` (13,63:1 · 13,59:1 en el
+  oscuro) con el número en medium, porque son instrucciones y no una
+  aclaración. Cada paso dice quién lo hace. Primer consumidor: «Conectá Search
+  Console», en Métricas › Búsquedas (sumado el 2026-09-26,
+  `work/busquedas-de-google/`).
+- Primer consumidor: los tres estados sin datos del panel de métricas. Lo
+  usan también las secciones de Búsquedas sin filas: nunca una lista vacía
+  muda.
 
 ### Pantalla de acceso
 

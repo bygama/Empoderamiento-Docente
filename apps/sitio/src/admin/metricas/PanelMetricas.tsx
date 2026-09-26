@@ -1,5 +1,6 @@
 import { Aviso } from "@/admin/armazon/Campos";
 import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { actualizarMetricasAhora } from "@/datos/acciones/actualizar-metricas";
 import { estadoDeMetricas, tarjetas } from "@/datos/consultas/metricas";
 import { ActualizarAhora } from "./ActualizarAhora";
 import { Tarjeta } from "./Tarjeta";
@@ -24,7 +25,7 @@ export async function PanelMetricas() {
           {estado.ultima ? (estado.ultima.ok ? ` Actualizado el ${hora} UTC.` : ` Último intento el ${hora} UTC.`) : ""}
         </p>
       </div>
-      <ActualizarAhora />
+      <ActualizarAhora accion={actualizarMetricasAhora} />
     </div>
   );
 
