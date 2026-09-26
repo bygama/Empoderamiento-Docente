@@ -115,6 +115,12 @@ export function crearAuth({
       },
     },
 
+    // El token del enlace de «elegí tu contraseña» se guarda hasheado: quien
+    // lea la tabla `verification` (un backup, un log de consultas) no se lleva
+    // enlaces que sirvan. Uno pedido antes de este cambio deja de servir; duran
+    // una hora.
+    verification: { storeIdentifier: "hashed" },
+
     session: {
       expiresIn: UNA_SEMANA,
       updateAge: UN_DIA,

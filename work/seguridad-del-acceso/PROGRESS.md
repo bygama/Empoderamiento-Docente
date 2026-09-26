@@ -20,7 +20,7 @@ Medido sobre `275518e`:
 
 ## In progress
 
-- Paso 6 del PLAN (tokens hasheados).
+- Paso 7 del PLAN (sesión y cookies).
 
 ## Hecho
 
@@ -90,3 +90,10 @@ Medido sobre `275518e`:
   inexistente no imprimió nada y contestó lo mismo; elegir la contraseña
   imprimió «Tu contraseña cambió» con el enlace a
   `/admin/olvide-mi-contrasena`.
+- 2026-09-26 — **Paso 6, tokens hasheados.** `verification: {
+  storeIdentifier: "hashed" }`. `pnpm typecheck` → exit 0. En el dev server,
+  con `verification` vacía: un reset nuevo deja una fila cuyo `identifier` no
+  contiene el token del enlace impreso (es un hash entero, sin el prefijo
+  `reset-password:`); el enlace sigue sirviendo (302 a
+  `/admin/nueva-contrasena?token=…`, `POST /reset-password` → 200) y una
+  segunda vez da 400 `INVALID_TOKEN`.
