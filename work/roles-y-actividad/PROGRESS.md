@@ -2,8 +2,6 @@
 
 ## In progress
 
-STATE: design-first approval window, waiting for owner approval of SPEC.md before PLAN.md
-
 - 2026-09-26 — Worktree listo: `pnpm install`, `pnpm generate`, base propia
   `ed_roles` con las 8 migraciones de `main` aplicadas, `.env.local`
   apuntado a ella. SPEC.md escrito desde el brief del padre (lane 3a de
@@ -13,6 +11,8 @@ STATE: design-first approval window, waiting for owner approval of SPEC.md befor
   da «This is an empty migration»); con el preview feature `partialIndexes`
   Prisma 7.10 escribe el mismo SQL, pero el brief pide el camino a mano y no
   hace falta un preview feature.
+- 2026-09-26 — SPEC aprobado por el padre con siete rulings (DECISIONS), uno
+  de ellos suma `nombrar-direccion`. PLAN.md escrito: 12 pasos.
 
 ## Hecho
 
