@@ -84,3 +84,19 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+/// El rate limit por IP de better-auth (`rateLimit.storage = "database"`).
+/// En la base y no en memoria porque en Vercel cada instancia tenía su
+/// propia cuenta: con diez instancias, el tope de 3 intentos por minuto era
+/// de 30. Nombres de la librería, como las tablas de arriba.
+model RateLimit {
+  /// better-auth pone un id en toda tabla suya y valida el esquema al arrancar.
+  id          String @id
+  /// La IP y la ruta, armadas por better-auth.
+  key         String @unique
+  count       Int
+  /// Milisegundos desde 1970, como los escribe better-auth: un número, no una fecha.
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}

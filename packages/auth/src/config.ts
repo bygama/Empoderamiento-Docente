@@ -105,14 +105,18 @@ export function crearAuth({
      */
     rateLimit: {
       enabled: true,
+      // En la base (tabla `rateLimit`), no en memoria: en Vercel cada
+      // instancia llevaba su propia cuenta y el tope se multiplicaba por la
+      // cantidad de instancias vivas.
+      storage: "database",
       window: 60,
       max: 60,
       customRules: {
         "/sign-in/email": { window: 60, max: 3 },
+        // No hay otra ruta que mande este correo: `/forget-password` ya no
+        // existe en better-auth 1.7 (solo en el plugin email-otp, que no se
+        // usa), y la regla que la limitaba no limitaba nada.
         "/request-password-reset": { window: 300, max: 3 },
-        // El nombre viejo sigue respondiendo como alias: si no se limita, es
-        // una puerta de atrás al mismo envío de correos.
-        "/forget-password": { window: 300, max: 3 },
         "/reset-password": { window: 300, max: 5 },
       },
     },
