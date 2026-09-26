@@ -1,4 +1,5 @@
 import type { BetterAuthOptions } from "better-auth";
+import { frenarSiEstaSuspendida } from "./suspendidas";
 
 /**
  * Dónde se abrió cada sesión, para que la persona reconozca las suyas en Mi
@@ -44,14 +45,18 @@ export const CAMPOS_DE_LA_SESION = {
 } as const;
 
 /**
- * Llena la ubicación al crear una sesión: al entrar y cuando cambiar la
- * contraseña abre una nueva. Una sesión creada fuera de un pedido queda sin
- * ubicación.
+ * Lo que pasa al crear una sesión: al entrar, con el código y cuando cambiar
+ * la contraseña abre una nueva. Primero, que la cuenta no esté suspendida
+ * (suspendidas.ts); después, dónde se abrió. Una sesión creada fuera de un
+ * pedido queda sin ubicación.
  */
 export const GANCHOS_DE_LA_BASE: BetterAuthOptions["databaseHooks"] = {
   session: {
     create: {
-      before: async (sesion, ctx) => ({ data: { ...sesion, ...ubicacionDelPedido(ctx?.headers ?? ctx?.request?.headers) } }),
+      before: async (sesion, ctx) => {
+        await frenarSiEstaSuspendida(sesion.userId, ctx);
+        return { data: { ...sesion, ...ubicacionDelPedido(ctx?.headers ?? ctx?.request?.headers) } };
+      },
     },
   },
 };
