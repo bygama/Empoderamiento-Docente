@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Seleccion, TextoCorto } from "@ed/kit-admin";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { agregarRedireccion } from "@/datos/acciones/redirecciones";
 
 type Resultado = { ok: boolean; detalle: string; campo?: "desde" | "hacia" };

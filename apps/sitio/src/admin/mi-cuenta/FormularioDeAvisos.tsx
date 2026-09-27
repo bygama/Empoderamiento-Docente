@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton } from "@ed/kit-admin";
 import { AVISOS, type ClaveDeAviso } from "@/config/avisos";
 import { guardarMisAvisos } from "@/datos/acciones/avisos";
 

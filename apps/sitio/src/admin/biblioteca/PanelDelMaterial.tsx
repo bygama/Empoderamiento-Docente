@@ -1,4 +1,4 @@
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { ChequeoDelLink } from "@/datos/consultas/ficha-de-material";

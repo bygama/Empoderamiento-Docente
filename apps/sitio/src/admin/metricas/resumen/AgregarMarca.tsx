@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
-import { ENTRADA, TextoCorto } from "@ed/kit-admin";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton, ENTRADA, TextoCorto } from "@ed/kit-admin";
 import { LARGO_DE_UNA_MARCA } from "@/config/metricas";
 import { agregarMarca, type ResultadoDeMarca } from "@/datos/acciones/marcas";
 

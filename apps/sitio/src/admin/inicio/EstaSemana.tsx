@@ -1,4 +1,4 @@
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { Cifra } from "@/admin/armazon/Cifra";
 import type { NumeroDeLaSemana } from "@/datos/inicio/esta-semana";
 

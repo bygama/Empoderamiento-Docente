@@ -4,9 +4,9 @@ import { useId, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CODIGO_NO_SALIO, CUENTA_SUSPENDIDA, quienPuede } from "@ed/auth";
+import { Aviso, Boton as BotonDelAdmin } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { Boton as BotonDelAdmin } from "@/admin/armazon/Boton";
-import { Aviso, Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
+import { Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 import { destinoSeguro } from "../destino";
 
 /**

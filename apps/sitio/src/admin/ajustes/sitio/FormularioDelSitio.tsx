@@ -1,8 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton } from "@ed/kit-admin";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Momento } from "@/admin/armazon/Momento";
 import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";

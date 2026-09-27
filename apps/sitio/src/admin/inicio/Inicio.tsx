@@ -1,6 +1,6 @@
 import { puede } from "@ed/auth";
+import { BotonEnlace } from "@ed/kit-admin";
 import { MODULOS } from "@/admin/armazon/barra-lateral/modulos";
-import { BotonEnlace } from "@/admin/armazon/Boton";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import type { DatosDelInicio } from "@/datos/inicio/inicio";
 import { ActividadReciente } from "./ActividadReciente";

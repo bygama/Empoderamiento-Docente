@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useState } from "react";
-import { Boton } from "@/admin/armazon/Boton";
+import { Boton } from "@ed/kit-admin";
 import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Fila, Lista } from "@/admin/armazon/Lista";

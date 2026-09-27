@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
-import { Seleccion, TextoCorto, type Opcion } from "@ed/kit-admin";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton, type Opcion, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { CANALES_DE_ENLACE } from "@/config/metricas";
 import { crearEnlaceDesdeElAdmin, type ResultadoDeEnlace } from "@/datos/acciones/enlaces";
 import { codigoDesde } from "@/lib/metricas/codigo";

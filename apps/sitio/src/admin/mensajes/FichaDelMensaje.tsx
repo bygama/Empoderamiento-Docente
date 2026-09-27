@@ -1,4 +1,4 @@
-import { claseDeBoton } from "@/admin/armazon/clases";
+import { claseDeBoton } from "@ed/kit-admin";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia, type Tono } from "@/admin/armazon/Insignia";
 import { Momento } from "@/admin/armazon/Momento";

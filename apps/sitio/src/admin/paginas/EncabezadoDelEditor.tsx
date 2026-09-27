@@ -1,4 +1,4 @@
-import { Boton } from "@/admin/armazon/Boton";
+import { Boton } from "@ed/kit-admin";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Pestanas, type Pestana } from "@/admin/armazon/Pestanas";

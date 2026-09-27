@@ -1,6 +1,6 @@
 "use client";
 
-import { Boton } from "@/admin/armazon/Boton";
+import { Boton } from "@ed/kit-admin";
 import { useCopiar } from "@/lib/hooks/useCopiar";
 
 /**

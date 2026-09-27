@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Fila, Lista } from "@/admin/armazon/Lista";
 import type { FilaDeLista } from "@/datos/consultas/editor-de-paginas";

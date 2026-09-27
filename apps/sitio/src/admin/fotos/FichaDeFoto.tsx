@@ -1,4 +1,4 @@
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso } from "@ed/kit-admin";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Momento } from "@/admin/armazon/Momento";
