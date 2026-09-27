@@ -135,3 +135,14 @@ test("la destacada que otra publicó al mismo tiempo se dice en el campo Destaca
   assert.match(fallo?.detalle ?? "", /pasó a ser la destacada mientras publicabas/);
   assert.equal(await falloPorIndice(base, new Error("otro"), { id, slug: "prueba-publicar-i" }), null);
 });
+
+test("despublicar una que no es la destacada deja la intención de su borrador", sinBase, async () => {
+  const { base, guardarNovedadEnBase, despublicarNovedadEnBase } = await modulos();
+  const id = await publicada("prueba-publicar-j");
+  const g = await guardarNovedadEnBase(base, { id, contenido: completa("prueba-publicar-j", { destacada: true }), borradorEnVisto: null, quien: "Ana" });
+  if (!g.ok) return assert.fail(g.detalle);
+  const r = await despublicarNovedadEnBase(base, { id, borradorEnVisto: g.borradorEn });
+  assert.equal(r.ok && r.detalle, "Despublicada: ya no se ve en el sitio.");
+  const fila = await base.novedad.findUnique({ where: { id } });
+  assert.deepEqual([fila?.publicada, fila?.destacada, (fila?.borrador as { destacada?: boolean } | null)?.destacada], [false, false, true]);
+});
