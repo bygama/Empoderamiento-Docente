@@ -24,8 +24,11 @@ Sí sabe de Next: `CampoFoto` y `ListaFija` usan `next/image`. `react`,
 | --- | --- |
 | `TextoCorto`, `Parrafo` | una línea o varias, con el tope a la vista y el contador |
 | `Seleccion` | un valor de una lista cerrada, con `{ valor, etiqueta }` |
+| `Casilla` | sí o no, con su etiqueta y lo que pasa si se marca |
+| `Fecha` | año, y si se sabe, mes y día: `AAAA-MM-DD`, `AAAA-MM` o `AAAA` |
 | `CampoFoto` | una foto: miniatura con el foco, alt obligatorio y la subida |
 | `ListaFija` | exactamente N ítems, en una grilla de miniaturas |
+| `ListaVariable` | ítems que se agregan, se quitan y se mueven, hasta un máximo; cada uno con una clave estable que da quien lo usa |
 | `Contador`, `PieDelCampo`, `estadoDelLargo` | el largo de un texto y lo que se dice de él |
 | `Boton`, `claseDeBoton`, `Variante` | los botones: primario, secundario, terciario y destructivo |
 | `Aviso` | un banner de error o de confirmación, nunca un toast |
