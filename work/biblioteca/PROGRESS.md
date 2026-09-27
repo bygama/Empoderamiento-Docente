@@ -307,6 +307,29 @@
   crece y parte su texto antes de empujar la acción (`flex-1 basis-64`), y la
   acción baja recién a 390 (`bfcc4629`, DESIGN.md §11 «Lista» lo dice).
 
+- **En pausa, con el PR abierto** (2026-09-27): los 15 pasos hechos y
+  verificados (abajo), la rama publicada y el
+  [PR #191](https://github.com/bygama/Empoderamiento-Docente/pull/191)
+  abierto. Falta lo que no es de esta sesión: la revisión de cierre, que
+  lanza el padre, y el rebase sobre `main`, que desde #190 (Ajustes) choca
+  en AGENTS.md, README, el índice de ADRs, `datos/actividad.ts`,
+  `admin/actividad/frase.ts`, `admin/por-hacer/guias.ts` y
+  `app/(sitio)/novedades/[slug]/page.tsx`.
+
+## Next
+
+1. Si el padre manda arreglos de la revisión: arreglarlos acá, volver a
+   correr el gate (`pnpm typecheck`, `pnpm lint`, `node
+   scripts/verificar-react-doctor.mjs`, `pnpm test`, `pnpm build`) y pegar
+   los veredictos tal cual en `## Verification`.
+2. Cuando el padre pida el rebase: `git rebase origin/main`, conciliar los
+   siete archivos (en AGENTS.md y README, las dos secciones conviven; en
+   `actividad.ts` y `frase.ts`, los tipos de Ajustes y los de la Biblioteca;
+   el índice de ADRs lleva el 0015 de Ajustes y el 0016 de acá), aplicar las
+   cuatro migraciones de Ajustes a `ed_biblioteca` (`pnpm migrate:deploy`) y
+   repetir el gate y `comparar-render` contra un build de `main` nuevo.
+3. Al cerrar: el commit que saca `work/biblioteca/`, dentro de este PR.
+
 ## Verification
 
 ### 2026-09-27 — L DoD (lane de un XL) — PASS
