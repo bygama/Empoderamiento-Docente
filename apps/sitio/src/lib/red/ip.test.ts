@@ -42,3 +42,21 @@ test("internet pública sí", () => {
     assert.equal(ipQueNoSePide(ip), false, ip);
   }
 });
+
+test("IPv4-translated (::ffff:0:0/96) no es una IPv4 escrita como IPv6: cae en la regla de las globales", () => {
+  // El atajo viejo, /^::ffff:/, las mandaba a la lista de IPv4 y las dejaba pasar.
+  for (const ip of ["::ffff:0:7f00:1", "::ffff:0:a9fe:a9fe", "0:0:0:0:ffff:0:a00:1", "::ffff:0:808:808"]) {
+    assert.equal(ipQueNoSePide(ip), true, ip);
+  }
+});
+
+test("IPv4-mapped de verdad (::ffff:a.b.c.d), en cualquier escritura, se juzga como su IPv4", () => {
+  for (const ip of ["::ffff:127.0.0.1", "::FFFF:7F00:1", "0000:0000:0000:0000:0000:ffff:0a00:0001", "::ffff:169.254.169.254", "::ffff:0.0.0.0"]) {
+    assert.equal(ipQueNoSePide(ip), true, ip);
+  }
+  for (const ip of ["::ffff:8.8.8.8", "::ffff:808:808", "0:0:0:0:0:ffff:c82d:101"]) assert.equal(ipQueNoSePide(ip), false, ip);
+});
+
+test("una IPv6 con zona (fe80::1%eth0) no se pide", () => {
+  assert.equal(ipQueNoSePide("fe80::1%eth0"), true);
+});

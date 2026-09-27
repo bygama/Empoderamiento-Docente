@@ -44,6 +44,27 @@ for (const [red, prefijo] of [
 }
 
 /**
+ * La IPv4 de una IPv4-mapped de verdad (`::ffff:a.b.c.d`, en cualquier
+ * escritura), o `null`. Se mira la forma canónica que da el parser de URL
+ * (minúsculas, ceros comprimidos, la IPv4 en hexa), así `0:0:0:0:0:ffff:7f00:1`
+ * y `::ffff:127.0.0.1` son lo mismo. Solo `::ffff:hhhh:hhhh`: la IPv4-translated
+ * (`::ffff:0:a9fe:a9fe`, ::ffff:0:0/96) no es una de estas y cae en la regla de
+ * las globales, que la rechaza.
+ */
+function ipv4Mapeada(ip: string): string | null {
+  let host: string;
+  try {
+    host = new URL(`http://[${ip}]/`).hostname;
+  } catch {
+    return null;
+  }
+  const grupos = /^\[::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})\]$/.exec(host);
+  if (!grupos) return null;
+  const [alto, bajo] = [parseInt(grupos[1], 16), parseInt(grupos[2], 16)];
+  return [alto >> 8, alto & 255, bajo >> 8, bajo & 255].join(".");
+}
+
+/**
  * ¿Es una dirección a la que no se le pide nada? Lo que no es una IP también
  * da `true`: ante la duda, no se pide.
  */
@@ -52,6 +73,11 @@ export function ipQueNoSePide(ip: string): boolean {
   if (version === 4) return NO_SE_PIDEN.check(ip, "ipv4");
   if (version !== 6) return true;
   // Una IPv4 escrita como IPv6 se juzga como IPv4.
-  if (/^::ffff:/i.test(ip)) return NO_SE_PIDEN.check(ip, "ipv6");
-  return !GLOBAL.check(ip, "ipv6") || NO_SE_PIDEN.check(ip, "ipv6");
+  const mapeada = ipv4Mapeada(ip);
+  if (mapeada !== null) return NO_SE_PIDEN.check(mapeada, "ipv4");
+  try {
+    return !GLOBAL.check(ip, "ipv6") || NO_SE_PIDEN.check(ip, "ipv6");
+  } catch {
+    return true;
+  }
 }

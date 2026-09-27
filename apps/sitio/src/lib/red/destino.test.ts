@@ -25,6 +25,9 @@ test("solo https, en el puerto de siempre, sin credenciales y sin IP interna esc
   assert.equal(motivo("https://[::1]/"), "ip");
   assert.equal(motivo("https://[::ffff:127.0.0.1]/"), "ip");
   assert.equal(motivo("https://0x7f000001/"), "ip");
+  // IPv4-translated: la metadata de la nube escrita como ::ffff:0:a9fe:a9fe.
+  assert.equal(motivo("https://[::ffff:0:a9fe:a9fe]/latest/meta-data/"), "ip");
+  assert.equal(motivo("https://[::ffff:0:7f00:1]/"), "ip");
 });
 
 /** Lo que contesta el `lookup` para ese host, con un resolvedor inventado. */
