@@ -1,5 +1,6 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { openGraphDeLaPagina } from "@/config/metadata";
+import { casosDelSitio } from "@/datos/consultas/casos";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { InvestigacionHero } from "@/features/investigacion/components/InvestigacionHero";
 import { LineasInvestigacion } from "@/features/investigacion/components/LineasInvestigacion";
@@ -44,14 +45,16 @@ export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Pr
  * Biblioteca sigue en el cierre, del lado izquierdo (decisión de Gastón).
  */
 export default async function InvestigacionPage() {
-  // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, lineas, ciclo, enAccion, cierre } = await contenidoDe("investigacion");
+  // El contenido publicado (o el borrador, en vista previa); sin base, el
+  // inicial del código. Los casos son una entidad: sin base, ninguno.
+  const [{ hero, lineas, ciclo, enAccion, cierre }, casos] = await Promise.all([contenidoDe("investigacion"), casosDelSitio()]);
   return (
     <main id="contenido" tabIndex={-1}>
       <InvestigacionHero contenido={hero} />
-      <LineasInvestigacion contenido={lineas} />
+      {/* De los casos, las líneas necesitan solo adónde lleva cada «Ver en acción». */}
+      <LineasInvestigacion contenido={lineas} casos={casos.map(({ id, slug }) => ({ id, slug }))} />
       <EspiralInvestigacion contenido={ciclo} />
-      <InvestigacionEnAccion contenido={enAccion} />
+      <InvestigacionEnAccion contenido={enAccion} casos={casos} />
       <CierreInvestigacion contenido={cierre} />
     </main>
   );

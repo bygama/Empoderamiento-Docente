@@ -1,4 +1,4 @@
-import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
+import type { CasoInvestigacion } from "@/features/investigacion/casos/tipos";
 import { ROTULO_SECCION, TINTES } from "../tintes";
 import { LaminaCaso } from "../LaminaCaso";
 import { FlechaManuscrita, SubrayadoMarcador } from "../Garabatos";

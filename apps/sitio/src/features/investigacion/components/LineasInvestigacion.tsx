@@ -8,6 +8,7 @@ import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { FlechaManuscrita } from "@/features/investigacion/casos/Garabatos";
 import { ROTULO_MICRO } from "@/features/investigacion/casos/tintes";
 import type { Lineas } from "@/features/investigacion/contenido/lineas";
+import { CASO_DE_CADA_LINEA } from "@/features/investigacion/contenido/modelo-de-casos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { alClicIrA } from "@/lib/navegar";
@@ -21,22 +22,6 @@ import { PuntosCampo } from "./PuntosCampo";
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
-
-/**
- * El caso que muestra en acción a cada línea, por su lugar en la lista: el
- * slug del expediente (data/casos.ts) que «Ver en acción» abre. El cruce es
- * editorial (Facundo, 2026-09-14) y hay que validarlo con ED; no se edita
- * desde el admin porque es un cruce con los casos, que son una entidad
- * (SPEC §4 de work/paginas-investigacion-y-resto/).
- */
-const CASO_DE_CADA_LINEA = [
-  "oaxaca-transformacion-colectiva",
-  "resignificacion-escuelas-tecnicas",
-  "oaxaca-transformacion-colectiva",
-  "contenido-curricular-herramienta-pensamiento",
-  "contenido-curricular-herramienta-pensamiento",
-  "evaluacion-mas-alla-del-puntaje",
-] as const;
 
 /**
  * Sección 3 — Líneas de investigación (`#lineas`): UNA CARPETA A PANTALLA
@@ -53,9 +38,10 @@ const CASO_DE_CADA_LINEA = [
  * pin); las filas se revelan en cascada al llegar
  * (lineas-investigacion/coreografia-lineas.ts). Touch / reduced-motion:
  * carpeta plana y filas quietas. Los textos llegan por props (de
- * `features/investigacion/contenido/lineas.ts` o de la base).
+ * `features/investigacion/contenido/lineas.ts` o de la base), y los casos
+ * con su slug, para «Ver en acción».
  */
-export function LineasInvestigacion({ contenido }: { contenido: Lineas }) {
+export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; casos: ReadonlyArray<{ id: string; slug: string }> }) {
   const zonaRef = useRef<HTMLElement | null>(null);
   const carpetaRef = useRef<HTMLDivElement | null>(null);
   const listaRef = useRef<HTMLOListElement | null>(null);
@@ -153,7 +139,7 @@ export function LineasInvestigacion({ contenido }: { contenido: Lineas }) {
                 pueden repetirla. */}
             <ol ref={listaRef} className="mt-14 grid items-start gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-2 lg:gap-y-12">
               {contenido.lineas.map((linea, i) => (
-                <Papel key={numeroDePapel(i)} linea={linea} caso={CASO_DE_CADA_LINEA[i]} indice={i} />
+                <Papel key={numeroDePapel(i)} linea={linea} caso={casos.find((c) => c.id === CASO_DE_CADA_LINEA[i])?.slug} indice={i} />
               ))}
             </ol>
 

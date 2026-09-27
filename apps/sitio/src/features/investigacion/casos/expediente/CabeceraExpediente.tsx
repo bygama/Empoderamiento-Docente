@@ -1,5 +1,5 @@
 import type { Ref } from "react";
-import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
+import type { CasoInvestigacion } from "@/features/investigacion/casos/tipos";
 import { ROTULO_MICRO } from "../tintes";
 import { Enlace } from "@/components/ui/icons";
 import { useCopiar } from "@/lib/hooks/useCopiar";

@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef } from "react";
 import { irAElemento, irAPosicion } from "@/lib/indice";
 import { EVENTO_CASO } from "../abrir-caso";
-import { CASOS } from "@/features/investigacion/data/casos";
+import type { CasoInvestigacion } from "../tipos";
 import type { Maquina } from "./useLugarExpediente";
 
 type Acciones = {
@@ -34,21 +34,24 @@ function irAlCaso(
 /**
  * El lugar como página del navegador: link directo por hash, pedido desde
  * otra sección (píldoras «Ver en acción» de las líneas), Escape y el botón
- * «atrás». Los efectos van en este orden, el de siempre.
+ * «atrás». Los efectos van en este orden, el de siempre. `casos` llega por
+ * props (la base).
  */
-export function useHistorialLugar(m: Maquina, { abrir, cerrar, solicitarCierre }: Acciones) {
+export function useHistorialLugar(m: Maquina, { abrir, cerrar, solicitarCierre }: Acciones, casos: readonly CasoInvestigacion[]) {
   const { activo, estado, estadoRef, historialRef, cierrePendienteRef, botonesRef, sectionRef } = m;
 
   /* ── Link directo (#slug): abre el expediente al cargar ─────────── */
-  // `abrir` se lee por ref para no atar el efecto de montaje a su identidad.
+  // `abrir` y los casos se leen por ref para no atar el efecto de montaje a su identidad.
   const abrirRef = useRef(abrir);
+  const casosRef = useRef(casos);
   useEffect(() => {
     abrirRef.current = abrir;
+    casosRef.current = casos;
   });
   useEffect(() => {
     const slug = window.location.hash.replace(/^#/, "");
     if (!slug) return;
-    const i = CASOS.findIndex((c) => c.slug === slug);
+    const i = casosRef.current.findIndex((c) => c.slug === slug);
     if (i < 0) return;
     const t = window.setTimeout(() => {
       const el = botonesRef.current[i];
@@ -65,7 +68,7 @@ export function useHistorialLugar(m: Maquina, { abrir, cerrar, solicitarCierre }
   useEffect(() => {
     const onCaso = (e: Event) => {
       const slug = (e as CustomEvent<string>).detail;
-      const i = CASOS.findIndex((c) => c.slug === slug);
+      const i = casosRef.current.findIndex((c) => c.slug === slug);
       if (i < 0 || estadoRef.current !== "index") return;
       const el = botonesRef.current[i];
       const section = sectionRef.current;

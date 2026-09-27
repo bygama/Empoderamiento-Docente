@@ -1,4 +1,4 @@
-import type { TinteCarpeta } from "@/features/investigacion/data/casos";
+import type { TinteCarpeta } from "@/features/investigacion/casos/tipos";
 
 /**
  * Mapeo de tintes de carpeta a clases del design system (tokens, no
@@ -110,6 +110,13 @@ export const TINTES: Record<
  * escalera). Abajo de md el desorden es el mismo pero comprimido, y la
  * pestaña se angosta a w-48 para que entre.
  */
+/**
+ * El tinte de cada carpeta, por el número del caso. Es parte de la escena, no
+ * del contenido: cada carpeta de la pila tiene su color, en este orden, y los
+ * casos son siempre cuatro (SPEC §4 de work/casos-aliados-fotos/).
+ */
+export const TINTE_DEL_CASO: Record<string, TinteCarpeta> = { "01": "navy", "02": "medio", "03": "claro", "04": "verde" };
+
 export const OFFSET_PESTANA = [
   "left-[0%] md:left-[8%]",
   "left-[20%] md:left-[55%]",

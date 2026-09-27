@@ -24,6 +24,16 @@ export function esIdDeCaso(valor: string): valor is IdDeCaso {
   return (IDS_DE_CASOS as readonly string[]).includes(valor);
 }
 
+/**
+ * El caso que muestra en acción a cada línea de investigación, por su lugar
+ * en la lista: el id del caso cuyo expediente abre «Ver en acción». Va por id
+ * y no por slug, que se edita en el admin: el link lleva al slug que el caso
+ * tenga hoy (SPEC §4.1). El cruce es editorial (Facundo, 2026-09-14) y hay
+ * que validarlo con ED; no se edita desde el admin (SPEC §4 de
+ * work/paginas-investigacion-y-resto/). Lo leen las líneas y «Se ve en».
+ */
+export const CASO_DE_CADA_LINEA: readonly IdDeCaso[] = ["caso-01", "caso-02", "caso-01", "caso-04", "caso-04", "caso-03"];
+
 /** Cómo lo nombran el admin y la actividad: «Caso 01». */
 export function nombreDelCaso(id: IdDeCaso): string {
   return `Caso ${CASOS_FIJOS.find((c) => c.id === id)?.numero ?? id}`;

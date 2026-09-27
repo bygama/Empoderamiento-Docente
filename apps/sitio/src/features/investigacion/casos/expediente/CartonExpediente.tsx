@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
-import { ETIQUETA_DEMO } from "@/features/investigacion/data/casos";
+import type { CasoInvestigacion } from "@/features/investigacion/casos/tipos";
+import { ETIQUETA_DEMO } from "@/features/investigacion/casos/tipos";
 import { ROTULO_MICRO } from "../tintes";
 import { EvidenciasCaso } from "../EvidenciasCaso";
 import { ClipPapel } from "../Garabatos";
