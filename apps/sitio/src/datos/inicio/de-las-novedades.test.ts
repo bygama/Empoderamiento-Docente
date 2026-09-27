@@ -35,3 +35,16 @@ test("cuenta los borradores quietos hace más de 7 días, y no los recientes", s
     await base.novedad.deleteMany({ where: { id: { in: [vieja.id, nueva.id] } } });
   }
 });
+
+test("una despublicada que se reescribe se nombra por el título del borrador", sinBase, async () => {
+  const { base } = await import("@/datos/cliente");
+  const hace = new Date(Date.now() - 9 * 24 * 60 * 60 * 1000);
+  const fila = await base.novedad.create({ data: { titulo: "Prueba inicio publicado", borrador: { titulo: "Prueba inicio reescrito", slug: "" }, borradorEn: hace } });
+  try {
+    const detalle = (await novedadesEnBorradorViejas())?.detalle ?? "";
+    assert.match(detalle, /«Prueba inicio reescrito»/);
+    assert.doesNotMatch(detalle, /Prueba inicio publicado/);
+  } finally {
+    await base.novedad.delete({ where: { id: fila.id } });
+  }
+});
