@@ -7,10 +7,15 @@ import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
 import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import type { FichaDeNovedad as Ficha, Vecinas } from "@/datos/consultas/ficha-de-novedad";
+import type { BorradorDeNovedad } from "@/features/novedades/contenido/novedad";
 import { EncabezadoDeLaFicha } from "./EncabezadoDeLaFicha";
 import { aDocumento, aFormulario, mismoDocumento, type NovedadEnElFormulario } from "./formulario";
 import { FormularioDeNovedad } from "./FormularioDeNovedad";
+import { QueCambio } from "./QueCambio";
+import { SalidaDeNovedad } from "./SalidaDeNovedad";
 import { SIN_RED, useGuardarNovedad } from "./useGuardarNovedad";
+import { usePublicarNovedad } from "./usePublicarNovedad";
+import { useSalidaDeNovedad } from "./useSalidaDeNovedad";
 
 type Props = {
   /** La novedad; en `/nueva`, sin id. */
@@ -36,13 +41,15 @@ function ayudaDeLaDestacada(vecinas: Vecinas, id: string | null): string {
 export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
   const [form, setForm] = useState(() => aFormulario(ficha.documento));
   const [guardado, setGuardado] = useState(() => ficha.documento);
+  // Lo que está en el sitio (para «Qué cambió» y descartar), o nada si nunca se publicó.
+  const [publicado, setPublicado] = useState<BorradorDeNovedad | null>(() => ficha.publicado);
   // La URL sigue al título hasta que alguien la escribe, o hasta que se publica.
   const [urlAMano, setUrlAMano] = useState(() => ficha.publicado !== null || (ficha.documento.slug !== "" && ficha.documento.slug !== desdeTexto(ficha.documento.titulo)));
   const documento = aDocumento(form);
   const haySinGuardar = !mismoDocumento(documento, guardado);
   const soltarSalida = useFrenarSalida(haySinGuardar);
   const errores = useErroresDelEditor();
-  const { id, estado, aviso, setAviso, pendiente, setPendiente, guardarDocumento } = useGuardarNovedad({
+  const { id, estado, setEstado, aviso, setAviso, pendiente, setPendiente, guardarDocumento } = useGuardarNovedad({
     idInicial: ficha.id,
     estadoInicial: ficha.estado,
     mostrarErrores: errores.mostrar,
@@ -80,6 +87,33 @@ export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
     }
   };
 
+  // Publicar y ver el borrador guardan antes lo que haya en pantalla (o crean la fila).
+  const preparar = async () => (id && !haySinGuardar ? { id, borradorEn: estado.borradorEn } : guardarLoQueHay());
+  const { verBorrador, publicar } = usePublicarNovedad({
+    setEstado,
+    setAviso,
+    setPendiente,
+    mostrarErrores: errores.mostrar,
+    preparar,
+    nadaParaPublicar: Boolean(id && estado.publicada && !estado.borradorEn && !haySinGuardar),
+    alPublicarse: () => {
+      setPublicado(documento);
+      setUrlAMano(true);
+    },
+  });
+  const salida = useSalidaDeNovedad({
+    estado,
+    setEstado,
+    setAviso,
+    setPendiente,
+    soltarSalida: () => soltarSalida(),
+    alDescartarse: () => {
+      if (!publicado) return;
+      setForm(aFormulario(publicado));
+      setGuardado(publicado);
+    },
+  });
+
   const recargar = () => {
     if (haySinGuardar && !window.confirm("Recargar tira lo que escribiste sin guardar. ¿Recargar igual?")) return;
     soltarSalida();
@@ -97,6 +131,8 @@ export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
         pendiente={pendiente}
         aviso={<AvisoDeLaAccion aviso={aviso} alCerrar={() => setAviso(null)} alRecargar={recargar} />}
         alGuardar={guardar}
+        alVerBorrador={verBorrador}
+        alPublicar={publicar}
       />
       <div className="max-w-3xl">
         <FormularioDeNovedad
@@ -111,6 +147,19 @@ export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
               : `Así queda: /novedades/${form.slug || "…"}. Sigue al título hasta que la escribas vos o se publique.`
           }
         />
+        <div className="mt-10 space-y-10">
+          <QueCambio publicado={publicado} actual={documento} />
+          {id ? (
+            <SalidaDeNovedad
+              titulo={form.titulo.trim() || "Sin título"}
+              estado={estado}
+              pendiente={pendiente}
+              alDescartar={() => void salida.descartar(id)}
+              alDespublicar={() => void salida.despublicar(id)}
+              alBorrar={() => void salida.borrar(id)}
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   );
