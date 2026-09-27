@@ -6,6 +6,7 @@ import { base } from "@/datos/cliente";
 import { numerosPara, type NumeroDeLaSemana } from "@/datos/inicio/esta-semana";
 import { SIN_SEARCH_CONSOLE } from "@/datos/inicio/lecturas-de-la-semana";
 import { sumarPorValor } from "@/lib/metricas/agregar";
+import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 import { diaISO, fechaUTC, sumarDias, variacion } from "@/lib/metricas/periodos";
 
 // Los números del resumen semanal (SPEC de work/metricas-completas/ §8): los
@@ -14,11 +15,11 @@ import { diaISO, fechaUTC, sumarDias, variacion } from "@/lib/metricas/periodos"
 
 const SEMANA = 7;
 
-/** Las vistas de la ventana de 7 días de la copia, contra la anterior. */
+/** Las vistas de la ventana de 7 días de la copia, contra la anterior; sin las variables, lo dice como los visitantes. */
 async function vistas(): Promise<NumeroDelResumen> {
   const [estado, ventana] = await Promise.all([estadoDeMetricas(), tarjetaDe(SEMANA)]);
-  const valor = estado.hayVariables && ventana ? ventana.vistas : null;
-  return { etiqueta: "Vistas", valor, variacion: ventana?.variacionVistas };
+  if (!estado.hayVariables) return { etiqueta: "Vistas", valor: null, nota: SIN_VARIABLES_DE_METRICAS };
+  return { etiqueta: "Vistas", valor: ventana?.vistas ?? null, variacion: ventana?.variacionVistas };
 }
 
 /** Los contactos de los últimos 7 días, contra los 7 anteriores: los contadores cuentan en el momento. */
