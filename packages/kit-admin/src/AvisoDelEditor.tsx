@@ -5,7 +5,7 @@ import { Aviso } from "./Aviso";
 export type AvisoDelEditor = { ok: boolean; detalle: ReactNode; choque?: true };
 
 /**
- * El aviso de la última acción de un editor (una página, una novedad), con
+ * El aviso de la última acción de un editor (una página, una entrada), con
  * «Recargar» adentro cuando otra persona guardó mientras tanto (DESIGN.md §11,
  * «Avisos»).
  */

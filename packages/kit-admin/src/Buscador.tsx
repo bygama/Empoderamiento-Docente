@@ -3,7 +3,7 @@ import { Boton } from "./Boton";
 import { claseDeBoton, ENTRADA } from "./clases";
 
 type Props = {
-  /** Qué busca, para el lector y el `aria-label` del formulario: «Buscar en Contacto». */
+  /** Qué busca, para el lector y el `aria-label` del formulario: «Buscar en los mensajes». */
   etiqueta: string;
   /** Adónde va: la misma lista. */
   accion: string;

@@ -14,8 +14,7 @@ type Props = {
 /**
  * Guardar borrador, Vista previa y Publicar, el único primario (DESIGN.md
  * §11, «Botones» y «Ficha de una entidad»): las acciones del encabezado de la
- * ficha de una cosa que se publica (una novedad, un material, un caso, un
- * aliado). Mientras una corre, las demás esperan, y la que corre lo dice. En
+ * ficha de una cosa que se publica, con su borrador y lo publicado. Mientras una corre, las demás esperan, y la que corre lo dice. En
  * el celular «Guardar borrador» dice «Guardar»: la barra de abajo no tiene
  * lugar; el lector lee el nombre entero.
  */

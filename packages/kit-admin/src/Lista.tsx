@@ -9,7 +9,7 @@ export function Lista({ children }: { children: React.ReactNode }) {
 }
 
 type PropsDeFila = {
-  /** A la izquierda de todo, una imagen chica que la identifica (la portada de un material): decorativa. */
+  /** A la izquierda de todo, una imagen chica que la identifica (una portada): decorativa. */
   miniatura?: React.ReactNode;
   /** Lo principal: un nombre, y si hace falta algo al lado en meta. */
   principal: React.ReactNode;
@@ -31,8 +31,8 @@ type PropsDeFila = {
  * principal baja a `gris-texto` (4,83:1) y la nota ocupa el lugar de la
  * acción: no se esconde, se explica. Con miniatura, va a la izquierda de lo
  * principal, y lo principal y el detalle se corren junto a ella; ese bloque
- * crece y parte su texto antes de empujar la acción abajo (los títulos de
- * los materiales son largos), y recién baja si no le quedan 16rem.
+ * crece y parte su texto antes de empujar la acción abajo (hay títulos
+ * largos), y recién baja si no le quedan 16rem.
  */
 export function Fila({ miniatura, principal, detalle, insignias, accion, atenuada, desplegable }: PropsDeFila) {
   const texto = (
