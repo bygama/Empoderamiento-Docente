@@ -353,7 +353,9 @@ Hasta tenerlos en el repo, usar placeholder textual o el favicon de Next.js.
 El admin (`/admin`) es una herramienta de trabajo, no una pieza de marca: lo
 usa el equipo de ED unas pocas veces por mes, y pesa más la claridad que la
 velocidad. Usa la paleta y las fuentes de la marca con estas reglas propias.
-Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED.
+Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED;
+los controles de un formulario, en `packages/kit-admin/`, que tampoco, y
+cuyo README dice qué tokens espera de la app que lo usa.
 Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
 sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
 índice de tarjetas, la lista, el estado vacío y la pantalla de acceso nueva,
@@ -364,8 +366,9 @@ vista previa de buscador y redes, también (`work/paginas-inicio/`); el
 número, el filtro, el buscador, «volver», confirmar lo que no se deshace y
 la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
 (`work/inicio/`); el paginado y la tabla, también (`work/cuentas/`); la sección
-compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`). Todos
-los contrastes están
+compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`); el estado
+vacío con su acción, la fecha, la selección, la lista variable y la ficha de
+una entidad, también (`work/novedades-y-kit/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -768,8 +771,11 @@ hacer, en una frase en meta `gris-texto` (4,83:1 · 7,08:1). Borde punteado
 `azul-claro`, decorativo, `rounded-xl`, `p-6`: dice «acá va a haber algo» sin
 competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
 
-- **La acción principal llega con Novedades** («Todavía no hay novedades.
-  [Nueva novedad]»), su primer consumidor.
+- **Con una acción**, cuando la pantalla vacía tiene algo para hacer: debajo
+  de la frase, y es el primario de la pantalla, así que el encabezado no lo
+  repite. Primer consumidor: Novedades sin ninguna novedad («Todavía no hay
+  novedades.» y «Nueva novedad»); con alguna, el primario vuelve al
+  encabezado y el vacío de una pestaña o de una búsqueda no lleva acción.
 - **Con pasos**, cuando lo que falta es configurar algo: una lista ordenada
   debajo de la frase, en meta `azul-principal` (13,63:1 · 13,59:1 en el
   oscuro) con el número en medium, porque son instrucciones y no una
@@ -836,8 +842,66 @@ frase y no solo el cuadrito.
 - **Cuando las casillas son lo que se elige** (los avisos de Mi cuenta),
   cada fila es de 44 px con el texto en cuerpo, y van juntas en un
   `fieldset` con su `legend` en meta medium («Mandame un correo con cada»).
+- **Como campo de un formulario** (sí o no, con lo que pasa si se marca) es
+  `Casilla` de `packages/kit-admin/`: la etiqueta en meta medium envuelve la
+  casilla en una fila de 40 px, la ayuda debajo en meta `gris-texto`
+  (4,83:1 · 7,08:1) y el error del campo, como cualquier otro. La ayuda dice
+  la consecuencia: «Hoy la destacada es «…». Al publicar esta, aquella deja
+  de serlo: hay una sola.»
 - Primer consumidor: el campo opcional del editor (`admin/campos/Campo.tsx`);
-  registrada con los avisos de Mi cuenta (2026-09-26, `work/mensajes/`).
+  registrada con los avisos de Mi cuenta (2026-09-26, `work/mensajes/`). La
+  `Casilla` del kit es esta misma regla hecha componente: la usa la destacada
+  de una novedad.
+
+### Fecha
+
+Una fecha con la precisión que da la fuente: el año y, si se saben, el mes y
+el día. `packages/kit-admin/src/Fecha.tsx`.
+
+- **Tres controles en un `fieldset`**, con la etiqueta como `legend` en meta
+  medium: el año se escribe (cuatro cifras, teclado numérico) y el mes y el
+  día se eligen, con «Sin mes» y «Sin día». Cada uno lleva su nombre arriba
+  en meta `gris-texto`. Son la `ENTRADA` del admin.
+- **El día depende del mes**: sin mes queda deshabilitado, y sus opciones son
+  las de ese mes; si el mes nuevo no tiene el día elegido, el día se suelta.
+  Un 30 de febrero no se puede elegir.
+- **Un error marca los tres** (`aria-invalid`) y el foco va al año.
+- Primer consumidor: la fecha de una novedad.
+
+### Selección
+
+Un valor de una lista cerrada: el `select` del navegador con la `ENTRADA`
+del admin. `packages/kit-admin/src/Seleccion.tsx`.
+
+- **La ayuda va antes del campo**, porque se lee antes de elegir.
+- **Si el valor guardado ya no está en la lista** (la lista cambió), el campo
+  lo muestra: aparece la opción vacía que pide elegir («Elegí una
+  categoría»), en vez de mostrar la primera como si estuviera elegida.
+- «Ninguna» es una opción más cuando no elegir es válido («Publicación de la
+  Biblioteca: Ninguna»).
+- Primer consumidor: la ruta interna del editor de páginas; en una novedad,
+  la categoría y la publicación.
+
+### Lista variable
+
+Ítems que se agregan, se quitan y se mueven, hasta un tope.
+`packages/kit-admin/src/ListaVariable.tsx`.
+
+- **El título dice la cuenta**, en `text-admin-seccion`: «Secciones · 2 de
+  10». Vacía, una frase en meta `gris-texto` dice qué significa («Sin
+  secciones, la novedad no tiene ficha propia…»).
+- **Cada ítem es una caja** `rounded-xl` con borde `azul-claro/60`: una
+  cabecera con su número y lo que lo nombra en meta medium (lo que lo nombra
+  en `gris-texto`), «Subir» y «Bajar» (íconos de 40 px en `azul-medio`,
+  5,11:1 · 7,14:1, con su nombre para el lector) y «Quitar», destructivo; y
+  adentro, sus campos.
+- **Se mueve con botones, no arrastrando**: el teclado y el lector llegan
+  igual, y cada cambio se anuncia («Moviste sección 2 al lugar 1.»). Al
+  agregar, el foco va al primer campo del ítem nuevo; al quitar, a «Agregar».
+- **«Agregar sección»** es secundario, con el ícono `Mas`. En el tope deja su
+  lugar a la explicación: «Llegaste al tope de 10: para agregar, primero hay
+  que quitar». No se deshabilita.
+- Primer consumidor: el cuerpo de una novedad.
 
 ### Cifra
 
@@ -974,7 +1038,9 @@ título, antes de los campos. `apps/sitio/src/admin/paginas/AvisoDeCompartida.ts
 ### Qué cambió
 
 El borrador contra lo publicado, antes de publicar (la pestaña «Qué cambió»
-del editor). `apps/sitio/src/admin/paginas/ListaDeCambios.tsx`.
+del editor). La lista es `apps/sitio/src/admin/armazon/ListaDeDiferencias.tsx`;
+la pestaña de una página la arma por parte (`admin/paginas/ListaDeCambios.tsx`)
+y la ficha de una novedad, por campo.
 
 - **Por parte**: el nombre en `text-admin-seccion` con el divisor de las
   secciones, y debajo una fila por campo que cambió, separadas por el divisor
@@ -989,11 +1055,19 @@ del editor). `apps/sitio/src/admin/paginas/ListaDeCambios.tsx`.
   alternativo escrito debajo. Lo que no había o ya no está dice «Nada».
 - **Vacía**: el `EstadoVacio`, «No hay cambios sin publicar», o «El borrador
   es igual a lo publicado» si lo hay pero no cambia nada.
+- **En la ficha de una entidad va plegado**, debajo del formulario: un
+  `details` con el título de sección y la cuenta a la vista en meta
+  `gris-texto` («Qué cambió · 2 campos contra lo publicado»). Compara lo que
+  está en pantalla, sin guardar incluido, porque es lo que «Publicar» va a
+  publicar. Una que nunca se publicó no lo lleva.
 
 ### Vista previa de buscador y redes
 
 Cómo se ve una página en Google y al compartir el link, en vivo con lo que
-está en el formulario (la pestaña SEO). `VistaPreviaSeo.tsx`.
+está en el formulario (la pestaña SEO). Las dos figuras son
+`apps/sitio/src/admin/armazon/ComoSeVe.tsx`; la pestaña de una página las
+arma en `admin/paginas/VistaPreviaSeo.tsx` y el panel de una novedad, en el
+suyo.
 
 - **Dos figuras**, una al lado de la otra desde `lg`, con su `figcaption`
   en meta medium, en cajas `rounded-xl` con borde `azul-claro/60`.
@@ -1007,3 +1081,42 @@ está en el formulario (la pestaña SEO). `VistaPreviaSeo.tsx`.
   sitio (`opengraph-image`), y lo dice.
 - Es ilustración: la imagen va con alt vacío y lo que es va escrito debajo
   («Imagen propia: …» o «Sin imagen propia: va la del sitio.»).
+- **En el panel de una entidad**, una debajo de la otra. En Google el título
+  lleva el nombre del sitio, como la pestaña del navegador; al compartir, va
+  solo. Sin imagen propia va **la generada** (la de la novedad, con su título,
+  categoría y fecha), pedida cuando lo escrito queda quieto, y lo dice. Debajo,
+  «Usar otra», terciario, abre el campo de la foto y pasa a «Volver a la
+  generada»: un solo botón que cambia de nombre, así el foco no se pierde.
+
+### Ficha de una entidad
+
+Crear y editar una cosa que se publica (una novedad): el encabezado del
+editor, el formulario escrito a mano con los controles del kit y, al lado,
+cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
+
+- **El encabezado del editor**, fijo, con su modo navy y su barra de abajo
+  en el celular: «← Novedades» (`Volver`), el título de la cosa («Nueva
+  novedad» mientras no tiene) con su insignia, quién y cuándo, y Guardar
+  borrador · Vista previa · **Publicar**, el único primario. Salir con algo
+  sin guardar pregunta, como en el editor.
+- **El formulario, en bloques** con el título de sección y su divisor («La
+  novedad», «Imagen», «Cuerpo», «Enlaces»), de hasta 48 rem. Un error del
+  guardado cae en su campo y el foco va al primero.
+- **El panel**, al lado desde `xl` (22 rem) y, por debajo, entre el formulario
+  y lo demás: «Cómo se ve» (arriba) y **«Se ve en»**, una lista con divisor de
+  los lugares del sitio donde aparece, el lugar en meta medium y el detalle en
+  meta `gris-texto` («Novedades · En la tapa, como la destacada, y en la
+  lista»). Sin publicar, una frase lo avisa: «Todavía no está en el sitio. Al
+  publicarla, va a estar en:». Publicada, «Ver en el sitio», terciario, abre
+  en otra pestaña y lo dice al lector. En `lg` el panel no va al lado: con la
+  sidebar, el formulario quedaría en unos 300 px.
+- **Debajo del formulario**, «Qué cambió» plegado y, al final, **«Deshacer o
+  sacar del sitio»**: una fila por acción con qué pasa si se toca a la
+  izquierda y su botón a la derecha. Descartar y borrar son destructivos y
+  confirman en el lugar (`Confirmacion`); despublicar es secundario y no
+  confirma, porque volver a publicar es un clic. Van al pie y no en el
+  encabezado: se usan poco.
+- **Su lista** es una `Lista` con dos pestañas (Publicadas · Borradores), el
+  buscador a la derecha y «Nueva novedad» como primario del encabezado.
+- Primer consumidor: Novedades. Las entidades que siguen (materiales, casos,
+  equipo) la repiten con sus campos.
