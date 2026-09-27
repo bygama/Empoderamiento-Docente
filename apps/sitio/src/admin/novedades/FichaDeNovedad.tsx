@@ -138,7 +138,7 @@ export function FichaDeNovedad({ ficha, vecinas, materiales }: Props) {
         alPublicar={publicar}
       />
       {/* Desde `xl`, el panel ocupa las dos filas de la derecha; la segunda fila se lleva el sobrante, así «Qué cambió» no se despega del formulario. */}
-      <div className="grid items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
+      <div className="grid grid-cols-1 items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
         <FormularioDeNovedad
           form={form}
           cambiar={cambiar}
