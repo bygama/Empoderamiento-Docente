@@ -54,6 +54,27 @@ test("una publicación que choca no deja versión", { skip: !hayBase && "sin DAT
   assert.equal(await base.versionDePagina.count({ where: { slug: SLUG } }), 0);
 });
 
+test("publicar la dueña de lo compartido devuelve también las rutas que lo muestran", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { guardarBorradorEnBase } = await import("./editar-paginas");
+  const { publicarEnBase } = await import("./publicar-paginas");
+  const conQuienUsa: RegistroDePaginas = {
+    ...registro,
+    "prueba-usa": {
+      ruta: "/prueba-usa",
+      nombre: "Prueba que usa",
+      secciones: { suya: { nombre: "Suya", esquema: z.object({}), inicial: {}, usa: { pagina: SLUG, seccion: "bloque", que: "Los bloques" } } },
+    },
+  };
+  await base.pagina.deleteMany({ where: { slug: SLUG } });
+  const guardado = await guardarBorradorEnBase(base, { slug: SLUG, seccion: "bloque", contenido: { titulo: "Compartido" }, borradorEnVisto: null, quien: "Raquel" }, conQuienUsa);
+  assert.equal(guardado.ok, true);
+  if (!guardado.ok) return;
+  const publicado = await publicarEnBase(base, { slug: SLUG, quien: "Raquel", borradorEnVisto: guardado.borradorEn }, conQuienUsa);
+  assert.equal(publicado.ok, true);
+  if (publicado.ok) assert.deepEqual(publicado.rutas, ["/prueba-versiones", "/prueba-usa"]);
+});
+
 after(async () => {
   if (!hayBase) return;
   const { base } = await import("@/datos/cliente");

@@ -58,9 +58,11 @@ export async function publicar(pedido: { slug: string; borradorEnVisto: string |
     const valido = esquemaDeLaPagina.safeParse(pedido);
     if (!valido.success) return { ok: false, detalle: "Esa página no existe." };
     const resultado = await publicarEnBase(base, { ...valido.data, quien: sesion.user.name });
-    // La página del sitio es estática: esto la regenera en la próxima visita (spec del admin §4).
+    // Las páginas del sitio son estáticas: esto las regenera en la próxima
+    // visita (spec del admin §4). Son la de la página y las que muestran algo
+    // que ella comparte (Inicio muestra las áreas de Qué hacemos).
     if (resultado.ok) {
-      revalidatePath(resultado.ruta);
+      for (const ruta of resultado.rutas) revalidatePath(ruta);
       revalidatePath(ARMAZON_DEL_ADMIN, "layout");
       await registrarActividad({ tipo: "publico-una-pagina", quien: sesion.user.id, sobre: PAGINAS[valido.data.slug].nombre, sobreId: valido.data.slug });
     }

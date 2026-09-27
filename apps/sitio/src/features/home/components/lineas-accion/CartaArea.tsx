@@ -7,7 +7,7 @@ import {
   TrendingUp,
   Users,
 } from "@/components/ui/icons";
-import type { Areas } from "@/features/home/contenido/areas";
+import type { AreaDeInicio } from "@/features/home/contenido/compartido";
 import { partirResaltado } from "@/lib/contenido/resaltado";
 
 // Un ícono de marca por área, en el orden de la lista: la identidad de cada
@@ -29,7 +29,7 @@ export function CartaArea({
   total,
   azulBase,
 }: {
-  area: Areas["areas"][number];
+  area: AreaDeInicio;
   indice: number;
   total: number;
   azulBase: boolean;

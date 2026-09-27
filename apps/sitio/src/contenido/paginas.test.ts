@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { z } from "zod";
+import { problemasDeCompartidos } from "@/lib/contenido/compartido";
 import { describir } from "@/lib/contenido/describir";
 import { partesDe, type SeccionRegistrada } from "@/lib/contenido/documento";
 import { CLAVE_SEO } from "@/lib/contenido/seo";
@@ -30,6 +31,10 @@ test("el contenido inicial de cada parte pasa su propio esquema", () => {
 test("el formulario de cada parte se puede dibujar", () => {
   // describir() tira si un campo no salió de campos.ts: así se ve acá y no en el admin.
   for (const [donde, seccion] of secciones()) assert.doesNotThrow(() => describir(seccion.esquema, seccion.nombre), donde);
+});
+
+test("lo compartido apunta a una sección que existe, de otra página, sin cadenas", () => {
+  assert.deepEqual(problemasDeCompartidos(PAGINAS), []);
 });
 
 test("ninguna sección se llama como la clave del SEO", () => {

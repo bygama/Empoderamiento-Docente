@@ -1,11 +1,13 @@
 import type { z } from "zod";
+import type { Compartido } from "./compartido";
 import { CLAVE_SEO, esquemaSeo, type Seo } from "./seo";
 
 // El documento de una página es `{ [seccion]: contenido }` (SPEC §4.3), más su
 // SEO bajo la clave `seo` si la página lo tiene. Acá se completa y se valida
 // contra el registro; no sabe de la base ni de ED.
 
-export type SeccionRegistrada = { nombre: string; esquema: z.ZodType; inicial: unknown };
+/** `usa`: lo que la sección muestra de otra página, que se edita allá (compartido.ts). */
+export type SeccionRegistrada = { nombre: string; esquema: z.ZodType; inicial: unknown; usa?: Compartido };
 /** `seo` es el valor inicial del SEO de la página (lo de hoy); sin él, la página no tiene pestaña SEO. */
 export type PaginaRegistrada = { ruta: string; nombre: string; secciones: Record<string, SeccionRegistrada>; seo?: Seo };
 export type RegistroDePaginas = Record<string, PaginaRegistrada>;
