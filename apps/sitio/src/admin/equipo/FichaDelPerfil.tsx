@@ -126,7 +126,8 @@ export function FichaDelPerfil({ ficha, vecinos }: Props) {
         alPublicar={publicar}
       />
       {/* Desde `xl`, el panel ocupa las dos filas de la derecha; la segunda fila se lleva el sobrante, así «Qué cambió» no se despega del formulario. */}
-      <div className="grid items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
+      {/* `grid-cols-1` es `minmax(0, 1fr)`: sin eso, lo que no se corta (un título con `truncate`) ensancha la ficha en el celular. */}
+      <div className="grid grid-cols-1 items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
         <FormularioDelPerfil form={form} cambiar={cambiar} errores={errores.contexto.errores} id={id} vecinos={vecinos} slugPublicado={publicado?.slug ?? null} />
         <div className="xl:col-start-2 xl:row-span-2 xl:row-start-1">
           <PanelDelPerfil nivel={form.nivel} conRecorrido={form.recorrido !== null} slugPublicado={estado.publicado && publicado ? publicado.slug : null} />
