@@ -45,8 +45,9 @@ export async function moverAliadoEnBase(base: PrismaClient, { id, hacia }: { id:
   const j = hacia === "antes" ? i - 1 : i + 1;
   if (j < 0 || j >= filas.length) return { ok: true, movio: false };
   // Se renumera toda la tira en su orden nuevo: así un orden repetido de antes no deja dos en el mismo lugar.
+  // `updateMany` y no `update`: si alguien borró un aliado entre la lectura y esto, se saltea en vez de tirar.
   const nuevo = filas.map((f) => f.id);
   [nuevo[i], nuevo[j]] = [nuevo[j], nuevo[i]];
-  await base.$transaction(nuevo.map((idDe, k) => base.aliado.update({ where: { id: idDe }, data: { orden: k + 1 } })));
+  await base.$transaction(nuevo.map((idDe, k) => base.aliado.updateMany({ where: { id: idDe }, data: { orden: k + 1 } })));
   return { ok: true, movio: true };
 }
