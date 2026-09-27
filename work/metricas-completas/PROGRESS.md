@@ -109,7 +109,55 @@
   dónde llegan» dice «Hay 6 visitas en estos 7 días; … hacen falta 20»; a
   390 de ancho no hay desborde. Las capturas de pantalla de Orca no andan
   (`Screenshot timed out`: la ventana no tiene foco), así que la evidencia
-  son sondas del DOM. `2ff9678`, `5f449e6`.
+  son sondas del DOM. `2ff9678`, `5f449e6` (hashes de antes del rebase).
+- **Rebase sobre `main` con la 8a** (`d051c6a`), entre el paso 11 y el 12:
+  ver DECISIONS. Pusheado con el pre-push en verde (typecheck, react-doctor
+  100/100, lint). `44438c8`.
+- **Paso 12** — Origen: `lib/metricas/mejor-hora.ts` (`grillaDeHoras` con
+  `Intl` en `ZONA_HORARIA`, `mejoresFranjas`, `franjasEnPalabras`; test con el
+  cambio de horario de Chile del 6/9/2026 y la madrugada UTC que es la noche
+  anterior), `lib/metricas/ocultar.ts` (`ocultarMenores`),
+  `datos/consultas/origen.ts` (`origenDe`: una sola lectura, lo chico a
+  «Otros», el cruce con `DIMENSIONES_DEL_CRUCE`), la pantalla
+  (`admin/metricas/Origen.tsx`, `origen/` con `CuerpoDeOrigen`, `Dispositivos`,
+  `PaginaPorPais`, `filas.ts`; `MejorHora.tsx`) y su página con la guarda.
+  `dominioPropio()` saca el `www.`. DESIGN.md §11: la grilla y «lo chico no
+  se nombra». Tests: 5 pasan; typecheck, eslint y react-doctor (100/100) → 0.
+  **En el navegador:** los seis bloques con sus anclas; Chile, México y
+  Argentina arriba; «Regiones» dice que Vercel no las da; los dispositivos en
+  castellano; el cruce con «menos de 3»; 168 celdas con su `title` («los
+  lunes de 0 a 1: 4 visitas») y la frase «Cuando más gente entra, en hora de
+  Chile: …»; con poco tráfico, «De dónde llegan» y la mejor hora dicen cuánto
+  falta; sin desborde a 390. `3a492ee`, `038f5f2`.
+- **Paso 13** — `datos/consultas/que-hace-la-gente.ts` (el período termina
+  hoy) y la pantalla (`QueHaceLaGente.tsx`, `acciones/CaminoDelCV.tsx`,
+  `acciones/Contactos.tsx`) con su página. **En el navegador:** la tabla del
+  camino por canal con su total y los contactos «142, −2 % contra los 30 días
+  anteriores» con su reparto por canal. typecheck, eslint, react-doctor → 0.
+  `32da712`.
+- **Paso 14** — Links para compartir, en tres commits: (1) el código pasa a
+  `lib/metricas/codigo.ts` (con `@ed/db/slug`, así el formulario lo muestra
+  sin llevar Prisma al cliente) y `/l/[codigo]` pasa de `route.ts` a
+  `page.tsx`: la ruta de API daba un 404 **vacío** con `notFound()`; la página
+  da la del sitio («Página no encontrada», con `noindex`) y redirige igual con
+  307; `destinoDelEnlace(cabeceras, codigo)` reemplaza a `abrirEnlace`; (2) la
+  pantalla (`Enlaces.tsx`, `enlaces/CrearEnlace.tsx`, `ListaDeEnlaces.tsx`,
+  `Copiar.tsx` sobre el `useCopiar` que ya existía) con
+  `datos/consultas/enlaces.ts` (`enlacesConCifras`, `destinosPosibles`,
+  `baseDeLosLinks`) y la línea de §11 en «Lista»; (3) se borran las guías de
+  Métricas. Tests de abrir, enlaces, código y rutas: 13 pasan; typecheck,
+  eslint, react-doctor → 0. **De punta a punta:** crear «Charla en Viña del
+  Mar» desde la pantalla (vista previa del código, aviso con el link,
+  `creo-un-enlace` en actividad); `curl` a `/l/charla-en-vina-del-mar` con un
+  `User-Agent` de iPhone → `307`, `location:
+  /contacto?utm_source=instagram&utm_medium=link&utm_campaign=charla-en-vina-del-mar`
+  y un `enlace-clic`; con `LinkedInBot` → 307 y no cuenta; un código que no
+  existe → 404 con la página del sitio; borrar confirma con el foco en
+  «Cancelar», deja `borro-un-enlace` y el link pasa a 404. `POST /api/contar`
+  con `curl`: 204 siempre, `cv-vio` desde `www.linkedin.com` suma uno en
+  `redes`, `enlace-clic` y basura no suman. **Cabecera:** en `next dev` la
+  página redirige con `Cache-Control: no-cache, must-revalidate`; el `no-store`
+  de producción se mide con `next start` en work-verify.
 
 ## Abierto
 
