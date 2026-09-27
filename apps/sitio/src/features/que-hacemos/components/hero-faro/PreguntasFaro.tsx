@@ -1,17 +1,19 @@
 import { Highlight } from "@/components/ui/Highlight";
-import { PREGUNTAS, VERBO_POS } from "../preguntas-faro";
+import { partirResaltado } from "@/lib/contenido/resaltado";
+import { VERBO_POS } from "../preguntas-faro";
 
-/** S2 · Las cuatro frases del enfoque: un golpe por momento. */
-export function PreguntasFaro() {
+/** S2 · Las cuatro frases del enfoque: un golpe por momento. Cada una trae su palabra clave entre dobles asteriscos. */
+export function PreguntasFaro({ frases }: { frases: readonly string[] }) {
   return (
     <>
-      {PREGUNTAS.map(({ antes, clave, resto }, i) => {
+      {frases.map((frase, i) => {
+        const { antes, clave, despues: resto } = partirResaltado(frase);
         // La primera frase es la tesis: un escalón más grande y más
         // ancha que las tres que se desprenden de ella.
         const lider = i === 0;
         return (
           <div
-            key={clave}
+            key={frase}
             data-verbo-txt={i}
             aria-hidden="true"
             // La líder cierra en tres líneas («No capacitamos docentes: /

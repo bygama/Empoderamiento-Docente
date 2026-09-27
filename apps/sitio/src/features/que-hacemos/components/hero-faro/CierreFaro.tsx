@@ -26,7 +26,7 @@ const irALineas = (e: React.MouseEvent<HTMLAnchorElement>) => {
  * VALIDAR jerarquía con ED. `inert` por defecto: en el fallback está
  * invisible y no debe recibir foco; la coreografía lo quita al montar.
  */
-export function CierreFaro() {
+export function CierreFaro({ titulo, boton }: { titulo: string; boton: string }) {
   return (
     <div data-esc="cierre" inert className="pointer-events-none absolute inset-0 flex items-center" style={{ opacity: 0 }}>
       <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
@@ -48,14 +48,14 @@ export function CierreFaro() {
             textShadow: "0 2px 40px rgb(6 11 25 / 0.75)",
           }}
         >
-          La transformación queda encendida en cada equipo.
+          {titulo}
         </p>
         {/* Secundario sobre navy (transparente + borde) en vez del
             naranja: sobre la noche el primario era un bloque que
             competía con el titular. Sigue siendo la única acción. */}
         <div data-cta className="pointer-events-auto mt-9" style={{ opacity: 0 }}>
           <ButtonSecondary href="#areas" variant="dark" withArrow onClick={irALineas}>
-            Ver las siete áreas
+            {boton}
           </ButtonSecondary>
         </div>
       </div>
