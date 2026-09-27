@@ -19,7 +19,7 @@ const hrefDe = (filtro: FiltroDeFotos) => (filtro === "todas" ? "/admin/contenid
 const VACIO: Record<FiltroDeFotos, { titulo: string; texto: string }> = {
   todas: { titulo: "Todavía no hay fotos.", texto: "Las que subas desde acá o desde el campo de foto de un formulario quedan en la biblioteca, listas para elegir." },
   "sin-alt": { titulo: "Todas tienen texto alternativo.", texto: "Cuando una no tiene, aparece acá: el texto alternativo es lo que lee un lector de pantalla." },
-  "sin-usar": { titulo: "Todas se usan en algún lugar.", texto: "Una foto que no está en ninguna página, novedad, caso ni aliado aparece acá, y se puede borrar." },
+  "sin-usar": { titulo: "Todas se usan en algún lugar.", texto: "Una foto que no está en ninguna página, novedad, material, caso ni aliado aparece acá, y se puede borrar." },
 };
 
 // Contenido › Fotos (SPEC §7.3 de `work/casos-aliados-fotos/`): la
