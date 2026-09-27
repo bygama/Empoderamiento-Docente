@@ -24,7 +24,8 @@ export function QuienRecibe({ aviso, nombre, cada, cuentas }: Props) {
     evento.preventDefault();
     const elegidas = new FormData(evento.currentTarget).getAll("cuentas").map(String);
     setGuardando(true);
-    setResultado(await guardarQuienRecibe({ aviso, cuentas: elegidas }));
+    // Van también las que se mostraron: solo esas se tocan, así una cuenta nueva que no estaba en la pantalla sigue como venía.
+    setResultado(await guardarQuienRecibe({ aviso, cuentas: elegidas, mostradas: cuentas.map((c) => c.id) }));
     setGuardando(false);
   }
 
