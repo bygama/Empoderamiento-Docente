@@ -69,3 +69,32 @@
   `datos/actividad.ts` al lado de `QUIEN_VE`, y no un filtro en la consulta:
   cada tipo nuevo lo decide ahí. El texto del vacío queda igual. Test contra
   la base (`actividad-reciente.test.ts`), visto en rojo con `entro: true`.
+- 2026-09-26 — **Revisión r1 (Opus 5.5, medium): PASS** sobre `2f58d20`, 0
+  Critical, 0 Important, 2 Minor y una nota fuera de lente. El padre: se
+  arreglan el Minor 1 (Esta semana con los cortes de Resumen) y la nota (el
+  test con filas de 2999 en la base compartida); el Minor 2 (la tabla del
+  SPEC) queda como está, porque la carpeta se borra al cerrar.
+- 2026-09-26 — **`Numero` pasa a llamarse `Cifra`** (al rebasear sobre
+  Mensajes, `490547f`): Mensajes estrenó `admin/armazon/Numero.tsx` como la
+  pastilla con la cuenta de sin leer («El número» en §11), con consumidores
+  en la sidebar, las pestañas y el filtro. El patrón de esta lane (una cifra
+  con su comparación) se renombra en el commit que lo crea, para que la
+  historia no tenga dos `Numero`.
+- 2026-09-26 — **Los cortes de Esta semana son los de cada pantalla:** los
+  visitantes pasan por `estadoDeMetricas` (sin variables, «—» con «Faltan las
+  variables de Vercel», la misma frase que Resumen, en
+  `SIN_VARIABLES_DE_METRICAS`) y los clics por `estadoDeBusquedas` (sin
+  conexión, «Search Console no está conectado»). Los clics no los pidió el
+  revisor, pero tenían el mismo problema.
+- 2026-09-26 — **Lo de Mensajes en el Inicio** (el padre: lo suma el que se
+  mergea segundo): pendientes «CV nuevos» y «mensajes de contacto sin leer»
+  (`alguien-espera`, los CV primero, como el SPEC padre §5.2) y «CV que se
+  borran en 7 días» (`se-borra-pronto`), cada una a su bandeja; el número «CV
+  recibidos» con la tabla `mensajes` (los últimos 7 días contra los 7
+  anteriores, en cualquier estado); y, porque el SPEC §2.1 lo prometía, lo
+  que llegó desde tu visita («llegaron 3 mensajes de contacto», sin el
+  spam). «Sin leer» es el estado Nuevo, como la sidebar; los plazos, los de
+  `config/privacidad.ts`. Las de CV, solo `verCV`. Los cinco tipos de
+  actividad de Mensajes: los de Contacto con `verContacto` y su tema en la
+  frase, salvo spam y borrado, que no lo repiten; «borró un CV» con `verCV`;
+  todos van al Inicio.
