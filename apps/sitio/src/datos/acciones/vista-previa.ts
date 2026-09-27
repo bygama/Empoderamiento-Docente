@@ -59,6 +59,29 @@ export async function abrirVistaPreviaDeNovedad(id: string): Promise<{ ok: true;
 }
 
 /**
+ * Enciende la vista previa y lleva a Quiénes somos con el perfil abierto
+ * (`?persona=`), como quedaría al publicarlo (work/equipo/); sin URL
+ * todavía, a la sección del equipo. Muestra lo guardado: la ficha guarda
+ * antes de llamar.
+ */
+export async function abrirVistaPreviaDePersona(id: string): Promise<{ ok: true; url: string } | { ok: false; detalle: string }> {
+  try {
+    const sesion = await auth.api.getSession({ headers: await headers() });
+    if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para ver la vista previa." };
+    if (!puede(sesion.user.rol, "editarContenido")) return { ok: false, detalle: SIN_PERMISO };
+    const valido = z.uuid().safeParse(id);
+    const fila = valido.success ? await base.persona.findUnique({ where: { id: valido.data }, select: { slug: true, borrador: true } }) : null;
+    if (!fila) return { ok: false, detalle: "Ese perfil no existe." };
+    const slug = comoDocumento(fila.borrador).slug ?? fila.slug;
+    await encenderVistaPrevia();
+    return { ok: true, url: typeof slug === "string" && slug !== "" ? `/quienes-somos?persona=${encodeURIComponent(slug)}` : "/quienes-somos#equipo" };
+  } catch (e) {
+    console.error("abrirVistaPreviaDePersona:", e);
+    return { ok: false, detalle: "No se pudo abrir la vista previa; probá de nuevo en un rato." };
+  }
+}
+
+/**
  * Enciende la vista previa y lleva al catálogo de la Biblioteca, donde cada
  * material se ve como quedaría al publicarlo (work/biblioteca/). Muestra lo
  * guardado: la ficha guarda antes de llamar.
