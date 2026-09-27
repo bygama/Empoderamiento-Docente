@@ -8,6 +8,18 @@
 {$DOMINIO} {
 	encode zstd gzip
 
+	# Umami (servicio `analitica`): el script que carga el sitio y el pedido
+	# que manda cada vista, y nada más. Su panel, su login y su API no salen a
+	# internet: se usan por un túnel SSH (docs/deploy/vps.md).
+	@umami path /umami/script.js /umami/api/send
+	handle @umami {
+		uri strip_prefix /umami
+		reverse_proxy analitica:3000
+	}
+	handle /umami/* {
+		respond 404
+	}
+
 	# Todo lo demás es el sitio y su admin.
 	handle {
 		reverse_proxy app:3000
