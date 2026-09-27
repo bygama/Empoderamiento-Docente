@@ -425,7 +425,7 @@ día por día y los visitantes van «—» con el porqué.
 | **Búsquedas** | Qué buscó la gente en Google: clics, impresiones y puesto por búsqueda, página y país, y «Casi nos encuentran» | la copia diaria de Search Console | con 2 o 3 días de atraso |
 | **Origen** | Países (Chile, México y Argentina arriba), de dónde llegan, dispositivo, sistema y navegador, la página por país y la mejor hora para publicar, en hora de Chile. **Regiones no hay**: Vercel da el país y nada más fino. Lo que tiene menos de 3 visitas no se nombra | la copia diaria de Vercel | hasta ayer |
 | **Qué hace la gente** | El camino del CV por canal (vio la página, empezó el formulario, lo envió), los contactos enviados y los materiales más consultados | los **contadores propios** (`contadores`): sumas por día, sin IP, sin navegador, sin cookies | en el momento |
-| **Links para compartir** | Links cortos propios (`/l/<codigo>`) con sus clics, visitas y CV | los clics, del servidor; las visitas, de Vercel por su `utm_campaign` (con un plan que cuente por UTM: Hobby no, y van «—»); los CV, de los contadores | en el momento; las visitas, hasta ayer |
+| **Links para compartir** | Links cortos propios (`/l/<codigo>`) con sus clics, visitas y CV | los clics, del servidor; las visitas, de Vercel por su `utm_campaign`, solo con un plan que cuente por UTM (Hobby no: la pantalla lo dice una vez y muestra clics y CV); los CV, de los contadores | en el momento; las visitas, hasta ayer |
 
 Con poco tráfico, cada bloque dice «Todavía no hay datos suficientes» y cuánto
 falta, en vez de dibujar un gráfico que engaña. Un CV cuenta para un link solo
