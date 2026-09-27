@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
+import { openGraphDeLaPagina } from "@/config/metadata";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { QueHacemosHero } from "@/features/que-hacemos/components/QueHacemosHero";
 import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemosHeroFaro";
@@ -8,12 +9,15 @@ import { ViboraQueHacemos } from "@/features/que-hacemos/components/vibora/Vibor
 import { MiradaPasos } from "@/features/que-hacemos/components/MiradaPasos";
 import { ProyectosAplicaciones } from "@/features/que-hacemos/components/ProyectosAplicaciones";
 import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHacemos";
+import { metadataDeSeo } from "@/lib/contenido/seo";
 
-export const metadata: Metadata = {
-  title: "Qué hacemos",
-  description:
-    "Consultora especializada en la transformación del aprendizaje matemático: investigación, diseño de materiales didácticos, desarrollo profesional docente, acompañamiento, currículo y evaluación.",
-};
+// El título, la descripción y la imagen para redes salen del SEO de la página
+// (publicado, o el borrador en vista previa): se editan en su pestaña del admin.
+// Sin imagen propia, la del sitio, que se hereda del layout.
+export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Promise<Metadata> {
+  const { seo } = await contenidoDe("que-hacemos");
+  return metadataDeSeo(seo, await openGraphDeLaPagina(padre));
+}
 
 // Orden nuevo (2026-09-08). Raquel y Daniela dijeron que la web se ve
 // espectacular pero no se entiende qué hace ED: había tantas animaciones

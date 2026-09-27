@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { siteConfig } from "./site";
 
 // Lo que la metadata de todas las páginas comparte. Vive acá y no en el layout
@@ -13,3 +13,17 @@ export const TITULO_DEL_SITIO = "Empoderamiento Docente — Transformamos el apr
  * el del layout entero (Next no los mezcla), así que lo repite desde acá.
  */
 export const OPEN_GRAPH_COMUN = { type: "website", locale: "es_ES", siteName: siteConfig.name } satisfies Metadata["openGraph"];
+
+/**
+ * Lo común de Open Graph para una página que cuelga del layout, con la imagen
+ * que hereda de él: la del sitio (`app/(sitio)/opengraph-image.png`). El
+ * `openGraph` de una página reemplaza el del layout imagen incluida; en `/`
+ * no se nota porque la imagen es de ese mismo segmento, pero en una página
+ * hija, sin esto, el link compartido se queda sin imagen y la tarjeta de X
+ * pierde la grande. Si el SEO trae imagen propia, `metadataDeSeo` la pone
+ * encima.
+ */
+export async function openGraphDeLaPagina(padre: ResolvingMetadata): Promise<NonNullable<Metadata["openGraph"]>> {
+  const { openGraph } = await padre;
+  return { ...OPEN_GRAPH_COMUN, images: openGraph?.images };
+}
