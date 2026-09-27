@@ -2,13 +2,13 @@ import { after, test } from "node:test";
 import assert from "node:assert/strict";
 import { config as cargarEntorno } from "dotenv";
 import { SIN_PERMISO } from "@ed/auth";
-import { tiraMovida } from "./tira-de-aliados";
 
 // El ciclo de un aliado y su marca contra el Postgres local. **El test crea
 // sus propios aliados y mide contra ellos**, nunca contra el estado de la
 // tabla: los archivos de tests corren a la vez y otros suman o borran aliados
 // en el medio (ronda de arreglos 2, DECISIONS). El lugar en la tira se mira
-// como el orden de los dos que crea; la punta, con `tiraMovida`, que es pura.
+// como el orden de los dos que crea; la punta, con `unPasoMovido` (lib/orden.ts),
+// que es pura.
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
@@ -28,14 +28,6 @@ after(async () => {
   if (!process.env.DATABASE_URL) return;
   const { base } = await modulos();
   await base.aliado.deleteMany({ where: { id: { in: creados } } });
-});
-
-test("mover en la tira: un lugar, y en la punta nada", () => {
-  assert.deepEqual(tiraMovida(["a", "b", "c"], "b", "antes"), ["b", "a", "c"]);
-  assert.deepEqual(tiraMovida(["a", "b", "c"], "b", "despues"), ["a", "c", "b"]);
-  assert.equal(tiraMovida(["a", "b", "c"], "a", "antes"), null);
-  assert.equal(tiraMovida(["a", "b", "c"], "c", "despues"), null);
-  assert.equal(tiraMovida(["a", "b", "c"], "z", "antes"), undefined);
 });
 
 test("crear, que sin la marca no se publique, que quien edita no la ponga, y el ciclo entero", sinBase, async () => {

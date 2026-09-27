@@ -4,9 +4,9 @@ import type { PrismaClient } from "@/../prisma/generado/client";
 import { publicadoDeAliado } from "@/datos/consultas/aliados";
 import { estaAutorizado, loQueSeAutoriza } from "@/features/aliados/contenido/autorizacion";
 import { TOPES } from "@/features/aliados/contenido/modelo";
+import { unPasoMovido } from "@/lib/orden";
 import { NO_EXISTE, nombreDelAliado } from "./aliados-en-base";
 import type { Fallo } from "./choque";
-import { tiraMovida } from "./tira-de-aliados";
 
 // La marca «Autorizado» de un aliado y su lugar en la tira
 // (`work/casos-aliados-fotos/SPEC.md` §5 y §5.1), con el cliente inyectado.
@@ -63,7 +63,7 @@ export async function autorizarAliadoEnBase(
 /** Sube o baja un lugar en la tira, cambiándolo con el de al lado. En una punta, no hace nada. */
 export async function moverAliadoEnBase(base: PrismaClient, { id, hacia }: { id: string; hacia: "antes" | "despues" }): Promise<{ ok: true; movio: boolean } | Fallo> {
   const filas = await base.aliado.findMany({ orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true } });
-  const nuevo = tiraMovida(filas.map((f) => f.id), id, hacia);
+  const nuevo = unPasoMovido(filas.map((f) => f.id), id, hacia);
   if (nuevo === undefined) return NO_EXISTE;
   if (nuevo === null) return { ok: true, movio: false };
   // Se renumera toda la tira en su orden nuevo: así un orden repetido de antes no deja dos en el mismo lugar.
