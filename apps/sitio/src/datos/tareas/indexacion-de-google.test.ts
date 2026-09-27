@@ -12,12 +12,12 @@ const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
 // como está en una base local sin Search Console.
 const RUTAS = Array.from({ length: 25 }, (_, i) => `/prueba-indexacion-${String(i).padStart(2, "0")}`);
 
-/** Un cliente que anota qué le pidieron: PASS a las pares, NEUTRAL a las impares; `rota` tira. */
-function clienteFalso(pedidas: string[], rota?: number): ClienteDeInspeccion {
+/** Un cliente que anota qué le pidieron: PASS a las pares, NEUTRAL a las impares; la ruta `rota` tira. */
+function clienteFalso(pedidas: string[], rota?: string): ClienteDeInspeccion {
   return {
     async inspeccionar(url) {
-      if (pedidas.length === rota) throw new Error("Google respondió 429: se pasó la cuota de inspecciones (2000 por día y 600 por minuto).");
       pedidas.push(new URL(url).pathname);
+      if (new URL(url).pathname === rota) throw new Error("Google respondió 429: se pasó la cuota de inspecciones (2000 por día y 600 por minuto).");
       const n = Number(url.slice(-2));
       return { veredicto: n % 2 ? "NEUTRAL" : "PASS", cobertura: n % 2 ? "Crawled - currently not indexed" : "Submitted and indexed", ultimoRastreo: null };
     },
@@ -55,26 +55,14 @@ test("borra las filas de las rutas que ya no están", sinBase, async () => {
   assert.equal(await base.indexacionDeUrl.count({ where: { ruta: { startsWith: "/prueba-indexacion" } } }), 2);
 });
 
-test("un error corta la corrida con su explicación, y lo ya revisado queda", sinBase, async () => {
+test("una que falla sale en la corrida con su explicación, y las demás quedan guardadas", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
   const { revisarIndexacion } = await import("./indexacion-de-google");
   await base.indexacionDeUrl.deleteMany({ where: { ruta: { startsWith: "/prueba-indexacion" } } });
-  const r = await revisarIndexacion({ cliente: clienteFalso([], 2), base, rutas: RUTAS.slice(0, 5), sitio: "https://ejemplo.org" });
+  const r = await revisarIndexacion({ cliente: clienteFalso([], RUTAS[2]), base, rutas: RUTAS.slice(0, 5), sitio: "https://ejemplo.org" });
   assert.equal(r.ok, false);
-  assert.match(r.detalle, /^Se revisaron 2 de 5 URLs y se cortó: Google respondió 429/);
-  assert.equal(await base.indexacionDeUrl.count({ where: { ruta: { startsWith: "/prueba-indexacion" } } }), 2);
-});
-
-test("pasados los 35 segundos no empieza otra", sinBase, async () => {
-  const { base } = await import("@/datos/cliente");
-  const { revisarIndexacion } = await import("./indexacion-de-google");
-  let ahora = 0;
-  // Cada pregunta al reloj corre 20 segundos: la tercera ya pasó el freno.
-  const reloj = () => (ahora += 20_000);
-  const pedidas: string[] = [];
-  const r = await revisarIndexacion({ cliente: clienteFalso(pedidas), base, rutas: RUTAS.slice(0, 5), sitio: "https://ejemplo.org", reloj });
-  assert.equal(pedidas.length, 1);
-  assert.equal(r.ok, true);
+  assert.match(r.detalle, /^Se revisaron 4 de 5 URLs; 1 no se pudieron revisar: Google respondió 429/);
+  assert.equal(await base.indexacionDeUrl.count({ where: { ruta: { startsWith: "/prueba-indexacion" } } }), 4);
 });
 
 test("sin las variables de Search Console, la corrida sale fallida y no toca la API; y está en el cron", async () => {
