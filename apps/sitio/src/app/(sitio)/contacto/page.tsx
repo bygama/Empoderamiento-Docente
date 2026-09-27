@@ -2,7 +2,9 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { cvAbierto } from "@/config/cv";
 import { openGraphDeLaPagina } from "@/config/metadata";
 import { contenidoDe } from "@/datos/consultas/paginas";
+import { vigente } from "@/config/privacidad";
 import { datosDelSitio } from "@/datos/consultas/sitio";
+import { plazosDeGuarda } from "@/datos/privacidad";
 import { ContactoExperiencia } from "@/features/contacto/components/ContactoExperiencia";
 import { metadataDeSeo } from "@/lib/contenido/seo";
 
@@ -21,11 +23,15 @@ export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Pr
  * barra fija de abajo. Todo dentro de ContactoExperiencia. «Sumate al equipo»
  * lleva a /sumate-al-equipo solo con el CV encendido; si no, al correo. El
  * correo, el WhatsApp, la oficina y los países salen de Ajustes › Datos del
- * sitio.
+ * sitio, y cuánto se guarda un contacto, de Ajustes › Privacidad.
  */
 export default async function ContactoPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const [{ titular, apertura, cierre }, { correo, whatsapp, direccion, paises }] = await Promise.all([contenidoDe("contacto"), datosDelSitio()]);
+  const [{ titular, apertura, cierre }, { correo, whatsapp, direccion, paises }, plazos] = await Promise.all([
+    contenidoDe("contacto"),
+    datosDelSitio(),
+    plazosDeGuarda(),
+  ]);
   return (
     <main id="contenido" tabIndex={-1}>
       <ContactoExperiencia
@@ -34,6 +40,7 @@ export default async function ContactoPage() {
         apertura={apertura}
         cierre={cierre}
         contacto={{ correo, whatsapp, direccion, paises }}
+        mesesDeGuarda={vigente(plazos.contacto)}
       />
     </main>
   );

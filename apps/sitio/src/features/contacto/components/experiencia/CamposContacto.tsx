@@ -1,5 +1,5 @@
 import { ArrowUpRight } from "@/components/ui/icons";
-import { MESES_DE_GUARDA } from "@/config/privacidad";
+import { aLos } from "@/config/privacidad";
 import { PaisDropdown } from "../PaisDropdown";
 import type { Envio } from "./contexto";
 import { INPUT_BASE, LABEL_BASE } from "./estilos";
@@ -10,9 +10,11 @@ import { INPUT_BASE, LABEL_BASE } from "./estilos";
  * la cascada; la CTA de envío es el único naranja en pantalla. Mientras el
  * mensaje viaja, la CTA dice «Enviando…»; si no salió, el error va arriba de
  * ella, en `rojo-error` (6,57:1), y se anuncia en el acto. El correo y los
- * países salen de Ajustes › Datos del sitio: los mismos que acepta /api/contacto.
+ * países salen de Ajustes › Datos del sitio (los mismos que acepta
+ * /api/contacto), y el plazo de la línea de privacidad, de Ajustes ›
+ * Privacidad: el mismo que usa el borrado.
  */
-export function CamposContacto({ envio, correo, paises }: { envio: Envio; correo: string; paises: readonly string[] }) {
+export function CamposContacto({ envio, correo, paises, mesesDeGuarda }: { envio: Envio; correo: string; paises: readonly string[]; mesesDeGuarda: number }) {
   return (
     <div className="border-azul-claro/50 grid content-center gap-x-8 gap-y-6 rounded-b-3xl border border-t-0 bg-white/80 p-6 backdrop-blur-sm md:grid-cols-2 md:p-8 lg:rounded-r-3xl lg:rounded-bl-none lg:border-t lg:border-l-0">
       <div data-campo>
@@ -86,10 +88,9 @@ export function CamposContacto({ envio, correo, paises }: { envio: Envio; correo
         </button>
       </div>
 
-      {/* Qué se hace con los datos y cuándo se borran, en llano. El plazo
-          sale de config/privacidad.ts, el mismo que usa el borrado. */}
+      {/* Qué se hace con los datos y cuándo se borran, en llano. */}
       <p data-campo className="text-gris-texto text-center font-sans text-[0.8rem] leading-relaxed md:col-span-2">
-        Usamos tus datos solo para responderte, y los borramos a los {MESES_DE_GUARDA.contacto} meses. Si querés que los
+        Usamos tus datos solo para responderte, y los borramos {aLos("contacto", mesesDeGuarda)}. Si querés que los
         borremos antes, escribinos a{" "}
         <a href={`mailto:${correo}`} className="text-azul-principal underline underline-offset-2">
           {correo}

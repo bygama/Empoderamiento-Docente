@@ -3,7 +3,9 @@ import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Filtro } from "@/admin/armazon/Filtro";
 import { cvAbierto } from "@/config/cv";
 import { BANDEJAS, ESTADOS, ETIQUETA_DEL_ESTADO, type Bandeja, type EstadoDeMensaje } from "@/config/mensajes";
+import { vigente } from "@/config/privacidad";
 import { FILAS_POR_PANTALLA, bandejasDe, listarMensajes, nuevosPorBandeja } from "@/datos/consultas/mensajes";
+import { plazosDeGuarda } from "@/datos/privacidad";
 import { EncabezadoDeMensajes } from "./EncabezadoDeMensajes";
 import { ListaDeMensajes } from "./ListaDeMensajes";
 import { COSA, nombreDe, vacioDe } from "./textos";
@@ -22,11 +24,15 @@ function hrefDe(bandeja: Bandeja, estado: EstadoDeMensaje, q?: string): string {
  * buscador y la lista, o qué pasa si no hay nada.
  */
 export async function BandejaDeMensajes({ bandeja, estado, q, rol, borrado = false }: Props) {
-  const [nuevos, { filas, hayMas }] = await Promise.all([nuevosPorBandeja(rol), listarMensajes({ bandeja, estado, busqueda: q })]);
+  const [nuevos, { filas, hayMas }, plazos] = await Promise.all([
+    nuevosPorBandeja(rol),
+    listarMensajes({ bandeja, estado, busqueda: q }),
+    plazosDeGuarda(),
+  ]);
   const nombre = nombreDe(bandeja);
   const vacio = q
     ? { titulo: `Nada coincide con «${q}» en ${ETIQUETA_DEL_ESTADO[estado]}`, texto: "Probá con otra palabra, en otro estado, o borrá la búsqueda." }
-    : vacioDe(bandeja, estado, cvAbierto());
+    : vacioDe(bandeja, estado, cvAbierto(), { guarda: vigente(plazos[bandeja]), spam: plazos.spam });
   const opciones = ESTADOS.map((e) => ({
     href: hrefDe(bandeja, e, q),
     etiqueta: ETIQUETA_DEL_ESTADO[e],

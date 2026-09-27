@@ -2,6 +2,7 @@ import { esEstado, type Bandeja, type EstadoDeMensaje } from "@/config/mensajes"
 import { seBorraEl } from "@/config/privacidad";
 import type { Dato } from "@/lib/formularios/campos";
 import { base } from "@/datos/cliente";
+import { plazosDeGuarda } from "@/datos/privacidad";
 
 // La ficha de un mensaje o de un CV (work/mensajes/SPEC.md §6). Quien la pide
 // ya pasó por la guarda de su bandeja.
@@ -12,7 +13,7 @@ export type FichaDeMensaje = {
   bandeja: Bandeja;
   estado: EstadoDeMensaje;
   recibidoEn: string;
-  /** Cuándo lo borra la retención (`config/privacidad.ts`). */
+  /** Cuándo lo borra la retención: sus plazos de Ajustes › Privacidad, contados como en `config/privacidad.ts`. */
   seBorraEl: string;
   nombre: string;
   correo: string;
@@ -27,7 +28,10 @@ export type FichaDeMensaje = {
 
 /** La ficha de un mensaje de esa bandeja, o `null` si no está (o es de otra bandeja). */
 export async function fichaDeMensaje(bandeja: Bandeja, id: string): Promise<FichaDeMensaje | null> {
-  const m = await base.mensaje.findFirst({ where: { id, bandeja }, include: { tomadoPor: { select: { id: true, name: true } } } });
+  const [m, plazos] = await Promise.all([
+    base.mensaje.findFirst({ where: { id, bandeja }, include: { tomadoPor: { select: { id: true, name: true } } } }),
+    plazosDeGuarda(),
+  ]);
   if (!m) return null;
   const estado = esEstado(m.estado) ? m.estado : "nuevo";
   return {
@@ -35,7 +39,7 @@ export async function fichaDeMensaje(bandeja: Bandeja, id: string): Promise<Fich
     bandeja,
     estado,
     recibidoEn: m.recibidoEn.toISOString(),
-    seBorraEl: seBorraEl({ bandeja, estado, recibidoEn: m.recibidoEn, estadoEn: m.estadoEn }).toISOString(),
+    seBorraEl: seBorraEl({ bandeja, estado, recibidoEn: m.recibidoEn, estadoEn: m.estadoEn }, plazos).toISOString(),
     nombre: m.nombre,
     correo: m.correo,
     pais: m.pais,

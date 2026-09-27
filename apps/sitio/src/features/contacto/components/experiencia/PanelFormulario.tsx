@@ -15,6 +15,8 @@ type Props = {
   cvAbierto: boolean;
   /** El correo, la oficina y los países del formulario, de Ajustes › Datos del sitio. */
   contacto: ContactoDelSitio;
+  /** Cuántos meses se guarda un contacto, de Ajustes › Privacidad. */
+  mesesDeGuarda: number;
   onCambiar: () => void;
   onEnviar: (e: FormEvent<HTMLFormElement>) => void;
 };
@@ -23,7 +25,7 @@ type Props = {
  * 2 · FORMULARIO — breadcrumb de vuelta, el rail navy y el panel de campos
  * como UNA sola pieza, y la segunda puerta (sumarse al equipo) al pie.
  */
-export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto, contacto, onCambiar, onEnviar }: Props) {
+export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto, contacto, mesesDeGuarda, onCambiar, onEnviar }: Props) {
   return (
     <div
       data-panel="formulario"
@@ -61,7 +63,7 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto,
           className="w-full lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-stretch"
         >
           <RailTema temaActivo={temaActivo} temaIdx={temaIdx} correo={contacto.correo} direccion={contacto.direccion} />
-          <CamposContacto envio={envio} correo={contacto.correo} paises={contacto.paises} />
+          <CamposContacto envio={envio} correo={contacto.correo} paises={contacto.paises} mesesDeGuarda={mesesDeGuarda} />
         </form>
 
         {/* Segunda puerta (sumarse al equipo): FUERA del contenedor,

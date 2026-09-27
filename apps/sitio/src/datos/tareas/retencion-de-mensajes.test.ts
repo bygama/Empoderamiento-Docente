@@ -17,6 +17,8 @@ const correo = `prueba-${randomUUID()}@ed.test`;
 const carpetas: string[] = [];
 const empezo = new Date();
 const fecha = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
+// Los plazos de antes, fijos: así la prueba no depende de lo que tenga Ajustes en esta base.
+const DE_ANTES = { cv: [{ desde: new Date(0), valor: 12 }], contacto: [{ desde: new Date(0), valor: 24 }], spam: 30 };
 
 after(async () => {
   if (!hayBase) return;
@@ -40,8 +42,8 @@ test("Contacto: se va lo de más de 24 meses y el spam de más de 30 días, qued
       fila("spam-nuevo", "2000-10-01", "spam", "2001-01-10"),
     ],
   });
-  const r = await retenerContacto(HOY);
-  assert.deepEqual(r, { ok: true, detalle: "Se borraron 2 mensajes de Contacto: 1 de más de 24 meses y 1 de spam de más de 30 días." });
+  const r = await retenerContacto(HOY, DE_ANTES);
+  assert.deepEqual(r, { ok: true, detalle: "Se borraron 2 mensajes de Contacto: 1 que pasó su plazo y 1 de spam de más de 30 días." });
   const quedan = await base.mensaje.findMany({ where: { correo, bandeja: "contacto" }, select: { nombre: true }, orderBy: { nombre: "asc" } });
   assert.deepEqual(quedan.map((q) => q.nombre), ["queda", "spam-nuevo"]);
 });
@@ -68,7 +70,7 @@ test("CV: el vencido y el spam vencido se van con su archivo; el que no, se qued
     ],
   });
 
-  const [corrida] = await correrTareas([{ ...retencionDeCV, correr: () => retenerCV(HOY, () => almacen) }], { registrar: registrarCorrida, limiteMs: 10_000 });
+  const [corrida] = await correrTareas([{ ...retencionDeCV, correr: () => retenerCV(HOY, () => almacen, DE_ANTES) }], { registrar: registrarCorrida, limiteMs: 10_000 });
   const detalle = "Se borraron 2 CV con sus archivos (1 de spam).";
   assert.deepEqual(corrida, { clave: "retencion-de-cv", ok: true, detalle });
   assert.equal(await almacen.leer(`cv/${vencido}.pdf`), null);
