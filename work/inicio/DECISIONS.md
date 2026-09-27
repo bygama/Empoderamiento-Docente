@@ -58,3 +58,14 @@
   Inicio», «… descartó el borrador de Inicio», «… restauró una versión de
   Inicio». «Lo nuevo desde tu visita» sigue leyendo `paginas.publicadoEn`
   (sigue siendo verdad y no depende de que cada acción anote).
+- 2026-09-26 — **La actividad del Inicio, sin sesiones** (el padre, al ver
+  `inicio-dirige-mixto.png`: siete de ocho eventos eran «entró» y «salió» y
+  tapaban lo que el Inicio tiene que contar). Van al Inicio los tipos que
+  cambian algo del sitio o del admin (publicar, descartar, restaurar, y los
+  que traigan los módulos: invitar, cambiar un rol, cerrar un mensaje,
+  publicar una novedad…); los de la sesión y de la cuenta propia (entró,
+  salió, cambió su contraseña, cambió su nombre) no, y siguen en Cuentas ›
+  Actividad. Es un dato del registro de tipos, `VA_AL_INICIO` en
+  `datos/actividad.ts` al lado de `QUIEN_VE`, y no un filtro en la consulta:
+  cada tipo nuevo lo decide ahí. El texto del vacío queda igual. Test contra
+  la base (`actividad-reciente.test.ts`), visto en rojo con `entro: true`.
