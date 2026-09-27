@@ -54,6 +54,11 @@ test("cada rol ve la actividad de lo que usa: quien edita, la de Contenido, Cont
     "borro-un-enlace",
     "agrego-una-marca",
     "borro-una-marca",
+    "publico-un-perfil",
+    "despublico-un-perfil",
+    "descarto-cambios-de-un-perfil",
+    "borro-un-perfil",
+    "movio-un-perfil",
   ]);
 });
 
@@ -62,6 +67,11 @@ test("un link y una marca de Métricas se leen por su nombre, entre comillas", (
   assert.equal(fraseDe({ tipo: "borro-un-enlace", quien: "Ana", sobre: null }), "Ana borró un link");
   assert.equal(fraseDe({ tipo: "agrego-una-marca", quien: "Ana", sobre: "Posteamos en LinkedIn" }), "Ana agregó la marca «Posteamos en LinkedIn»");
   assert.equal(fraseDe({ tipo: "borro-una-marca", quien: "Ana", sobre: null }), "Ana borró una marca");
+});
+
+test("lo que se hace con un perfil del Equipo se lee con el nombre de la persona", () => {
+  assert.equal(fraseDe({ tipo: "publico-un-perfil", quien: "Ana", sobre: "Daniela Reyes" }), "Ana publicó el perfil de Daniela Reyes");
+  assert.equal(fraseDe({ tipo: "movio-un-perfil", quien: "Ana", sobre: "Iván Pérez" }), "Ana movió a Iván Pérez en el orden del equipo");
 });
 
 test("lo que se cambia en Ajustes se lee con qué cambió, y solo lo ve quien usa Ajustes", () => {

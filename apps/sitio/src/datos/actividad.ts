@@ -86,6 +86,13 @@ export const TIPOS_DE_ACTIVIDAD = [
   "borro-un-enlace",
   "agrego-una-marca",
   "borro-una-marca",
+  // Equipo (work/equipo/): sobre el perfil, con el nombre de la persona como
+  // era en ese momento y su id. Mover es un paso por clic, y cada paso se anota.
+  "publico-un-perfil",
+  "despublico-un-perfil",
+  "descarto-cambios-de-un-perfil",
+  "borro-un-perfil",
+  "movio-un-perfil",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
@@ -97,10 +104,11 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * edita el contenido; con un mensaje de Contacto, quien ve Contacto; que se
  * borró un CV, solo quien ve los CV; lo que se le hace a otra cuenta, quien
  * usa Cuentas; lo que se hace con una novedad, quien edita las novedades; con
- * un material, quien edita la Biblioteca; con un caso, un aliado o una foto,
- * quien edita el contenido (también que se autorizó un logo, aunque marcarlo
- * sea de quien dirige o administra); lo que se cambia en Ajustes, quien usa
- * Ajustes; y un link o una marca de Métricas, quien ve las métricas.
+ * un material, quien edita la Biblioteca; con un caso, un aliado, un perfil
+ * del Equipo o una foto, quien edita el contenido (también que se autorizó un
+ * logo, aunque marcarlo sea de quien dirige o administra); lo que se cambia en
+ * Ajustes, quien usa Ajustes; y un link o una marca de Métricas, quien ve las
+ * métricas.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -155,6 +163,11 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "borro-un-enlace": "verMetricas",
   "agrego-una-marca": "verMetricas",
   "borro-una-marca": "verMetricas",
+  "publico-un-perfil": "editarContenido",
+  "despublico-un-perfil": "editarContenido",
+  "descarto-cambios-de-un-perfil": "editarContenido",
+  "borro-un-perfil": "editarContenido",
+  "movio-un-perfil": "editarContenido",
 };
 
 /**
@@ -218,6 +231,11 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "borro-un-enlace": true,
   "agrego-una-marca": true,
   "borro-una-marca": true,
+  "publico-un-perfil": true,
+  "despublico-un-perfil": true,
+  "descarto-cambios-de-un-perfil": true,
+  "borro-un-perfil": true,
+  "movio-un-perfil": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */

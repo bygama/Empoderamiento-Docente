@@ -13,6 +13,7 @@ import { MODULOS_DE_ACTIVIDAD, moduloDe } from "@/admin/cuentas/actividad/modulo
 import { TIPOS_DE_ACTIVIDAD } from "@/datos/actividad";
 import { listarActividad } from "@/datos/consultas/actividad";
 import { listarCuentas } from "@/datos/consultas/cuentas";
+import { perfilesQueExisten } from "@/datos/consultas/equipo-del-admin";
 import { materialesQueExisten } from "@/datos/consultas/materiales-del-admin";
 import { sesionActual } from "@/datos/sesion";
 
@@ -41,7 +42,8 @@ export default async function Actividad({ searchParams }: Props) {
     listarActividad(rol, { tipos, persona: filtros.persona, dias: filtros.cuando && CUANDO[filtros.cuando].dias, texto: filtros.q, pagina: filtros.pagina }),
     listarCuentas(rol),
   ]);
-  const materiales = await materialesQueExisten(pagina.filas.flatMap((f) => (moduloDe(f.tipo) === "biblioteca" && f.sobreId ? [f.sobreId] : [])));
+  const idsDe = (modulo: string) => pagina.filas.flatMap((f) => (moduloDe(f.tipo) === modulo && f.sobreId ? [f.sobreId] : []));
+  const [materiales, perfiles] = await Promise.all([materialesQueExisten(idsDe("biblioteca")), perfilesQueExisten(idsDe("contenido"))]);
   const activa = urlDeActividad(filtros, 1);
   const conFiltros = hayFiltros(filtros);
   return (
@@ -56,7 +58,7 @@ export default async function Actividad({ searchParams }: Props) {
         <Filtro etiqueta="Cuándo" activa={activa} opciones={opcionesDe(filtros, "cuando", "Todo", Object.entries(CUANDO).map(([valor, { texto }]) => [valor, texto]))} />
       </div>
       {pagina.filas.length ? (
-        <ListaDeActividad filas={pagina.filas} cuentasQueExisten={new Set(cuentas.map((c) => c.id))} materialesQueExisten={materiales} />
+        <ListaDeActividad filas={pagina.filas} cuentasQueExisten={new Set(cuentas.map((c) => c.id))} materialesQueExisten={materiales} perfilesQueExisten={perfiles} />
       ) : (
         <EstadoVacio
           titulo={conFiltros ? "No hay actividad con esos filtros" : "Todavía no hay actividad"}
