@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { hayCookieDeSesion } from "@ed/auth";
+import { CABECERA_DEL_METODO } from "@/lib/metricas/clic";
 import { nuevoNonce, politicaDeContenido, ponerCabeceras } from "@/lib/seguridad/cabeceras";
 import { esLlegadaDeOtroSitio, paginaDeRebote } from "@/lib/seguridad/rebote";
 
@@ -30,6 +31,18 @@ function aEntrar(req: NextRequest, ruta: string): URL {
   return destino;
 }
 
+/**
+ * Lo que viaja hacia adentro del pedido. El admin lleva su CSP (Next saca el
+ * nonce de ahí). Un link corto (`/l/`) lleva el método real en
+ * `CABECERA_DEL_METODO`, **siempre pisada**: su página no ve el método y un
+ * HEAD no es un clic (lib/metricas/clic.ts). Lo demás pasa como vino.
+ */
+function haciaAdentro(req: NextRequest, esAdmin: boolean, csp: string): { request: { headers: Headers } } | undefined {
+  if (esAdmin) return { request: { headers: conCabecera(req.headers, "Content-Security-Policy", csp) } };
+  if (req.nextUrl.pathname.startsWith("/l/")) return { request: { headers: conCabecera(req.headers, CABECERA_DEL_METODO, req.method) } };
+  return undefined;
+}
+
 function conCabecera(cabeceras: Headers, nombre: string, valor: string): Headers {
   const copia = new Headers(cabeceras);
   copia.set(nombre, valor);
@@ -58,7 +71,7 @@ export function proxy(req: NextRequest) {
   const res = !sinSesion
     ? // Next saca el nonce de la CSP del *pedido* y se lo pone a sus scripts:
       // por eso la política viaja también hacia adentro, no solo en la respuesta.
-      NextResponse.next(esAdmin ? { request: { headers: conCabecera(req.headers, "Content-Security-Policy", csp) } } : undefined)
+      NextResponse.next(haciaAdentro(req, esAdmin, csp))
     : esLlegadaDeOtroSitio(req)
       ? paginaDeRebote(req.nextUrl)
       : NextResponse.redirect(aEntrar(req, ruta));

@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import { paginaDeRebote } from "@/lib/seguridad/rebote";
-import { proxy } from "./proxy";
+import { CABECERA_DEL_METODO } from "@/lib/metricas/clic";
+import { config, proxy } from "./proxy";
 
 const DE_OTRO_SITIO = { "sec-fetch-site": "cross-site", "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" };
 const DEL_MISMO = { ...DE_OTRO_SITIO, "sec-fetch-site": "same-origin" };
@@ -80,4 +81,18 @@ test("el sitio público sigue con su CSP estática, sin nonce", () => {
   assert.equal(scriptSrc(res), "script-src 'self' 'unsafe-inline'");
   assert.equal(res.headers.get("cross-origin-opener-policy"), null);
   assert.equal(res.headers.get("x-middleware-request-content-security-policy"), null);
+});
+
+test("a /l/ le pasa el método real, pisando el que venga de afuera: un HEAD que dice ser GET sigue siendo HEAD", () => {
+  const cabecera = `x-middleware-request-${CABECERA_DEL_METODO}`;
+  assert.equal(pedir("/l/taller", { [CABECERA_DEL_METODO]: "GET" }, "HEAD").headers.get(cabecera), "HEAD");
+  assert.equal(pedir("/l/taller", {}, "GET").headers.get(cabecera), "GET");
+  // Fuera de /l/ no se pone: nadie más la lee.
+  assert.equal(pedir("/que-hacemos", {}, "GET").headers.get(cabecera), null);
+});
+
+test("el matcher del proxy cubre /l/: si la dejara afuera, /l/ no contaría nada", () => {
+  const cubre = (ruta: string) => config.matcher.some((m) => new RegExp(`^${m}$`).test(ruta));
+  assert.equal(cubre("/l/taller-en-monterrey"), true);
+  assert.equal(cubre("/_next/static/chunk.js"), false);
 });

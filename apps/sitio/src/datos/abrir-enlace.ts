@@ -1,5 +1,5 @@
 import { claveDeLimite, ipDelPedido } from "@/lib/formularios/limite";
-import { esRobot } from "@/lib/metricas/robots";
+import { esUnClic } from "@/lib/metricas/clic";
 import { segundoPlano } from "@/lib/segundo-plano";
 import { sumarContador } from "./contadores";
 import { enlacePorCodigo, type Enlace } from "./enlaces";
@@ -24,20 +24,24 @@ export function destinoConUtm(enlace: Pick<Enlace, "destino" | "canal" | "codigo
   return `${url.pathname}${url.search}`;
 }
 
-/** Si el pedido es el clic de una persona: ni la vista previa de una red ni un robot. */
-export function esUnClic(cabeceras: Headers): boolean {
-  return !esRobot(cabeceras.get("user-agent"));
+/** Si la IP de este pedido todavía entra en el tope de ese link; lo cuenta aunque no entre. */
+async function dentroDelTope(cabeceras: Headers, enlace: Pick<Enlace, "id">): Promise<boolean> {
+  const clave = claveDeLimite(`enlace:${enlace.id}`, ipDelPedido(cabeceras), process.env.BETTER_AUTH_SECRET ?? "");
+  return (await sumarEnvio(clave, HORA_MS)) <= TOPE_DE_CLICS;
 }
 
 /**
- * Suma el clic, si cuenta: el de una persona y dentro del tope por IP, que se
- * guarda como un HMAC. El `User-Agent` y la IP se leen y no se guardan.
+ * Suma el clic, si cuenta: un GET de una persona (`esUnClic`, con el método
+ * que pasa el proxy) y dentro del tope por IP, que se guarda como un HMAC. El
+ * `User-Agent` y la IP se leen y no se guardan.
  */
-export async function contarClic(cabeceras: Headers, enlace: Pick<Enlace, "id">): Promise<void> {
-  if (!esUnClic(cabeceras)) return;
-  const clave = claveDeLimite(`enlace:${enlace.id}`, ipDelPedido(cabeceras), process.env.BETTER_AUTH_SECRET ?? "");
-  if ((await sumarEnvio(clave, HORA_MS)) > TOPE_DE_CLICS) return;
-  await sumarContador({ evento: "enlace-clic", clave: enlace.id });
+export async function contarClic(
+  cabeceras: Headers,
+  enlace: Pick<Enlace, "id">,
+  { tope = dentroDelTope, sumar = sumarContador }: { tope?: typeof dentroDelTope; sumar?: typeof sumarContador } = {},
+): Promise<void> {
+  if (!esUnClic(cabeceras) || !(await tope(cabeceras, enlace))) return;
+  await sumar({ evento: "enlace-clic", clave: enlace.id });
 }
 
 type Dependencias = { buscar?: typeof enlacePorCodigo; contar?: typeof contarClic };
