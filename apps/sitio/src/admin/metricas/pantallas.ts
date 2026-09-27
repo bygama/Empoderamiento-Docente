@@ -1,6 +1,6 @@
 // Las cinco pantallas de Métricas (SPEC padre §5.7), en el orden de sus
-// pestañas. Una sola lista para las pestañas y las guías de las que todavía no
-// existen: así una pestaña y su guía no pueden decir cosas distintas.
+// pestañas. Una sola lista para las pestañas y el detalle del encabezado de
+// cada pantalla: así una pestaña y su pantalla no pueden decir cosas distintas.
 
 export const METRICAS = {
   nombre: "Métricas",
