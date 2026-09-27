@@ -134,8 +134,15 @@
     guardada y no se aplica. La fila lo dice («No se aplica: esa ruta la
     contesta el sitio.»), la confirmación y el aviso de borrar dicen que no
     cambia nada, y las demás, que vuelve la página de error.
-  - Comprobado contra el manifiesto de rutas del build: las 58 cubiertas.
+  - Comprobado contra el manifiesto de rutas del build: 58 cubiertas. Eran
+    60: el cruce salteaba `/_not-found` y `/_global-error` (ronda 2, abajo).
 - 2026-09-27 — **Quién recibe un aviso se anota solo si cambió algo**
   (MINOR de r1): `ponerQuienRecibe` escribe solo las cuentas que cambian y
   devuelve `{ reciben, cambiaron }`; con `cambiaron` en 0, la acción no
   revalida ni anota.
+- 2026-09-27 — **Ronda 2 (Minor de r2): nada que empiece con «/_» es un
+  «desde».** `/[...resto]` (o-redirige) abarcaba también `/_not-found` y
+  `/_global-error`, internas de Next que nunca pasan por la atrapa-todo: se
+  guardaban y no se aplicaban. `/_next/[[...todo]]` pasa a ser
+  `/_*/[[...todo]]`. Rechaza también cualquier otra «/_…»: nadie escribe
+  una ruta vieja así, y el borde queda cerrado para lo interno que Next sume.
