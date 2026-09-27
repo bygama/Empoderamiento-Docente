@@ -6,7 +6,8 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen } from "@/components/ui/icons";
 import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
 import type { BibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
-import { etiquetaDeCategoria, fechaCorta } from "@/features/novedades/contenido/modelo";
+import { etiquetaDeCategoria } from "@/features/novedades/contenido/modelo";
+import { fechaCorta } from "@/features/novedades/contenido/fechas";
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 

@@ -2,7 +2,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/config/site";
-import { etiquetaDeCategoria, fechaCorta } from "../contenido/modelo";
+import { etiquetaDeCategoria } from "../contenido/modelo";
+import { fechaCorta } from "../contenido/fechas";
 import { TAMANO } from "./tamano";
 
 // La imagen para redes de una novedad (SPEC §6.3 de `work/novedades-y-kit/`):
