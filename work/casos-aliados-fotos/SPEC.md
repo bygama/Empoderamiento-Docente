@@ -1,7 +1,9 @@
 # SPEC — Casos, Aliados y Fotos
 
 - **Fecha:** 2026-09-27
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-27, con las doce propuestas de
+  §12 y tres resguardos (el SVG, el orden de reemplazar, el comentario del
+  SQL generado); ver DECISIONS
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación, tablas y dependencias incluidas: DECISIONS del padre,
   2026-09-26)
@@ -143,6 +145,18 @@ tocaría el esquema de cada sección y el HTML del sitio; la URL ya es única
 **Las deudas que cierra:** reemplazar y borrar ahora sí borran el archivo en
 Blob o en disco; una foto subida desde un formulario que nunca se guardó
 aparece en «Sin usar» y se puede borrar.
+
+**El archivo se borra después de la base, nunca antes** (resguardo 2 del
+padre): si el borrado falla, queda en el log, y **una tarea del cron diario**
+(`archivos-de-fotos-sueltos`) borra de Blob o del disco los archivos que
+ninguna fila de `fotos` usa y tienen más de un día (una subida en curso guarda
+el archivo antes que la fila). Nunca toca `public/`.
+
+**El SVG entra solo por la importación** (resguardo 1): subir mira los bytes
+con `sharp` y acepta jpg, png y webp, así que un SVG se rechaza aunque se
+llame `.png`, y un test lo prueba. El logo de Techint se sirve como estático
+de `public/aliados/`: es un archivo del repositorio, revisado como cualquier
+código, y ningún SVG llega por el admin.
 
 ### 3.5. `origen-03-pregunta.webp`, una sola vez **[propuesta K]**
 
