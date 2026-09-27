@@ -11,6 +11,7 @@
 # lo es si renombró o borró algo que el código viejo usa (docs/deploy/vps.md).
 set -euo pipefail
 cd "$(dirname "$0")/.."
+export MSYS_NO_PATHCONV=1
 
 versiones() { docker images ed-sitio --format '  {{.Tag}}  {{.CreatedAt}}' | grep -v '^  actual '; }
 

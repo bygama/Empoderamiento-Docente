@@ -13,6 +13,8 @@
 # etiquetada con el commit para poder volver (`scripts/volver.sh`).
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# En Git Bash (Windows, la prueba local) las rutas de Linux no se traducen.
+export MSYS_NO_PATHCONV=1
 
 # Cuántas imágenes de `app` se guardan para volver atrás.
 GUARDAR=5
@@ -45,6 +47,9 @@ docker tag "ed-sitio:$version" ed-sitio:actual
 
 paso "5/5 Levantar todo con la versión nueva"
 docker compose up -d --wait --remove-orphans
+# Caddy no relee su archivo solo: si el deploy trajo un Caddyfile nuevo, así
+# entra sin cortar conexiones.
+docker compose exec -T proxy caddy reload --config /etc/caddy/Caddyfile
 
 paso "Quedan las últimas $GUARDAR imágenes de app"
 docker images ed-sitio --format '{{.CreatedAt}}|{{.Tag}}' \
