@@ -1,3 +1,5 @@
+import type { HeroDeQueHacemos } from "@/features/que-hacemos/contenido/hero";
+
 /**
  * Titular y bajada del hero (referencia Ink): titular blanco con
  * «transformamos.» teñido de celeste y subrayado verde (el marcador de
@@ -51,17 +53,19 @@
  * `balance` sigue descartado por lo de arriba: empareja los renglones y mata
  * el escalón.
  */
-export function TitularQH() {
+export function TitularQH({ titulo, bajada }: { titulo: HeroDeQueHacemos["titulo"]; bajada: string }) {
   return (
     <>
       <h1
+        // Nombra la sección del hero (aria-labelledby): el nombre sigue al titular editable.
+        id="que-hacemos-titulo"
         className="font-display font-extrabold tracking-[-0.03em] text-white [text-shadow:0_2px_30px_rgb(15_21_40/0.55)]"
         style={{ fontSize: "clamp(2.75rem, 1.1rem + 7vw, 6.25rem)", lineHeight: 1.04 }}
       >
-        <span className="sr-only">Generamos y transformamos.</span>
+        <span className="sr-only">{`${titulo.primeraLinea} ${titulo.segundaLinea}`}</span>
         <span aria-hidden="true" className="block overflow-hidden pb-[0.08em]">
           <span data-qh-word className="block">
-            Generamos y
+            {titulo.primeraLinea}
           </span>
         </span>
         <span aria-hidden="true" className="block overflow-hidden pb-[0.14em]">
@@ -73,9 +77,9 @@ export function TitularQH() {
                 el subrayado va y el color viene. Sin motion: celeste
                 directo (el clip solo lo setea GSAP). */}
             <span className="relative inline-block">
-              transformamos.
+              {titulo.segundaLinea}
               <span aria-hidden="true" data-qh-pintura className="text-azul-claro absolute inset-0">
-                transformamos.
+                {titulo.segundaLinea}
               </span>
               <span
                 data-qh-underline
@@ -90,8 +94,7 @@ export function TitularQH() {
         data-qh-rise
         className="mt-6 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed text-pretty text-white/85 md:text-[1.2rem]"
       >
-        Generamos escenarios de aprendizaje situados que transforman hoy la
-        relación cotidiana de docentes con la matemática escolar.
+        {bajada}
       </p>
     </>
   );

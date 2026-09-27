@@ -2,6 +2,7 @@
 
 import { useRef, type CSSProperties } from "react";
 import type { AreaDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
+import type { HeroDeQueHacemos } from "@/features/que-hacemos/contenido/hero";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMouseParallax } from "@/lib/hooks/useMouseParallax";
@@ -73,7 +74,7 @@ import { idDeArea } from "./areas/anclas";
  * magnetismo en `capsula-magnetismo.ts`, portal y viaje en `portal-viaje.ts`;
  * markup en `CieloPolvo`, `TitularQH` y `CapsulaPortal`.
  */
-export function QueHacemosHero({ areas }: { areas: readonly AreaDeQueHacemos[] }) {
+export function QueHacemosHero({ contenido, areas }: { contenido: HeroDeQueHacemos; areas: readonly AreaDeQueHacemos[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const holdRef = useRef<HTMLButtonElement | null>(null);
   const campoRef = useRef<HTMLDivElement | null>(null);
@@ -128,7 +129,7 @@ export function QueHacemosHero({ areas }: { areas: readonly AreaDeQueHacemos[] }
     <section
       ref={rootRef}
       className="relative z-20 isolate flex min-h-svh flex-col justify-center overflow-x-clip pt-24 pb-12 text-white"
-      aria-label="Qué hacemos"
+      aria-labelledby="que-hacemos-titulo"
       style={
         {
           "--qhx": "0",
@@ -159,7 +160,7 @@ export function QueHacemosHero({ areas }: { areas: readonly AreaDeQueHacemos[] }
             "perspective(1000px) translate3d(calc(var(--qhx, 0) * 10px), calc(var(--qhy, 0) * 8px), 0) rotateY(calc(var(--qhx, 0) * 2.6deg)) rotateX(calc(var(--qhy, 0) * -2.1deg))",
         }}
       >
-        <TitularQH />
+        <TitularQH titulo={contenido.titulo} bajada={contenido.bajada} />
 
         {/* Las siete áreas, como chips: se leen de una y bajan a
             su bloque en #areas. */}
@@ -184,7 +185,7 @@ export function QueHacemosHero({ areas }: { areas: readonly AreaDeQueHacemos[] }
           ))}
         </ul>
 
-        <CapsulaPortal refCampo={campoRef} refBoton={holdRef} refInner={innerRef} />
+        <CapsulaPortal refCampo={campoRef} refBoton={holdRef} refInner={innerRef} texto={contenido.boton} />
       </div>
     </section>
   );

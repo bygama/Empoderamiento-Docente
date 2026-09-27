@@ -54,3 +54,17 @@ Append-only: fecha — decisión — por qué.
   no se suma uno: eso volvería región algo que hoy no lo es. El cambio es de
   atributos: comparar-render no lo ve, así que PROGRESS anota el nombre
   accesible de antes y de después de cada una.
+- 2026-09-26 — **El SEO de las dos páginas usa `openGraphDeLaPagina(padre)`
+  de la 4c** (aviso del padre, «SEO de página hija: usá openGraphDeLaPagina
+  de la 4c»). `metadataDeSeo` en una página hija pierde `og:image` y la
+  tarjeta grande de X: el `openGraph` de la página reemplaza el del layout,
+  imagen incluida, y la imagen del sitio vive en el segmento del layout. La
+  4c suma a `config/metadata.ts` `openGraphDeLaPagina(padre:
+  ResolvingMetadata)`, que hereda la imagen ya resuelta; cada
+  `generateMetadata` la usa con su segundo argumento. Si la 4c no está en
+  `main` al llegar al paso 9, se escribe igual —misma firma, mismo archivo,
+  mismo cuerpo que el de su worktree— y concilia quien rebasee segundo; su
+  test (`config/metadata.test.ts`) queda de ella, para no chocar en un
+  archivo nuevo. comparar-render tiene que mostrar `og:image` y
+  `twitter:image` sin cambios: cambian solo `og:title`, `og:description`,
+  `twitter:title` y `twitter:description`.
