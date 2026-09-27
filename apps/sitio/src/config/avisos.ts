@@ -25,12 +25,23 @@ export type DefinicionDeAviso = {
    * resumen semanal viene apagado: lo recibe quien lo pide.
    */
   deFabrica: boolean;
+  /** Qué trae el correo, y qué no, para Ajustes › Avisos. */
+  trae: string;
 };
 
+/** Lo que dicen los de una bandeja: el correo nunca lleva a quien escribió. */
+const SIN_LO_QUE_ESCRIBIERON = "El correo no trae lo que escribieron: se lee en el admin.";
+
 export const AVISOS: Record<ClaveDeAviso, DefinicionDeAviso> = {
-  contacto: { nombre: BANDEJAS.contacto.nombre, cada: "mensaje nuevo de Contacto", capacidad: BANDEJAS.contacto.capacidad, deFabrica: true },
-  cv: { nombre: BANDEJAS.cv.nombre, cada: "CV nuevo", capacidad: BANDEJAS.cv.capacidad, deFabrica: true },
-  "resumen-semanal": { nombre: "Resumen semanal", cada: "resumen semanal de las métricas, los lunes", capacidad: "verMetricas", deFabrica: false },
+  contacto: { nombre: BANDEJAS.contacto.nombre, cada: "mensaje nuevo de Contacto", capacidad: BANDEJAS.contacto.capacidad, deFabrica: true, trae: SIN_LO_QUE_ESCRIBIERON },
+  cv: { nombre: BANDEJAS.cv.nombre, cada: "CV nuevo", capacidad: BANDEJAS.cv.capacidad, deFabrica: true, trae: SIN_LO_QUE_ESCRIBIERON },
+  "resumen-semanal": {
+    nombre: "Resumen semanal",
+    cada: "resumen semanal de las métricas, los lunes",
+    capacidad: "verMetricas",
+    deFabrica: false,
+    trae: "Viene apagado: lo recibe quien lo pide. Trae solo sumas de la semana, nada de ninguna persona.",
+  },
 };
 
 export function esAviso(valor: unknown): valor is ClaveDeAviso {

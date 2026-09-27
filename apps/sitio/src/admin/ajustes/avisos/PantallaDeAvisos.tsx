@@ -22,14 +22,9 @@ export function PantallaDeAvisos({ avisos }: { avisos: readonly AvisoConCuentas[
       />
       <div>
         {avisos.map(({ aviso, cuentas }) => {
-          const { nombre, cada, capacidad } = AVISOS[aviso];
+          const { nombre, cada, capacidad, trae } = AVISOS[aviso];
           return (
-            <Apartado
-              key={aviso}
-              id={aviso}
-              titulo={nombre}
-              descripcion={`Lo pueden recibir las cuentas de ${quienPuede(capacidad)}. El correo no trae lo que escribieron: se lee en el admin.`}
-            >
+            <Apartado key={aviso} id={aviso} titulo={nombre} descripcion={`Lo pueden recibir las cuentas de ${quienPuede(capacidad)}. ${trae}`}>
               <QuienRecibe aviso={aviso} nombre={nombre} cada={cada} cuentas={cuentas} />
             </Apartado>
           );

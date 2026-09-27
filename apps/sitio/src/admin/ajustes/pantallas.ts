@@ -21,7 +21,7 @@ export type PantallaDeAjustes = {
 export const PANTALLAS_DE_AJUSTES: readonly PantallaDeAjustes[] = [
   { clave: "sitio", nombre: "Datos del sitio", href: "/admin/ajustes/sitio", que: "El correo, el WhatsApp, la oficina, los países y las redes que muestra el sitio." },
   { clave: "seo", nombre: "SEO", href: "/admin/ajustes/seo", que: "Las redirecciones, si cada página está en Google y el sitemap." },
-  { clave: "avisos", nombre: "Avisos", href: "/admin/ajustes/avisos", que: "Quién recibe un correo con cada mensaje de Contacto y con cada CV." },
+  { clave: "avisos", nombre: "Avisos", href: "/admin/ajustes/avisos", que: "Quién recibe un correo con cada mensaje de Contacto, con cada CV y con el resumen semanal." },
   { clave: "privacidad", nombre: "Privacidad", href: "/admin/ajustes/privacidad", que: "Cuánto se guarda lo que llega por los formularios del sitio." },
   { clave: "conexiones", nombre: "Conexiones", href: "/admin/ajustes/conexiones", que: "Vercel Analytics, Search Console, Resend y Blob: si están y cómo anduvieron." },
 ];
