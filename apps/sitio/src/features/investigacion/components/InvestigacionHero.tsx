@@ -2,12 +2,13 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
-import { Highlight } from "@/components/ui/Highlight";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
+import type { HeroInvestigacion } from "@/features/investigacion/contenido/hero";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { alClicIrA } from "@/lib/navegar";
+import { ConResaltado } from "./ConResaltado";
 import { LinternaFaro } from "./LinternaFaro";
 import { Bandada } from "./hero/Bandada";
 import { CieloNocturno } from "./hero/CieloNocturno";
@@ -22,7 +23,8 @@ const HAZ_REPOSO = -168;
  * Sección 1 — Hero: «la luz abre el archivo», en dos vidas sobre la misma
  * sección pinneada. Copy según docs/content/arquitectura-investigacion.md
  * §3; la bajada no se muestra entera: vive repartida en los cuatro beats
- * de la historia (constelacion.ts → frase).
+ * de la historia. El titular, los botones y los beats llegan por props (de
+ * `features/investigacion/contenido/hero.ts` o de la base).
  *
  * - **Encendido (autónomo, al cargar):** de noche, la linterna del faro
  *   plantada abajo a la derecha (el mismo faro de la marca, recortado y
@@ -49,7 +51,7 @@ const HAZ_REPOSO = -168;
  * la noche. La historia solo existe con la coreografía (desktop con
  * puntero).
  */
-export function InvestigacionHero() {
+export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion }) {
   const zonaRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -125,16 +127,14 @@ export function InvestigacionHero() {
               lineHeight: 1.06,
             }}
           >
-            <Highlight>Investigamos</Highlight> para transformar la matemática
-            escolar.
+            <ConResaltado texto={contenido.titulo} />
           </h1>
           {/* Los dos CTA cortan directo a su sección (sin recorrer las
-              escenas del medio), igual que el navbar. El secundario va a
-              los casos, lo que más se vuelve a buscar (decisión de ED,
-              2026-09-08; antes salía a la Biblioteca). */}
+              escenas del medio), igual que el navbar. El destino queda en
+              código: es el trabajo de cada botón (SPEC §4). */}
           <div data-hero-rise className="mt-9 flex flex-wrap gap-4">
             <ButtonPrimary href="#lineas" onClick={alClicIrA("lineas")}>
-              Conocé qué investigamos
+              {contenido.botonPrincipal}
             </ButtonPrimary>
             <ButtonSecondary
               href="#en-accion"
@@ -142,7 +142,7 @@ export function InvestigacionHero() {
               withArrow
               onClick={alClicIrA("en-accion")}
             >
-              Ver los casos
+              {contenido.botonSecundario}
             </ButtonSecondary>
           </div>
         </div>
@@ -165,7 +165,7 @@ export function InvestigacionHero() {
         </div>
       </div>
 
-      <HojaHistoria />
+      <HojaHistoria pasos={contenido.pasos} />
       <Bandada />
     </section>
   );

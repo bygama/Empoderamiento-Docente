@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import type { HeroInvestigacion } from "@/features/investigacion/contenido/hero";
 import { FIGURAS } from "../constelacion";
 
 /**
@@ -7,8 +8,8 @@ import { FIGURAS } from "../constelacion";
  * constelación (los puntos viven en su propia capa, encima de la hoja:
  * Bandada.tsx; el hueco solo dice dónde y de qué tamaño); a la derecha,
  * riel 01–04, verbo que se releva y frase que se pinta palabra por palabra
- * (la bajada del doc maestro vive repartida en esas cuatro frases:
- * constelacion.ts → frase).
+ * (la bajada del doc maestro vive repartida en esas cuatro frases). Los
+ * pasos llegan por props, uno por figura y en el orden de FIGURAS.
  *
  * Llega subiendo desde abajo sobre la noche al ritmo del scroll y se queda
  * enmarcada por ella (inset-2.5: la canaleta deja ver el cielo alrededor,
@@ -16,7 +17,7 @@ import { FIGURAS } from "../constelacion";
  * coreografía la muestra, y siempre si no corre: touch y reduced-motion ven
  * el hero de noche y nada más (coreografia-historia.ts).
  */
-export function HojaHistoria() {
+export function HojaHistoria({ pasos }: { pasos: HeroInvestigacion["pasos"] }) {
   return (
     <div
       data-hero-hoja
@@ -68,18 +69,18 @@ export function HojaHistoria() {
           {/* h holgada para los descendentes (la «g» de Preguntar) sin
               soltar el overflow-hidden que necesita el relevo. */}
           <div className="font-display text-azul-principal relative mt-8 h-[1.5em] overflow-hidden text-[2.1rem] leading-[1.35] font-extrabold tracking-[-0.02em] lg:text-[2.5rem]">
-            {FIGURAS.map((f) => (
+            {FIGURAS.map((f, i) => (
               <span key={f.id} data-verbo className="absolute inset-0">
-                {f.etiqueta}
+                {pasos[i]?.verbo}
               </span>
             ))}
           </div>
 
           {/* La frase que se pinta palabra por palabra. */}
           <div className="text-azul-principal/15 mt-5 grid max-w-[38ch] text-[1.05rem] leading-relaxed lg:text-[1.15rem]">
-            {FIGURAS.map((f) => (
+            {FIGURAS.map((f, i) => (
               <p key={f.id} data-frase className="col-start-1 row-start-1">
-                {f.frase.split(" ").map((palabra, k) => (
+                {(pasos[i]?.frase ?? "").split(" ").map((palabra, k) => (
                   <span key={k} data-palabra>
                     {palabra}{" "}
                   </span>
