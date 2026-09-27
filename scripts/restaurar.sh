@@ -15,7 +15,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export MSYS_NO_PATHCONV=1
 
-respaldos() { ls -1 respaldos 2>/dev/null | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | sed 's/^/  /'; }
+respaldos() { ls -1 respaldos 2>/dev/null | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | sed 's/^/  /' || echo '  (ninguno)'; }
 
 if [ $# -ne 1 ]; then
   echo "Uso: scripts/restaurar.sh <AAAA-MM-DD>. Los que hay:"

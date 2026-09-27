@@ -15,7 +15,7 @@ export MSYS_NO_PATHCONV=1
 
 # Las imágenes llevan el nombre del proyecto (compose.yaml).
 sitio="$(docker compose config --no-interpolate | sed -n 's/^name: //p')-sitio"
-versiones() { docker images "$sitio" --format '  {{.Tag}}  {{.CreatedAt}}' | grep -v '^ *actual '; }
+versiones() { docker images "$sitio" --format '  {{.Tag}}  {{.CreatedAt}}' | grep -v '^ *actual ' || echo '  (ninguna)'; }
 
 if [ $# -ne 1 ]; then
   echo "Uso: scripts/volver.sh <versión>. Las que hay:"
