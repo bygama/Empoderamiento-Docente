@@ -13,6 +13,9 @@
 - 2026-09-27 — Los 20 pasos hechos; rebaseada sobre `main` en `782aeb27`
   (Ajustes) y verificada (abajo). Falta la revisión de cierre, que corre el
   padre después del `worker_done`.
+- 2026-09-27 — `main` sumó Biblioteca (`d051c6a0`) mientras se verificaba:
+  segundo rebase, la portada de un material en el registro de usos, y la
+  verificación repetida sobre el resultado (abajo).
 
 ## Hecho
 
@@ -308,7 +311,9 @@
 
 ## Verification
 
-Sobre `66a42920`, rebaseada sobre `main` en `782aeb27` (la lane de Ajustes).
+Sobre `9069d86a`, rebaseada sobre `main` en `d051c6a0` (Ajustes y
+Biblioteca). La primera pasada fue sobre `782aeb27`; lo que cambió con
+Biblioteca se volvió a correr entero y está en «Segunda pasada», al final.
 
 **Después del paso 20, tres arreglos que salieron de verificar** (commits
 aparte): `07ea387b` saca `public/quienes-somos` de `config/rutas.ts` (llegó
@@ -389,6 +394,46 @@ factor por el log):
   `autorizarAliados` la acción (test) y la página solo decide si mostrar la
   casilla habilitada. No hay consulta que devuelva algo reservado por rol.
 
+**Segunda pasada, sobre `d051c6a0` (Biblioteca):** el rebase juntó a mano la
+actividad (los tipos de materiales y los de esta lane), el Inicio (los dos
+cargan en el mismo `Promise.all`), el cron (la salud de los links y los
+archivos sueltos), los pendientes, AGENTS.md, el spec y DESIGN.md.
+Biblioteca también había subido `QueCambioPlegado` al armazón (quedó el suyo;
+la ficha del aliado lo dibuja solo si hay algo publicado) y seguía importando
+`AccionesDeLaFicha` de `admin/novedades/` (ahora del armazón). Y un hueco
+real: **una portada propia de un material es una foto de la biblioteca y el
+registro de usos no conocía la Biblioteca** — figuraba «Sin usar», se podía
+borrar, y reemplazarla dejaba la portada apuntando a un archivo borrado. Se
+suma `datos/fotos/de-los-materiales.ts` (`01ad5b0c`), la portada del material
+ofrece «Elegir una ya subida…» (`18bbc0ed`) y el README nombra la Biblioteca
+(`9069d86a`). `datos/inicio/pendientes.ts` queda en 110 líneas: en `main` ya
+tenía 104 (el tope de §6 es 100); no se reformateó lo de Biblioteca.
+
+| Comando | Resultado |
+| --- | --- |
+| `pnpm build` | exit 0 |
+| `pnpm typecheck` | exit 0 (con los tipos de rutas regenerados por el build) |
+| `pnpm lint` | exit 0 |
+| `node scripts/verificar-react-doctor.mjs` | exit 0 · `react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 1033 archivos · …)` |
+| `pnpm test`, tres vueltas | exit 0 las tres · sitio 462 tests, 461 pass, 0 fail, 1 skip |
+
+- **Migraciones:** quedan intercaladas por fecha (`biblioteca` →
+  `fotos_de_public` → `material_de_las_novedades` → `casos` → `aliados`).
+  Desde cero, las 25 en orden; y en el orden de producción (las 22 de `main`
+  primero, las tres de esta lane después): las dos veces 47 fotos, 4 casos, 5
+  aliados publicados y autorizados, y ninguna novedad con la ruta vieja.
+- **`comparar-render`** contra `main` en `d051c6a0` (las dos buildeadas contra
+  bases recién migradas): lo mismo que en la primera pasada, las 12 páginas
+  iguales salvo `novedades` y `relime-2025`, cuya única diferencia es la ruta
+  de `origen-03-pregunta.webp`.
+- **En el navegador:** en la ficha de un material, «Usar otra» → «Elegir una
+  ya subida…» → una foto → guardar; la ficha de esa foto la lista en «Se usa
+  en» como «Material «Taller de conceptos básicos…» › Portada», «Sin
+  publicar», con su link; se descartó el borrador.
+- Con Biblioteca mergeada, la regla del ancho (`grid-cols-1`) pasa también a
+  las fichas de una novedad y de un material, y queda escrita en DESIGN.md
+  §11, «Ficha de una entidad»; a 390 px las dos sin desborde.
+
 **Revisión de cierre:** no se corrió desde acá. La corre el padre después del
 `worker_done` (orchestrate); los arreglos que pida vuelven como tarea a esta
 terminal.
@@ -402,18 +447,13 @@ pestaña). Con el PASS, el cierre de la lane —el commit que borra
 
 Para después, fuera de esta lane:
 
-- **La ficha de una novedad tiene el mismo problema de ancho** que se arregló
-  en la de caso y aliado (`FichaDeNovedad.tsx`: la grilla sin columnas por
-  debajo de `xl`); con un título largo con `truncate` se ensancharía en el
-  celular. No se tocó porque la lane de Biblioteca (8a) está sobre Novedades.
 - **`datos/avisos.test.ts` (de Ajustes) es inestable** cuando la suite corre
   entera: falla 1 de cada 4 vueltas también en `main` en `782aeb27`
   («repetirlo no cambia nada»: `cambiaron: 1`).
-- Novedades puede usar `Bloque` y `QueCambioPlegado` del armazón cuando 8a
-  cierre (DECISIONS, el paso 16).
-- Conflictos esperables al integrar con Biblioteca: la `Lista`, los archivos
-  de Novedades que se tocaron (`FormularioDeNovedad`, `PanelDeLaNovedad`,
-  `publicar-novedades.ts` con `redirigir.ts`) y el cron (`diarias.ts`).
+- Las portadas tipográficas de `public/biblioteca/portadas/` no entraron a la
+  tabla `fotos` (las generó Biblioteca; no son fotos del contenido que se
+  editen): un material que las usa no aparece en «Se usa en» de nadie, y no
+  hace falta.
 - Sin resolver con el cliente: la nota de autorización de Techint repite lo
   que dice `docs/content/aliados-fuentes-drive.md` («la hoja de ALIANZAS
   todavía dice “solicitado”: confirmar con Raquel»).
