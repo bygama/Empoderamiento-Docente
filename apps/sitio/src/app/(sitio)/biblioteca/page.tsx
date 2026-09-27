@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 
 export default async function BibliotecaPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, destacados } = await contenidoDe("biblioteca");
+  const { hero, destacados, catalogo } = await contenidoDe("biblioteca");
   return (
     <main id="contenido" tabIndex={-1}>
       <BibliotecaHero contenido={hero} />
       <DestacadosBiblioteca contenido={destacados} />
-      <MaterialesListado />
+      <MaterialesListado contenido={catalogo} />
       <PuenteInvestigacion />
       <CierreBiblioteca />
     </main>

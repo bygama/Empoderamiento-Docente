@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { Catalogo } from "@/features/biblioteca/contenido/catalogo";
 import { getLenis } from "@/lib/lenis";
 import { EVENTO_URL } from "@/lib/navegar";
 import { MATERIALES } from "../data/materiales";
@@ -31,9 +32,10 @@ const PASO = 8;
  * (como la referencia), "Todos" lo destilda. Sin animación de entrada — es
  * una sección utilitaria y el contenido cambia con los filtros. Se muestra
  * de a PASO filas con «Ver más»: con 57 piezas la página no puede ser un
- * rollo.
+ * rollo. El aviso sin resultados llega por props (de
+ * `features/biblioteca/contenido/catalogo.ts` o de la base).
  */
-export function MaterialesListado() {
+export function MaterialesListado({ contenido }: { contenido: Catalogo }) {
   const [busqueda, setBusqueda] = useState("");
   const [filtros, setFiltros] = useState<Filtros>(SIN_FILTROS);
   // Tramos extra pedidos con «Ver más», atados a la búsqueda con la que se
@@ -205,8 +207,7 @@ export function MaterialesListado() {
             ) : (
               <div className="border-azul-principal/15 mt-6 flex flex-col items-start gap-5 rounded-xl border border-dashed px-6 py-10 md:px-8">
                 <p className="text-azul-principal font-sans text-[1.02rem] leading-relaxed">
-                  No encontramos materiales con esa combinación de filtros.
-                  Probá con menos filtros o con otras palabras.
+                  {contenido.sinResultados}
                 </p>
                 <button
                   type="button"
