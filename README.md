@@ -250,9 +250,10 @@ actividad reciente, **Cuentas** (invitar, cambiar roles, suspender y la
 actividad; ver «Las cuentas»), **Métricas con sus búsquedas en Google** (ver
 «Las métricas y lo programado»), **la edición de las páginas** (ver «Editar
 las páginas»), **Mensajes**, lo que llega por los formularios del sitio (ver
-«Mensajes»), **Novedades**, la primera entidad (ver «Novedades»), y
-**Ajustes**, lo que se configura una vez (ver «Ajustes»); la biblioteca, los
-casos y el equipo llegan en la fase siguiente.
+«Mensajes»), **Novedades**, la primera entidad (ver «Novedades»),
+**Ajustes**, lo que se configura una vez (ver «Ajustes»), y en Contenido **los
+casos, los aliados y la biblioteca de fotos** (ver «Casos, aliados y fotos»);
+la biblioteca de materiales y el equipo llegan en la fase siguiente.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
 y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
@@ -373,7 +374,8 @@ sesión, con una franja abajo para volver) y «Publicar» lo pasa al sitio,
 regenera la página y guarda la versión. Si otra persona guardó el borrador
 mientras tanto, nada se pisa: el aviso dice quién y cuándo, y ofrece
 «Recargar». Las fotos se suben desde el formulario (jpg, png o webp de hasta
-4 MB, con texto alternativo obligatorio y punto de foco): con
+4 MB, con texto alternativo obligatorio y punto de foco), o se eligen entre
+las ya subidas: con
 `BLOB_READ_WRITE_TOKEN` van a Vercel Blob; sin él, a `apps/sitio/.fotos/`
 (git-ignorada), servida por `/api/fotos/<id>`. Sin base el sitio muestra el
 contenido inicial del código y carga igual. El diseño está en el
@@ -385,6 +387,26 @@ contenido inicial del código y carga igual. El diseño está en el
 > sobre `apps/sitio/.fotos/`), y en cuanto el token aparece en ese entorno
 > (por ejemplo, al promover a producción) esa URL da 404, porque el archivo
 > nunca viajó a Blob.
+
+### Casos, aliados y fotos
+
+Tres pestañas de **Contenido**, con el molde de Novedades (borrador, vista
+previa, «Qué cambió» y publicar):
+
+- **Casos** (`/admin/contenido/casos`) — los cuatro de Investigación, que se
+  editan pero no se crean ni se borran. Cambiar el slug al publicar deja el
+  308 del viejo.
+- **Aliados** (`/admin/contenido/aliados`) — los logos de la tira del pie, del
+  Inicio y de Qué hacemos, en su orden. **Sin la marca «Autorizado» un logo no
+  se publica nunca** (AGENTS.md §5.4): la ponen quien dirige o administra, con
+  la nota de dónde consta, y la consulta del sitio filtra siempre por ella.
+- **Fotos** (`/admin/contenido/fotos`) — todas las fotos del sitio, las
+  subidas y las de `public/`, con su texto alternativo y **dónde se usa cada
+  una**. Reemplazar el archivo reescribe la URL en todos sus usos en una
+  transacción y recién después borra el archivo viejo; si ese borrado falla,
+  la tarea diaria limpia los archivos que ninguna fila usa. Una foto se borra
+  solo si no se usa. Un SVG no se sube: el de Techint entró con la migración,
+  desde el repositorio.
 
 ### Las métricas y lo programado
 

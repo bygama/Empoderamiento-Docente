@@ -176,12 +176,13 @@ un release candidate de la 8 (ADR-0007).
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
             │   ├── roles.ts     ← el único camino para cambiar un rol (ponerRol: prende el segundo factor si lo pide)
             │   ├── sobre-cuentas.ts ← lo común de las acciones de Cuentas (queSePuede sobre la cuenta, borrar si nunca hizo nada)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes, materiales, lista- y ficha-de-material, materiales-del-admin, portadas)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos)
-            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, choque, mover-mensajes)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes, materiales, lista- y ficha-de-material, materiales-del-admin, portadas, casos, casos-del-admin, aliados —nunca uno sin autorizar—, aliados-del-admin, fotos)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos, casos, aliados, ciclo-de-aliados, vista-previa-de-contenido)
+            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, editar-, publicar-casos, editar-, publicar-, autorizar-aliados, subir-, editar-, reemplazar-foto, redirigir, choque, mover-mensajes)
             │   ├── biblioteca/  ← buscar los datos de un material afuera (Crossref, OpenAlex, la página) y chequear su link (ADR-0016)
+            │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, casos, aliados), que busca y reemplaza por URL
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
-            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links
+            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links, los archivos de fotos que ninguna fila usa
             ├── admin/         ← las pantallas del admin
             │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/), el número de sin leer, la cifra
             │   ├── inicio/      ← el Inicio: el saludo, los pendientes, la semana y la actividad
@@ -191,6 +192,8 @@ un release candidate de la 8 (ADR-0007).
             │   ├── novedades/   ← la primera entidad: la lista, la ficha con su formulario y su panel, «Qué cambió» (cambios.ts)
             │   ├── ajustes/     ← el índice de Ajustes y sus cinco pantallas (sitio, seo, avisos, privacidad, conexiones)
             │   ├── biblioteca/  ← la segunda entidad: la lista con miniatura, la ficha de un material y agregar por DOI, ISBN o link
+            │   ├── casos/ · aliados/ ← Contenido › Casos y Aliados, con el molde de novedades/
+            │   ├── fotos/       ← Contenido › Fotos: la grilla, la subida y la ficha de cada foto
             │   ├── campos/      ← el generador de formularios de las páginas (Campo.tsx) y sus errores; los controles son del kit
             │   └── <entidad>/   ← las que siguen, como novedades/ (fase 3)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
@@ -210,10 +213,12 @@ un release candidate de la 8 (ADR-0007).
             │   ├── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
             │   ├── novedades/contenido/ ← además, los dos esquemas de una novedad (novedad.ts) y lo que no
             │   │                   necesita Zod (modelo.ts: categorías, topes); y imagen-para-redes/ (next/og)
-            │   └── biblioteca/contenido/ ← lo mismo para un material (material.ts, campos-del-material.ts, modelo.ts), la cita APA
-            │                       (cita.ts) y lo que ve el sitio (del-sitio.ts); y portada/ (la tipográfica, next/og)
+            │   ├── biblioteca/contenido/ ← lo mismo para un material (material.ts, campos-del-material.ts, modelo.ts), la cita APA
+            │   │                   (cita.ts) y lo que ve el sitio (del-sitio.ts); y portada/ (la tipográfica, next/og)
+            │   ├── investigacion/contenido/ ← los dos esquemas de un caso (caso.ts) y su modelo; casos/, la escena, recibe los casos por prop
+            │   └── aliados/     ← los esquemas de un aliado (contenido/) y el logo de la tira (LogoDeAliado)
             ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO)
-            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed): sin dominio de ED
+            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -319,9 +324,12 @@ usa lenguaje inclusivo:
 
 Solo publicar con autorización confirmada por el usuario. Por defecto, NO
 publicar. Los autorizados son exactamente los de la carpeta «LOGOS ALIANZAS»
-de ED (hoy: Techint, UNESCO, Bloom/ser+, UCSH, Science Up); la lista única
-vive en `apps/sitio/src/config/aliados.ts` y el detalle en
-`docs/content/aliados-fuentes-drive.md`. Ministerio de Educación: no se
+de ED (hoy: Techint, UNESCO, Bloom/ser+, UCSH, Science Up); la lista vive en
+la tabla `aliados` y se edita en `/admin/contenido/aliados`, y el detalle, en
+`docs/content/aliados-fuentes-drive.md`. La marca «Autorizado» la ponen solo
+quien dirige o administra, con la nota de dónde consta, y **la consulta del
+sitio (`aliadosDelSitio`) nunca devuelve un aliado sin ella**, tampoco en la
+vista previa: un test lo cuida. Ministerio de Educación: no se
 puede por contrato. OEI, SEMS-SEP, CENEVAL: sin autorización, no van.
 
 ### 5.5. Mensajes pilares
@@ -605,8 +613,9 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 > `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
 > lo que hay. La fase 2 también: `packages/kit-admin` nació con Novedades, la
 > primera entidad. De las tablas de contenido existen `paginas`,
-> `versiones_de_paginas`, `fotos`, `novedades`, `materiales` y `autorias`
-> (spec del admin §6); las de las demás entidades llegan con ellas.
+> `versiones_de_paginas`, `fotos`, `novedades`, `materiales`, `autorias`,
+> `casos` y `aliados` (spec del admin §6); las de las demás entidades llegan
+> con ellas.
 
 Reglas para el admin y sus datos:
 

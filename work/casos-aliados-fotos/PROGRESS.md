@@ -285,5 +285,22 @@
   «descartó los cambios de el caso 01»: se contraen «del» y «al» en
   `frase.ts`, con su test (commit aparte, `fix(actividad)`).
   `pnpm --filter sitio typecheck` 0, lint 0, react-doctor 100/100.
+  Commits `9897c59d` (la frase) y `345c938e`.
+- **Paso 20 — los documentos**: AGENTS.md §3 (el árbol: las consultas y
+  acciones de casos, aliados y fotos, `datos/fotos/`, la tarea de los
+  archivos sueltos, `admin/casos/ · aliados/ · fotos/`,
+  `features/investigacion/contenido/` y `features/aliados/`, el almacén en
+  disco), §5.4 (la lista vive en la tabla `aliados`; la marca la ponen
+  dirige y administra, y la consulta del sitio nunca devuelve uno sin ella)
+  y §12 (las tablas `casos` y `aliados`); el README (el resumen del admin,
+  «elegir entre las ya subidas» y la sección «Casos, aliados y fotos», con
+  reemplazar y el SVG); el spec del admin §6 (el origen de `fotos`, `casos`
+  y `aliados`); `docs/content/aliados-fuentes-drive.md`, y los dos docs de
+  contenido que apuntaban a `investigacion/data/casos.ts` (el inventario del
+  2026-09-07 queda como estaba: es historia). §13 no se toca: la fase 3
+  sigue abierta con equipo y materiales, que son de otras lanes.
+  `grep -rn "config/aliados" AGENTS.md README.md docs/ apps/` → solo el spec
+  del admin y el doc de fuentes diciendo «era»/«antes», y los comentarios
+  de las migraciones y del esquema (historia).
 
 ## Abierto
