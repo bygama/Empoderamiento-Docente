@@ -168,6 +168,66 @@
   sin «use server»). Cuatro tipos en `datos/actividad.ts`. Partidas en tres
   para quedar bajo 100 líneas. Aceptación: `acciones-con-sesion.test.ts` y
   `actividad.test.ts` 17/17; lint; react-doctor 100/100.
+- **Antes del paso 11**: `git fetch` — `main` sigue en `490547f` (la 3b y la
+  3c sin mergear): la UI consume `Buscador`, `Volver` y `Confirmacion` de
+  Mensajes. Dev server en su pestaña de Orca (`next dev -p 3024`, con
+  `NEXT_PUBLIC_SITE_URL` pisada), perfil de navegador propio
+  `novedades-y-kit`, cuenta `novedades.prueba@ejemplo.org` (administra) en
+  `ed_novedades`. **Las capturas no salen**: `orca screenshot` da «the
+  browser tab may not be visible or the window may not have focus» (la
+  ventana de Orca no muestra este worktree; no le robo el foco a nadie). La
+  verificación visual va por el DOM (`orca eval`) hasta que se pueda.
+- **Paso 11 — la lista** (`241997e`). `datos/consultas/lista-de-novedades.ts`
+  (`filasDeLaLista` pura + test 2/2), `admin/novedades/PantallaDeNovedades.tsx`
+  y `ListaDeNovedades.tsx`, rutas `novedades/` (layout con la guarda,
+  `error.tsx`, `page.tsx` Publicadas, `borradores/page.tsx`), `EstadoVacio`
+  con `accion`, la guía de `por-hacer` borrada. React-doctor leyó el
+  `includes` de un texto como el de una lista: va en `tieneLoBuscado`.
+  Aceptación: `guarda.test.ts` 4/4; react-doctor 100/100; en el navegador,
+  `/admin/novedades` lista las nueve (RELIME con «★ Destacada»),
+  `?q=relime` deja una y ofrece «Borrar la búsqueda», Borradores vacía dice
+  «No hay borradores.», el título de la pestaña es «Borradores · Novedades
+  · Admin ED» y hay un solo primario.
+- **Paso 12 — la ficha y guardar** (`287ed5b`, `b161e23`).
+  `useFrenarSalida`, `useErroresDelEditor` y el aviso con «Recargar»
+  (`AvisoDeLaAccion`) pasan de `admin/paginas/` al armazón: los usan dos
+  módulos. `datos/consultas/ficha-de-novedad.ts`, `admin/novedades/formulario.ts`,
+  `FormularioDeNovedad`, `CuerpoDeNovedad`, `EncabezadoDeLaFicha` (+
+  `AccionesDeLaFicha`, por la complejidad que marcó react-doctor),
+  `FichaDeNovedad`, `useGuardarNovedad`, `publicaciones.ts`, rutas `nueva/`
+  y `[id]/`. Dos cosas que salieron probando: (1) «Cambios sin guardar» no
+  se apagaba al abrir una guardada, porque el `jsonb` reordena las claves:
+  `mismoDocumento` compara sin mirar el orden; (2) el `revalidatePath` del
+  primer guardado refrescaba la ruta nueva (`/[id]`) y rearmaba la ficha,
+  perdiendo el aviso: crear y guardar un borrador ya no revalidan (las
+  pantallas del admin son dinámicas). Aceptación en el navegador: la URL
+  sigue al título («prueba-de-la-ficha»), el encabezado pasa a azul, el
+  primer guardado crea la fila, pasa a `/admin/novedades/<id>` y dice
+  «Borrador guardado.»; al recargar sigue ahí y sin «Cambios sin guardar»;
+  un año «20» da el error en el campo, «Hay un campo para revisar: Fecha —
+  …», `aria-invalid` y el foco en `fecha-campo`.
+- **Paso 13 — publicar y lo demás** (`a96bfff`, `e99400a`). `ListaDeDiferencias`
+  y `VistaPreviaFrenada` al armazón; `cambios.ts` (+ test 3/3), `QueCambio`,
+  `SalidaDeNovedad` (descartar y borrar con `Confirmacion`, despublicar
+  sin), `usePublicarNovedad` y `useSalidaDeNovedad` (partidos por el tope de
+  100 líneas). Recorrido en el navegador con la novedad de prueba: subir la
+  foto por el campo de archivo (`/api/fotos/<uuid>`), «Agregar sección» (el
+  foco va al título nuevo), **Publicar** → «Publicada: el sitio ya la
+  muestra.»; `/novedades/tercera-prueba` 200 con su cuerpo, en el listado,
+  RSS con 10 `<item>`, su imagen 200 `image/png`; **cambiar la URL** y
+  publicar → la vieja da `308 → /novedades/tercera-prueba-nueva`;
+  **destacada** → «…y «Resignificar…» dejó de ser la destacada», la tapa de
+  `/novedades` pasa a la nueva; **despublicar** → «…y dejó de ser la
+  destacada», la ficha da 404 y «← Novedades» apunta a Borradores;
+  **borrar** → la confirmación deja el foco en «Cancelar», vuelve a
+  `/admin/novedades/borradores?borrada=1` con «Se borró la novedad.», sin
+  fila ni redirecciones. En RELIME: volver a marcarla destacada («Qué
+  cambió · un campo»), guardar un borrador («Cambios sin publicar») y
+  **descartar** → «Se descartaron los cambios…», «Publicada», sin azul.
+  **Vista previa**: con un título de borrador, la ficha y la tapa lo
+  muestran con la barra «Volver al sitio publicado», y `curl` sin la cookie
+  no; «Volver al sitio publicado» la apaga. RELIME quedó como estaba
+  (publicada, destacada, sin borrador).
 
 ## Abierto
 
