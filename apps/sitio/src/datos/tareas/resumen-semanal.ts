@@ -3,10 +3,11 @@ import { mandarCorreo } from "@/correos/mandar";
 import { resumenSemanal, type NumeroDelResumen } from "@/correos/resumen-semanal";
 import { destinatariosDe, type DestinatarioConRol } from "@/datos/avisos";
 import { base } from "@/datos/cliente";
-import { ayerUTC, fechaUTC, sumarDias } from "@/lib/metricas/periodos";
+import { ayerUTC, fechaUTC } from "@/lib/metricas/periodos";
 import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 import { urlDelSitio } from "@/lib/url-del-sitio";
-import { numerosDelResumen, paginaMasVista } from "./numeros-del-resumen";
+import { copiaDeVercel } from "./metricas-de-vercel";
+import { numerosDelResumen, paginaMasVista, semanaAntesDe, type Semana } from "./numeros-del-resumen";
 
 // El resumen semanal por correo (SPEC de work/metricas-completas/ §8): una
 // tarea del cron diario (ADR-0011) que actúa solo cuando en Chile es lunes, a
@@ -33,9 +34,9 @@ export async function diasQueFaltan(hoy: Date = new Date()): Promise<number> {
 
 const dia = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "long", timeZone: "UTC" });
 
-/** «del 21 al 27 de septiembre»: los siete días hasta ayer. */
-function semanaHasta(ayer: string): string {
-  const [desde, hasta] = [sumarDias(ayer, -6), ayer].map((d) => dia.format(fechaUTC(d)));
+/** «del 21 al 27 de septiembre»: la semana que cuentan los números. */
+function nombreDe(semana: Semana): string {
+  const [desde, hasta] = [semana.desde, semana.hasta].map((d) => dia.format(fechaUTC(d)));
   const [diaDesde, mesDesde] = desde.split(" de ");
   return mesDesde === hasta.split(" de ")[1] ? `del ${diaDesde} al ${hasta}` : `del ${desde} al ${hasta}`;
 }
@@ -45,8 +46,8 @@ type Dependencias = {
   mandar?: typeof mandarCorreo;
   destinatarios?: () => Promise<DestinatarioConRol[]>;
   faltan?: (hoy: Date) => Promise<number>;
-  numeros?: (rol: unknown, hoy: Date) => Promise<NumeroDelResumen[]>;
-  pagina?: () => Promise<{ nombre: string; vistas: number } | null>;
+  numeros?: (rol: unknown, semana: Semana) => Promise<NumeroDelResumen[]>;
+  pagina?: (semana: Semana) => Promise<{ nombre: string; vistas: number } | null>;
 };
 
 export async function mandarResumenSemanal({
@@ -63,12 +64,14 @@ export async function mandarResumenSemanal({
   if (falta > 0) return { ok: true, detalle: `Todavía no hay un mes de datos (faltan ${falta} días): no se mandó.` };
   const personas = await destinatarios();
   if (!personas.length) return { ok: true, detalle: "Nadie tiene activado el resumen semanal." };
-  const [masVista, semana] = [await pagina(), semanaHasta(ayerUTC(hoy))];
+  // La semana sale del lunes de Chile, y todos los números cuentan esa: de lunes a domingo.
+  const semana = semanaAntesDe(lunes);
+  const masVista = await pagina(semana);
   const enlace = `${urlDelSitio()}/admin/metricas?periodo=7`;
   // Un correo por persona, con los números de su rol; uno que no sale no frena a los demás.
   const envios = await Promise.allSettled(
     personas.map(async (p) => {
-      const contenido = resumenSemanal({ nombre: p.nombre, semana, numeros: await numeros(p.rol, hoy), paginaMasVista: masVista, enlace });
+      const contenido = resumenSemanal({ nombre: p.nombre, semana: nombreDe(semana), numeros: await numeros(p.rol, semana), paginaMasVista: masVista, enlace });
       // La clave es la persona y el lunes: una segunda corrida el mismo día no lo manda otra vez.
       if ((await mandar({ para: p.correo, contenido, idempotencia: `resumen-semanal:${lunes}:${p.id}` })) === "no-salio") throw new Error("no salió");
     }),
@@ -77,4 +80,10 @@ export async function mandarResumenSemanal({
   return { ok: salieron === personas.length, detalle: `Salió a ${salieron} de ${personas.length} ${personas.length === 1 ? "persona" : "personas"}.` };
 }
 
-export const resumenSemanalDeMetricas: Tarea = { clave: "resumen-semanal", nombre: "Resumen semanal por correo", correr: () => mandarResumenSemanal() };
+// Lee la ventana de 7 días que termina el domingo, y esa la escribe la copia de Vercel de la misma corrida: la espera.
+export const resumenSemanalDeMetricas: Tarea = {
+  clave: "resumen-semanal",
+  nombre: "Resumen semanal por correo",
+  correr: () => mandarResumenSemanal(),
+  despuesDe: copiaDeVercel.clave,
+};
