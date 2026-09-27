@@ -94,7 +94,8 @@ se queda en la app. **El armazón se mudó el 2026-09-27**
 ED —el encabezado, las pestañas, la lista, la tabla, el estado vacío, la
 confirmación, el filtro, el buscador, el paginado, la cifra, la curva y las
 demás— están en el kit, y en la app queda lo que sabe de ED: la sidebar, la
-guarda, el tema, la pantalla de acceso y lo que depende de `lib/contenido/`.
+guarda, el tema, la pantalla de acceso, lo que depende de `lib/contenido/` y
+los errores del editor de las páginas.
 
 ## 4. Cómo lee el sitio
 
@@ -441,7 +442,8 @@ secciones, con su pestaña SEO, como las demás páginas.
   páginas el 2026-09-26 (§6).
 - Editor de texto enriquecido, más de un idioma, comentarios.
 - Analíticas: quedaron afuera de este diseño y entraron aparte, como el
-  módulo Métricas, que no depende del kit
+  módulo Métricas, con sus propias fuentes de datos y armado con las piezas
+  del kit como los demás módulos
   ([ADR-0009](../adrs/0009-analitica-de-vercel-con-copia-diaria.md),
   [ADR-0011](../adrs/0011-search-console-y-un-solo-cron.md),
   [ADR-0017](../adrs/0017-contadores-propios-y-links-cortos.md)). De ellas
