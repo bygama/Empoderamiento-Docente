@@ -411,21 +411,40 @@ previa, «Qué cambió» y publicar):
 
 ### Las métricas y lo programado
 
-**Métricas** (`/admin/metricas`) tiene cinco pestañas. **Resumen** muestra
-cuánta gente entra al sitio: visitantes y vistas de los últimos 7 y 30 días,
-contra el período anterior (el Inicio lo muestra también, hasta que se
-rehaga). **Búsquedas** muestra qué buscó la gente en Google para llegar: clics,
-impresiones y puesto de los últimos 28 días con datos, por búsqueda, página y
-país, y «Casi nos encuentran». Origen, Qué hace la gente y Links para
-compartir todavía muestran lo que van a tener.
+**Métricas** (`/admin/metricas`) tiene cinco pestañas, y la regla de todo el
+módulo: **todo dato gratis y legal, sin cookies, y nunca se identifica a una
+persona ni a una institución**. Resumen, Origen y Qué hace la gente eligen el
+período arriba: 7, 30 o 90 días, contra el anterior.
+
+| Pestaña | Qué ve ED | De dónde sale | Cuándo llega |
+| --- | --- | --- | --- |
+| **Resumen** | Visitantes y vistas; la curva de visitantes por día con sus **marcas** (las de publicar una página o una novedad, solas; las de a mano, con «Agregar marca»); por dónde llegan (Buscador · Redes · Asistentes IA · Directo · Otros sitios); las páginas más vistas | la copia diaria de Vercel Web Analytics; las marcas, de `actividad` y `marcas` | hasta ayer (días UTC) |
+| **Búsquedas** | Qué buscó la gente en Google: clics, impresiones y puesto por búsqueda, página y país, y «Casi nos encuentran» | la copia diaria de Search Console | con 2 o 3 días de atraso |
+| **Origen** | Países (Chile, México y Argentina arriba), de dónde llegan, dispositivo, sistema y navegador, la página por país y la mejor hora para publicar, en hora de Chile. **Regiones no hay**: Vercel da el país y nada más fino. Lo que tiene menos de 3 visitas no se nombra | la copia diaria de Vercel | hasta ayer |
+| **Qué hace la gente** | El camino del CV por canal (vio la página, empezó el formulario, lo envió), los contactos enviados y los materiales más consultados | los **contadores propios** (`contadores`): sumas por día, sin IP, sin navegador, sin cookies | en el momento |
+| **Links para compartir** | Links cortos propios (`/l/<codigo>`) con sus clics, visitas y CV | los clics, del servidor; las visitas, de Vercel por su `utm_campaign`; los CV, de los contadores | en el momento; las visitas, hasta ayer |
+
+Con poco tráfico, cada bloque dice «Todavía no hay datos suficientes» y cuánto
+falta, en vez de dibujar un gráfico que engaña. Un CV cuenta para un link solo
+si se manda en la misma visita en que se llegó por él: saber más pediría
+guardar algo en el navegador de la persona, y el sitio no guarda nada
+([ADR-0017](docs/architecture/adrs/0017-contadores-propios-y-links-cortos.md)).
+La Biblioteca del admin dice cuántas veces se consultó cada material este mes,
+y el Inicio suma los materiales consultados de la semana.
+
+El **resumen semanal por correo** sale los lunes (en Chile) a quien lo active
+en Mi cuenta › Avisos —viene apagado—, con los números de la semana según su
+rol; empieza cuando la copia de Vercel tiene un mes de datos, y hasta entonces
+Mi cuenta dice cuántos días faltan.
 
 Ninguna pantalla consulta a Vercel ni a Google al renderizar. **Un solo cron**
 (`/api/cron/diario`, a las 4 UTC) corre cada día las tareas registradas en
 `apps/sitio/src/datos/tareas/diarias.ts`, cada una aislada: la copia de Vercel
 Analytics (a las tablas `metricas_*`), la de Search Console (a
 `busquedas_diarias`), la revisión de la indexación (a `indexacion_de_urls`,
-hasta 20 páginas por día: la API tiene cuota), la retención de Mensajes y la
-salud de los links de la Biblioteca (ver [Biblioteca](#biblioteca)).
+hasta 20 páginas por día: la API tiene cuota), la retención de Mensajes, la
+salud de los links de la Biblioteca (ver [Biblioteca](#biblioteca)) y el
+resumen semanal, que solo actúa los lunes.
 Cada corrida, bien o con su error en llano, queda en
 `corridas_de_tareas`. «Actualizar ahora», en cada pantalla, corre su tarea a
 mano, con un freno de diez minutos por tarea. Lo que necesite correr solo más
