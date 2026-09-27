@@ -1,12 +1,14 @@
 import type { PrismaClient } from "@/../prisma/generado/client";
 import { comoDocumento } from "@/lib/contenido/documento";
-import { unPasoMovido } from "@/lib/orden";
 import type { Fallo } from "./choque";
 import { nombreDe } from "./equipo-en-base";
+import { LISTAS, moverEnLaLista } from "./lista-ordenada";
 
 // El orden del Equipo (SPEC §6.2 de `work/equipo/`): un paso por clic, dentro
 // de su nivel, como el orden de los aliados en la tira. No va al borrador: es
-// del equipo, no de una persona, y cambia el sitio en el momento.
+// del equipo, no de una persona, y cambia el sitio en el momento. El Equipo es
+// una sola lista con su candado (lista-ordenada.ts): un perfil cambia de grupo
+// al publicarse en otro nivel, y un candado por nivel pediría dos a la vez.
 
 export type Hacia = "antes" | "despues";
 
@@ -24,14 +26,23 @@ export function nivelEnLaLista(fila: { nivel: number | null; borrador: unknown }
  * una punta, no hace nada. Dice a quién movió, para la actividad.
  */
 export async function moverPersonaEnBase(base: PrismaClient, { id, hacia }: { id: string; hacia: Hacia }): Promise<{ ok: true; movio: boolean; nombre: string } | Fallo> {
-  const todas = await base.persona.findMany({ orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true, nivel: true, borrador: true, nombre: true } });
-  const esta = todas.find((f) => f.id === id);
-  if (!esta) return NO_EXISTE;
-  const nivel = nivelEnLaLista(esta);
-  const nuevo = unPasoMovido(todas.filter((f) => nivelEnLaLista(f) === nivel).map((f) => f.id), id, hacia);
-  if (!nuevo) return { ok: true, movio: false, nombre: nombreDe(esta) };
-  // Se renumera el nivel entero en su orden nuevo: así un orden repetido de antes no deja dos en el mismo lugar.
-  // `updateMany` y no `update`: si alguien borró un perfil entre la lectura y esto, se saltea en vez de tirar.
-  await base.$transaction(nuevo.map((idDe, k) => base.persona.updateMany({ where: { id: idDe }, data: { orden: k } })));
-  return { ok: true, movio: true, nombre: nombreDe(esta) };
+  let nombre = "";
+  const movio = await moverEnLaLista(base, {
+    lista: LISTAS.equipo,
+    id,
+    hacia,
+    async ordenDe(tx) {
+      const todas = await tx.persona.findMany({ orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true, nivel: true, borrador: true, nombre: true } });
+      const esta = todas.find((f) => f.id === id);
+      if (!esta) return [];
+      nombre = nombreDe(esta);
+      const nivel = nivelEnLaLista(esta);
+      return todas.filter((f) => nivelEnLaLista(f) === nivel).map((f) => f.id);
+    },
+    // `updateMany`: una fila que se borró sin pasar por el candado (la limpieza de un test) se saltea en vez de tirar.
+    async renumerar(tx, ids) {
+      for (const [k, idDe] of ids.entries()) await tx.persona.updateMany({ where: { id: idDe }, data: { orden: k } });
+    },
+  });
+  return movio === undefined ? NO_EXISTE : { ok: true, movio, nombre };
 }

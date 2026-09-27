@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorradorDeAliado } from "@/features/aliados/contenido/aliado";
 import { NO_EXISTE, nombreDelAliado, problemasDeAliado } from "./aliados-en-base";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
+import { LISTAS, tomarLaLista } from "./lista-ordenada";
 
 // Crear, guardar, descartar y borrar un aliado en la base
 // (`work/casos-aliados-fotos/SPEC.md` §6), con el cliente inyectado para
@@ -59,7 +60,7 @@ export async function descartarCambiosDeAliadoEnBase(
   return { ok: true, detalle: "Se descartaron los cambios: el aliado vuelve a lo publicado.", descarto: true };
 }
 
-/** Borra la fila: si estaba en la tira, deja de verse. El logo queda en Fotos. */
+/** Borra la fila: si estaba en la tira, deja de verse. El logo queda en Fotos. Con el candado de la tira, como mover. */
 export async function borrarAliadoEnBase(
   base: PrismaClient,
   { id, borradorEnVisto }: { id: string; borradorEnVisto: string | null },
@@ -68,7 +69,10 @@ export async function borrarAliadoEnBase(
   if (!fila) return NO_EXISTE;
   // Borrar lo que otra persona guardó sin haberlo visto también es pisar.
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila, "el aliado");
-  const { count } = await base.aliado.deleteMany({ where: { id, borradorEn: fila.borradorEn } });
+  const { count } = await base.$transaction(async (tx) => {
+    await tomarLaLista(tx, LISTAS.aliados);
+    return tx.aliado.deleteMany({ where: { id, borradorEn: fila.borradorEn } });
+  });
   if (count === 0) return choqueCon(await base.aliado.findUnique({ where: { id } }), "el aliado");
   return { ok: true, nombre: nombreDelAliado(fila), estabaEnElSitio: fila.publicado && fila.autorizado };
 }

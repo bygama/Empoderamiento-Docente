@@ -4,6 +4,7 @@ import { comoDocumento } from "@/lib/contenido/documento";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { publicacionQueNoFirma } from "./chequeos-del-perfil";
 import { nombreDe, problemasDePersona, slugOcupado, slugRepetido } from "./equipo-en-base";
+import { LISTAS, tomarLaLista } from "./lista-ordenada";
 
 // Crear, guardar, descartar y borrar un perfil del Equipo en la base (SPEC
 // §6.1 de `work/equipo/`), con el cliente inyectado para probarlo contra el
@@ -84,7 +85,8 @@ function sinLaPersona(borrador: Prisma.JsonValue, id: string): Prisma.InputJsonO
 /**
  * Borra la fila y las redirecciones que llevaban a ella. Sus autorías quedan
  * de afuera, con su nombre: en las publicadas lo hace la fk (`SET NULL`), y en
- * los borradores de los materiales, esto (SPEC §6.1, propuesta O).
+ * los borradores de los materiales, esto (SPEC §6.1, propuesta O). Toma el
+ * candado del Equipo, como mover y publicar (lista-ordenada.ts).
  */
 export async function borrarPersonaEnBase(
   base: PrismaClient,
@@ -95,6 +97,7 @@ export async function borrarPersonaEnBase(
   // Borrar lo que otra persona guardó sin haberlo visto también es pisar.
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila, EL_PERFIL);
   const borrada = await base.$transaction(async (tx) => {
+    await tomarLaLista(tx, LISTAS.equipo);
     const { count } = await tx.persona.deleteMany({ where: { id, borradorEn: fila.borradorEn } });
     if (count === 0) return false;
     if (fila.slug) await tx.redireccion.deleteMany({ where: { hacia: `/quienes-somos/equipo/${fila.slug}` } });
