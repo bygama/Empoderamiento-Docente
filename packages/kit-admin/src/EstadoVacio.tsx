@@ -5,13 +5,12 @@
  * `azul-claro`. No sabe de ED.
  *
  * La **acción**, cuando la pantalla vacía tiene algo para hacer («Todavía no
- * hay novedades. [Nueva novedad]»), va debajo de la frase: es el primario de
- * la pantalla, así que el encabezado no lo repite. Primer consumidor:
- * Novedades.
+ * hay entradas. [Nueva entrada]»), va debajo de la frase: es el primario de
+ * la pantalla, así que el encabezado no lo repite.
  *
  * Cuando lo que falta es configurar algo, lleva **pasos**: una lista ordenada
  * en meta `azul-principal` (13,63:1), porque son instrucciones para seguir y no
- * una aclaración. Primer consumidor: «Conectá Search Console».
+ * una aclaración: «Conectá el servicio», y cómo.
  */
 export function EstadoVacio({ titulo, texto, pasos, accion }: { titulo: string; texto: string; pasos?: readonly string[]; accion?: React.ReactNode }) {
   return (

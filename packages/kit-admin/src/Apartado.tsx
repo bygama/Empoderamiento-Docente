@@ -3,7 +3,7 @@
  * izquierda qué es y qué pasa si se toca; a la derecha, lo que se toca. Desde
  * `lg`, en dos columnas (un tercio y dos); por debajo, uno arriba del otro.
  * Van en una pila, separados por un divisor, y el `id` es su ancla
- * (`/admin/mi-cuenta#contrasena`). No sabe de ED.
+ * (`/cuenta#contrasena`). No sabe de ED.
  */
 export function Apartado({ id, titulo, descripcion, children }: { id: string; titulo: string; descripcion?: string; children: React.ReactNode }) {
   const idDelTitulo = `${id}-titulo`;

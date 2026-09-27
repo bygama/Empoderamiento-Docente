@@ -6,7 +6,7 @@ type Miga = { href: string; etiqueta: string };
 type Props = {
   /** El `h1` de la pantalla. */
   titulo: string;
-  /** En un detalle, la vuelta a su lista («← Contacto»), arriba del título. */
+  /** En un detalle, la vuelta a su lista («← Mensajes»), arriba del título. */
   volver?: DestinoDeVolver;
   /** Lo que hay arriba de esta pantalla, en orden; van antes del título, en la misma línea. */
   migas?: Miga[];

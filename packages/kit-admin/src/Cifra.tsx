@@ -1,7 +1,7 @@
 const numero = new Intl.NumberFormat("es-AR");
 
-// `variacion()` (lib/metricas/periodos.ts) devuelve una de cuatro formas
-// («+N %», «−N %», «igual», «sin datos previos»); acá cada una se traduce a
+// La variación llega en una de cuatro formas («+N %», «−N %», «igual»,
+// «sin datos previos»); acá cada una se traduce a
 // la frase que se lee debajo del número, contra el período que se compara.
 function leyendaDe(variacion: string, periodo: string): string {
   if (variacion.startsWith("+") || variacion.startsWith("−")) return `${variacion} contra ${periodo}`;
@@ -14,8 +14,8 @@ type Props = {
   /** `null` cuando no hay datos: se dibuja «—», nunca un cero inventado. */
   valor: number | null;
   /**
-   * Sin `variacion` no lleva comparación: la posición en Google no se compara
-   * en porcentaje, porque bajar es mejorar y se leería al revés.
+   * Sin `variacion` no lleva comparación: una posición en un ranking no se
+   * compara en porcentaje, porque bajar es mejorar y se leería al revés.
    */
   variacion?: string;
   /** Contra qué se compara: «el período anterior», «la semana anterior». */

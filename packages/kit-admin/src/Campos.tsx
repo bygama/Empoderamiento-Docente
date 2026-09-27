@@ -1,6 +1,6 @@
 /**
  * Los campos y el botón de las tres pantallas de acceso. Los colores están
- * medidos contra WCAG AA (PROGRESS de `work/armazon-del-admin/`): la caja de
+ * medidos contra WCAG AA con los tokens de la app (README): la caja de
  * texto es la `ENTRADA` del admin, y el texto del botón es `azul-principal`
  * sobre el naranja (4,54:1; DESIGN.md §7).
  */
