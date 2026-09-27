@@ -1,16 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
+import { openGraphDeLaPagina } from "@/config/metadata";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { InvestigacionHero } from "@/features/investigacion/components/InvestigacionHero";
 import { LineasInvestigacion } from "@/features/investigacion/components/LineasInvestigacion";
 import { EspiralInvestigacion } from "@/features/investigacion/components/EspiralInvestigacion";
 import { InvestigacionEnAccion } from "@/features/investigacion/components/InvestigacionEnAccion";
 import { CierreInvestigacion } from "@/features/investigacion/components/CierreInvestigacion";
+import { metadataDeSeo } from "@/lib/contenido/seo";
 
-export const metadata: Metadata = {
-  title: "Investigación",
-  description:
-    "Investigamos para transformar la matemática escolar: socioepistemología, problematización, empoderamiento docente y evidencia que vuelve al aula.",
-};
+// El título, la descripción y la imagen para redes salen del SEO de la página
+// (publicado, o el borrador en vista previa): se editan en su pestaña del admin.
+// Sin imagen propia, la del sitio, que se hereda del layout.
+export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Promise<Metadata> {
+  const { seo } = await contenidoDe("investigacion");
+  return metadataDeSeo(seo, await openGraphDeLaPagina(padre));
+}
 
 /**
  * Página «Investigación» — estructura base según
