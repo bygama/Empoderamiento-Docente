@@ -478,11 +478,12 @@ Sobre `fff0a717` (commits `6a788882`, `5fd5dfc5`, `56dff890`, `fff0a717`), con
 | `pnpm build` | exit 0 |
 | `pnpm lint` | exit 0 |
 | `node scripts/verificar-react-doctor.mjs` | exit 0 · `react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 1041 archivos · …)` (antes, dos diagnósticos de complejidad: se partieron `AutorizacionDelAliado` y `SalidaDeLaFoto`) |
-| `pnpm test`, tres vueltas | exit 0 las tres · sitio 469 tests, 468 pass, 0 fail, 1 skip (el de Vercel) |
+| `pnpm test`, tres vueltas | ~~exit 0 las tres~~ — **no era estable**: tres vueltas en verde acá no lo probaban. El revisor r2, sobre una base recién migrada, sacó exit 1, 0 y 1 (`editar-aliados.test.ts` y `editar-fotos.test.ts`, que medían contra el estado de la tabla mientras otros archivos la tocaban). Lo arregla la ronda 2, abajo. |
 
 La primera tanda de vueltas falló en `editar-aliados.test.ts`: suponía que el
 vecino del aliado de prueba era Science Up, y un aliado de una prueba a mano
-quedó al final de la tabla. `fff0a717` lo mide contra su lugar de antes.
+quedó al final de la tabla. `fff0a717` lo midió contra su lugar de antes, que
+seguía siendo una posición en la tabla entera: el mismo error, más chico.
 
 **En el navegador de Orca** (dev server en 3027; `edita` y `administra`, esta
 con segundo factor por el log):
@@ -524,6 +525,162 @@ con segundo factor por el log):
   13 apariciones (la fila del Inicio en HTML y RSC, y los controles de la
   marca en las dos fichas). El código de los componentes de cliente viaja en
   los chunks de JS igual para todos; lo medido es lo que se renderiza.
+
+### Ronda de arreglos 2
+
+La re-revisión r2 (sobre `4f3afafc`) cerró el Critical y los Minors 2, 4 y 5,
+y dio FAIL por dos Important. Sobre `2420d8bf` (commits `92b8cee3` y
+`2420d8bf`), con `main` en `d051c6a0`.
+
+- **Important 2 — el texto del logo, atado** (`92b8cee3`, decisión del padre
+  en DECISIONS): `autorizado_alt`, con la misma regla que el logo y el nombre.
+  La migración `aliados` se regeneró otra vez (`20260927065218_aliados`; los
+  cinco con su alt de hoy como autorizado) y `ed_casos` se reseteó. El
+  mensaje al negar publicar dice «Cambió el logo, el nombre o el texto del
+  logo desde que se autorizó: …», y la confirmación muestra «Texto del logo».
+  Tests nuevos: el escenario de r2 contra la base (el mismo logo y el mismo
+  nombre, alt «Ministerio de Educación de Chile»: publicar se niega, la vista
+  previa no lo muestra, lo publicado sigue igual), un alt distinto escrito
+  directo en la base (no sale), y el mismo caso puro en
+  `consultas/aliados.test.ts`. **Sin la comparación del alt fallan los tres**
+  (se sacó un momento de `estaAutorizado`: 9 pass, 3 fail; con ella, 12 pass).
+  El caso bueno sigue: cambiar solo la URL o el tamaño se publica.
+- **Important 1 — tests estables** (`2420d8bf`, decisión del padre): cada
+  test crea sus propias filas y mide contra ellas. `editar-aliados.test.ts`
+  crea dos aliados y mira el orden entre ellos; la punta se prueba con
+  `tiraMovida`, pura. `editar-fotos.test.ts` crea su novedad con un slug que
+  no es `prueba-editar-…` (el prefijo que borra `editar-novedades.test.ts` en
+  el medio: era el `findFirstOrThrow` que no encontraba la fila) y la lee por
+  id; el logo autorizado es una foto y un aliado propios.
+  `autorizacion-de-aliados.test.ts` ya no toca UNESCO. Con la misma vara,
+  también `aliado.test.ts` (buscaba «todo lo que no tiene `creado_por`», y los
+  tests crean aliados así) y el uso del código en `registro.test.ts` (ahora
+  mide si el Inicio se publicó). El resto de los tests nuevos de la lane ya
+  usaban filas propias (el caso 04, el 03, sus fotos, su carpeta temporal).
+
+| Comando | Resultado |
+| --- | --- |
+| `pnpm typecheck`, sin `.next`, `next-env.d.ts` ni `tsconfig.tsbuildinfo`, antes del build | exit 0 |
+| `pnpm build` | exit 0 |
+| `pnpm lint` | exit 0 |
+| `node scripts/verificar-react-doctor.mjs` | exit 0 · `react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 1042 archivos · …)` |
+| `pnpm test`, cinco vueltas seguidas sobre `ed_casos` recién migrada (25 migraciones) | exit 0 las cinco · sitio 472 tests, 471 pass, 0 fail, 1 skip (el de Vercel) |
+
+Las cinco salidas (el resumen de cada paquete y el exit de `pnpm test`):
+
+```
+--- vuelta 1
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/kit-admin test: ℹ duration_ms 231.9531
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    packages/auth test: ℹ duration_ms 2828.5792
+    apps/sitio test: ℹ tests 472
+    apps/sitio test: ℹ pass 471
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    apps/sitio test: ℹ duration_ms 18740.5074
+    exit 0
+--- vuelta 2
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/kit-admin test: ℹ duration_ms 184.3883
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    packages/auth test: ℹ duration_ms 2241.1983
+    apps/sitio test: ℹ tests 472
+    apps/sitio test: ℹ pass 471
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    apps/sitio test: ℹ duration_ms 17704.0507
+    exit 0
+--- vuelta 3
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/kit-admin test: ℹ duration_ms 163.7967
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    packages/auth test: ℹ duration_ms 2105.2839
+    apps/sitio test: ℹ tests 472
+    apps/sitio test: ℹ pass 471
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    apps/sitio test: ℹ duration_ms 17079.6517
+    exit 0
+--- vuelta 4
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/kit-admin test: ℹ duration_ms 160.3657
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    packages/auth test: ℹ duration_ms 1995.2642
+    apps/sitio test: ℹ tests 472
+    apps/sitio test: ℹ pass 471
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    apps/sitio test: ℹ duration_ms 17151.7984
+    exit 0
+--- vuelta 5
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/kit-admin test: ℹ duration_ms 151.9527
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    packages/auth test: ℹ duration_ms 1831.4121
+    apps/sitio test: ℹ tests 472
+    apps/sitio test: ℹ pass 471
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    apps/sitio test: ℹ duration_ms 16847.0007
+    exit 0
+```
+
+Después de las cinco, la base quedó con sus 5 aliados y sin novedades ni
+materiales de prueba: cada test borró lo suyo.
+
+**En el navegador de Orca**, con las cuentas creadas de nuevo (la base se
+reseteó): como `edita`, en UNESCO solo el texto del logo pasa a «Ministerio de
+Educación de Chile» → guardar → «Publicar» contesta «Cambió el logo, el
+nombre o el texto del logo desde que se autorizó: …»; como `administra`, la
+misma ficha muestra «Se autorizó» («UNESCO», texto «UNESCO») y «Se va a
+autorizar» («UNESCO», texto «Ministerio de Educación de Chile»); `/` no tiene
+«Ministerio»; se descartó el borrador.
 
 ## Abierto
 

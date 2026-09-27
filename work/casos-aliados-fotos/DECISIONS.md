@@ -162,3 +162,33 @@
   en la biblioteca (el archivo de `public/` sigue; el de una subida se borra).
   Es aceptable para el equipo de ED, que es chico y rara vez borra y elige la
   misma foto en el mismo segundo: lo decidió el padre, y queda escrito acá.
+- 2026-09-27 — **Ronda de arreglos 2** (r2 cerró el Critical y dio FAIL por
+  dos Important). Lo que decidió el padre:
+  - **El alt también va atado.** Una columna más, `autorizado_alt`, con la
+    misma regla que el logo y el nombre: se guarda al autorizar, publicar se
+    niega si difiere, y la consulta del sitio y la vista previa exigen que
+    coincida. El alt es el texto público del logo (lo que lee un lector de
+    pantalla y lo que indexa un buscador): con el mismo logo y el mismo
+    nombre, «Ministerio de Educación de Chile» como alt se publicaba. La
+    confirmación de autorizar muestra el texto, y el mensaje al negar publicar
+    nombra lo que cambió («Cambió el logo, el nombre o el texto del logo desde
+    que se autorizó: …»). La migración `aliados` se regeneró otra vez
+    (`20260927065218_aliados`, los cinco con su alt de hoy como autorizado) y
+    `ed_casos` se reseteó.
+  - **Cada test crea sus propias filas y mide contra ellas**, nunca contra el
+    estado global de la tabla: `tsx --test` corre los archivos a la vez y los
+    de aliados, novedades y el registro de usos se pisaban. No se serializa la
+    corrida ni se reintenta. Lo que se cambió con esa vara:
+    `editar-aliados.test.ts` crea dos aliados y mira el orden entre ellos (la
+    punta, con `tiraMovida`, que salió de `moverAliadoEnBase` a
+    `tira-de-aliados.ts` y es pura); `autorizacion-de-aliados.test.ts` ya no
+    toca UNESCO, crea sus aliados autorizados y los borra por id;
+    `editar-fotos.test.ts` crea su novedad con un slug que no toma el prefijo
+    `prueba-editar` (el de `editar-novedades.test.ts`, que la borraba en el
+    medio) y la lee por id, y el logo autorizado es una foto y un aliado
+    propios; `aliado.test.ts` busca los cinco por nombre y no «todo lo que no
+    tiene `creado_por`» (los tests crean aliados así); el registro de usos
+    mide en la base si el Inicio se publicó antes de esperar un uso «del
+    código». `editar-casos.test.ts` (el caso 04), `registro.test.ts` (el 03),
+    `subir-foto.test.ts` y la tarea de los archivos sueltos ya trabajaban
+    sobre filas propias.
