@@ -1,19 +1,22 @@
 import Image from "next/image";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { accionDe, type Material } from "@/features/biblioteca/data/materiales";
+import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
+import { accionDe } from "@/features/biblioteca/contenido/modelo";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
 
 /** Una fila del catálogo: portada, chips de tipo y tema, título, autores, descripción, metadata y el link de acción. */
-export function FilaMaterial({ material: m }: { material: Material }) {
+export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
   return (
     <article className="grid gap-5 py-7 md:grid-cols-[218px_minmax(0,1fr)] md:gap-8 md:py-8">
       {/* Portada: cualquier foto que el equipo cargue (mock: fotos del hero) */}
       <div className="bg-azul-claro/30 relative aspect-[16/9] overflow-hidden rounded-xl md:aspect-[4/3]">
         <Image
-          src={m.portada}
+          src={m.portada.src}
           alt=""
           fill
           sizes="(min-width: 768px) 218px, 100vw"
           className="object-cover"
+          style={estiloDeFoco(m.portada.foco)}
         />
       </div>
 

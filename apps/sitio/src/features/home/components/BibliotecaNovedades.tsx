@@ -4,18 +4,12 @@ import { type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen } from "@/components/ui/icons";
-import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
+import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
 import type { BibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
 import { etiquetaDeCategoria } from "@/features/novedades/contenido/modelo";
 import { fechaCorta } from "@/features/novedades/contenido/fechas";
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
-
-// Biblioteca: los mismos cuatro destacados que abren la página Biblioteca
-// (publicaciones reales, curadas en `biblioteca/data/materiales`), y cada
-// fila lleva a la publicación, como allá. Antes era un mock de recursos
-// inventados (Gastón, 2026-09-11).
-const BIBLIOTECA = ITEMS_DESTACADOS.map(({ material }) => material);
 
 /** Realce que sigue al cursor: guarda la posición del mouse en CSS vars. */
 function trackPointer(e: MouseEvent<HTMLElement>) {
@@ -37,9 +31,20 @@ function trackPointer(e: MouseEvent<HTMLElement>) {
  * títulos y las bajadas llegan por props (de
  * `features/home/contenido/biblioteca-y-novedades.ts` o de la base), y las
  * novedades también: las cuatro más nuevas, de la base. La que tiene ficha
- * propia lleva a su ficha; el resto, al listado.
+ * propia lleva a su ficha; el resto, al listado. De la Biblioteca, los mismos
+ * destacados que abren su página (de la base, en su orden), y cada fila lleva
+ * a la publicación, como allá. Antes era un mock de recursos inventados
+ * (Gastón, 2026-09-11).
  */
-export function BibliotecaNovedades({ contenido, ultimasNovedades }: { contenido: BibliotecaYNovedades; ultimasNovedades: readonly NovedadDelSitio[] }) {
+export function BibliotecaNovedades({
+  contenido,
+  ultimasNovedades,
+  destacados,
+}: {
+  contenido: BibliotecaYNovedades;
+  ultimasNovedades: readonly NovedadDelSitio[];
+  destacados: readonly MaterialDelSitio[];
+}) {
   const { biblioteca, novedades } = contenido;
   return (
     <section
@@ -79,8 +84,8 @@ export function BibliotecaNovedades({ contenido, ultimasNovedades }: { contenido
             </header>
 
             <ul className="mt-9 flex flex-col gap-3">
-              {BIBLIOTECA.map(({ titulo, fuente, fecha, formato, url }) => (
-                <li key={titulo}>
+              {destacados.map(({ id, titulo, fuente, fecha, formato, url }) => (
+                <li key={id}>
                   <a
                     href={url}
                     target="_blank"
