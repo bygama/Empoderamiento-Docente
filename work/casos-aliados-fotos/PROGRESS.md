@@ -434,10 +434,17 @@ tenía 104 (el tope de §6 es 100); no se reformateó lo de Biblioteca.
   las fichas de una novedad y de un material, y queda escrita en DESIGN.md
   §11, «Ficha de una entidad»; a 390 px las dos sin desborde.
 
-**Revisión de cierre:** la corre el padre después del `worker_done`
-(orchestrate). r1 (Opus 5.5, medium) dio **FAIL** por un Critical: la marca
-«Autorizado» no estaba atada al logo ni al nombre autorizados. Lo arregla la
-ronda 1, abajo; vuelve a mirarlo el mismo revisor.
+**Revisión de cierre:** la corrió el padre después del `worker_done`
+(orchestrate), un revisor Opus 5.5 en medium, tres vueltas:
+- r1, sobre `8669148f`: **FAIL** por un Critical (la marca «Autorizado» no
+  estaba atada al logo ni al nombre autorizados) y cuatro Minor. Ronda 1.
+- r2, sobre `4f3afafc`: cerró el Critical y los Minor 2, 4 y 5; **FAIL** por
+  dos Important (los tests no eran estables; el alt del logo no estaba
+  atado). Ronda 2.
+- r3, sobre `412bf2b8`: **PASS**, sin hallazgos. Vio el alt atado, los tests
+  nuevos que fallan sin el arreglo, cinco corridas estables sin estado
+  global, las migraciones desde cero y en el orden de producción, el render y
+  el gate en limpio (según el mensaje del padre que cerró la lane).
 
 ### Ronda de arreglos 1
 
@@ -684,20 +691,35 @@ autorizar» («UNESCO», texto «Ministerio de Educación de Chile»); `/` no ti
 
 ## Abierto
 
-**Sigue:** la revisión de cierre del padre sobre el PR. Si pide arreglos,
-vuelven como tarea a esta terminal (el dev server sigue en 3027, en su
-pestaña). Con el PASS, el cierre de la lane —el commit que borra
-`work/casos-aliados-fotos/`— va en este mismo PR, antes del merge.
+**Cerrada** con el PASS de r3: el commit siguiente borra
+`work/casos-aliados-fotos/`, en este mismo PR (#192), antes del merge. Lo de
+abajo pasa a la lane del padre con el `worker_done`.
 
 Para después, fuera de esta lane:
 
-- **`datos/avisos.test.ts` (de Ajustes) es inestable** cuando la suite corre
-  entera: falla 1 de cada 4 vueltas también en `main` en `782aeb27`
-  («repetirlo no cambia nada»: `cambiaron: 1`).
+- **`datos/avisos.test.ts` (de Ajustes) era inestable** con la suite entera
+  (1 de cada 4 vueltas, también en `main` en `782aeb27`); según el padre, la
+  lane 11 le hizo el arreglo de «cada test mide contra sus filas».
+- `datos/inicio/pendientes.ts` pasa el tope de utilidades: 104 líneas en
+  `main`, 110 con las dos filas de esta lane.
+- **Para la lane `equipo`:** las fotos de `public/equipo/` (17 archivos) no
+  están en la tabla `fotos` ni en `CARPETAS_DE_FOTOS`
+  (`lib/contenido/fotos.ts`); su migración las carga como hizo
+  `fotos_de_public`, con el alt de su primer uso. El registro de usos
+  (`datos/fotos/registro.ts`) necesita la entrada del equipo
+  (`de-los-perfiles.ts` o como se llame, con `buscar` y `reemplazar` sobre su
+  columna y su borrador), o una foto de un perfil figura «Sin usar», se puede
+  borrar y reemplazarla no cambia el perfil. El campo de foto del perfil pasa
+  `elegir={fotosParaElegir}`. Para la ficha, las piezas del armazón
+  (`AccionesDeLaFicha`, `Bloque`, `FilaDeAccion`, `QueCambioPlegado`) y la
+  regla `grid-cols-1` de DESIGN.md §11; la tarjeta de Equipo del índice de
+  Contenido y su guía de «por hacer» siguen esperándola.
 - Las portadas tipográficas de `public/biblioteca/portadas/` no entraron a la
   tabla `fotos` (las generó Biblioteca; no son fotos del contenido que se
   editen): un material que las usa no aparece en «Se usa en» de nadie, y no
   hace falta.
-- Sin resolver con el cliente: la nota de autorización de Techint repite lo
-  que dice `docs/content/aliados-fuentes-drive.md` («la hoja de ALIANZAS
-  todavía dice “solicitado”: confirmar con Raquel»).
+- **Para ED:** la nota de autorización de Techint repite lo que dice
+  `docs/content/aliados-fuentes-drive.md` («la hoja de ALIANZAS todavía dice
+  “solicitado”: confirmar con Raquel»). Si Raquel lo confirma, la hoja
+  ALIANZAS ED se actualiza y la nota se cambia desde la ficha de Techint (es
+  la nota: no hace falta volver a autorizar el logo).
