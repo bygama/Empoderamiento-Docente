@@ -58,6 +58,7 @@ export function FichaDeFoto({ ficha, subida }: { ficha: Ficha; subida: boolean }
         usos={ficha.usos.length}
         enElCodigo={ficha.usos.filter((u) => u.en === "codigo").length}
         delRepositorio={ficha.delRepositorio}
+        logoAutorizadoDe={ficha.logoAutorizadoDe}
       />
     </div>
   );

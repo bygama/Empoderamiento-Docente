@@ -1,5 +1,6 @@
 import type { Foto } from "@/../prisma/generado/client";
 import { base } from "@/datos/cliente";
+import { aliadoConEseLogoAutorizado } from "@/datos/consultas/aliados";
 import { usosPorFoto } from "@/datos/fotos/registro";
 import type { Uso } from "@/datos/fotos/uso";
 
@@ -48,6 +49,8 @@ export type FichaDeFoto = {
   /** Un archivo de `public/`: se sirve desde el repositorio y no se borra desde el admin. */
   delRepositorio: boolean;
   usos: Uso[];
+  /** El aliado del que es el logo autorizado: ese archivo no se reemplaza desde acá. */
+  logoAutorizadoDe: string | null;
 };
 
 /** ¿La foto es un archivo de `public/`? Las subidas están en /api/fotos/ (en local) o en Blob. */
@@ -58,7 +61,8 @@ export function esDelRepositorio(url: string): boolean {
 export async function fichaDeFoto(id: string): Promise<FichaDeFoto | null> {
   const fila = await base.foto.findUnique({ where: { id } });
   if (!fila) return null;
-  const usos = (await usosPorFoto(base)).get(fila.url) ?? [];
+  const [porFoto, logoAutorizadoDe] = await Promise.all([usosPorFoto(base), aliadoConEseLogoAutorizado(base, fila.url)]);
+  const usos = porFoto.get(fila.url) ?? [];
   return {
     id,
     src: fila.url,
@@ -71,6 +75,7 @@ export async function fichaDeFoto(id: string): Promise<FichaDeFoto | null> {
     subidaPor: fila.subidaPor,
     delRepositorio: esDelRepositorio(fila.url),
     usos,
+    logoAutorizadoDe,
   };
 }
 
