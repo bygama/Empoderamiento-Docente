@@ -7,6 +7,7 @@ import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ALTO_SVH } from "./niveles-escala/niveles-escena";
 import { crearNiveles } from "./niveles-escala/coreografia-niveles";
+import { EscaleraMovil } from "./niveles-escala/EscaleraMovil";
 import { NivelCard } from "./niveles-escala/NivelCard";
 
 /**
@@ -39,8 +40,10 @@ import { NivelCard } from "./niveles-escala/NivelCard";
  * clave (Mateo, 2026-09-05); las cards arrancan con el escenario ya
  * clavado, por eso van desplazadas ENTRADA unidades.
  *
- * Sin motion / touch / pantalla chica: no clava; grilla legible + titular.
- * `live` arranca en false (coincide con SSR).
+ * Escritorio con mouse (≥ 1024px): esta escena. Celular y tablet: la
+ * ESCALERA (niveles-escala/EscaleraMovil.tsx); antes, entre 768 y 1023 esta
+ * escena corría sin víbora y cortaba las cards. Sin motion o con menos de
+ * 620px de alto: grilla legible + titular. Arranca en grilla (el SSR).
  *
  * Piezas: geometría en `niveles-escala/niveles-escena.ts`, ritmo y timeline
  * en `coreografia-niveles.ts` (+ `toggle-nivel.ts`), la víbora en la capa
@@ -65,13 +68,19 @@ export function NivelesEscala({ contenido }: { contenido: NivelesDeQueHacemos })
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
-  const [live, setLive] = useState(false);
+  const [modo, setModo] = useState<"grilla" | "vivo" | "movil">("grilla");
+  const live = modo === "vivo";
+
+  // El modo se decide entero cada vez (la preferencia de movimiento reducido
+  // llega después de hidratar; ver ProyectosAplicaciones).
+  useIsomorphicLayoutEffect(() => {
+    if (reduced) setModo("grilla");
+    else if (window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) setModo("vivo");
+    else if (window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)").matches) setModo("movil");
+  }, [reduced]);
 
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 768px)").matches) return;
-    setLive(true);
-
+    if (!live) return;
     const zone = zoneRef.current;
     const stage = stageRef.current;
     if (!zone || !stage) return;
@@ -94,7 +103,9 @@ export function NivelesEscala({ contenido }: { contenido: NivelesDeQueHacemos })
       cancelado = true;
       cleanup?.();
     };
-  }, [reduced]);
+  }, [live]);
+
+  if (modo === "movil") return <EscaleraMovil contenido={contenido} frase={<FraseGrande frase={contenido.frase} />} />;
 
   return (
     <div
