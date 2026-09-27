@@ -45,8 +45,8 @@ export async function parecidosA(base: PrismaClient, titulo: string, menos: stri
  * material publicado: una sugerencia, que la ficha deja cambiar.
  */
 export async function conPersonas(base: PrismaClient, autorias: readonly Autoria[]): Promise<Autoria[]> {
-  const conocidas = await base.autoria.findMany({ where: { persona: { not: null } }, select: { nombre: true, persona: true }, distinct: ["nombre"] });
-  const porNombre = new Map(conocidas.map((a) => [clave(a.nombre), a.persona]));
+  const conocidas = await base.autoria.findMany({ where: { personaId: { not: null } }, select: { nombre: true, personaId: true }, distinct: ["nombre"] });
+  const porNombre = new Map(conocidas.map((a) => [clave(a.nombre), a.personaId]));
   return autorias.map((a) => ({ ...a, persona: a.persona ?? porNombre.get(clave(a.nombre)) ?? null }));
 }
 

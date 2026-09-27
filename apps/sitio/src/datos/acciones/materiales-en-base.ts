@@ -102,7 +102,20 @@ export function columnasDe(m: Material) {
 
 /** Las filas de `autorias` de un material, en su orden. */
 export function autoriasDe(materialId: string, m: Material) {
-  return m.autorias.map((a, orden) => ({ materialId, orden, nombre: a.nombre, persona: a.persona }));
+  return m.autorias.map((a, orden) => ({ materialId, orden, nombre: a.nombre, personaId: a.persona }));
+}
+
+/**
+ * La primera autoría vinculada a una persona que ya no está en el Equipo (la
+ * borraron desde que se abrió la ficha): el campo lo dice. `null` si están
+ * todas, o si no hay ninguna vinculada.
+ */
+export async function personaQueNoEsta(base: PrismaClient, autorias: ReadonlyArray<{ persona: string | null }>): Promise<Fallo | null> {
+  const ids = autorias.flatMap((a) => (a.persona ? [a.persona] : []));
+  if (!ids.length) return null;
+  const estan = new Set((await base.persona.findMany({ where: { id: { in: ids } }, select: { id: true } })).map((p) => p.id));
+  const i = autorias.findIndex((a) => a.persona !== null && !estan.has(a.persona));
+  return i === -1 ? null : falloEnCampo(`autorias.${i}.persona`, "Esa persona ya no está en el Equipo: elegí otra, o marcala de afuera.");
 }
 
 /** Lo que cambia del borrador de un material que deja de ser destacado: `destacado` en nulo, si lo tenía. */

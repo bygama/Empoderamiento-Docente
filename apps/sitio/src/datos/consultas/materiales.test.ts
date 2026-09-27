@@ -41,7 +41,7 @@ function fila(titulo: string, fecha: string, otros: Partial<FilaConAutorias> = {
     chequeoEn: null,
     chequeo: null,
     chequeoDetalle: null,
-    autorias: [{ materialId: `id-${titulo}`, orden: 0, nombre: "Karla Pacheco López", persona: null }],
+    autorias: [{ materialId: `id-${titulo}`, orden: 0, nombre: "Karla Pacheco López", personaId: null }],
     ...otros,
   };
 }

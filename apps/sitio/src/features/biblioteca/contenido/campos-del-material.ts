@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { EQUIPO } from "@/features/quienes-somos/data/equipo";
 import { esSrcDeFoto } from "@/lib/contenido/fotos";
 import { esDoi, normalizarDoi } from "@/lib/metadatos/doi";
 import { TOPES } from "./modelo";
@@ -76,12 +75,11 @@ export function portadaDe(publicar: boolean) {
     .nullable();
 }
 
-const CLAVES_DEL_EQUIPO = EQUIPO.map((p) => p.key) as [string, ...string[]];
-
 export function autoriaDe(publicar: boolean) {
   return z.object({
     nombre: linea(TOPES.autor, publicar, "Falta el nombre de quien firma."),
-    // La clave del perfil (`daniela-reyes`); la 8b la vuelve una fk a su tabla.
-    persona: z.enum(CLAVES_DEL_EQUIPO, { error: "Esa persona no está en el Equipo." }).nullable(),
+    // El id de su perfil del Equipo (la fk de `autorias`): que exista lo
+    // chequea `datos/` al guardar y al publicar (work/equipo/SPEC.md §4.2).
+    persona: z.uuid({ error: "Esa persona no está en el Equipo." }).nullable(),
   });
 }

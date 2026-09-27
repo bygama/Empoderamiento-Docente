@@ -35,12 +35,12 @@ function estadoDe(f: Fila): EstadoDeMaterial {
 }
 
 /** Lo que se edita: el borrador, o lo publicado si no hay (con las autorías de la tabla). */
-function documentoDe(f: Fila & { autorias: Autoria[] }): Record<string, unknown> {
+function documentoDe(f: Fila & { autorias: Array<Pick<Autoria, "nombre">> }): Record<string, unknown> {
   if (f.borrador) return comoDocumento(f.borrador);
   return { ...f, autorias: f.autorias, autores: f.autores ?? "", descripcion: f.descripcion ?? "", fuente: f.fuente ?? "" };
 }
 
-function filaDe(f: Fila & { autorias: Autoria[] }): { fila: FilaDeMaterial; buscable: string } {
+function filaDe(f: Fila & { autorias: Array<Pick<Autoria, "nombre">> }): { fila: FilaDeMaterial; buscable: string } {
   const d = documentoDe(f);
   const autorias = Array.isArray(d.autorias) ? (d.autorias as unknown[]).map((a) => ({ nombre: texto(comoDocumento(a).nombre) })) : [];
   const portada = comoDocumento(d.portada).src;
@@ -67,7 +67,7 @@ function tieneLoBuscado(buscable: string, buscado: string): boolean {
 }
 
 /** Las filas que pasan los filtros: sin año primero (los recién empezados), después por año y por orden de carga. Pura: se prueba sin base. */
-export function filasDeLaLista(filas: ReadonlyArray<Fila & { autorias: Autoria[] }>, filtros: FiltrosDeMateriales): FilaDeMaterial[] {
+export function filasDeLaLista(filas: ReadonlyArray<Fila & { autorias: Array<Pick<Autoria, "nombre">> }>, filtros: FiltrosDeMateriales): FilaDeMaterial[] {
   const buscado = filtros.q ? normalizar(filtros.q) : "";
   return filas
     .map((f) => ({ ...filaDe(f), creadoEn: f.creadoEn.getTime(), publicado: f.publicado }))
