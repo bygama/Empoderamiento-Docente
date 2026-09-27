@@ -18,6 +18,7 @@ import { esquemaHero as esquemaHeroDeQuienesSomos, heroInicial as heroDeQuienesS
 import { equipoInicial, esquemaEquipo } from "@/features/quienes-somos/contenido/equipo";
 import { esquemaMirada, miradaInicial } from "@/features/quienes-somos/contenido/mirada";
 import { esquemaOrigen, origenInicial } from "@/features/quienes-somos/contenido/origen";
+import { seoQuienesSomosInicial } from "@/features/quienes-somos/contenido/seo";
 import {
   comoTrabajamosInicial as comoTrabajamosDeQueHacemos,
   esquemaComoTrabajamos as esquemaComoTrabajamosDeQueHacemos,
@@ -71,6 +72,7 @@ export const PAGINAS = {
       mirada: { nombre: "Nuestra mirada", esquema: esquemaMirada, inicial: miradaInicial },
       equipo: { nombre: "Quiénes sostienen ED", esquema: esquemaEquipo, inicial: equipoInicial },
     },
+    seo: seoQuienesSomosInicial,
   },
   investigacion: { ruta: "/investigacion", nombre: "Investigación", secciones: {} },
   biblioteca: { ruta: "/biblioteca", nombre: "Biblioteca", secciones: {} },

@@ -1,15 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
+import { openGraphDeLaPagina } from "@/config/metadata";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { QuienesSomosHero } from "@/features/quienes-somos/components/QuienesSomosHero";
 import { OrigenEd } from "@/features/quienes-somos/components/OrigenEd";
 import { MiradaEd } from "@/features/quienes-somos/components/MiradaEd";
 import { ImpulsanEd } from "@/features/quienes-somos/components/ImpulsanEd";
+import { metadataDeSeo } from "@/lib/contenido/seo";
 
-export const metadata: Metadata = {
-  title: "Quiénes somos",
-  description:
-    "Empoderamiento Docente no es una capacitación más: investigación, diseño y acompañamiento para transformar la relación con el saber matemático escolar.",
-};
+// El título, la descripción y la imagen para redes salen del SEO de la página
+// (publicado, o el borrador en vista previa): se editan en su pestaña del admin.
+// Sin imagen propia, la del sitio, que se hereda del layout.
+export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Promise<Metadata> {
+  const { seo } = await contenidoDe("quienes-somos");
+  return metadataDeSeo(seo, await openGraphDeLaPagina(padre));
+}
 
 export default async function QuienesSomosPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
