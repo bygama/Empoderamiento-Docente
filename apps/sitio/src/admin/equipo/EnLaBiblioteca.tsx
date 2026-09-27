@@ -1,4 +1,4 @@
-import { Bloque } from "@/admin/biblioteca/Bloque";
+import { Bloque } from "@/admin/armazon/Bloque";
 import { BotonEnlace } from "@/admin/armazon/Boton";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Fila, Lista } from "@/admin/armazon/Lista";

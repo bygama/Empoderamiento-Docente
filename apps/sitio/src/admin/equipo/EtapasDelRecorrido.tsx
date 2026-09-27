@@ -1,7 +1,7 @@
 "use client";
 
 import { ListaVariable } from "@ed/kit-admin";
-import { Bloque } from "@/admin/biblioteca/Bloque";
+import { Bloque } from "@/admin/armazon/Bloque";
 import type { Firmado } from "@/datos/consultas/ficha-de-persona";
 import { TOPES } from "@/features/quienes-somos/contenido/modelo-del-equipo";
 import type { PropsDelRecorrido } from "./bloques";

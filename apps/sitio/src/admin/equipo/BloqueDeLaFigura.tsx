@@ -1,7 +1,7 @@
 "use client";
 
 import { CampoFoto, Casilla, resolverCambio, Seleccion } from "@ed/kit-admin";
-import { Bloque } from "@/admin/biblioteca/Bloque";
+import { Bloque } from "@/admin/armazon/Bloque";
 import { errorDe } from "@/admin/campos/errores";
 import { subirFoto } from "@/datos/acciones/fotos";
 import { FIGURAS } from "@/features/quienes-somos/contenido/modelo-del-equipo";
