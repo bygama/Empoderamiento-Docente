@@ -18,10 +18,10 @@ export const metadata: Metadata = {
  */
 export default async function ContactoPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { titular } = await contenidoDe("contacto");
+  const { titular, apertura } = await contenidoDe("contacto");
   return (
     <main id="contenido" tabIndex={-1}>
-      <ContactoExperiencia cvAbierto={cvAbierto()} titular={titular} />
+      <ContactoExperiencia cvAbierto={cvAbierto()} titular={titular} apertura={apertura} />
     </main>
   );
 }

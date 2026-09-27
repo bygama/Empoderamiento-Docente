@@ -1,14 +1,34 @@
 import Image from "next/image";
+import type { Apertura } from "@/features/contacto/contenido/apertura";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { fragmentos } from "@/lib/contenido/resaltado";
 import { EQUIPO_FOTOS, EQUIPO_RESTO } from "./data";
 import { TITULO_TIPO } from "./estilos";
+
+/** La frase pilar con su parte resaltada (entre dobles asteriscos) en verde. */
+function FraseConVerde({ texto }: { texto: string }) {
+  const partes = fragmentos(texto);
+  const i = partes.findIndex((f) => f.resaltado);
+  if (i === -1) return <>{texto}</>;
+  const unir = (lista: typeof partes) => lista.map((f) => f.texto).join("");
+  return (
+    <>
+      {unir(partes.slice(0, i))}
+      <span className="text-verde-concepto">{partes[i].texto}</span>
+      {unir(partes.slice(i + 1))}
+    </>
+  );
+}
 
 /**
  * Columna de identidad de la apertura (izquierda): rayita, el titular que
  * ATERRIZA desde el hero, la frase-pilar y el equipo real (foto + cartel en
  * desktop, fila compacta en mobile). Composición editorial asimétrica, idioma
- * de la home. El titular llega por props.
+ * de la home. El titular y los textos llegan por props; las caras son del
+ * equipo.
  */
-export function ColumnaIdentidad({ titulo }: { titulo: string }) {
+export function ColumnaIdentidad({ titulo, apertura }: { titulo: string; apertura: Apertura }) {
+  const { equipo } = apertura;
   return (
     <div className="lg:flex lg:h-full lg:flex-col lg:justify-between">
       {/* Bloque superior: rayita + titular + bajada. */}
@@ -45,8 +65,7 @@ export function ColumnaIdentidad({ titulo }: { titulo: string }) {
         data-ap-head
         className="font-display text-azul-principal hidden max-w-[26rem] text-[1.4rem] leading-snug font-semibold tracking-[-0.01em] lg:block"
       >
-        <span className="text-verde-concepto">Comunidad docente</span> en
-        torno a la Matemática Educativa.
+        <FraseConVerde texto={apertura.frase} />
       </p>
 
       {/* Foto real + cartel flotante: el idioma EXACTO de las tarjetas
@@ -65,11 +84,12 @@ export function ColumnaIdentidad({ titulo }: { titulo: string }) {
         <div className="relative">
           <div className="relative aspect-[7/5] w-full overflow-hidden rounded-2xl shadow-[0_28px_70px_-28px_rgb(31_45_77_/_0.5)] ring-1 ring-white/40 [@media(max-height:760px)]:aspect-[7/4]">
             <Image
-              src="/fotos/docentes-mesa-redonda.webp"
-              alt="Docentes conversan alrededor de una mesa de trabajo"
+              src={equipo.foto.src}
+              alt={equipo.foto.alt}
               fill
               sizes="(min-width: 1024px) 24rem, 0px"
               className="object-cover"
+              style={estiloDeFoco(equipo.foto.foco)}
             />
           </div>
           <div className="ring-azul-principal/10 absolute -bottom-6 left-4 z-10 flex items-center gap-3 rounded-xl bg-white/85 px-3.5 py-2.5 shadow-[0_16px_36px_-18px_rgb(31_45_77_/_0.45)] ring-1 backdrop-blur-md">
@@ -90,10 +110,10 @@ export function ColumnaIdentidad({ titulo }: { titulo: string }) {
             </div>
             <div>
               <p className="font-display text-verde-concepto text-[0.82rem] leading-tight font-semibold tracking-[-0.01em]">
-                Del otro lado, personas
+                {equipo.titulo}
               </p>
               <p className="text-gris-texto mt-0.5 font-sans text-[0.72rem] leading-snug whitespace-nowrap">
-                Investigan y enseñan matemáticas
+                {equipo.bajada}
               </p>
             </div>
           </div>
@@ -119,7 +139,7 @@ export function ColumnaIdentidad({ titulo }: { titulo: string }) {
           </span>
         </div>
         <p className="text-gris-texto font-sans text-[0.85rem] leading-snug">
-          Del otro lado, personas que investigan y enseñan.
+          {equipo.enCelular}
         </p>
       </div>
     </div>

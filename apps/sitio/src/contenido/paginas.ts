@@ -3,6 +3,7 @@ import { catalogoInicial, esquemaCatalogo } from "@/features/biblioteca/contenid
 import { cierreDeBibliotecaInicial, esquemaCierreDeBiblioteca } from "@/features/biblioteca/contenido/cierre";
 import { destacadosInicial, esquemaDestacados } from "@/features/biblioteca/contenido/destacados";
 import { esquemaHeroBiblioteca, heroBibliotecaInicial } from "@/features/biblioteca/contenido/hero";
+import { aperturaInicial, esquemaApertura } from "@/features/contacto/contenido/apertura";
 import { esquemaTitular, titularInicial } from "@/features/contacto/contenido/titular";
 import { esquemaPuente, puenteInicial } from "@/features/biblioteca/contenido/puente";
 import { seoBibliotecaInicial } from "@/features/biblioteca/contenido/seo";
@@ -129,6 +130,7 @@ export const PAGINAS = {
     nombre: "Contacto",
     secciones: {
       titular: { nombre: "Titular", esquema: esquemaTitular, inicial: titularInicial },
+      apertura: { nombre: "Apertura", esquema: esquemaApertura, inicial: aperturaInicial },
     },
   },
 } satisfies RegistroDePaginas;
