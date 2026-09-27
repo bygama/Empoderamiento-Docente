@@ -2,7 +2,7 @@ import { base } from "@/datos/cliente";
 import { ultimaCorrida, type UltimaCorrida } from "@/datos/tareas/corridas";
 import { copiaDeVercel } from "@/datos/tareas/metricas-de-vercel";
 import { hayVariablesDeMetricas } from "@/lib/metricas/entorno";
-import { diaISO, fechaUTC, sumarDias, variacion } from "@/lib/metricas/periodos";
+import { diaISO, fechaUTC, sumarDias, variacion, type Periodo } from "@/lib/metricas/periodos";
 
 // Lo que lee el panel. Solo de nuestras tablas: nunca de la API en el render.
 
@@ -21,7 +21,7 @@ export async function estadoDeMetricas(): Promise<EstadoDeMetricas> {
 }
 
 export type Tarjeta = {
-  dias: 7 | 30;
+  dias: Periodo;
   vistas: number;
   visitantes: number;
   variacionVistas: string;
@@ -36,7 +36,7 @@ export type Tarjeta = {
  * se separan y la grilla quedaría vacía sin necesidad. La lee también el
  * Inicio, en «Esta semana».
  */
-export async function tarjetaDe(dias: 7 | 30): Promise<Tarjeta | null> {
+export async function tarjetaDe(dias: Periodo): Promise<Tarjeta | null> {
   // Acá sí hay una dependencia real: `anterior` necesita la fecha de `actual`.
   const actual = await base.metricaVentana.findFirst({ where: { dias }, orderBy: { fechaFin: "desc" } });
   if (!actual) return null;
