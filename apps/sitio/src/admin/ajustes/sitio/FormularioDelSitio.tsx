@@ -5,7 +5,7 @@ import { Boton } from "@/admin/armazon/Boton";
 import { Aviso } from "@/admin/armazon/Campos";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Momento } from "@/admin/armazon/Momento";
-import { useFrenarSalida } from "@/admin/paginas/useFrenarSalida";
+import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { CAMPOS_DEL_SITIO, type CampoDelSitio, type ValoresDelSitio } from "@/config/formulario-del-sitio";
 import { guardarDatosDelSitio } from "@/datos/acciones/datos-del-sitio";
 import { VOLVER_A_AJUSTES } from "../pantallas";
