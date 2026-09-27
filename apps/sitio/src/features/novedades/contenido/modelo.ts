@@ -34,6 +34,9 @@ export function etiquetaDeCategoria(clave: string): string {
  */
 export const TOPES = { titulo: 100, bajada: 320, tituloDeSeccion: 80, textoDeSeccion: 2000, secciones: 10, alt: 200 } as const;
 
+/** Cuántas muestra el Inicio: las más nuevas. Lo lee también «Se ve en», en la ficha del admin. */
+export const NOVEDADES_EN_EL_INICIO = 4;
+
 /**
  * Las secciones del cuerpo con su ancla (`#que-estudia`), sacada del título:
  * así corregir un título no deja un link a una sección que no existe, y dos
@@ -50,6 +53,11 @@ export function anclasDe(cuerpo: readonly SeccionDelCuerpo[]): Array<SeccionDelC
   });
 }
 
+/** Una foto sin archivo todavía, con el foco al centro: la de una novedad nueva, o la imagen para redes al elegir «Usar otra». */
+export function fotoVacia(): BorradorDeNovedad["imagen"] {
+  return { src: "", alt: "", foco: { x: 0.5, y: 0.5 } };
+}
+
 /**
  * Una novedad recién empezada: la fecha de hoy, la primera categoría y lo
  * demás vacío. `hoy` lo da quien llama (`AAAA-MM-DD`): el servidor y el
@@ -62,7 +70,7 @@ export function borradorVacio(hoy: string): BorradorDeNovedad {
     bajada: "",
     fecha: hoy,
     categoria: CATEGORIAS[0].clave,
-    imagen: { src: "", alt: "", foco: { x: 0.5, y: 0.5 } },
+    imagen: fotoVacia(),
     cuerpo: [],
     destacada: false,
     publicacion: null,

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { desdeTexto } from "@ed/db/slug";
 import { resolverCambio, type Cambio, type Opcion } from "@ed/kit-admin";
 import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
+import { errorDe } from "@/admin/campos/errores";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
 import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import type { FichaDeNovedad as Ficha, Vecinas } from "@/datos/consultas/ficha-de-novedad";
@@ -11,6 +12,7 @@ import type { BorradorDeNovedad } from "@/features/novedades/contenido/novedad";
 import { EncabezadoDeLaFicha } from "./EncabezadoDeLaFicha";
 import { aDocumento, aFormulario, mismoDocumento, type NovedadEnElFormulario } from "./formulario";
 import { FormularioDeNovedad } from "./FormularioDeNovedad";
+import { PanelDeLaNovedad } from "./PanelDeLaNovedad";
 import { QueCambio } from "./QueCambio";
 import { SalidaDeNovedad } from "./SalidaDeNovedad";
 import { SIN_RED, useGuardarNovedad } from "./useGuardarNovedad";
@@ -33,7 +35,8 @@ function ayudaDeLaDestacada(vecinas: Vecinas, id: string | null): string {
 
 /**
  * La ficha de una novedad (SPEC §6.2 de `work/novedades-y-kit/`): el
- * encabezado fijo con el estado y las acciones, y el formulario. Lo escrito
+ * encabezado fijo con el estado y las acciones, el formulario y, al lado desde
+ * `xl`, el panel con cómo se ve y dónde (abajo en pantallas más chicas). Lo escrito
  * vive en el navegador hasta que se guarda; «Cambios sin guardar» es el
  * documento en pantalla contra el último guardado, y frena la salida. Mientras
  * la novedad no se publicó y nadie tocó la URL, la URL sigue al título.
@@ -134,7 +137,8 @@ export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
         alVerBorrador={verBorrador}
         alPublicar={publicar}
       />
-      <div className="max-w-3xl">
+      {/* Desde `xl`, el panel ocupa las dos filas de la derecha; la segunda fila se lleva el sobrante, así «Qué cambió» no se despega del formulario. */}
+      <div className="grid items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
         <FormularioDeNovedad
           form={form}
           cambiar={cambiar}
@@ -147,7 +151,17 @@ export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
               : `Así queda: /novedades/${form.slug || "…"}. Sigue al título hasta que la escribas vos o se publique.`
           }
         />
-        <div className="mt-10 space-y-10">
+        <div className="xl:col-start-2 xl:row-span-2 xl:row-start-1">
+          <PanelDeLaNovedad
+            form={form}
+            cambiarImagen={(v) => cambiar("imagenParaRedes", v)}
+            error={errorDe(errores.contexto.errores, "imagenParaRedes")}
+            id={id}
+            vecinas={vecinas}
+            enElSitio={estado.publicada ? publicado : null}
+          />
+        </div>
+        <div className="space-y-10">
           <QueCambio publicado={publicado} actual={documento} />
           {id ? (
             <SalidaDeNovedad
