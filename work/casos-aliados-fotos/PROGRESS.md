@@ -109,5 +109,19 @@
   cada una con su `en` y su lugar; una foto del código de Inicio como uso
   `codigo`; reemplazar la cambia en los cuatro y dice qué regenerar) → 2
   pass, 0 fail, 0 skipped, y las filas de prueba se deshacen; typecheck 0.
+  Commit `74197f5c`.
+- **Paso 10 — lo que se hace con una foto**: `datos/consultas/fotos.ts`
+  (`grillaDe`/`grillaDeFotos` con los filtros y sus cuentas, `fichaDeFoto`
+  con «Se usa en», `paraElegir` solo jpg/png/webp, `resumenDeFotos`,
+  `esDelRepositorio`); `editar-fotos.ts` (`editarAltEnBase`,
+  `borrarFotoEnBase`: solo sin usos, la fila y después el archivo, nunca uno
+  de `public/`); `reemplazar-foto.ts` (por los bytes; frena si un uso es del
+  código; archivo nuevo con nombre nuevo, la transacción reescribe los usos
+  y la fila, y el viejo se borra después); `revalidar-fotos.ts`; las
+  acciones en `fotos.ts` (`editarAltDeFoto`, `reemplazarFoto`, `borrarFoto`,
+  `fotosParaElegir`; subir no revalida porque se sube desde formularios a
+  medio escribir) con su actividad. `editar-fotos.test.ts` +
+  `consultas/fotos.test.ts` + `subir-foto.test.ts` +
+  `acciones-con-sesion.test.ts` → 22 pass, 0 fail, 0 skipped; typecheck 0.
 
 ## Abierto
