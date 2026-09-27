@@ -1,90 +1,37 @@
+import type { PrincipioDeLaMirada } from "@/features/quienes-somos/contenido/mirada";
+
 /**
- * Contenido, geometría y tiempos de la constelación de «Nuestra mirada».
- * Lo consumen el mapa (`MapaConstelacion`), los bloques de lectura y las dos
- * mitades de la coreografía (`setup-estados`, `timeline-fases`).
+ * Estructura, geometría y tiempos de la constelación de «Nuestra mirada»: el
+ * número y el color de cada principio (`ACENTOS`, de acá sale cuántos son),
+ * dónde va cada nodo y cómo se mueve la cámara. Los textos llegan del
+ * contenido (features/quienes-somos/contenido/mirada.ts). Lo consumen el
+ * mapa (`MapaConstelacion`), los bloques de lectura y las dos mitades de la
+ * coreografía (`setup-estados`, `timeline-fases`).
  */
 
-export type Perspectiva = {
-  id: string;
-  accent: string;
-  /**
-   * Color del texto de la palabra destacada. Nulo = la palabra va en navy
-   * con SUBRAYADO decorativo del acento (el naranja no alcanza 3:1 como
-   * texto sobre el fondo claro; como regla decorativa no necesita ratio).
-   */
-  acentoTexto: string | null;
-  label: string;
-  /** Frase principal; `tachado` es el fragmento que se tacha (si existe). */
-  fraseAntes: string;
-  tachado?: string;
-  frasePunto: string;
-  /** Frase afirmativa partida para acentuar `afirmativaAccent`. */
-  afirmativaPre: string;
-  afirmativaAccent: string;
-  afirmativaPost: string;
-  fichas: readonly string[];
-};
+/**
+ * Lo que no se edita de cada principio: su número y su color. `acentoTexto`
+ * es el color de la parte destacada de la afirmación; nulo = va en navy con
+ * SUBRAYADO decorativo del acento (el naranja no alcanza 3:1 como texto sobre
+ * el fondo claro; como regla decorativa no necesita ratio).
+ */
+export const ACENTOS: ReadonlyArray<{ id: string; accent: string; acentoTexto: string | null }> = [
+  { id: "01", accent: "#1f9a78", acentoTexto: "#1f9a78" }, // verde-concepto
+  // «transformar» conserva el verde ya aprobado en el lenguaje del sitio; el
+  // nodo se diferencia del 01 por su acento azul-medio.
+  { id: "02", accent: "#4a6fa5", acentoTexto: "#1f9a78" },
+  // naranja-accion (dosis mínima, señal de acento): navy + subrayado naranja
+  // (contraste AA garantizado).
+  { id: "03", accent: "#e07a2f", acentoTexto: null },
+];
 
-export const PERSPECTIVAS: readonly Perspectiva[] = [
-  {
-    id: "01",
-    accent: "#1f9a78", // verde-concepto
-    acentoTexto: "#1f9a78",
-    label: "Pensamiento matemático",
-    fraseAntes: "La matemática no es solo ",
-    tachado: "resolver cuentas",
-    frasePunto: ".",
-    afirmativaPre: "Es una manera de ",
-    afirmativaAccent: "pensar, argumentar y actuar",
-    afirmativaPost: " en el mundo.",
-    fichas: [
-      "Construir estrategias",
-      "Argumentar",
-      "Tomar decisiones",
-      "Resolver problemas",
-      "Actuar dentro y fuera del aula",
-    ],
-  },
-  {
-    id: "02",
-    accent: "#4a6fa5", // azul-medio
-    // «transformar» conserva el verde ya aprobado en el lenguaje del sitio;
-    // el nodo se diferencia del 01 por su acento azul-medio.
-    acentoTexto: "#1f9a78",
-    label: "Empoderamiento desde el saber",
-    fraseAntes: "El poder no es ",
-    tachado: "sobre otras personas",
-    frasePunto: ".",
-    afirmativaPre: "Es poder para ",
-    afirmativaAccent: "transformar",
-    afirmativaPost: ".",
-    fichas: [
-      "Saber",
-      "Reflexión",
-      "Experiencia",
-      "Convicción para transformar",
-      "Mirada no deficitaria",
-    ],
-  },
-  {
-    id: "03",
-    accent: "#e07a2f", // naranja-accion (dosis mínima, señal de acento)
-    acentoTexto: null, // navy + subrayado naranja (contraste AA garantizado)
-    label: "Transformación educativa",
-    fraseAntes: "La educación es un derecho",
-    frasePunto: ".",
-    afirmativaPre: "Transformarla es ",
-    afirmativaAccent: "ampliar posibilidades",
-    afirmativaPost: ".",
-    fichas: [
-      "Perspectiva de género",
-      "Inclusión",
-      "Justicia social",
-      "Construcción colectiva del conocimiento",
-      "Mirada no deficitaria del profesorado",
-    ],
-  },
-] as const;
+/** Un principio como lo dibuja la escena: su número y su color, con sus textos. */
+export type Perspectiva = (typeof ACENTOS)[number] & PrincipioDeLaMirada;
+
+/** Junta la estructura de cada principio con sus textos, por posición. */
+export function armarPerspectivas(principios: readonly PrincipioDeLaMirada[]): Perspectiva[] {
+  return ACENTOS.map((acento, i) => ({ ...acento, ...principios[i] }));
+}
 
 /** Posiciones (en % del escenario) de los tres nodos. */
 export const NODOS = [

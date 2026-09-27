@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { altoViewport, anchoDocumento } from "@/lib/viewport";
-import { AIRE_TITULO, CAMARA, NODOS, PERSPECTIVAS } from "./constelacion-mirada";
+import { ACENTOS, AIRE_TITULO, CAMARA, NODOS } from "./constelacion-mirada";
 import { crearIndicador, type Escena } from "./setup-estados";
 
 /**
@@ -57,7 +57,7 @@ export function crearTimelineFases(e: Escena, zone: HTMLElement) {
   tl.to(centro, { autoAlpha: 0, duration: 0.28 }, 1.02 + AIRE_TITULO);
 
   // FASES 1-5 — acercamiento, revelado y salida de cada principio.
-  PERSPECTIVAS.forEach((p, i) => {
+  ACENTOS.forEach((p, i) => {
     const S = 1.3 + AIRE_TITULO + i * 2.15;
     const cam = CAMARA[i];
     const nodo = NODOS[i];

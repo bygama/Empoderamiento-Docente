@@ -1,8 +1,11 @@
+import { partirResaltado } from "@/lib/contenido/resaltado";
+
 /**
  * Síntesis + puente hacia la red: la frase final sobre una niebla marfil
  * (MOMENTO B) y el párrafo que enlaza con «La red tiene nombres».
  */
-export function SintesisMirada({ live }: { live: boolean }) {
+export function SintesisMirada({ live, sintesis, puente }: { live: boolean; sintesis: string; puente: string }) {
+  const frase = partirResaltado(sintesis);
   return (
     <div
       data-sintesis
@@ -30,15 +33,15 @@ export function SintesisMirada({ live }: { live: boolean }) {
         className="font-display text-azul-principal relative max-w-[24ch] text-balance font-bold tracking-[-0.02em]"
         style={{ fontSize: "clamp(1.8rem, 1rem + 2.4vw, 3rem)", lineHeight: 1.16 }}
       >
-        Pensamiento matemático, saber y transformación forman{" "}
-        <span className="text-verde-concepto">una misma mirada</span>.
+        {frase.antes}
+        {frase.clave === null ? null : <span className="text-verde-concepto">{frase.clave}</span>}
+        {frase.despues}
       </p>
       <p
         data-puente
         className="text-azul-principal/80 relative mt-7 max-w-[40ch] font-sans text-[1.02rem] leading-relaxed md:text-[1.1rem]"
       >
-        Se sostiene en una red de especialistas, trayectorias y
-        experiencias diversas.
+        {puente}
       </p>
     </div>
   );
