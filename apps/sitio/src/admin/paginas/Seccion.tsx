@@ -1,6 +1,6 @@
+import type { Cambio } from "@ed/kit-admin";
 import { Campo } from "@/admin/campos/Campo";
 import { ChevronDown } from "@/components/ui/icons";
-import type { Cambio } from "@/admin/campos/cambio";
 import type { Comparticion } from "@/lib/contenido/compartido";
 import type { Descripcion } from "@/lib/contenido/descripcion";
 import { AvisoDeCompartida } from "./AvisoDeCompartida";

@@ -2,8 +2,8 @@ import { createContext } from "react";
 
 // Los errores del último guardado, por camino del campo («quienesSomos.cuerpo»,
 // «hero.tarjetas.2.foto.alt»: el mismo `nombre` que arma `Campo`). Solo
-// `Campo.tsx` lee este contexto: cada control recibe su `error` como una prop
-// plana más, para mudarse a kit-admin sin llevarse el generador (AGENTS.md §12).
+// `Campo.tsx` lee este contexto: cada control del kit recibe su `error` como
+// una prop plana más, y no conoce el generador (AGENTS.md §12).
 
 export type ErroresDelFormulario = {
   errores: Readonly<Record<string, string>>;

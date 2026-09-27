@@ -1,8 +1,8 @@
 "use client";
 
 import { useId, useState } from "react";
+import { ENTRADA } from "@ed/kit-admin";
 import { Eye, EyeOff } from "@/components/ui/icons";
-import { ENTRADA } from "@/admin/campos/clases";
 
 type Props = {
   etiqueta: string;

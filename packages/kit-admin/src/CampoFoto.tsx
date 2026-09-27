@@ -2,18 +2,17 @@
 
 import Image from "next/image";
 import { useRef, useState, useTransition, type KeyboardEvent, type MouseEvent } from "react";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
-import { claseDeBoton } from "@/admin/armazon/clases";
-import { Subir } from "@/components/ui/icons";
-import { MAXIMO_BYTES, posicionDelFoco, type ValorFoto } from "@/lib/contenido/fotos";
+import { Aviso } from "./Aviso";
+import { Boton } from "./Boton";
 import type { Cambio } from "./cambio";
-import { ENTRADA } from "./clases";
+import { claseDeBoton, ENTRADA } from "./clases";
+import { posicionDelFoco, type ValorDeFoto } from "./foto";
+import { Subir } from "./iconos";
 
 /**
  * Lo que el control necesita de quien guarda la foto: recibe el archivo y el
- * alt, y contesta dónde quedó o por qué no. Llega por prop para que el control
- * no conozca la Server Action de la app y pueda mudarse al kit.
+ * alt, y contesta dónde quedó o por qué no. Llega por prop: el control no
+ * conoce la Server Action de la app.
  */
 export type SubirFoto = (datos: FormData) => Promise<{ ok: true; foto: { src: string } } | { ok: false; detalle: string }>;
 
@@ -21,12 +20,21 @@ type Props = {
   nombre: string;
   etiqueta: string;
   ayuda?: string;
-  valor: ValorFoto;
-  alCambiar: (valor: Cambio<ValorFoto>) => void;
+  valor: ValorDeFoto;
+  alCambiar: (valor: Cambio<ValorDeFoto>) => void;
   subir: SubirFoto;
+  /**
+   * El tope de bytes de quien guarda. Se chequea acá, antes de mandar, porque
+   * el servidor corta un cuerpo demasiado grande antes de entrar a la acción,
+   * y ese corte no lo contesta nadie en llano.
+   */
+  maximoBytes: number;
   /** Lo que el último guardado dijo de esta foto (casi siempre, del alt). */
   error?: string;
 };
+
+/** 4194304 → «4». */
+const megas = (bytes: number) => String(Math.round((bytes / (1024 * 1024)) * 10) / 10).replace(".", ",");
 
 // Cuánto mueve cada pulsación de flecha, en fracción de la caja (0..1): un
 // paso fino y uno grande con Shift, como un slider de dos ejes.
@@ -35,13 +43,13 @@ const PASO_FOCO_GRANDE = 0.25;
 
 /**
  * Una foto del contenido: la miniatura recortada alrededor del foco, el texto
- * alternativo (obligatorio) y la subida de un archivo nuevo (SPEC §2 y §4.4).
- * El foco se elige con un clic sobre la miniatura, o con las flechas del
- * teclado (Shift para el paso grande). El marco es 4/3 y no el de cada
- * tarjeta: las once tienen once relaciones de aspecto y el campo es uno solo
- * (DECISIONS, 8); el recorte real se ve en la vista previa.
+ * alternativo (obligatorio) y la subida de un archivo nuevo. El foco se elige
+ * con un clic sobre la miniatura, o con las flechas del teclado (Shift para el
+ * paso grande). El marco es siempre 4/3 y no el de cada lugar donde va la foto:
+ * el campo es uno solo aunque la foto se recorte distinto en cada uno, y el
+ * recorte real se ve en la vista previa.
  */
-export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, error }: Props) {
+export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, maximoBytes, error }: Props) {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [pendiente, empezar] = useTransition();
@@ -63,7 +71,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, er
     // Updater, no un valor plano: si esto corre justo después de que una
     // subida resuelva pero antes de que React confirme ese cambio, un valor
     // plano armado contra el `valor` de este render pisaría el `src` nuevo.
-    alCambiar((actual: ValorFoto) => ({ ...actual, foco }));
+    alCambiar((actual: ValorDeFoto) => ({ ...actual, foco }));
   };
 
   // Con el teclado: las flechas mueven el foco de a un paso (Shift, uno grande).
@@ -76,7 +84,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, er
     const x = Math.min(1, Math.max(0, valor.foco.x + dx));
     const y = Math.min(1, Math.max(0, valor.foco.y + dy));
     const foco = { x: Number(x.toFixed(3)), y: Number(y.toFixed(3)) };
-    alCambiar((actual: ValorFoto) => ({ ...actual, foco }));
+    alCambiar((actual: ValorDeFoto) => ({ ...actual, foco }));
   };
 
   const alSubir = () => {
@@ -87,8 +95,8 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, er
     }
     // Acá y no solo en el servidor: el tope del cuerpo de la acción corta
     // antes de entrar a ella, y ese error no lo contesta nadie en llano.
-    if (archivo.size > MAXIMO_BYTES) {
-      setAviso("La foto pesa más de 4 MB: achicala antes de subirla.");
+    if (archivo.size > maximoBytes) {
+      setAviso(`La foto pesa más de ${megas(maximoBytes)} MB: achicala antes de subirla.`);
       return;
     }
     const datos = new FormData();
@@ -107,7 +115,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, er
         // el valor contra `actual` (lo más fresco), no contra el `valor` que
         // tenía este render cuando arrancó la subida: el alt pudo seguir
         // escribiéndose mientras tanto.
-        alCambiar((actual: ValorFoto) => ({ ...actual, src: r.foto.src, foco: { x: 0.5, y: 0.5 } }));
+        alCambiar((actual: ValorDeFoto) => ({ ...actual, src: r.foto.src, foco: { x: 0.5, y: 0.5 } }));
       } catch {
         // Sin red, o el servidor cortó el pedido: un aviso, no la pantalla de error de Next.
         setAviso("No se pudo subir la foto. Fijate la conexión y probá de nuevo.");
@@ -169,7 +177,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, er
             // subida de más arriba — si esto corre después de que algo
             // asíncrono resuelva pero antes de que React confirme, un valor
             // plano pisaría lo que se haya tocado en otro campo mientras tanto.
-            alCambiar((actual: ValorFoto) => ({ ...actual, alt }));
+            alCambiar((actual: ValorDeFoto) => ({ ...actual, alt }));
           }}
           className={`mt-1 ${ENTRADA}`}
         />
@@ -204,7 +212,7 @@ export function CampoFoto({ nombre, etiqueta, ayuda, valor, alCambiar, subir, er
           <Subir size={16} />
           {valor.src ? "Cambiar foto…" : "Elegir foto…"}
         </label>
-        <span className="text-admin-meta text-gris-texto">jpg, png o webp · hasta 4 MB</span>
+        <span className="text-admin-meta text-gris-texto">jpg, png o webp · hasta {megas(maximoBytes)} MB</span>
       </div>
       {archivo ? (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">

@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Los controles del admin viven en un package (`@ed/kit-admin`), fuera de la
+   app: Tailwind v4 no escanea más allá de la raíz de la app, así que sus
+   clases se le piden acá. Los tokens que usan están en el @theme de abajo
+   (packages/kit-admin/README.md). */
+@source "../../../../packages/kit-admin/src";
+
 @theme {
   /* === Paleta cromática (manual de marca ED) === */
   --color-azul-principal: #1f2d4d;

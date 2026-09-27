@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { resolverCambio, type Cambio } from "@/admin/campos/cambio";
+import { resolverCambio, type Cambio } from "@ed/kit-admin";
 import { ContextoDeErrores } from "@/admin/campos/errores";
 import type { Pestana } from "@/admin/armazon/Pestanas";
 import { guardarBorrador } from "@/datos/acciones/paginas";

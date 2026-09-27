@@ -1,9 +1,11 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { Alerta, X } from "@/components/ui/icons";
-import { posicionDelFoco } from "@/lib/contenido/fotos";
-import type { Resumen } from "@/lib/contenido/resumen";
 import { resolverCambio, type Cambio } from "./cambio";
+import { posicionDelFoco, type ValorDeFoto } from "./foto";
+import { Alerta, X } from "./iconos";
+
+/** Lo que se ve de un ítem cerrado: su primera foto (con su foco) y una línea de texto. */
+export type ResumenDeItem = { foto: ValorDeFoto | null; texto: string };
 
 type Props = {
   /** Único en el formulario: es el `name` de los `<details>`, que así se abren de a uno. */
@@ -18,14 +20,14 @@ type Props = {
   valor: unknown[];
   alCambiar: (valor: Cambio<unknown[]>) => void;
   /** Lo que se ve de un ítem cerrado: su primera foto y una línea. */
-  resumenDe: (valor: unknown) => Resumen;
+  resumenDe: (valor: unknown) => ResumenDeItem;
   porItem: (indice: number, valor: unknown, cambiar: (valor: Cambio<unknown>) => void) => ReactNode;
   /** ¿El último guardado encontró un error adentro de este ítem? Cerrado, lo dice. */
   conError?: (indice: number) => boolean;
 };
 
 /** La cara de un ítem cerrado: la miniatura con su número y una línea de texto. */
-function Cerrado({ numero, etiquetaItem, resumen, conError }: { numero: number; etiquetaItem: string; resumen: Resumen; conError: boolean }) {
+function Cerrado({ numero, etiquetaItem, resumen, conError }: { numero: number; etiquetaItem: string; resumen: ResumenDeItem; conError: boolean }) {
   return (
     <span className="block group-open/item:hidden">
       <span className="relative block aspect-4/3 overflow-hidden rounded-lg bg-gris-fondo">
@@ -53,11 +55,11 @@ function Cerrado({ numero, etiquetaItem, resumen, conError }: { numero: number; 
 
 /**
  * Exactamente `cantidad` ítems: se edita cada uno, no se agregan ni se sacan
- * (SPEC §2 de `work/edicion-de-paginas/`). En una grilla de miniaturas (6
- * columnas desde `lg`, 3 por debajo): cada ítem es un `<details>` con el
- * `name` de la lista, así se abre uno solo a la vez sin JS, y el abierto pasa
- * a su propia fila a todo el ancho sin reordenar nada, porque el orden de
- * lectura y de Tab es el del DOM (SPEC §5 de `work/editor-sin-pared/`).
+ * (la cantidad es parte de la escena, no del contenido). En una grilla de
+ * miniaturas (6 columnas desde `lg`, 3 por debajo): cada ítem es un
+ * `<details>` con el `name` de la lista, así se abre uno solo a la vez sin JS,
+ * y el abierto pasa a su propia fila a todo el ancho sin reordenar nada,
+ * porque el orden de lectura y de Tab es el del DOM.
  */
 export function ListaFija({ nombre, etiqueta, etiquetaItem, cantidad, ayuda, itemVacio, valor, alCambiar, resumenDe, porItem, conError }: Props) {
   // Siempre la cantidad exacta: si el valor trae menos, se completa con vacíos; si trae más, se recorta.

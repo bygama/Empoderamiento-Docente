@@ -14,7 +14,7 @@ type Props = {
 };
 
 /**
- * Varias líneas, con contador: los cuerpos de «¿Quiénes somos?» y «Misión».
+ * Varias líneas, con contador: un texto que se lee en párrafos.
  * Crece con el texto (`field-sizing`) desde unos cuatro renglones
  * (`min-h-28`), así un cuerpo largo se lee entero sin scrollear adentro.
  */
