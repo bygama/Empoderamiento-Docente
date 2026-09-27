@@ -30,6 +30,9 @@ const aliado = (sobre: string | null | undefined) => (sobre ? `el logo de ${sobr
 /** Una foto por su texto alternativo, como era en ese momento. */
 const foto = (sobre: string | null | undefined) => (sobre ? `la foto «${sobre}»` : "una foto");
 
+/** «de» y «a» delante de «el …» se contraen: «del caso 01», «al logo de UNESCO». */
+const contraer = (preposicion: "de" | "a", nombre: string) => (nombre.startsWith("el ") ? `${preposicion}l ${nombre.slice(3)}` : `${preposicion} ${nombre}`);
+
 // Un verbo en pasado sobre quien lo hizo, como lo diría una persona. Es un
 // Record para que un tipo nuevo no compile hasta tener su frase.
 const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
@@ -75,9 +78,9 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "descarto-cambios-de-un-material": ({ quien, sobre }) => `${quien} descartó los cambios del material ${material(sobre)}`,
   "borro-un-material": ({ quien, sobre }) => `${quien} borró el material ${material(sobre)}`,
   "publico-un-caso": ({ quien, sobre }) => `${quien} publicó ${caso(sobre)}`,
-  "descarto-cambios-de-un-caso": ({ quien, sobre }) => `${quien} descartó los cambios de ${caso(sobre)}`,
+  "descarto-cambios-de-un-caso": ({ quien, sobre }) => `${quien} descartó los cambios ${contraer("de", caso(sobre))}`,
   "autorizo-un-aliado": ({ quien, sobre }) => `${quien} autorizó ${aliado(sobre)}`,
-  "quito-la-autorizacion-de-un-aliado": ({ quien, sobre }) => `${quien} le quitó la autorización a ${aliado(sobre)}`,
+  "quito-la-autorizacion-de-un-aliado": ({ quien, sobre }) => `${quien} le quitó la autorización ${contraer("a", aliado(sobre))}`,
   "publico-un-aliado": ({ quien, sobre }) => `${quien} publicó ${aliado(sobre)}`,
   "despublico-un-aliado": ({ quien, sobre }) => `${quien} despublicó ${aliado(sobre)}`,
   "borro-un-aliado": ({ quien, sobre }) => `${quien} borró ${aliado(sobre)}`,
