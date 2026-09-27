@@ -9,10 +9,15 @@ import { Boton as BotonDelAdmin } from "@/admin/armazon/Boton";
 import { Aviso, Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 import { destinoSeguro } from "../destino";
 
-/** Si el último código salió, si el correo no salió, o si hay que esperar para pedir otro. */
-type Envio = "salio" | "no-salio" | "esperar";
+/**
+ * Si el último código salió, si el correo no salió, si hay que esperar para
+ * pedir otro (429), o si el pedido falló por otra cosa (un 500, la cookie del
+ * paso vencida).
+ */
+type Envio = "salio" | "no-salio" | "esperar" | "fallo";
 
 const PEDISTE_MUCHOS = "Pediste muchos códigos seguidos. Esperá unos minutos y pedí otro.";
+const NO_SE_PUDO_PEDIR = "No pudimos mandarte el código. Probá entrar de nuevo.";
 const VOLVE_A_ENTRAR = "Pasó mucho tiempo desde que pusiste la contraseña. Volvé a entrar.";
 
 /** Lo que se le dice a quien probó un código que no anduvo, por el código de error. */
@@ -25,7 +30,7 @@ const POR_ERROR: Record<string, string> = {
 };
 
 function envioDe(valor: string | null): Envio {
-  return valor === "no-salio" || valor === "esperar" ? valor : "salio";
+  return valor === "no-salio" || valor === "esperar" || valor === "fallo" ? valor : "salio";
 }
 
 /**
@@ -59,7 +64,7 @@ export function FormularioCodigo({ minutosDeVigencia }: { minutosDeVigencia: num
       return;
     }
     if (fallo.code === CODIGO_NO_SALIO) setEnvio("no-salio");
-    else setError(fallo.status === 429 ? PEDISTE_MUCHOS : (POR_ERROR[fallo.code ?? ""] ?? "No se pudo pedir otro código. Probá de nuevo."));
+    else setError(fallo.status === 429 ? PEDISTE_MUCHOS : (POR_ERROR[fallo.code ?? ""] ?? NO_SE_PUDO_PEDIR));
   }
 
   async function entrar(datos: FormData) {
@@ -97,12 +102,21 @@ export function FormularioCodigo({ minutosDeVigencia }: { minutosDeVigencia: num
     return (
       <div className="space-y-4">
         <Aviso tono="error">
-          No pudimos mandarte el código, y sin él no se puede entrar con tu cuenta. Avisale a quien se ocupa del sitio: el envío de correos no
+          No pudimos mandarte el código, y sin él no se puede entrar con este rol. Avisale a quien se ocupa del sitio: el envío de correos no
           está andando.
         </Aviso>
         <Boton type="button" onClick={mandarOtro} disabled={mandando} aria-busy={mandando || undefined}>
           {mandando ? "Mandando…" : "Probar de nuevo"}
         </Boton>
+        <p className="text-center text-admin-meta">{volver}</p>
+      </div>
+    );
+  }
+
+  if (envio === "fallo") {
+    return (
+      <div className="space-y-4">
+        <Aviso tono="error">{NO_SE_PUDO_PEDIR}</Aviso>
         <p className="text-center text-admin-meta">{volver}</p>
       </div>
     );
