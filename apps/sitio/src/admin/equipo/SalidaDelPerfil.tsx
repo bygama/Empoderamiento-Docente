@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Boton } from "@/admin/armazon/Boton";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
+import { FilaDeAccion } from "@/admin/armazon/FilaDeAccion";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-persona";
 import type { Pendiente } from "./useGuardarPerfil";
 
@@ -14,19 +15,6 @@ type Props = {
   alDespublicar: () => void;
   alBorrar: () => void;
 };
-
-/** Una acción con lo que pasa si se toca, a la izquierda, y su botón a la derecha. */
-function Accion({ titulo, consecuencia, children }: { titulo: string; consecuencia: string; children: React.ReactNode }) {
-  return (
-    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
-      <div className="min-w-0 max-w-prose">
-        <p className="font-medium">{titulo}</p>
-        <p className="mt-0.5 text-admin-meta text-gris-texto">{consecuencia}</p>
-      </div>
-      {children}
-    </li>
-  );
-}
 
 /**
  * Lo que deshace un perfil o lo saca del sitio (SPEC §6.1 de `work/equipo/`),
@@ -44,7 +32,7 @@ export function SalidaDelPerfil({ nombre, estado, pendiente, alDescartar, alDesp
       </h2>
       <ul className="divide-y divide-azul-claro/60">
         {estado.publicado && estado.borradorEn ? (
-          <Accion titulo="Descartar los cambios" consecuencia="Vuelve a lo que está publicado. Lo que se guardó como borrador desde entonces se pierde.">
+          <FilaDeAccion titulo="Descartar los cambios" consecuencia="Vuelve a lo que está publicado. Lo que se guardó como borrador desde entonces se pierde.">
             {confirmando === "descartar" ? (
               <Confirmacion
                 pregunta="¿Descartar los cambios sin publicar? No se puede deshacer."
@@ -58,16 +46,16 @@ export function SalidaDelPerfil({ nombre, estado, pendiente, alDescartar, alDesp
                 Descartar cambios
               </Boton>
             )}
-          </Accion>
+          </FilaDeAccion>
         ) : null}
         {estado.publicado ? (
-          <Accion titulo="Despublicar" consecuencia="Su tarjeta y su perfil dejan de verse en Quiénes somos, y se conserva todo: volver a publicarlo es un clic.">
+          <FilaDeAccion titulo="Despublicar" consecuencia="Su tarjeta y su perfil dejan de verse en Quiénes somos, y se conserva todo: volver a publicarlo es un clic.">
             <Boton variante="secundario" disabled={corriendo} aria-busy={pendiente === "despublicar" || undefined} onClick={alDespublicar}>
               {pendiente === "despublicar" ? "Despublicando…" : "Despublicar"}
             </Boton>
-          </Accion>
+          </FilaDeAccion>
         ) : null}
-        <Accion titulo="Borrar" consecuencia="Se borra para siempre. Sus publicaciones siguen en la Biblioteca, con su nombre, como de alguien de afuera del equipo.">
+        <FilaDeAccion titulo="Borrar" consecuencia="Se borra para siempre. Sus publicaciones siguen en la Biblioteca, con su nombre, como de alguien de afuera del equipo.">
           {confirmando === "borrar" ? (
             <Confirmacion
               pregunta={`¿Borrar el perfil de ${nombre} para siempre? No se puede deshacer.`}
@@ -81,7 +69,7 @@ export function SalidaDelPerfil({ nombre, estado, pendiente, alDescartar, alDesp
               Borrar el perfil
             </Boton>
           )}
-        </Accion>
+        </FilaDeAccion>
       </ul>
     </section>
   );

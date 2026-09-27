@@ -1,7 +1,7 @@
 "use client";
 
 import { Parrafo, TextoCorto } from "@ed/kit-admin";
-import { Bloque } from "@/admin/biblioteca/Bloque";
+import { Bloque } from "@/admin/armazon/Bloque";
 import { errorDe } from "@/admin/campos/errores";
 import { TOPES } from "@/features/quienes-somos/contenido/modelo-del-equipo";
 import type { PropsDelRecorrido } from "./bloques";

@@ -2,7 +2,7 @@
 
 import { LARGO_MAXIMO } from "@ed/db/slug";
 import { CampoFoto, Casilla, Seleccion, TextoCorto } from "@ed/kit-admin";
-import { Bloque } from "@/admin/biblioteca/Bloque";
+import { Bloque } from "@/admin/armazon/Bloque";
 import { errorDe } from "@/admin/campos/errores";
 import { subirFoto } from "@/datos/acciones/fotos";
 import { ACERCAMIENTO, NIVELES, NUMEROS_DE_NIVEL, TOPES, type Nivel } from "@/features/quienes-somos/contenido/modelo-del-equipo";
