@@ -18,8 +18,70 @@
   cuentas de prueba de las tres (la contraseña se elige de nuevo por «Olvidé
   mi contraseña», con el enlace en la consola); el dev server va en el 3017,
   con un perfil de navegador aislado.
+- 2026-09-26 — **Ronda de arreglos 1** (la revisión r1 dio FAIL: la fuga de
+  Cuentas a quien edita, más tres menores; «Tried and failed»). Hecha,
+  rebasada sobre `main` (`15def2c`, con la lane 3c del Inicio) y verificada
+  (abajo). **Vuelve a revisarla el mismo revisor**: esta carpeta no se borra
+  hasta su PASS. Para retomar: la contraseña de Ada (administra) se eligió de
+  nuevo en esta ronda por «Olvidé mi contraseña» y no está en el repo; Eli
+  (edita) tiene el segundo factor apagado, para poder entrar con `next
+  start`, donde el código no sale.
 
 ## Verification
+
+### 2026-09-26 — Ronda de arreglos 1, sobre `main` (`15def2c`) — PASS
+
+Seis commits sobre `de40636` (`b8913fe`…`502709f`) y el de este PROGRESS,
+base `ed_cuentas`. Los hashes de «Hecho» siguen siendo los de antes de los
+rebases.
+
+- **La fuga, probada como la probó el revisor:** `next start -p 3017` con el
+  build de producción, la sesión de Eli (edita), un GET por ruta con su
+  cookie y un `grep` del HTML entero (payload de RSC incluido) contra los
+  correos de las otras cinco cuentas y el id de Nico. Antes del
+  arreglo, con el build de la rama sin él: `/admin/cuentas` 5 correos y 2 veces el id, la ficha de Nico 2
+  y 2, Actividad 0 y 2, Invitar 0 y 0. Después, con el de `502709f`:
+
+  ```
+  GET /admin/cuentas → 200, 48874 bytes: correos de otras cuentas = 0, id de Nico = 0, «Sin permiso» = 1
+  GET /admin/cuentas/8OcOeB1aNozsGiRTCIVPUW47EE1pH2R9 → 200, 49440 bytes: correos de otras cuentas = 0, id de Nico = 2, «Sin permiso» = 1
+  GET /admin/cuentas/actividad → 200, 49377 bytes: correos de otras cuentas = 0, id de Nico = 0, «Sin permiso» = 1
+  GET /admin/cuentas/invitar → 200, 49369 bytes: correos de otras cuentas = 0, id de Nico = 0, «Sin permiso» = 1
+  ```
+
+  Los nombres de las otras cinco cuentas: 0 en las cuatro rutas. Las dos
+  veces que aparece el id de Nico en su ficha son el árbol de rutas del
+  payload (`"c":["","admin","cuentas","<id>"]`): la URL que tipeó quien
+  edita, no un dato; el `<title>` es «Admin ED», sin el nombre.
+- **La capa 3 atrapa la fuga:** con `cuentas/actividad/page.tsx` de
+  `de40636` (sin el chequeo) puesta en el árbol, `guarda.test.ts` → ✖ «cada
+  página de un módulo que deja afuera a algún rol chequea su capacidad antes
+  de leer»; con la de ahora, 7/7.
+- **L1, en limpio** (sin `.next` ni `next-env.d.ts`): `pnpm typecheck` → 0;
+  `pnpm lint` → 0; `node scripts/verificar-react-doctor.mjs` → 0, «100/100,
+  sin diagnósticos» (sitio 668 archivos, db 3, auth 27). La primera corrida
+  dio un hallazgo (`js-set-map-lookups` en `listarActividad`): se arregló con
+  un `Set`, dentro del commit del arreglo.
+- **L2:** `pnpm test` → 0 (`@ed/auth` 46/46; sitio 258: 256 pass, 0 fail, 2
+  saltados, los de siempre); `pnpm build` → 0 («Compiled successfully»);
+  `next start -p 3017` → 200 en `/admin/entrar`.
+- **L3**, con `next start` y, para lo que pide el código por la consola,
+  `next dev`; navegador de Orca con un perfil aislado (`cuentas-r1`, borrado
+  al terminar):
+  - Como edita: las cuatro rutas de Cuentas → «Esta sección es de quien
+    dirige o administra», y su Inicio no tiene «Ver toda la actividad».
+  - La pantalla del código: `?envio=fallo` → «No pudimos mandarte el código.
+    Probá entrar de nuevo.»; `?envio=no-salio` → «…y sin él no se puede
+    entrar con este rol…»; `?envio=esperar` → «Pediste muchos códigos
+    seguidos…».
+  - Como administra (Ada, entrando con el código de la consola): el Inicio con
+    «Ver toda la actividad» en la fila de «Actividad reciente» (40 px, a la
+    altura del título) y la actividad de Cuentas («Nico Nuevo le pasó la
+    dirección a Dora Dirige», «…borró la cuenta de Zeta Sinhistoria»,
+    «…reactivó a Eli Edita»); el clic → `/admin/cuentas/actividad`,
+    «Actividad · Admin ED».
+  - Invitar a Inés → la ficha con «Le mandamos la invitación a ines@ed.test.
+    Vence el 29/9 a las 22:34.» (72 h).
 
 ### 2026-09-26 — Después del rebase sobre `main` (`490547f`) — PASS
 
@@ -153,6 +215,11 @@ dev server en el 3017.
 
 ## Tried and failed
 
+- **Revisión r1 (2026-09-26): FAIL.** La guarda del layout era la única
+  barrera de Cuentas, y solo oculta la interfaz: Next dibuja la página en
+  paralelo y la manda en el payload, así que quien edita recibía los correos
+  de todas las cuentas y la actividad aunque viera «Sin permiso». Arreglado
+  en tres capas (DECISIONS, «Ronda de arreglos 1»; la prueba, arriba).
 - **Capturas:** `orca screenshot --json` cerró el runtime de Orca dos veces
   seguidas (`runtime_unavailable`); como dice la memoria, no se insistió. Lo
   visual quedó probado con probes numéricos (contraste, ancho, clases de
@@ -345,7 +412,9 @@ dev server en el 3017.
   «Más viejas», links que conservan los filtros). DESIGN.md §11: «Volver»,
   «Buscador» y «Paginado», con contrastes y primer consumidor, y la línea de
   historia del §11. Aceptación: `pnpm --filter sitio typecheck` y `lint` exit
-  0; react-doctor 100/100.
+  0; react-doctor 100/100. **Hoy** (rebase sobre `490547f`): «← volver», el
+  buscador y el filtro son los de `main` (`Volver`, `Buscador`, `Filtro` de
+  píldoras); de este paso quedan el `Paginado` y la «Tabla».
 - **Paso 13 — Personas e Invitar** (`5f6429a`). `cuentas/layout.tsx` con
   `<Guarda capacidad="usarCuentas">`; `cuentas/page.tsx` (Personas: el
   encabezado con las pestañas Personas · Actividad y el primario «Invitar a
@@ -366,6 +435,8 @@ dev server en el 3017.
   puede cada rol», las tres cuentas e «Invitar a alguien», título «Cuentas ·
   Admin ED»; `/admin/cuentas/invitar` → 200, «Invitar · Admin ED»; como
   edita, `/admin/cuentas` → «Esta sección es de quien dirige o administra».
+  **Hoy** (ronda 1): esa guarda del layout solo oculta la interfaz; cada
+  página chequea `usarCuentas` antes de leer y las consultas reciben el rol.
 - **Paso 14 — una cuenta** (`99ee275`). `cuentas/[id]/page.tsx` (título con
   el nombre, 404 si no existe, `queSePuede` con la sesión, y el aviso de
   Invitar por `?invitacion=salio|no-salio`). `admin/cuentas/FichaDeLaCuenta.tsx`
@@ -373,7 +444,8 @@ dev server en el 3017.
   los apartados de `ficha/Apartados.tsx` (Datos con el cambio de correo,
   Rol con el selector, Estado o Invitación, Segundo factor, Sesiones, La
   dirección), cada uno según `queSePuede`. Piezas de cliente en `ficha/`:
-  `BotonDeAccion` (confirma con `window.confirm`, como «Descartar» del editor
+  `BotonDeAccion` (**hoy** confirma con `Confirmacion`, la de `main`; al
+  escribirse, con `window.confirm`, como «Descartar» del editor
   de páginas, lo que no se deshace con un clic; suspender y reactivar
   comparten `key` para que el aviso sobreviva), `FormularioDelRol`,
   `FormularioDelCorreo` y `FormularioDeLaDireccion`; `ficha/Acciones.tsx`
@@ -403,18 +475,20 @@ dev server en el 3017.
   `/admin/cuentas/actividad` → 200, «Actividad · Admin ED», `role="search"`,
   la pestaña encendida, las frases; `?pagina=2&modulo=cuentas&q=juan` → 200
   con «No hay actividad con esos filtros» y «Sacar los filtros»; parámetros
-  basura → 200.
+  basura → 200. **Hoy** los filtros son el `Filtro` de píldoras de `main`, y
+  «Sacar los filtros» se fue (DECISIONS, rebase).
 - **Paso 16 — los documentos** (`8b6d21d`, `f975239`, `adebce1`, `c299689`).
-  ADR-0012 «Segundo factor por correo, obligatorio para quien dirige y
+  ADR-0013 (se escribió como 0012 y pasó a 0013 al rebasar: la lane 7 mergeó
+  antes su 0012) «Segundo factor por correo, obligatorio para quien dirige y
   administra» (y su fila en el índice de ADRs); el §7 del spec del admin
   (Cuentas, la suspensión, la invitación de 72 h, `queSePuede` y el segundo
   factor); AGENTS.md §12 (la línea de la sesión: el segundo factor y la
-  suspensión, ADR-0012) y §3 (`roles.ts`, `sobre-cuentas.ts`, y las
+  suspensión, ADR-0013) y §3 (`roles.ts`, `sobre-cuentas.ts`, y las
   consultas y acciones nuevas en el árbol de `datos/`); README (Cuentas en
   la intro del admin, el código por la consola en local, «Las cuentas», los
   correos nuevos y **Resend como condición del primer deploy**). Aceptación:
   `git status` mostró solo esos archivos; los links nuevos resuelven (`ls` de
-  `0012-segundo-factor-por-correo.md` desde la raíz y desde `specs/`).
+  `0013-segundo-factor-por-correo.md` (entonces `0012-…`) desde la raíz y desde `specs/`).
   Commits partidos por scope. Un encabezado de 76 caracteres se rehízo con
   `reset --soft` antes de pushear, y el del paso 3 (75) con un rebase sin
   conflictos **sobre la misma base** (`5a07368`), que solo cambió ese mensaje
@@ -425,12 +499,11 @@ dev server en el 3017.
 
 ## Abierto
 
-- ~~El rebase sobre `main`~~: hecho (Verification, «Después del rebase»).
-- **La 3c (`inicio`)** crea la frase y la visibilidad de la actividad en los
-  mismos lugares (DECISIONS): concilia la que rebasee segunda, y si la 3c ya
-  está en `main`, sumo «Ver toda la actividad» hacia `/admin/cuentas/actividad`
-  si no está.
-- **Mi cuenta:** la lane 7 le suma «Avisos»; al rebasear se conservan las dos
-  secciones.
+- ~~El rebase sobre `main`~~: hecho dos veces (`490547f` y `15def2c`).
+- ~~La 3c (`inicio`)~~: está en `main`; conciliada en el rebase sobre
+  `15def2c` (`VA_AL_INICIO` de los tipos nuevos y «Ver toda la actividad»).
+- ~~Mi cuenta~~: conserva «Avisos» (lane 7) y «Seguridad».
+- **La revisión r1 vuelve** sobre la ronda de arreglos 1, con el mismo
+  revisor.
 - **Para el deploy (lane 0):** Resend configurado y probado antes de que esta
-  lane llegue a producción (README, ADR-0012).
+  lane llegue a producción (README, ADR-0013).

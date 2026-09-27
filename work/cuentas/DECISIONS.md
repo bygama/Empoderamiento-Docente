@@ -95,3 +95,50 @@
     mande, porque `mandarCorreo` ahora contesta si salió.
   - Las migraciones de `main` (`…231213`, `…231819`) van antes que la mía
     (`…232051`): no se regeneró nada. Probado desde una base vacía.
+- 2026-09-26 — **Ronda de arreglos 1** (la revisión r1 dio FAIL por la fuga
+  de Cuentas a quien edita; el padre pidió tres capas):
+  - **Página:** cada `page.tsx` de Cuentas pregunta `puede(rol,
+    "usarCuentas")` justo después de la sesión y, sin la capacidad, devuelve
+    `<SinPermiso>` antes de leer nada. El layout conserva su `<Guarda>`: sigue
+    siendo lo que ve quien entra al módulo, pero ya no se lo cuenta como
+    protección.
+  - **`datos/`:** `listarCuentas`, `unaCuenta`, `cuentaParaActuar` y
+    `listarActividad` reciben primero el rol de quien mira (`unknown`, como
+    `puede`) y sin `usarCuentas` devuelven `[]`, `null` o una página vacía.
+    Que sea el primer argumento, obligatorio, es lo que hace difícil
+    olvidarlo: llamarlas sin rol no compila. Se descartó un tipo «marcado»
+    (un permiso que solo emite un chequeo): obliga a chequear, pero deja la
+    consulta confiando en quien la llama, que es justo lo que falló.
+    `listarActividad` además cruza los tipos pedidos con `tiposQueVe(rol)`,
+    y el título de la ficha pasa por la misma consulta, porque el nombre
+    viajaba en el `<title>`.
+  - **El test** vive en `guarda.test.ts`, al lado del de los layouts. Pide el
+    chequeo a toda página de un módulo cuya capacidad deja afuera a algún rol
+    (`PUEDE[capacidad]` más corto que `ROLES`): hoy Cuentas; Ajustes, apenas
+    tenga carpeta, sin tocar el test. Métricas y Contenido, que ven los tres
+    roles, no entran. La bandeja de Mensajes va aparte, en
+    `CAPACIDAD_DE_LA_RUTA`, con su motivo: la capacidad sale de la ruta
+    (`capacidadDe(bandeja)`). Vale `puede(…, capacidad)` o envolver lo que
+    lee en `<Guarda capacidad=…>`, y el chequeo tiene que aparecer antes de
+    la primera llamada a algo importado de `@/datos/consultas/`. Es un chequeo
+    de texto, como el de los layouts: no ve una lectura escondida en un
+    componente, y para eso está la capa de `datos/`.
+  - **El id en la URL no es una fuga:** en la ficha, el id que tipeó quien
+    edita vuelve en el árbol de rutas del payload. Nombre, correo y título no.
+  - **Rebase sobre `15def2c` (la 3c):** van al Inicio los tipos que le hacen
+    algo a otra cuenta (invitar, reenviar, cancelar, cambiar el rol o el
+    correo, suspender, reactivar, borrar, pasar la dirección y cerrarle las
+    sesiones a alguien); activar o desactivar el segundo factor propio, no,
+    porque son de la cuenta propia. Conflictos: `actividad.ts` y `frase.ts`
+    quedaron con la forma de `main` más los tipos de esta lane; la línea de
+    historia de DESIGN.md y la intro del README suman las dos lanes.
+  - **«Ver toda la actividad»:** terciario en la fila de «Actividad
+    reciente», como «Ver métricas» en la de la semana, para quien tiene
+    `usarCuentas` (`DatosDelInicio.verActividad`). Sin CTA propio en el
+    estado vacío: el link ya está arriba.
+  - **El código que no se pudo pedir:** `envio` suma `fallo`. Solo el 429 es
+    «Pediste muchos códigos seguidos»; cualquier otro fallo de send-otp que
+    no sea `CODIGO_NO_SALIO` dice «No pudimos mandarte el código. Probá
+    entrar de nuevo.», con «Volver a entrar» y sin el campo, porque no hay
+    código que escribir. En «Mandar otro», la cookie vencida conserva su
+    texto propio («Pasó mucho tiempo…»), que dice más que el genérico.
