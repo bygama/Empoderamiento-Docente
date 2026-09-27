@@ -79,7 +79,8 @@ export function FichaDeCaso({ ficha }: { ficha: Ficha }) {
         alVerBorrador={acciones.verBorrador}
         alPublicar={acciones.publicar}
       />
-      <div className="grid items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
+      {/* `grid-cols-1` es `minmax(0, 1fr)`: sin eso, lo que no se corta (un título con `truncate`) ensancha la ficha en el celular. */}
+      <div className="grid grid-cols-1 items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
         <div className="space-y-10">
           <ElCaso
             {...bloque}

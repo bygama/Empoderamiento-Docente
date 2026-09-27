@@ -104,7 +104,8 @@ export function FichaDeAliado({ ficha, puedeAutorizar, quienPuede }: Props) {
         alVerBorrador={verBorrador}
         alPublicar={publicar}
       />
-      <div className="grid items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
+      {/* `grid-cols-1` es `minmax(0, 1fr)`: sin eso, lo que no se corta (un título con `truncate`) ensancha la ficha en el celular. */}
+      <div className="grid grid-cols-1 items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
         <div className="space-y-10">
           <FormularioDelAliado form={form} cambiar={cambiar} error={(camino) => errorDe(errores.contexto.errores, camino)} />
           <AutorizacionDelAliado id={g.id} autorizacion={ficha.autorizacion} puedeAutorizar={puedeAutorizar} quienPuede={quienPuede} />
