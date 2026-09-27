@@ -105,6 +105,10 @@ services:
       DATABASE_URL: postgresql://umami:${CLAVE_DB_UMAMI}@db:5432/umami
       APP_SECRET: ${UMAMI_APP_SECRET:?falta UMAMI_APP_SECRET en .env}
       DISABLE_TELEMETRY: "1"
+      # La IP, de la cabecera que pisa Caddy. Sin esto, Umami toma la primera
+      # que encuentra de una lista (CF-Connecting-IP, entre otras), y esas las
+      # puede mandar cualquiera.
+      CLIENT_IP_HEADER: x-real-ip
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://127.0.0.1:3000/api/heartbeat"]
       interval: 10s
