@@ -21,10 +21,16 @@ export function FichaProyecto({
   ficha,
   n,
   live,
+  compacta = false,
 }: {
   ficha: Ficha;
   n: number;
   live: boolean;
+  /**
+   * La de la pila en celular (PilaFichasMovil): menos relleno y la cifra un
+   * escalón más chica, para que la ficha entera entre debajo del capítulo.
+   */
+  compacta?: boolean;
 }) {
   return (
     <article
@@ -32,7 +38,7 @@ export function FichaProyecto({
       className={live ? "absolute inset-x-0 top-0" : "relative"}
       style={live ? { opacity: 0 } : undefined}
     >
-      <div className="border-azul-principal/8 relative overflow-hidden rounded-[1.75rem] border bg-white p-9 shadow-[0_1px_2px_rgb(31_45_77/0.05),0_34px_70px_-30px_rgb(31_45_77/0.3)] md:p-11">
+      <div className={`border-azul-principal/8 relative overflow-hidden rounded-[1.75rem] border bg-white shadow-[0_1px_2px_rgb(31_45_77/0.05),0_34px_70px_-30px_rgb(31_45_77/0.3)] ${compacta ? "p-6 md:p-8" : "p-9 md:p-11"}`}>
         <span
           aria-hidden="true"
           className="text-azul-principal pointer-events-none absolute -right-4 -bottom-5 opacity-[0.09]"
@@ -65,9 +71,9 @@ export function FichaProyecto({
         </div>
 
         <p
-          className="font-display text-azul-principal relative mt-9 font-extrabold tracking-[-0.03em]"
+          className={`font-display text-azul-principal relative font-extrabold tracking-[-0.03em] ${compacta ? "mt-6" : "mt-9"}`}
           style={{
-            fontSize: "clamp(2.3rem, 1.4rem + 1.6vw, 3.4rem)",
+            fontSize: compacta ? "clamp(2.1rem, 1.5rem + 2.4vw, 3rem)" : "clamp(2.3rem, 1.4rem + 1.6vw, 3.4rem)",
             lineHeight: 0.98,
           }}
         >
@@ -77,14 +83,14 @@ export function FichaProyecto({
           </span>
         </p>
 
-        <h3 className="font-display text-azul-principal relative mt-6 text-[1.25rem] leading-snug font-bold text-balance">
+        <h3 className={`font-display text-azul-principal relative leading-snug font-bold text-balance ${compacta ? "mt-4 text-[1.12rem]" : "mt-6 text-[1.25rem]"}`}>
           {ficha.nombre}
         </h3>
-        <p className="text-gris-texto relative mt-3 max-w-[38ch] font-sans text-[1rem] leading-relaxed">
+        <p className={`text-gris-texto relative max-w-[38ch] font-sans leading-relaxed ${compacta ? "mt-2 text-[0.95rem]" : "mt-3 text-[1rem]"}`}>
           {ficha.texto}
         </p>
 
-        <p className="text-verde-concepto-texto relative mt-8 font-mono text-[0.72rem] tracking-[0.14em] uppercase">
+        <p className={`text-verde-concepto-texto relative font-mono text-[0.72rem] tracking-[0.14em] uppercase ${compacta ? "mt-5" : "mt-8"}`}>
           Proyecto {String(n).padStart(2, "0")}
         </p>
       </div>

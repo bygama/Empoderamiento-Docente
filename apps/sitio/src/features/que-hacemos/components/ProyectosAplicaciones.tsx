@@ -6,6 +6,7 @@ import { sinMarcas } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { EscenarioFichas } from "./proyectos-aplicaciones/EscenarioFichas";
+import { PilaFichasMovil } from "./proyectos-aplicaciones/PilaFichasMovil";
 import { FichaProyecto } from "./proyectos-aplicaciones/FichaProyecto";
 import { TituloPractica } from "./proyectos-aplicaciones/TituloPractica";
 import { Bajada } from "./proyectos-aplicaciones/Bajada";
@@ -27,16 +28,18 @@ import { armarCapitulos } from "./proyectos-aplicaciones/fichas";
  * víbora dejaba cuatro huérfanas. Y antes de esto, dos zonas clavadas con
  * una costura donde la víbora nacía cortada.
  *
- * Solo desktop con mouse y con motion (celular: fallback estático, sin
- * más trabajo por ahora). Piezas: los textos llegan por props
- * (`contenido/proyectos.ts` o la base) y se juntan con la estructura del
- * archivo en `proyectos-aplicaciones/fichas.ts`; el resto en
- * `proyectos-aplicaciones/` (escenario, escena, coreografías, cinta,
- * ficha, dibujos).
+ * Tres modos: en escritorio con mouse, este archivo de dos lados; en
+ * celular y tablet (< lg), la misma pila en vertical (PilaFichasMovil,
+ * Gastón 2026-09-26); con movimiento reducido o sin JS, las fichas en
+ * grilla. Piezas: los textos llegan por props (`contenido/proyectos.ts` o la
+ * base) y se juntan con la estructura del archivo en
+ * `proyectos-aplicaciones/fichas.ts`; el resto en `proyectos-aplicaciones/`
+ * (escenarios, escena, coreografías, cinta, ficha, dibujos).
  */
 export function ProyectosAplicaciones({ contenido }: { contenido: ProyectosDeQueHacemos }) {
   const reduced = useReducedMotion();
-  const [live, setLive] = useState(false);
+  const [modo, setModo] = useState<"grilla" | "vivo" | "movil">("grilla");
+  const live = modo === "vivo";
   // Memorizado: el escenario rearma su coreografía cuando cambian sus lados.
   const { capitulos, lados, fichas } = useMemo(() => {
     const caps = armarCapitulos(contenido);
@@ -50,11 +53,15 @@ export function ProyectosAplicaciones({ contenido }: { contenido: ProyectosDeQue
     };
   }, [contenido]);
 
+  // El modo se decide entero cada vez: la preferencia de movimiento reducido
+  // llega después de hidratar, y si solo se salía temprano quedaba prendido
+  // el modo animado que se había elegido antes.
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches)
-      return;
-    setLive(true);
+    if (reduced) setModo("grilla");
+    else if (window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) setModo("vivo");
+    // La pila en celular pide alto: con menos de 620px la ficha no entra
+    // entera debajo del capítulo, y ahí quedan las fichas en columna.
+    else if (window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)").matches) setModo("movil");
   }, [reduced]);
 
   return (
@@ -69,9 +76,9 @@ export function ProyectosAplicaciones({ contenido }: { contenido: ProyectosDeQue
       }
       aria-labelledby="proyectos-titulo"
     >
-      {live ? (
-        <EscenarioFichas intro={contenido} lados={lados} total={fichas.length} />
-      ) : (
+      {live && <EscenarioFichas intro={contenido} lados={lados} total={fichas.length} />}
+      {modo === "movil" && <PilaFichasMovil intro={contenido} capitulos={capitulos} fichas={fichas} />}
+      {modo === "grilla" && (
         <div className="relative mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
           <header className="max-w-[62ch]">
             <p id="proyectos-titulo" className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
