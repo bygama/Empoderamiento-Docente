@@ -98,16 +98,20 @@ export async function borrarPersonaEnBase(
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila, EL_PERFIL);
   const borrada = await base.$transaction(async (tx) => {
     await tomarLaLista(tx, LISTAS.equipo);
+    // Los borradores de materiales que la nombran quedan bloqueados hasta el final: un guardado que llegue en el
+    // medio espera y no se pisa. Antes de borrar la fila, que suelta sus autorías: es el orden en que publica un
+    // material (primero su fila, después sus autorías), así los dos no se esperan en cruz.
+    const conBorrador = await tx.$queryRaw<Array<{ id: string; borrador: Prisma.JsonValue }>>`
+      SELECT id, borrador FROM materiales
+      WHERE borrador @> jsonb_build_object('autorias', jsonb_build_array(jsonb_build_object('persona', ${id}::text)))
+      ORDER BY id FOR UPDATE`;
     const { count } = await tx.persona.deleteMany({ where: { id, borradorEn: fila.borradorEn } });
     if (count === 0) return false;
     if (fila.slug) await tx.redireccion.deleteMany({ where: { hacia: `/quienes-somos/equipo/${fila.slug}` } });
-    const conBorrador = await tx.material.findMany({ where: { borrador: { not: Prisma.DbNull } }, select: { id: true, borrador: true } });
-    await Promise.all(
-      conBorrador.flatMap((m) => {
-        const limpio = sinLaPersona(m.borrador, id);
-        return limpio ? [tx.material.update({ where: { id: m.id }, data: { borrador: limpio } })] : [];
-      }),
-    );
+    for (const m of conBorrador) {
+      const limpio = sinLaPersona(m.borrador, id);
+      if (limpio) await tx.material.update({ where: { id: m.id }, data: { borrador: limpio } });
+    }
     return true;
   });
   if (!borrada) return choqueCon(await base.persona.findUnique({ where: { id } }), EL_PERFIL);
