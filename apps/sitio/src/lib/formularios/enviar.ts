@@ -11,6 +11,16 @@ function esRespuesta(valor: unknown): valor is Respuesta {
 }
 
 /**
+ * Un 4xx o 5xx del formulario trae el problema en llano, `{ ok: false, error }`,
+ * y se muestra. Uno que no es suyo (el 413 de Vercel, una página de error) no
+ * tiene esa forma: ahí va `sinRespuesta`.
+ */
+async function problemaDe(r: Response, sinRespuesta: string): Promise<Respuesta> {
+  const cuerpo: unknown = await r.json().catch(() => null);
+  return esRespuesta(cuerpo) && !cuerpo.ok ? cuerpo : { ok: false, error: sinRespuesta };
+}
+
+/**
  * Manda el formulario y devuelve lo que contestó. Si no hubo respuesta (sin
  * conexión) o no se entendió, devuelve `sinRespuesta`: quien lo muestra dice
  * qué hacer en ese caso.
@@ -23,7 +33,8 @@ export async function enviarFormulario(url: string, cuerpo: FormData | object, s
       headers: esFormData ? undefined : { "Content-Type": "application/json" },
       body: esFormData ? cuerpo : JSON.stringify(cuerpo),
     });
-    const respuesta: unknown = await r.json();
+    if (!r.ok) return problemaDe(r, sinRespuesta);
+    const respuesta: unknown = await r.json().catch(() => null);
     return esRespuesta(respuesta) ? respuesta : { ok: false, error: sinRespuesta };
   } catch {
     return { ok: false, error: sinRespuesta };

@@ -67,7 +67,8 @@ export type Dato = { etiqueta: string; valor: string };
  * cambie. Los campos vacíos no se guardan.
  */
 export function datosDe(campos: readonly CampoDeFormulario[], valores: Record<string, string>, columnas: readonly string[]): Dato[] {
+  const propias = new Set(columnas);
   return campos
-    .filter((c) => !columnas.includes(c.clave) && valores[c.clave])
+    .filter((c) => !propias.has(c.clave) && valores[c.clave])
     .map((c) => ({ etiqueta: c.etiqueta, valor: valores[c.clave] }));
 }
