@@ -15,7 +15,8 @@
   `main`, que avanzó con `paginas-inicio` (ver «Abierto»). La lane se cierra
   (se borra esta carpeta) en la ronda que siga a la revisión, antes del
   merge. Para retomar: `.env.local` apunta a `ed_cuentas`, que tiene cuentas
-  de prueba de las tres (contraseña `contrasena-de-prueba-cuentas`); el dev
+  de prueba de las tres (la contraseña se elige de nuevo por «Olvidé mi
+  contraseña», con el enlace en la consola); el dev
   server va en el 3017, con un perfil de navegador aislado.
 
 ## Verification
