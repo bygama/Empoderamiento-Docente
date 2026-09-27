@@ -13,6 +13,7 @@ export const MODULOS_DE_ACTIVIDAD = {
   novedades: "Novedades",
   biblioteca: "Biblioteca",
   mensajes: "Mensajes",
+  metricas: "Métricas",
   ajustes: "Ajustes",
 } as const;
 export type ModuloDeActividad = keyof typeof MODULOS_DE_ACTIVIDAD;
@@ -66,6 +67,10 @@ const MODULO_DE: Record<TipoDeActividad, ModuloDeActividad> = {
   "borro-una-redireccion": "ajustes",
   "cambio-quien-recibe-un-aviso": "ajustes",
   "cambio-los-plazos-de-guarda": "ajustes",
+  "creo-un-enlace": "metricas",
+  "borro-un-enlace": "metricas",
+  "agrego-una-marca": "metricas",
+  "borro-una-marca": "metricas",
 };
 
 export function moduloDe(tipo: TipoDeActividad): ModuloDeActividad {

@@ -80,6 +80,12 @@ export const TIPOS_DE_ACTIVIDAD = [
   "subio-una-foto",
   "reemplazo-una-foto",
   "borro-una-foto",
+  // Métricas (work/metricas-completas/): un link con su nombre en `sobre`; una
+  // marca de la curva, con su texto.
+  "creo-un-enlace",
+  "borro-un-enlace",
+  "agrego-una-marca",
+  "borro-una-marca",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
@@ -93,8 +99,8 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * usa Cuentas; lo que se hace con una novedad, quien edita las novedades; con
  * un material, quien edita la Biblioteca; con un caso, un aliado o una foto,
  * quien edita el contenido (también que se autorizó un logo, aunque marcarlo
- * sea de quien dirige o administra); y lo que se cambia en Ajustes, quien usa
- * Ajustes.
+ * sea de quien dirige o administra); lo que se cambia en Ajustes, quien usa
+ * Ajustes; y un link o una marca de Métricas, quien ve las métricas.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -145,6 +151,10 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "subio-una-foto": "editarContenido",
   "reemplazo-una-foto": "editarContenido",
   "borro-una-foto": "editarContenido",
+  "creo-un-enlace": "verMetricas",
+  "borro-un-enlace": "verMetricas",
+  "agrego-una-marca": "verMetricas",
+  "borro-una-marca": "verMetricas",
 };
 
 /**
@@ -204,6 +214,10 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "subio-una-foto": false,
   "reemplazo-una-foto": true,
   "borro-una-foto": true,
+  "creo-un-enlace": true,
+  "borro-un-enlace": true,
+  "agrego-una-marca": true,
+  "borro-una-marca": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */

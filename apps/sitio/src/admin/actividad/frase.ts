@@ -32,6 +32,9 @@ const foto = (sobre: string | null | undefined) => (sobre ? `la foto «${sobre}�
 
 /** «de» y «a» delante de «el …» se contraen: «del caso 01», «al logo de UNESCO». */
 const contraer = (preposicion: "de" | "a", nombre: string) => (nombre.startsWith("el ") ? `${preposicion}l ${nombre.slice(3)}` : `${preposicion} ${nombre}`);
+/** «el link «Taller»»; sin nombre, «un link»: lo nombrado entre comillas, como una novedad. */
+const entre = (que: "el link" | "la marca", sobre: string | null | undefined) =>
+  sobre ? `${que} «${sobre}»` : que === "el link" ? "un link" : "una marca";
 
 // Un verbo en pasado sobre quien lo hizo, como lo diría una persona. Es un
 // Record para que un tipo nuevo no compile hasta tener su frase.
@@ -87,6 +90,11 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "subio-una-foto": ({ quien, sobre }) => `${quien} subió ${foto(sobre)}`,
   "reemplazo-una-foto": ({ quien, sobre }) => `${quien} reemplazó el archivo de ${foto(sobre)}`,
   "borro-una-foto": ({ quien, sobre }) => `${quien} borró ${foto(sobre)}`,
+  // Métricas: el link por su nombre, la marca por su texto.
+  "creo-un-enlace": ({ quien, sobre }) => `${quien} creó ${entre("el link", sobre)}`,
+  "borro-un-enlace": ({ quien, sobre }) => `${quien} borró ${entre("el link", sobre)}`,
+  "agrego-una-marca": ({ quien, sobre }) => `${quien} agregó ${entre("la marca", sobre)}`,
+  "borro-una-marca": ({ quien, sobre }) => `${quien} borró ${entre("la marca", sobre)}`,
 };
 
 /**

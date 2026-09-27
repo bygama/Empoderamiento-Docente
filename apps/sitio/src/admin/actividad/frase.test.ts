@@ -21,7 +21,7 @@ test("un caso, un aliado y una foto se nombran como en su lista", () => {
   assert.equal(fraseDe({ tipo: "reemplazo-una-foto", quien: "Ana", sobre: "Un aula" }), "Ana reemplazó el archivo de la foto «Un aula»");
 });
 
-test("cada rol ve la actividad de lo que usa: quien edita, la de Contenido, Contacto, Novedades y la Biblioteca, y no la de cuentas ni CV", () => {
+test("cada rol ve la actividad de lo que usa: quien edita, la de Contenido, Contacto, Novedades, la Biblioteca y Métricas, y no la de cuentas ni CV", () => {
   assert.deepEqual(tiposQueVe("administra"), [...TIPOS_DE_ACTIVIDAD]);
   assert.deepEqual(tiposQueVe("edita"), [
     "publico-una-pagina",
@@ -50,7 +50,18 @@ test("cada rol ve la actividad de lo que usa: quien edita, la de Contenido, Cont
     "subio-una-foto",
     "reemplazo-una-foto",
     "borro-una-foto",
+    "creo-un-enlace",
+    "borro-un-enlace",
+    "agrego-una-marca",
+    "borro-una-marca",
   ]);
+});
+
+test("un link y una marca de Métricas se leen por su nombre, entre comillas", () => {
+  assert.equal(fraseDe({ tipo: "creo-un-enlace", quien: "Ana", sobre: "Taller en Monterrey" }), "Ana creó el link «Taller en Monterrey»");
+  assert.equal(fraseDe({ tipo: "borro-un-enlace", quien: "Ana", sobre: null }), "Ana borró un link");
+  assert.equal(fraseDe({ tipo: "agrego-una-marca", quien: "Ana", sobre: "Posteamos en LinkedIn" }), "Ana agregó la marca «Posteamos en LinkedIn»");
+  assert.equal(fraseDe({ tipo: "borro-una-marca", quien: "Ana", sobre: null }), "Ana borró una marca");
 });
 
 test("lo que se cambia en Ajustes se lee con qué cambió, y solo lo ve quien usa Ajustes", () => {
