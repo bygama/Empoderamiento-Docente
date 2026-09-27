@@ -16,3 +16,12 @@
   de Crossref **al escribir la migración** (una vez, en esta máquina) y quedan
   en el SQL como datos fijos: aplicar una migración nunca depende de la red. El
   comentario del SQL dice de dónde y cuándo salieron.
+- 2026-09-27 — **La cita vacía es la generada** (paso 1): el mismo criterio que
+  el padre fijó para la firma en C. `cita` guardada solo cuando alguien la
+  escribió o cuando la fuente trae lo que la generada no sabe (volumen, número
+  y páginas de Crossref); vacía, el sitio arma la cita con los datos de hoy,
+  así nunca queda vieja al corregir un título. «Sigue a los datos hasta que se
+  escribe» (propuesta I) es exactamente eso.
+- 2026-09-27 — **`biblioteca/portadas` entra en las carpetas de fotos** en el
+  paso 1 y no en el 2: el esquema de la portada la valida, y sin ella las 57
+  de hoy no pasarían.
