@@ -809,7 +809,11 @@ Filas separadas por un divisor, en una caja con el mismo borde
   «Restaurar como borrador») las bandejas de Mensajes (quién lo tomó como
   insignia normal, «Abrir» como acción) y dos del Inicio: los pendientes y
   la actividad reciente, de una línea, con el cuándo a la derecha en meta
-  `gris-texto` (4,83:1 · 7,08:1).
+  `gris-texto` (4,83:1 · 7,08:1). Y los links de Métricas › Links para
+  compartir, con su canal como insignia normal y dos acciones: «Copiar»,
+  secundario, que dice «Copiado» un momento y lo anuncia en un `role="status"`
+  aparte, y «Borrar», destructivo, que confirma en el lugar
+  (`work/metricas-completas/`).
 
 ### Filtro
 
