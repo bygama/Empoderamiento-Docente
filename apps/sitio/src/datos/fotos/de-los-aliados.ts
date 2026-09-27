@@ -24,22 +24,23 @@ export const usosEnAliados: UsosDeUnModulo = {
     });
   },
   async reemplazar(tx, vieja, nueva) {
-    let enElSitio = false;
-    for (const fila of await tx.aliado.findMany({ select: { id: true, logo: true, borrador: true, publicado: true, autorizado: true } })) {
-      const logo = cambiarFoto(fila.logo, vieja, nueva);
-      const borrador = cambiarFoto(fila.borrador, vieja, nueva);
-      if (!logo.cambio && !borrador.cambio) continue;
-      // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
-      await tx.aliado.update({
-        where: { id: fila.id },
-        data: {
-          ...(logo.cambio ? { logo: logo.valor as Prisma.InputJsonValue } : {}),
-          ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
-        },
-      });
-      enElSitio ||= logo.cambio && fila.publicado && fila.autorizado;
-    }
+    const filas = await tx.aliado.findMany({ select: { id: true, logo: true, borrador: true, publicado: true, autorizado: true } });
+    const cambios = filas
+      .map((f) => ({ id: f.id, enElSitio: f.publicado && f.autorizado, logo: cambiarFoto(f.logo, vieja, nueva), borrador: cambiarFoto(f.borrador, vieja, nueva) }))
+      .filter((c) => c.logo.cambio || c.borrador.cambio);
+    await Promise.all(
+      cambios.map(({ id, logo, borrador }) =>
+        // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
+        tx.aliado.update({
+          where: { id },
+          data: {
+            ...(logo.cambio ? { logo: logo.valor as Prisma.InputJsonValue } : {}),
+            ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
+          },
+        }),
+      ),
+    );
     // La tira va en el pie de todas las páginas: el layout entero.
-    return enElSitio ? [{ ruta: "/", layout: true }] : [];
+    return cambios.some((c) => c.logo.cambio && c.enElSitio) ? [{ ruta: "/", layout: true }] : [];
   },
 };

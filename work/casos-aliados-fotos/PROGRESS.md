@@ -132,6 +132,28 @@
   usa y tiene más de un día, y está en `TAREAS_DIARIAS`. Su test (el usado y
   el recién subido quedan, el suelto de hace 48 h se va; la segunda corrida
   no encuentra nada) + los del almacén, la poda, «a mano», editar y subir →
-  14 pass, 0 fail, 0 skipped; typecheck 0.
+  14 pass, 0 fail, 0 skipped; typecheck 0. Commit `c1f22b37`.
+- **Paso 12 — Fotos en el admin**: `/admin/contenido/fotos` (el filtro con el
+  número de las sin alt, `GrillaDeFotos` con `MiniaturaDeFoto`, «Subir foto»
+  de primario y el vacío de cada filtro), `/fotos/subir` (el `CampoFoto` del
+  kit, que al subir lleva a la ficha con `?subida=1`) y `/fotos/[id]`
+  (`FichaDeFoto`: el alt como título con su insignia, medidas, peso, tipo y
+  quién la subió; `FormularioDelAlt`; `UsosDeLaFoto`; `SalidaDeLaFoto`, que
+  avisa antes si un uso es del código). `EncabezadoDeContenido` suma
+  `acciones` y `avisos`. react-doctor marcó seis cosas y se arreglaron por
+  código (estado perezoso, el formato fuera del componente, `Intl` al tope y
+  las escrituras del registro y del cron en paralelo con `Promise.all`).
+  «Grilla de fotos» en DESIGN.md §11. En el navegador de Orca (perfil propio
+  `casos-aliados-fotos`, cuenta `edita`): la grilla con las 47 y sus usos; la
+  ficha de `conferencia-problematizacion` con sus tres usos del código;
+  subir un webp → ficha con «Se subió la foto»; editar el alt → aviso y la
+  fila cambiada; reemplazar por un 800×600 → la url nueva, 800×600 en la
+  fila y en `.fotos/` solo el archivo nuevo; borrar → el foco va a
+  «Cancelar», «Sí, borrar» vuelve a la grilla con «Se borró la foto de la
+  biblioteca», sin fila ni archivo; la actividad anotó subió, reemplazó y
+  borró. Las capturas del navegador de Orca fallan («the browser tab may not
+  be visible»): la verificación va por el árbol de accesibilidad y `eval`.
+  `pnpm typecheck` 0, `pnpm --filter sitio lint` 0,
+  `node scripts/verificar-react-doctor.mjs` → 100/100 sin diagnósticos.
 
 ## Abierto

@@ -413,9 +413,10 @@ la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
 (`work/inicio/`); el paginado y la tabla, también (`work/cuentas/`); la sección
 compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`); el estado
 vacío con su acción, la fecha, la selección, la lista variable y la ficha de
-una entidad, también (`work/novedades-y-kit/`); y Ajustes, que no suma
-patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`). Todos
-los contrastes están
+una entidad, también (`work/novedades-y-kit/`); Ajustes, que no suma
+patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); y la
+grilla de fotos, el 2026-09-27 (`work/casos-aliados-fotos/`). Todos los
+contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -713,6 +714,35 @@ columna, dos desde `sm`, tres desde `lg`).
 - Primer consumidor: `/admin/contenido`. Lo usa también `/admin/ajustes`, con
   el estado de cada pantalla; una que pide atención («Nadie recibe los avisos
   de CV», «1 conexión con error») va como insignia fuerte.
+
+### Grilla de fotos
+
+Las fotos de la biblioteca, para reconocerlas de un vistazo: una grilla de
+tarjetas (dos columnas, tres desde `sm`, cuatro desde `lg`).
+`apps/sitio/src/admin/fotos/GrillaDeFotos.tsx`.
+
+- **Cada tarjeta entera es el link a su ficha**, como una del índice: el
+  nombre es el texto alternativo, en meta `azul-principal` (13,63:1 ·
+  13,59:1), cortado en tres renglones; sin alt, «Sin texto alternativo» en
+  meta medium, porque es lo que falta. Cuántos usos tiene («En 3 lugares»,
+  «Sin usar») va debajo, en meta `gris-texto` (4,83:1 · 7,08:1), y se lee como
+  descripción del link.
+- **La miniatura** (`MiniaturaDeFoto`), 4/3 sobre `gris-fondo`, `rounded-lg`:
+  una foto se recorta al centro; un png o un SVG, que puede tener
+  transparencia (casi siempre un logo), va entero con aire. Es decorativa, con
+  alt vacío: el alt ya está escrito debajo. La ficha usa la misma, grande.
+- **Caja:** `rounded-xl`, `p-3`, borde `azul-claro/60` decorativo que pasa a
+  `azul-medio` en hover, foco en la tarjeta entera en `azul-medio` (5,11:1 ·
+  7,14:1). Sin sombra.
+- Arriba, el `Filtro` (Todas · Sin texto alternativo · Sin usar), con el
+  número solo en lo que pide atención: las sin alt.
+- Primer consumidor: Contenido › Fotos. **La ficha de una foto** se arma con
+  lo que ya hay: «← Fotos», el alt como título (cortado en una palabra) con
+  «Sin texto alternativo» (fuerte) o «Sin usar» (apagada); la foto al lado de
+  su texto alternativo, cuyo «Guardar» es el primario; «Se usa en», una
+  `Lista` con cada lugar, su insignia (en el sitio, normal; sin publicar,
+  apagada), el alt con que va ahí y «Editar»; y al pie «Reemplazar o borrar»,
+  las filas de «Deshacer o sacar del sitio».
 
 ### Lista
 

@@ -52,25 +52,25 @@ export const usosEnPaginas: UsosDeUnModulo = {
     });
   },
   async reemplazar(tx, vieja, nueva) {
-    const regenerar: string[] = [];
-    for (const fila of await tx.pagina.findMany()) {
-      const publicado = cambiarFoto(fila.publicado, vieja, nueva);
-      const borrador = cambiarFoto(fila.borrador, vieja, nueva);
-      if (!publicado.cambio && !borrador.cambio) continue;
-      // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
-      await tx.pagina.update({
-        where: { slug: fila.slug },
-        data: {
-          ...(publicado.cambio ? { publicado: publicado.valor as Prisma.InputJsonValue } : {}),
-          ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
-        },
-      });
-      if (publicado.cambio) regenerar.push(...rutasQueMuestran(PAGINAS, fila.slug));
-    }
-    for (const version of await tx.versionDePagina.findMany({ select: { id: true, documento: true } })) {
-      const documento = cambiarFoto(version.documento, vieja, nueva);
-      if (documento.cambio) await tx.versionDePagina.update({ where: { id: version.id }, data: { documento: documento.valor as Prisma.InputJsonValue } });
-    }
+    const [filas, versiones] = await Promise.all([tx.pagina.findMany(), tx.versionDePagina.findMany({ select: { id: true, documento: true } })]);
+    const paginas = filas
+      .map((f) => ({ slug: f.slug, publicado: cambiarFoto(f.publicado, vieja, nueva), borrador: cambiarFoto(f.borrador, vieja, nueva) }))
+      .filter((c) => c.publicado.cambio || c.borrador.cambio);
+    const documentos = versiones.map((v) => ({ id: v.id, documento: cambiarFoto(v.documento, vieja, nueva) })).filter((c) => c.documento.cambio);
+    // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
+    await Promise.all([
+      ...paginas.map(({ slug, publicado, borrador }) =>
+        tx.pagina.update({
+          where: { slug },
+          data: {
+            ...(publicado.cambio ? { publicado: publicado.valor as Prisma.InputJsonValue } : {}),
+            ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
+          },
+        }),
+      ),
+      ...documentos.map(({ id, documento }) => tx.versionDePagina.update({ where: { id }, data: { documento: documento.valor as Prisma.InputJsonValue } })),
+    ]);
+    const regenerar = paginas.filter((c) => c.publicado.cambio).flatMap((c) => rutasQueMuestran(PAGINAS, c.slug));
     return [...new Set(regenerar)].map((ruta) => ({ ruta }));
   },
 };
