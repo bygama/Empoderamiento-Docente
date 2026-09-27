@@ -9,7 +9,8 @@ import { base } from "./cliente";
  * cuenta › Avisos (la cuenta propia) y Ajustes › Avisos (todas), con estas
  * mismas funciones. Recibe una cuenta activa cuyo rol tiene la capacidad del
  * aviso (`puede`, nunca el string de un rol): una suspendida no entra al
- * admin, y no recibe nada. Mandar el de un mensaje nuevo es de
+ * admin, y no recibe nada. Cambiar quién recibe uno desde Ajustes es de
+ * `quien-recibe.ts`, y mandar el de un mensaje nuevo, de
  * `avisar-mensaje-nuevo.ts`.
  */
 
@@ -19,7 +20,7 @@ export type Destinatario = { id: string; nombre: string; correo: string };
 export type DestinatarioConRol = Destinatario & { rol: string };
 
 /** Si una cuenta recibe el aviso, con sus filas de `avisos`: la suya si la tiene, o lo de fábrica. */
-function recibe(aviso: ClaveDeAviso, filas: ReadonlyArray<{ aviso: string; activo: boolean }>): boolean {
+export function recibe(aviso: ClaveDeAviso, filas: ReadonlyArray<{ aviso: string; activo: boolean }>): boolean {
   return filas.find((f) => f.aviso === aviso)?.activo ?? AVISOS[aviso].deFabrica;
 }
 
@@ -67,26 +68,5 @@ export async function avisosDeTodas(rol: unknown): Promise<AvisoConCuentas[]> {
       .filter((c) => puede(c.rol, AVISOS[aviso].capacidad))
       .map((c) => ({ id: c.id, nombre: c.name, correo: c.email, activo: recibe(aviso, c.avisos) })),
   }));
-}
-
-/**
- * Deja ese aviso prendido para las cuentas de `cuentaIds` y apagado para las
- * demás que lo pueden recibir; un id que no puede recibirlo no cuenta. Escribe
- * solo las que cambian, y devuelve cuántas lo reciben y cuántas cambiaron.
- * Quien llama ya chequeó `usarAjustes`.
- */
-export async function ponerQuienRecibe(aviso: ClaveDeAviso, cuentaIds: readonly string[]): Promise<{ reciben: number; cambiaron: number }> {
-  const elegidas = new Set(cuentaIds);
-  const pueden = (
-    await base.user.findMany({ where: { suspendida: false }, select: { id: true, rol: true, avisos: { where: { aviso }, select: { aviso: true, activo: true } } } })
-  ).filter((c) => puede(c.rol, AVISOS[aviso].capacidad));
-  // Sin fila, vale lo de fábrica: cambia la que queda distinta de como está.
-  const cambian = pueden.filter((c) => recibe(aviso, c.avisos) !== elegidas.has(c.id));
-  await base.$transaction(
-    cambian.map(({ id }) =>
-      base.aviso.upsert({ where: { cuentaId_aviso: { cuentaId: id, aviso } }, create: { cuentaId: id, aviso, activo: elegidas.has(id) }, update: { activo: elegidas.has(id) } }),
-    ),
-  );
-  return { reciben: pueden.filter(({ id }) => elegidas.has(id)).length, cambiaron: cambian.length };
 }
 

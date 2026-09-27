@@ -7,7 +7,8 @@ import { SIN_PERMISO, puede } from "@ed/auth";
 import { AVISOS, esAviso } from "@/config/avisos";
 import { registrarActividad } from "@/datos/actividad";
 import { auth } from "@/datos/auth";
-import { avisosDe, guardarAviso, ponerQuienRecibe } from "@/datos/avisos";
+import { avisosDe, guardarAviso } from "@/datos/avisos";
+import { ponerQuienRecibe } from "@/datos/quien-recibe";
 
 // Los avisos de Mi cuenta (work/mensajes/SPEC.md §9): cuáles de los del
 // registro (`config/avisos.ts`) le mandan un correo a quien tiene la sesión.
@@ -36,20 +37,20 @@ export async function guardarMisAvisos(activas: string[]): Promise<{ ok: boolean
 
 // Ajustes › Avisos (work/ajustes/SPEC.md §2.4): quién recibe un aviso, visto
 // desde las cuentas. Es la misma preferencia que Mi cuenta › Avisos, así que
-// escribe con la misma función; esta sí pide `usarAjustes`, porque toca las
-// cuentas de otras personas.
+// escribe en la misma tabla; esta sí pide `usarAjustes`, porque toca las
+// cuentas de otras personas. Toca solo las que la pantalla mostró (`mostradas`).
 
-const esquemaDeQuienRecibe = z.object({ aviso: z.string().max(40), cuentas: z.array(z.string().max(100)).max(200) });
+const esquemaDeQuienRecibe = z.object({ aviso: z.string().max(40), cuentas: z.array(z.string().max(100)).max(200), mostradas: z.array(z.string().max(100)).max(200) });
 
-export async function guardarQuienRecibe(pedido: { aviso: string; cuentas: string[] }): Promise<{ ok: boolean; detalle: string }> {
+export async function guardarQuienRecibe(pedido: { aviso: string; cuentas: string[]; mostradas: string[] }): Promise<{ ok: boolean; detalle: string }> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para cambiar quién recibe los avisos." };
     if (!puede(sesion.user.rol, "usarAjustes")) return { ok: false, detalle: SIN_PERMISO };
     const valido = esquemaDeQuienRecibe.safeParse(pedido);
     if (!valido.success || !esAviso(valido.data.aviso)) return { ok: false, detalle: "Ese aviso no existe." };
-    const { aviso, cuentas } = valido.data;
-    const { reciben, cambiaron } = await ponerQuienRecibe(aviso, cuentas);
+    const { aviso, cuentas, mostradas } = valido.data;
+    const { reciben, cambiaron } = await ponerQuienRecibe(aviso, { mostradas, elegidas: cuentas });
     // Guardar sin tocar nada no es un cambio: no va a la actividad.
     if (cambiaron) {
       revalidatePath("/admin/ajustes", "layout");
