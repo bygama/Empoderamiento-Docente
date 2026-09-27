@@ -25,6 +25,7 @@
 | Estilo de código  | [`conventions/CODE-STYLE.md`](conventions/CODE-STYLE.md) | Decisiones de estilo que las tools no enforce-an + índice de configs |
 | Código IA-friendly| [`AI_GUIDELINES.md`](AI_GUIDELINES.md)          | Reglas detalladas: naming, archivos chicos, TS, Tailwind v4, GSAP            |
 | ADRs              | [`architecture/adrs/`](architecture/adrs/README.md) | Decisiones arquitectónicas (stack base, Neon, el admin a medida, Prisma, etc.) |
+| Deploy            | [`deploy/vps.md`](deploy/vps.md) · [`deploy/vercel.md`](deploy/vercel.md) | Los dos hosts del mismo código: el runbook del VPS de Hostinger (Docker Compose, respaldos, Umami) y el proyecto de Vercel; la mudanza de uno a otro (ADR-0018) |
 | Diseño del admin  | [`architecture/specs/2026-09-18-admin-a-medida-diseno.md`](architecture/specs/2026-09-18-admin-a-medida-diseno.md) | El admin a medida sobre Neon + Prisma: arquitectura, mapa de URLs, modelo de contenido, seguridad y fases |
 | Monorepo          | [`architecture/specs/2026-09-17-monorepo-apps-diseno.md`](architecture/specs/2026-09-17-monorepo-apps-diseno.md) | El repo pasa a `apps/`: por qué una app y no dos, cómo queda el gate multi-proyecto, qué se muda y en qué orden |
 
@@ -41,6 +42,7 @@
 | Entender la arquitectura del proyecto             | `../AGENTS.md` §1 + §3 → [`architecture/adrs/0001-stack-base.md`](architecture/adrs/0001-stack-base.md) |
 | Instalar y correr local                           | [`../README.md`](../README.md) (getting started) → `package.json` scripts (`pnpm dev` / `build` / `start` / `lint` / `typecheck`) |
 | Entender el backend / el admin (Neon + Prisma)    | `../AGENTS.md` §12 → [`architecture/adrs/0005-admin-a-medida.md`](architecture/adrs/0005-admin-a-medida.md) → [`architecture/specs/2026-09-18-admin-a-medida-diseno.md`](architecture/specs/2026-09-18-admin-a-medida-diseno.md) |
+| Deployar, operar el VPS o mudarse de host        | [`deploy/vps.md`](deploy/vps.md) o [`deploy/vercel.md`](deploy/vercel.md) → [`architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md`](architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md) |
 | Ponerte al día con el estado del proyecto         | `../AGENTS.md` §13 (Estado del proyecto)                                             |
 
 ---
