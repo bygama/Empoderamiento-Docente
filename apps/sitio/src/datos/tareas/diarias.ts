@@ -1,5 +1,6 @@
 import { correrTareas, type Corrida } from "@/lib/tareas/corredor";
 import { definirTareas } from "@/lib/tareas/registro";
+import { archivosDeFotosSueltos } from "./archivos-de-fotos-sueltos";
 import { copiaDeSearchConsole } from "./busquedas-de-google";
 import { registrarCorrida } from "./corridas";
 import { indexacionDeGoogle } from "./indexacion-de-google";
@@ -23,6 +24,7 @@ export const TAREAS_DIARIAS = definirTareas([
   retencionDeCV,
   podaDeLimitesPorIp,
   saludDeLinks,
+  archivosDeFotosSueltos,
 ]);
 
 /**

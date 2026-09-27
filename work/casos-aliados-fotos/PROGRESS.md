@@ -123,5 +123,15 @@
   medio escribir) con su actividad. `editar-fotos.test.ts` +
   `consultas/fotos.test.ts` + `subir-foto.test.ts` +
   `acciones-con-sesion.test.ts` → 22 pass, 0 fail, 0 skipped; typecheck 0.
+  Commit `d13982ac`.
+- **Paso 11 — los archivos sueltos, en el cron**: `Almacen` suma `listar()`
+  (Blob, de a páginas; el disco, los `<uuid>.<ext>` con su fecha); lo del
+  disco se mudó a `lib/contenido/almacen-en-disco.ts` (y su test, con
+  `git mv`) para que `almacen.ts` quede bajo las 100 líneas; la tarea
+  `archivos-de-fotos-sueltos` (`datos/tareas/`) borra lo que ninguna fila
+  usa y tiene más de un día, y está en `TAREAS_DIARIAS`. Su test (el usado y
+  el recién subido quedan, el suelto de hace 48 h se va; la segunda corrida
+  no encuentra nada) + los del almacén, la poda, «a mano», editar y subir →
+  14 pass, 0 fail, 0 skipped; typecheck 0.
 
 ## Abierto

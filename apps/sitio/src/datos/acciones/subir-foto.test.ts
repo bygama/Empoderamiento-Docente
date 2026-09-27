@@ -6,7 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import { config as cargarEntorno } from "dotenv";
 import sharp from "sharp";
-import { almacenEnDisco } from "@/lib/contenido/almacen";
+import { almacenEnDisco } from "@/lib/contenido/almacen-en-disco";
 
 // Subir contra el Postgres local, con los archivos en una carpeta temporal.
 // Las filas de prueba llevan el alt «Prueba subir…» y se borran al final.
