@@ -9,8 +9,8 @@
 # Por qué no `docker compose up` a secas: el sitio se prerenderiza leyendo la
 # base, y un `docker build` no llega a la base del compose. Así que primero se
 # migra, después el servicio `construir` corre `next build` adentro de la red
-# y deja el standalone en `.compilado/`, y recién con eso se arma la imagen
-# `app`, etiquetada con el commit para poder volver (`scripts/volver.sh`).
+# y saca el standalone como un tar, que es el contexto de la imagen `app`,
+# etiquetada con el commit para poder volver (`scripts/volver.sh`).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -29,24 +29,21 @@ fi
 
 paso() { printf '\n== %s\n' "$*"; }
 
-paso "1/6 La imagen fuente (dependencias y Prisma)"
+paso "1/5 La imagen fuente (dependencias y Prisma)"
 docker compose build migrar
 
-paso "2/6 La base"
+paso "2/5 La base"
 docker compose up -d --wait db
 
-paso "3/6 Las migraciones"
+paso "3/5 Las migraciones"
 docker compose run --rm migrar
 
-paso "4/6 El build del sitio, con la base"
-mkdir -p .compilado
-docker compose run --rm --no-deps construir
-
-paso "5/6 La imagen app, versión $version"
-ED_VERSION="$version" docker compose build app
+paso "4/5 El build del sitio con la base, y la imagen app $version"
+# -T: sin terminal, para que por stdout salga solo el tar.
+docker compose run --rm -T --no-deps construir | docker build --target app -t "ed-sitio:$version" -
 docker tag "ed-sitio:$version" ed-sitio:actual
 
-paso "6/6 Levantar todo con la versión nueva"
+paso "5/5 Levantar todo con la versión nueva"
 docker compose up -d --wait --remove-orphans
 
 paso "Quedan las últimas $GUARDAR imágenes de app"

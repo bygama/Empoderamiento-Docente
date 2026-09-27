@@ -1,10 +1,9 @@
 # El sitio en un VPS (docs/deploy/vps.md, ADR-0018).
 #
 # **Se levanta con `scripts/desplegar.sh`, no con `docker compose up` a
-# secas.** La imagen `app` se arma desde `.compilado/`, que deja el servicio
-# `construir` después de migrar: el sitio se prerenderiza leyendo la base, y
-# eso solo pasa adentro de esta red. Sin `.compilado/`, `up` no tiene de dónde
-# sacar la imagen.
+# secas.** La imagen `app` sale del build que corre el servicio `construir`
+# después de migrar: el sitio se prerenderiza leyendo la base, y eso solo pasa
+# adentro de esta red. Sin esa imagen, `up` no tiene de dónde sacarla.
 #
 # Solo `proxy` publica puertos. `app`, `db` y `analitica` se alcanzan nada más
 # por la red interna, y por eso la app puede confiar en la IP que le pasa Caddy.
@@ -66,20 +65,18 @@ services:
   construir:
     image: ed-fuente:actual
     profiles: ["construir"]
+    # Saca un tar por stdout: el contexto de la imagen `app`.
     command: ["sh", "deploy/construir.sh"]
     environment: *entorno-de-la-app
-    volumes:
-      - ./.compilado:/compilado
     depends_on:
       migrar:
         condition: service_completed_successfully
 
   app:
-    image: ed-sitio:${ED_VERSION:-actual}
-    build:
-      context: ./.compilado
-      dockerfile: ../Dockerfile
-      target: app
+    # La arma scripts/desplegar.sh con el commit como etiqueta; `actual` es la
+    # que corre (scripts/volver.sh la cambia).
+    image: ed-sitio:actual
+    pull_policy: never
     restart: unless-stopped
     environment: *entorno-de-la-app
     volumes:
