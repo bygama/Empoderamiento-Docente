@@ -144,14 +144,15 @@ un release candidate de la 8 (ADR-0007).
 ├── packages/              ← LO REUSABLE, cero dominio de ED adentro
 │   ├── db/                ← cliente Prisma, slugs, redirecciones
 │   ├── auth/              ← better-auth configurado, permisos, guarda
-│   └── kit-admin/         ← tabla, formulario, controles, uploader (fase 2)
+│   └── kit-admin/         ← los controles de un formulario, el botón y el aviso; el
+│                            README dice qué tokens espera de la app (ADR-0014)
 └── apps/
     └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz
         ├── .env.example   ← las variables son de la app
         ├── public/        ← assets estáticos (brand/, imágenes)
         ├── prisma/        ← el modelo de datos
-        │   ├── schema/      ← base · auth · sitio (contenido: fase 2)
+        │   ├── schema/      ← base · auth · sitio · y un archivo por tabla de contenido (paginas, novedades…)
         │   └── migrations/  ← generadas, se commitean; una aplicada no se toca (§12)
         ├── (config)       ← tsconfig.json, eslint.config.mjs,
         │                     next.config.ts, postcss.config.mjs
@@ -173,9 +174,9 @@ un release candidate de la 8 (ADR-0007).
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
             │   ├── roles.ts     ← el único camino para cambiar un rol (ponerRol: prende el segundo factor si lo pide)
             │   ├── sobre-cuentas.ts ← lo común de las acciones de Cuentas (queSePuede sobre la cuenta, borrar si nunca hizo nada)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion)
-            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, choque, mover-mensajes)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades)
+            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, choque, mover-mensajes)
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes
             ├── admin/         ← las pantallas del admin
@@ -184,8 +185,9 @@ un release candidate de la 8 (ADR-0007).
             │   ├── actividad/   ← cómo se lee cada tipo de actividad (frase.ts), para el Inicio y Cuentas
             │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)
             │   ├── mensajes/    ← las bandejas de Contacto y CV y la ficha de cada mensaje
-            │   ├── campos/      ← los controles del formulario; se mudan a kit-admin en la fase 2
-            │   └── <entidad>/   ← Lista, Formulario y sus límites (fase 2)
+            │   ├── novedades/   ← la primera entidad: la lista, la ficha con su formulario y su panel, «Qué cambió» (cambios.ts)
+            │   ├── campos/      ← el generador de formularios de las páginas (Campo.tsx) y sus errores; los controles son del kit
+            │   └── <entidad>/   ← las que siguen, como novedades/ (fase 3)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
             ├── proxy.ts       ← sesión · cabeceras (CSP con nonce en el admin) · rebote Strict
             ├── correos/       ← las plantillas de los correos y por dónde salen (Resend o consola)
@@ -200,9 +202,11 @@ un release candidate de la 8 (ADR-0007).
             │   │                   una subcarpeta con su nombre y el
             │   │                   compositor se queda en su ruta
             │   │                   (AI_GUIDELINES §2)
-            │   └── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
+            │   ├── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
+            │   └── novedades/contenido/ ← además, los dos esquemas de una novedad (novedad.ts) y lo que no
+            │                       necesita Zod (modelo.ts: categorías, topes); y imagen-para-redes/ (next/og)
             ├── config/        ← site.ts (datos institucionales) + nav.ts · mensajes.ts (bandejas y estados) · privacidad.ts (los plazos de borrado) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO)
-            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar): sin dominio de ED
+            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), rss.ts (el feed): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -586,10 +590,10 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 > `packages/auth`, `apps/sitio/prisma/` con sus migraciones,
 > `apps/sitio/src/datos/`, `apps/sitio/src/admin/`, `proxy.ts` y
 > `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
-> lo que hay. Lo único que todavía no existe es `packages/kit-admin`, que nace
-> en la fase 2 contra una entidad de verdad. De las tablas de contenido existen
-> `paginas`, `versiones_de_paginas` y `fotos` (spec del admin §6); las de las
-> entidades llegan con ellas.
+> lo que hay. La fase 2 también: `packages/kit-admin` nació con Novedades, la
+> primera entidad. De las tablas de contenido existen `paginas`,
+> `versiones_de_paginas`, `fotos` y `novedades` (spec del admin §6); las de las
+> demás entidades llegan con ellas.
 
 Reglas para el admin y sus datos:
 
@@ -611,6 +615,13 @@ Reglas para el admin y sus datos:
   de un `DROP`), y solo **antes de su primera aplicación**: `pnpm migrate
   --create-only`, el SQL comentado en el mismo archivo (qué mueve y por qué) y
   recién ahí `pnpm migrate` (ADR-0011).
+- **Una entidad tiene lo publicado en columnas y el borrador en un
+  documento** ([ADR-0014](docs/architecture/adrs/0014-kit-admin-y-modelo-de-entidad.md)):
+  el sitio lee las columnas y la base garantiza sobre ellas (la URL única, la
+  destacada única); el borrador es un `jsonb` que puede estar incompleto. Dos
+  esquemas Zod, uno para guardar y otro para publicar (y leer), y seis
+  acciones: crear, guardar, publicar, despublicar, descartar y borrar.
+  Novedades es el molde de las que siguen.
 - **Nada de meta-capa de configuración para los formularios.** Cada entidad
   escribe el suyo con los primitivos de `packages/kit-admin`. Un objeto que un
   renderizador genérico traduce a formulario es el modelo de Payload, y es cómo
@@ -637,10 +648,10 @@ Reglas para el admin y sus datos:
     etiqueta, ayuda, largo, opciones, cantidad. Nada de
     visibilidad condicional, componentes propios por campo ni hooks. Una
     sección que los necesite escribe su formulario a mano.
-  - **Los controles no conocen el generador.** Los de `admin/campos/` reciben
-    props planas y la subida de fotos por prop; solo `Campo.tsx` conoce
-    `Descripcion` y las acciones de `datos/`. Así se mudan a
-    `packages/kit-admin` en la fase 2 sin llevárselo.
+  - **Los controles no conocen el generador.** Viven en `packages/kit-admin`
+    y reciben props planas y la subida de fotos por prop; solo `Campo.tsx`,
+    que se quedó en `admin/campos/`, conoce `Descripcion` y las acciones de
+    `datos/`.
 - **Se escribe en vocabulario relacional**: tablas, columnas y controles. No
   «colecciones», «globals» ni `CollectionConfig`.
 - **Validar todos los bordes con Zod** antes de escribir o leer, incluidas las
@@ -729,8 +740,11 @@ define al implementar cada fase.
       muestra una entidad (casos, materiales), solo los textos propios de la
       sección. Una página que no es la raíz hereda la imagen del sitio con
       `openGraphDeLaPagina` (`config/metadata.ts`), y un test lo cuida.
-- [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
-      novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`.
+- [x] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
+      novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`
+      (`/novedades`, cada ficha, el Inicio y `/novedades/rss.xml`). Las nueve de
+      hoy entraron por la migración y su `data.ts` se borró. Diseño en
+      `work/novedades-y-kit/` y el modelo en el ADR-0014.
 - [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
       aliados, páginas y ajustes.
 - [ ] **Admin, fase 4 — URLs y SEO:** las 26 rutas nuevas (15 perfiles, 4 casos,
