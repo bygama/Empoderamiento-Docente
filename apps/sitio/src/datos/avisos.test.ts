@@ -45,12 +45,16 @@ test("reciben las cuentas activas cuyo rol ve la bandeja y no apagaron su aviso"
   assert.deepEqual(nuestras((await destinatariosDe("contacto")).map((d) => d.id)), [ADMINISTRA, EDITA, CALLADA].sort());
 });
 
-test("cada cuenta ve un aviso por cada uno que su rol recibe, activado de fábrica", sinBase, async () => {
+test("cada cuenta ve un aviso por cada uno que su rol recibe: los de bandeja prendidos de fábrica, el resumen apagado", sinBase, async () => {
   const { avisosDe, guardarAviso } = await import("./avisos");
-  assert.deepEqual(await avisosDe(EDITA, "edita"), [{ aviso: "contacto", activo: true }]);
+  assert.deepEqual(await avisosDe(EDITA, "edita"), [
+    { aviso: "contacto", activo: true },
+    { aviso: "resumen-semanal", activo: false },
+  ]);
   assert.deepEqual(await avisosDe(CALLADA, "administra"), [
     { aviso: "contacto", activo: true },
     { aviso: "cv", activo: false },
+    { aviso: "resumen-semanal", activo: false },
   ]);
   await guardarAviso(CALLADA, "cv", true);
   assert.equal((await avisosDe(CALLADA, "administra"))[1]?.activo, true);
@@ -98,11 +102,36 @@ test("poner quién recibe prende las elegidas y apaga las demás que pueden; un 
     assert.ok(primera.cambiaron >= 2, "prende la callada y apaga la que administra (y las de la base que lo tenían)");
     assert.equal((await avisosDe(CALLADA, "administra"))[1]?.activo, true);
     assert.equal((await avisosDe(ADMINISTRA, "administra"))[1]?.activo, false);
-    assert.deepEqual(await avisosDe(EDITA, "edita"), [{ aviso: "contacto", activo: true }]);
+    assert.deepEqual(await avisosDe(EDITA, "edita"), [
+      { aviso: "contacto", activo: true },
+      { aviso: "resumen-semanal", activo: false },
+    ]);
     // Guardar lo mismo otra vez no cambia nada, y la acción no lo anota en la actividad.
     assert.deepEqual(await ponerQuienRecibe("cv", [CALLADA, EDITA]), { reciben: 1, cambiaron: 0 });
   } finally {
     await base.aviso.deleteMany({ where: { aviso: "cv", cuentaId: { notIn: CUENTAS.map((c) => c.id) } } });
+    if (antes.length) await base.aviso.createMany({ data: antes });
+  }
+});
+
+test("el resumen semanal lo recibe solo quien lo prende, aunque su rol lo pueda recibir", sinBase, async () => {
+  const { avisosDeTodas, destinatariosDe, guardarAviso, ponerQuienRecibe } = await import("./avisos");
+  assert.deepEqual(nuestras((await destinatariosDe("resumen-semanal")).map((d) => d.id)), []);
+  await guardarAviso(EDITA, "resumen-semanal", true);
+  assert.deepEqual(nuestras((await destinatariosDe("resumen-semanal")).map((d) => d.id)), [EDITA]);
+  const resumen = (await avisosDeTodas("administra")).find((a) => a.aviso === "resumen-semanal");
+  assert.deepEqual(
+    nuestras((resumen?.cuentas ?? []).filter((c) => c.activo).map((c) => c.id)),
+    [EDITA],
+  );
+  // Desde Ajustes, prender a quien administra y apagar a quien edita cambia esas dos, y nada más de las nuestras.
+  const { base } = await import("@/datos/cliente");
+  const antes = await base.aviso.findMany({ where: { aviso: "resumen-semanal", cuentaId: { notIn: CUENTAS.map((c) => c.id) } } });
+  try {
+    await ponerQuienRecibe("resumen-semanal", [ADMINISTRA]);
+    assert.deepEqual(nuestras((await destinatariosDe("resumen-semanal")).map((d) => d.id)), [ADMINISTRA]);
+  } finally {
+    await base.aviso.deleteMany({ where: { aviso: "resumen-semanal", cuentaId: { notIn: CUENTAS.map((c) => c.id) } } });
     if (antes.length) await base.aviso.createMany({ data: antes });
   }
 });
