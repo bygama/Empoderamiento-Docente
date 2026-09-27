@@ -363,7 +363,8 @@ el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
 vista previa de buscador y redes, también (`work/paginas-inicio/`); el
 número, el filtro, el buscador, «volver», confirmar lo que no se deshace y
 la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
-(`work/inicio/`); el paginado y la tabla, también (`work/cuentas/`). Todos
+(`work/inicio/`); el paginado y la tabla, también (`work/cuentas/`); la sección
+compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`). Todos
 los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
@@ -947,6 +948,28 @@ que lo lea quien usa lector de pantalla o quien lee despacio.
   en el color del aviso (5,75:1 en el error, 11,63:1 en la confirmación), fuera
   del texto con el `role`, para que no se anuncie como parte del mensaje.
 - `gris-texto` no va sobre `azul-claro/30`: da 4,12:1.
+
+### Sección compartida
+
+Lo que dos páginas muestran igual vive en una sola, la dueña, y el editor lo
+avisa en la tarjeta de la sección, en las dos puntas: una línea debajo del
+título, antes de los campos. `apps/sitio/src/admin/paginas/AvisoDeCompartida.tsx`.
+
+- **Del lado de quien usa**, dónde se edita, con el link a la sección de la
+  dueña: «Las siete áreas se editan en [Qué hacemos › Áreas de
+  especialización]: las comparten las dos páginas.»
+- **Del lado de la dueña**, quién más lo muestra y qué pasa al publicar:
+  «Inicio también muestra las siete áreas: al publicar Qué hacemos, cambian
+  las dos páginas.»
+- **La línea:** meta `azul-principal` (13,63:1 · 13,59:1 en el oscuro) con el
+  ícono `Enlace` a 16 px en `azul-medio`, decorativo. El link en meta medium
+  `azul-medio` (5,11:1 · 7,14:1), **subrayado siempre**: adentro de una frase
+  el color solo no alcanza (`azul-medio` contra `azul-principal` no llega a
+  3:1); en hover pasa a `azul-principal`, y el foco es el de siempre.
+- **No es un aviso de arriba:** no contesta a una acción, describe la
+  sección, así que no lleva `role`, ni borde, ni ×. Sin verde ni naranja.
+- Primer consumidor: las áreas y las frases del método, que Inicio toma de
+  Qué hacemos.
 
 ### Qué cambió
 
