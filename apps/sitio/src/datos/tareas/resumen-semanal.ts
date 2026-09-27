@@ -80,7 +80,7 @@ export async function mandarResumenSemanal({
   return { ok: salieron === personas.length, detalle: `Salió a ${salieron} de ${personas.length} ${personas.length === 1 ? "persona" : "personas"}.` };
 }
 
-// Lee la ventana de 7 días que termina el domingo, y esa la escribe la copia de Vercel de la misma corrida: la espera.
+// Lee la ventana de 7 días que termina el domingo, y esa la escribe la copia de las visitas de la misma corrida: la espera.
 export const resumenSemanalDeMetricas: Tarea = {
   clave: "resumen-semanal",
   nombre: "Resumen semanal por correo",

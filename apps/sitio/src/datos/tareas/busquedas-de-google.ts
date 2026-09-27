@@ -13,7 +13,7 @@ import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 /** La primera vez y como máximo: Google guarda 16 meses, y 90 días alcanzan para el período de Búsquedas y su anterior. */
 const MAXIMO_DIAS = 90;
 
-// `total` es la marca de agua, como en la copia de Vercel: la próxima corrida
+// `total` es la marca de agua, como en la copia de las visitas: la próxima corrida
 // sigue desde la fila `total` más nueva. Por eso va última: si una dimensión
 // falla, la marca no avanza sin que el rango haya entrado entero.
 const ORDEN: readonly DimensionDeBusqueda[] = ["consulta", "pagina", "pais", "total"];

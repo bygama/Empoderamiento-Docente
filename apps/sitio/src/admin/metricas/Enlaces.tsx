@@ -7,7 +7,7 @@ import { Bloque } from "./Seccion";
  * Métricas › Links para compartir (SPEC de work/metricas-completas/ §6.4):
  * crear un link corto propio arriba y la lista abajo. El clic se cuenta en
  * el servidor, sin cookies; las visitas, con el `utm_campaign` que agrega la
- * redirección, cuando el plan de Vercel las cuenta. Si no se miden, se dice
+ * redirección, cuando la fuente las cuenta (Umami sí; Vercel Hobby, no). Si no se miden, se dice
  * una vez en la explicación de la lista, no en cada fila.
  */
 export async function Enlaces() {

@@ -103,7 +103,7 @@ test("el resumen semanal trae los números contra la semana anterior, la página
     numeros: [
       { etiqueta: "Visitantes", valor: 1234, variacion: "+12 %" },
       { etiqueta: "Contactos enviados", valor: 0, variacion: "sin datos previos" },
-      { etiqueta: "Vistas", valor: null, nota: "La copia de Vercel todavía no llegó al domingo" },
+      { etiqueta: "Vistas", valor: null, nota: "La copia de las visitas todavía no llegó al domingo" },
     ],
     paginaMasVista: { nombre: "Inicio", vistas: 520 },
     enlace: "https://ed.test/admin/metricas?periodo=7",
@@ -111,7 +111,7 @@ test("el resumen semanal trae los números contra la semana anterior, la página
   assert.equal(correo.asunto, "El sitio en la semana del 21 al 27 de septiembre");
   assert.ok(correo.texto.includes("Visitantes: 1.234 (+12 % contra la semana anterior)"));
   assert.ok(correo.texto.includes("Contactos enviados: 0 (sin datos de la semana anterior)"));
-  assert.ok(correo.texto.includes("Vistas: — (La copia de Vercel todavía no llegó al domingo)"));
+  assert.ok(correo.texto.includes("Vistas: — (La copia de las visitas todavía no llegó al domingo)"));
   assert.ok(correo.texto.includes("La página más vista fue Inicio, con 520 vistas."));
   assert.ok(correo.texto.includes("https://ed.test/admin/metricas?periodo=7"));
   assert.match(correo.texto, /Lo apagás en Mi cuenta/);

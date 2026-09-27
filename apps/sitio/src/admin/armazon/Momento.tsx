@@ -9,7 +9,7 @@ const DIA = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "numeric",
  * Una fecha en la zona de quien mira: absoluta («21/9 a las 14:05») o
  * relativa («hace 3 minutos», como pide el SPEC §2 para el borrador), o solo el
  * día con su año (`dia`: «Se borra el 27/9/2028»). El
- * servidor la renderiza con su reloj y su zona (UTC en Vercel) y el navegador
+ * servidor la renderiza con su reloj y su zona (UTC en Vercel y en el VPS) y el navegador
  * la corrige al hidratar: `suppressHydrationWarning` existe para esto y solo
  * cubre este elemento. La relativa se recalcula en cada render, o sea cada
  * vez que el estado del editor cambia.

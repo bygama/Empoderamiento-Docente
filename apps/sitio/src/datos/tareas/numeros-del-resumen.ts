@@ -29,11 +29,11 @@ const contra = (etiqueta: string, actual: number, previo: number | null): Numero
 const sinNumero = (etiquetas: string[], nota: string): NumeroDelResumen[] => etiquetas.map((etiqueta) => ({ etiqueta, valor: null, nota }));
 
 /** Visitantes y vistas de la ventana de 7 días que termina el domingo, contra la del domingo anterior. */
-async function deVercel(semana: Semana): Promise<NumeroDelResumen[]> {
+async function deLasVisitas(semana: Semana): Promise<NumeroDelResumen[]> {
   if (!hayVariablesDeMetricas()) return sinNumero(["Visitantes", "Vistas"], SIN_VARIABLES_DE_METRICAS);
   const ventana = (fin: Dia) => base.metricaVentana.findUnique({ where: { fechaFin_dias: { fechaFin: fechaUTC(fin), dias: 7 } } });
   const [esta, previa] = await Promise.all([ventana(semana.hasta), ventana(anterior(semana).hasta)]);
-  if (!esta) return sinNumero(["Visitantes", "Vistas"], "La copia de Vercel todavía no llegó al domingo");
+  if (!esta) return sinNumero(["Visitantes", "Vistas"], "La copia de las visitas todavía no llegó al domingo");
   return [contra("Visitantes", esta.visitantes, previa?.visitantes ?? null), contra("Vistas", esta.vistas, previa?.vistas ?? null)];
 }
 
@@ -55,7 +55,7 @@ async function deLosCV(semana: Semana, contar: typeof cvRecibidos): Promise<Nume
  */
 export async function numerosDelResumen(rol: unknown, semana: Semana, { contarCV = cvRecibidos }: { contarCV?: typeof cvRecibidos } = {}): Promise<NumeroDelResumen[]> {
   const [vercel, contactos, cv, materiales] = await Promise.all([
-    deVercel(semana),
+    deLasVisitas(semana),
     deUnContador("contacto-envio", "Contactos enviados", semana),
     puede(rol, "verCV") ? deLosCV(semana, contarCV) : Promise.resolve(null),
     deUnContador("material-consultado", "Materiales consultados", semana),

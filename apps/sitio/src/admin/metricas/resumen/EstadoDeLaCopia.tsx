@@ -7,7 +7,7 @@ const fechaLarga = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "lo
 const horaCorta = new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short", timeZone: "UTC" });
 
 /**
- * Hasta qué día llega la copia de Vercel y cuándo se actualizó, en una línea;
+ * Hasta qué día llega la copia de las visitas y cuándo se actualizó, en una línea;
  * y, si la última corrida falló, el aviso con el porqué. Lo leen Resumen y
  * Origen, que muestran la misma copia.
  */

@@ -3,7 +3,7 @@ import type { EstadoDeMetricas } from "@/datos/consultas/metricas";
 import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 
 /**
- * Lo que ve una pantalla que lee la copia de Vercel cuando todavía no hay
+ * Lo que ve una pantalla que lee la copia de las visitas cuando todavía no hay
  * ninguna: faltan las variables, o todavía no corrió. `null` si hay datos.
  * Lo usan Resumen y Origen, con las mismas palabras que el Inicio.
  */

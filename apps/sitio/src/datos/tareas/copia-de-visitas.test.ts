@@ -5,6 +5,12 @@ import { diaISO, fechaUTC } from "@/lib/metricas/periodos";
 import type { ClienteDeAnaliticas } from "@/lib/metricas/cliente";
 import type { FiltroDePais } from "@/lib/metricas/tipos";
 import { crearClienteDeAnaliticas } from "@/lib/metricas/vercel";
+import { PLANES_DE_LA_FUENTE } from "@/config/metricas";
+import { consultasDe, diasPorCorrida, ventanasQueSePiden } from "./consultas-de-la-copia";
+
+// Los tests con base fijan el plan de Vercel (Hobby): son los que prueban la
+// ventana de 30 días. El de Umami, sin ventana, se prueba abajo sin base.
+const VERCEL = PLANES_DE_LA_FUENTE.vercel;
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const hayBase = Boolean(process.env.DATABASE_URL);
@@ -44,8 +50,8 @@ test("correr dos veces deja las mismas filas y dice qué días copió", { skip: 
   // (mucho más nueva que 2001), rangoFaltante da null y sin esto el test
   // dependería de qué haya sincronizado el cron antes. Con minimoDias el
   // rango de los últimos días queda forzado pase lo que pase.
-  const r1 = await sincronizarMetricas({ cliente: clienteFalso, base, hoy: HOY, minimoDias: 3 });
-  const r2 = await sincronizarMetricas({ cliente: clienteFalso, base, hoy: HOY, minimoDias: 3 });
+  const r1 = await sincronizarMetricas({ plan: VERCEL, cliente: clienteFalso, base, hoy: HOY, minimoDias: 3 });
+  const r2 = await sincronizarMetricas({ plan: VERCEL, cliente: clienteFalso, base, hoy: HOY, minimoDias: 3 });
   assert.equal(r1.ok, true);
   assert.equal(r2.ok, true);
   assert.equal(r2.detalle, "Del 2001-01-08 al 2001-01-10: 3 días, 1 filas, 3 ventanas.");
@@ -80,7 +86,7 @@ test("la hora y el cruce por país se guardan con su propia dimensión", { skip:
       return { vistas: 2, visitantes: 2 };
     },
   };
-  const r = await sincronizarMetricas({ cliente, base, hoy: new Date("2001-09-11T12:00:00.000Z"), minimoDias: 1 });
+  const r = await sincronizarMetricas({ plan: VERCEL, cliente, base, hoy: new Date("2001-09-11T12:00:00.000Z"), minimoDias: 1 });
   assert.equal(r.ok, true);
   const guardadas = await base.metricaDiaria.findMany({ where: { fecha: fechaUTC("2001-09-10") }, orderBy: { dimension: "asc" } });
   assert.deepEqual(
@@ -100,7 +106,7 @@ test("si la API falla, la corrida sale fallida y no se copia nada", { skip: !hay
   // minimoDias por la misma razón que arriba: sin esto, una marca de agua
   // real y lejana haría "Nada nuevo" antes de llamar a la API rota, y el
   // error nunca se vería.
-  const r = await sincronizarMetricas({ cliente: clienteRoto, base, hoy: new Date("2001-02-11T12:00:00.000Z"), minimoDias: 1 });
+  const r = await sincronizarMetricas({ plan: VERCEL, cliente: clienteRoto, base, hoy: new Date("2001-02-11T12:00:00.000Z"), minimoDias: 1 });
   assert.equal(r.ok, false);
   assert.match(r.detalle, /401/);
   const filas = await base.metricaDiaria.count({ where: { fecha: { gte: fechaUTC("2001-01-11"), lte: fechaUTC("2001-02-10") } } });
@@ -134,12 +140,21 @@ test("una ventana que Vercel rechaza (400) no voltea la copia: va al detalle y l
   // (una marca más nueva, de otro test o de datos reales, da lo mismo por `minimoDias`).
   const marca = { fecha: fechaUTC("2001-11-09"), dimension: "total", valor: "", agrupado: false };
   await base.metricaDiaria.upsert({ where: { fecha_dimension_valor_agrupado: marca }, create: { ...marca, vistas: 1, visitantes: 1 }, update: {} });
-  const r = await sincronizarMetricas({ cliente, base, hoy, minimoDias: 1 });
+  const r = await sincronizarMetricas({ plan: VERCEL, cliente, base, hoy, minimoDias: 1 });
   assert.equal(r.ok, true);
   assert.equal(r.detalle, "Del 2001-11-10 al 2001-11-10: 1 días, 1 filas, 2 ventanas. No se pudo: la de 30 días hasta el 2001-11-10 (Vercel respondió 400.).");
   // Nunca pidió más atrás que el mes del plan.
   assert.deepEqual(pedidas.sort(), ["2001-10-12", "2001-10-28", "2001-11-04"]);
   assert.equal(await base.metricaDiaria.count({ where: { fecha: fechaUTC("2001-11-10"), dimension: "total" } }), 1);
+});
+
+test("con Umami, sin ventana de reporte, se piden las seis ventanas, 31 días y la campaña", () => {
+  const umami = PLANES_DE_LA_FUENTE.umami;
+  assert.deepEqual(ventanasQueSePiden("2001-01-10", HOY, umami).map((v) => v.dias), [7, 30, 90, 7, 30, 90]);
+  assert.equal(diasPorCorrida(umami), 31);
+  assert.equal(diasPorCorrida(VERCEL), 30);
+  assert.ok(consultasDe(umami).some((c) => c.dimension === "campana"));
+  assert.ok(!consultasDe(VERCEL).some((c) => c.dimension === "campana"));
 });
 
 after(async () => {

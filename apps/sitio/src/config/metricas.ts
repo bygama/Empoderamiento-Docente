@@ -1,20 +1,43 @@
-// Lo de ED en Métricas (work/metricas-completas/SPEC.md): los países que van
-// siempre arriba, la hora en que se leen los días y las horas, los eventos
-// que cuenta el sitio, dónde se comparte un link y cuánto dato hace falta
-// para dibujar cada bloque. Lo que no sabe de ED vive en `lib/metricas/`.
+import type { FuenteDeVisitas } from "@/lib/metricas/entorno";
+
+// Lo de ED en Métricas (work/metricas-completas/SPEC.md): lo que da cada
+// fuente de las visitas, los países que van siempre arriba, la hora en que se
+// leen los días y las horas, los eventos que cuenta el sitio, dónde se
+// comparte un link y cuánto dato hace falta para dibujar cada bloque. Lo que
+// no sabe de ED vive en `lib/metricas/`.
+
+export type PlanDeLaFuente = {
+  /** Cómo se nombra en el admin. */
+  nombre: string;
+  /** Hasta cuántos días para atrás da; `null` si guarda todo. */
+  ventanaDeReporteDias: number | null;
+  /** Si da la campaña (UTM) de cada visita. */
+  utm: boolean;
+};
 
 /**
- * Lo que da el plan de Vercel de ED, que es Hobby (ADR-0009), verificado el
- * 2026-09-27 en https://vercel.com/docs/analytics/limits-and-pricing
- * (actualizada el 2026-08-25): «Reporting Window: 1 Month» y «UTM Parameters:
- * -». La copia diaria nunca le pide a Vercel nada más viejo que la ventana ni
- * lo que el plan no tiene: si lo pidiera, la API lo rechaza o lo recorta, y
- * la copia fallaría todos los días o daría cifras falsas. Si ED cambia de
- * plan, se cambia acá (Pro: 12 meses, UTM solo con Web Analytics Plus).
+ * Lo que da cada fuente. La copia diaria nunca le pide nada más viejo que la
+ * ventana ni lo que no tiene: si lo pidiera, la API lo rechaza o lo recorta, y
+ * la copia fallaría todos los días o daría cifras falsas.
+ *
+ * - **Vercel:** el plan de ED es Hobby (ADR-0009), verificado el 2026-09-27 en
+ *   https://vercel.com/docs/analytics/limits-and-pricing (actualizada el
+ *   2026-08-25): «Reporting Window: 1 Month» y «UTM Parameters: -». Si ED
+ *   cambia de plan, se cambia acá (Pro: 12 meses, UTM solo con Web Analytics
+ *   Plus).
+ * - **Umami** (ADR-0018): guarda todo lo que cuenta y da la campaña de cada
+ *   vista. Su salvedad: rota la sal de la sesión cada mes, así que en 90 días
+ *   una persona que vuelve en otro mes cuenta más de una vez.
+ *
+ * Cuál rige lo dice `planDeLaFuente()` (`datos/fuente-de-visitas.ts`), que
+ * lee el entorno: este archivo lo importan componentes del navegador.
  */
-export const PLAN_DE_VERCEL = { ventanaDeReporteDias: 30, utm: false } as const;
+export const PLANES_DE_LA_FUENTE: Record<FuenteDeVisitas, PlanDeLaFuente> = {
+  vercel: { nombre: "Vercel", ventanaDeReporteDias: 30, utm: false },
+  umami: { nombre: "Umami", ventanaDeReporteDias: null, utm: true },
+};
 
-/** Los países que van siempre arriba en Origen, en este orden: ISO alfa-2, como los da Vercel. */
+/** Los países que van siempre arriba en Origen, en este orden: ISO alfa-2, como los da la analítica. */
 export const PAISES_FIJOS = ["CL", "MX", "AR"] as const;
 export type PaisFijo = (typeof PAISES_FIJOS)[number];
 
@@ -37,7 +60,7 @@ type DefinicionDeEvento = {
 
 /**
  * Los eventos que cuenta el sitio, cerrados: son raros a propósito, nunca
- * cada visita (eso lo cuenta Vercel). Se guardan como sumas por día en
+ * cada visita (eso lo cuenta la analítica). Se guardan como sumas por día en
  * `contadores`, sin nada de la persona.
  */
 export const EVENTOS = {

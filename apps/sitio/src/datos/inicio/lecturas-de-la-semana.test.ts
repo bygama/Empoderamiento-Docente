@@ -14,7 +14,7 @@ const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
 
 const ventana: Tarjeta = { dias: 7, vistas: 3120, visitantes: 1204, variacionVistas: "+8 %", variacionVisitantes: "+12 %" };
 
-test("sin las variables de Vercel, los visitantes dicen lo mismo que Resumen y no muestran la ventana vieja", async () => {
+test("sin las variables de la analítica, los visitantes dicen lo mismo que Resumen y no muestran la ventana vieja", async () => {
   let leida = false;
   const lectura = await visitantesSegun({ hayVariables: false, hastaDia: "2026-09-25" }, async () => {
     leida = true;
