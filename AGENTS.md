@@ -158,7 +158,7 @@ un release candidate de la 8 (ADR-0007).
         │                     next.config.ts, postcss.config.mjs
         └── src/
             ├── app/
-            │   ├── (sitio)/   ← el sitio: sus páginas y su layout
+            │   ├── (sitio)/   ← el sitio: sus páginas y su layout; [...resto] da el 308 de una redirección o el 404
             │   ├── (admin)/   ← SOLO rutas del admin
             │   ├── api/       ← auth/ · contacto/ y cv/ (los formularios públicos, que delegan en datos/formularios/)
             │   └── globals.css
@@ -169,16 +169,18 @@ un release candidate de la 8 (ADR-0007).
             │   ├── sesion.ts    ← la sesión del pedido, preguntada una vez (sesionActual)
             │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados, QUIEN_VE)
             │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
-            │   ├── avisos.ts    ← quién recibe el correo de cada mensaje nuevo, y mandarlo (tabla avisos)
+            │   ├── avisos.ts    ← quién recibe cada aviso por correo, del registro de config/avisos.ts, y mandarlo (tabla avisos)
+            │   ├── privacidad.ts ← los plazos de retención de la base, con su historial (ADR-0014)
+            │   ├── conexiones.ts ← el estado de cada servicio de afuera: sus variables y sus corridas
             │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
             │   ├── roles.ts     ← el único camino para cambiar un rol (ponerRol: prende el segundo factor si lo pide)
             │   ├── sobre-cuentas.ts ← lo común de las acciones de Cuentas (queSePuede sobre la cuenta, borrar si nunca hizo nada)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades)
-            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, choque, mover-mensajes)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad)
+            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, choque, mover-mensajes)
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
-            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes
+            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google
             ├── admin/         ← las pantallas del admin
             │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/), el número de sin leer, la cifra
             │   ├── inicio/      ← el Inicio: el saludo, los pendientes, la semana y la actividad
@@ -186,6 +188,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)
             │   ├── mensajes/    ← las bandejas de Contacto y CV y la ficha de cada mensaje
             │   ├── novedades/   ← la primera entidad: la lista, la ficha con su formulario y su panel, «Qué cambió» (cambios.ts)
+            │   ├── ajustes/     ← el índice de Ajustes y sus cinco pantallas (sitio, seo, avisos, privacidad, conexiones)
             │   ├── campos/      ← el generador de formularios de las páginas (Campo.tsx) y sus errores; los controles son del kit
             │   └── <entidad>/   ← las que siguen, como novedades/ (fase 3)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
@@ -205,8 +208,8 @@ un release candidate de la 8 (ADR-0007).
             │   ├── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
             │   └── novedades/contenido/ ← además, los dos esquemas de una novedad (novedad.ts) y lo que no
             │                       necesita Zod (modelo.ts: categorías, topes); y imagen-para-redes/ (next/og)
-            ├── config/        ← site.ts (datos institucionales) + nav.ts · mensajes.ts (bandejas y estados) · privacidad.ts (los plazos de borrado) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO)
-            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), rss.ts (el feed): sin dominio de ED
+            ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO)
+            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), rss.ts (el feed): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -299,7 +302,13 @@ usa lenguaje inclusivo:
 
 ### 5.3. Datos institucionales centralizados
 
-- Email, dirección, teléfono, URLs de redes → `apps/sitio/src/config/site.ts`.
+- Email, dirección, teléfono, países y URLs de redes → la tabla
+  `datos_del_sitio`, editable en Ajustes › Datos del sitio (ADR-0014). El
+  sitio los lee por `datos/consultas/sitio.ts` (`datosDelSitio()`) y los pasa
+  por props; sin base, van los valores iniciales de
+  `config/datos-del-sitio.ts`, que nada del sitio importa directo.
+- `apps/sitio/src/config/site.ts` guarda lo de la marca: el nombre, la URL, la
+  descripción y las frases pilares.
 - Nunca hardcodear datos institucionales en JSX.
 
 ### 5.4. Logos de aliados
