@@ -1,7 +1,9 @@
 # SPEC — Equipo
 
 - **Fecha:** 2026-09-27
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-27, con un cambio (J: sin
+  arrastre) y dos precisiones (H: los títulos cortos de la Biblioteca; N:
+  vincular por palabra, sin tildes); ver DECISIONS
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación, tablas y dependencias incluidas: DECISIONS del padre,
   2026-09-26)
@@ -287,18 +289,20 @@ otro para guardar, donde todo puede estar vacío—, en
 - El orden es **dentro de un nivel** y **no va al borrador**: es del equipo,
   no de una persona (como el orden de los aliados en la lane 9). Se aplica en
   el momento y regenera `/quienes-somos`.
-- La acción recibe el nivel y los ids en el orden nuevo, chequea que sean
-  exactamente los de ese nivel (si no: «El equipo cambió mientras tanto:
-  recargá la página») y escribe `orden`.
-- **Se mueve con «Subir» y «Bajar»** en cada fila (el teclado y el lector
-  llegan, y cada cambio se anuncia), **y arrastrando** con el puntero, como
-  pide el brief. DESIGN.md §11 dice «se mueve con botones, no arrastrando»
-  para la Lista variable de un formulario; acá es otra pieza —una lista que
-  se ordena y se guarda sola— y el arrastre se suma a los botones, no los
-  reemplaza. Nace como patrón nuevo en §11 («Lista que se ordena»), con
-  arrastre nativo (HTML5, sin dependencias). Si la lane 9 deja antes en
-  `main` su «Subir» y «Bajar» de Aliados, se usa esa pieza y se le suma el
-  arrastre.
+- **Se mueve con «Subir» y «Bajar»** en cada fila, y **no arrastrando**
+  (cambio del padre a la propuesta J): igual que Aliados en la lane 9 y que
+  la regla de DESIGN.md §11; el arrastre nativo no anda en pantallas
+  táctiles y suma código que los botones ya cubren.
+- La acción copia la forma de `moverAliado` de la lane 9:
+  **`moverPersona({ id, hacia })`**, un paso dentro de su nivel por clic, en
+  una transacción, aplicado en el momento; el foco sigue a la persona movida
+  y el cambio se anuncia en un `role="status"`.
+- **Equipo es el segundo consumidor** de ese orden: al rebasear sobre la 9,
+  el patrón sube a DESIGN.md §11 como «Lista que se ordena» (una regla que no
+  nombra ruta) y la entrada de Aliados apunta a él. Si lo compartido en
+  código (el foco que sigue, el anuncio, el botón quieto mientras mueve)
+  queda duplicado, se extrae a una pieza de `admin/armazon/` que usen las dos
+  listas; si lo compartido es solo la forma, alcanza con la regla.
 
 ### 6.3. La URL **[propuesta K]**
 
@@ -324,7 +328,7 @@ Todo cuelga de `/admin/contenido`, con las cinco pestañas arriba
   `Lista` con miniatura (la foto de la tarjeta; sin foto, el cuadrado con el
   ícono): el nombre, el rol · el país en el detalle, las insignias («Sin
   publicar», «Cambios sin publicar», «Despublicado»), «Subir», «Bajar» y
-  «Editar». Se arrastra desde la fila.
+  «Editar» (§6.2).
 - Vacía: «Todavía no hay perfiles» con «Nuevo perfil».
 
 ### 7.2. `/admin/contenido/equipo/nuevo` y `/[id]`
@@ -369,9 +373,11 @@ persona exista y se la pasa a «Agregar material»:
 
 - **«Cargar a mano»** abre la ficha con la persona como primera autora (su
   nombre completo y el vínculo).
-- **«Buscar datos»** vincula la persona al autor que la nombra (todas las
-  palabras de su nombre corto en el nombre del autor: «Luis Cabrera» ↔ «Luis
-  Manuel Cabrera Chim»); si ninguno la nombra, no la agrega sola —un DOI
+- **«Buscar datos»** vincula la persona al autor que la nombra: cada palabra
+  de su nombre corto está, entera, entre las palabras del nombre del autor,
+  sin mayúsculas ni tildes («Luis Cabrera» ↔ «Luis Manuel Cabrera Chim»,
+  «Iván Pérez» ↔ «Ivan Perez»), comparando palabra por palabra y no por
+  subcadena (precisión del padre, con su test); si ninguno la nombra, no la agrega sola —un DOI
   equivocado sumaría una autora que no es— y lo avisa arriba de la ficha:
   «Ningún autor de este material es Luis Cabrera: vinculala a mano en
   Autores».
@@ -411,8 +417,11 @@ rebasea segunda concilia.
   aproximación variacional» → «… para la significación de los criterios de
   la derivada»), 2 tienen en la Biblioteca la versión corta (una de Iván
   Pérez, la de Andrea Vergara) y 3 difieren en una coma o una mayúscula. Es
-  la regla de una sola fuente; si un título de la Biblioteca está
-  incompleto, se corrige ahí (queda en «Abierto»).
+  la regla de una sola fuente. **Precisión del padre:** esos 2 se miran en
+  la fuente del material (Crossref o la página de la revista); si el título
+  completo es el de la fuente, la migración de `equipo` lo corrige en
+  `materiales` (con su línea en DECISIONS) y el perfil no muestra menos que
+  hoy; si la fuente dice la versión corta, queda como está.
 - **2 rótulos**: el capítulo de Karla Gómez en actas del CIAEM pasa de
   «Libro» a «Artículo» (su tipo en la Biblioteca es «Actas de congreso»), y
   *Matemática en Red* de «Colección» a «Materiales».
@@ -457,15 +466,16 @@ rebasea segunda concilia.
 | --- | --- | --- | --- |
 | `publico-un-perfil` · `despublico-un-perfil` | «Ana publicó el perfil de Daniela Reyes» | `editarContenido` | sí |
 | `descarto-cambios-de-un-perfil` · `borro-un-perfil` | «Ana borró el perfil de Daniela Reyes» | `editarContenido` | sí |
-| `reordeno-el-equipo` | «Ana reordenó el equipo: Líderes de área y proyecto» | `editarContenido` | sí |
+| `movio-un-perfil` | «Ana movió a Iván Pérez en el orden del equipo» | `editarContenido` | sí |
 
   En Cuentas › Actividad van al módulo Contenido; «Ver» lleva a la ficha del
-  perfil (un perfil borrado no lleva link) o, al reordenar, a la lista.
+  perfil (un perfil borrado no lleva link). Mover es un paso por clic (§6.2):
+  cada paso queda anotado, con la persona que se movió.
 
 ## 11. Patrones nuevos (DESIGN.md §11)
 
-- **Lista que se ordena** — su primer consumidor es la lista del Equipo (§6.2),
-  salvo que la lane 9 la traiga antes.
+- **Lista que se ordena** — la trae la lane 9 con Aliados; Equipo es el
+  segundo consumidor y la sube a regla general de §11 (§6.2).
 - **Una lista variable adentro de otra** (los hitos y las publicaciones de
   una etapa), si la anidada pide algo distinto de la «Lista variable» de hoy;
   si no, se consume tal cual y no se escribe nada.
@@ -508,7 +518,7 @@ los tres temas, 390 de ancho y el teclado.
 | G | El detalle vacío lee la fuente; la migración guarda solo los que dicen otra cosa | una sola fuente, como la firma y la cita de la 8a |
 | H | Lo que se ve distinto es solo §8.2 | la regla de una sola fuente; cada diferencia, contada |
 | I | Dirección general una sola (índice parcial), Dirección hasta dos (al publicar) | el masthead tiene un lugar al centro y dos a los costados |
-| J | El orden dentro del nivel, fuera del borrador, con Subir, Bajar y arrastre nativo; patrón nuevo en §11 | el brief pide arrastrar y teclado; §11 prohíbe arrastrar solo en la lista de un formulario |
+| J | El orden dentro del nivel, fuera del borrador, con «Subir» y «Bajar» (`moverPersona`), como Aliados; sin arrastre (cambio del padre) | un solo modo de ordenar en el admin, que llega con teclado, lector y pantalla táctil |
 | K | El slug es la clave de hoy; 308 a la ruta de la fase 4 al cambiarlo | como los casos |
 | L | La actividad de §10, todo al Inicio | el molde de Novedades, más reordenar, que cambia el sitio |
 | M | Las 15 fotos de `public/equipo/` entran a `fotos` y Equipo suma su entrada al registro de usos, después de la lane 9 | el spec del admin §6 le da `public/**` de origen, y la lane 9 dejó `public/equipo/` para esta |
@@ -520,8 +530,8 @@ los tres temas, 390 de ancho y el teclado.
 
 Las fichas públicas de cada persona y su JSON-LD (fase 4); la Biblioteca
 (8a, en `main`: acá solo la FK, las 5 que faltan y regenerar
-`/quienes-somos`); corregir en la Biblioteca los títulos que el perfil tenía
-más completos (§8.2); el registro de usos de fotos, el campo «Elegir de
+`/quienes-somos`, y los dos títulos cortos si la fuente los da enteros,
+§8.2); el registro de usos de fotos, el campo «Elegir de
 Fotos» y la tabla `fotos` (lane 9); los contadores de consultas (lane 11).
 
 ## 15. Cómo se sabe que está
@@ -536,9 +546,10 @@ Fotos» y la tabla `fotos` (lane 9); los contadores de consultas (lane 11).
   `sin-link` salen); guardar con choque, publicar con 308, la Dirección
   general una sola, la Dirección hasta dos, una referencia que la persona no
   firma frena, despublicar, descartar, borrar (las autorías quedan de afuera);
-  ordenar (chequea el nivel entero); un material con una persona que no
-  existe no se guarda; vincular por nombre al agregar un material; las
-  frases; y los dos tests de guarda y de sesión.
+  mover (un paso dentro del nivel; en la punta no se mueve); un material con
+  una persona que no existe no se guarda; vincular por nombre al agregar un
+  material (palabra por palabra, sin tildes ni mayúsculas); las frases; y los
+  dos tests de guarda y de sesión.
 - Las migraciones aplicadas en `ed_equipo` desde cero, `migrate status` al
   día y `migrate diff` vacío.
 - El HTML de todas las páginas comparado contra `main` con
@@ -546,7 +557,7 @@ Fotos» y la tabla `fotos` (lane 9); los contadores de consultas (lane 11).
   y el script de las 78 tarjetas, con exactamente las diferencias de §8.2.
 - De punta a punta en el navegador de Orca, con una cuenta `edita`: editar y
   publicar un perfil (y su vista previa), cambiarle el slug, reordenar un
-  nivel con los botones y arrastrando, sumar una publicación de la
+  nivel con «Subir» y «Bajar», sumar una publicación de la
   Biblioteca a una etapa, «Agregar en Biblioteca» con la persona elegida,
   despublicar y borrar un perfil de prueba; los tres temas, 390 de ancho y
   el teclado.
