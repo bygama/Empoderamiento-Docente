@@ -37,6 +37,27 @@ export function quienesUsan(registro: RegistroDePaginas, slug: string, seccion: 
 }
 
 /**
+ * Qué comparte una sección, para que el editor lo avise en las dos puntas:
+ * la usa de otra página (y se edita allá), o la muestran otras (y publicar
+ * esta las cambia). `undefined` si no comparte nada.
+ */
+export type Comparticion =
+  | { tipo: "usa"; que: string; pagina: { slug: string; nombre: string }; seccion: { clave: string; nombre: string } }
+  | { tipo: "muestran"; paginas: Array<{ nombre: string; que: string }> };
+
+export function comparticionDe(registro: RegistroDePaginas, slug: string, clave: string): Comparticion | undefined {
+  const usa = propioDe(propioDe(registro, slug)?.secciones ?? {}, clave)?.usa;
+  if (usa) {
+    const duena = propioDe(registro, usa.pagina);
+    const seccion = duena ? propioDe(duena.secciones, usa.seccion) : undefined;
+    if (!duena || !seccion) return undefined;
+    return { tipo: "usa", que: usa.que, pagina: { slug: usa.pagina, nombre: duena.nombre }, seccion: { clave: usa.seccion, nombre: seccion.nombre } };
+  }
+  const paginas = quienesUsan(registro, slug, clave).map(({ nombre, que }) => ({ nombre, que }));
+  return paginas.length > 0 ? { tipo: "muestran", paginas } : undefined;
+}
+
+/**
  * Lo que está mal anotado: un `usa` que apunta a una página o sección que no
  * existe, a la propia página, o a una sección que a su vez usa otra (sin
  * cadenas: lo compartido vive en un solo lugar). Lo mira el test del registro.

@@ -139,7 +139,16 @@ export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
       />
       <ContextoDeErrores value={errores.contexto}>
         {pagina.secciones.map((s) => (
-          <Seccion key={s.clave} clave={s.clave} nombre={s.nombre} descripcion={s.descripcion} valor={contenidos[s.clave]} alCambiar={(v) => cambiar(s.clave, v)} />
+          <Seccion
+            key={s.clave}
+            clave={s.clave}
+            nombre={s.nombre}
+            descripcion={s.descripcion}
+            valor={contenidos[s.clave]}
+            alCambiar={(v) => cambiar(s.clave, v)}
+            compartida={s.compartida}
+            pagina={pagina.nombre}
+          />
         ))}
       </ContextoDeErrores>
       {aparte?.(contenidos)}
