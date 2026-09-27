@@ -9,6 +9,7 @@ import { buscarDatos } from "@/datos/biblioteca/buscar-datos";
 import { conPersonas, parecidosA, presentacion, yaEsta, type Vecino } from "@/datos/biblioteca/contra-la-biblioteca";
 import type { CamposDeAfuera, Fuente } from "@/datos/biblioteca/de-afuera";
 import { pedirProtegido } from "@/lib/red/pedido-protegido";
+import { pedidoSinForma, sinForma } from "./materiales-en-base";
 
 // «Buscar datos» y «¿se parece a otro?» desde la ficha de un material (SPEC
 // §8 de `work/biblioteca/`). No escriben nada. Empiezan por la sesión y
@@ -27,8 +28,8 @@ export async function buscarDatosDeMaterial(pedido: { entrada: string }): Promis
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return SIN_SESION;
     if (!puede(sesion.user.rol, "editarBiblioteca")) return { ok: false, detalle: SIN_PERMISO };
-    const valido = esquemaEntrada.safeParse(pedido);
-    if (!valido.success) return { ok: false, detalle: valido.error.issues[0]?.message ?? "Pegá un DOI, un ISBN o un link." };
+    const valido = esquemaEntrada.safeParse(pedido, sinForma);
+    if (!valido.success) return { ok: false, detalle: pedidoSinForma(valido.error, "buscarDatosDeMaterial") ?? valido.error.issues[0]?.message ?? "Pegá un DOI, un ISBN o un link." };
     const { agente, contacto } = await presentacion();
     const r = await buscarDatos(valido.data.entrada, { pedir: (url, o) => pedirProtegido(url, { ...o, agente }), contacto });
     if ("error" in r) return { ok: false, detalle: r.error };
