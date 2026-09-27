@@ -1,14 +1,16 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { publicadoDeAliado } from "@/datos/consultas/aliados";
 import { esquemaAliado } from "@/features/aliados/contenido/aliado";
+import { CAMBIO_DESDE_LA_AUTORIZACION, estaAutorizado } from "@/features/aliados/contenido/autorizacion";
 import { columnasDelAliado, falloEnCampoDelAliado, NO_EXISTE, nombreDelAliado, problemasDeAliado } from "./aliados-en-base";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 
 // Publicar y despublicar un aliado (`work/casos-aliados-fotos/SPEC.md` §5.1 y
 // §6), con el cliente inyectado. **Publicar exige la marca `autorizado`**
-// (AGENTS.md §5.4): sin ella contesta por qué, y aunque se colara, la
-// consulta del sitio no lo mostraría. El logo tiene que estar en Fotos: de
-// ahí salen sus medidas.
+// (AGENTS.md §5.4), **y para ese logo y ese nombre**: si cambiaron desde que se
+// autorizó, se niega, a cualquiera; publicar no reautoriza a nadie. Aunque se
+// colara, la consulta del sitio no lo mostraría. El logo tiene que estar en
+// Fotos: de ahí salen sus medidas.
 
 export type ResultadoDePublicarAliado = { ok: true; detalle: string; publicadoEn: string; publicadoPor: string; nombre: string } | Fallo;
 
@@ -25,13 +27,14 @@ export async function publicarAliadoEnBase(
   if (fila.publicado && !fila.borrador) return { ok: false, detalle: "El aliado ya está publicado así." };
   const valido = esquemaAliado.safeParse(fila.borrador ?? publicadoDeAliado(fila));
   if (!valido.success) return problemasDeAliado(valido.error);
+  if (!estaAutorizado(valido.data, fila)) return { ok: false, detalle: CAMBIO_DESDE_LA_AUTORIZACION };
   if (!(await base.foto.findUnique({ where: { url: valido.data.logo.src } }))) {
     return falloEnCampoDelAliado("logo.src", "Ese logo no está en Fotos: elegilo de las ya subidas o subilo de nuevo.");
   }
   const ahora = new Date();
   // La condición sobre `borradorEn` hace que un guardado que se cuele en el medio no se publique sin haberse visto.
   const { count } = await base.aliado.updateMany({
-    where: { id, borradorEn: fila.borradorEn, autorizado: true },
+    where: { id, borradorEn: fila.borradorEn, autorizado: true, autorizadoLogo: valido.data.logo.src, autorizadoNombre: valido.data.nombre },
     data: { ...columnasDelAliado(valido.data), publicado: true, publicadoEn: ahora, publicadoPor: quien, borrador: Prisma.DbNull, borradorEn: null, borradorPor: null },
   });
   if (count === 0) return choqueCon(await base.aliado.findUnique({ where: { id } }), "el aliado");

@@ -10,38 +10,48 @@
 /// es un hecho sobre ED, no contenido, y la ponen solo quien dirige o
 /// administra (`autorizarAliados`), con la nota de dónde consta.
 ///
+/// **La marca está atada a lo que se autorizó**: `autorizado_logo` y
+/// `autorizado_nombre` guardan el logo y el nombre que vio quien autorizó. Si
+/// el documento que se publicaría (o que muestra la vista previa) tiene otro
+/// logo u otro nombre, publicar se niega y la consulta del sitio no lo
+/// muestra, aunque `autorizado` diga que sí: la marca no sirve para otro logo.
+///
 /// **La fila tiene dos copias**, como una novedad: lo publicado en columnas,
 /// nulas solo mientras nunca se publicó, y el borrador en un documento. Las
 /// dos se validan con los esquemas de `features/aliados/contenido/aliado.ts`.
 model Aliado {
-  id            String    @id @default(uuid())
+  id               String    @id @default(uuid())
   /// Cómo lo llaman el admin y la actividad: «UCSH».
-  nombre        String?
+  nombre           String?
   /// { src, alt, foco }: una foto de Fotos. El alt es lo que se lee en la tira.
-  logo          Json?
+  logo             Json?
   /// chico | mediano | grande: cuánto alto le da la tira (features/aliados/contenido/modelo.ts).
-  tamano        String?
+  tamano           String?
   /// Su sitio, con https://. Con URL, el logo es un link.
-  url           String?
+  url              String?
   /// El lugar en la tira: de menor a mayor.
-  orden         Int
+  orden            Int
   /// El sitio lo muestra (si además está autorizado). Despublicar conserva las columnas.
-  publicado     Boolean   @default(false)
-  publicadoEn   DateTime? @map("publicado_en")
+  publicado        Boolean   @default(false)
+  publicadoEn      DateTime? @map("publicado_en")
   /// Quién, en llano. Nulo en los que entraron con la migración.
-  publicadoPor  String?   @map("publicado_por")
+  publicadoPor     String?   @map("publicado_por")
   /// El documento que se edita; nulo es «el borrador es lo publicado».
-  borrador      Json?
+  borrador         Json?
   /// El último guardado, y la marca del aviso de choque.
-  borradorEn    DateTime? @map("borrador_en")
-  borradorPor   String?   @map("borrador_por")
-  autorizado    Boolean   @default(false)
+  borradorEn       DateTime? @map("borrador_en")
+  borradorPor      String?   @map("borrador_por")
+  autorizado       Boolean   @default(false)
   /// Dónde consta la autorización: la carta, el mail o la carpeta.
-  autorizacion  String?
-  autorizadoEn  DateTime? @map("autorizado_en")
-  autorizadoPor String?   @map("autorizado_por")
-  creadoEn      DateTime  @default(now()) @map("creado_en")
-  creadoPor     String?   @map("creado_por")
+  autorizacion     String?
+  /// El `src` del logo que se autorizó. Nulo sin la marca.
+  autorizadoLogo   String?   @map("autorizado_logo")
+  /// El nombre que se autorizó, tal cual. Nulo sin la marca.
+  autorizadoNombre String?   @map("autorizado_nombre")
+  autorizadoEn     DateTime? @map("autorizado_en")
+  autorizadoPor    String?   @map("autorizado_por")
+  creadoEn         DateTime  @default(now()) @map("creado_en")
+  creadoPor        String?   @map("creado_por")
 
   @@map("aliados")
 }

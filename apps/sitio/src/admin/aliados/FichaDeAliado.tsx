@@ -9,6 +9,7 @@ import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { errorDe } from "@/admin/campos/errores";
 import type { FichaDeAliado as Ficha } from "@/datos/consultas/aliados-del-admin";
 import type { BorradorDeAliado } from "@/features/aliados/contenido/aliado";
+import { estaAutorizado, loQueSeAutoriza } from "@/features/aliados/contenido/autorizacion";
 import { igual } from "@/lib/contenido/comparar";
 import { AutorizacionDelAliado } from "./AutorizacionDelAliado";
 import { cambiosDelAliado } from "./cambios";
@@ -83,6 +84,10 @@ export function FichaDeAliado({ ficha, puedeAutorizar, quienPuede }: Props) {
   });
 
   const { id } = g;
+  // Lo que autorizaría la marca ahora (lo guardado, o lo publicado si lo guardado no se puede publicar), y si ya vale para eso.
+  const a = ficha.autorizacion;
+  const aAutorizar = loQueSeAutoriza(guardado, publicado);
+  const alDia = aAutorizar ? estaAutorizado(aAutorizar, { autorizado: a.autorizado, autorizadoLogo: a.logo, autorizadoNombre: a.nombre }) : false;
   const recargar = () => {
     if (haySinGuardar && !window.confirm("Recargar tira lo que escribiste sin guardar. ¿Recargar igual?")) return;
     soltarSalida();
@@ -96,7 +101,7 @@ export function FichaDeAliado({ ficha, puedeAutorizar, quienPuede }: Props) {
         titulo={form.nombre.trim() || "Nuevo aliado"}
         id={g.id}
         estado={g.estado}
-        autorizado={ficha.autorizacion.autorizado}
+        autorizado={alDia}
         haySinGuardar={haySinGuardar}
         pendiente={g.pendiente}
         aviso={<AvisoDeLaAccion aviso={g.aviso} alCerrar={() => g.setAviso(null)} alRecargar={recargar} />}
@@ -108,10 +113,18 @@ export function FichaDeAliado({ ficha, puedeAutorizar, quienPuede }: Props) {
       <div className="grid grid-cols-1 items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
         <div className="space-y-10">
           <FormularioDelAliado form={form} cambiar={cambiar} error={(camino) => errorDe(errores.contexto.errores, camino)} />
-          <AutorizacionDelAliado id={g.id} autorizacion={ficha.autorizacion} puedeAutorizar={puedeAutorizar} quienPuede={quienPuede} />
+          <AutorizacionDelAliado
+            id={g.id}
+            autorizacion={a}
+            aAutorizar={aAutorizar}
+            alDia={alDia}
+            haySinGuardar={haySinGuardar}
+            puedeAutorizar={puedeAutorizar}
+            quienPuede={quienPuede}
+          />
         </div>
         <div className="xl:col-start-2 xl:row-span-2 xl:row-start-1">
-          <PanelDelAliado form={form} autorizado={ficha.autorizacion.autorizado} enElSitio={g.estado.publicado} />
+          <PanelDelAliado form={form} autorizado={alDia} enElSitio={g.estado.publicado} />
         </div>
         <div className="space-y-10">
           {/* Sin nada publicado no hay contra qué comparar: se publica entero. */}
