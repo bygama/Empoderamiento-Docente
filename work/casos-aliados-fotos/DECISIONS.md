@@ -85,3 +85,18 @@
   mover en la tira (`updateMany`, y los tests separados por filas). El
   primero toca solo las fichas de esta lane; la de Novedades, que tiene lo
   mismo, queda anotada en PROGRESS para no pisar a la lane de Biblioteca.
+- 2026-09-27 — **Segundo rebase, sobre `main` en `d051c6a0` (Biblioteca)**,
+  que se mergeó mientras esta lane verificaba. Se juntó a mano lo de las dos
+  (actividad, Inicio, cron, pendientes, docs). De las piezas que las dos lanes
+  subieron al armazón quedó la de `main` (`QueCambioPlegado`); de
+  `AccionesDeLaFicha`, el lugar de esta lane (el armazón), con el cambio de
+  tipo que hicieron las dos igual, y la ficha del material apunta ahí. La
+  portada propia de un material entra al registro de usos de Fotos: sin eso,
+  borrar o reemplazar esa foto rompía la portada. Las portadas tipográficas de
+  `public/` no se importan a `fotos`: las genera Biblioteca, no se editan como
+  fotos. `pendientes.ts` queda en 110 líneas (104 en `main`): no se reformatea
+  el código de otra lane para esconderlo.
+- 2026-09-27 — El `grid-cols-1` de las fichas se extiende a la de una novedad
+  y a la de un material una vez mergeada Biblioteca (antes se había dejado
+  afuera para no pisarla): es una regla del patrón «Ficha de una entidad», no
+  de una ficha, y queda escrita en DESIGN.md §11.
