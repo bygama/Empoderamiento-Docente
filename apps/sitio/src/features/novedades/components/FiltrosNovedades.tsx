@@ -4,7 +4,8 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
-import { NOVEDADES, CATEGORIAS, CATEGORIA_LABEL, type CategoriaKey } from "@/features/novedades/data/novedades";
+import { CATEGORIAS, etiquetaDeCategoria, type Categoria } from "@/features/novedades/contenido/modelo";
+import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { NovedadCard } from "./NovedadCard";
 import { PaginacionNovedades } from "./PaginacionNovedades";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -15,11 +16,11 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-type Filtro = "todas" | CategoriaKey;
+type Filtro = "todas" | Categoria;
 const POR_PAGINA = 6;
 
-const filtrarLista = (f: Filtro) =>
-  f === "todas" ? NOVEDADES : NOVEDADES.filter((n) => n.categoria === f);
+const filtrarLista = (novedades: readonly NovedadDelSitio[], f: Filtro) =>
+  f === "todas" ? novedades : novedades.filter((n) => n.categoria === f);
 
 /**
  * "Filtros por categoría" + "Últimas novedades" del sitemap: el archivo
@@ -34,14 +35,14 @@ const filtrarLista = (f: Filtro) =>
  * links compartibles y estado que sobrevive al refresh, sin useSearchParams
  * (evita el bailout a CSR de Next). Sin motion: todo funciona, sin animar.
  */
-export function FiltrosNovedades() {
+export function FiltrosNovedades({ novedades }: { novedades: readonly NovedadDelSitio[] }) {
   const [activa, setActiva] = useState<Filtro>("todas");
   const [pagina, setPagina] = useState(1);
   const gridRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
 
-  const filtradas = filtrarLista(activa);
+  const filtradas = filtrarLista(novedades, activa);
   const totalPaginas = Math.max(1, Math.ceil(filtradas.length / POR_PAGINA));
 
   const aplicar = (
@@ -52,11 +53,11 @@ export function FiltrosNovedades() {
     const { animar = true, scroll = false } = opts;
     const grid = gridRef.current;
     if (!grid) return;
-    const lista = filtrarLista(filtro);
+    const lista = filtrarLista(novedades, filtro);
     const total = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
     const p = Math.min(Math.max(1, pag), total);
     const visibles = new Set(
-      lista.slice((p - 1) * POR_PAGINA, p * POR_PAGINA).map((n) => n.id),
+      lista.slice((p - 1) * POR_PAGINA, p * POR_PAGINA).map((n) => n.slug),
     );
     setActiva(filtro);
     setPagina(p);
@@ -128,7 +129,7 @@ export function FiltrosNovedades() {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("categoria") as Filtro | null;
     const filtro: Filtro =
-      cat && CATEGORIAS.some((c) => c.key === cat) ? cat : "todas";
+      cat && CATEGORIAS.some((c) => c.clave === cat) ? cat : "todas";
     aplicar(filtro, Number(params.get("pagina")) || 1, { animar: false });
 
     const grid = gridRef.current;
@@ -146,7 +147,7 @@ export function FiltrosNovedades() {
     return () => ctx.revert();
   }, [reduced]);
 
-  const chips: Filtro[] = ["todas", ...CATEGORIAS.map((c) => c.key)];
+  const chips: Filtro[] = ["todas", ...CATEGORIAS.map((c) => c.clave)];
 
   return (
     <section
@@ -190,14 +191,14 @@ export function FiltrosNovedades() {
                         : "border-azul-principal/15 text-gris-texto hover:border-verde-concepto/50 hover:text-azul-principal"
                     }`}
                   >
-                    {key === "todas" ? "Todas" : CATEGORIA_LABEL[key]}
+                    {key === "todas" ? "Todas" : etiquetaDeCategoria(key)}
                   </button>
                 );
               })}
             </div>
             <p className="text-gris-texto font-mono text-[0.68rem] tracking-[0.14em] uppercase" aria-live="polite">
               {filtradas.length} {filtradas.length === 1 ? "novedad" : "novedades"}
-              {activa !== "todas" && ` · ${CATEGORIA_LABEL[activa]}`}
+              {activa !== "todas" && ` · ${etiquetaDeCategoria(activa)}`}
             </p>
           </div>
 
@@ -221,8 +222,8 @@ export function FiltrosNovedades() {
               </div>
             )}
             <div ref={gridRef} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {NOVEDADES.map((n) => (
-                <NovedadCard key={n.id} n={n} />
+              {novedades.map((n) => (
+                <NovedadCard key={n.slug} n={n} />
               ))}
             </div>
           </div>

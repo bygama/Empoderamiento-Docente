@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OPEN_GRAPH_COMUN } from "@/config/metadata";
+import { novedadesDelSitio } from "@/datos/consultas/novedades";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { HeroQuienes } from "@/features/home/components/HeroQuienes";
 import { DatosDuros } from "@/features/home/components/DatosDuros";
@@ -19,9 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
   // Lo compartido vive en Qué hacemos (su publicado, o su borrador en vista previa).
-  const [{ hero, quienesSomos, mision, enNumeros, comoTrabajamos, areas, bibliotecaYNovedades }, queHacemos] = await Promise.all([
+  const [{ hero, quienesSomos, mision, enNumeros, comoTrabajamos, areas, bibliotecaYNovedades }, queHacemos, novedades] = await Promise.all([
     contenidoDe("inicio"),
     contenidoDe("que-hacemos"),
+    novedadesDelSitio(),
   ]);
   return (
     <main>
@@ -41,7 +43,8 @@ export default async function Home() {
           de la home junto con la llegada del bloque plano y vuelve a su lugar
           original, después de «Cómo trabajamos» (2026-09-09). */}
       <LineasAccion contenido={areas} areas={areasDeInicio(queHacemos.areas)} />
-      <BibliotecaNovedades contenido={bibliotecaYNovedades} />
+      {/* Las cuatro novedades más nuevas: la lista ya viene en orden. */}
+      <BibliotecaNovedades contenido={bibliotecaYNovedades} ultimasNovedades={novedades.slice(0, 4)} />
     </main>
   );
 }

@@ -7,7 +7,6 @@ import { RotadorPalabras } from "./RotadorPalabras";
 import { SplitFlap } from "./SplitFlap";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { NOVEDADES } from "@/features/novedades/data/novedades";
 
 /**
  * Hero de Novedades — comparte la BASE de marca con Biblioteca (patrón §6
@@ -33,10 +32,10 @@ import { NOVEDADES } from "@/features/novedades/data/novedades";
  */
 // La fecha del tablero es la de la novedad más nueva, con la precisión que
 // trae (día·mes·año, mes·año o solo año): antes era un string fijo y quedó
-// mostrando la fecha de una nota inventada (Gastón, 2026-09-11).
-const ULTIMA = NOVEDADES[0].fecha.split("-").reverse().join("·");
-
-export function NovedadesHero() {
+// mostrando la fecha de una nota inventada (Gastón, 2026-09-11). Sin
+// novedades (sin base), el tablero no se muestra.
+export function NovedadesHero({ fechaDeLaUltima }: { fechaDeLaUltima: string | null }) {
+  const ultima = fechaDeLaUltima?.split("-").reverse().join("·");
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -127,23 +126,20 @@ export function NovedadesHero() {
             Apilado (etiqueta arriba, fecha abajo) para que la FECHA quede
             centrada en sí misma y no corrida a la derecha, que es lo que pasa
             cuando etiqueta y fecha comparten un renglón centrado como bloque. */}
-        <div
-          data-nh-rise
-          className="text-azul-claro/90 mt-10 flex flex-col items-center gap-2.5 font-mono text-[0.8rem] tracking-[0.18em] uppercase"
-        >
-          {/* El punto va absoluto (fuera del flujo) para que NO sume ancho:
-              la frase queda centrada en sí misma, como la fecha de abajo. */}
-          <span className="relative whitespace-nowrap">
-            <span className="bg-verde-concepto absolute top-1/2 -left-5 h-2 w-2 -translate-y-1/2 animate-pulse rounded-full" />
-            Última actualización
-          </span>
-          <SplitFlap
-            text={ULTIMA}
-            charset="digits"
-            trigger="mount"
-            className="text-white"
-          />
-        </div>
+        {ultima ? (
+          <div
+            data-nh-rise
+            className="text-azul-claro/90 mt-10 flex flex-col items-center gap-2.5 font-mono text-[0.8rem] tracking-[0.18em] uppercase"
+          >
+            {/* El punto va absoluto (fuera del flujo) para que NO sume ancho:
+                la frase queda centrada en sí misma, como la fecha de abajo. */}
+            <span className="relative whitespace-nowrap">
+              <span className="bg-verde-concepto absolute top-1/2 -left-5 h-2 w-2 -translate-y-1/2 animate-pulse rounded-full" />
+              Última actualización
+            </span>
+            <SplitFlap text={ultima} charset="digits" trigger="mount" className="text-white" />
+          </div>
+        ) : null}
       </div>
 
       {/* Pista de scroll al pie del hero. */}

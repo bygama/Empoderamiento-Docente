@@ -44,6 +44,17 @@ export function compararFechas(a: string, b: string): number {
   return a > b ? -1 : 1;
 }
 
+// Fecha → "15 jul 2026", "jul 2026" o "2026", según la precisión que trae. Sin
+// librerías de fechas ni el locale del navegador, que rompería la hidratación.
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+/** La fecha como la muestra el sitio: «15 jul 2026», «jul 2026» o «2026». */
+export function fechaCorta(fecha: string): string {
+  const [anio, mes, dia] = fecha.split("-").map(Number);
+  if (!mes) return `${anio}`;
+  return dia ? `${dia} ${MESES[mes - 1]} ${anio}` : `${MESES[mes - 1]} ${anio}`;
+}
+
 /**
  * Las secciones del cuerpo con su ancla (`#que-estudia`), sacada del título:
  * así corregir un título no deja un link a una sección que no existe, y dos

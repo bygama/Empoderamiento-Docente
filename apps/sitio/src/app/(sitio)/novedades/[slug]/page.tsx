@@ -1,35 +1,32 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { NOVEDADES } from "@/features/novedades/data/novedades";
+import { notFound, permanentRedirect } from "next/navigation";
+import { novedadPorSlug, redireccionDe, slugsConFicha } from "@/datos/consultas/novedades";
 import { FichaNovedad } from "@/features/novedades/components/FichaNovedad";
 
-// Solo las novedades con cuerpo tienen ficha (piloto: el libro). El resto
-// del catálogo se irá sumando cargando `cuerpo` en data.ts.
-export function generateStaticParams() {
-  const slugs: Array<{ slug: string }> = [];
-  for (const n of NOVEDADES) if (n.cuerpo) slugs.push({ slug: n.id });
-  return slugs;
+// Solo las novedades con cuerpo tienen ficha. Las publicadas se prerenderizan;
+// una que se publica después se arma en su primera visita (y publicar la
+// revalida).
+export async function generateStaticParams() {
+  return (await slugsConFicha()).map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const n = NOVEDADES.find((x) => x.id === slug);
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const n = await novedadPorSlug((await params).slug);
   if (!n) return {};
   return { title: n.titulo, description: n.bajada };
 }
 
-export default async function NovedadPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function NovedadPage({ params }: Props) {
   const { slug } = await params;
-  const n = NOVEDADES.find((x) => x.id === slug && x.cuerpo);
-  if (!n) notFound();
+  const n = await novedadPorSlug(slug);
+  if (!n || n.cuerpo.length === 0) {
+    // Un slug que cambió al publicar: el 308 del viejo al nuevo, antes del 404.
+    const hacia = await redireccionDe(`/novedades/${slug}`);
+    if (hacia) permanentRedirect(hacia);
+    notFound();
+  }
   return (
     <main id="contenido" tabIndex={-1}>
       <FichaNovedad n={n} />
