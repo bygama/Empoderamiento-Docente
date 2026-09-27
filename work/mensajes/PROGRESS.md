@@ -76,3 +76,48 @@
   la fila con `datos` y el archivo en `.cv/cv/<id>.pdf`; el archivo da 404 por
   `/.cv/…` y `/cv/…`. Las capturas del navegador embebido fallan («the
   browser tab may not be visible»): la evidencia es por DOM y por la base.
+- **Paso 9 — el número** (`8e1efdb`). `admin/armazon/Numero.tsx`,
+  `numero` en `ItemDeNavegacion` y en `Pestanas`, `nuevosPorBandeja(rol)` en
+  `datos/consultas/mensajes.ts`, `BarraLateral` lo cuenta junto con el punto.
+  Cuentas de prueba en `ed_mensajes`: `admin.mensajes@ed.test` (administra) y
+  `edita.mensajes@ed.test` (edita), contraseña elegida por «Olvidé». En el
+  navegador, con 5 contactos y 1 CV nuevos: la entrada dice «Mensajes 6 (6
+  sin leer)» para administra y «Mensajes 5 (5 sin leer)» para edita. Colores
+  leídos por `getComputedStyle` en los tres temas (cookie `tema-del-admin`):
+  claro blanco sobre `#1F2D4D` (13,63:1), mixto `#33466C` sobre blanco
+  (9,40:1), oscuro `#172239` sobre `#E8EEF7` (13,59:1). DESIGN.md §11 «El
+  número». Typecheck y lint exit 0.
+- **Paso 10 — la bandeja** (`e636d15`). Rutas `mensajes/` (layout con la
+  guarda de Contacto, `page.tsx` que redirige con `bandejaConMasNuevos`,
+  `[bandeja]/page.tsx` con la guarda de su capacidad, `error.tsx`),
+  `admin/mensajes/` (encabezado con pestañas-bandeja y su número, la lista,
+  los vacíos por estado), `admin/armazon/Filtro.tsx` y `Buscador.tsx`,
+  `listarMensajes`; la guía de Mensajes sale de `guias.ts`. `guarda.test.ts`
+  → 4 pasan. En el navegador: `/admin/mensajes` → `/admin/mensajes/contacto`
+  («Contacto · Admin ED», pestañas «Contacto 5 · CV 1», filtro «Nuevo 5» activo);
+  `?q=talleres` deja una fila; `?estado=spam` y `?estado=cerrado&q=zzz` dicen
+  su vacío; como edita, sin pestañas y `/admin/mensajes/cv` en «Esta sección
+  es de quien dirige o administra». A 390 de ancho: sin desborde de página
+  (`scrollWidth` 375), el filtro scrollea de costado adentro de su fila y el
+  buscador ocupa el ancho. DESIGN.md §11 «Filtro» y «Buscador».
+- **Paso 11 — la ficha y sus acciones** (`e5c614b`). La ficha
+  (`FichaDelMensaje`, `AccionesDelMensaje`, `formato.ts`), `Volver` en el
+  slot `volver` del `Encabezado`, `Confirmacion`; `mover-mensajes.ts` (la
+  lógica, probada contra la base) y las cuatro Server Actions que solo
+  verifican y delegan; cinco tipos en `actividad.ts`;
+  `ficha-de-mensaje.ts` aparte para que `consultas/mensajes.ts` quede en 85
+  líneas; la descarga `descargarCV` y su ruta. `tsx --test
+  src/datos/acciones/acciones-con-sesion.test.ts
+  src/datos/acciones/mover-mensajes.test.ts` → 16 pasan. En el navegador:
+  Nuevo → «Lo tomo yo» → En curso («Tomado por vos», «Responder» primario) →
+  «Cerrar» → «Marcar como spam» («Se borra el 27/10/2026») → «Lo tomo yo»;
+  la actividad quedó con el tema («Investigación») y sin el nombre. «Borrar
+  ahora» muestra la pregunta con el foco en «Cancelar» (que la lleva como
+  descripción); «Sí, borrar» vuelve a `?borrado=1` con «Se borró el mensaje
+  para siempre.» y deja `borro-un-mensaje` sin `sobre_id`. Descarga del CV:
+  como administra 200, `application/pdf`, adjunto «CV de Bruno Prueba
+  CV.pdf», `no-store`, 193 bytes que empiezan por `%PDF-`; sin cookie el
+  proxy da 307 a entrar (antes que la ruta: el 401 del SPEC §3 lo da la ruta
+  con una cookie que no es una sesión, probado con una falsa); como edita
+  403 «No tenés permiso para hacer eso.». DESIGN.md §11 «Volver» y
+  «Confirmar lo que no se deshace».
