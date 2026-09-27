@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import gsap from "gsap";
 import { MathField } from "@/components/ui/MathField";
 import type { Apertura } from "@/features/contacto/contenido/apertura";
+import type { CierreDeContacto } from "@/features/contacto/contenido/cierre";
 import type { Titular } from "@/features/contacto/contenido/titular";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -75,10 +76,12 @@ export function ContactoExperiencia({
   cvAbierto,
   titular,
   apertura,
+  cierre,
 }: {
   cvAbierto: boolean;
   titular: Titular;
   apertura: Apertura;
+  cierre: CierreDeContacto;
 }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -200,6 +203,7 @@ export function ContactoExperiencia({
         <PanelCierre
           activo={vista === "cierre"}
           titulo={temaActivo?.titulo ?? "Consulta"}
+          contenido={cierre}
           onOtra={() => otraConsulta(contexto())}
         />
       </div>
