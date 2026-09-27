@@ -12,6 +12,7 @@ import { cierreDeInvestigacionInicial, esquemaCierreDeInvestigacion } from "@/fe
 import { enAccionInicial, esquemaEnAccion } from "@/features/investigacion/contenido/en-accion";
 import { esquemaHeroInvestigacion, heroInvestigacionInicial } from "@/features/investigacion/contenido/hero";
 import { esquemaLineas, lineasInicial } from "@/features/investigacion/contenido/lineas";
+import { seoInvestigacionInicial } from "@/features/investigacion/contenido/seo";
 import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import { cierreInicial as cierreDeQueHacemos, esquemaCierre as esquemaCierreDeQueHacemos } from "@/features/que-hacemos/contenido/cierre";
 import { esquemaFaro, faroInicial } from "@/features/que-hacemos/contenido/faro";
@@ -101,6 +102,7 @@ export const PAGINAS = {
       enAccion: { nombre: "Investigación en acción", esquema: esquemaEnAccion, inicial: enAccionInicial },
       cierre: { nombre: "Cierre", esquema: esquemaCierreDeInvestigacion, inicial: cierreDeInvestigacionInicial },
     },
+    seo: seoInvestigacionInicial,
   },
   biblioteca: { ruta: "/biblioteca", nombre: "Biblioteca", secciones: {} },
   novedades: { ruta: "/novedades", nombre: "Novedades", secciones: {} },
