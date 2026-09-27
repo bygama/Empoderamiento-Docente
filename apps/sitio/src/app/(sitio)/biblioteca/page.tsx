@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { contenidoDe } from "@/datos/consultas/paginas";
 import { BibliotecaHero } from "@/features/biblioteca/components/BibliotecaHero";
 import { DestacadosBiblioteca } from "@/features/biblioteca/components/DestacadosBiblioteca";
 import { MaterialesListado } from "@/features/biblioteca/components/MaterialesListado";
@@ -11,10 +12,12 @@ export const metadata: Metadata = {
     "Publicaciones y recursos de Empoderamiento Docente: producción académica, materiales pedagógicos y proyectos, abiertos para llevar al aula.",
 };
 
-export default function BibliotecaPage() {
+export default async function BibliotecaPage() {
+  // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
+  const { hero } = await contenidoDe("biblioteca");
   return (
     <main id="contenido" tabIndex={-1}>
-      <BibliotecaHero />
+      <BibliotecaHero contenido={hero} />
       <DestacadosBiblioteca />
       <MaterialesListado />
       <PuenteInvestigacion />

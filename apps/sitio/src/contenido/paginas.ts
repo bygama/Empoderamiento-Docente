@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import { esquemaHeroBiblioteca, heroBibliotecaInicial } from "@/features/biblioteca/contenido/hero";
 import { areasInicial, esquemaAreas } from "@/features/home/contenido/areas";
 import { bibliotecaYNovedadesInicial, esquemaBibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
 import { comoTrabajamosInicial, esquemaComoTrabajamos } from "@/features/home/contenido/como-trabajamos";
@@ -104,7 +105,13 @@ export const PAGINAS = {
     },
     seo: seoInvestigacionInicial,
   },
-  biblioteca: { ruta: "/biblioteca", nombre: "Biblioteca", secciones: {} },
+  biblioteca: {
+    ruta: "/biblioteca",
+    nombre: "Biblioteca",
+    secciones: {
+      hero: { nombre: "Hero", esquema: esquemaHeroBiblioteca, inicial: heroBibliotecaInicial },
+    },
+  },
   novedades: { ruta: "/novedades", nombre: "Novedades", secciones: {} },
   contacto: { ruta: "/contacto", nombre: "Contacto", secciones: {} },
 } satisfies RegistroDePaginas;
