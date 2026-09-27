@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MathField } from "@/components/ui/MathField";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
+import type { HeroDeQuienesSomos } from "@/features/quienes-somos/contenido/hero";
 import { alClicIrA } from "@/lib/navegar";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -51,7 +52,7 @@ const clipStyle = (gradient: string) =>
     WebkitTextFillColor: "transparent",
   }) as const;
 
-export function QuienesSomosHero() {
+export function QuienesSomosHero({ contenido }: { contenido: HeroDeQuienesSomos }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -113,7 +114,7 @@ export function QuienesSomosHero() {
     <section
       ref={rootRef}
       className="relative isolate flex min-h-[87svh] flex-col justify-between overflow-hidden bg-gradient-to-b from-white via-white to-gris-fondo/40 px-6 pt-40 pb-12 md:px-12 md:pt-48 md:pb-16"
-      aria-label="Quiénes somos — Empoderamiento Docente"
+      aria-labelledby="quienes-somos-titulo"
     >
       {/* Fondo de nodos de marca (el mismo del Inicio), detrás de todo */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 opacity-40">
@@ -122,16 +123,17 @@ export function QuienesSomosHero() {
 
       {/* ── Titular gigante (arriba, a la izquierda) — la antítesis ───────── */}
       <h1
+        id="quienes-somos-titulo"
         className="font-display relative z-10 max-w-[16ch] font-extrabold tracking-[-0.025em]"
         style={{ fontSize: "clamp(2.4rem, 0.5rem + 9vw, 8.5rem)", lineHeight: 0.96 }}
       >
-        <span className="sr-only">No capacitamos. Transformamos.</span>
+        <span className="sr-only">{`${contenido.titulo.primeraLinea} ${contenido.titulo.segundaLinea}`}</span>
         <span aria-hidden="true" className="block">
           <span data-title-1 className="block" style={clipStyle(FILL_NAVY)}>
-            No capacitamos.
+            {contenido.titulo.primeraLinea}
           </span>
           <span data-title-2 className="block" style={clipStyle(FILL_VERDE)}>
-            Transformamos.
+            {contenido.titulo.segundaLinea}
           </span>
         </span>
       </h1>
@@ -142,17 +144,17 @@ export function QuienesSomosHero() {
           data-hero-foot
           className="text-azul-principal max-w-[42ch] font-sans text-[1.05rem] leading-relaxed font-medium [text-wrap:balance] md:max-w-[62ch] md:text-right md:text-[1.2rem]"
         >
-          Somos investigación, diseño y acompañamiento: un proceso colectivo que
-          cambia la relación con el saber matemático escolar.
+          {contenido.bajada}
         </p>
         {/* Atajo a la sección que más se vuelve a buscar (decisión de ED,
-            2026-09-08): mismas palabras que el submenú y el título de la
-            sección, y corta directo como el navbar (la sección está al final,
+            2026-09-08): hoy dice lo mismo que el submenú y la volanta de la
+            sección (los dos textos se editan en el admin, y la ayuda de cada
+            uno nombra al otro), y corta directo como el navbar (la sección está al final,
             después de dos escenas largas). Secundario: el naranja es para
             Contacto. Entra con la bajada (data-hero-foot). */}
         <div data-hero-foot>
           <ButtonSecondary href="#equipo" onClick={alClicIrA("equipo")}>
-            Quiénes sostienen ED
+            {contenido.boton}
           </ButtonSecondary>
         </div>
       </div>

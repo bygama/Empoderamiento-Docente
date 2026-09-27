@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { contenidoDe } from "@/datos/consultas/paginas";
 import { QuienesSomosHero } from "@/features/quienes-somos/components/QuienesSomosHero";
 import { OrigenEd } from "@/features/quienes-somos/components/OrigenEd";
 import { MiradaEd } from "@/features/quienes-somos/components/MiradaEd";
@@ -10,10 +11,12 @@ export const metadata: Metadata = {
     "Empoderamiento Docente no es una capacitación más: investigación, diseño y acompañamiento para transformar la relación con el saber matemático escolar.",
 };
 
-export default function QuienesSomosPage() {
+export default async function QuienesSomosPage() {
+  // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
+  const { hero } = await contenidoDe("quienes-somos");
   return (
     <main id="contenido" tabIndex={-1}>
-      <QuienesSomosHero />
+      <QuienesSomosHero contenido={hero} />
       <OrigenEd />
       <MiradaEd />
       {/* «Nuestro enfoque» (TRANSFORMACIÓN armándose + diferenciales) estuvo
