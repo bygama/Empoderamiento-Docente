@@ -31,7 +31,8 @@ function estados(r: ResumenDeAjustes): Record<ClaveDeAjustes, React.ReactNode> {
       return `${cuantas(redirecciones, "redirección", "redirecciones")} · ${google}`;
     }),
     avisos: estadoDe(r.avisos, (avisos) => {
-      const nadie = avisos.find((a) => a.reciben === 0);
+      // Uno que viene prendido y quedó sin nadie es un aviso que alguien apagó para todas; el que se pide (el resumen semanal), no.
+      const nadie = avisos.find((a) => a.deFabrica && a.reciben === 0);
       if (nadie) return <Insignia tono="fuerte">Nadie recibe los avisos de {nadie.nombre}</Insignia>;
       return avisos.map((a) => `${a.nombre}: ${cuantas(a.reciben, "persona", "personas")}`).join(" · ");
     }),

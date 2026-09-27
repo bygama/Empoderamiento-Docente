@@ -16,7 +16,7 @@ export type Leido<T> = { ok: true; valor: T } | { ok: false };
 export type ResumenDeAjustes = {
   sitio: Leido<{ cambiadoEn: Date | null; cambiadoPor: string | null }>;
   seo: Leido<{ redirecciones: number; rutas: number; revisadas: number; enGoogle: number; conectado: boolean }>;
-  avisos: Leido<Array<{ nombre: string; reciben: number }>>;
+  avisos: Leido<Array<{ nombre: string; reciben: number; deFabrica: boolean }>>;
   privacidad: Leido<{ cv: number; contacto: number; spam: number }>;
   conexiones: Leido<{ configuradas: number; total: number; conError: number }>;
 };
@@ -44,7 +44,7 @@ export async function resumenDeAjustes(rol: unknown): Promise<ResumenDeAjustes |
       const revisadas = filas.filter((f) => f.veredicto);
       return { redirecciones, rutas: filas.length, revisadas: revisadas.length, enGoogle: revisadas.filter((f) => f.veredicto === "PASS").length, conectado: Boolean(indexacion?.conectado) };
     }),
-    aislado("los avisos", async () => (await avisosDeTodas(rol)).map(({ aviso, cuentas }) => ({ nombre: AVISOS[aviso].nombre, reciben: cuentas.filter((c) => c.activo).length }))),
+    aislado("los avisos", async () => (await avisosDeTodas(rol)).map(({ aviso, cuentas }) => ({ nombre: AVISOS[aviso].nombre, reciben: cuentas.filter((c) => c.activo).length, deFabrica: AVISOS[aviso].deFabrica }))),
     aislado("los plazos", async () => {
       const plazos = await plazosDeLaBase();
       return { cv: vigente(plazos.cv), contacto: vigente(plazos.contacto), spam: plazos.spam };
