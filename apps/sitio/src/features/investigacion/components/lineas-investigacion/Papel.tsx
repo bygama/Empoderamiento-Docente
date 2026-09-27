@@ -4,6 +4,7 @@ import { ClipPapel, FlechaManuscrita, SubrayadoMarcador } from "@/features/inves
 import { ROTULO_MICRO } from "@/features/investigacion/casos/tintes";
 import type { Lineas } from "@/features/investigacion/contenido/lineas";
 import { ConResaltado } from "../ConResaltado";
+import { numeroDePapel } from "./numero";
 
 /** Una línea de la mesa: su nombre y su pregunta, con la parte que subraya el marcador entre dobles asteriscos. */
 type Linea = Lineas["lineas"][number];
@@ -55,7 +56,7 @@ function subrayada(clave: string) {
  */
 export function Papel({ linea, caso, indice }: { linea: Linea; caso: string; indice: number }) {
   const material = MATERIALES[indice % 3];
-  const numero = String(indice + 1).padStart(2, "0");
+  const numero = numeroDePapel(indice);
   // Tres tonos que se distinguen entre sí y de la carpeta (que es
   // azul-claro): la hoja blanca, la nota en un azul más claro que la carpeta
   // y la ficha en el gris del sitio, con borde.
