@@ -12,6 +12,9 @@ model Redireccion {
   hacia  String
 
   creadaEn DateTime @default(now()) @map("creada_en")
+  /// La agregó una persona en Ajustes › SEO. Falsa: la escribió el sitio solo,
+  /// al cambiar el slug de algo (Novedades), y desde Ajustes no se borra.
+  aMano    Boolean  @default(false) @map("a_mano")
 
   @@map("redirecciones")
 }
