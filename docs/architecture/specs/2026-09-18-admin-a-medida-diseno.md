@@ -161,7 +161,7 @@ Siete entidades, más las páginas y los ajustes:
 
 | Tabla | Qué guarda | Origen hoy |
 | --- | --- | --- |
-| `fotos` | imagen, alt obligatorio; el punto focal y el alt de cada lugar van con cada uso, que la encuentra por su URL | la migración `fotos_de_public` (las de `public/fotos`, `novedades`, `investigacion` y `aliados`) y las que sube el admin |
+| `fotos` | imagen, alt obligatorio; el punto focal y el alt de cada lugar van con cada uso, que la encuentra por su URL | la migración `fotos_de_public` (las de `public/fotos`, `novedades`, `investigacion` y `aliados`), la `fotos_del_equipo` (las de `public/equipo`) y las que sube el admin |
 | `novedades` | slug, fecha, categoría, título, bajada, imagen, destacada, cuerpo, el material que abre (`material_id`), imagen para redes | la migración `novedades` (era `features/novedades/data/novedades.ts`, borrado); `material_id`, de la migración `material_de_las_novedades` |
 | `materiales` | título, autores (solo la firma que no es una lista), descripción, tipo, tema, público, fecha, formato, páginas, portada, URL, fuente, DOI, cita, lugar de destacado y sus textos, el último chequeo del link | la migración `biblioteca` (era `features/biblioteca/data/materiales.ts`, borrado) |
 | `autorias` | quién firma cada material publicado, en orden, y el perfil del equipo si es de ED (`persona_id`, fk a `equipo`, `SET NULL`) | la migración `biblioteca`; la fk, de la migración `equipo` |

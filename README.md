@@ -594,7 +594,9 @@ link son los del material, y la línea de abajo (con quién, dónde) es del
 perfil. Lo que no tiene link se escribe en la etapa. «Agregar en
 Biblioteca», en la ficha, abre un material nuevo con la persona ya elegida
 como autora. Borrar un perfil deja sus autorías en la Biblioteca, con su
-nombre, como de alguien de afuera. Los 15 perfiles entraron con la migración
+nombre, como de alguien de afuera. Las fotos de la tarjeta y de la figura
+están en Fotos: se suben o se eligen de las ya subidas, y la ficha de cada
+foto dice en qué perfil se usa. Los 15 perfiles entraron con la migración
 `equipo`; la bio y el LinkedIn de cada uno, que el sitio no muestra, quedaron
 en [`docs/content/equipo-sin-publicar.md`](docs/content/equipo-sin-publicar.md).
 
