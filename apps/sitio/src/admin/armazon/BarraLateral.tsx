@@ -1,4 +1,5 @@
 import { puede } from "@ed/auth";
+import type { Cuenta } from "@ed/kit-admin";
 import { listaDeAliados } from "@/datos/consultas/aliados-del-admin";
 import { listaDeCasos } from "@/datos/consultas/casos-del-admin";
 import { listaDePaginas } from "@/datos/consultas/editor-de-paginas";
@@ -8,7 +9,6 @@ import { nuevosPorBandeja } from "@/datos/consultas/mensajes";
 import { ContenidoDeLaBarra, type Usuario } from "./barra-lateral/ContenidoDeLaBarra";
 import { MODULOS } from "./barra-lateral/modulos";
 import { PanelMovil } from "./barra-lateral/PanelMovil";
-import type { Cuenta } from "./Numero";
 import type { Tema } from "./tema";
 
 /**

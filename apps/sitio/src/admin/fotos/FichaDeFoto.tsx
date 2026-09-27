@@ -1,6 +1,4 @@
-import { Aviso } from "@ed/kit-admin";
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { Aviso, Encabezado, Insignia } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import type { FichaDeFoto as Ficha } from "@/datos/consultas/fotos";
 import { FormularioDelAlt } from "./FormularioDelAlt";

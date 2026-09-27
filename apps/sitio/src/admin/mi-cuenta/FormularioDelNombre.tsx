@@ -1,8 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Campo } from "@/admin/armazon/Campos";
+import { Aviso, Boton, CampoSimple } from "@ed/kit-admin";
 import { cambiarMiNombre } from "@/datos/acciones/mi-cuenta";
 
 /**
@@ -28,7 +27,7 @@ export function FormularioDelNombre({ nombre }: { nombre: string }) {
   return (
     <form onSubmit={guardar} className="max-w-md space-y-3">
       {/* La `key` lo vuelve a armar con el nombre guardado, que llega limpio («Ana  María » → «Ana María»). */}
-      <Campo
+      <CampoSimple
         key={nombre}
         etiqueta="Nombre"
         name="nombre"

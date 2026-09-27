@@ -3,8 +3,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { QUE_PUEDE, ROLES_QUE_SE_ASIGNAN, ROL_POR_DEFECTO } from "@ed/auth";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Campo } from "@/admin/armazon/Campos";
+import { Aviso, Boton, CampoSimple } from "@ed/kit-admin";
 import { invitar } from "@/datos/acciones/invitaciones";
 
 /**
@@ -35,8 +34,8 @@ export function FormularioDeInvitacion() {
 
   return (
     <form onSubmit={mandar} className="max-w-md space-y-6">
-      <Campo etiqueta="Correo" name="correo" type="email" required maxLength={254} autoComplete="off" />
-      <Campo etiqueta="Nombre" name="nombre" required maxLength={80} autoComplete="off" />
+      <CampoSimple etiqueta="Correo" name="correo" type="email" required maxLength={254} autoComplete="off" />
+      <CampoSimple etiqueta="Nombre" name="nombre" required maxLength={80} autoComplete="off" />
       <fieldset>
         <legend className="text-admin-meta font-medium">Rol</legend>
         <div className="mt-2 space-y-3">

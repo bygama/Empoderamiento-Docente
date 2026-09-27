@@ -1,6 +1,6 @@
 "use client";
 
-import type { Pestana } from "@/admin/armazon/Pestanas";
+import type { Pestana } from "@ed/kit-admin";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 import { CLAVE_SEO } from "@/lib/contenido/buscador";
 import { EditorDePagina } from "./EditorDePagina";

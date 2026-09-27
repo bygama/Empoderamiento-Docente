@@ -1,11 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { BotonEnlace } from "@ed/kit-admin";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
-import { AvisosDelOrden, BotonesDeOrden } from "@/admin/armazon/ListaQueSeOrdena";
-import { useMoverEnOrden } from "@/admin/armazon/useMoverEnOrden";
+import { AvisosDelOrden, BotonEnlace, BotonesDeOrden, Fila, Insignia, Lista, useMoverEnOrden } from "@ed/kit-admin";
 import { Persona } from "@/components/ui/icons";
 import { moverPersona } from "@/datos/acciones/equipo";
 import type { FilaDePerfil } from "@/datos/consultas/equipo-del-admin";

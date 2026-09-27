@@ -1,4 +1,4 @@
-import { BotonEnlace } from "@ed/kit-admin";
+import { BotonEnlace } from "./Boton";
 
 /**
  * Las páginas de una lista larga, paginada en el servidor (DESIGN.md §11,

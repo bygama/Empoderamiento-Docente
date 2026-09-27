@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { EstadoVacio } from "@ed/kit-admin";
 import { ListaDeCasos } from "@/admin/casos/ListaDeCasos";
 import { EncabezadoDeContenido } from "@/admin/contenido/EncabezadoDeContenido";
 import { listaDeCasos } from "@/datos/consultas/casos-del-admin";

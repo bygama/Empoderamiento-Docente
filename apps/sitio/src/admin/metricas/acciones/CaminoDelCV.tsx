@@ -1,5 +1,4 @@
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Tabla } from "@/admin/armazon/Tabla";
+import { EstadoVacio, Tabla } from "@ed/kit-admin";
 import { EVENTOS, MINIMOS } from "@/config/metricas";
 import type { QueHaceLaGente } from "@/datos/consultas/que-hace-la-gente";
 import { NOMBRE_DEL_CANAL } from "@/lib/metricas/canales";

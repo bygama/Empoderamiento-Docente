@@ -1,5 +1,4 @@
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Pestanas } from "@/admin/armazon/Pestanas";
+import { Encabezado, Pestanas } from "@ed/kit-admin";
 import { CUENTAS, PESTANAS_DE_CUENTAS } from "./pantallas";
 
 /**

@@ -1,6 +1,5 @@
 import { quienPuede } from "@ed/auth";
-import { Apartado } from "@/admin/armazon/Apartado";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Apartado, Encabezado } from "@ed/kit-admin";
 import { AVISOS } from "@/config/avisos";
 import type { AvisoConCuentas } from "@/datos/avisos";
 import { VOLVER_A_AJUSTES } from "../pantallas";

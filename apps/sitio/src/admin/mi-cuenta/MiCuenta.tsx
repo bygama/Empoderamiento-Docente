@@ -1,6 +1,5 @@
 import { QUE_PUEDE, esRol, esUnaSola, quienPuede } from "@ed/auth";
-import { Apartado } from "@/admin/armazon/Apartado";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Apartado, Encabezado } from "@ed/kit-admin";
 import type { ClaveDeAviso } from "@/config/avisos";
 import type { SesionAbierta } from "@/datos/consultas/mi-cuenta";
 import { FormularioDeAvisos } from "./FormularioDeAvisos";

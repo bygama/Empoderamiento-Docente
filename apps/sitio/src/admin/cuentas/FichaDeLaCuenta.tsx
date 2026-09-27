@@ -1,6 +1,5 @@
 import { ROL_AL_DEJAR_LA_DIRECCION } from "@ed/auth";
-import { Aviso } from "@ed/kit-admin";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Aviso, Encabezado } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import { EstadoDeLaCuenta } from "./EstadoDeLaCuenta";
 import {

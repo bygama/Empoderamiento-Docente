@@ -1,6 +1,4 @@
-import { BotonEnlace } from "@ed/kit-admin";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { BotonEnlace, Fila, Insignia, Lista } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import { BANDEJAS, type Bandeja } from "@/config/mensajes";
 import type { FilaDeMensaje } from "@/datos/consultas/mensajes";

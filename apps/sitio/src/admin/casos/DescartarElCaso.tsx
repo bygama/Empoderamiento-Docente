@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Boton } from "@ed/kit-admin";
-import { Confirmacion } from "@/admin/armazon/Confirmacion";
-import { FilaDeAccion } from "@/admin/armazon/FilaDeAccion";
+import { Boton, Confirmacion, FilaDeAccion } from "@ed/kit-admin";
 
 type Props = { corriendo: boolean; descartando: boolean; alDescartar: () => void };
 

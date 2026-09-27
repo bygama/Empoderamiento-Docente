@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Confirmacion } from "@/admin/armazon/Confirmacion";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { Aviso, Boton, Confirmacion, EstadoVacio, Fila, Insignia, Lista } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import { CANALES_DE_ENLACE, esCanalDeEnlace } from "@/config/metricas";
 import { borrarEnlaceDesdeElAdmin } from "@/datos/acciones/enlaces";

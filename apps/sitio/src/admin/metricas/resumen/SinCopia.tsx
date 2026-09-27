@@ -1,4 +1,4 @@
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { EstadoVacio } from "@ed/kit-admin";
 import type { EstadoDeMetricas } from "@/datos/consultas/metricas";
 import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 

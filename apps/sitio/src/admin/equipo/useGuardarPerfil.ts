@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import type { AvisoDelEditor } from "@ed/kit-admin";
 import { crearPersona, guardarPersona } from "@/datos/acciones/equipo";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-persona";
 import type { BorradorDePersona } from "@/features/quienes-somos/contenido/persona";

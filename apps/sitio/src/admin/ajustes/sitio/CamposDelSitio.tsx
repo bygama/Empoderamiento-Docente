@@ -1,5 +1,4 @@
-import { TextoCorto } from "@ed/kit-admin";
-import { Apartado } from "@/admin/armazon/Apartado";
+import { Apartado, TextoCorto } from "@ed/kit-admin";
 import { ETIQUETAS, type CampoDelSitio, type ValoresDelSitio } from "@/config/formulario-del-sitio";
 
 type Props = {

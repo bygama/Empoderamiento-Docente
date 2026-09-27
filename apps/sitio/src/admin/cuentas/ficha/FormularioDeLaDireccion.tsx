@@ -3,9 +3,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ROL_AL_DEJAR_LA_DIRECCION } from "@ed/auth";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
-import { Confirmacion } from "@/admin/armazon/Confirmacion";
+import { Aviso, Boton, CampoContrasena, Confirmacion } from "@ed/kit-admin";
 import { pasarLaDireccion } from "@/datos/acciones/direccion";
 
 /**

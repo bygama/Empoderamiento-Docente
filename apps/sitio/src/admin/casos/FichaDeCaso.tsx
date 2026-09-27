@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { resolverCambio, type Cambio } from "@ed/kit-admin";
-import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
+import { AvisoDeLaAccion, type Cambio, resolverCambio, useFrenarSalida } from "@ed/kit-admin";
 import { QueCambioPlegado } from "@/admin/armazon/QueCambioPlegado";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
-import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { errorDe } from "@/admin/campos/errores";
 import type { FichaDeCaso as Ficha } from "@/datos/consultas/casos-del-admin";
 import type { BorradorDeCaso } from "@/features/investigacion/contenido/caso";

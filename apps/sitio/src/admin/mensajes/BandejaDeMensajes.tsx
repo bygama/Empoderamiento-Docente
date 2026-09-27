@@ -1,6 +1,4 @@
-import { Buscador } from "@/admin/armazon/Buscador";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Filtro } from "@/admin/armazon/Filtro";
+import { Buscador, EstadoVacio, Filtro } from "@ed/kit-admin";
 import { cvAbierto } from "@/config/cv";
 import { BANDEJAS, ESTADOS, ETIQUETA_DEL_ESTADO, type Bandeja, type EstadoDeMensaje } from "@/config/mensajes";
 import { vigente } from "@/config/privacidad";

@@ -1,4 +1,4 @@
-import { Filtro } from "@/admin/armazon/Filtro";
+import { Filtro } from "@ed/kit-admin";
 import { PERIODOS, type Periodo } from "@/lib/metricas/periodos";
 
 /**

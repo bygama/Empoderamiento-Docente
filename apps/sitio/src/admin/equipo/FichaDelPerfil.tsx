@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { desdeTexto } from "@ed/db/slug";
-import { resolverCambio } from "@ed/kit-admin";
-import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
+import { AvisoDeLaAccion, resolverCambio, useFrenarSalida } from "@ed/kit-admin";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
-import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import type { FichaDePersona, VecinosDePersona } from "@/datos/consultas/ficha-de-persona";
 import type { BorradorDePersona } from "@/features/quienes-somos/contenido/persona";
 import { personaVacia } from "@/features/quienes-somos/contenido/persona-vacia";

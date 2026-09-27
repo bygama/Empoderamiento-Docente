@@ -1,5 +1,4 @@
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Pestanas } from "@/admin/armazon/Pestanas";
+import { Encabezado, Pestanas } from "@ed/kit-admin";
 import { CONTENIDO, PANTALLAS_DE_CONTENIDO } from "./pantallas";
 
 const PESTANAS = PANTALLAS_DE_CONTENIDO.map((p) => ({ href: p.href, etiqueta: p.nombre }));

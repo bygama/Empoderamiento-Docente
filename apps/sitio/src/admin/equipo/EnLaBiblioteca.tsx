@@ -1,7 +1,4 @@
-import { BotonEnlace } from "@ed/kit-admin";
-import { Bloque } from "@/admin/armazon/Bloque";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { Bloque, BotonEnlace, Fila, Insignia, Lista } from "@ed/kit-admin";
 import type { Firmado } from "@/datos/consultas/ficha-de-persona";
 import type { RecorridoEnElFormulario } from "./formulario";
 

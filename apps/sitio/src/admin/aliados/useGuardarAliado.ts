@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import type { AvisoDelEditor } from "@ed/kit-admin";
 import { crearAliado, guardarAliado } from "@/datos/acciones/aliados";
 import type { EstadoDelAliado } from "@/datos/consultas/aliados-del-admin";
 import type { BorradorDeAliado } from "@/features/aliados/contenido/aliado";

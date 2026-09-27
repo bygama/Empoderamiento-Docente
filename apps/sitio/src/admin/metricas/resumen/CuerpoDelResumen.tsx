@@ -1,4 +1,4 @@
-import { Cifra } from "@/admin/armazon/Cifra";
+import { Cifra } from "@ed/kit-admin";
 import { MINIMOS } from "@/config/metricas";
 import type { MarcaDeLaCurva } from "@/datos/consultas/marcas";
 import type { ResumenDelPeriodo } from "@/datos/consultas/resumen";

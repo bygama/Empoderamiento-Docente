@@ -1,5 +1,4 @@
-import { Cifra } from "@/admin/armazon/Cifra";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { Cifra, Fila, Lista } from "@ed/kit-admin";
 import type { QueHaceLaGente } from "@/datos/consultas/que-hace-la-gente";
 import { parte } from "@/lib/metricas/agregar";
 import { NOMBRE_DEL_CANAL } from "@/lib/metricas/canales";

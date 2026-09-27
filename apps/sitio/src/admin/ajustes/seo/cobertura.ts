@@ -1,4 +1,4 @@
-import type { Tono } from "@/admin/armazon/Insignia";
+import type { Tono } from "@ed/kit-admin";
 
 // Lo que dice Google de cada página (el `coverageState` de la API de
 // inspección), en castellano. Google lo manda en inglés y sin lista cerrada:

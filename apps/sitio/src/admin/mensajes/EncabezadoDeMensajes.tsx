@@ -1,6 +1,4 @@
-import { Aviso } from "@ed/kit-admin";
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Pestanas } from "@/admin/armazon/Pestanas";
+import { Aviso, Encabezado, Pestanas } from "@ed/kit-admin";
 import { BANDEJAS, type Bandeja } from "@/config/mensajes";
 import { MENSAJES } from "./textos";
 

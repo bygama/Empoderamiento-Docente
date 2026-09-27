@@ -1,5 +1,5 @@
+import { AccionesDeLaFicha } from "@ed/kit-admin";
 import { EncabezadoDeFicha } from "@/admin/armazon/EncabezadoDeFicha";
-import { AccionesDeLaFicha } from "@/admin/armazon/AccionesDeLaFicha";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-persona";
 import { insigniaDelPerfil } from "./estado";
 import type { Pendiente } from "./useGuardarPerfil";

@@ -1,6 +1,5 @@
+import { AccionesDeLaFicha, type Tono } from "@ed/kit-admin";
 import { EncabezadoDeFicha } from "@/admin/armazon/EncabezadoDeFicha";
-import type { Tono } from "@/admin/armazon/Insignia";
-import { AccionesDeLaFicha } from "@/admin/armazon/AccionesDeLaFicha";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-material";
 import type { Pendiente } from "./useGuardarMaterial";
 

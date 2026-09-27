@@ -1,7 +1,5 @@
-import { Aviso, BotonEnlace } from "@ed/kit-admin";
+import { Aviso, BotonEnlace, EstadoVacio, Fila, Lista } from "@ed/kit-admin";
 import { fraseDe } from "@/admin/actividad/frase";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Fila, Lista } from "@/admin/armazon/Lista";
 import { Momento } from "@/admin/armazon/Momento";
 import type { EventoReciente } from "@/datos/inicio/actividad-reciente";
 

@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import type { AvisoDelEditor } from "@ed/kit-admin";
 import { descartarCambiosDeMaterial, ocultarMaterial } from "@/datos/acciones/ciclo-de-materiales";
 import { borrarMaterial } from "@/datos/acciones/materiales";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-material";

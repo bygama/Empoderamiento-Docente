@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Confirmacion } from "@/admin/armazon/Confirmacion";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { Aviso, Boton, Confirmacion, EstadoVacio, Insignia, Tabla } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
-import { Tabla } from "@/admin/armazon/Tabla";
 import { borrarRedireccion } from "@/datos/acciones/redirecciones";
 
 export type RedireccionParaMostrar = { id: string; desde: string; hacia: string; aMano: boolean; creadaEn: string; seAplica: boolean };

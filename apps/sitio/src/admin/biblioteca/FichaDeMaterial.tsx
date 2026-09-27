@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { resolverCambio } from "@ed/kit-admin";
-import { AvisoDeLaAccion, type AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import { AvisoDeLaAccion, type AvisoDelEditor, resolverCambio, useFrenarSalida } from "@ed/kit-admin";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
-import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { materialesParecidos } from "@/datos/acciones/buscar-datos";
 import type { Vecino } from "@/datos/biblioteca/contra-la-biblioteca";
 import type { FichaDeMaterial as Ficha, Vecinos } from "@/datos/consultas/ficha-de-material";

@@ -1,5 +1,5 @@
 import type { EstadoDeCuenta } from "@ed/auth";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { Insignia } from "@ed/kit-admin";
 
 /**
  * La insignia del estado de una cuenta (SPEC de work/cuentas §2): activa es

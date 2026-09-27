@@ -1,7 +1,4 @@
-import { BotonEnlace } from "@ed/kit-admin";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { BotonEnlace, EstadoVacio, Fila, Insignia, Lista } from "@ed/kit-admin";
 import type { Donde, Uso } from "@/datos/fotos/uso";
 
 /** Dónde está cada uso, como insignia: lo que el sitio muestra es el estado estable; lo demás, todavía no. */

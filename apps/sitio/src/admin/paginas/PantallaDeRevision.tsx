@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { Pestana } from "@/admin/armazon/Pestanas";
+import { AvisoDeLaAccion, type Pestana } from "@ed/kit-admin";
 import type { PaginaEnRevision } from "@/datos/consultas/historial-de-paginas";
-import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
 import { EncabezadoDelEditor } from "./EncabezadoDelEditor";
 import { useAccionesDePagina } from "./useAccionesDePagina";
 

@@ -1,5 +1,4 @@
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Pestanas } from "@/admin/armazon/Pestanas";
+import { Encabezado, Pestanas } from "@ed/kit-admin";
 import { METRICAS, PANTALLAS_DE_METRICAS } from "./pantallas";
 
 const PESTANAS = PANTALLAS_DE_METRICAS.map((p) => ({ href: p.href, etiqueta: p.nombre }));

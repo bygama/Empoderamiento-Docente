@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Confirmacion } from "@/admin/armazon/Confirmacion";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { Aviso, Boton, Confirmacion, Fila, Lista } from "@ed/kit-admin";
 import { borrarMarca, type ResultadoDeMarca } from "@/datos/acciones/marcas";
 
 export type MarcaParaMostrar = { id: string; numero: number; dia: string; texto: string; creadaPor: string | null };

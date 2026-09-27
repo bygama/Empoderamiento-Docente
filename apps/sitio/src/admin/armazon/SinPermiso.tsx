@@ -1,6 +1,5 @@
 import { QUE_PUEDE, esRol, quienPuede, type Capacidad } from "@ed/auth";
-import { BotonEnlace } from "@ed/kit-admin";
-import { Encabezado } from "./Encabezado";
+import { BotonEnlace, Encabezado } from "@ed/kit-admin";
 
 /**
  * Lo que ve quien entra por URL a una sección que su rol no usa (DESIGN.md

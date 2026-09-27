@@ -2,9 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Confirmacion } from "@/admin/armazon/Confirmacion";
-import { FilaDeAccion } from "@/admin/armazon/FilaDeAccion";
+import { Aviso, Boton, Confirmacion, FilaDeAccion } from "@ed/kit-admin";
 import { borrarFoto } from "@/datos/acciones/fotos";
 import { noSeReemplazaElLogo } from "@/features/aliados/contenido/autorizacion";
 import { ReemplazarElArchivo } from "./salida-de-la-foto/ReemplazarElArchivo";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useId, useState } from "react";
-import { ENTRADA } from "@ed/kit-admin";
-import { Eye, EyeOff } from "@/components/ui/icons";
+import { ENTRADA } from "./clases";
+import { Ojo, OjoTachado } from "./iconos";
 
 type Props = {
   etiqueta: string;
@@ -56,7 +56,7 @@ export function CampoContrasena({ etiqueta, name, autoComplete, minLength, ayuda
           onClick={() => setVisible((v) => !v)}
           className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-gris-texto transition-colors hover:text-azul-principal focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-azul-medio"
         >
-          {visible ? <EyeOff size={20} /> : <Eye size={20} />}
+          {visible ? <OjoTachado size={20} /> : <Ojo size={20} />}
         </button>
       </div>
       {ayuda ? (

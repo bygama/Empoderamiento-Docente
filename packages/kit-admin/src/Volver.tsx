@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "@/components/ui/icons";
+import { FlechaIzquierda } from "./iconos";
 
 export type DestinoDeVolver = { href: string; etiqueta: string };
 
@@ -18,7 +18,7 @@ export function Volver({ href, etiqueta, resaltado = false }: DestinoDeVolver & 
       href={href}
       className={`inline-flex min-h-6 items-center gap-1 rounded-sm text-admin-meta font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 ${color}`}
     >
-      <ArrowLeft size={16} aria-hidden="true" className="shrink-0" />
+      <FlechaIzquierda size={16} aria-hidden="true" className="shrink-0" />
       {etiqueta}
     </Link>
   );

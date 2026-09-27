@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import type { AvisoDelEditor } from "@ed/kit-admin";
 import { crearMaterial, guardarMaterial } from "@/datos/acciones/materiales";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-material";
 import type { BorradorDeMaterial } from "@/features/biblioteca/contenido/material";

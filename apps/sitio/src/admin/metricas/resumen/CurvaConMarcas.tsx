@@ -1,6 +1,4 @@
-import { Curva } from "@/admin/armazon/Curva";
-import { diaLargo } from "@/admin/armazon/curva/calculos";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { Curva, diaLargo, EstadoVacio } from "@ed/kit-admin";
 import { MINIMOS } from "@/config/metricas";
 import type { MarcaDeLaCurva } from "@/datos/consultas/marcas";
 import type { PuntoDeLaCurva } from "@/lib/metricas/agregar";
