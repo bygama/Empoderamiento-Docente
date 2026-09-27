@@ -45,17 +45,20 @@ con este repo (Mateo, 2026-09-26).
 | 0 | deploy-al-dia | `work/deploy-al-dia/` | `mateo/deploy-al-dia` | 1 | — (respuestas del §8) | Claude, `--command "claude"` |
 | 1 | patrones-del-admin | `work/patrones-del-admin/` | `mateo/patrones-del-admin` | 1 | — | Claude, `--command "claude"` |
 | 2 | seguridad-del-acceso | `work/seguridad-del-acceso/` | `mateo/seguridad-del-acceso` | 1 | — | Claude, `--command "claude"` |
-| 3 | roles-y-cuentas | `work/roles-y-cuentas/` | `mateo/roles-y-cuentas` | 2 | 1, 2 | Claude, `--command "claude"` |
+| 3a | roles-y-actividad | `work/roles-y-actividad/` | `mateo/roles-y-actividad` | 2 | 1, 2 | Claude, `--command "claude"` |
+| 3b | cuentas | `work/cuentas/` | `mateo/cuentas` | 3 | 3a | Claude, `--command "claude"` |
+| 3c | inicio | `work/inicio/` | `mateo/inicio` | 3 | 3a, 5 | Claude, `--command "claude"` |
 | 4a | paginas-inicio | `work/paginas-inicio/` | `mateo/paginas-inicio` | 2 | 1 | Claude, `--command "claude"` |
 | 4b | paginas-que-hacemos-y-quienes-somos | `work/paginas-que-hacemos-y-quienes-somos/` | `mateo/paginas-que-hacemos-y-quienes-somos` | 3 | 4a | Claude, `--command "claude"` |
 | 4c | paginas-investigacion-y-resto | `work/paginas-investigacion-y-resto/` | `mateo/paginas-investigacion-y-resto` | 3 | 4a | Claude, `--command "claude"` |
 | 5 | busquedas-de-google | `work/busquedas-de-google/` | `mateo/busquedas-de-google` | 2 | 1 | Claude, `--command "claude"` |
-| 6 | novedades-y-kit | `work/novedades-y-kit/` | `mateo/novedades-y-kit` | 3 | 3 | Claude, `--command "claude"` |
-| 7 | mensajes | `work/mensajes/` | `mateo/mensajes` | 3 | 2, 3 | Claude, `--command "claude"` |
-| 8 | biblioteca-y-equipo | `work/biblioteca-y-equipo/` | `mateo/biblioteca-y-equipo` | 4 | 6 | Claude, `--command "claude"` |
+| 6 | novedades-y-kit | `work/novedades-y-kit/` | `mateo/novedades-y-kit` | 3 | 3a, 4a | Claude, `--command "claude"` |
+| 7 | mensajes | `work/mensajes/` | `mateo/mensajes` | 3 | 2, 3a | Claude, `--command "claude"` |
+| 8a | biblioteca | `work/biblioteca/` | `mateo/biblioteca` | 4 | 6 | Claude, `--command "claude"` |
+| 8b | equipo | `work/equipo/` | `mateo/equipo` | 5 | 8a | Claude, `--command "claude"` |
 | 9 | casos-aliados-fotos | `work/casos-aliados-fotos/` | `mateo/casos-aliados-fotos` | 4 | 4a, 6 | Claude, `--command "claude"` |
-| 10 | ajustes | `work/ajustes/` | `mateo/ajustes` | 4 | 3, 5, 7 | Claude, `--command "claude"` |
-| 11 | metricas-completas | `work/metricas-completas/` | `mateo/metricas-completas` | 5 | 0, 7, 8 | Claude, `--command "claude"` |
+| 10 | ajustes | `work/ajustes/` | `mateo/ajustes` | 4 | 3a, 5, 7 | Claude, `--command "claude"` |
+| 11 | metricas-completas | `work/metricas-completas/` | `mateo/metricas-completas` | 5 | 0, 7, 8a | Claude, `--command "claude"` |
 
 ## Lo que cada hija recibe en su brief
 
