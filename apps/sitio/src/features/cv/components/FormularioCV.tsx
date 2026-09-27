@@ -2,10 +2,11 @@
 
 import { useState, type FormEvent } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { CAMPOS_DEL_CV, CV_PESA_DE_MAS, MAXIMO_DEL_CV } from "@/config/cv";
+import { CV_PESA_DE_MAS, MAXIMO_DEL_CV } from "@/config/cv";
 import { MESES_DE_GUARDA } from "@/config/privacidad";
 import { siteConfig } from "@/config/site";
 import { INPUT_BASE, LABEL_BASE } from "@/features/contacto/components/experiencia/estilos";
+import type { CampoDeFormulario } from "@/lib/formularios/campos";
 import { enviarFormulario } from "@/lib/formularios/enviar";
 import { CampoCV } from "./formulario-cv/CampoCV";
 import { ConfirmacionCV } from "./formulario-cv/ConfirmacionCV";
@@ -16,11 +17,12 @@ const MEGAS = MAXIMO_DEL_CV / (1024 * 1024);
 /**
  * El formulario de CV (work/mensajes/SPEC.md §5.2), con la forma de enviar de
  * Contacto: viaja por `fetch` a /api/cv y la respuesta dice si salió o qué
- * pasó. Los campos salen de `config/cv.ts`; el archivo, el campo trampa, el
- * error y la línea de privacidad son fijos. El peso se chequea antes de
- * mandar: pasado el tope, Vercel corta el pedido sin una respuesta legible.
+ * pasó. Los campos llegan de la página (`camposDelCV`, con los países de la
+ * base: los mismos que acepta /api/cv); el archivo, el campo trampa, el error
+ * y la línea de privacidad son fijos. El peso se chequea antes de mandar:
+ * pasado el tope, Vercel corta el pedido sin una respuesta legible.
  */
-export function FormularioCV() {
+export function FormularioCV({ campos }: { campos: readonly CampoDeFormulario[] }) {
   const [envio, setEnvio] = useState<{ enviando: boolean; error: string | null }>({ enviando: false, error: null });
   const [listo, setListo] = useState(false);
 
@@ -45,7 +47,7 @@ export function FormularioCV() {
       onSubmit={(e) => void enviar(e)}
       className="border-azul-claro/50 grid gap-x-8 gap-y-6 rounded-3xl border bg-white/80 p-6 backdrop-blur-sm md:grid-cols-2 md:p-8"
     >
-      {CAMPOS_DEL_CV.map((campo) => (
+      {campos.map((campo) => (
         <CampoCV key={campo.clave} campo={campo} />
       ))}
 

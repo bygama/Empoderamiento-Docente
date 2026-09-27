@@ -34,8 +34,10 @@ function largoDe(campo: CampoDeFormulario): number {
 function esquemaDelCampo(campo: CampoDeFormulario): z.ZodType<string> {
   const { etiqueta, obligatorio, tipo } = campo;
   if (tipo === "opcion") {
-    const opciones = z.enum(campo.opciones ?? [], { error: `Elegí una opción de «${etiqueta}».` });
-    return obligatorio ? opciones : z.union([z.literal(""), opciones]);
+    const error = `Elegí una opción de «${etiqueta}».`;
+    const opciones = z.enum(campo.opciones ?? [], { error });
+    // La unión lleva el mismo error: sin él, Zod contesta «Invalid input», en inglés.
+    return obligatorio ? opciones : z.union([z.literal(""), opciones], { error });
   }
   const largo = largoDe(campo);
   const texto = z.string().trim().max(largo, `«${etiqueta}» puede tener hasta ${largo} caracteres.`);

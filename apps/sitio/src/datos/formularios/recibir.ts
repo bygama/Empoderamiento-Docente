@@ -1,4 +1,3 @@
-import { siteConfig } from "@/config/site";
 import type { Bandeja } from "@/config/mensajes";
 import type { Respuesta } from "@/lib/formularios/enviar";
 import { claveDeLimite, ipDelPedido } from "@/lib/formularios/limite";
@@ -12,7 +11,8 @@ import { sumarEnvio } from "@/datos/limites-por-ip";
 // cierre, `{ ok: false, error }` se queda en el formulario y lo muestra
 // (`lib/formularios/enviar.ts`, del lado del navegador).
 
-export const ESCRIBINOS = `escribinos a ${siteConfig.contacto.email}`;
+/** La salida de todo error: el correo de ED, el de Ajustes › Datos del sitio (`datosDelSitio().correo`). */
+export const escribinosA = (correo: string) => `escribinos a ${correo}`;
 
 const HORA_MS = 60 * 60 * 1000;
 
@@ -28,14 +28,14 @@ export function rechazado(estado: number, error: string): Response {
   return responder(estado, { ok: false, error });
 }
 
-export function demasiados(): Response {
-  return responder(429, { ok: false, error: `Ya nos mandaste varios seguidos. Probá de nuevo en una hora, o ${ESCRIBINOS}.` }, {
+export function demasiados(correo: string): Response {
+  return responder(429, { ok: false, error: `Ya nos mandaste varios seguidos. Probá de nuevo en una hora, o ${escribinosA(correo)}.` }, {
     "Retry-After": String(HORA_MS / 1000),
   });
 }
 
-export function noSePudo(): Response {
-  return rechazado(500, `No pudimos guardar lo que mandaste. Probá de nuevo en un rato, o ${ESCRIBINOS}.`);
+export function noSePudo(correo: string): Response {
+  return rechazado(500, `No pudimos guardar lo que mandaste. Probá de nuevo en un rato, o ${escribinosA(correo)}.`);
 }
 
 /**
