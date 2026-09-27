@@ -15,6 +15,7 @@ import { esquemaNiveles, nivelesInicial } from "@/features/que-hacemos/contenido
 import { esquemaProyectos, proyectosInicial } from "@/features/que-hacemos/contenido/proyectos";
 import { seoQueHacemosInicial } from "@/features/que-hacemos/contenido/seo";
 import { esquemaHero as esquemaHeroDeQuienesSomos, heroInicial as heroDeQuienesSomos } from "@/features/quienes-somos/contenido/hero";
+import { esquemaOrigen, origenInicial } from "@/features/quienes-somos/contenido/origen";
 import {
   comoTrabajamosInicial as comoTrabajamosDeQueHacemos,
   esquemaComoTrabajamos as esquemaComoTrabajamosDeQueHacemos,
@@ -64,6 +65,7 @@ export const PAGINAS = {
     nombre: "Quiénes somos",
     secciones: {
       hero: { nombre: "Hero", esquema: esquemaHeroDeQuienesSomos, inicial: heroDeQuienesSomos },
+      origen: { nombre: "Origen, sentido y evolución", esquema: esquemaOrigen, inicial: origenInicial },
     },
   },
   investigacion: { ruta: "/investigacion", nombre: "Investigación", secciones: {} },

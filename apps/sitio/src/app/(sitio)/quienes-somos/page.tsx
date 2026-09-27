@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 
 export default async function QuienesSomosPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero } = await contenidoDe("quienes-somos");
+  const { hero, origen } = await contenidoDe("quienes-somos");
   return (
     <main id="contenido" tabIndex={-1}>
       <QuienesSomosHero contenido={hero} />
-      <OrigenEd />
+      <OrigenEd contenido={origen} />
       <MiradaEd />
       {/* «Nuestro enfoque» (TRANSFORMACIÓN armándose + diferenciales) estuvo
           acá entre la mirada y el equipo (2026-09-08) y se sacó al día
