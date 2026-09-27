@@ -55,6 +55,30 @@
   público en la página de la colección. El SPEC aprobado lo deja «sin link»
   (el perfil de hoy no lo tiene): sumarle el link, y pasarlo a la
   Biblioteca, es de ED.
+- 2026-09-27 — **Lo que se ve distinto, medido** (paso 3, el script de las 78
+  tarjetas contra `data/equipo.ts`): **14 títulos** (no 15 ni 16: los dos que
+  la Biblioteca tenía cortos ya no difieren, porque se corrigieron ahí; el
+  de Viète suma uno), **2 rótulos** (el CIAEM de Karla Gómez, «Libro» →
+  «Artículo»; *Matemática en Red*, «Colección» → «Materiales») y **2
+  detalles**: el destacado de Gedisa de Daniela Reyes (previsto) y, **uno que
+  el SPEC §8.2 no listaba**, *Problematizar la matemática escolar* de Daniela
+  Reyes, que hoy no tiene línea y pasa a decir «Bolema», su fuente, por la
+  regla G (el detalle vacío lee la fuente). Se deja así: todas las demás
+  tarjetas de la Biblioteca llevan su fuente, y un «sin línea» sería un
+  estado más para una sola tarjeta. Nada más cambia: el orden, las 15
+  tarjetas del equipo, las fotos, los recorridos y los años, links y
+  conceptos de las 78.
+- 2026-09-27 — **`ImpulsanEd` y `PersonCard` reciben el tipo del sitio con
+  un alias** (`PersonaDelSitio as Persona`, paso 3): los componentes no
+  cambian de contrato más que en la foto (`persona.foto`, nula si la persona
+  pidió no publicarla) y el nivel (`rotuloDelNivel`); `Persona` a secas es
+  ahora el documento de la base. La Dirección general se dibuja solo si hay
+  una publicada.
+- 2026-09-27 — **La figura lineal lee el alt de su foto** (paso 3):
+  `datos-figura.ts` pasa `alt` (el de la foto de la figura, o el nombre
+  completo) en vez de `fullName`, así el alt que se edita en la ficha es el
+  que se ve. La migración lo cargó con el nombre completo: el HTML del perfil
+  es el mismo.
 - 2026-09-27 — **La actividad de mover se llama `movio-un-perfil`** (consecuencia
   de J): con un paso por clic, lo que se anota es a quién se movió («Ana movió
   a Iván Pérez en el orden del equipo»), no el nivel entero. Va al Inicio,
