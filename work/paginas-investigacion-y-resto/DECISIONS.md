@@ -74,3 +74,20 @@ Append-only: fecha — decisión — por qué.
     «Escribinos», «Oficina») y del canal directo son interfaz; el mail y la
     oficina salen de `config/site.ts`. Las caras del equipo y el «+8» son de
     la entidad Equipo (lane 8).
+- 2026-09-26 — **Revisión r1 (Opus 5.5, medium, «el cambio entero contra su
+  SPEC») sobre `83a332c`: PASS**, 0 Critical, 0 Important, 2 Minor y dos
+  notas fuera de su lente (según el padre). Rulings del padre:
+  1. **Arreglar las keys que salían de un texto editable** (el nombre de las
+     líneas, de los recursos del puente y de las estaciones): dos iguales
+     cargados en el admin repetían la key. Las listas son fijas y no se
+     reordenan, así que la key es la posición. `key={i}` lo marca
+     react-doctor (`no-array-index-as-key`) aun recorriendo una constante;
+     la key pasa a ser el número visible de cada ítem —el del papel
+     (`numeroDePapel`), el del recurso en su lomo (`numeroDeRecurso`) y el
+     de la estación (`numero`, que ya existía)—, cada uno en su propio
+     módulo porque exportarlo desde el archivo del componente lo marca
+     `only-export-components`. (`d45afa1`, `7a8b7f9`)
+  2. **Ordenar los imports de `contenido/paginas.ts`**: los de Contacto
+     habían quedado entre los de Biblioteca. (`e2316c9`)
+  3. **Quedan como están**: los hashes viejos de PROGRESS (la carpeta se
+     borra al cerrar) y `constelacion.ts`, que ya estaba así.
