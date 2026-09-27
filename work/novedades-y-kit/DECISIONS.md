@@ -72,3 +72,41 @@
   ruta solo la llama (`app/` son rutas). Lo que llega en la dirección pasa
   por los campos de `esquemaBorrador` con `.catch`: un título a medio
   escribir dibuja igual.
+- 2026-09-26 — **Revisión de cierre r1** (Opus 5.5, medium, sobre `4ada3bc`):
+  PASS con 0 Critical, 0 Important, 4 Minor y dos notas fuera de su lente,
+  según el padre. Probó la migración fila por fila, la destacada única, el kit
+  sin ED, el render, el RSS, la imagen para redes y el 308.
+- 2026-09-26 — **Minor 1, ratificado por el padre (desvío del SPEC §6.1):**
+  «Nueva novedad» va solo en el encabezado cuando hay alguna novedad; el
+  estado vacío de una pestaña con la otra llena, o de una búsqueda, no la
+  repite. El SPEC la ponía también ahí («con la misma acción»), y eran dos
+  primarios en la pantalla: DESIGN.md §11 pide uno. Sin ninguna novedad, el
+  primario va en el estado vacío y no en el encabezado.
+- 2026-09-26 — **Minor 2, ratificado por el padre (desvío del SPEC §6.2):**
+  Despublicar, Descartar cambios y Borrar van en «Deshacer o sacar del sitio»,
+  al pie de la ficha, y no en el encabezado. Lo destructivo queda lejos del
+  primario (Publicar), cada acción dice qué pasa antes de tocarla, y se usan
+  poco.
+- 2026-09-26 — **Los arreglos 3 a 6 de la revisión:** (3) publicar distingue
+  el índice único que saltó por su nombre, que el adaptador de Postgres trae
+  en `meta.driverAdapterError.cause.constraint.index` (visto con Prisma
+  7.10): la URL dice de quién es y si está publicada o despublicada («la
+  conserva para volver al sitio»), en el campo URL; la destacada, en el suyo;
+  otro error sube. Vive en `datos/acciones/indices-de-novedades.ts`, porque
+  `publicar-novedades.ts` pasaba las 100 líneas. (4) El `guid` del RSS es
+  `urn:uuid:<id>`: la novedad del sitio (`NovedadDelSitio`) lleva el id de
+  su fila, que viaja también en el payload de los componentes del sitio (nueve
+  uuid, ningún texto visible). (5) Despublicar suelta la destacada del
+  borrador solo si la novedad era la destacada. (6) El pendiente del Inicio
+  nombra la novedad por el título de su borrador (`tituloDelBorrador`); los
+  demás usos de `tituloDe` siguen con el publicado primero.
+- 2026-09-26 — **Rebase sobre `5737390`** (Cuentas, y Qué hacemos y Quiénes
+  somos): los conflictos se resolvieron sumando los dos lados (los imports de
+  `Seccion.tsx`, `page.tsx` del Inicio, `contenido/paginas.ts`, los
+  registros de actividad, el índice de ADRs, §11, AGENTS.md y el README).
+  `FormularioDelRol` de Cuentas importaba `ENTRADA` de `admin/campos/clases`,
+  que se mudó al kit: sigue el import en el commit del kit, y el arreglo
+  aparte del buscador quedó vacío y se cayó. El registro nuevo de Cuentas
+  (`admin/cuentas/actividad/modulos.ts`) suma el módulo «Novedades» para sus
+  cuatro tipos, sin link a la ficha: una novedad se borra, como un mensaje.
+  `openGraphDeLaPagina` quedó una sola: las dos lanes la escribieron igual.
