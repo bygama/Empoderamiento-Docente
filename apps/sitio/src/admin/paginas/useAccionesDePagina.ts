@@ -4,7 +4,7 @@ import { abrirVistaPrevia } from "@/datos/acciones/vista-previa";
 import type { EstadoDePagina } from "@/datos/consultas/editor-de-paginas";
 import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
 import type { EstadoPendiente } from "./EncabezadoDelEditor";
-import { VistaPreviaFrenada } from "./VistaPreviaFrenada";
+import { VistaPreviaFrenada } from "@/admin/armazon/VistaPreviaFrenada";
 
 /** Lo que corre antes de publicar o de abrir el borrador: guardar lo que haya en pantalla. Da el `borradorEn` que quedó, o `false` si no se pudo (y ya avisó). */
 export type Preparar = () => Promise<string | null | false>;
