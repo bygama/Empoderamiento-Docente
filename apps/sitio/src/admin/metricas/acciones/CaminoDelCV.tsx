@@ -11,17 +11,18 @@ const numero = new Intl.NumberFormat("es-AR");
 const PASOS = ["cv-vio", "cv-empezo", "cv-envio"] as const;
 
 /**
- * El camino del CV (SPEC de work/metricas-completas/ §6.3): cuánta gente vio
- * la página, empezó el formulario y lo mandó, por canal. Con el formulario
- * cerrado y sin nada contado, lo dice; con poco, dice cuánto falta.
+ * El camino del CV (SPEC de work/metricas-completas/ §6.3): cuántas veces se
+ * abrió la página, se empezó el formulario y se mandó, por canal. «cv-vio»
+ * cuenta cargas, así que se dice en vistas (§3), no en personas. Con el
+ * formulario cerrado y sin nada contado, lo dice; con poco, dice cuánto falta.
  */
 export function CaminoDelCV({ cv, periodo, abierto }: { cv: QueHaceLaGente["cv"]; periodo: Periodo; abierto: boolean }) {
-  const vieron = cv.total["cv-vio"];
+  const vistas = cv.total["cv-vio"];
   let vacio: { titulo: string; texto: string } | null = null;
-  if (!abierto && vieron === 0) {
-    vacio = { titulo: "El formulario de CV está cerrado", texto: "Cuando se abra, acá se ve cuánta gente llega a la página, empieza el formulario y lo manda, y por dónde llegó." };
-  } else if (vieron < MINIMOS.caminoDelCV) {
-    vacio = pocoTrafico({ hay: vieron, minimo: MINIMOS.caminoDelCV, periodo, una: "persona que vio la página", varias: "personas que vieron la página", para: "para este camino" });
+  if (!abierto && vistas === 0) {
+    vacio = { titulo: "El formulario de CV está cerrado", texto: "Cuando se abra, acá se ve cuántas veces se abre la página, se empieza el formulario y se manda, y por dónde llegó la gente." };
+  } else if (vistas < MINIMOS.caminoDelCV) {
+    vacio = pocoTrafico({ hay: vistas, minimo: MINIMOS.caminoDelCV, periodo, una: "vista de la página", varias: "vistas de la página", para: "para este camino" });
   }
   return (
     <Bloque id="cv" titulo="El camino del CV" explicacion="Cuántas veces se abrió la página del CV, cuántas se empezó el formulario y cuántas se mandó, según por dónde llegó la gente.">
