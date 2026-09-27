@@ -92,8 +92,3 @@ export async function novedadPorSlug(slug: string): Promise<NovedadDelSitio | un
   return (await novedadesDelSitio()).find((n) => n.slug === slug);
 }
 
-/** Adónde redirige una ruta vieja (el 308 de un slug que cambió), o `null`. */
-export async function redireccionDe(ruta: string): Promise<string | null> {
-  const fila = await leerSinRomper("redireccionDe", () => base.redireccion.findUnique({ where: { desde: ruta } }), null);
-  return fila?.hacia ?? null;
-}

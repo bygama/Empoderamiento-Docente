@@ -11,13 +11,13 @@ export function refrescarAdmin(): void {
 
 /**
  * Lo que el sitio muestra de una novedad: el Inicio (las cuatro más nuevas),
- * el listado, el RSS, y la ficha con su imagen, con el slug viejo y el nuevo
- * si cambió. Las páginas son estáticas: esto las regenera en la próxima
- * visita (spec del admin §4).
+ * el listado, el RSS, el sitemap (lista las fichas: Ajustes › SEO), y la ficha
+ * con su imagen, con el slug viejo y el nuevo si cambió. Las páginas son
+ * estáticas: esto las regenera en la próxima visita (spec del admin §4).
  */
 export function revalidarSitio(slugs: readonly string[]): void {
   refrescarAdmin();
-  for (const ruta of ["/", "/novedades", "/novedades/rss.xml"]) revalidatePath(ruta);
+  for (const ruta of ["/", "/novedades", "/novedades/rss.xml", "/sitemap.xml"]) revalidatePath(ruta);
   for (const slug of slugs) {
     revalidatePath(`/novedades/${slug}`);
     revalidatePath(`/novedades/${slug}/imagen-para-redes`);

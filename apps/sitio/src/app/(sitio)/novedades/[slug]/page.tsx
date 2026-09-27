@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { OPEN_GRAPH_COMUN } from "@/config/metadata";
-import { novedadPorSlug, redireccionDe, slugsConFicha } from "@/datos/consultas/novedades";
+import { novedadPorSlug, slugsConFicha } from "@/datos/consultas/novedades";
+import { redireccionDe } from "@/datos/consultas/redirecciones";
 import { FichaNovedad } from "@/features/novedades/components/FichaNovedad";
 import { TAMANO } from "@/features/novedades/imagen-para-redes/tamano";
 
