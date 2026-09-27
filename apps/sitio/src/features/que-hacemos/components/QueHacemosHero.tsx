@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import type { AreaDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import type { HeroDeQueHacemos } from "@/features/que-hacemos/contenido/hero";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -74,7 +73,14 @@ import { idDeArea } from "./areas/anclas";
  * magnetismo en `capsula-magnetismo.ts`, portal y viaje en `portal-viaje.ts`;
  * markup en `CieloPolvo`, `TitularQH` y `CapsulaPortal`.
  */
-export function QueHacemosHero({ contenido, areas }: { contenido: HeroDeQueHacemos; areas: readonly AreaDeQueHacemos[] }) {
+export function QueHacemosHero({
+  contenido,
+  nombresCortos,
+}: {
+  contenido: HeroDeQueHacemos;
+  /** El de cada área, en orden: es lo único que el hero toma de ellas, así no viajan enteras al navegador. */
+  nombresCortos: readonly string[];
+}) {
   const rootRef = useRef<HTMLElement | null>(null);
   const holdRef = useRef<HTMLButtonElement | null>(null);
   const campoRef = useRef<HTMLDivElement | null>(null);
@@ -169,7 +175,7 @@ export function QueHacemosHero({ contenido, areas }: { contenido: HeroDeQueHacem
           aria-label="Áreas de trabajo"
           className="mt-7 flex max-w-[64ch] flex-wrap justify-center gap-2"
         >
-          {areas.map((a, i) => (
+          {nombresCortos.map((nombreCorto, i) => (
             <li key={idDeArea(i)}>
               <a
                 href={`#${idDeArea(i)}`}
@@ -179,7 +185,7 @@ export function QueHacemosHero({ contenido, areas }: { contenido: HeroDeQueHacem
                     completa, y con los nombres largos la fila se come el aire
                     entre la bajada y la capsula. El area completa se lee en su
                     bloque. */}
-                {a.nombreCorto}
+                {nombreCorto}
               </a>
             </li>
           ))}

@@ -74,6 +74,9 @@ export const esquemaAreas = z.object({
 export type AreasDeQueHacemos = z.infer<typeof esquemaAreas>;
 export type AreaDeQueHacemos = AreasDeQueHacemos["areas"][number];
 
+/** El nombre corto de cada área, en orden: lo único que usan los botones del hero. */
+export const nombresCortos = ({ areas }: AreasDeQueHacemos): string[] => areas.map((area) => area.nombreCorto);
+
 /** El contenido de hoy, tal cual está en el sitio. */
 export const areasInicial: AreasDeQueHacemos = {
   titulo: "Áreas de **especialización**",

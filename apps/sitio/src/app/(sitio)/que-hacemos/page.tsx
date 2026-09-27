@@ -9,6 +9,7 @@ import { ViboraQueHacemos } from "@/features/que-hacemos/components/vibora/Vibor
 import { MiradaPasos } from "@/features/que-hacemos/components/MiradaPasos";
 import { ProyectosAplicaciones } from "@/features/que-hacemos/components/ProyectosAplicaciones";
 import { CierreQueHacemos } from "@/features/que-hacemos/components/CierreQueHacemos";
+import { nombresCortos } from "@/features/que-hacemos/contenido/areas";
 import { metadataDeSeo } from "@/lib/contenido/seo";
 
 // El título, la descripción y la imagen para redes salen del SEO de la página
@@ -67,7 +68,7 @@ export default async function QueHacemosPage() {
             "linear-gradient(180deg, color-mix(in srgb, var(--color-azul-principal) 82%, #04060c) 0, color-mix(in srgb, var(--color-azul-principal) 62%, #04060c) 52svh, color-mix(in srgb, var(--color-azul-principal) 45%, black) 100svh)",
         }}
       >
-        <QueHacemosHero contenido={hero} areas={areas.areas} />
+        <QueHacemosHero contenido={hero} nombresCortos={nombresCortos(areas)} />
         {/* Escena del faro por capas de profundidad (cámara scrubbed). Su
             CTA final («Ver las siete áreas») baja a #areas. */}
         <QueHacemosHeroFaro contenido={faro} />
