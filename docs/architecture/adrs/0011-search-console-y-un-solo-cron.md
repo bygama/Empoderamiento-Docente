@@ -1,6 +1,9 @@
 # ADR-0011: Copiar Search Console cada día con una cuenta de servicio, y correr todo lo programado desde un solo cron
 
-- **Status:** Accepted
+- **Status:** Accepted, ampliado por el ADR-0018
+- **Amended by:** [ADR-0018](0018-deploy-en-vercel-o-en-un-vps.md) — en un VPS,
+  el cron de `vercel.json` lo hace el servicio `cron` del compose; sigue
+  siendo uno solo.
 - **Date:** 2026-09-26
 - **Decision-makers:** el padre del XL `work/mapa-del-admin/` (Mateo le delegó
   las aprobaciones el 2026-09-26), diseñado en

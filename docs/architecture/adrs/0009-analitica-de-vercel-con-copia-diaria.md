@@ -1,6 +1,9 @@
 # ADR-0009: Medir el tráfico con la analítica de Vercel y guardar una copia diaria en Neon
 
-- **Status:** Accepted
+- **Status:** Accepted, ampliado por el ADR-0018
+- **Amended by:** [ADR-0018](0018-deploy-en-vercel-o-en-un-vps.md) — Vercel Web
+  Analytics deja de ser la única fuente: la copia elige su cliente por
+  variables, y en un VPS es Umami.
 - **Date:** 2026-09-21
 - **Decision-makers:** @bygama (Facundo), diseñado en conversación
 - **Related:** [ADR-0004](0004-monorepo-apps.md) (un solo deployable),

@@ -1,9 +1,13 @@
 # ADR-0005: Construir el admin a medida y sacar Payload (reemplaza Payload)
 
-- **Status:** Accepted, corregido en dos detalles por el ADR-0008
+- **Status:** Accepted, corregido en dos detalles por el ADR-0008 y ampliado
+  por el ADR-0018
 - **Amended by:** [ADR-0008](0008-correcciones-de-la-fase-1.md) — el adaptador
   es `@prisma/adapter-pg` y el hasheo es scrypt. La decisión de fondo (admin a
   medida, Payload afuera) no cambia.
+- **Amended by:** [ADR-0018](0018-deploy-en-vercel-o-en-un-vps.md) — Neon y
+  Vercel Blob son los de Vercel, no los únicos: en un VPS la base es el
+  Postgres del compose y las fotos van a disco.
 - **Date:** 2026-09-18
 - **Decision-makers:** @mateo
 - **Supersedes:** ADR-0003 (Payload como panel de contenido)
