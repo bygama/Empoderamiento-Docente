@@ -29,7 +29,7 @@ import { ALIADOS } from "@/config/aliados";
  * que ya publican el pie y la home, con el mismo filtro que los pinta de
  * blanco sobre navy.
  */
-export function BandaAliados() {
+export function BandaAliados({ rotulo }: { rotulo: string }) {
   return (
     <div
       data-mirada-banda
@@ -41,7 +41,7 @@ export function BandaAliados() {
       />
       <div className="bg-azul-principal relative rounded-[1.75rem] px-6 py-8 md:px-12">
         <p className="text-azul-claro/80 text-center font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
-          Nos acompañan
+          {rotulo}
         </p>
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-5 md:gap-x-16">
           {ALIADOS.map((a) => (

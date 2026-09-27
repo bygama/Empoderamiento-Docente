@@ -1,8 +1,9 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { MIRADA } from "@/features/que-hacemos/data/areas";
+import type { VerboDelMetodo } from "@/features/que-hacemos/contenido/como-trabajamos";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
 
-type Paso = (typeof MIRADA)[number];
+type Paso = VerboDelMetodo;
 
 /**
  * LAS MEDIDAS DE LA PILA NO ESTÁN ACÁ: viven en `globals.css`, como custom
@@ -138,13 +139,14 @@ export function PanelMirada({
 
         <div className="relative aspect-[4/3] overflow-hidden rounded-[1rem] lg:aspect-auto lg:h-full">
           <Image
-            src={paso.foto}
-            alt={paso.fotoAlt}
+            src={paso.foto.src}
+            alt={paso.foto.alt}
             fill
             sizes="(min-width: 1024px) 45vw, 100vw"
-            // `fotoPos`: dónde anclar el recorte cuando la foto no es apaisada
-            // (ver areas.ts); sin él, centrado.
-            className={`object-cover ${"fotoPos" in paso ? paso.fotoPos : ""}`}
+            className="object-cover"
+            // El foco de la foto: dónde anclar el recorte cuando no es
+            // apaisada (se elige en el admin); centrado, no suma nada.
+            style={estiloDeFoco(paso.foto.foco)}
           />
         </div>
       </div>

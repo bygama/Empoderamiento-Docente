@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { CSSProperties } from "react";
-import { MIRADA, MIRADA_INTRO } from "@/features/que-hacemos/data/areas";
+import type { ComoTrabajamosDeQueHacemos } from "@/features/que-hacemos/contenido/como-trabajamos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { BandaAliados } from "./mirada-pasos/BandaAliados";
 import { crearAchicado } from "./mirada-pasos/coreografia-achicado";
@@ -62,7 +62,7 @@ import { PanelMirada } from "./mirada-pasos/PanelMirada";
  * seis paneles y la banda van uno abajo del otro, con su alto natural. Seis
  * paneles pegajosos en un teléfono dejan al pulgar peleando para salir.
  */
-export function MiradaPasos() {
+export function MiradaPasos({ contenido }: { contenido: ComoTrabajamosDeQueHacemos }) {
   const rootRef = useRef<HTMLElement | null>(null);
 
   useIsomorphicLayoutEffect(() => {
@@ -100,7 +100,7 @@ export function MiradaPasos() {
       data-mirada
       style={
         {
-          "--mirada-solapas-pila": `calc(${MIRADA.length - 1} * var(--mirada-solapa))`,
+          "--mirada-solapas-pila": `calc(${contenido.pasos.length - 1} * var(--mirada-solapa))`,
           "--mirada-solapas-grupo": `calc(${POR_GRUPO - 1} * var(--mirada-solapa))`,
         } as CSSProperties
       }
@@ -134,9 +134,9 @@ export function MiradaPasos() {
                 className="font-display text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem] lg:text-[2.1rem]"
                 style={{ lineHeight: 1.1 }}
               >
-                {MIRADA_INTRO.titulo}
+                {contenido.titulo}
               </h2>
-              <IndicadorPasos />
+              <IndicadorPasos verbos={contenido.pasos.map((p) => p.verbo)} />
             </div>
           </header>
 
@@ -163,12 +163,12 @@ export function MiradaPasos() {
             data-mirada-pila
             className="mt-12 space-y-4 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:grid lg:gap-y-40 lg:space-y-0 lg:pt-[var(--mirada-franja,5.5rem)] lg:after:block lg:after:h-[calc(100svh-var(--mirada-tope,6rem)-var(--mirada-franja,5.5rem)+8rem)] lg:after:content-['']"
           >
-            {MIRADA.map((paso, i) => (
+            {contenido.pasos.map((paso, i) => (
               <PanelMirada
                 key={paso.verbo}
                 paso={paso}
                 numero={i + 1}
-                total={MIRADA.length}
+                total={contenido.pasos.length}
                 {...lugarEnGrupo(i)}
               />
             ))}
@@ -177,7 +177,7 @@ export function MiradaPasos() {
 
         {/* Cierra subiendo por encima del último grupo; el mecanismo está en
             la propia BandaAliados. */}
-        <BandaAliados />
+        <BandaAliados rotulo={contenido.aliados} />
       </div>
     </section>
   );
