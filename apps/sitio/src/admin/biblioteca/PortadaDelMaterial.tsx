@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Boton, CampoFoto, resolverCambio } from "@ed/kit-admin";
 import { errorDe } from "@/admin/campos/errores";
-import { subirFoto } from "@/datos/acciones/fotos";
+import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import { MAXIMO_BYTES } from "@/lib/contenido/fotos";
 import { Bloque, type PropsDeBloque } from "./Bloque";
 
@@ -28,6 +28,7 @@ export function PortadaDelMaterial({ form, cambiar, errores, generada }: PropsDe
           valor={propia}
           alCambiar={(v) => cambiar("portada", (actual) => resolverCambio(v, actual ?? SIN_ARCHIVO))}
           subir={subirFoto}
+          elegir={fotosParaElegir}
           maximoBytes={MAXIMO_BYTES}
           error={errorDe(errores, "portada")}
         />
