@@ -6,11 +6,10 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- work-verify PASS (abajo). Falta la revisión de cierre, que abre el padre al
+- Rebasada sobre `main` `15def2c` y verificada de nuevo (el bloque de
+  arriba en Verification). Falta la revisión de cierre, que abre el padre al
   recibir `worker_done` (1 asiento, Opus 5.5, medium, «el cambio entero
-  contra su SPEC»), y el rebase sobre `main` cuando el padre lo pida: al
-  2026-09-26, `main` va 64 commits adelante (`15def2c`) y `git merge-tree`
-  muestra un solo conflicto, en DESIGN.md (la frase de apertura de §11).
+  contra su SPEC»).
 
 **En pausa con el PR #187 abierto**
 (https://github.com/bygama/Empoderamiento-Docente/pull/187), esperando la
@@ -26,18 +25,60 @@ revisión de cierre del padre. Para retomar en frío:
   `nombres.js`, `aviso.js`, `lineas.cjs`): son de sesión, no del repo.
 - **Si llegan hallazgos de la revisión:** se arreglan acá, se re-verifica
   desde el gate y se anota cada ruling en DECISIONS.
-- **Al rebasear sobre `main` (cuando lo pida el padre):** resolver DESIGN.md
-  §11 (la frase de apertura suma «la sección compartida»); si la 4c ya entró,
+- **Si hay que rebasear otra vez** (por ejemplo, si entra la 4c antes):
   conciliar `contenido/paginas.ts`, `config/metadata.ts` (la misma
-  `openGraphDeLaPagina`) y el README. Después, **rehacer la referencia de
-  comparar-render con el build del `main` nuevo** (la de `48ed711` queda
-  vieja) y comprobar que siguen siendo solo las cuatro diferencias; correr el
-  gate entero y el pre-push.
+  `openGraphDeLaPagina`) y el README; rehacer la referencia de comparar-render
+  con el build del `main` nuevo (hoy `%TEMP%/ed-paginasqh/antes-15def2c`) y
+  comprobar que siguen siendo solo las cuatro diferencias; el gate entero y
+  el pre-push.
 - **Al cerrar** (después del PASS del revisor): el commit que finaliza la
   lane y el que borra `work/paginas-que-hacemos-y-quienes-somos/`, los dos en
   este mismo PR.
 
 ## Verification
+
+### 2026-09-26 — Rebase sobre `main` `15def2c` — gate entero — PASS
+
+Pedido del padre antes de la revisión de cierre. `git rebase origin/main`
+(30 commits) con un solo conflicto, DESIGN.md §11, la frase de apertura: se
+conservan las dos intenciones (lo que sumaron mensajes e inicio, y «la
+sección compartida») en una sola frase; las entradas de §11 quedan una por
+patrón, sin duplicados (`### Sección compartida` es la única que habla de
+compartir). README y AGENTS.md se mezclaron solos y quedaron coherentes.
+`main` y esta lane no tocan ningún archivo de código en común (solo esos tres
+docs). **Migraciones:** la lane no tiene; la de `main`
+(`20260926231819_mensajes`) se aplicó a `ed_paginasqh` (`pnpm
+migrate:deploy` → «All migrations have been successfully applied»,
+`migrate:status` → «Database schema is up to date!»). `pnpm install` →
+«Already up to date»; `pnpm generate` → Prisma 7.10.0. **SEO:**
+`openGraphDeLaPagina` todavía no está en `main` (la 4c no entró): queda la de
+esta lane, misma firma, mismo lugar.
+
+- **Referencia nueva:** `git checkout --detach origin/main` (`15def2c`),
+  `.next` borrado, `pnpm build` → exit 0, copia de `server/` y `static/` a
+  `%TEMP%/ed-paginasqh/antes-15def2c`; vuelta a la rama.
+- **Typecheck en limpio:** con `apps/sitio/next-env.d.ts` y `apps/sitio/.next`
+  borrados (`ls` → «No such file or directory» los dos), `pnpm typecheck` →
+  exit 0, 0 `error TS`.
+- `pnpm lint` → exit 0 · `pnpm test` → exit 0 (packages/auth 28/28;
+  apps/sitio 245: 244 ok, 0 fallas, 1 omitido que ya venía) · `pnpm build` →
+  exit 0 (`/`, `/que-hacemos` y `/quienes-somos` ○) ·
+  `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor: 100/100,
+  sin diagnósticos», apps/sitio/src 640 archivos · packages/db/src 3 ·
+  packages/auth/src 17).
+- **comparar-render contra `15def2c`** → exit 1 con **exactamente las cuatro
+  diferencias aprobadas** y las otras 10 páginas iguales:
+  `que-hacemos` en `head` (og:title, og:description, twitter:title,
+  twitter:description) e `imagenes` (#3, la foto de Investigar, de clase a
+  `style`); `quienes-somos` en `head` (las mismas cuatro etiquetas) e
+  `imagenes` (#2 y #3, `%2Fquienes-somos%2F` → `%2Ffotos%2F`). **`og:image` y
+  `twitter:image` no cambian** en ninguna de las dos (el md5 de esas etiquetas
+  da igual antes y después: `f4927b5c` en los cuatro casos).
+- **Humo:** dev server de nuevo en su pestaña; `/`, `/que-hacemos` y
+  `/quienes-somos` → 200; en `/admin/contenido/paginas/inicio`, los dos avisos
+  de sección compartida con su texto.
+- La vista previa y la revalidación de punta a punta (bloque de abajo) no se
+  repitieron: ningún archivo de código de esta lane cambió en el rebase.
 
 ### 2026-09-26 — L DoD (aceptaciones del PLAN + gate del repo + SPEC §11) — PASS
 
