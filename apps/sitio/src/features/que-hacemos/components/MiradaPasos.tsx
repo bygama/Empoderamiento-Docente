@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import type { CSSProperties } from "react";
+import gsap from "gsap";
 import type { AliadoDelSitio } from "@/features/aliados/contenido/modelo";
 import type { ComoTrabajamosDeQueHacemos } from "@/features/que-hacemos/contenido/como-trabajamos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -12,6 +13,7 @@ import { crearMirada } from "./mirada-pasos/coreografia-mirada";
 import { lugarEnGrupo, POR_GRUPO } from "./mirada-pasos/grupos";
 import { IndicadorPasos } from "./mirada-pasos/IndicadorPasos";
 import { PanelMirada } from "./mirada-pasos/PanelMirada";
+import { crearPilaMirada } from "./mirada-pasos/pila-movil";
 
 /**
  * Cómo trabajamos, en los seis verbos que ED usa para contarse («La mirada
@@ -59,9 +61,13 @@ import { PanelMirada } from "./mirada-pasos/PanelMirada";
  * aliados cierra subiendo por encima de todo, con «Áreas» detrás (ver el
  * comentario de la banda).
  *
- * En celular no hay apilado, ni franja, ni grupos, ni entrada: el título, los
- * seis paneles y la banda van uno abajo del otro, con su alto natural. Seis
- * paneles pegajosos en un teléfono dejan al pulgar peleando para salir.
+ * En celular y tablet, la PILA del Inicio (Gastón, 2026-09-26): el título y
+ * unos puntitos arriba, y los paneles suben de a uno y tapan al anterior,
+ * del que queda el lomo (máximo tres), con la foto arriba de cada panel
+ * (mirada-pasos/pila-movil.ts). No son seis stickies peleándole al pulgar:
+ * es una escena fija con una pista, que se suelta al final. Con movimiento
+ * reducido, o una pantalla de menos de 620px de alto, van uno abajo del
+ * otro con su alto natural.
  *
  * Los aliados de la banda llegan por props, de la base.
  */
@@ -74,7 +80,12 @@ export function MiradaPasos({ contenido, aliados }: { contenido: ComoTrabajamosD
     const limpiarMirada = crearMirada(root);
     const limpiarAchicado = crearAchicado(root);
     const limpiarIndicador = crearIndicador(root);
+    const mm = gsap.matchMedia();
+    mm.add("(max-width: 63.999rem) and (min-height: 38.75rem) and (prefers-reduced-motion: no-preference)", () =>
+      crearPilaMirada(root),
+    );
     return () => {
+      mm.revert();
       limpiarIndicador();
       limpiarAchicado();
       limpiarMirada();
@@ -114,68 +125,84 @@ export function MiradaPasos({ contenido, aliados }: { contenido: ComoTrabajamosD
             grilla: la franja no ocupa lugar en el flujo y la pila arranca, por
             su padding, debajo de la banda blanca. */}
         <div className="lg:grid">
-          {/* La franja mide, invisible, lo mismo que un grupo trabado: su caja
-              baja hasta el pie de los paneles. Sin esto la franja medía 4rem,
-              el fondo de la lista la empujaba mucho después que a los paneles,
-              y quedaba clavada mientras ellos pasaban por detrás (el usuario,
-              2026-09-11: «se queda fixed, eso no tendría que pasar»). Con los
-              pies parejos se despega con la pila. No sirve devolver el alto con
-              un margen negativo:
-              el sticky se acota por la caja CON márgenes, y el pie volvería a
-              quedar arriba. La parte transparente no atrapa el mouse. */}
-          <header
-            data-mirada-tope
-            style={{ top: "var(--mirada-tope, 6rem)" }}
-            className="lg:pointer-events-none lg:sticky lg:col-start-1 lg:row-start-1 lg:h-[var(--mirada-pila,47.5rem)] lg:self-start"
-          >
-            <div
-              data-mirada-franja
-              className="lg:pointer-events-auto lg:flex lg:h-[var(--mirada-titulo,4rem)] lg:items-center lg:bg-white"
-            >
-              <h2
-                data-mirada-titulo
-                className="font-display text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem] lg:text-[2.1rem]"
-                style={{ lineHeight: 1.1 }}
+          {/* La pista y la escena de la PILA en celular (pila-movil.ts y
+              globals.css, `.is-pila`). Sin la pila no existen (contents). */}
+          <div data-mirada-pista className="contents">
+            <div data-mirada-escena className="contents">
+              {/* La franja mide, invisible, lo mismo que un grupo trabado: su caja
+                  baja hasta el pie de los paneles. Sin esto la franja medía 4rem,
+                  el fondo de la lista la empujaba mucho después que a los paneles,
+                  y quedaba clavada mientras ellos pasaban por detrás (el usuario,
+                  2026-09-11: «se queda fixed, eso no tendría que pasar»). Con los
+                  pies parejos se despega con la pila. No sirve devolver el alto con
+                  un margen negativo:
+                  el sticky se acota por la caja CON márgenes, y el pie volvería a
+                  quedar arriba. La parte transparente no atrapa el mouse. */}
+              <header
+                data-mirada-tope
+                style={{ top: "var(--mirada-tope, 6rem)" }}
+                className="lg:pointer-events-none lg:sticky lg:col-start-1 lg:row-start-1 lg:h-[var(--mirada-pila,47.5rem)] lg:self-start"
               >
-                {contenido.titulo}
-              </h2>
-              <IndicadorPasos verbos={contenido.pasos.map((p) => p.verbo)} />
+                <div
+                  data-mirada-franja
+                  className="lg:pointer-events-auto lg:flex lg:h-[var(--mirada-titulo,4rem)] lg:items-center lg:bg-white"
+                >
+                  <h2
+                    data-mirada-titulo
+                    className="font-display text-[2rem] font-bold tracking-[-0.02em] text-balance md:text-[2.75rem] lg:text-[2.1rem]"
+                    style={{ lineHeight: 1.1 }}
+                  >
+                    {contenido.titulo}
+                  </h2>
+                  <IndicadorPasos verbos={contenido.pasos.map((p) => p.verbo)} />
+                  {/* Los puntitos de la pila en celular: dicen en qué paso va. */}
+                  <div data-mirada-puntos aria-hidden="true" className="hidden items-center gap-3">
+                    {contenido.pasos.map((paso) => (
+                      <span
+                        key={paso.verbo}
+                        data-punto
+                        className="bg-azul-principal/20 data-[activo]:bg-azul-principal h-2 w-2 rounded-full transition-[transform,background-color] duration-300 data-[activo]:scale-x-[2.25] motion-reduce:transition-none"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </header>
+
+              {/* La pila arranca justo debajo de lo que reserva la franja: no hay
+                  escenario vacío, las cards nacen invisibles y la entrada las
+                  prende en cascada cuando el título ya viaja.
+
+                  Entre panel y panel hay 10rem de aire EN EL FLUJO, que no se ven:
+                  quedan debajo del panel trabado. Sirven para que cada card
+                  descanse sola un momento antes de que asome la siguiente (el
+                  usuario, 2026-09-11: que el scroll sea más suave). Van como `gap`
+                  de una grilla y NO como margen: el sticky se acota por la caja con
+                  márgenes, y con margen abajo cada card se despegaba 10rem antes
+                  que las demás y la banda no llegaba a comerse a la primera.
+
+                  El `after` es el COLCHÓN: sin él, el último panel no se traba
+                  nunca, porque la lista termina justo en su borde y el sticky no
+                  puede salirse del contenido de su contenedor (el padding no
+                  cuenta, se probó). Mide lo que la banda de aliados necesita para
+                  subir desde el pie del viewport hasta el borde de la pila más
+                  8rem de descanso con la pila completa antes de que la banda
+                  asome; la banda se mete en este colchón con su margen negativo. */}
+              <ol
+                data-mirada-pila
+                className="mt-12 space-y-4 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:grid lg:gap-y-40 lg:space-y-0 lg:pt-[var(--mirada-franja,5.5rem)] lg:after:block lg:after:h-[calc(100svh-var(--mirada-tope,6rem)-var(--mirada-franja,5.5rem)+8rem)] lg:after:content-['']"
+              >
+                {contenido.pasos.map((paso, i) => (
+                  <PanelMirada
+                    key={paso.verbo}
+                    paso={paso}
+                    numero={i + 1}
+                    total={contenido.pasos.length}
+                    {...lugarEnGrupo(i)}
+                  />
+                ))}
+              </ol>
             </div>
-          </header>
-
-          {/* La pila arranca justo debajo de lo que reserva la franja: no hay
-              escenario vacío, las cards nacen invisibles y la entrada las
-              prende en cascada cuando el título ya viaja.
-
-              Entre panel y panel hay 10rem de aire EN EL FLUJO, que no se ven:
-              quedan debajo del panel trabado. Sirven para que cada card
-              descanse sola un momento antes de que asome la siguiente (el
-              usuario, 2026-09-11: que el scroll sea más suave). Van como `gap`
-              de una grilla y NO como margen: el sticky se acota por la caja con
-              márgenes, y con margen abajo cada card se despegaba 10rem antes
-              que las demás y la banda no llegaba a comerse a la primera.
-
-              El `after` es el COLCHÓN: sin él, el último panel no se traba
-              nunca, porque la lista termina justo en su borde y el sticky no
-              puede salirse del contenido de su contenedor (el padding no
-              cuenta, se probó). Mide lo que la banda de aliados necesita para
-              subir desde el pie del viewport hasta el borde de la pila más
-              8rem de descanso con la pila completa antes de que la banda
-              asome; la banda se mete en este colchón con su margen negativo. */}
-          <ol
-            data-mirada-pila
-            className="mt-12 space-y-4 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:grid lg:gap-y-40 lg:space-y-0 lg:pt-[var(--mirada-franja,5.5rem)] lg:after:block lg:after:h-[calc(100svh-var(--mirada-tope,6rem)-var(--mirada-franja,5.5rem)+8rem)] lg:after:content-['']"
-          >
-            {contenido.pasos.map((paso, i) => (
-              <PanelMirada
-                key={paso.verbo}
-                paso={paso}
-                numero={i + 1}
-                total={contenido.pasos.length}
-                {...lugarEnGrupo(i)}
-              />
-            ))}
-          </ol>
+          </div>
         </div>
 
         {/* Cierra subiendo por encima del último grupo; el mecanismo está en

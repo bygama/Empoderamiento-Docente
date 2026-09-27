@@ -797,6 +797,81 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
   }
 }
 
+/* «Cómo trabajamos» en PILA (celular y tablet con motion y alto suficiente,
+   ver mirada-pasos/pila-movil.ts, que pone la clase). El mismo gesto que las
+   Áreas del Inicio: los seis paneles comparten una celda de grilla (miden lo
+   que el más alto y el de adelante tapa entero al de atrás, sin animar
+   alturas) y de los tapados queda el LOMO, la cabecera con número y verbo.
+   La pista es alta y la escena —título, puntitos y pila— queda fija
+   mientras se recorre. En escritorio la pista y la escena son
+   `display: contents` y no existen. */
+[data-mirada].is-pila [data-mirada-pista] {
+  display: block;
+  height: var(--mirada-pista-alto, 420lvh);
+}
+[data-mirada].is-pila [data-mirada-escena] {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100lvh;
+  overflow: hidden;
+  margin: 0 -1.25rem;
+  padding: 5.25rem 1.25rem 1rem;
+}
+[data-mirada].is-pila [data-mirada-franja] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+[data-mirada].is-pila [data-mirada-puntos] {
+  display: flex;
+}
+/* El título en un renglón, al lado de los puntitos. */
+[data-mirada].is-pila [data-mirada-titulo] {
+  font-size: clamp(1.45rem, 1.1rem + 1.4vw, 2.2rem);
+  white-space: nowrap;
+}
+[data-mirada].is-pila [data-mirada-pila] {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  margin-top: 1rem;
+  grid-template-columns: minmax(0, 34rem);
+  grid-template-rows: max-content;
+  justify-content: center;
+}
+/* Sin el espacio entre paneles del flujo (space-y). */
+[data-mirada].is-pila [data-mirada-pila] > * {
+  margin: 0;
+}
+[data-mirada].is-pila [data-mirada-card] {
+  grid-area: 1 / 1;
+  box-shadow:
+    0 -12px 26px -16px rgb(31 45 77 / 0.22),
+    0 18px 44px -16px rgb(31 45 77 / 0.16);
+}
+/* El lomo, más bajo que en flujo: es lo que queda a la vista de cada tapado. */
+[data-mirada].is-pila [data-mirada-lomo] {
+  padding-block: 0.8rem;
+}
+/* La foto va primero, apaisada y más baja, para que el panel entero entre. */
+[data-mirada].is-pila [data-mirada-foto] {
+  order: -1;
+  aspect-ratio: 2 / 1;
+}
+[data-mirada].is-pila [data-mirada-cuerpo] {
+  gap: 1.1rem;
+}
+/* Pantallas bajas (iPhone SE): la foto, más apaisada, para que el panel
+   abierto entre entero debajo de un lomo. */
+@media (max-height: 43.75rem) {
+  [data-mirada].is-pila [data-mirada-foto] {
+    aspect-ratio: 5 / 2;
+  }
+}
+
 /* EL TAMAÑO DE LA FRASE DEL FARO (QueHacemosHeroFaro, escena S1). Vive acá y
    no en una clase por lo mismo que las medidas de `[data-mirada]`: depende del
    ALTO de la ventana y son DOS variantes que tienen que convivir; con la
