@@ -1,43 +1,27 @@
-import { after, before, test } from "node:test";
+import { test } from "node:test";
 import assert from "node:assert/strict";
 import { config as cargarEntorno } from "dotenv";
-import { personaVacia } from "@/features/quienes-somos/contenido/persona-vacia";
-import { limpiarEquipo } from "./equipo-de-prueba";
+import { nivelEnLaLista } from "./mover-equipo";
 
-// Mover dentro del nivel contra el Postgres local. Los perfiles de prueba van
-// sin nivel todavía: ese grupo es solo de ellos, y los 15 de la migración no
-// se tocan. Se borran antes y después.
+// Mover dentro del nivel. El intercambio es `unPasoMovido` (lib/orden.ts),
+// puro y con su test; acá, a qué grupo va cada perfil, que también es puro.
+// Contra la base, solo lo que no depende de las demás filas: los archivos de
+// tests corren a la vez y otros suman perfiles al mismo grupo en el medio, así
+// que un intercambio medido en la tabla puede caer con una fila ajena.
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
-const PREFIJO = "prueba-mover-perfil";
 
-async function modulos() {
+test("se ordena en el nivel publicado; si nunca se publicó, en el de su borrador; sin ninguno, sin nivel", () => {
+  assert.equal(nivelEnLaLista({ nivel: 3, borrador: { nivel: 4 } }), 3);
+  assert.equal(nivelEnLaLista({ nivel: null, borrador: { nivel: 4 } }), 4);
+  assert.equal(nivelEnLaLista({ nivel: null, borrador: { nivel: null } }), null);
+  assert.equal(nivelEnLaLista({ nivel: null, borrador: null }), null);
+});
+
+test("un perfil que ya no existe no se mueve y lo dice", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
-  return { base, ...(await import("./editar-equipo")), ...(await import("./mover-equipo")) };
-}
-
-before(async () => {
-  if (process.env.DATABASE_URL) await limpiarEquipo((await modulos()).base, PREFIJO);
-});
-after(async () => {
-  if (process.env.DATABASE_URL) await limpiarEquipo((await modulos()).base, PREFIJO);
-});
-
-test("un paso dentro del nivel, cambiando con el de al lado; en la punta no se mueve", sinBase, async () => {
-  const { base, crearPersonaEnBase, moverPersonaEnBase } = await modulos();
-  const crear = async (letra: string) => {
-    const r = await crearPersonaEnBase(base, { contenido: { ...personaVacia(), slug: `${PREFIJO}-${letra}`, nombre: `Prueba ${letra}` }, quien: "Ana" });
-    return r.ok ? r.id : assert.fail(r.detalle);
-  };
-  const a = await crear("a");
-  const b = await crear("b");
-  const orden = async () =>
-    (await base.persona.findMany({ where: { slug: null, borrador: { path: ["slug"], string_starts_with: PREFIJO } }, orderBy: { orden: "asc" }, select: { id: true } })).map((f) => f.id);
-  assert.deepEqual(await orden(), [a, b]);
-  assert.deepEqual(await moverPersonaEnBase(base, { id: b, hacia: "antes" }), { ok: true, movio: true, nombre: "Prueba b" });
-  assert.deepEqual(await orden(), [b, a]);
-  assert.deepEqual(await moverPersonaEnBase(base, { id: b, hacia: "antes" }), { ok: true, movio: false, nombre: "Prueba b" });
-  assert.deepEqual(await moverPersonaEnBase(base, { id: b, hacia: "despues" }), { ok: true, movio: true, nombre: "Prueba b" });
-  assert.deepEqual(await orden(), [a, b]);
+  const { moverPersonaEnBase } = await import("./mover-equipo");
+  const r = await moverPersonaEnBase(base, { id: "b0f1a5e2-0000-4000-8000-0000000000ff", hacia: "antes" });
+  assert.match(!r.ok ? r.detalle : "", /ya no existe/);
 });
