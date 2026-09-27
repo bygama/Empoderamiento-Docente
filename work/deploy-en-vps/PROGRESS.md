@@ -35,8 +35,9 @@
   de pnpm y en una carpeta compartida con Windows no sobreviven («The file cannot
   be accessed by the system»). Arreglo: `construir` saca el contexto como un
   tar por stdout y `desplegar.sh` lo pasa directo a `docker build -`; no queda
-  nada del build en el host (DECISIONS). Segunda corrida desde cero (sin
-  volúmenes ni imágenes de la app): `bash scripts/desplegar.sh` → exit 0, «Listo:
+  nada del build en el host (DECISIONS). Segunda corrida (el volumen de la
+  base y la imagen `fuente` venían de la primera; la imagen `app` no existía;
+  la corrida desde cero de verdad va en la verificación): `bash scripts/desplegar.sh` → exit 0, «Listo:
   https://localhost corre 8d9d59cb471a». Por Caddy: `/` 200, `/novedades` 200
   (con la novedad de UNESCO que vino de la base: el prerender leyó la base),
   `/quienes-somos` 200, `/admin` 307 → `/admin/entrar`, `/_next/image` 200
