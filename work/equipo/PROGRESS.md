@@ -10,6 +10,9 @@
 - 2026-09-27 — **SPEC aprobado por el padre** con el cambio J (sin arrastre:
   «Subir» y «Bajar» como Aliados) y las precisiones H y N (DECISIONS).
   PLAN.md escrito: 13 pasos; el 11 y el 12 esperan a la lane 9.
+- 2026-09-27 — **Ronda de arreglos 1** (revisión r1: FAIL con un Important y
+  cuatro Minor, todos arreglados; ver «Hecho» y `## Verification`). Vuelve
+  al mismo revisor.
 - 2026-09-27 — **Pausa para la revisión de cierre.** Los 13 pasos del PLAN
   están hechos y verificados (`## Verification`), la rama rebasada sobre
   `main` (`ddc8ca1d`) y el PR abierto. Sin bloqueos ni comandos en rojo.
@@ -20,7 +23,7 @@
 
 ## Hecho
 
-- **Paso 1 — los esquemas de una persona** (`28cbc763`):
+- **Paso 1 — los esquemas de una persona** (`df04c375`):
   `features/quienes-somos/contenido/` suma `modelo-del-equipo.ts` (niveles
   con su rótulo y sus lugares, colores, composiciones, figuras, topes y
   `rotuloDePublicacion`, los cuatro rótulos de §5.2), `campos-de-persona.ts`
@@ -33,10 +36,10 @@
   de una línea reusan `linea`/`opcional`/`deLaLista` de la Biblioteca.
   `pnpm --filter sitio exec tsx --test src/features/quienes-somos/contenido/persona.test.ts`
   → 7 pass, 0 fail; `pnpm typecheck` 0; eslint de los archivos nuevos 0.
-- **Paso 2 — la migración `equipo` y la FK** (`5500823a`):
+- **Paso 2 — la migración `equipo` y la FK** (`e07ba931`):
   `prisma/schema/equipo.prisma` (modelo `Persona`, tabla `equipo`) y
   `Autoria.personaId` con su relación `SET NULL`; la migración
-  `20260927073013_equipo` (renombrada al rebasear sobre la lane 9, para que vaya después de `aliados`; esquema de `migrate diff`, partido para mover los
+  `20260927081656_equipo` (renombrada al rebasear, sobre la lane 9 y después sobre métricas, para que vaya después de las de `main`; esquema de `migrate diff`, partido para mover los
   datos antes del `DROP`): la tabla, el índice parcial de la Dirección
   general, los 15 perfiles con ids fijos (generados por un script que valida
   con `esquemaPersona`: 64 referencias a la Biblioteca, 14 `sin-link`, 7
@@ -80,7 +83,7 @@
   `pnpm lint` 0; `node scripts/verificar-react-doctor.mjs` → 100/100 sin
   diagnósticos; `pnpm test` → sitio 431 pass, 0 fail, 1 saltado; auth 46;
   kit 3.
-- **Paso 4 — el ciclo de un perfil en la base** (`368adac7`):
+- **Paso 4 — el ciclo de un perfil en la base** (`0ddbc35c`):
   `datos/acciones/editar-equipo.ts` (crear —último en el orden—, guardar con
   choque, descartar, borrar: la fila, sus redirecciones y la persona en los
   borradores de materiales, con la fk `SET NULL` para las autorías
@@ -96,14 +99,14 @@
   corren a la vez y la limpieza de uno borraba el material del otro: visto y
   corregido). `pnpm --filter sitio exec tsx --test src/datos/acciones/editar-equipo.test.ts src/datos/acciones/publicar-equipo.test.ts`
   → 6 pass, 0 fail; `ed_equipo` queda con sus 15 y 62.
-- **Paso 5 — mover dentro del nivel** (`fd8f5f98`): `mover-equipo.ts`, con la
+- **Paso 5 — mover dentro del nivel** (`594d4334`): `mover-equipo.ts`, con la
   forma de `moverAliadoEnBase` de la lane 9 (`hacia: "antes" | "despues"`,
   renumera el nivel en una transacción, en la punta no se mueve); el nivel
   de quien nunca se publicó es el de su borrador (`nivelEnLaLista`).
   `mover-equipo.test.ts` → 1 pass (con perfiles sin nivel, un grupo solo de
   la prueba: los 15 no se tocan, comprobado en psql).
 - **Paso 6 — las Server Actions, la vista previa y la actividad**
-  (`3e27ca68`, `f5713c32`): los cinco tipos (`publico-`, `despublico-`,
+  (`76e64a84`, `ba6611f8`): los cinco tipos (`publico-`, `despublico-`,
   `descarto-cambios-de-`, `borro-un-perfil`, `movio-un-perfil`) en
   `datos/actividad.ts` (`editarContenido`, todos al Inicio), su frase, su
   módulo (Contenido) y su link en Cuentas › Actividad
@@ -114,7 +117,7 @@
   `/admin/contenido`), `revalidar-equipo.ts` y `abrirVistaPreviaDePersona`
   (`/quienes-somos?persona=<slug>`). `pnpm --filter sitio exec tsx --test src/datos/acciones/acciones-con-sesion.test.ts src/datos/actividad.test.ts src/admin/actividad/frase.test.ts`
   → 22 pass, 0 fail; typecheck 0; eslint 0; react-doctor 100/100.
-- **Paso 7 — la ficha: la tarjeta** (`42b95429`): `/admin/contenido/equipo/nuevo`
+- **Paso 7 — la ficha: la tarjeta** (`a16a89bf`): `/admin/contenido/equipo/nuevo`
   y `/[id]` (cada una chequea `editarContenido` antes de leer),
   `datos/consultas/ficha-de-persona.ts` (la ficha, lo que firma, quiénes
   ocupan cada nivel), `admin/equipo/` con `FichaDelPerfil` (el molde de un
@@ -124,13 +127,13 @@
   «Sin foto», la foto, el acercamiento, la URL), `PanelDelPerfil` («Se ve
   en»), `SalidaDelPerfil` y «Qué cambió» (`cambios.ts`, campo por campo y
   etapa por etapa, con `cambios.test.ts` → 2 pass).
-- **Paso 8 — la ficha: el recorrido** (`a302156a`): `BloqueDelRecorrido`
+- **Paso 8 — la ficha: el recorrido** (`057cfb2a`): `BloqueDelRecorrido`
   («Tiene recorrido», que no borra nada hasta guardar; quién es, titular,
   bajada, formación en renglones), `CategoriasDelRecorrido`,
   `BloqueDeLaFigura` (marco, recorte o sin foto; la foto y «apaisada») y
   `BloqueDelCierre`.
-- **Paso 9 — la ficha: las etapas y sus publicaciones** (`5b8b3447`,
-  `226567cf`): `EtapasDelRecorrido` y `EtapaDelRecorrido` (lo común y lo que
+- **Paso 9 — la ficha: las etapas y sus publicaciones** (`13fbb190`,
+  `ba6896eb`): `EtapasDelRecorrido` y `EtapaDelRecorrido` (lo común y lo que
   usa cada composición, en `etapa-del-recorrido/composiciones.ts`), con
   `HitosDeLaEtapa`, `RamasDeLaEtapa`, `PublicacionesDeLaEtapa` y
   `PublicacionDeLaEtapa` (de la Biblioteca —lo que firma— o sin link), y
@@ -139,13 +142,13 @@
   duplicado con el de un material y dos exports que no eran componentes: el
   encabezado subió al armazón (`EncabezadoDeFicha`, el refactor aparte) y
   los colores a `colores.ts`; queda en 100/100.
-- **Paso 10 — «Agregar en Biblioteca» con la persona elegida** (`b2763ec6`):
+- **Paso 10 — «Agregar en Biblioteca» con la persona elegida** (`b002ca07`):
   `/admin/biblioteca/nuevo?persona=<id>` (la persona que no existe se
   ignora), `personaParaAutoria`, `AgregarMaterial` (a mano: primera autora;
   con datos de afuera: `vincularPersona`, palabra por palabra sin tildes ni
   mayúsculas, o el aviso «Ningún autor de este material es…») y el aviso
   inicial de la ficha de un material. `vincular-persona.test.ts` → 2 pass.
-- **Paso 13, en parte** (`3ff14bdd`, `3bda882c`): AGENTS.md §3 y §13, el
+- **Paso 13, en parte** (`79cdf7e7`, `fbf690e0`): AGENTS.md §3 y §13, el
   README (Equipo), el spec del admin §6 y DESIGN.md §11 (el encabezado de la
   ficha en el armazón y la lista variable anidada). Falta «Lista que se
   ordena», que es del paso 11.
@@ -166,9 +169,10 @@
   Navegadora»…). En la ficha de Karla Gómez: **contraste AA en los tres
   temas, 0 fallas** (cada texto contra su fondo real, con 2 s para la
   transición del tema: a 300 ms salían 55 falsas en oscuro, y 10 iguales
-  en la ficha de un material); **a 390 px, 0 desbordes** (la caja a 390, una
-  sola columna, todos los `details` abiertos; los breakpoints siguen en
-  escritorio porque el viewport no se puede emular); **teclado**: 0 clics
+  en la ficha de un material); **a 390 px, «0 desbordes» — mal medido**: la caja
+  simulada forzaba `minmax(0,1fr)` en la grilla, que es justo lo que le
+  faltaba a la ficha (`grid-cols-1`); a 390 real desbordaba 11 px (revisión
+  r1, arreglado en la ronda 1); **teclado**: 0 clics
   sobre `div`, 0 campos sin etiqueta, y todo lo interactivo del perfil pasa
   por `Boton`, `BotonEnlace` y los controles del kit, que llevan su
   `focus-visible`.
@@ -181,9 +185,9 @@
     recorrido con teclado quedan para la revisión de cierre.
   - **Encontró dos cosas, arregladas:** el aviso de publicar decía «El
     primero: URL» con el nombre vacío, porque el `slug` iba primero en el
-    esquema (`0c04a052`, con su test); y un perfil nuevo no se publicaba sin
+    esquema (`13a3d3f1`, con su test); y un perfil nuevo no se publicaba sin
     escribir la URL a mano: ahora sigue al nombre hasta que se escribe o se
-    publica, como la de una novedad (`585f468e`). `persona.test.ts` → 8
+    publica, como la de una novedad (`b16023aa`). `persona.test.ts` → 8
     pass; typecheck 0; eslint 0.
 
 - **Rebase sobre `main` con la lane 9** (`ddc8ca1d`, 43 commits): conflictos
@@ -195,8 +199,9 @@
   ese import) y los documentos (AGENTS.md §3 y §12, README, spec del admin
   §6 y DESIGN.md §11: lo de las dos lanes). Después del rebase, la
   migración del equipo se renombró de `…060356` a
-  **`20260927073013_equipo`** (`4c787a64`) para que vaya después de
-  `…065218_aliados`: solo estaba aplicada en `ed_equipo`, donde se
+  **`20260927073013_equipo`** (`14fb5621`) para que vaya después de
+  `…065218_aliados` (en la ronda 1, al rebasear sobre métricas, pasó a
+  `20260927081656_equipo`): solo estaba aplicada en `ed_equipo`, donde se
   actualizó su fila de `_prisma_migrations` (mismo contenido) y
   `pnpm migrate:deploy` aplicó las 3 de la 9. `prisma migrate reset` no se
   usó: Prisma lo frena para un agente sin el consentimiento del usuario. El
@@ -204,11 +209,11 @@
   (`migrate:deploy` de las 26), con los mismos conteos que `ed_equipo` (15
   perfiles, 62 materiales, 74 autorías con persona, 5 aliados, 4 casos, 47
   fotos); `migrate diff` contra el esquema, vacío. El perfil pasó al
-  `Bloque` y la `FilaDeAccion` del armazón que subió la 9 (`b67ad7ea`).
+  `Bloque` y la `FilaDeAccion` del armazón que subió la 9 (`0f9bd8bc`).
   `pnpm typecheck` 0, `pnpm lint` 0, react-doctor 100/100, `pnpm test` →
   545 (544 pass, 1 skip, 0 fail).
-- **Paso 11 — la lista del Equipo** (`2db8bd30`, `c41ddf2d`, `4fee870e`,
-  `d2e70342`): lo compartido de mover (el foco que sigue, el anuncio, los
+- **Paso 11 — la lista del Equipo** (`7feb5d31`, `023cf41a`, `cd5f3657`,
+  `3a6418e4`): lo compartido de mover (el foco que sigue, el anuncio, los
   botones quietos) subió al armazón (`useMoverEnOrden`,
   `ListaQueSeOrdena`) y la lista de aliados lo usa sin cambiar su
   comportamiento; `/admin/contenido/equipo` (chequea `editarContenido`
@@ -230,8 +235,9 @@
   `validator.ts` de `.next/` seguía nombrando la ruta borrada), `pnpm lint`
   0, react-doctor 100/100, `pnpm test` → 545 (544 pass, 1 skip).
 
-- **Paso 12 — las fotos del equipo** (`6a8a273c`, `6ef3d981`, `342c7d83`):
-  la migración `20260927074549_fotos_del_equipo` (creada con `pnpm migrate
+- **Paso 12 — las fotos del equipo** (`169988a6`, `f9f166bb`, `2fac0791`):
+  la migración `20260927074549_fotos_del_equipo` (hoy
+  `20260927081756_fotos_del_equipo`, ronda 1; creada con `pnpm migrate
   --create-only` y completada con el SQL de datos antes de aplicarla): las
   15 `.jpg` de `public/equipo/` que usan los perfiles, medidas con sharp, con
   el alt de la tarjeta; los dos recortes de Daniela quedan afuera (DECISIONS).
@@ -248,17 +254,112 @@
   Osalde»), cada uno con «Editar» al bloque de su ficha; en la ficha de Karla,
   «Elegir una ya subida…» abre la grilla con las fotos del equipo y marca
   «Karla Gómez (la de ahora)».
-- **Los tests, sin depender de las filas de otros** (`6bf12c68`,
-  `2340d6dd`), por la nota del padre al mergear la 9: el intercambio de
+- **Los tests, sin depender de las filas de otros** (`358ec4dd`,
+  `10573760`), por la nota del padre al mergear la 9: el intercambio de
   mover pasó a `lib/orden.ts` (`unPasoMovido`, la `tiraMovida` de la 9, con
   su test) y lo usan Aliados y Equipo; `mover-equipo.test.ts` prueba lo puro
   y contra la base solo el perfil que no existe, y `publicar-equipo.test.ts`
   mide «último en su nivel» contra los perfiles que no son de prueba.
   typecheck 0, eslint 0; los 6 archivos que tocan esto → 12 pass.
 
+- **Ronda de arreglos 1** (revisión r1 sobre `90ea947f`, Opus 5.5 medium:
+  FAIL con un Important y cuatro Minor).
+  - **Rebase sobre `main` en `d7c8107b`** (entró métricas): conflictos en la
+    actividad (`datos/actividad.ts`, `frase.ts` y su test: los tipos de las
+    dos lanes), AGENTS.md §3, el spec del admin §6 y DESIGN.md §11, todos
+    resueltos sumando lo de las dos. La migración de métricas
+    (`…073235_contadores_enlaces_y_marcas`) quedaba entre las dos del equipo
+    y en producción ya va a estar aplicada: las dos del equipo pasan a
+    `20260927081656_equipo` y `20260927081756_fotos_del_equipo`
+    (`fc0f941a`, solo el nombre de la carpeta); en `ed_equipo` se
+    actualizaron sus filas de `_prisma_migrations` y `migrate:deploy`
+    aplicó la de métricas.
+  - **Important 1, el deadlock de mover** (`0984a8da`):
+    `datos/acciones/lista-ordenada.ts`, la pieza que usan Aliados y Equipo.
+    En una transacción interactiva, primero `pg_advisory_xact_lock` de la
+    lista (`lista:aliados`, `lista:equipo`) y recién después leer el orden
+    y renumerar. `moverPersonaEnBase` y `moverAliadoEnBase` la usan, y
+    borrar un perfil o un aliado toma el mismo candado. El test
+    `lista-ordenada.test.ts` es la reproducción del revisor achicada: cinco
+    rondas de cuatro «Subir» a la vez más un borrado, sobre cinco perfiles
+    propios. Con el candado apagado a mano falla en la ronda 0 («actual»
+    con `e` en el segundo lugar: se perdieron pasos); con él, pasa. La
+    reproducción del revisor con la función real (script sin commitear, 40
+    rondas de dos «Subir» a la vez y dos «Bajar» a la vez en el nivel 3):
+    «0 transacciones cortadas, 0 órdenes equivocados; el nivel 3 quedó
+    igual que antes».
+  - **Minor 4, publicar con lugares contados** (`005d28af`): `nivelSinLugar`
+    pasa adentro de la transacción, después del candado del Equipo. Test
+    nuevo en `publicar-equipo.test.ts`: con un lugar libre en la Dirección
+    (Raquel Ayala despublicada mientras dura, y restaurada al final, después
+    de borrar las filas de prueba), dos publicaciones a la vez → entra una.
+    Con el candado apagado falla (`actual: [ true, true ]`); con él, pasa.
+  - **Minor 5, borrar un perfil** (`c9cdd375`): los borradores de materiales
+    que nombran a la persona se bloquean con `FOR UPDATE` en la misma
+    transacción, antes de borrar la fila (el orden en que publica un
+    material: su fila, después sus autorías). El test de borrar de
+    `editar-equipo.test.ts` sigue verde (reescribe el borrador que la nombra).
+  - **Minor 3, la ficha a 390** (`72993c11`): `grid-cols-1` en la grilla de
+    `FichaDelPerfil`, como las otras cuatro fichas; el «0 desbordes» de
+    antes estaba mal medido (arriba, en el paso 7 a 10).
+  - **DESIGN.md §11 y AGENTS.md** (`473058d0`): «Lista que se ordena» suma su
+    parte de datos; el árbol nombra `lista-ordenada.ts`.
+  - **El gate lo frenó una vez** (react-doctor 90/100: `async-await-in-loop`
+    ×3 y `server-sequential-independent-await` ×1 en lo nuevo), y se arregló
+    por código (`9d7aa7c2`): renumerar y reescribir los borradores van en
+    paralelo dentro de la transacción, y borrar un perfil saca a la persona
+    de los borradores (`sacarDeLosBorradores`, con el `FOR UPDATE`) antes de
+    borrar la fila, que tira una excepción si otro guardó en el medio. Los dos
+    tests nuevos, otra vez con el candado apagado a mano, fallan («ronda 0» y
+    `[ true, true ]`); con él, los 6 archivos que tocan esto → 15 pass.
+
 ## Verification
 
-Sobre `04e34788`, rebasada sobre `main` en `ddc8ca1d` (la lane 9 adentro).
+### Ronda de arreglos 1
+
+Sobre `9d7aa7c2`, rebasada sobre `main` en `d7c8107b` (métricas adentro).
+
+- **Gate en limpio** (sin `apps/sitio/.next` ni `next-env.d.ts`, typecheck
+  antes del build): `pnpm typecheck` → exit 0 (los 4 proyectos); `pnpm lint`
+  → exit 0; `node scripts/verificar-react-doctor.mjs` → «react-doctor:
+  100/100, sin diagnósticos (apps/sitio/src: 1181 archivos · packages/db/src:
+  3 archivos · packages/auth/src: 27 archivos · packages/kit-admin/src: 22
+  archivos)»; `pnpm build` → exit 0 («Compiled successfully», 68/68 páginas
+  estáticas).
+- **`pnpm test` 5 veces seguidas sobre una base recién migrada**
+  (`ed_equipo_tests_r1b`, creada vacía, con `pnpm migrate:deploy` de las 28
+  migraciones en su orden; `DATABASE_URL` apuntada a ella), con el código
+  final:
+
+  ```
+  === corrida 1 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 2 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 3 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 4 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 5 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  ```
+
+  El salteado, las cinco veces, es el de Métricas («las respuestas grabadas
+  de la API se mapean enteras — sin respuestas grabadas: falta correr A1»).
+  Antes del arreglo del gate hubo otras cinco sobre `ed_equipo_tests_r1`,
+  también 5/5 con 578 tests y 0 fail.
+- **Los tests nuevos agarran el bug:** con `tomarLaLista` apagado a mano,
+  `lista-ordenada.test.ts` falla en la ronda 0 (pasos perdidos) y el de
+  publicar a la vez en la Dirección da `[ true, true ]`; con el candado, pasan.
+- **La reproducción del revisor** con la función real (40 rondas de dos
+  «Subir» a la vez y dos «Bajar» a la vez en el nivel 3): «0 transacciones
+  cortadas, 0 órdenes equivocados; el nivel 3 quedó igual que antes».
+- **La grilla de la ficha debajo de `xl`** (Karla Gómez en el navegador de
+  Orca, la caja a 390 y la grilla con sus clases sin las `xl:`): con
+  `grid-cols-1`, 0 px de desborde; sin la clase, la columna se pasa 179 px.
+  El 390 con los breakpoints reales (Playwright, como lo midió el revisor)
+  no se puede correr acá.
+- **Migraciones:** las 28 desde cero en una base vacía, en el orden de la
+  carpeta (las dos del equipo, después de la de métricas).
+
+### Antes de la revisión r1, con sus correcciones
+
+Sobre `95d5cc46`, rebasada sobre `main` en `ddc8ca1d` (la lane 9 adentro).
 
 - **Estático:** `pnpm typecheck` → exit 0 (los 4 proyectos); `pnpm lint` →
   exit 0; `node scripts/verificar-react-doctor.mjs` → «react-doctor: 100/100,
@@ -279,6 +380,10 @@ Sobre `04e34788`, rebasada sobre `main` en `ddc8ca1d` (la lane 9 adentro).
 
   El salteado es de Métricas y no de esta lane («las respuestas grabadas de
   la API se mapean enteras — sin respuestas grabadas: falta correr A1»).
+  **Corrección (revisión r1):** esas cinco pasaron, pero no probaban que no
+  hubiera carrera: la corrida 2 del revisor cayó en el deadlock de mover
+  (`editar-aliados.test.ts:33`), que rompía 1 de cada 5. Arreglado en la
+  ronda 1, con sus cinco corridas arriba.
 - **Migraciones:** las 27 desde cero en una base vacía (`ed_equipo_orden` y
   `ed_equipo_tests`), con los mismos conteos que `ed_equipo`; `prisma migrate
   diff --from-config-datasource --to-schema` → «This is an empty migration.»;
@@ -316,8 +421,9 @@ Sobre `04e34788`, rebasada sobre `main` en `ddc8ca1d` (la lane 9 adentro).
   «Agregar en Biblioteca», descartar, despublicar, borrar, la actividad y sus
   frases, la lista con «Subir» y «Bajar» y el sitio en su orden nuevo, la
   tarjeta del índice, la ficha de una foto con «Se usa en» y «Elegir una ya
-  subida…». Contraste AA medido en los tres temas (0 fallas); a 390, 0
-  desbordes con la caja simulada; teclado revisado en el código y el DOM.
+  subida…». Contraste AA medido en los tres temas (0 fallas); a 390, la caja
+  simulada escondió 11 px de desborde (ver arriba); teclado revisado en el
+  código y el DOM.
 - **Lo que no se pudo verificar acá:** `orca screenshot`, `orca exec "set
   viewport"` y `orca cookie get` tiran el runtime, y `orca keypress` no llega
   a la página. La mirada visual (capturas, los tres temas a ojo, 390 con los
@@ -327,7 +433,7 @@ Sobre `04e34788`, rebasada sobre `main` en `ddc8ca1d` (la lane 9 adentro).
 
 ## Abierto
 
-- `ed_equipo_orden` y `ed_equipo_tests` (donde se probaron las migraciones
+- `ed_equipo_orden`, `ed_equipo_tests`, `ed_equipo_tests_r1` y `ed_equipo_tests_r1b` (donde se probaron las migraciones
   desde cero y los tests) y `ed_equipo_antes` (la de `comparar-render`)
   quedan en `ed-postgres`: son locales y se pueden borrar al cerrar.
 - En `ed_equipo` queda la cuenta de prueba de la verificación (`equipo-prueba@ejemplo.org`,

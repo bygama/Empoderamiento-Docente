@@ -105,7 +105,8 @@
   del padre: «si la generaste antes de este rebase, volvé a generarla sobre
   el main nuevo; no la edites a mano»). Su esquema toca solo `equipo` y
   `autorias`, que la lane 9 no tocó; su contenido quedó igual (solo cambió el
-  nombre de la carpeta, a `20260927073013_equipo`, para que vaya después de
+  nombre de la carpeta, a `20260927073013_equipo` (y en la ronda 1, a
+  `20260927081656_equipo`), para que vaya después de
   `aliados`). La prueba de que regenerarla daría lo mismo: las 27 migraciones
   aplicadas desde cero en una base vacía (`ed_equipo_orden`,
   `ed_equipo_tests`) y `migrate diff` contra el esquema, vacío.
@@ -147,6 +148,48 @@
   (paso 11): «Sin publicar», «Cambios sin publicar» y «Despublicado», como
   pedía el SPEC §7.1 y como la lista de la Biblioteca; la de Aliados muestra
   también «Publicado», porque al lado va la de la autorización.
+- 2026-09-27 — **Ronda 1: mover es una sola pieza de datos, con su candado**
+  (decisión del padre sobre el Important de la revisión r1).
+  `datos/acciones/lista-ordenada.ts`: en una transacción interactiva,
+  `pg_advisory_xact_lock(hashtextextended('lista:…', 0))` y recién después
+  leer el orden y renumerar; la usan Aliados y Equipo. Lo que eligió la lane
+  dentro de lo que dejó abierto el padre:
+  - **Un candado para todo el Equipo, no uno por nivel.** Un perfil cambia de
+    grupo al publicarse en otro nivel (y uno sin publicar, al guardar otro
+    nivel en su borrador): con un candado por nivel, publicar tendría que
+    pedir dos a la vez, en un orden fijo, para no cruzarse con un mover del
+    nivel de origen. Con uno solo no hay orden que cuidar, y con 15 perfiles
+    y pocas personas editando, esperar el turno no se nota.
+  - **Borrar toma el candado aunque no es imprescindible**: renumerar usa
+    `updateMany`, que saltea una fila borrada, así que no habría deadlock;
+    pero así la regla es una sola («todo lo que cambia la lista lo pide
+    primero») y el test de mover con un borrado mide un orden exacto.
+  - **Renumerar sigue con `updateMany`**, fila por fila y adentro del
+    candado: la limpieza de los tests borra filas sin pasar por él, y un
+    `update` tiraría.
+  - **Crear un aliado no toma el candado**: pone la fila al final
+    (`max + 1`) sin renumerar a nadie; dos a la vez empatan y desempata
+    `creadoEn`, como antes. Queda como estaba.
+- 2026-09-27 — **Publicar cuenta el lugar con el candado del Equipo** (Minor 4
+  de r1): `nivelSinLugar` corre adentro de la transacción, después del
+  candado. El test necesita un lugar libre en la Dirección, que la migración
+  llena: despublica a Raquel Ayala mientras dura y la vuelve a publicar al
+  final, después de borrar sus filas de prueba, así la Dirección nunca queda
+  con tres. Ningún otro archivo de tests publica en la Dirección ni cuenta
+  sus personas.
+- 2026-09-27 — **Borrar un perfil bloquea con `FOR UPDATE` solo los borradores
+  que lo nombran** (Minor 5 de r1), con `borrador @> {"autorias":
+  [{"persona": id}]}`, y antes de borrar la fila: publicar un material
+  bloquea su fila y después sus autorías, y borrar la persona suelta sus
+  autorías (`SET NULL`); en el mismo orden, los dos no se esperan en cruz.
+  Un guardado del material que llega en el medio espera y escribe después:
+  si todavía nombra a la persona, publicarlo lo frena con «no está en el
+  Equipo», como antes.
+- 2026-09-27 — **Las migraciones del equipo se renombraron otra vez** (ronda
+  1): con `main` en `d7c8107b`, la de métricas (`…073235`) quedaba entre las
+  dos del equipo. Pasan a `20260927081656_equipo` y
+  `20260927081756_fotos_del_equipo`, con el mismo contenido: solo se
+  aplicaron en las bases locales de la lane.
 - 2026-09-27 — **Visto al pasar, sin tocar:** `docs/AI_GUIDELINES.md` §2
   («Dónde va un archivo de datos») da de ejemplo `quienes-somos/data/equipo.ts`,
   que esta lane borra; el único `data/` de contenido que queda es
