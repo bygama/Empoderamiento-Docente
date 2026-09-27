@@ -1,0 +1,33 @@
+// Lo que se configura una vez y se edita en Ajustes (work/ajustes/SPEC.md §3 y
+// §4). Antes vivía en el código (`config/site.ts`, `config/privacidad.ts`);
+// ahora se cambia desde el admin sin un deploy.
+
+/// Los datos institucionales del sitio: una fila sola, siempre (el `CHECK` de
+/// la migración `datos_del_sitio`, que también la cargó con los de hoy). El
+/// sitio la lee por `datos/consultas/sitio.ts` y la escribe Ajustes › Datos
+/// del sitio. Lo de la marca —nombre, URL, descripción— sigue en el código.
+model DatosDelSitio {
+  id          Int       @id @default(1)
+  correo      String
+  /// Solo dígitos, con el código de país (56912345678): arma el link de
+  /// WhatsApp. Sin número, no hay botón.
+  whatsapp    String?
+  calle       String
+  /// El piso o la oficina.
+  complemento String?
+  ciudad      String
+  region      String?
+  pais        String
+  /// Los países donde trabaja ED, en el orden en que se muestran.
+  paises      String[]
+  /// La URL de cada red. Sin URL, la red no aparece.
+  instagram   String?
+  facebook    String?
+  linkedin    String?
+  /// Null: como la cargó la migración.
+  cambiadoEn  DateTime? @map("cambiado_en")
+  /// El nombre de quien lo cambió, en llano, como `paginas.publicado_por`.
+  cambiadoPor String?   @map("cambiado_por")
+
+  @@map("datos_del_sitio")
+}
