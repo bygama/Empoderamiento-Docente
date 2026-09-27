@@ -12,9 +12,9 @@ import type { Fallo } from "./choque";
 // La marca no va al borrador: es un hecho sobre ED y rige ya. La pone solo
 // quien puede `autorizarAliados`: la acción lo chequea, y esto lo vuelve a
 // chequear con el rol, así ninguna otra puerta la salta. **Queda atada a lo
-// que se autorizó**: guarda el logo y el nombre (los del borrador si se puede
-// publicar; si no, los publicados), y quien autoriza manda los que vio, así
-// no autoriza algo que cambió mientras lo miraba.
+// que se autorizó**: guarda el logo, el nombre y el texto del logo (los del
+// borrador si se puede publicar; si no, los publicados), y quien autoriza
+// manda los que vio, así no autoriza algo que cambió mientras lo miraba.
 
 export const esquemaNota = z
   .string()
@@ -24,7 +24,7 @@ export const esquemaNota = z
 
 export async function autorizarAliadoEnBase(
   base: PrismaClient,
-  { id, autorizado, nota, rol, quien, visto }: { id: string; autorizado: boolean; nota: unknown; rol: unknown; quien: string; visto?: { logo: string; nombre: string } },
+  { id, autorizado, nota, rol, quien, visto }: { id: string; autorizado: boolean; nota: unknown; rol: unknown; quien: string; visto?: { logo: string; nombre: string; alt: string } },
 ): Promise<{ ok: true; detalle: string; nombre: string; cambio: boolean } | Fallo> {
   if (!puede(rol, "autorizarAliados")) return { ok: false, detalle: SIN_PERMISO };
   const fila = await base.aliado.findUnique({ where: { id } });
@@ -32,7 +32,10 @@ export async function autorizarAliadoEnBase(
   const nombre = nombreDelAliado(fila);
   if (!autorizado) {
     if (!fila.autorizado) return { ok: true, detalle: "No estaba autorizado.", nombre, cambio: false };
-    await base.aliado.update({ where: { id }, data: { autorizado: false, autorizadoLogo: null, autorizadoNombre: null, autorizadoEn: new Date(), autorizadoPor: quien } });
+    await base.aliado.update({
+      where: { id },
+      data: { autorizado: false, autorizadoLogo: null, autorizadoNombre: null, autorizadoAlt: null, autorizadoEn: new Date(), autorizadoPor: quien },
+    });
     return { ok: true, detalle: "Se quitó la autorización: el logo ya no está en la tira, aunque siga publicado.", nombre, cambio: true };
   }
   const valida = esquemaNota.safeParse(nota);
@@ -40,13 +43,13 @@ export async function autorizarAliadoEnBase(
   const publicado = publicadoDeAliado(fila);
   const documento = loQueSeAutoriza(fila.borrador, publicado);
   if (!documento) return { ok: false, detalle: "Todavía no hay qué autorizar: completá el nombre y el logo y guardá el borrador." };
-  if (visto && (visto.logo !== documento.logo.src || visto.nombre !== documento.nombre)) {
-    return { ok: false, detalle: "Lo guardado cambió mientras lo mirabas: recargá para ver qué logo y qué nombre autorizás." };
+  if (visto && (visto.logo !== documento.logo.src || visto.nombre !== documento.nombre || visto.alt !== documento.logo.alt)) {
+    return { ok: false, detalle: "Lo guardado cambió mientras lo mirabas: recargá para ver qué logo, qué nombre y qué texto autorizás." };
   }
-  const marca = { autorizado: true, autorizadoLogo: documento.logo.src, autorizadoNombre: documento.nombre };
-  // Solo si `autorizado_logo` y `autorizado_nombre` siguen como se leyeron: dos que autorizan a la vez no se pisan sin verse.
+  const marca = { autorizado: true, autorizadoLogo: documento.logo.src, autorizadoNombre: documento.nombre, autorizadoAlt: documento.logo.alt };
+  // Solo si lo autorizado sigue como se leyó: dos que autorizan a la vez no se pisan sin verse.
   const { count } = await base.aliado.updateMany({
-    where: { id, autorizadoLogo: fila.autorizadoLogo, autorizadoNombre: fila.autorizadoNombre },
+    where: { id, autorizadoLogo: fila.autorizadoLogo, autorizadoNombre: fila.autorizadoNombre, autorizadoAlt: fila.autorizadoAlt },
     data: { ...marca, autorizacion: valida.data, autorizadoEn: new Date(), autorizadoPor: quien },
   });
   if (!count) return { ok: false, detalle: "Otra persona cambió la autorización mientras tanto: recargá para ver cómo quedó." };

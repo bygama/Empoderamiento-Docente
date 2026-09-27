@@ -19,7 +19,7 @@ type Estado = {
 export function explicacionDe({ id, puedeAutorizar, quienPuede }: Estado): string {
   if (!puedeAutorizar) return `La marca la pone ${quienPuede}, con la nota de dónde consta la autorización: sin ella el logo no se publica nunca.`;
   if (!id) return "Guardá el aliado primero: después se marca la autorización.";
-  return "Sin esta marca el logo no se publica nunca, y vale solo para el logo y el nombre que se autorizan. Ponela solo si la organización autorizó el uso de su logo, y anotá dónde consta.";
+  return "Sin esta marca el logo no se publica nunca, y vale solo para el logo, el nombre y el texto del logo que se autorizan. Ponela solo si la organización autorizó el uso de su logo, y anotá dónde consta.";
 }
 
 /** Por qué todavía no se puede autorizar, o `null`. */

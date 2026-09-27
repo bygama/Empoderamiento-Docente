@@ -16,7 +16,7 @@ export default async function NuevoAliado() {
   const sesion = await sesionActual();
   if (!sesion) redirect("/admin/entrar");
   const estado = { publicado: false, publicadoEn: null, publicadoPor: null, borradorEn: null, borradorPor: null };
-  const autorizacion = { autorizado: false, nota: "", en: null, por: null, logo: null, nombre: null };
+  const autorizacion = { autorizado: false, nota: "", en: null, por: null, logo: null, nombre: null, alt: null };
   return (
     <FichaDeAliado
       ficha={{ id: null, documento: aliadoVacio(), publicado: null, estado, autorizacion }}

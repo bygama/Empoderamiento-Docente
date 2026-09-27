@@ -12,9 +12,9 @@ import { leerSinRomper } from "./leer-sin-romper";
 // §5 y §8). **Sin la marca `autorizado`, un logo no sale nunca** (AGENTS.md
 // §5.4): lo filtra la consulta a la base y otra vez `aliadosVisibles`, también
 // en la vista previa, y un test lo prueba. **Y la marca vale solo para lo que
-// se autorizó**: el documento que se mostraría tiene que tener el logo y el
-// nombre de `autorizado_logo` y `autorizado_nombre`, aunque las columnas se
-// hayan escrito por otro lado.
+// se autorizó**: el documento que se mostraría tiene que tener el logo, el
+// nombre y el texto del logo de `autorizado_logo`, `autorizado_nombre` y
+// `autorizado_alt`, aunque las columnas se hayan escrito por otro lado.
 
 /** Las columnas de lo publicado, como documento. Sin URL, un texto vacío. */
 export function publicadoDeAliado(fila: Fila): unknown {
@@ -39,7 +39,7 @@ function documentoAMostrar(fila: Fila, enVistaPrevia: boolean): Aliado | null {
   return publicado.success ? publicado.data : null;
 }
 
-/** Lo que muestra el sitio de una fila: ese documento, solo si la marca vale para su logo y su nombre. */
+/** Lo que muestra el sitio de una fila: ese documento, solo si la marca vale para su logo, su nombre y su alt. */
 function documentoVisible(fila: Fila, enVistaPrevia: boolean): Aliado | null {
   const documento = documentoAMostrar(fila, enVistaPrevia);
   return documento && estaAutorizado(documento, fila) ? documento : null;
@@ -66,7 +66,7 @@ export function aliadosVisibles(filas: readonly Fila[], fotos: readonly FotoDelL
  */
 /** Las filas con la marca y las fotos de sus logos: lo que `aliadosVisibles` filtra. Aparte, para probarlo contra la base. */
 export async function tiraEnBase(db: Prisma.TransactionClient): Promise<{ filas: Fila[]; fotos: FotoDelLogo[] }> {
-  const filas = await db.aliado.findMany({ where: { autorizado: true, autorizadoLogo: { not: null }, autorizadoNombre: { not: null } } });
+  const filas = await db.aliado.findMany({ where: { autorizado: true, autorizadoLogo: { not: null }, autorizadoNombre: { not: null }, autorizadoAlt: { not: null } } });
   // Los logos de lo publicado y de los borradores: la vista previa puede mostrar uno nuevo.
   const urls = filas.flatMap((f) => fotosEn([f.logo, f.borrador]).map((foto) => foto.src));
   const fotos = await db.foto.findMany({ where: { url: { in: urls } }, select: { url: true, ancho: true, alto: true, tipo: true } });

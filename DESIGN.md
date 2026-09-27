@@ -764,9 +764,11 @@ oscuro. Sobre blanco, un logo blanco desaparecería.
   `Bloque` propio debajo del formulario, con la casilla «Autorizado» (la
   nativa, como en «Casilla»), la nota de dónde consta y su botón,
   secundario, porque rige en el momento y no espera a publicar. **Vale para
-  un logo y un nombre**: arriba, «Se autorizó» con ese logo como en la tira y
-  su nombre; al marcar, «Se va a autorizar» con lo guardado, antes del botón
-  «Autorizar este logo» (lo que está sin guardar no se autoriza, y lo dice).
+  un logo, un nombre y un texto del logo**: arriba, «Se autorizó» con ese logo
+  como en la tira, su nombre y su texto en meta `gris-texto` («Texto del logo:
+  «…»», escrito porque el logo va decorativo); al marcar, «Se va a autorizar»
+  con lo guardado, antes del botón «Autorizar este logo» (lo que está sin
+  guardar no se autoriza, y lo dice).
   Si lo guardado cambió desde la autorización, un aviso de error lo dice y el
   aliado cuenta como sin autorizar. Para quien no la puede poner, la casilla
   va deshabilitada y la explicación, en meta `gris-texto` debajo del título,
