@@ -2,7 +2,7 @@ import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { config as cargarEntorno } from "dotenv";
-import { segundoFactorObligatorio } from "@ed/auth";
+import { puede, segundoFactorObligatorio } from "@ed/auth";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const hayBase = Boolean(process.env.DATABASE_URL);
@@ -96,6 +96,13 @@ test("poner quién recibe prende las elegidas y apaga las demás que pueden; un 
   // Solo nuestras cuentas: las demás de la base quedan apagadas en esta prueba y se vuelven a prender abajo.
   const { base } = await import("@/datos/cliente");
   const antes = await base.aviso.findMany({ where: { aviso: "cv", cuentaId: { notIn: CUENTAS.map((c) => c.id) } } });
+  // Otros archivos de test crean cuentas que administran mientras este corre, y
+  // una nueva sin fila recibe el CV de fábrica: la segunda llamada la apaga y la
+  // cuenta. Por eso «repetirlo no cambia nada» se mide contra las que podían
+  // recibirlo al empezar.
+  const podianRecibirlo = async () =>
+    new Set((await base.user.findMany({ where: { suspendida: false }, select: { id: true, rol: true } })).filter((c) => puede(c.rol, "verCV")).map((c) => c.id));
+  const alEmpezar = await podianRecibirlo();
   try {
     const primera = await ponerQuienRecibe("cv", [CALLADA, EDITA]);
     assert.equal(primera.reciben, 1);
@@ -106,8 +113,12 @@ test("poner quién recibe prende las elegidas y apaga las demás que pueden; un 
       { aviso: "contacto", activo: true },
       { aviso: "resumen-semanal", activo: false },
     ]);
-    // Guardar lo mismo otra vez no cambia nada, y la acción no lo anota en la actividad.
-    assert.deepEqual(await ponerQuienRecibe("cv", [CALLADA, EDITA]), { reciben: 1, cambiaron: 0 });
+    // Guardar lo mismo otra vez no cambia nada, y la acción no lo anota en la
+    // actividad: solo cambian, si las hay, las cuentas que aparecieron en el medio.
+    const segunda = await ponerQuienRecibe("cv", [CALLADA, EDITA]);
+    const aparecieron = [...(await podianRecibirlo())].filter((id) => !alEmpezar.has(id)).length;
+    assert.equal(segunda.reciben, 1);
+    assert.ok(segunda.cambiaron <= aparecieron, `repetirlo cambió ${segunda.cambiaron} y solo aparecieron ${aparecieron} cuentas nuevas`);
   } finally {
     await base.aviso.deleteMany({ where: { aviso: "cv", cuentaId: { notIn: CUENTAS.map((c) => c.id) } } });
     if (antes.length) await base.aviso.createMany({ data: antes });
