@@ -1,7 +1,8 @@
 import type { Capacidad } from "@ed/auth";
+import { BANDEJAS } from "@/config/mensajes";
 import { hayVariablesDeBusquedas } from "@/lib/busquedas/entorno";
 import { paginasSinPublicar } from "./de-las-paginas";
-import { enOrden, leerAisladas, visiblesPara } from "./registro";
+import { leerCvNuevos, leerCvQueSeBorran, leerMensajesSinLeer } from "./de-los-mensajes";
 
 /**
  * Qué tan urgente es una fila, de más a menos: el orden del SPEC padre §5.2,
@@ -10,9 +11,9 @@ import { enOrden, leerAisladas, visiblesPara } from "./registro";
  * orden del registro.
  */
 export const URGENCIAS = [
-  /** Una persona espera respuesta: CV nuevos y mensajes sin leer. Los trae la lane 7, mensajes. */
+  /** Una persona espera respuesta: CV nuevos y mensajes sin leer. */
   "alguien-espera",
-  /** Algo se borra solo: CV que se borran en 7 días. Lo trae la lane 7. */
+  /** Algo se borra solo: CV que se borran en 7 días. */
   "se-borra-pronto",
   /** Trabajo sin terminar: páginas con cambios sin publicar, y novedades en borrador hace más de 7 días (lane 6). */
   "sin-publicar",
@@ -26,7 +27,7 @@ export const URGENCIAS = [
 export type Urgencia = (typeof URGENCIAS)[number];
 
 /** Las filas que existen. Un módulo que llega suma su clave acá y su entrada en `PENDIENTES`. */
-export const CLAVES_DE_PENDIENTES = ["paginas-sin-publicar", "conectar-search-console"] as const;
+export const CLAVES_DE_PENDIENTES = ["cv-nuevos", "mensajes-sin-leer", "cv-que-se-borran", "paginas-sin-publicar", "conectar-search-console"] as const;
 export type ClaveDePendiente = (typeof CLAVES_DE_PENDIENTES)[number];
 
 /** Lo que dice una fila con algo pendiente: «2 páginas con cambios sin publicar» · «Inicio y Qué hacemos». */
@@ -44,7 +45,18 @@ export type Pendiente = {
   leer: () => Promise<LoPendiente | null>;
 };
 
+// En el orden del SPEC padre §5.2: a igual urgencia, los CV antes que Contacto.
 export const PENDIENTES: Record<ClaveDePendiente, Pendiente> = {
+  "cv-nuevos": { urgencia: "alguien-espera", capacidad: "verCV", que: "los CV", href: BANDEJAS.cv.href, accion: "Ir a CV", leer: leerCvNuevos },
+  "mensajes-sin-leer": {
+    urgencia: "alguien-espera",
+    capacidad: "verContacto",
+    que: "los mensajes de contacto",
+    href: BANDEJAS.contacto.href,
+    accion: "Ir a Contacto",
+    leer: leerMensajesSinLeer,
+  },
+  "cv-que-se-borran": { urgencia: "se-borra-pronto", capacidad: "verCV", que: "los CV", href: BANDEJAS.cv.href, accion: "Ir a CV", leer: leerCvQueSeBorran },
   "paginas-sin-publicar": {
     urgencia: "sin-publicar",
     capacidad: "editarContenido",
@@ -64,33 +76,3 @@ export const PENDIENTES: Record<ClaveDePendiente, Pendiente> = {
       hayVariablesDeBusquedas() ? null : { titulo: "Conectá Search Console", detalle: "Para ver qué busca la gente en Google." },
   },
 };
-
-export type FilaDePendiente<C extends string = ClaveDePendiente> = LoPendiente & {
-  clave: C;
-  href: string;
-  accion: string;
-  /** La consulta tiró: la fila dice que no se pudo revisar, en vez de callarlo y dejar un «Todo al día» falso. */
-  fallo: boolean;
-};
-
-/**
- * Las filas con algo pendiente de un registro que ese rol puede ver, de la
- * más urgente a la menos. Recibe el registro para poder probar el orden sin
- * base; el Inicio usa `pendientesPara`.
- */
-export async function filasDePendientes<C extends string>(registro: Record<C, Pendiente>, rol: unknown): Promise<FilaDePendiente<C>[]> {
-  const leidas = await leerAisladas(visiblesPara(enOrden(registro), rol), (p) => p.leer());
-  const conOrden = leidas.flatMap(({ entrada: p, ...lectura }) => {
-    const comun = { clave: p.clave, href: p.href, accion: p.accion };
-    const orden = URGENCIAS.indexOf(p.urgencia);
-    if ("fallo" in lectura) return [{ orden, fila: { ...comun, titulo: `No se pudo revisar ${p.que}`, detalle: "Probá recargar la página.", fallo: true } }];
-    return lectura.valor ? [{ orden, fila: { ...comun, ...lectura.valor, fallo: false } }] : [];
-  });
-  // `sort` es estable: a igual urgencia queda el orden del registro.
-  return conOrden.sort((a, b) => a.orden - b.orden).map(({ fila }) => fila);
-}
-
-/** Las filas con algo pendiente que ese rol puede ver, de la más urgente a la menos. */
-export function pendientesPara(rol: unknown): Promise<FilaDePendiente[]> {
-  return filasDePendientes(PENDIENTES, rol);
-}

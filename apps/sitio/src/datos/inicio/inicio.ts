@@ -2,7 +2,7 @@ import { puede } from "@ed/auth";
 import { actividadReciente, type EventoReciente } from "./actividad-reciente";
 import { loNuevoPara, ultimaVisita } from "./desde-tu-visita";
 import { numerosPara, type NumeroDeLaSemana } from "./esta-semana";
-import { pendientesPara, type FilaDePendiente } from "./pendientes";
+import { pendientesPara, type FilaDePendiente } from "./filas-de-pendientes";
 
 /** Lo que el Inicio necesita de la sesión: quién es, su rol y cuándo empezó esta sesión. */
 export type SesionDelInicio = { user: { id: string; name: string; rol?: unknown }; session: { createdAt: Date } };

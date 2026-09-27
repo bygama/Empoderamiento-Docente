@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { filasDePendientes, type Pendiente } from "./pendientes";
+import { filasDePendientes } from "./filas-de-pendientes";
+import type { Pendiente } from "./pendientes";
 
 // El registro de pendientes, con filas falsas: el orden, el filtro por
 // capacidad y el aislamiento no necesitan base.
