@@ -16,7 +16,8 @@
   la actividad» sigue afuera. Los hashes de los pasos son los de después del
   rebase.
 - 2026-09-26 — **En pausa con el PR abierto:** los 10 pasos hechos, la
-  verificación M en PASS (abajo) y el PR contra `main`. Falta la revisión de
+  verificación M en PASS (abajo) y el PR contra `main`: #184
+  (https://github.com/bygama/Empoderamiento-Docente/pull/184). Falta la revisión de
   cierre, que lanza el padre. **Lo que sigue:** los hallazgos de esa revisión
   (si los hay), el rebase sobre el `main` que haya (si la 3b ya está, sumar
   «Ver toda la actividad»; si la 7 sumó tipos de actividad, filas o números,
