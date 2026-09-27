@@ -74,3 +74,12 @@ test("el sexto de la misma IP en una hora recibe 429, con cuándo volver", sinBa
   assert.equal(r.headers.get("retry-after"), "3600");
   assert.match((await r.json()).error, /Probá de nuevo en una hora/);
 });
+
+test("un cuerpo chunked de más recibe 413 sin leerse entero, aunque no diga su largo", async () => {
+  const { pedidoChunked } = await import("@/lib/formularios/__fixtures__/pedido-chunked");
+  const { recibirContacto } = await import("./contacto");
+  const { pedido, contador } = pedidoChunked(100, "http://localhost/api/contacto", { "content-type": "application/json" });
+  const r = await recibirContacto(pedido);
+  assert.equal(r.status, 413);
+  assert.ok(contador.pedidos < 10, `leyó ${contador.pedidos} de 100 pedazos`);
+});

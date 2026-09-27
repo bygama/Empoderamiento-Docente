@@ -3,9 +3,10 @@ import path from "node:path";
 import { CAMPOS_DEL_CV, COLUMNAS_DEL_CV, CV_PESA_DE_MAS, MAXIMO_DEL_CV, cvAbierto } from "@/config/cv";
 import { almacenPrivado, type AlmacenPrivado } from "@/lib/formularios/almacen-privado";
 import { datosDe, esquemaDe, valoresDe } from "@/lib/formularios/campos";
+import { comoFormData, leerConTope } from "@/lib/formularios/cuerpo";
 import { esPdf } from "@/lib/formularios/pdf";
 import { base } from "@/datos/cliente";
-import { ESCRIBINOS, avisarDespues, dentroDelTope, demasiados, largoDelPedido, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
+import { ESCRIBINOS, avisarDespues, dentroDelTope, demasiados, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
 
 // `POST /api/cv`: el formulario de /sumate-al-equipo (work/mensajes/SPEC.md
 // §5.2). Llega como multipart con el PDF. El archivo va al almacén privado
@@ -42,8 +43,9 @@ async function pdfDe(archivo: FormDataEntryValue | null): Promise<Uint8Array | s
 
 export async function recibirCV(pedido: Request, entorno: Entorno = process.env): Promise<Response> {
   if (!cvAbierto(entorno)) return new Response("No encontrado", { status: 404 });
-  if (largoDelPedido(pedido) > MAXIMO_DEL_CV + MARGEN_BYTES) return rechazado(413, CV_PESA_DE_MAS);
-  const datos = await pedido.formData().catch(() => null);
+  const bytes = await leerConTope(pedido, MAXIMO_DEL_CV + MARGEN_BYTES);
+  if (!bytes) return rechazado(413, CV_PESA_DE_MAS);
+  const datos = await comoFormData(bytes, pedido.headers.get("content-type"));
   if (!datos) return rechazado(400, "No entendimos lo que llegó. Probá de nuevo.");
 
   // El campo trampa, como en Contacto: se contesta que salió bien y no se guarda nada.
