@@ -6,7 +6,8 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- Paso 17 del PLAN (el aviso de sección compartida).
+- work-verify: el gate entero, la vista previa y la revalidación de punta a
+  punta.
 
 ## Abierto
 
@@ -16,6 +17,45 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
   archivo; el padre lo anota en su lane.
 
 ## Hecho
+
+- **Paso 18 — Docs** (`c54a7dc`, `f771e88`, `fed49b2`). README «Editar las
+  páginas» (las dos páginas y lo compartido), AGENTS.md §13 (la fase C) y los
+  punteros de `docs/content/arquitectura-que-hacemos.md` y
+  `que-hace-ed-fuentes.md` al contenido nuevo. `git grep -n
+  "que-hacemos/data" -- docs README.md AGENTS.md` → exit 1 (sin resultados).
+
+- **Paso 17 — El aviso de sección compartida** (`a78da12`, DESIGN.md en
+  `a924fc5`). `comparticionDe(registro, slug, clave)` en
+  `lib/contenido/compartido.ts` (+1 test: las dos puntas y nada donde no se
+  comparte); `paginaParaEditar` suma `compartida` a cada sección;
+  `admin/paginas/AvisoDeCompartida.tsx` la dibuja debajo del título de la
+  sección, en `Seccion`. DESIGN.md §11 suma «Sección compartida». typecheck 0
+  · lint 0 · test 0 (187 ok) · build 0 · react-doctor 100/100 ·
+  comparar-render contra el paso anterior **0** (el sitio no cambia). En el
+  navegador (`localhost:3022`, cuenta de prueba):
+  - **Textos:** Inicio › Cómo trabajamos «Las frases en verde de los pasos se
+    editan en Qué hacemos › Cómo trabajamos: las comparten las dos páginas.»
+    y Inicio › Áreas «Las siete áreas se editan en Qué hacemos › Áreas de
+    especialización: …»; Qué hacemos › Cómo trabajamos «Inicio también
+    muestra las frases en verde de los pasos: al publicar Qué hacemos,
+    cambian las dos páginas.» y Qué hacemos › Áreas «Inicio también muestra
+    las siete áreas: …».
+  - **Link:** `href` a `/admin/contenido/paginas/que-hacemos#seccion-areas` (y
+    `#seccion-comoTrabajamos`); el clic lleva al editor de Qué hacemos con la
+    sección a la vista (tope a 112 px, debajo del encabezado fijo).
+  - **Tres temas** (cookie `tema-del-admin`), medido con WCAG 2.x sobre el
+    fondo real: claro y mixto, línea 13,63:1 y link 5,11:1; oscuro, 13,59:1 y
+    7,14:1; link subrayado en los tres.
+  - **Celular:** la emulación de dispositivo de Orca (`orca set device`) y
+    las capturas (`orca screenshot`) fallan con la ventana de Orca sin foco
+    («Screenshot timed out — the browser tab may not be visible», el mismo
+    límite que tuvo la 4a), y el admin no se deja enmarcar (su CSP), así que
+    un iframe de 390 no sirve. Medido por DOM: la línea clonada en una caja
+    de 320 px envuelve en tres renglones sin desbordar (`scrollWidth` =
+    `clientWidth` = 320). No hay capturas de este paso.
+  - **Teclado:** el link es un `<a>` con el foco de siempre
+    (`focus-visible:outline-2 … outline-azul-medio`, en la hoja construida);
+    el foco real no se pudo ejercitar con la ventana sin foco.
 
 - **Paso 16 — Las frases del método, una sola fuente** (`3112758`). Los
   pasos de Inicio pierden `frase` (esquema e inicial) y su sección anota
