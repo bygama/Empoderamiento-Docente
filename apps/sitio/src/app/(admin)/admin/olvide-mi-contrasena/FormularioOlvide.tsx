@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Aviso } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { Aviso, Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
+import { Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 
 export function FormularioOlvide() {
   const [listo, setListo] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Boton } from "@/admin/armazon/Boton";
+import { Boton } from "@ed/kit-admin";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-material";
 import type { Pendiente } from "./useGuardarMaterial";

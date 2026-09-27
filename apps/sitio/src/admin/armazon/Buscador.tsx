@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { ENTRADA } from "@ed/kit-admin";
-import { Boton } from "./Boton";
-import { claseDeBoton } from "./clases";
+import { Boton, claseDeBoton, ENTRADA } from "@ed/kit-admin";
 
 type Props = {
   /** Qué busca, para el lector y el `aria-label` del formulario: «Buscar en Contacto». */

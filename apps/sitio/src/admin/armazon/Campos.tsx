@@ -7,11 +7,6 @@
 
 import { claseDeBoton, ENTRADA } from "@ed/kit-admin";
 
-// El aviso que usa todo el admin vive en el kit, con los controles que lo
-// usan (work/novedades-y-kit/DECISIONS, A).
-// Se va con la mudanza de armazon al kit.
-export { Aviso } from "@ed/kit-admin";
-
 /** Los links de las pantallas de acceso («Olvidé mi contraseña», «Volver»), con el foco en `azul-medio` como los campos. */
 export const ENLACE_DE_ACCESO =
   "rounded-sm text-azul-medio underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio";

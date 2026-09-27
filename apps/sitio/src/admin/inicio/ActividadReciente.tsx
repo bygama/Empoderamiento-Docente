@@ -1,6 +1,5 @@
+import { Aviso, BotonEnlace } from "@ed/kit-admin";
 import { fraseDe } from "@/admin/actividad/frase";
-import { BotonEnlace } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
 import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Fila, Lista } from "@/admin/armazon/Lista";
 import { Momento } from "@/admin/armazon/Momento";

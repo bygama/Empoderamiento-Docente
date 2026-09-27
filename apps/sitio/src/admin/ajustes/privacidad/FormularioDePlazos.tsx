@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { ENTRADA } from "@ed/kit-admin";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton, ENTRADA } from "@ed/kit-admin";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
 import { PLAZOS, TOPES, type Plazo, type Plazos } from "@/config/privacidad";
 import { guardarPlazos, type ResultadoDePlazos } from "@/datos/acciones/privacidad";

@@ -1,4 +1,4 @@
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { ArrowUpRight } from "@/components/ui/icons";
 import { rotuloDelNivel, type Nivel } from "@/features/quienes-somos/contenido/modelo-del-equipo";
 

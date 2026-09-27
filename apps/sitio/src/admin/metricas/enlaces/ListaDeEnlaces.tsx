@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton } from "@ed/kit-admin";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
 import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Insignia } from "@/admin/armazon/Insignia";

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Fila, Lista } from "@/admin/armazon/Lista";
 import { AvisosDelOrden, BotonesDeOrden } from "@/admin/armazon/ListaQueSeOrdena";

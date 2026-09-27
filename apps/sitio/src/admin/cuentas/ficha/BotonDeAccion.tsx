@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton, type Variante } from "@ed/kit-admin";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
-import type { Variante } from "@/admin/armazon/clases";
 
 type Resultado = { ok: boolean; detalle: string };
 

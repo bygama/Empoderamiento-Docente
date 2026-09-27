@@ -1,5 +1,5 @@
 import { QUE_PUEDE, esRol, quienPuede, type Capacidad } from "@ed/auth";
-import { BotonEnlace } from "./Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { Encabezado } from "./Encabezado";
 
 /**

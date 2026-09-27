@@ -1,4 +1,4 @@
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso } from "@ed/kit-admin";
 import { estadoDeBusquedas, resumenDeBusquedas } from "@/datos/consultas/busquedas";
 import { avisoDeCorrida } from "./aviso";
 import { CabeceraDeBusquedas } from "./CabeceraDeBusquedas";

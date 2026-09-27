@@ -4,9 +4,10 @@ import { useId, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CODIGO_NO_SALIO, CUENTA_SUSPENDIDA, quienPuede } from "@ed/auth";
+import { Aviso } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
 import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
-import { Aviso, Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
+import { Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 import { enmascararCorreo } from "@/lib/correo/enmascarar";
 import { destinoSeguro } from "./destino";
 

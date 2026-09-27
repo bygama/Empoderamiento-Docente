@@ -1,5 +1,5 @@
+import { Boton } from "@ed/kit-admin";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { Boton } from "./Boton";
 
 type Props = {
   /** Lo que corre en la ficha, o nada: «guardar», «vista-previa» o «publicar» se dicen en su botón; lo demás solo los deja esperando. */

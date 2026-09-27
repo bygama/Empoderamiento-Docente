@@ -1,6 +1,5 @@
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { Aviso, BotonEnlace } from "@ed/kit-admin";
 import { Buscador } from "@/admin/armazon/Buscador";
-import { Aviso } from "@/admin/armazon/Campos";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Filtro } from "@/admin/armazon/Filtro";

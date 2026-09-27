@@ -3,8 +3,8 @@
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { QUE_PUEDE, ROLES_QUE_SE_ASIGNAN, ROL_POR_DEFECTO } from "@ed/auth";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso, Campo } from "@/admin/armazon/Campos";
+import { Aviso, Boton } from "@ed/kit-admin";
+import { Campo } from "@/admin/armazon/Campos";
 import { invitar } from "@/datos/acciones/invitaciones";
 
 /**

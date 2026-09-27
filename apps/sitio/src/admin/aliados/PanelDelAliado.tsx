@@ -1,4 +1,4 @@
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { BorradorDeAliado } from "@/features/aliados/contenido/aliado";
 import { altoDe } from "@/features/aliados/contenido/modelo";

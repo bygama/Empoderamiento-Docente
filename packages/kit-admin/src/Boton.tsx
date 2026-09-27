@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { claseDeBoton, type Variante } from "./clases";
 
 type Props = {
@@ -14,4 +15,11 @@ type Props = {
  */
 export function Boton({ variante, sobreAzul = false, type = "button", className, ...props }: Props) {
   return <button type={type} {...props} className={`${claseDeBoton(variante, sobreAzul)} ${className ?? ""}`} />;
+}
+
+type PropsDeEnlace = { variante: Variante } & React.ComponentProps<typeof Link>;
+
+/** Un link con cara de botón (DESIGN.md §11): navega, no hace. */
+export function BotonEnlace({ variante, className, ...props }: PropsDeEnlace) {
+  return <Link {...props} className={`${claseDeBoton(variante)} ${className ?? ""}`} />;
 }

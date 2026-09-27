@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Aviso, Boton } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
 
 /**
  * Cierra todas las sesiones de la cuenta menos esta, por el cliente de

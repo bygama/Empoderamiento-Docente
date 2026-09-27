@@ -2,8 +2,8 @@
 
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso, Campo } from "@/admin/armazon/Campos";
+import { Aviso, Boton } from "@ed/kit-admin";
+import { Campo } from "@/admin/armazon/Campos";
 import { cambiarElCorreo } from "@/datos/acciones/cuentas";
 
 /**

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton } from "@ed/kit-admin";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
 import { Fila, Lista } from "@/admin/armazon/Lista";
 import { borrarMarca, type ResultadoDeMarca } from "@/datos/acciones/marcas";

@@ -1,4 +1,4 @@
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { ArrowUpRight } from "@/components/ui/icons";
 import { CASO_DE_CADA_LINEA, type IdDeCaso } from "@/features/investigacion/contenido/modelo-de-casos";
 

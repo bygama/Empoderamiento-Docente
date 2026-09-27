@@ -1,4 +1,4 @@
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso } from "@ed/kit-admin";
 import type { EstadoDeMetricas } from "@/datos/consultas/metricas";
 
 const fechaLarga = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "long", timeZone: "UTC" });

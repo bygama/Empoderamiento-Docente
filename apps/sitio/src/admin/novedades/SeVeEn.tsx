@@ -1,4 +1,4 @@
-import { BotonEnlace } from "@/admin/armazon/Boton";
+import { BotonEnlace } from "@ed/kit-admin";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { Vecinas } from "@/datos/consultas/ficha-de-novedad";
 import type { BorradorDeNovedad } from "@/features/novedades/contenido/novedad";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Boton } from "@/admin/armazon/Boton";
+import { Boton } from "@ed/kit-admin";
 
 /**
  * El límite de error de Contenido, del índice al editor: sin esto, un

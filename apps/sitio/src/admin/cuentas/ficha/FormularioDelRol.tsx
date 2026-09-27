@@ -3,9 +3,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ROLES_QUE_SE_ASIGNAN, type Rol } from "@ed/auth";
-import { ENTRADA } from "@ed/kit-admin";
-import { Boton } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { Aviso, Boton, ENTRADA } from "@ed/kit-admin";
 import { cambiarElRol } from "@/datos/acciones/cuentas";
 
 /** Cambiar el rol de otra cuenta, entre los que se asignan: dirige no, que se pasa. */

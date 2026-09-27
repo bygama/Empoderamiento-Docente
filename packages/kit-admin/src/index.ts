@@ -6,7 +6,7 @@
 // subir una foto. Los tokens de las clases los define la app (README).
 
 export { Aviso } from "./Aviso";
-export { Boton } from "./Boton";
+export { Boton, BotonEnlace } from "./Boton";
 export { resolverCambio, type Cambio } from "./cambio";
 export { CampoFoto, type ElegirFoto, type FotoElegible, type SubirFoto } from "./CampoFoto";
 export { Casilla } from "./Casilla";
