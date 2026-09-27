@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ErrorDeCorreo, crearClienteDeResend, type Correo } from "./resend";
+import { ErrorDeCorreo, URL_DE_RESEND, crearClienteDeResend, urlDesviada, type Correo } from "./resend";
 
 const ENLACE = "https://ed.test/api/auth/reset-password/token-secreto";
 
@@ -98,4 +98,14 @@ test("un error nunca lleva el enlace que se mandaba", async () => {
     assert.ok(!e.message.includes("token-secreto"), e.message);
     return true;
   });
+});
+
+test("otra URL que la de Resend se nota, y el cliente manda ahí", async () => {
+  assert.equal(urlDesviada(undefined), null);
+  assert.equal(urlDesviada(""), null);
+  assert.equal(urlDesviada(URL_DE_RESEND), null);
+  assert.equal(urlDesviada("http://correo:3000/emails"), "http://correo:3000/emails");
+  const { fetchImpl, llamadas } = fetchFalso([Response.json({ id: "local" })]);
+  await crearClienteDeResend({ clave: "x", url: "http://correo:3000/emails", fetchImpl }).mandar(CORREO);
+  assert.equal(llamadas[0].url, "http://correo:3000/emails");
 });

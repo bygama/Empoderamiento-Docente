@@ -1,7 +1,16 @@
 // Cliente de la API de correos de Resend, por `fetch` y sin su paquete: una
 // sola llamada no justifica una dependencia. No sabe nada de ED: recibe la
 // clave y el correo ya armado, y devuelve el id que le da Resend.
-const URL_DE_RESEND = "https://api.resend.com/emails";
+export const URL_DE_RESEND = "https://api.resend.com/emails";
+
+/**
+ * La URL a la que van los correos si no es la de Resend, o `null`. Otra URL
+ * sirve solo para probar la imagen de producción con un Resend falso
+ * (`compose.prueba.yaml`); quien la deje puesta tiene que enterarse.
+ */
+export function urlDesviada(url: string | undefined): string | null {
+  return url && url !== URL_DE_RESEND ? url : null;
+}
 
 export type Correo = {
   de: string;
@@ -42,17 +51,20 @@ async function motivo(respuesta: Response): Promise<string> {
 
 export function crearClienteDeResend({
   clave,
+  url = URL_DE_RESEND,
   fetchImpl = fetch,
   espera = 10_000,
 }: {
   clave: string;
+  /** Adónde se manda; la de Resend salvo en una prueba (`urlDesviada`). */
+  url?: string;
   fetchImpl?: typeof fetch;
   /** Cuánto se espera cada intento, en milisegundos. */
   espera?: number;
 }): ClienteDeCorreo {
   async function intentar(correo: Correo): Promise<Response | Error> {
     try {
-      return await fetchImpl(URL_DE_RESEND, {
+      return await fetchImpl(url, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${clave}`,

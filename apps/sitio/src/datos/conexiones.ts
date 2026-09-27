@@ -15,7 +15,9 @@ export type EstadoDeConexion = Conexion & {
   /** Los nombres de las variables que faltan: nunca su valor. */
   faltan: string[];
   tareasDeLaConexion: EstadoDeTarea[];
-  /** Configurada y con la última corrida de alguna tarea fallida. */
+  /** Lo raro de su configuración (`Conexion.avisar`), o `null`. */
+  aviso: string | null;
+  /** Configurada y con un aviso o con la última corrida de alguna tarea fallida. */
   conError: boolean;
 };
 
@@ -50,8 +52,9 @@ export async function estadoDeLasConexiones(
         conexion.tareas === "todas"
           ? [{ clave: "todas", nombre: "Cualquier tarea", ...(await leer(null)) }]
           : await Promise.all(conexion.tareas.map(async (clave) => ({ clave, nombre: nombreDe(clave), ...(await leer(clave)) })));
-      const conError = faltan.length === 0 && tareasDeLaConexion.some((t) => t.ultima && !t.ultima.ok);
-      return { ...conexion, faltan, tareasDeLaConexion, conError };
+      const aviso = conexion.avisar?.(entorno) ?? null;
+      const conError = faltan.length === 0 && (aviso !== null || tareasDeLaConexion.some((t) => t.ultima && !t.ultima.ok));
+      return { ...conexion, faltan, tareasDeLaConexion, aviso, conError };
     }),
   );
 }
