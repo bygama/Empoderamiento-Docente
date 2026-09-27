@@ -73,6 +73,40 @@
   `pnpm lint` 0; `node scripts/verificar-react-doctor.mjs` → 100/100 sin
   diagnósticos; `pnpm test` → sitio 431 pass, 0 fail, 1 saltado; auth 46;
   kit 3.
+- **Paso 4 — el ciclo de un perfil en la base** (`938704b7`):
+  `datos/acciones/editar-equipo.ts` (crear —último en el orden—, guardar con
+  choque, descartar, borrar: la fila, sus redirecciones y la persona en los
+  borradores de materiales, con la fk `SET NULL` para las autorías
+  publicadas), `publicar-equipo.ts` (publicar con el 308 de
+  `/quienes-somos/equipo/<viejo>`, al final de su nivel si es la primera vez
+  o cambió de nivel; despublicar), `chequeos-del-perfil.ts`
+  (`publicacionQueNoFirma`, `nivelSinLugar` con los nombres de quienes
+  ocupan el lugar), `indices-del-equipo.ts` (el slug y la Dirección general
+  que saltan en la transacción), `equipo-en-base.ts` y
+  `features/quienes-somos/contenido/etiquetas-de-persona.ts` («Etapa 3 ›
+  Publicación 1 › Material de la Biblioteca»). Fixtures en
+  `equipo-de-prueba.ts`, con un prefijo por archivo (los archivos de test
+  corren a la vez y la limpieza de uno borraba el material del otro: visto y
+  corregido). `pnpm --filter sitio exec tsx --test src/datos/acciones/editar-equipo.test.ts src/datos/acciones/publicar-equipo.test.ts`
+  → 6 pass, 0 fail; `ed_equipo` queda con sus 15 y 62.
+- **Paso 5 — mover dentro del nivel** (`a51447a8`): `mover-equipo.ts`, con la
+  forma de `moverAliadoEnBase` de la lane 9 (`hacia: "antes" | "despues"`,
+  renumera el nivel en una transacción, en la punta no se mueve); el nivel
+  de quien nunca se publicó es el de su borrador (`nivelEnLaLista`).
+  `mover-equipo.test.ts` → 1 pass (con perfiles sin nivel, un grupo solo de
+  la prueba: los 15 no se tocan, comprobado en psql).
+- **Paso 6 — las Server Actions, la vista previa y la actividad**
+  (`48b0cf12`, `501a6ac8`): los cinco tipos (`publico-`, `despublico-`,
+  `descarto-cambios-de-`, `borro-un-perfil`, `movio-un-perfil`) en
+  `datos/actividad.ts` (`editarContenido`, todos al Inicio), su frase, su
+  módulo (Contenido) y su link en Cuentas › Actividad
+  (`perfilesQueExisten`; `pantallaDe` ya no manda todo lo de Contenido al
+  editor de páginas, solo sus tres tipos, como hace la lane 9);
+  `datos/acciones/equipo.ts` y `ciclo-de-equipo.ts` (sesión +
+  `editarContenido` primero; revalidan `/quienes-somos` y
+  `/admin/contenido`), `revalidar-equipo.ts` y `abrirVistaPreviaDePersona`
+  (`/quienes-somos?persona=<slug>`). `pnpm --filter sitio exec tsx --test src/datos/acciones/acciones-con-sesion.test.ts src/datos/actividad.test.ts src/admin/actividad/frase.test.ts`
+  → 22 pass, 0 fail; typecheck 0; eslint 0; react-doctor 100/100.
 
 ## Abierto
 
