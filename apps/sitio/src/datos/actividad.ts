@@ -61,8 +61,8 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * lo ve. Entrar, salir y lo que alguien cambia de su propia cuenta es de las
  * cuentas: lo ve quien usa Cuentas. Lo que se hace con una página lo ve quien
  * edita el contenido; con un mensaje de Contacto, quien ve Contacto; que se
- * borró un CV, solo quien ve los CV; y lo que se le hace a otra cuenta, quien
- * usa Cuentas.
+ * borró un CV, solo quien ve los CV; lo que se le hace a otra cuenta, quien
+ * usa Cuentas; y lo que se hace con una novedad, quien edita las novedades.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -89,6 +89,10 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "borro-una-cuenta": "usarCuentas",
   "paso-la-direccion": "usarCuentas",
   "cerro-las-sesiones": "usarCuentas",
+  "publico-una-novedad": "editarNovedades",
+  "despublico-una-novedad": "editarNovedades",
+  "descarto-cambios-de-una-novedad": "editarNovedades",
+  "borro-una-novedad": "editarNovedades",
 };
 
 /**
@@ -123,6 +127,10 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "borro-una-cuenta": true,
   "paso-la-direccion": true,
   "cerro-las-sesiones": true,
+  "publico-una-novedad": true,
+  "despublico-una-novedad": true,
+  "descarto-cambios-de-una-novedad": true,
+  "borro-una-novedad": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */

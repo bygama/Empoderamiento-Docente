@@ -6,6 +6,9 @@ export type EventoParaLeer = { tipo: TipoDeActividad; quien: string; sobre?: str
 /** El nombre de la página, que las acciones anotan en `sobre`; sin él, «una página». */
 const pagina = (sobre: string | null | undefined) => sobre ?? "una página";
 
+/** Una novedad por su título, como era en ese momento; sin él, «una novedad». */
+const novedad = (sobre: string | null | undefined) => (sobre ? `«${sobre}»` : "una novedad");
+
 /**
  * Un mensaje de Contacto por su tema, que es lo único que se anota de él
  * («sobre Investigación»); sin tema, «de Contacto».
@@ -44,6 +47,10 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "borro-una-cuenta": ({ quien, sobre }) => `${quien} borró la cuenta de ${persona(sobre)}`,
   "paso-la-direccion": ({ quien, sobre }) => `${quien} le pasó la dirección a ${persona(sobre)}`,
   "cerro-las-sesiones": ({ quien, sobre }) => `${quien} cerró las sesiones de ${persona(sobre)}`,
+  "publico-una-novedad": ({ quien, sobre }) => `${quien} publicó la novedad ${novedad(sobre)}`,
+  "despublico-una-novedad": ({ quien, sobre }) => `${quien} despublicó la novedad ${novedad(sobre)}`,
+  "descarto-cambios-de-una-novedad": ({ quien, sobre }) => `${quien} descartó los cambios de la novedad ${novedad(sobre)}`,
+  "borro-una-novedad": ({ quien, sobre }) => `${quien} borró la novedad ${novedad(sobre)}`,
 };
 
 /**
