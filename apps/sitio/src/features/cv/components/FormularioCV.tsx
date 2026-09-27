@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
 import { CV_PESA_DE_MAS, MAXIMO_DEL_CV } from "@/config/cv";
 import { enPalabras } from "@/config/privacidad";
 import { INPUT_BASE, LABEL_BASE } from "@/features/contacto/components/experiencia/estilos";
+import { contar } from "@/lib/contadores/contar";
 import type { CampoDeFormulario } from "@/lib/formularios/campos";
 import { enviarFormulario } from "@/lib/formularios/enviar";
 import { CampoCV } from "./formulario-cv/CampoCV";
@@ -22,10 +23,29 @@ const MEGAS = MAXIMO_DEL_CV / (1024 * 1024);
  * CV, de Ajustes › Privacidad; el archivo y el campo trampa son fijos. El peso
  * se chequea antes de mandar: pasado el tope, Vercel corta el pedido sin una
  * respuesta legible.
+ *
+ * Cuenta el camino del CV (work/metricas-completas/SPEC.md §5.3): que se abrió
+ * la página, que se empezó el formulario y que se mandó, cada uno una vez y
+ * como un aviso aparte. **`/api/cv` no recibe nada de eso**: el origen nunca
+ * viaja con el CV de nadie.
  */
 export function FormularioCV({ campos, correo, mesesDeGuarda }: { campos: readonly CampoDeFormulario[]; correo: string; mesesDeGuarda: number }) {
   const [envio, setEnvio] = useState<{ enviando: boolean; error: string | null }>({ enviando: false, error: null });
   const [listo, setListo] = useState(false);
+  const contado = useRef({ vio: false, empezo: false });
+
+  // Una vez por carga: el ref frena el doble efecto del modo estricto.
+  useEffect(() => {
+    if (contado.current.vio) return;
+    contado.current.vio = true;
+    contar("cv-vio");
+  }, []);
+
+  function empezar() {
+    if (contado.current.empezo) return;
+    contado.current.empezo = true;
+    contar("cv-empezo");
+  }
 
   async function enviar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,7 +58,9 @@ export function FormularioCV({ campos, correo, mesesDeGuarda }: { campos: readon
     setEnvio({ enviando: true, error: null });
     const respuesta = await enviarFormulario("/api/cv", datos, sinRespuesta(correo));
     setEnvio({ enviando: false, error: respuesta.ok ? null : respuesta.error });
-    if (respuesta.ok) setListo(true);
+    if (!respuesta.ok) return;
+    contar("cv-envio");
+    setListo(true);
   }
 
   if (listo) return <ConfirmacionCV mesesDeGuarda={mesesDeGuarda} />;
@@ -46,6 +68,7 @@ export function FormularioCV({ campos, correo, mesesDeGuarda }: { campos: readon
   return (
     <form
       onSubmit={(e) => void enviar(e)}
+      onChange={empezar}
       className="border-azul-claro/50 grid gap-x-8 gap-y-6 rounded-3xl border bg-white/80 p-6 backdrop-blur-sm md:grid-cols-2 md:p-8"
     >
       {campos.map((campo) => (

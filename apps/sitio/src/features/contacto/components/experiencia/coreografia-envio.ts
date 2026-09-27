@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import type { FormEvent } from "react";
+import { contar } from "@/lib/contadores/contar";
 import { enviarFormulario } from "@/lib/formularios/enviar";
 import { panelDe, type Contexto } from "./contexto";
 
@@ -31,6 +32,9 @@ export async function enviar(c: Contexto, e: FormEvent<HTMLFormElement>, correo:
   );
   c.setEnvio({ enviando: false, error: respuesta.ok ? null : respuesta.error });
   if (!respuesta.ok) return;
+  // Una suma por día, aparte del mensaje: el origen no viaja con él
+  // (work/metricas-completas/SPEC.md §5.3).
+  contar("contacto-envio");
 
   c.setVista("cierre");
   if (c.reduced) {
