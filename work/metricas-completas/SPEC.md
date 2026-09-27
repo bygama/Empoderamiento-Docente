@@ -1,9 +1,9 @@
 # SPEC — Métricas completas
 
 - **Fecha:** 2026-09-27
-- **Estado:** esperando la aprobación del padre (design-first). Crea tablas:
-  Mateo le delegó al padre esa aprobación (DECISIONS del padre, 2026-09-26,
-  «procede en automatico»).
+- **Estado:** aprobado por el padre el 2026-09-27, con las siete
+  recomendaciones de §12 (DECISIONS). Crea tablas: Mateo le delegó al padre esa
+  aprobación (DECISIONS del padre, 2026-09-26, «procede en automatico»).
 - **Decide:** el padre de `work/mapa-del-admin/`
 - **Tier:** L · lane 11 del XL `work/mapa-del-admin/` · worktree propio, rama
   `mateo/metricas-completas`, dev server en el 3029, base `ed_metricas`

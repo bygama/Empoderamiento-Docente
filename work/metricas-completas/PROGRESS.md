@@ -2,8 +2,6 @@
 
 ## In progress
 
-STATE: design-first approval window, waiting for owner approval of SPEC.md before PLAN.md
-
 - 2026-09-27 — Lane abierta desde `main` en `782aeb2`, rama
   `mateo/metricas-completas`, dispatch `ctx_2f56b40105f3` (task
   `task_f6fdab703551`). Worktree listo: `pnpm install`, `pnpm generate`,
@@ -15,7 +13,9 @@ STATE: design-first approval window, waiting for owner approval of SPEC.md befor
 - 2026-09-27 — La API de Web Analytics de Vercel, verificada contra su
   documentación de hoy (SPEC §2): no da regiones ni ciudades; sí `hour`,
   `osName`, `browserName`, `utmCampaign` y filtros por país.
-- 2026-09-27 — SPEC.md escrito; pedida la aprobación al padre por `ask`.
+- 2026-09-27 — SPEC.md escrito (`37d2272`) y aprobado por el padre con las
+  siete recomendaciones de §12 (DECISIONS). PLAN.md escrito: 19 pasos, los dos
+  de la 8a al final.
 
 ## Hecho
 
