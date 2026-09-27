@@ -159,7 +159,7 @@ la raíz; los archivos, relativos a `apps/sitio/`), y sale 0.
 18. **Conexiones.** La pantalla, una fila por conexión con su estado y sus
     corridas.
     Aceptación: `pnpm typecheck`; `pnpm lint`. *(integration · low)*
-19. **ADR-0014**, que enmienda al 0012: los datos del sitio y los plazos en
+19. **ADR-0015** (nació 0014; DECISIONS), que enmienda al 0012: los datos del sitio y los plazos en
     la base, y el plazo prometido como techo; el índice de `adrs/` lo anota.
     Aceptación: `git diff --stat HEAD~1 -- docs/architecture/adrs` muestra
     el ADR y el índice. *(judgment · medium)*
