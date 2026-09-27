@@ -746,9 +746,8 @@ Las páginas de una lista paginada en el servidor.
 ### Tabla
 
 Para lo que se lee cruzando filas y columnas; una lista de cosas es una
-`Lista`, no una tabla. Hoy hay una sola, la de permisos, y la pieza vive con
-ella (`apps/sitio/src/admin/cuentas/TablaDePermisos.tsx`) hasta que haya una
-segunda.
+`Lista`, no una tabla. `apps/sitio/src/admin/armazon/Tabla.tsx`: nació con
+la de permisos y subió al armazón con su segunda, las de Ajustes › SEO.
 
 - **La caja de la `Lista`:** borde `azul-claro/60`, `rounded-xl`, filas
   separadas por el mismo divisor, `px-4 py-3`, todo en meta. Encabezados de
@@ -761,8 +760,13 @@ segunda.
   lector.
 - En el celular la caja scrollea de costado (`overflow-x-auto`) y la tabla
   no baja de `min-w-lg`.
+- **La primera columna es el encabezado de la fila**, en regular: lo que
+  nombra la fila (una capacidad, una ruta). Las celdas van arriba
+  (`align-top`), así una que ocupa dos renglones no desalinea las demás.
 - Primer consumidor: «Qué puede cada rol», en Cuentas, plegada en un
   desplegable debajo de la frase de cada rol. Se arma desde `permisos.ts`.
+  Segundo: las redirecciones y la indexación de Ajustes › SEO (sumado el
+  2026-09-26, `work/ajustes/`).
 
 ### Estado vacío
 
