@@ -89,7 +89,8 @@ nacieron con Novedades, y `Boton`, `claseDeBoton` y `Aviso`, porque
 `CampoFoto` los usa. Los tokens son de la app: su `README.md` dice cuáles
 espera. El generador de formularios de las páginas (`admin/campos/Campo.tsx`)
 y `admin/armazon/` se quedan en la app; el armazón se muda al kit en un
-cambio mecánico aparte, y la tabla llega cuando una lista la necesite.
+cambio mecánico aparte. La tabla vive con la de permisos de Cuentas hasta que
+la use una segunda pantalla (DESIGN.md §11, «Tabla»).
 
 ## 4. Cómo lee el sitio
 
