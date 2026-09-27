@@ -26,8 +26,46 @@
   nuevo en esta ronda por «Olvidé mi contraseña» y no está en el repo; Eli
   (edita) tiene el segundo factor apagado, para poder entrar con `next
   start`, donde el código no sale.
+- 2026-09-26 — **Revisión r2: PASS** (abajo). **Cierre:** `origin/main`
+  sigue en `15def2c` (el rebase no tuvo nada que hacer), el gate otra vez en
+  verde, y esta carpeta sale en el commit siguiente, dentro del PR #186. La
+  base `ed_cuentas` quedó limpia de lo que se puso a mano para probar: la
+  invitación a Inés (su cuenta, su enlace y la fila de actividad), Eli con el
+  segundo factor otra vez prendido, y las sesiones abiertas para probar,
+  cerradas. La contraseña que se le eligió a Ada no quedó guardada en ningún
+  lado, como la de las demás cuentas de prueba. **La base se borra al
+  cerrar**: cuando se saque el worktree, `DROP DATABASE ed_cuentas` en
+  `ed-postgres`; hasta entonces sirve si el padre pide otra vuelta.
 
 ## Verification
+
+### 2026-09-26 — Cierre, sobre `main` (`15def2c`) — PASS
+
+Sobre `5254b43` (la ronda de arreglos 1), sin cambios de código después de
+la revisión r2.
+
+- **Rebase:** `git fetch origin` → `origin/main` en `15def2c`; `git
+  rebase origin/main` → «Current branch mateo/cuentas is up to date.».
+- **L1, en limpio** (`rm -rf apps/sitio/.next apps/sitio/next-env.d.ts`
+  antes): `pnpm typecheck` → 0; `pnpm lint` → 0; `node
+  scripts/verificar-react-doctor.mjs` → 0, «react-doctor: 100/100, sin
+  diagnósticos» (apps/sitio/src 668 archivos · packages/db/src 3 ·
+  packages/auth/src 27).
+- **L2:** `pnpm test` → 0 (`@ed/auth` 46 pasan, 0 fallan; sitio 258: 256
+  pasan, 0 fallan, 2 saltados, los de siempre); después, en `ed_cuentas`,
+  las mismas 6 cuentas de antes. `pnpm build` → 0 («Compiled
+  successfully»).
+- **L3:** la de la ronda de arreglos 1 (abajo); el código no cambió desde
+  entonces.
+- **Barrido:** en el diff de la lane contra `main`, ningún `TODO`,
+  `FIXME`, `console.log`, `debugger`, `.only(` ni marcador sin llenar.
+- **Close review — r1** (Opus 5.5, medium, «el cambio entero contra su
+  SPEC»): FAIL, la fuga de Cuentas a quien edita («Tried and failed»).
+- **Close review — r2** (el mismo revisor, Opus 5.5, medium), como lo pasó
+  el padre: «La re-revisión r2 (mismo revisor, Opus 5.5, medium) dio PASS
+  sobre 5254b43: la fuga cerrada (con control positivo y una mutación del
+  test que falla como debe), los tres Minor, lo del rebase, y el gate en
+  limpio. Sin hallazgos nuevos.»
 
 ### 2026-09-26 — Ronda de arreglos 1, sobre `main` (`15def2c`) — PASS
 
@@ -503,7 +541,7 @@ dev server en el 3017.
 - ~~La 3c (`inicio`)~~: está en `main`; conciliada en el rebase sobre
   `15def2c` (`VA_AL_INICIO` de los tipos nuevos y «Ver toda la actividad»).
 - ~~Mi cuenta~~: conserva «Avisos» (lane 7) y «Seguridad».
-- **La revisión r1 vuelve** sobre la ronda de arreglos 1, con el mismo
-  revisor.
+- ~~La revisión r1 vuelve~~: r2 dio PASS sobre `5254b43`.
+- **La base `ed_cuentas`** se borra al cerrar, con el worktree.
 - **Para el deploy (lane 0):** Resend configurado y probado antes de que esta
   lane llegue a producción (README, ADR-0013).
