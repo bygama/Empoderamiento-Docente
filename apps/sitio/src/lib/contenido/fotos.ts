@@ -24,12 +24,13 @@ export const MAXIMO_BYTES = 4 * 1024 * 1024;
 // payload de la acción (M-1 de la revisión). No afecta a un nombre de
 // archivo que solo empieza con punto.
 const SEGMENTO_DE_RUTA = /(?!\.{1,2}\/|\.{1,2}$)(?:(?!%2[eEfF])[^\s?#/])+/;
-// Las carpetas de public/ con fotos del contenido: la de fotos aprobadas y
-// las dos de donde salen las imágenes de las novedades de hoy
-// (work/novedades-y-kit/DECISIONS), más las portadas tipográficas de la
-// Biblioteca (work/biblioteca/). Una lista, no «cualquier carpeta»: public/
-// también tiene logos y PDF, que no son una foto del contenido.
-const CARPETAS_DE_FOTOS = ["fotos", "novedades", "quienes-somos", "biblioteca/portadas"];
+// Las carpetas de public/ con fotos del contenido, que son las que entraron a
+// la biblioteca de Fotos (work/casos-aliados-fotos/SPEC.md §3.1): las fotos,
+// la imagen de una novedad, las láminas de los casos y los logos de los
+// aliados; más las portadas tipográficas de la Biblioteca (work/biblioteca/).
+// Una lista, no «cualquier carpeta»: public/ también tiene la marca y PDF,
+// que no son una foto del contenido.
+const CARPETAS_DE_FOTOS = ["fotos", "novedades", "investigacion", "aliados", "biblioteca/portadas"];
 const RUTA_DE_FOTO = new RegExp(String.raw`/(?:${CARPETAS_DE_FOTOS.join("|")})/(?:${SEGMENTO_DE_RUTA.source}/)*${SEGMENTO_DE_RUTA.source}`);
 
 // Lo único que el sitio sabe mostrar: sus fotos de public/, las subidas en

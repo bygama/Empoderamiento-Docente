@@ -39,21 +39,31 @@ model VersionDePagina {
   @@map("versiones_de_paginas")
 }
 
-/// Una foto subida desde el admin. `alt` es obligatorio (AGENTS.md §6). El
-/// punto de foco NO va acá: vive con cada uso de la foto en el contenido,
-/// porque la misma foto puede recortarse distinto en dos marcos. El id es el
-/// UUID que nombra el archivo (`/api/fotos/<id>` en local, `fotos/<id>.<ext>`
-/// en Blob); lo genera la acción y la ruta pública solo acepta esa forma.
+/// Una foto de la biblioteca (`work/casos-aliados-fotos/SPEC.md` §3): las que
+/// se suben desde el admin y las del contenido que viven en `public/`, que
+/// entraron con la migración `fotos_de_public`. El punto de foco NO va acá, y
+/// el alt de acá es el de la foto, no el de cada lugar donde se usa: los dos
+/// van con cada uso, porque la misma foto puede pedir otro recorte y otro alt
+/// en otro marco. Los usos la encuentran por su `url` (`datos/fotos/`).
+///
+/// El id de una subida es el UUID que nombra su archivo (`/api/fotos/<id>` en
+/// local, `fotos/<id>.<ext>` en Blob); una importada conserva su ruta de
+/// `public/`.
 model Foto {
   id        String   @id @default(uuid())
-  url       String                       // Blob en Vercel; /api/fotos/<id> en local
+  /// Blob en Vercel; /api/fotos/<id> en local; /fotos/…, /aliados/… de public/.
+  url       String   @unique
+  /// Obligatorio al subir y al editar; vacío solo en una importada sin uso.
   alt       String
   ancho     Int
   alto      Int
   bytes     Int
-  tipo      String                       // image/webp | image/jpeg | image/png
+  /// image/webp | image/jpeg | image/png; image/svg+xml solo en las
+  /// importadas del repositorio (el logo de Techint): subir no lo acepta.
+  tipo      String
   subidaEn  DateTime @default(now())
-  subidaPor String
+  /// Quién, en llano. Nulo en las que llegaron con el sitio.
+  subidaPor String?
 
   @@map("fotos")
 }
