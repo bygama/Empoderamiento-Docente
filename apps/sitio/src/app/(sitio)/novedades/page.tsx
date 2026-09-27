@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { novedadesDelSitio } from "@/datos/consultas/novedades";
 import { NovedadesHero } from "@/features/novedades/components/NovedadesHero";
 import { NovedadDestacada } from "@/features/novedades/components/NovedadDestacada";
 import { FiltrosNovedades } from "@/features/novedades/components/FiltrosNovedades";
@@ -12,12 +13,14 @@ export const metadata: Metadata = {
     "Publicaciones, encuentros, convocatorias y prensa de Empoderamiento Docente: seguí de cerca lo que investigamos, diseñamos y llevamos al aula.",
 };
 
-export default function NovedadesPage() {
+export default async function NovedadesPage() {
+  // Las publicadas (o el borrador, en vista previa), de la más nueva a la más vieja; sin base, ninguna.
+  const novedades = await novedadesDelSitio();
   return (
     <main id="contenido" tabIndex={-1}>
-      <NovedadesHero />
-      <NovedadDestacada />
-      <FiltrosNovedades />
+      <NovedadesHero fechaDeLaUltima={novedades[0]?.fecha ?? null} />
+      <NovedadDestacada novedades={novedades} />
+      <FiltrosNovedades novedades={novedades} />
       <EdEnMovimiento />
       <LanzamientosRecientes />
       <CierreNovedades />

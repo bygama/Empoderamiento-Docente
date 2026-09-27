@@ -6,18 +6,15 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen } from "@/components/ui/icons";
 import { ITEMS_DESTACADOS } from "@/features/biblioteca/data/materiales";
 import type { BibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
-import { CATEGORIA_LABEL, fechaCorta, NOVEDADES } from "@/features/novedades/data/novedades";
+import { etiquetaDeCategoria, fechaCorta } from "@/features/novedades/contenido/modelo";
+import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
 
 // Biblioteca: los mismos cuatro destacados que abren la página Biblioteca
 // (publicaciones reales, curadas en `biblioteca/data/materiales`), y cada
 // fila lleva a la publicación, como allá. Antes era un mock de recursos
 // inventados (Gastón, 2026-09-11).
 const BIBLIOTECA = ITEMS_DESTACADOS.map(({ material }) => material);
-
-// Novedades: las cuatro más nuevas de la página Novedades (hechos reales,
-// `novedades/data`). La que tiene ficha propia lleva a su ficha; el resto,
-// al listado.
-const NOVEDADES_INICIO = NOVEDADES.slice(0, 4);
 
 /** Realce que sigue al cursor: guarda la posición del mouse en CSS vars. */
 function trackPointer(e: MouseEvent<HTMLElement>) {
@@ -37,9 +34,11 @@ function trackPointer(e: MouseEvent<HTMLElement>) {
  * Sin reveal de scroll: el contenido está siempre presente (evita el "pop"
  * janky al bajar hacia el footer). La interacción vive en el hover. Los
  * títulos y las bajadas llegan por props (de
- * `features/home/contenido/biblioteca-y-novedades.ts` o de la base).
+ * `features/home/contenido/biblioteca-y-novedades.ts` o de la base), y las
+ * novedades también: las cuatro más nuevas, de la base. La que tiene ficha
+ * propia lleva a su ficha; el resto, al listado.
  */
-export function BibliotecaNovedades({ contenido }: { contenido: BibliotecaYNovedades }) {
+export function BibliotecaNovedades({ contenido, ultimasNovedades }: { contenido: BibliotecaYNovedades; ultimasNovedades: readonly NovedadDelSitio[] }) {
   const { biblioteca, novedades } = contenido;
   return (
     <section
@@ -146,10 +145,10 @@ export function BibliotecaNovedades({ contenido }: { contenido: BibliotecaYNoved
             </header>
 
             <ul className="mt-9 flex flex-col gap-3">
-              {NOVEDADES_INICIO.map(({ id, titulo, categoria, fecha, imagen, cuerpo }) => (
-                <li key={id}>
+              {ultimasNovedades.map(({ slug, titulo, categoria, fecha, imagen, cuerpo }) => (
+                <li key={slug}>
                   <Link
-                    href={cuerpo ? `/novedades/${id}` : "/novedades"}
+                    href={cuerpo.length > 0 ? `/novedades/${slug}` : "/novedades"}
                     onMouseMove={trackPointer}
                     className="bn-row block"
                   >
@@ -158,11 +157,12 @@ export function BibliotecaNovedades({ contenido }: { contenido: BibliotecaYNoved
                       {/* Miniatura (imagen real) */}
                       <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
                         <Image
-                          src={imagen}
+                          src={imagen.src}
                           alt=""
                           fill
                           sizes="64px"
                           className="object-cover"
+                          style={estiloDeFoco(imagen.foco)}
                         />
                       </span>
                       <div className="min-w-0 flex-1">
@@ -170,7 +170,7 @@ export function BibliotecaNovedades({ contenido }: { contenido: BibliotecaYNoved
                           {titulo}
                         </h4>
                         <p className="text-gris-texto mt-1 font-mono text-[0.72rem] tracking-[0.08em] uppercase">
-                          {CATEGORIA_LABEL[categoria]} · {fechaCorta(fecha)}
+                          {etiquetaDeCategoria(categoria)} · {fechaCorta(fecha)}
                         </p>
                       </div>
                       <span className="text-azul-principal/25 group-hover:text-naranja-accion shrink-0">

@@ -1,7 +1,5 @@
 "use client";
 
-import type { NovedadSeccion } from "@/features/novedades/data/novedades";
-
 /**
  * "En esta nota" — índice de secciones de la ficha (referencia: la Table of
  * Contents del blog de Nominal). Presentacional: la sección activa y el
@@ -13,7 +11,7 @@ export function GuiaNota({
   activa,
   onIr,
 }: {
-  secciones: NovedadSeccion[];
+  secciones: ReadonlyArray<{ ancla: string; titulo: string }>;
   activa: string;
   onIr: (e: React.MouseEvent<HTMLAnchorElement>, id: string) => void;
 }) {
@@ -27,12 +25,12 @@ export function GuiaNota({
       </p>
       <ol className="mt-3 space-y-1">
         {secciones.map((s, i) => {
-          const on = activa === s.id;
+          const on = activa === s.ancla;
           return (
-            <li key={s.id}>
+            <li key={s.ancla}>
               <a
-                href={`#s-${s.id}`}
-                onClick={(e) => onIr(e, s.id)}
+                href={`#s-${s.ancla}`}
+                onClick={(e) => onIr(e, s.ancla)}
                 aria-current={on ? "true" : undefined}
                 className={`flex items-baseline gap-3 rounded-xl px-3 py-2 transition-colors ${
                   on

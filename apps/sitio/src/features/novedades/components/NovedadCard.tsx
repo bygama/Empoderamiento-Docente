@@ -4,7 +4,9 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { CATEGORIA_LABEL, fechaCorta, type Novedad } from "@/features/novedades/data/novedades";
+import { etiquetaDeCategoria, fechaCorta } from "@/features/novedades/contenido/modelo";
+import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { useTransicionFaro } from "./TransicionFaro";
 
 /**
@@ -17,9 +19,10 @@ import { useTransicionFaro } from "./TransicionFaro";
  * link) y la apertura pasa por la transición del faro; sin provider (o sin
  * JS) cae a navegación normal.
  */
-export function NovedadCard({ n }: { n: Novedad }) {
+export function NovedadCard({ n }: { n: NovedadDelSitio }) {
   const abrir = useTransicionFaro();
-  const href = `/novedades/${n.id}`;
+  const href = `/novedades/${n.slug}`;
+  const conFicha = n.cuerpo.length > 0;
   const calentado = useRef(false);
   // Al primer hover/focus, pedir la ficha en segundo plano: en dev dispara
   // el compile de la ruta (el jank que rompía la transición) y en prod
@@ -31,7 +34,7 @@ export function NovedadCard({ n }: { n: Novedad }) {
   };
 
   return (
-    <div data-card data-id={n.id} data-cat={n.categoria} className="group relative">
+    <div data-card data-id={n.slug} data-cat={n.categoria} className="group relative">
       {/* Sombra del hover en capa propia animando SOLO opacity (y el mismo
           lift), porque animar box-shadow es paint (regla: transform/opacity).
           Vive fuera del article: su overflow-hidden la recortaría. */}
@@ -42,17 +45,18 @@ export function NovedadCard({ n }: { n: Novedad }) {
       <article className="border-azul-principal/8 group-hover:border-azul-claro/70 relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgb(31_45_77/0.04),0_18px_40px_-20px_rgb(31_45_77/0.14)] transition-[translate,border-color] duration-300 ease-out group-hover:-translate-y-1.5">
         <div className="relative aspect-[16/10] w-full overflow-hidden">
           <Image
-            src={n.imagen}
+            src={n.imagen.src}
             alt=""
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            style={estiloDeFoco(n.imagen.foco)}
           />
         </div>
         <div className="flex flex-1 flex-col p-5">
           <div className="flex items-center gap-2 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
             <span className="text-verde-concepto-texto">
-              {CATEGORIA_LABEL[n.categoria]}
+              {etiquetaDeCategoria(n.categoria)}
             </span>
             <span className="bg-gris-texto/40 h-1 w-1 rounded-full" />
             <span className="text-gris-texto">{fechaCorta(n.fecha)}</span>
@@ -63,7 +67,7 @@ export function NovedadCard({ n }: { n: Novedad }) {
           <p className="text-gris-texto mt-2 line-clamp-2 font-sans text-[0.92rem] leading-relaxed">
             {n.bajada}
           </p>
-          {n.cuerpo && (
+          {conFicha && (
             <span className="text-azul-principal mt-4 inline-flex items-center gap-1.5 font-sans text-[0.9rem] font-medium">
               Leer la nota
               <ArrowUpRight
@@ -74,7 +78,7 @@ export function NovedadCard({ n }: { n: Novedad }) {
           )}
         </div>
       </article>
-      {n.cuerpo && (
+      {conFicha && (
         <Link
           href={href}
           aria-label={n.titulo}

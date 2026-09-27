@@ -6,7 +6,9 @@ import Link from "next/link";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { ArrowRight } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
-import { CATEGORIA_LABEL, fechaCorta, type Novedad } from "@/features/novedades/data/novedades";
+import { etiquetaDeCategoria, fechaCorta } from "@/features/novedades/contenido/modelo";
+import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { useTransicionFaro, FLAG_ENTRADA_FARO } from "./TransicionFaro";
 import { GuiaNota } from "./GuiaNota";
 import { RevealFoco } from "./RevealFoco";
@@ -34,10 +36,10 @@ const irASeccion = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
   }
 };
 
-export function FichaNovedad({ n }: { n: Novedad }) {
+export function FichaNovedad({ n }: { n: NovedadDelSitio }) {
   const abrir = useTransicionFaro();
-  const secciones = n.cuerpo ?? [];
-  const [activa, setActiva] = useState(secciones[0]?.id ?? "");
+  const secciones = n.cuerpo;
+  const [activa, setActiva] = useState(secciones[0]?.ancla ?? "");
   // Solo LEER en el initializer (StrictMode lo re-ejecuta: tiene que ser
   // puro); el flag se consume después, en un efecto.
   const [conTelon] = useState(() => {
@@ -83,12 +85,11 @@ export function FichaNovedad({ n }: { n: Novedad }) {
       { rootMargin: "-25% 0px -60% 0px" },
     );
     secciones.forEach((s) => {
-      const el = document.getElementById(`s-${s.id}`);
+      const el = document.getElementById(`s-${s.ancla}`);
       if (el) obs.observe(el);
     });
     return () => obs.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n.id]);
+  }, [secciones]);
 
   return (
     <article className="bg-white">
@@ -107,7 +108,7 @@ export function FichaNovedad({ n }: { n: Novedad }) {
           <div className="min-w-0">
             <div className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.16em] uppercase">
               <span className="text-verde-concepto-texto">
-                {CATEGORIA_LABEL[n.categoria]}
+                {etiquetaDeCategoria(n.categoria)}
               </span>
               <span className="bg-gris-texto/40 h-1 w-1 rounded-full" />
               <span className="text-gris-texto">{fechaCorta(n.fecha)}</span>
@@ -128,7 +129,7 @@ export function FichaNovedad({ n }: { n: Novedad }) {
               className="mt-8 aspect-[16/10] w-full overflow-hidden rounded-2xl lg:hidden"
             >
               <div className="relative h-full w-full">
-                <Image src={n.imagen} alt="" fill sizes="100vw" className="object-cover" priority />
+                <Image src={n.imagen.src} alt="" fill sizes="100vw" className="object-cover" style={estiloDeFoco(n.imagen.foco)} priority />
               </div>
             </RevealFoco>
 
@@ -137,7 +138,7 @@ export function FichaNovedad({ n }: { n: Novedad }) {
             </p>
 
             {secciones.map((s) => (
-              <section key={s.id} id={`s-${s.id}`} className="mt-10 scroll-mt-32">
+              <section key={s.ancla} id={`s-${s.ancla}`} className="mt-10 scroll-mt-32">
                 <h2 className="font-display text-azul-principal text-[1.3rem] font-bold tracking-[-0.01em]">
                   {s.titulo}
                 </h2>
@@ -171,7 +172,7 @@ export function FichaNovedad({ n }: { n: Novedad }) {
                 className="aspect-[4/3] w-full overflow-hidden rounded-2xl"
               >
                 <div className="relative h-full w-full">
-                  <Image src={n.imagen} alt="" fill sizes="340px" className="object-cover" priority />
+                  <Image src={n.imagen.src} alt="" fill sizes="340px" className="object-cover" style={estiloDeFoco(n.imagen.foco)} priority />
                 </div>
               </RevealFoco>
               {secciones.length > 1 && (

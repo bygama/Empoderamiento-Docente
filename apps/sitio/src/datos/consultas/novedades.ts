@@ -71,6 +71,17 @@ export const novedadesDelSitio = cache(async (): Promise<NovedadDelSitio[]> => {
   return novedadesVisibles(filas, isEnabled);
 });
 
+/**
+ * Los slugs de las fichas publicadas, para prerenderizarlas en el build. Sin
+ * `draftMode`: `generateStaticParams` corre fuera de un pedido.
+ */
+export async function slugsConFicha(): Promise<string[]> {
+  const filas = await leerSinRomper("slugsConFicha", () => base.novedad.findMany({ where: { publicada: true } }), []);
+  return novedadesVisibles(filas, false)
+    .filter((n) => n.cuerpo.length > 0)
+    .map((n) => n.slug);
+}
+
 /** La novedad de una ficha, o `undefined`. */
 export async function novedadPorSlug(slug: string): Promise<NovedadDelSitio | undefined> {
   return (await novedadesDelSitio()).find((n) => n.slug === slug);
