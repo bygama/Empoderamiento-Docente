@@ -9,6 +9,13 @@ const hayBase = Boolean(process.env.DATABASE_URL);
 
 const HOY = new Date("2001-01-11T12:00:00.000Z");
 
+// Las filas que escriben estos tests, y ninguna más: los días que copian (con
+// la marca de agua que siembra el del 400) y el fin de cada ventana que
+// guardan. Otros archivos siembran en otros años y corren a la vez: borrar
+// por rango se llevaba sus filas.
+const DIAS_QUE_ESCRIBEN = ["2001-01-10", "2001-09-10", "2001-11-09", "2001-11-10"].map(fechaUTC);
+const FINES_DE_VENTANA = ["2001-01-03", "2001-01-10", "2001-09-03", "2001-09-10", "2001-11-03", "2001-11-10"].map(fechaUTC);
+
 const clienteFalso: ClienteDeAnaliticas = {
   async porDia(rango, dimension) {
     if (dimension !== "total") return [];
@@ -136,7 +143,7 @@ test("una ventana que Vercel rechaza (400) no voltea la copia: va al detalle y l
 after(async () => {
   if (!hayBase) return;
   const { base } = await import("@/datos/cliente");
-  await base.metricaDiaria.deleteMany({ where: { fecha: { lte: fechaUTC("2001-12-31") } } });
-  await base.metricaVentana.deleteMany({ where: { fechaFin: { lte: fechaUTC("2001-12-31") } } });
+  await base.metricaDiaria.deleteMany({ where: { fecha: { in: DIAS_QUE_ESCRIBEN } } });
+  await base.metricaVentana.deleteMany({ where: { fechaFin: { in: FINES_DE_VENTANA } } });
   await base.$disconnect();
 });
