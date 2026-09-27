@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import type { CSSProperties } from "react";
+import type { AliadoDelSitio } from "@/features/aliados/contenido/modelo";
 import type { ComoTrabajamosDeQueHacemos } from "@/features/que-hacemos/contenido/como-trabajamos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { BandaAliados } from "./mirada-pasos/BandaAliados";
@@ -61,8 +62,10 @@ import { PanelMirada } from "./mirada-pasos/PanelMirada";
  * En celular no hay apilado, ni franja, ni grupos, ni entrada: el título, los
  * seis paneles y la banda van uno abajo del otro, con su alto natural. Seis
  * paneles pegajosos en un teléfono dejan al pulgar peleando para salir.
+ *
+ * Los aliados de la banda llegan por props, de la base.
  */
-export function MiradaPasos({ contenido }: { contenido: ComoTrabajamosDeQueHacemos }) {
+export function MiradaPasos({ contenido, aliados }: { contenido: ComoTrabajamosDeQueHacemos; aliados: readonly AliadoDelSitio[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
 
   useIsomorphicLayoutEffect(() => {
@@ -177,7 +180,7 @@ export function MiradaPasos({ contenido }: { contenido: ComoTrabajamosDeQueHacem
 
         {/* Cierra subiendo por encima del último grupo; el mecanismo está en
             la propia BandaAliados. */}
-        <BandaAliados rotulo={contenido.aliados} />
+        <BandaAliados rotulo={contenido.aliados} aliados={aliados} />
       </div>
     </section>
   );

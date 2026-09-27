@@ -79,6 +79,21 @@
   generados por un script que no se commitea y validados con
   `esquemaAliado`; `publicadoDeAliado` en `datos/consultas/aliados.ts`.
   `migrate:deploy` → aplicada; `aliado.test.ts` → 4 pass, 0 fail, 0
-  skipped; typecheck 0.
+  skipped; typecheck 0. Commit `844cdb60`.
+- **Paso 8 — el sitio lee los aliados de la base**: `aliadosDelSitio()` y
+  `aliadosVisibles()` en `datos/consultas/aliados.ts` (filtra `autorizado`
+  en la consulta y otra vez en la función pura, también en la vista previa;
+  las medidas y el tipo salen de la foto por su url); `LogoDeAliado`
+  compartido (`features/aliados/components/`), con link en otra pestaña si
+  hay URL; el layout del sitio pasa a `async` y le da los aliados al pie;
+  el Inicio (`DatosDuros`) y Qué hacemos (`MiradaPasos` → `BandaAliados`)
+  los reciben por prop. Se borró `config/aliados.ts`. Aceptación:
+  `aliados.test.ts` (sin marca no sale ni en la vista previa; orden y
+  medidas; borrador en la vista previa solo si se puede publicar; un logo
+  que no está en Fotos no se dibuja y el SVG va sin optimizar) → 4 pass, 0
+  fail; typecheck 0; `pnpm build` y `comparar-render` contra `main` → las
+  12 páginas iguales salvo las dos de Novedades del dedupe (el diff de sus
+  `<img>` con la ruta nueva da igual), y los cinco logos con el mismo
+  `<img>` (p. ej. Techint 147×195, `h-12`, sin optimizar).
 
 ## Abierto

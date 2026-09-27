@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OPEN_GRAPH_COMUN } from "@/config/metadata";
+import { aliadosDelSitio } from "@/datos/consultas/aliados";
 import { destacadosDelSitio } from "@/datos/consultas/materiales";
 import { novedadesDelSitio } from "@/datos/consultas/novedades";
 import { contenidoDe } from "@/datos/consultas/paginas";
@@ -22,11 +23,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
   // Lo compartido vive en Qué hacemos (su publicado, o su borrador en vista previa).
-  const [{ hero, quienesSomos, mision, enNumeros, comoTrabajamos, areas, bibliotecaYNovedades }, queHacemos, novedades, destacados] = await Promise.all([
+  // Los aliados de la franja de «En números», los publicados y autorizados de la base.
+  const [{ hero, quienesSomos, mision, enNumeros, comoTrabajamos, areas, bibliotecaYNovedades }, queHacemos, novedades, destacados, aliados] = await Promise.all([
     contenidoDe("inicio"),
     contenidoDe("que-hacemos"),
     novedadesDelSitio(),
     destacadosDelSitio(),
+    aliadosDelSitio(),
   ]);
   return (
     <main>
@@ -40,7 +43,7 @@ export default async function Home() {
       {/* Acá hubo un bloque «Qué hacemos» en texto plano (QueHacemosResumen):
           entró el 2026-09-08 y Gastón lo sacó al día siguiente. Su código se
           borró el 2026-09-18; está en el historial si vuelve a hacer falta. */}
-      <DatosDuros contenido={enNumeros} />
+      <DatosDuros contenido={enNumeros} aliados={aliados} />
       <ComoTrabajamos contenido={comoTrabajamos} frases={ideasDelMetodo(queHacemos.comoTrabajamos, comoTrabajamos.pasos.length)} />
       {/* Áreas de especialización (el abanico de siete cartas). Había salido
           de la home junto con la llegada del bloque plano y vuelve a su lugar
