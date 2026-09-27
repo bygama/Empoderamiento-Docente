@@ -76,6 +76,16 @@ services:
       migrar:
         condition: service_completed_successfully
 
+  herramientas:
+    # Los comandos de apps/sitio/scripts/ con el entorno de la app, a mano:
+    #   docker compose run --rm herramientas pnpm --filter sitio nombrar-direccion <correo>
+    image: ed-fuente:actual
+    profiles: ["herramientas"]
+    environment: *entorno-de-la-app
+    depends_on:
+      db:
+        condition: service_healthy
+
   app:
     # La arma scripts/desplegar.sh con el commit como etiqueta; `actual` es la
     # que corre (scripts/volver.sh la cambia).
@@ -138,6 +148,35 @@ services:
         exec crond -f -l 8
     depends_on:
       app:
+        condition: service_healthy
+
+  respaldo:
+    # Todos los días a las 03:30 UTC, antes del cron: las dos bases y los
+    # archivos de fotos y CV en `respaldos/` del host (deploy/respaldo/). La
+    # misma mayor de Postgres que `db`, para que pg_dump le hable.
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${CLAVE_DB_ADMIN}
+      DIAS_DE_RESPALDO: ${DIAS_DE_RESPALDO:-14}
+      DUENO_DE_RESPALDOS: ${DUENO_DE_RESPALDOS:-1000:1000}
+    volumes:
+      - fotos:/datos/fotos
+      - cv:/datos/cv
+      - ./respaldos:/respaldos
+      - ./deploy/respaldo:/respaldo:ro
+    # crond no le pasa el entorno a sus trabajos: se lo deja en un archivo
+    # que solo lee root.
+    command:
+      - sh
+      - -c
+      - >-
+        umask 077 &&
+        printenv | grep -E '^(PGPASSWORD|DIAS_DE_RESPALDO|DUENO_DE_RESPALDOS)=' | sed 's/^/export /' > /run/respaldo.env &&
+        echo "30 3 * * * . /run/respaldo.env && sh /respaldo/respaldar.sh > /proc/1/fd/1 2>&1" | crontab - &&
+        exec crond -f -l 8
+    depends_on:
+      db:
         condition: service_healthy
 
   proxy:
