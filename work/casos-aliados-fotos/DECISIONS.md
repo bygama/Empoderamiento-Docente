@@ -100,3 +100,11 @@
   y a la de un material una vez mergeada Biblioteca (antes se había dejado
   afuera para no pisarla): es una regla del patrón «Ficha de una entidad», no
   de una ficha, y queda escrita en DESIGN.md §11.
+- 2026-09-27 — **Force-push de la rama de la lane, autorizado por el padre.**
+  La rama remota estaba en `3e0fbab1`, de antes de los dos rebases. Se
+  preguntó por `orca orchestration ask` (AGENTS.md §5.6) y el padre contestó:
+  «Sí: hacé `git push --force-with-lease=mateo/casos-aliados-fotos:3e0fbab1
+  origin mateo/casos-aliados-fotos`, solo sobre tu rama (nunca main, nunca
+  --no-verify). Es tu rama de lane, reescrita por el rebase que pide el
+  cierre; el lease protege contra pisar algo ajeno. Anotalo en tu DECISIONS
+  con esta autorización del padre.»
