@@ -2,10 +2,10 @@ import type { PrismaClient } from "@/../prisma/generado/client";
 import { base as baseDeLaApp } from "@/datos/cliente";
 import { clienteDesdeEntorno } from "@/lib/metricas/entorno";
 import { ayerUTC, diaISO, fechaUTC, MAXIMO_DIAS_POR_CORRIDA, rangoFaltante, sumarDias, ventanasDe } from "@/lib/metricas/periodos";
-import { DIMENSIONES } from "@/lib/metricas/tipos";
 import type { FilaDiaria } from "@/lib/metricas/tipos";
 import type { ClienteDeAnaliticas } from "@/lib/metricas/vercel";
 import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
+import { CONSULTAS } from "./consultas-de-vercel";
 
 // Copia a nuestra base lo que la API de Web Analytics tiene y todavía no
 // guardamos. Idempotente: correr dos veces deja lo mismo. Es una tarea del
@@ -15,14 +15,7 @@ import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 const PAUSA_MS = 250;
 const pausa = () => new Promise((r) => setTimeout(r, PAUSA_MS));
 
-// `total` es la marca de agua: la próxima corrida decide desde dónde seguir
-// mirando la fila `total` más nueva. Si se guardara antes de que termine el
-// resto (una dimensión o una ventana con un 429, por ejemplo) la marca
-// avanzaría sin que el rango haya entrado entero. Por eso corre última, después
-// de las dimensiones de acá abajo y de las ventanas.
-const ORDEN_DIMENSIONES = DIMENSIONES.filter((d) => d !== "total");
-
-async function guardarFila(base: PrismaClient, fila: FilaDiaria) {
+async function guardarFila(base: PrismaClient, fila: Omit<FilaDiaria, "dimension"> & { dimension: string }) {
   const clave = { fecha: fechaUTC(fila.fecha), dimension: fila.dimension, valor: fila.valor, agrupado: fila.agrupado };
   const datos = { vistas: fila.vistas, visitantes: fila.visitantes };
   await base.metricaDiaria.upsert({ where: { fecha_dimension_valor_agrupado: clave }, create: { ...clave, ...datos }, update: datos });
@@ -54,12 +47,12 @@ export async function sincronizarMetricas({
 
   try {
     let filas = 0;
-    for (const dimension of ORDEN_DIMENSIONES) {
+    for (const { dimension, filtro, guardarComo } of CONSULTAS) {
       // Las filas de un mismo llamado son upserts independientes a nuestra
       // base (claves distintas): van juntas. La pausa que sigue es la que
       // protege el ritmo de llamadas a la API externa de Vercel.
-      const filasDia = await cliente.porDia(rango, dimension);
-      await Promise.all(filasDia.map((fila) => guardarFila(base, fila)));
+      const filasDia = await cliente.porDia(rango, dimension, filtro);
+      await Promise.all(filasDia.map((fila) => guardarFila(base, { ...fila, dimension: guardarComo })));
       filas += filasDia.length;
       await pausa();
     }
@@ -71,9 +64,11 @@ export async function sincronizarMetricas({
       ventanas++;
       await pausa();
     }
-    // `total` cierra la corrida, después de las dimensiones y las ventanas: es
-    // la marca de agua que decide el rango de la próxima (ver el comentario de
-    // ORDEN_DIMENSIONES). Mismo patrón de upserts independientes que el resto.
+    // `total` es la marca de agua: la próxima corrida decide desde dónde seguir
+    // mirando la fila `total` más nueva. Si se guardara antes de que termine el
+    // resto (una consulta o una ventana con un 429, por ejemplo) la marca
+    // avanzaría sin que el rango haya entrado entero. Por eso cierra la
+    // corrida, con el mismo patrón de upserts independientes que el resto.
     const filasTotal = await cliente.porDia(rango, "total");
     await Promise.all(filasTotal.map((fila) => guardarFila(base, fila)));
     filas += filasTotal.length;

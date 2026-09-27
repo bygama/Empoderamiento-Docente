@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ayerUTC, diaISO, rangoFaltante, sumarDias, variacion, ventanasDe } from "./periodos";
+import { ayerUTC, diaISO, periodoDe, rangoFaltante, sumarDias, variacion, ventanasDe } from "./periodos";
 
 test("diaISO y sumarDias trabajan en UTC", () => {
   assert.equal(diaISO(new Date("2026-09-21T23:30:00.000Z")), "2026-09-21");
@@ -35,13 +35,23 @@ test("nunca más de 31 días por corrida", () => {
   assert.deepEqual(r, { desde: "2026-08-21", hasta: "2026-09-20" });
 });
 
-test("las cuatro ventanas: 7 y 30 días hasta el fin, y las anteriores", () => {
+test("las seis ventanas: 7, 30 y 90 días hasta el fin, y las anteriores", () => {
   assert.deepEqual(ventanasDe("2026-09-20"), [
     { fechaFin: "2026-09-20", dias: 7, desde: "2026-09-14" },
     { fechaFin: "2026-09-20", dias: 30, desde: "2026-08-22" },
+    { fechaFin: "2026-09-20", dias: 90, desde: "2026-06-23" },
     { fechaFin: "2026-09-13", dias: 7, desde: "2026-09-07" },
     { fechaFin: "2026-08-21", dias: 30, desde: "2026-07-23" },
+    { fechaFin: "2026-06-22", dias: 90, desde: "2026-03-25" },
   ]);
+});
+
+test("el período de la URL es 7, 30 o 90; lo demás, 30", () => {
+  assert.equal(periodoDe("7"), 7);
+  assert.equal(periodoDe("90"), 90);
+  assert.equal(periodoDe(undefined), 30);
+  assert.equal(periodoDe("365"), 30);
+  assert.equal(periodoDe(["7", "90"]), 30);
 });
 
 test("la variación se lee como la leería una persona", () => {

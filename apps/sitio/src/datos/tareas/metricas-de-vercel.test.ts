@@ -39,11 +39,43 @@ test("correr dos veces deja las mismas filas y dice qué días copió", { skip: 
   const r2 = await sincronizarMetricas({ cliente: clienteFalso, base, hoy: HOY, minimoDias: 3 });
   assert.equal(r1.ok, true);
   assert.equal(r2.ok, true);
-  assert.equal(r2.detalle, "Del 2001-01-08 al 2001-01-10: 3 días, 1 filas, 4 ventanas.");
+  assert.equal(r2.detalle, "Del 2001-01-08 al 2001-01-10: 3 días, 1 filas, 6 ventanas.");
   const filas = await base.metricaDiaria.count({ where: { fecha: { gte: fechaUTC("2000-12-01"), lte: fechaUTC("2001-01-10") } } });
   assert.equal(filas, 1);
-  const ventanas = await base.metricaVentana.count({ where: { fechaFin: { gte: fechaUTC("2000-12-01"), lte: fechaUTC("2001-01-10") } } });
-  assert.equal(ventanas, 4);
+  // La anterior de 90 días termina el 2000-10-12.
+  const ventanas = await base.metricaVentana.count({ where: { fechaFin: { gte: fechaUTC("2000-10-01"), lte: fechaUTC("2001-01-10") } } });
+  assert.equal(ventanas, 6);
+});
+
+test("la hora y el cruce por país se guardan con su propia dimensión", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { sincronizarMetricas } = await import("./metricas-de-vercel");
+  const filtros: string[] = [];
+  const cliente: ClienteDeAnaliticas = {
+    async porDia(rango, dimension, filtro) {
+      if (filtro) filtros.push(filtro);
+      const fila = { fecha: rango.hasta, dimension, agrupado: false, vistas: 2, visitantes: 2 };
+      if (dimension === "hora") return [{ ...fila, valor: "13" }];
+      if (dimension === "pagina" && filtro === "country eq 'MX'") return [{ ...fila, valor: "/que-hacemos" }];
+      if (dimension === "total") return [{ ...fila, valor: "" }];
+      return [];
+    },
+    async ventana() {
+      return { vistas: 2, visitantes: 2 };
+    },
+  };
+  const r = await sincronizarMetricas({ cliente, base, hoy: new Date("2001-09-11T12:00:00.000Z"), minimoDias: 1 });
+  assert.equal(r.ok, true);
+  const guardadas = await base.metricaDiaria.findMany({ where: { fecha: fechaUTC("2001-09-10") }, orderBy: { dimension: "asc" } });
+  assert.deepEqual(
+    guardadas.map((f) => [f.dimension, f.valor]),
+    [
+      ["hora", "13"],
+      ["pagina-mx", "/que-hacemos"],
+      ["total", ""],
+    ],
+  );
+  assert.deepEqual(filtros, ["country eq 'CL'", "country eq 'MX'", "country eq 'AR'", "not (country in ('CL','MX','AR'))"]);
 });
 
 test("si la API falla, la corrida sale fallida y no se copia nada", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
