@@ -40,7 +40,7 @@
   `index.ts`. `cuentas.test.ts`, cinco casos contra la tabla. Aceptación:
   `pnpm --filter @ed/auth test` exit 0 (34/34), `typecheck` exit 0, `lint`
   exit 0.
-- **Paso 3 — el segundo factor en `@ed/auth`** (`b623856`).
+- **Paso 3 — el segundo factor en `@ed/auth`** (`c4f85d6`).
   `segundo-factor.ts`: el plugin `twoFactor` solo con código por correo (6
   dígitos, 10 min, `storeOTP: "hashed"`, 5 intentos, paso pendiente 30 min,
   dispositivo 30 días, TOTP apagado) y el plugin propio
@@ -68,7 +68,7 @@
   exit 0 (sitio 153 pass, 1 saltado de antes); `pnpm typecheck` exit 0;
   `pnpm lint` exit 0; `node scripts/verificar-react-doctor.mjs` → 100/100,
   sin diagnósticos.
-- **Paso 4 — una cuenta suspendida no abre sesión** (`0e22928`).
+- **Paso 4 — una cuenta suspendida no abre sesión** (`b37cfe0`).
   `suspendidas.ts`: `CAMPO_SUSPENDIDA` (campo adicional de `user`, `input:
   false`, en `config.ts`) y `frenarSiEstaSuspendida(idDeCuenta, ctx)`, que
   corre primero en el gancho de la base que crea toda sesión
@@ -77,7 +77,7 @@
   buena, 403 y sin cookie; suspendida entre la contraseña y el código, el
   código también da 403; no se anota nada. Aceptación: `pnpm --filter
   @ed/auth test` 41/41; `pnpm typecheck` exit 0; `lint` exit 0.
-- **Paso 5 — el enlace de invitación** (`2ee0ea4`).
+- **Paso 5 — el enlace de invitación** (`34d72b8`).
   `packages/auth/src/invitacion.ts › crearEnlaceDeInvitacion(auth, {
   idDeCuenta, horas, volverA })` → `{ enlace, vence }`, exportada por
   `@ed/auth/servidor`: el formato del reset de better-auth
@@ -88,7 +88,7 @@
   credencial y sirve una sola vez; vencido, redirige con
   `error=INVALID_TOKEN` y el reset da 400. Aceptación: `pnpm --filter
   @ed/auth test` 43/43; `typecheck` y `lint` exit 0.
-- **Paso 6 — los correos que quedaban** (`323720a`). `elegiTuContrasena`
+- **Paso 6 — los correos que quedaban** (`4f8dd86`). `elegiTuContrasena`
   suma `invitacion?: { quienInvita, rol }`: dice quién invita y con qué rol,
   y «si no esperabas esta invitación» en vez de «si no lo pediste».
   `correos/tu-correo-cambio.ts › tuCorreoCambio({ nombre, anterior, nuevo,
@@ -96,7 +96,7 @@
   `plantilla.ts` (la usan dos correos). Un test nuevo encontró «te invitó a
   el admin»: corregido a «al». Aceptación: `pnpm --filter sitio test` exit 0
   (155 pass, 1 saltado de antes); `typecheck` y `lint` exit 0.
-- **Paso 7 — entrar con código** (`c4660aa`). `FormularioEntrar`: si la
+- **Paso 7 — entrar con código** (`e76dc86`). `FormularioEntrar`: si la
   respuesta trae `twoFactorRedirect`, pide el código
   (`twoFactor.sendOtp`) y va a `/admin/entrar/codigo?correo=d•••@…&volver=…`
   con `envio=no-salio` o `envio=esperar` si no salió; el 403
@@ -120,7 +120,7 @@
   contra Postgres: `send-otp` → `{"status":true}`, el código leído de la
   consola, `verify-otp` → la sesión; `twoFactor` con 0 filas y `actividad`
   con un `entro` por persona.
-- **Paso 8 — Mi cuenta › Seguridad** (`8f7ba38`). `admin/mi-cuenta/Seguridad.tsx`
+- **Paso 8 — Mi cuenta › Seguridad** (`865d5f4`). `admin/mi-cuenta/Seguridad.tsx`
   (la insignia Activo/Apagado; obligatorio y sin botón para D y A) y
   `FormularioDelSegundoFactor.tsx` (edita: la contraseña y «Activar el
   segundo factor» / «Desactivarlo», por `authCliente.twoFactor`), en el
@@ -133,7 +133,7 @@
   dirige, como `ed_cuentas` desde que creé una cuenta por rol); react-doctor
   100/100; `/admin/mi-cuenta` como edita → 200 con `id="seguridad"`,
   «Apagado» y «Activar el segundo factor».
-- **Paso 9 — los tipos de actividad, su frase y quién los ve** (`d302d7c`).
+- **Paso 9 — los tipos de actividad, su frase y quién los ve** (`5642c6a`).
   `datos/actividad.ts`: los diez tipos de Cuentas; `QUIEN_VE` (`satisfies
   Record<TipoDeActividad, Capacidad>`, todos `usarCuentas`, como la lectura
   5 de la 3c), `tiposQueVe(rol)` y `esTipoDeActividad`.
@@ -142,7 +142,7 @@
   la 3c también crea (DECISIONS): concilia la que rebasee segunda. Test
   `frase.test.ts`. Aceptación: `pnpm --filter sitio typecheck`, `test` (159
   pass, 2 saltados) y `lint` exit 0.
-- **Paso 10 — las consultas** (`b621ceb`). `datos/consultas/cuentas.ts`:
+- **Paso 10 — las consultas** (`e8bee07`). `datos/consultas/cuentas.ts`:
   `listarCuentas()` → `CuentaEnLista[]` (quien dirige primero, después por
   nombre) y `unaCuenta(id)` → `FichaDeCuenta | null` (más `segundoFactor`,
   `invitacionVence` solo si está pendiente, `tieneActividad` y `sesiones`,
@@ -156,7 +156,7 @@
   (`cuentas.test.ts`, `consultas/actividad.test.ts`: cuatro casos, corridos,
   no saltados). Aceptación: `pnpm --filter sitio test` 163 pass, 2 saltados
   (los de antes); `typecheck` y `lint` exit 0.
-- **Paso 11 — las acciones de Cuentas** (`5c07a13` y `6c9f337`). En el
+- **Paso 11 — las acciones de Cuentas** (`4573cd8` y `346ad68`). En el
   paquete: `confirmarContrasena(auth, { headers, correo, contrasena,
   bloqueos })` → `"bien" | "mal" | "frenada"` (`verifyPassword` desde el
   servidor, cada fallo en el bloqueo por cuenta, con el secreto del contexto
@@ -182,7 +182,7 @@
   rechazo de la clave foránea con historia); «subir a administra prende el
   segundo factor y cierra las sesiones» lo cubre `roles.test.ts` (paso 1);
   react-doctor 100/100.
-- **Paso 12 — los patrones nuevos del armazón** (`331f8aa`).
+- **Paso 12 — los patrones nuevos del armazón** (`a914e8b`).
   `admin/armazon/Volver.tsx` y el slot `volver` de `Encabezado` (en el modo
   navy pasa a `azul-claro`, para la ficha de una novedad de la lane 6);
   `Buscador.tsx` (formulario `GET` con `next/form`, `role="search"`, caja con
@@ -192,7 +192,7 @@
   «Buscador» y «Paginado», con contrastes y primer consumidor, y la línea de
   historia del §11. Aceptación: `pnpm --filter sitio typecheck` y `lint` exit
   0; react-doctor 100/100.
-- **Paso 13 — Personas e Invitar** (`5305a6b`). `cuentas/layout.tsx` con
+- **Paso 13 — Personas e Invitar** (`5f6429a`). `cuentas/layout.tsx` con
   `<Guarda capacidad="usarCuentas">`; `cuentas/page.tsx` (Personas: el
   encabezado con las pestañas Personas · Actividad y el primario «Invitar a
   alguien», «Qué puede cada rol» y la lista) y `cuentas/invitar/page.tsx`
@@ -212,7 +212,7 @@
   puede cada rol», las tres cuentas e «Invitar a alguien», título «Cuentas ·
   Admin ED»; `/admin/cuentas/invitar` → 200, «Invitar · Admin ED»; como
   edita, `/admin/cuentas` → «Esta sección es de quien dirige o administra».
-- **Paso 14 — una cuenta** (`9d3cde4`). `cuentas/[id]/page.tsx` (título con
+- **Paso 14 — una cuenta** (`99ee275`). `cuentas/[id]/page.tsx` (título con
   el nombre, 404 si no existe, `queSePuede` con la sesión, y el aviso de
   Invitar por `?invitacion=salio|no-salio`). `admin/cuentas/FichaDeLaCuenta.tsx`
   compone: «← Cuentas», el nombre con la insignia, correo y último acceso, y
@@ -233,7 +233,7 @@
   Datos, Rol, Estado, Segundo factor y Sesiones, y «Suspender», «Cambiar el
   rol», «Cambiar el correo», «Cerrar sus sesiones»; la de quien dirige →
   sin acciones y «no se suspende ni se borra: se pasa la dirección».
-- **Paso 15 — Actividad** (este commit). `cuentas/actividad/page.tsx`: el
+- **Paso 15 — Actividad** (`567aa0e`). `cuentas/actividad/page.tsx`: el
   encabezado con la pestaña Actividad, el `Buscador` con tres `Filtro`
   (persona, módulo, cuándo), la lista, el vacío (con o sin filtros) y el
   `Paginado`; muestra solo `tiposQueVe(rol)`. En `admin/cuentas/actividad/`:
@@ -250,5 +250,23 @@
   la pestaña encendida, las frases; `?pagina=2&modulo=cuentas&q=juan` → 200
   con «No hay actividad con esos filtros» y «Sacar los filtros»; parámetros
   basura → 200.
+- **Paso 16 — los documentos** (`8b6d21d`, `f975239`, `adebce1`, `c299689`).
+  ADR-0012 «Segundo factor por correo, obligatorio para quien dirige y
+  administra» (y su fila en el índice de ADRs); el §7 del spec del admin
+  (Cuentas, la suspensión, la invitación de 72 h, `queSePuede` y el segundo
+  factor); AGENTS.md §12 (la línea de la sesión: el segundo factor y la
+  suspensión, ADR-0012) y §3 (`roles.ts`, `sobre-cuentas.ts`, y las
+  consultas y acciones nuevas en el árbol de `datos/`); README (Cuentas en
+  la intro del admin, el código por la consola en local, «Las cuentas», los
+  correos nuevos y **Resend como condición del primer deploy**). Aceptación:
+  `git status` mostró solo esos archivos; los links nuevos resuelven (`ls` de
+  `0012-segundo-factor-por-correo.md` desde la raíz y desde `specs/`).
+  Commits partidos por scope. Un encabezado de 76 caracteres se rehízo con
+  `reset --soft` antes de pushear, y el del paso 3 (75) con un rebase sin
+  conflictos **sobre la misma base** (`5a07368`), que solo cambió ese mensaje
+  (el diff contra el árbol anterior da vacío): los hashes de este PROGRESS
+  ya son los nuevos. Un primer intento se había ido contra `origin/main`, que
+  avanzó con `paginas-inicio` mientras tanto: se abortó sin tocar nada;
+  rebasear sobre `main` nuevo es del padre.
 
 ## Abierto
