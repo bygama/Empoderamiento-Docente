@@ -571,6 +571,7 @@ encabezado.
   columnas desde `sm`; lo largo (un mensaje), en su sección con título.
 - Primer consumidor: la ficha de un mensaje y de un CV. Si otra lane deja
   uno antes en `main`, queda uno solo (DECISIONS de `work/mensajes/`).
+  También: Invitar y la ficha de una cuenta («← Cuentas», `work/cuentas/`).
 
 ### Confirmar lo que no se deshace
 
@@ -588,6 +589,9 @@ frena todo. `apps/sitio/src/admin/armazon/Confirmacion.tsx`.
 - **Hecho, vuelve a la lista** con un aviso de confirmación en su
   encabezado: «Se borró el mensaje para siempre.»
 - Primer consumidor: «Borrar ahora» en la ficha de un mensaje y de un CV.
+  También, en la ficha de una cuenta: «Borrar la cuenta», «Cancelar la
+  invitación» y «Pasarle la dirección» (`work/cuentas/`). Suspender, cerrar
+  sus sesiones o cambiarle el correo no preguntan: se deshacen con otro clic.
 
 ### Título de pestaña
 
@@ -700,7 +704,9 @@ pestañas: van debajo del encabezado, a la izquierda del buscador.
 - **Puede llevar su número** («Nuevo 3»). En el celular la fila scrollea de
   costado si no entra (las cuatro de Mensajes, a 390 de ancho).
 - Primer consumidor: los estados de las bandejas de Mensajes (Nuevo · En
-  curso · Cerrado · Spam).
+  curso · Cerrado · Spam). También Cuentas › Actividad, con tres filtros
+  apilados (módulo, persona y cuándo), cada uno con su «todos» primero; cada
+  opción conserva los otros filtros y la búsqueda.
 
 ### Buscador
 
@@ -717,7 +723,8 @@ Una caja en las listas largas, a la derecha del filtro.
 - **Sin resultados, el estado vacío lo dice** con lo buscado y dónde («Nada
   coincide con «zzz» en Cerrado»). En el celular, la caja ocupa el ancho.
 - Primer consumidor: las bandejas de Mensajes. Si otra lane deja uno antes
-  en `main`, queda uno solo (DECISIONS de `work/mensajes/`).
+  en `main`, queda uno solo (DECISIONS de `work/mensajes/`). También Cuentas ›
+  Actividad («Buscar en la actividad»), que conserva sus tres filtros.
 
 ### Paginado
 
