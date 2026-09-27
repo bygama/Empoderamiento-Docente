@@ -1,7 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { NIVELES } from "@/features/que-hacemos/data/niveles";
-import { ALTO_SVH, ENTRADA_SVH } from "./niveles-escena";
+import { ALTO_SVH, ENTRADA_SVH, POS } from "./niveles-escena";
 import { instalarToggle } from "./toggle-nivel";
 
 if (typeof window !== "undefined") {
@@ -54,7 +53,7 @@ export function crearNiveles(zone: HTMLElement, stage: HTMLElement) {
   let limpiarToggle: (() => void) | undefined;
   const ctx = gsap.context(() => {
     const cards = gsap.utils.toArray<HTMLElement>("[data-nivel-card]");
-    if (cards.length !== NIVELES.length) return;
+    if (cards.length !== POS.length) return;
     const tituloGrande = stage.querySelector<HTMLElement>("[data-nivel-titulo-grande]");
     const encabezado = stage.querySelector<HTMLElement>("[data-nivel-encabezado]");
 
