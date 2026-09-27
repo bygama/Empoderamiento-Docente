@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { etiquetaDeCategoria, fechaCorta } from "@/features/novedades/contenido/modelo";
+import { etiquetaDeCategoria } from "@/features/novedades/contenido/modelo";
+import { fechaCorta } from "@/features/novedades/contenido/fechas";
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { RevealFoco } from "../RevealFoco";

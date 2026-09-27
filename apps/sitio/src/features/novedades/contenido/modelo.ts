@@ -1,8 +1,9 @@
 import { desdeTexto } from "@ed/db/slug";
 import type { BorradorDeNovedad, SeccionDelCuerpo } from "./novedad";
 
-// Lo de una novedad que no necesita Zod: las categorías, los topes, el orden
-// y las anclas del cuerpo. Aparte de novedad.ts (los esquemas) porque lo leen
+// Lo de una novedad que no necesita Zod: las categorías, los topes, las
+// anclas del cuerpo y el borrador vacío (las fechas, en fechas.ts; cómo se
+// llama cada campo, en etiquetas.ts). Aparte de novedad.ts (los esquemas) porque lo leen
 // también los componentes del navegador —el sitio y el formulario del admin—
 // y Zod no tiene que viajar con ellos.
 
@@ -32,28 +33,6 @@ export function etiquetaDeCategoria(clave: string): string {
  * como mucho: hoy la nota más larga tiene tres.
  */
 export const TOPES = { titulo: 100, bajada: 320, tituloDeSeccion: 80, textoDeSeccion: 2000, secciones: 10, alt: 200 } as const;
-
-/**
- * El orden de las novedades: la más nueva primero. Las fechas van como texto
- * (`2026-08-26`, `2026-07`, `2026`) y se comparan como texto, así una fecha
- * con menos precisión queda después de las más precisas del mismo período:
- * «2025» después de «2025-05» (SPEC §7.2). Para `Array.sort`.
- */
-export function compararFechas(a: string, b: string): number {
-  if (a === b) return 0;
-  return a > b ? -1 : 1;
-}
-
-// Fecha → "15 jul 2026", "jul 2026" o "2026", según la precisión que trae. Sin
-// librerías de fechas ni el locale del navegador, que rompería la hidratación.
-const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-
-/** La fecha como la muestra el sitio: «15 jul 2026», «jul 2026» o «2026». */
-export function fechaCorta(fecha: string): string {
-  const [anio, mes, dia] = fecha.split("-").map(Number);
-  if (!mes) return `${anio}`;
-  return dia ? `${dia} ${MESES[mes - 1]} ${anio}` : `${MESES[mes - 1]} ${anio}`;
-}
 
 /**
  * Las secciones del cuerpo con su ancla (`#que-estudia`), sacada del título:

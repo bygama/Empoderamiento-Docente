@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { MATERIALES } from "@/features/biblioteca/data/materiales";
-import { anclasDe, borradorVacio, compararFechas } from "./modelo";
+import { anclasDe, borradorVacio } from "./modelo";
+import { compararFechas } from "./fechas";
 import { esquemaBorrador, esquemaNovedad, type Novedad } from "./novedad";
 
 const completa: Novedad = {

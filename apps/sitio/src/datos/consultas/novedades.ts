@@ -2,7 +2,8 @@ import { draftMode } from "next/headers";
 import { cache } from "react";
 import type { Novedad as Fila } from "@/../prisma/generado/client";
 import { base } from "@/datos/cliente";
-import { anclasDe, compararFechas } from "@/features/novedades/contenido/modelo";
+import { anclasDe } from "@/features/novedades/contenido/modelo";
+import { compararFechas } from "@/features/novedades/contenido/fechas";
 import { esquemaNovedad, type NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { leerSinRomper } from "./leer-sin-romper";
 
