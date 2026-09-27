@@ -2,6 +2,14 @@
 
 ## In progress
 
+- 2026-09-27 — **Pausa para la revisión de cierre.** Los 11 pasos del PLAN
+  están hechos y verificados (`## Verification`), sin bloqueos ni comandos
+  en rojo; la rama, sobre `main` en `910dabf5`, y el PR abierto. **Lo que
+  sigue:** la revisión de cierre, que lanza el padre después de
+  `worker_done`; sus hallazgos vuelven a esta lane como arreglos. Con su
+  PASS, el cierre en este mismo PR: el veredicto en `## Verification`, lo
+  de «Abierto» que es de la lane (la copia, los worktrees de paso, el
+  perfil del navegador) borrado, y el commit que borra `work/cierre-del-mapa/`.
 - 2026-09-27 — Worktree listo: `pnpm install`, `pnpm generate`, `.env.local`
   copiado (base `ed`, esta lane no migra). Dev server en el 3032, en su
   propia pestaña de Orca. Cuentas de prueba `cierre-administra@ed.test` y
@@ -224,3 +232,41 @@ Todo sobre `834af0d5`, en un worktree limpio de ese commit
     coincidir (DECISIONS).
 
 ## Abierto
+
+- **Recursos de la verificación, para borrar al cerrar** (no antes: una
+  ronda de arreglos los vuelve a usar): la base `ed_cierre` (P6), los
+  worktrees `%TEMP%/ed-cierre-antes` (el build de `main`) y
+  `%TEMP%/ed-cierre-limpio` (el de `834af0d5`), el perfil del navegador
+  `cierre-del-mapa` y los scripts de `%TEMP%/cierre/`. El dev server del
+  3032 sigue en su pestaña. Los `next start` del 3033 y el 3034 ya se
+  cerraron.
+- Las cuentas de prueba `cierre-administra@ed.test` y
+  `cierre-edita@ed.test` quedan en `ed`: tienen actividad y la clave
+  foránea no deja borrarlas (como las de las lanes anteriores).
+- **Para el padre, fuera de esta lane:**
+  - La suite de tests no está aislada de las filas reales cuando dos corren a
+    la vez contra la misma base (destacados, orden de los aliados, chequeos
+    de links): «Tried and failed». Una hija que corre su gate mientras otra
+    (o el gate del padre) corre el suyo sobre `ed` puede ensuciarla.
+  - `README.md` todavía dice «Cuando llegue la fase 1 del admin, el build
+    pasa a correr las migraciones» (sección del deploy): es del deploy
+    (lane 0), no de este cierre.
+  - AGENTS.md §6 cuenta los `.tsx` de `apps/sitio/src` sobre el tope,
+    medidos el 2026-09-26. Esta lane sacó 27 de ahí (24 mudados al kit y 3
+    borrados, ninguno sobre 200): la próxima medición cambia el total. No se
+    tocó, porque la cuenta tiene fecha.
+  - Una 404 propia del admin, con su armazón (P5): idea para después.
+
+### Las líneas de lo nuevo y lo mudado
+
+Todo por debajo de su tope (utilidades ≤ 100, componentes ≤ 200), contado
+con `wc -l` sobre `834af0d5`:
+
+| Carpeta | Archivos | El más largo |
+| --- | --- | --- |
+| `datos/actividad/` | 15 | `index.ts` 99, `regla.ts` 32, el mayor módulo `cuentas.ts` 17 |
+| `admin/actividad/frase/` | 15 | `index.ts` 43, `cuentas.ts` 18, `mensajes.ts` 16, `comun.ts` 13 |
+| `admin/cuentas/actividad/modulos/` | 15 | `index.ts` 64, `comun.ts` 30, `cuentas.ts` 23 |
+| `datos/inicio/pendientes/` | 9 | `pendiente.ts` 41, `index.ts` 31, `mensajes.ts` 17 |
+| `packages/kit-admin/src/` (lo mudado) | 32 | componentes: `Encabezado.tsx` 108, `Curva.tsx` 104, `Lista.tsx` 87; utilidades: `curva/calculos.ts` 54, `useFrenarSalida.ts` 54, `useMoverEnOrden.ts` 50 |
+| `packages/kit-admin/src/` (lo tocado) | 3 | `iconos.tsx` 120, `index.ts` 48, `Boton.tsx` 25 |
