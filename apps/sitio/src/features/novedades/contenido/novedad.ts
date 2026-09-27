@@ -97,3 +97,6 @@ export const esquemaBorrador = esquemaDe(false);
 export type Novedad = z.output<typeof esquemaNovedad>;
 export type BorradorDeNovedad = z.output<typeof esquemaBorrador>;
 export type SeccionDelCuerpo = Novedad["cuerpo"][number];
+
+/** Lo que reciben los componentes del sitio: la novedad, con el ancla de cada sección del cuerpo (`anclasDe`). */
+export type NovedadDelSitio = Omit<Novedad, "cuerpo"> & { cuerpo: Array<SeccionDelCuerpo & { ancla: string }> };
