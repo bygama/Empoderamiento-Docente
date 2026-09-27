@@ -290,7 +290,46 @@
   merge. El dev server de la lane sigue en :3024 para ese arreglo; la base
   `ed_novedades` tiene solo las nueve publicadas.
 
+- **Revisión r1 en PASS y los arreglos** (`418f11b`, `519af1e`, `3b7fbf6` y
+  `dfe13db`, ya rebasados): los índices únicos, el `guid` del RSS,
+  despublicar y el título del pendiente, cada uno con su test (DECISIONS).
+  `pnpm exec tsx --test` de publicar, editar, el RSS y el pendiente → 15/15.
+- **Rebase sobre `5737390`** y lo que pidió: el módulo «Novedades» en
+  Cuentas › Actividad y el test de quién ve qué; el §3 del spec del admin
+  corregido sobre la tabla (DECISIONS). `pnpm migrate:deploy` aplicó
+  `20260926232051_segundo_factor_y_cuentas` en `ed_novedades`. La sesión del
+  navegador ya no valía: se entró con una cuenta nueva `edita`
+  (`prueba-edita-novedades@ejemplo.org`, solo en la base de la lane).
+
 ## Verification
+
+### 2026-09-26 — DoD sobre `main` en `5737390`, con los arreglos de r1 — PASS
+
+- L1 static: `apps/sitio/.next` y `tsconfig.tsbuildinfo` borrados (el dev
+  server había dejado tipos de rutas viejas en `.next/dev/types`), después
+  `pnpm typecheck` → exit 0 (db, auth, kit-admin, sitio); `pnpm lint` → exit
+  0; `node scripts/verificar-react-doctor.mjs` → exit 0, «100/100, sin
+  diagnósticos (apps/sitio/src: 755 archivos · packages/db/src: 3 ·
+  packages/auth/src: 27 · packages/kit-admin/src: 19)».
+- L2 behavioral: `pnpm test` → exit 0 (sitio 304: 303 pass, 0 fail, 1
+  salteado, el de A1, de antes; auth 46/46; kit 3/3). `pnpm build` → exit 0,
+  con `/novedades`, las dos fichas, sus imágenes y `/novedades/rss.xml`
+  prerenderizadas; el feed trae 9 `<item>` con `guid` `urn:uuid:…`.
+- L2 render: base fresca de `main` (`5737390`, worktree temporal, ya borrado)
+  contra esta rama, `node scripts/comparar-render.mjs <main>/apps/sitio
+  apps/sitio` → exit 1, esperado: iguales todas salvo `novedades.html` y las
+  dos fichas. Sin mirar el orden, `novedades.html` tiene las mismas 806
+  palabras, 51 links y 33 imágenes; solo cambian de lugar «Problematizar…» y
+  «Los criterios de la derivada…» (aprobado). Las cabeceras: el RSS y el SEO
+  de la página; en las fichas, su título, su bajada y la imagen generada.
+- L3 end-to-end (dev server nuevo en :3024 y el navegador de Orca):
+  `/novedades`, una ficha, su imagen, el RSS y el Inicio → 200; la imagen del
+  admin sin cookie → 307 y con una cookie falsa → 401; con sesión de `edita`,
+  la lista (Publicadas · Borradores, «Nueva novedad») y la ficha de RELIME con
+  su panel (imagen generada de 1200 × 630, «Se ve en» y «Ver en el sitio»).
+- Close review: r1 (Opus 5.5, medium) → PASS sobre `4ada3bc`, 4 Minor y dos
+  notas; los dos Minor de diseño ratificados por el padre y los otros cuatro
+  puntos arreglados (arriba). La verificación de los arreglos es esta misma.
 
 ### 2026-09-26 — DoD de la lane (los 18 pasos + el gate del brief) — PASS
 
@@ -351,5 +390,3 @@
   comentarios; AGENTS.md §6): no se tocó.
 - **«Desde tu última visita»** del Inicio podría contar las novedades
   publicadas; no lo pide el brief.
-- **`openGraphDeLaPagina`** (`config/metadata.ts`) es igual a la de la 4c,
-  que todavía no está en `main`: la que llegue segunda se queda con una.
