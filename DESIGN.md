@@ -811,8 +811,9 @@ período anterior. `apps/sitio/src/admin/armazon/Cifra.tsx`. No confundir con
   en porcentaje), y el rojo es solo para errores.
 - **Sin datos, «—»**, con «Todavía no hay datos» abajo y «Sin datos» para el
   lector: nunca un cero inventado. Un cero es un cero solo si la fuente
-  existe y contó cero. Si la consulta falló, la nota lo dice («No se pudo
-  leer»).
+  existe y contó cero. Si no hay por algo que se puede decir, la nota lo
+  dice con las mismas palabras que la pantalla del módulo («Faltan las
+  variables de Vercel»); si la consulta falló, «No se pudo leer».
 - **Caja:** `rounded-xl`, `p-4`, borde `azul-claro` decorativo, fondo
   `white`. Sin sombra.
 - Primer consumidor: el panel de Métricas › Resumen, donde nació como su
