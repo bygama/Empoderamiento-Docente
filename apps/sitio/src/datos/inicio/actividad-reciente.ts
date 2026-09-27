@@ -1,16 +1,17 @@
-import { tiposQueVe, type TipoDeActividad } from "@/datos/actividad";
+import { tiposDelInicio, type TipoDeActividad } from "@/datos/actividad";
 import { base } from "@/datos/cliente";
 
 /** Un evento de la actividad listo para mostrar: quién, qué, sobre qué y cuándo (ISO). */
 export type EventoReciente = { id: string; tipo: TipoDeActividad; quien: string; sobre: string | null; en: string };
 
 /**
- * Los últimos eventos que ese rol puede ver (`QUIEN_VE`, en
- * `datos/actividad.ts`), el más nuevo primero. Sin ningún tipo visible no
+ * Los últimos eventos del Inicio que ese rol puede ver, el más nuevo primero.
+ * Qué tipos son lo deciden `QUIEN_VE` y `VA_AL_INICIO`, en
+ * `datos/actividad.ts`: acá no se filtra nada a mano. Sin ningún tipo no
  * consulta: devuelve la lista vacía.
  */
 export async function actividadReciente(rol: unknown, cuantos = 8): Promise<EventoReciente[]> {
-  const tipos = tiposQueVe(rol);
+  const tipos = tiposDelInicio(rol);
   if (!tipos.length) return [];
   const filas = await base.actividad.findMany({
     where: { tipo: { in: tipos } },

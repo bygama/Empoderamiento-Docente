@@ -53,9 +53,31 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "restauro-una-version": "editarContenido",
 };
 
+/**
+ * Si el tipo va a la actividad reciente del Inicio. Van los que cambian algo
+ * del sitio o del admin (publicar, descartar, restaurar, y lo que sumen los
+ * módulos); los de la sesión y de la cuenta propia no, porque taparían lo que
+ * el Inicio tiene que contar: siguen en Cuentas › Actividad. Un tipo nuevo no
+ * compila hasta decidirlo.
+ */
+export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
+  entro: false,
+  salio: false,
+  "cambio-su-contrasena": false,
+  "cambio-su-nombre": false,
+  "publico-una-pagina": true,
+  "descarto-un-borrador": true,
+  "restauro-una-version": true,
+};
+
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */
 export function tiposQueVe(rol: unknown): TipoDeActividad[] {
   return TIPOS_DE_ACTIVIDAD.filter((tipo) => puede(rol, QUIEN_VE[tipo]));
+}
+
+/** Los que ese rol ve en el Inicio: los que puede ver y van al Inicio. */
+export function tiposDelInicio(rol: unknown): TipoDeActividad[] {
+  return tiposQueVe(rol).filter((tipo) => VA_AL_INICIO[tipo]);
 }
 
 const esquema = z.object({
