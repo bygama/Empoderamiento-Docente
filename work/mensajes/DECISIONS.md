@@ -42,3 +42,16 @@
   (`datos/formularios/contacto.ts`) y se validan con `esquemaDe`: los mismos
   mensajes en llano que el CV, y la institución a `datos` por `datosDe`. El
   formulario del sitio sigue dibujado a mano; la lista es solo del borde.
+- 2026-09-26 — **Revisión r1 en PASS, con cuatro arreglos antes del merge** (el
+  padre): el desglose del spam de CV, «Lo que no se hace» en el ADR-0012, el
+  tope propio del cuerpo de los formularios y la cabecera de la descarga.
+  Quedan como están el texto del 429 y del 500, «PDF · 1,2 MB» y la prueba con
+  la base apagada (anotada en PROGRESS). El ADR va con el número 0012: esta
+  lane mergea primero y la de cuentas renumera.
+- 2026-09-26 — **El `Cache-Control` del admin se fija en el proxy, con
+  `private`** (la lane, ronda r1). El proxy pone el suyo en todo `/admin` y
+  pisa el de cada ruta, en dev y con `next start`; pedirle a la ruta que lo
+  diga no alcanza. `private, no-store, max-age=0` es correcto para toda
+  respuesta del admin (cada una es de una sesión) y es el valor del SPEC §3
+  para la descarga; la ruta deja el mismo por si alguna vez no pasa por el
+  proxy. `proxy.test.ts` sigue pidiendo `no-store` y pasa.
