@@ -23,11 +23,13 @@ function clasesDelItem(recorrido: boolean, activo: boolean) {
 }
 
 /**
- * El título y el índice de las áreas: al costado en desktop, chips
- * deslizables en celular. Los `data-areas-*` son los que mueve la
- * coreografía del aterrizaje (coreografia-titulo.ts); sin ella todo se ve
- * en su lugar. El `nav` se nombra con el título (`aria-labelledby`): si
- * alguien lo edita, el nombre lo sigue.
+ * El título y el índice de las áreas: al costado en desktop. En celular y
+ * tablet el índice no va: la lista de desplegables ya es el índice
+ * (ArticuloArea), y el título crece a título de sección. Los
+ * `data-areas-*` son los que mueve la coreografía del aterrizaje
+ * (coreografia-titulo.ts); sin ella todo se ve en su lugar. El `nav` se
+ * nombra con el título (`aria-labelledby`): si alguien lo edita, el nombre
+ * lo sigue.
  */
 export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo: string; areas: readonly AreaDeQueHacemos[] }) {
   return (
@@ -48,7 +50,7 @@ export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo:
       <h2
         id="areas-titulo"
         data-areas-titulo
-        className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance lg:text-[1.5rem]"
+        className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance max-lg:text-azul-principal max-lg:text-[clamp(1.9rem,1.4rem+2vw,2.5rem)] max-lg:font-extrabold max-lg:tracking-[-0.03em] lg:text-[1.5rem]"
         style={{ lineHeight: 1.2 }}
       >
         {fragmentos(titulo).map((f) =>
@@ -61,7 +63,7 @@ export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo:
           ),
         )}
       </h2>
-      <nav aria-labelledby="areas-titulo" className="mt-5 lg:mt-6 lg:w-full">
+      <nav aria-labelledby="areas-titulo" className="mt-5 max-lg:hidden lg:mt-6 lg:w-full">
         <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:relative lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
           {/* El riel que se dibuja de un trazo mientras el título aterriza,
               debajo de los bordes de los ítems (que lo pintan de verde o

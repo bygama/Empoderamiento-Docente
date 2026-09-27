@@ -1,18 +1,16 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import type { AreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
-import { estiloDeFoco } from "@/lib/contenido/fotos";
-import { sinMarcas } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
 import { ANCLAS_DE_AREAS, idDeArea } from "./areas/anclas";
+import { ArticuloArea } from "./areas/ArticuloArea";
 import { IndiceAreas } from "./areas/IndiceAreas";
-import { PanelArea } from "./areas/PanelArea";
 import { crearAterrizaje } from "./areas/coreografia-titulo";
+import { useDesplegableAreas } from "./areas/useDesplegableAreas";
 
 /**
  * Las siete áreas de especialización de ED, en texto plano y legibles de una.
@@ -20,8 +18,11 @@ import { crearAterrizaje } from "./areas/coreografia-titulo";
  * Raquel y Daniela (2026-09-08): la web se veía espectacular pero no se
  * entendía qué hace ED. Esta sección es la respuesta y nada se esconde detrás
  * de una animación. A la izquierda (desktop) un índice que se LLENA a medida
- * que se lee y sirve para saltar; en celular, chips deslizables. El único JS
- * es ese avance: sin él todo se lee igual, marcando la primera área. Los
+ * que se lee y sirve para saltar. En celular y tablet, DESPLEGABLES, uno
+ * abierto por vez (areas/ArticuloArea.tsx): la lista de las siete se ve de
+ * una y cada una se abre entera (Gastón, 2026-09-26; antes eran siete
+ * artículos seguidos, unas ocho pantallas). Sin JS, en celular se ve la
+ * lista de nombres; en escritorio, todo. Los
  * textos y las fotos llegan por props (features/que-hacemos/contenido/areas.ts
  * o la base); las anclas son estructura (areas/anclas.ts).
  */
@@ -45,6 +46,7 @@ export function AreasQueHacemos({ contenido }: { contenido: AreasDeQueHacemos })
 
   const zonaRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
+  const { abierta, alternar } = useDesplegableAreas(IDS_AREAS);
 
   // El aterrizaje del título (areas/coreografia-titulo.ts): solo en desktop,
   // donde el índice va al costado; en celular y con reduced motion el título
@@ -122,61 +124,17 @@ export function AreasQueHacemos({ contenido }: { contenido: AreasDeQueHacemos })
               pantalla, debajo del navbar (el usuario, 2026-09-16): la columna
               se clava al ras y el primer artículo aterriza esos 8rem más
               abajo. */}
-          <div data-areas-articulos className="mt-10 lg:mt-0 lg:pt-32">
+          <div data-areas-articulos className="border-azul-principal/10 mt-10 max-lg:mt-7 max-lg:border-t lg:mt-0 lg:pt-32">
             {contenido.areas.map((a, i) => (
-              <article
+              <ArticuloArea
                 key={IDS_AREAS[i]}
                 id={IDS_AREAS[i]}
-                data-area={i}
-                // Dos columnas recién desde XL, y en PROPORCIONES.
-                //
-                // No desde lg: a 1024px el índice ya se lleva 19rem, así que
-                // al artículo le quedan 592. Partirlos ahí dejaba el texto en
-                // 177px con la foto en un ancho fijo de 22rem, o en 313 con la
-                // foto convertida en una tira de 216x743 —la imagen destrozada
-                // por el recorte—. Entre 1024 y 1279 el artículo va en una
-                // columna: texto ancho y la foto abajo, en 16/9.
-                //
-                // Y en proporciones, no con la foto en un ancho fijo: así las
-                // dos ceden a la vez cuando la ventana se angosta.
-                className="border-azul-principal/10 scroll-mt-28 border-t py-12 first:border-t-0 first:pt-0 md:py-16 xl:grid xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] xl:gap-12"
-              >
-                <div>
-                  <p className="font-mono text-[0.78rem] tracking-[0.18em] text-gris-texto uppercase">
-                    Área 0{i + 1}
-                  </p>
-                  <h3
-                    className="font-display mt-3 text-[1.7rem] font-bold tracking-[-0.02em] md:text-[2.2rem]"
-                    style={{ lineHeight: 1.12 }}
-                  >
-                    {a.titulo}
-                  </h3>
-                  <p className="text-verde-concepto-texto font-display mt-3 text-[1.1rem] font-semibold md:text-[1.25rem]">
-                    {a.frase}
-                  </p>
-                  <p className="text-azul-principal/85 mt-5 max-w-[62ch] font-sans text-[1.02rem] leading-relaxed md:text-[1.1rem]">
-                    {sinMarcas(a.detalle)}
-                  </p>
-
-                  {/* TERCER NIVEL DE LECTURA: el panel separa el detalle sin
-                      esconder nada —la sección existe para que no se esconda—,
-                      así se lee primero qué es el área. */}
-                  <PanelArea area={a} rotulos={contenido.rotulos} />
-                </div>
-
-                <div className="mt-8 xl:mt-0 xl:h-full">
-                  <div className="relative aspect-[16/9] overflow-hidden rounded-[1.5rem] xl:aspect-auto xl:h-full">
-                    <Image
-                      src={a.foto.src}
-                      alt={a.foto.alt}
-                      fill
-                      sizes="(min-width: 1280px) 30vw, 100vw"
-                      className="object-cover"
-                      style={estiloDeFoco(a.foto.foco)}
-                    />
-                  </div>
-                </div>
-              </article>
+                area={a}
+                rotulos={contenido.rotulos}
+                i={i}
+                abierta={abierta === i}
+                alternar={alternar}
+              />
             ))}
           </div>
         </div>
