@@ -41,14 +41,14 @@ export const metadata: Metadata = {
  */
 export default async function InvestigacionPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, lineas, ciclo, enAccion } = await contenidoDe("investigacion");
+  const { hero, lineas, ciclo, enAccion, cierre } = await contenidoDe("investigacion");
   return (
     <main id="contenido" tabIndex={-1}>
       <InvestigacionHero contenido={hero} />
       <LineasInvestigacion contenido={lineas} />
       <EspiralInvestigacion contenido={ciclo} />
       <InvestigacionEnAccion contenido={enAccion} />
-      <CierreInvestigacion />
+      <CierreInvestigacion contenido={cierre} />
     </main>
   );
 }

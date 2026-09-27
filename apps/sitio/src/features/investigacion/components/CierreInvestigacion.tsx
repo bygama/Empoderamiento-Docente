@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
+import type { CierreDeInvestigacion } from "@/features/investigacion/contenido/cierre";
 import { LinternaFaro } from "./LinternaFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -20,17 +21,19 @@ import { crearAscenso } from "./coreografia-cierre";
  * «Cae la noche sobre el archivo»: la hoja llega enmarcada como la hoja 01
  * del hero, metida entre nubes, y al pinnearse el marco se disuelve y el
  * navy se expande hasta los bordes. La cámara baja: las nubes del primer
- * plano suben y se van (ver cierre-investigacion/NubesCierre.tsx) y el faro sube a su encuentro —el mismo
- * de Qué hacemos, recortado y grande— plantado en el piso. Gira, se
- * enciende arriba y el haz lee de costado: primero se posa sobre la
- * Biblioteca, después sobre el cierre.
+ * plano suben y se van (cierre-investigacion/NubesCierre.tsx) y el faro
+ * sube a su encuentro —el mismo de Qué hacemos, recortado y grande—
+ * plantado en el piso. Gira, se enciende arriba y el haz lee de costado:
+ * primero se posa sobre la Biblioteca, después sobre el cierre.
  * Los 13 puntos del hero vuelven como estrellas y la luz los va tocando.
  *
  * El SSR renderiza el último frame (todo encendido y en su lugar): es lo que
  * ven touch y reduced-motion. La coreografía (desktop con puntero) vive en
- * coreografia-cierre.ts.
+ * coreografia-cierre.ts. Los textos llegan por props (de
+ * `features/investigacion/contenido/cierre.ts` o de la base).
  */
-export function CierreInvestigacion() {
+export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestigacion }) {
+  const { biblioteca, conversemos } = contenido;
   const zonaRef = useRef<HTMLDivElement | null>(null);
   const hojaRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -119,11 +122,11 @@ export function CierreInvestigacion() {
               className="font-display text-azul-claro font-extrabold tracking-[-0.02em] text-balance"
               style={{ fontSize: "clamp(1.6rem, 0.8rem + 1.5vw, 2.1rem)", lineHeight: 1.08 }}
             >
-              La investigación también se comparte.
+              {biblioteca.titulo}
             </h2>
             <div className="mt-7">
               <ButtonSecondary href="/biblioteca" variant="dark" withArrow>
-                Explorá la Biblioteca
+                {biblioteca.boton}
               </ButtonSecondary>
             </div>
           </div>
@@ -134,17 +137,17 @@ export function CierreInvestigacion() {
           {/* Última parada del haz: el camino. */}
           <div data-cierre-bloque className="max-w-[30rem] lg:max-w-none">
             <p className="text-azul-claro/70 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
-              Investigar para transformar
+              {conversemos.antetitulo}
             </p>
             <h2
               data-cierre-titulo
               className="font-display mt-5 font-extrabold tracking-[-0.025em] text-balance"
               style={{ fontSize: "clamp(1.6rem, 0.8rem + 1.5vw, 2.1rem)", lineHeight: 1.08 }}
             >
-              Investigar permite hacer mejores preguntas.
+              {conversemos.titulo}
             </h2>
             <div className="mt-8">
-              <ButtonPrimary href="/contacto?tema=investigacion">Conversemos</ButtonPrimary>
+              <ButtonPrimary href="/contacto?tema=investigacion">{conversemos.boton}</ButtonPrimary>
             </div>
           </div>
         </div>
