@@ -78,27 +78,20 @@ test("despublicar lo saca del sitio y conserva sus columnas", sinBase, async () 
   assert.deepEqual(await base.persona.findUnique({ where: { id: creado.id }, select: { publicado: true, nombre: true } }), { publicado: false, nombre: "Prueba f" });
 });
 
-test("dos que publican a la vez en la Dirección con un solo lugar libre: entra una", sinBase, async () => {
+test("dos que publican a la vez donde queda un solo lugar: entra una", sinBase, async () => {
   const { base, crearPersonaEnBase, publicarPersonaEnBase } = await modulos();
-  // Un lugar libre en la Dirección mientras dura el test: Raquel Ayala, sin publicar. Al final se borran las de
-  // prueba y recién ahí vuelve, así la Dirección nunca queda con tres. Ningún otro archivo de tests publica ahí.
-  const raquel = await base.persona.findUnique({ where: { slug: "raquel-ayala" }, select: { id: true, publicado: true } });
-  if (!raquel?.publicado) return assert.fail("Raquel Ayala tiene que estar publicada en la base de los tests");
+  // Un cupo de un lugar contado solo entre las filas de este test: no toca a nadie de la carga. Sin el candado del
+  // Equipo, las dos cuentan cero a la vez y entran las dos.
   const prefijo = `${PREFIJO}-lugar`;
-  await base.persona.update({ where: { id: raquel.id }, data: { publicado: false } });
-  try {
-    const creados = [];
-    for (const letra of ["a", "b"]) {
-      const r = await crearPersonaEnBase(base, { contenido: perfil(`${prefijo}-${letra}`, 2), quien: "Ana" });
-      if (!r.ok) return assert.fail(r.detalle);
-      creados.push(r);
-    }
-    const resultados = await Promise.all(creados.map((r) => publicarPersonaEnBase(base, { id: r.id, borradorEnVisto: r.borradorEn, quien: "Ana" })));
-    assert.deepEqual(resultados.map((r) => r.ok).sort(), [false, true]);
-    assert.match(resultados.flatMap((r) => (r.ok ? [] : [r.detalle])).join(), /Dirección lleva 2 personas en el sitio/);
-    assert.equal(await base.persona.count({ where: { id: { in: creados.map((r) => r.id) }, publicado: true } }), 1);
-  } finally {
-    await limpiarEquipo(base, prefijo);
-    await base.persona.update({ where: { id: raquel.id }, data: { publicado: true } });
+  const cupo = { lugares: () => 1, ocupa: (slug: string | null) => Boolean(slug?.startsWith(prefijo)) };
+  const creados = [];
+  for (const letra of ["a", "b"]) {
+    const r = await crearPersonaEnBase(base, { contenido: perfil(`${prefijo}-${letra}`, 3), quien: "Ana" });
+    if (!r.ok) return assert.fail(r.detalle);
+    creados.push(r);
   }
+  const resultados = await Promise.all(creados.map((r) => publicarPersonaEnBase(base, { id: r.id, borradorEnVisto: r.borradorEn, quien: "Ana", cupo })));
+  assert.deepEqual(resultados.map((r) => r.ok).sort(), [false, true]);
+  assert.match(resultados.flatMap((r) => (r.ok ? [] : [r.detalle])).join(), /Líderes de área y proyecto lleva una sola persona en el sitio/);
+  assert.equal(await base.persona.count({ where: { id: { in: creados.map((r) => r.id) }, publicado: true } }), 1);
 });
