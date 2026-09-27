@@ -13,20 +13,22 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export MSYS_NO_PATHCONV=1
 
-versiones() { docker images ed-sitio --format '  {{.Tag}}  {{.CreatedAt}}' | grep -v '^ *actual '; }
+# Las imágenes llevan el nombre del proyecto (compose.yaml).
+sitio="$(docker compose config --no-interpolate | sed -n 's/^name: //p')-sitio"
+versiones() { docker images "$sitio" --format '  {{.Tag}}  {{.CreatedAt}}' | grep -v '^ *actual '; }
 
 if [ $# -ne 1 ]; then
   echo "Uso: scripts/volver.sh <versión>. Las que hay:"
   versiones
   exit 2
 fi
-if ! docker image inspect "ed-sitio:$1" >/dev/null 2>&1; then
-  echo "No hay una imagen ed-sitio:$1. Las que hay:" >&2
+if ! docker image inspect "$sitio:$1" >/dev/null 2>&1; then
+  echo "No hay una imagen $sitio:$1. Las que hay:" >&2
   versiones >&2
   exit 1
 fi
 
-docker tag "ed-sitio:$1" ed-sitio:actual
+docker tag "$sitio:$1" "$sitio:actual"
 # Solo `app`: las migraciones no vuelven atrás, y el resto no cambió.
 docker compose up -d --wait --no-deps app
 echo "Listo: corre $1."
