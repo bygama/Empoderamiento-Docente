@@ -8,7 +8,7 @@
 export { Aviso } from "./Aviso";
 export { Boton } from "./Boton";
 export { resolverCambio, type Cambio } from "./cambio";
-export { CampoFoto, type SubirFoto } from "./CampoFoto";
+export { CampoFoto, type ElegirFoto, type FotoElegible, type SubirFoto } from "./CampoFoto";
 export { Casilla } from "./Casilla";
 export { claseDeBoton, ENTRADA, type Variante } from "./clases";
 export { Fecha } from "./Fecha";

@@ -1,6 +1,6 @@
 import { use } from "react";
 import { CampoFoto, ListaFija, Parrafo, resolverCambio, Seleccion, TextoCorto, type Cambio } from "@ed/kit-admin";
-import { subirFoto } from "@/datos/acciones/fotos";
+import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import { valorVacio, type Descripcion } from "@/lib/contenido/descripcion";
 import { MAXIMO_BYTES, type ValorFoto } from "@/lib/contenido/fotos";
 import { resumirItem } from "@/lib/contenido/resumen";
@@ -75,6 +75,7 @@ export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false, col
           {...hoja}
           valor={valor && typeof valor === "object" ? (valor as ValorFoto) : (valorVacio(descripcion) as ValorFoto)}
           subir={subirFoto}
+          elegir={fotosParaElegir}
           maximoBytes={MAXIMO_BYTES}
         />
       );

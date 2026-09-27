@@ -155,5 +155,20 @@
   be visible»): la verificación va por el árbol de accesibilidad y `eval`.
   `pnpm typecheck` 0, `pnpm --filter sitio lint` 0,
   `node scripts/verificar-react-doctor.mjs` → 100/100 sin diagnósticos.
+  Commit `9c3ede43`.
+- **Paso 13 — elegir una foto ya subida**: `CampoFoto` (231 líneas) queda de
+  compositor y sus piezas pasan a `packages/kit-admin/src/campo-foto/`
+  (`MiniaturaConFoco`, `SubidaDeArchivo`, `ElegirYaSubida`), como pide
+  AI_GUIDELINES §2; suma `elegir` (el panel en línea, pedido en el clic) y
+  `conFoco`; el kit exporta `ElegirFoto` y `FotoElegible`. El editor de
+  páginas (`Campo.tsx`) y las dos fotos de una novedad le pasan
+  `fotosParaElegir`. README del kit y «Elegir una foto» en DESIGN.md §11.
+  react-doctor marcó un export de más en `SubidaDeArchivo` y se arregló. En
+  el navegador, en la ficha de `bolema-2025`: el panel trae 46 fotos (las 47
+  menos el SVG), el foco va al filtro, «pizarra» deja seis, elegir la primera
+  cambia la foto, cierra el panel, devuelve el foco a «Elegir una ya
+  subida…» y prende «Cambios sin guardar»; elegir la original lo apaga (no se
+  guardó nada). `pnpm typecheck` 0, `pnpm lint` 0,
+  `node scripts/verificar-react-doctor.mjs` → 100/100 (kit en 22 archivos).
 
 ## Abierto
