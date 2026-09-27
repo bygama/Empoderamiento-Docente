@@ -1,8 +1,19 @@
 import { Fragment } from "react";
-import { PALABRAS_REMATE } from "./data";
+import { fragmentos } from "@/lib/contenido/resaltado";
+
+/** La frase, palabra por palabra; cada una en verde si cae en una parte resaltada. */
+function palabras(frase: string): Array<{ palabra: string; verde: boolean }> {
+  return fragmentos(frase).flatMap((f) =>
+    f.texto
+      .split(/\s+/)
+      .filter((palabra) => palabra !== "")
+      .map((palabra) => ({ palabra, verde: f.resaltado })),
+  );
+}
 
 /** BEAT 4: «Vivir para hacer vivir» — las palabras convergen desde el blur. */
-export function BeatRemate() {
+export function BeatRemate({ frase, texto }: { frase: string; texto: string }) {
+  const lista = palabras(frase);
   return (
     <div
       data-beat="4"
@@ -12,17 +23,15 @@ export function BeatRemate() {
         className="font-display font-bold tracking-[-0.02em]"
         style={{ fontSize: "clamp(2.6rem, 1rem + 5.6vw, 5.4rem)", lineHeight: 1.05 }}
       >
-        {PALABRAS_REMATE.map((w, i) => (
-          <Fragment key={w}>
+        {lista.map(({ palabra, verde }, i) => (
+          <Fragment key={palabra}>
             <span
               data-fin-word
-              className={`inline-block ${
-                i === 0 || i === 3 ? "text-verde-concepto" : "text-white"
-              }`}
+              className={`inline-block ${verde ? "text-verde-concepto" : "text-white"}`}
             >
-              {w}
+              {palabra}
             </span>
-            {i < 3 ? " " : null}
+            {i < lista.length - 1 ? " " : null}
           </Fragment>
         ))}
       </h3>
@@ -35,8 +44,7 @@ export function BeatRemate() {
         data-fin-sub
         className="text-azul-claro/85 mt-7 max-w-[50ch] font-sans text-[1.02rem] leading-relaxed md:text-[1.15rem]"
       >
-        Para transformar el aprendizaje, el cuerpo docente necesita
-        primero vivir una nueva relación con la matemática.
+        {texto}
       </p>
     </div>
   );

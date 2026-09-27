@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef } from "react";
+import type { OrigenDeQuienesSomos } from "@/features/quienes-somos/contenido/origen";
+import { partirResaltado } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { crearOrigen } from "./origen/coreografia-origen";
@@ -45,12 +47,16 @@ import { BeatRemate } from "./origen/BeatRemate";
  * — VALIDAR con el cliente antes de publicar.
  * Reduced-motion / sin JS: los beats quedan apilados en flow, legibles.
  *
- * Piezas: contenido en `origen/data.ts`, clases compartidas en `estilos.ts`,
+ * Piezas: los textos y las fotos llegan por props
+ * (`contenido/origen.ts` o la base), la estructura en `origen/data.ts`,
+ * las clases compartidas en `estilos.ts`,
  * coreografía en `coreografia-origen.ts` (+ `estados-origen`,
  * `timeline-origen`, `panel-fotos`), markup en `PanelFotos`, `PilaresOrigen`,
  * `TrayectoriaHorizontal`, `TrayectoriaVertical` y `BeatRemate`.
  */
-export function OrigenEd() {
+export function OrigenEd({ contenido }: { contenido: OrigenDeQuienesSomos }) {
+  const { queEs, remate } = contenido;
+  const definicion = partirResaltado(queEs.titulo);
   const rootRef = useRef<HTMLElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
@@ -87,9 +93,9 @@ export function OrigenEd() {
             data-story-tilt
             className="relative h-full w-full [transform-style:preserve-3d] motion-reduce:h-auto"
           >
-            <PanelFotos />
+            <PanelFotos fotos={contenido.fotos} />
 
-            <PilaresOrigen />
+            <PilaresOrigen contenido={contenido} />
 
             {/* ── BEAT 3: qué es ED (definición institucional) ────────────────
                 Título grande (≈70% del titular de apertura) y la trayectoria
@@ -101,22 +107,23 @@ export function OrigenEd() {
               className="flex h-full flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24"
             >
               <span className="text-azul-claro/80 font-mono text-[0.78rem] font-medium tracking-[0.24em] uppercase">
-                Qué es Empoderamiento Docente
+                {queEs.volanta}
               </span>
               <h3
                 data-const-title
                 className="font-display mt-5 max-w-[26ch] text-balance font-bold tracking-[-0.02em] text-white"
                 style={{ fontSize: "clamp(1.7rem, 1rem + 2vw, 2.75rem)", lineHeight: 1.12 }}
               >
-                Una convicción convertida en{" "}
-                <span className="text-verde-concepto">investigación y acción</span>.
+                {definicion.antes}
+                {definicion.clave === null ? null : <span className="text-verde-concepto">{definicion.clave}</span>}
+                {definicion.despues}
               </h3>
 
-              <TrayectoriaHorizontal />
-              <TrayectoriaVertical />
+              <TrayectoriaHorizontal hitos={queEs.hitos} />
+              <TrayectoriaVertical hitos={queEs.hitos} />
             </div>
 
-            <BeatRemate />
+            <BeatRemate frase={remate.frase} texto={remate.texto} />
 
             {/* Indicador de progreso de la historia (5 beats) */}
             <div

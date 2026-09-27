@@ -1,5 +1,5 @@
 import { SplitChars } from "@/components/ui/SplitChars";
-import { PREGUNTA } from "./data";
+import type { OrigenDeQuienesSomos } from "@/features/quienes-somos/contenido/origen";
 import { PILAR_CUERPO, PILAR_TITULO } from "./estilos";
 import { Pilar } from "./Pilar";
 
@@ -11,7 +11,8 @@ import { Pilar } from "./Pilar";
  * línea. Fragment: los tres siguen siendo hijos directos de `[data-story-tilt]`
  * (la coreografía los superpone con `position: absolute`).
  */
-export function PilaresOrigen() {
+export function PilaresOrigen({ contenido }: { contenido: OrigenDeQuienesSomos }) {
+  const { origen, sentido, evolucion } = contenido;
   return (
     <>
       {/* ── BEAT 0 · 01 Origen ──────────────────────────────────────── */}
@@ -19,13 +20,12 @@ export function PilaresOrigen() {
         i={0}
         titulo={
           <h2 className={`${PILAR_TITULO} mx-auto md:mx-0 md:max-w-[13ch]`}>
-            <SplitChars text="No nacimos de una teoría." />
+            <SplitChars text={origen.titulo} />
           </h2>
         }
         cuerpo={
           <p className={PILAR_CUERPO}>
-            Nacimos en aulas reales, discutiendo la matemática a fondo con
-            docentes de distintos estados de México.
+            {origen.texto}
           </p>
         }
       />
@@ -53,27 +53,19 @@ export function PilaresOrigen() {
             >
               “
             </span>
-            <span className="block overflow-hidden">
-              <span data-quote-line className="block">
-                Estaba a punto de jubilarme.
+            {/* Tres renglones, cada uno en su máscara; el tercero en verde. */}
+            {sentido.cita.map((renglon, i) => (
+              <span key={renglon} className="block overflow-hidden">
+                <span data-quote-line className={i === 2 ? "text-verde-concepto block" : "block"}>
+                  {renglon}
+                </span>
               </span>
-            </span>
-            <span className="block overflow-hidden">
-              <span data-quote-line className="block">
-                Ahora quiero volver:
-              </span>
-            </span>
-            <span className="block overflow-hidden">
-              <span data-quote-line className="text-verde-concepto block">
-                quiero transformar el aula.
-              </span>
-            </span>
+            ))}
           </blockquote>
         }
         cuerpo={
           <p data-quote-sub className={PILAR_CUERPO}>
-            — Una profesora, al cerrar uno de los primeros encuentros de
-            formación docente en México.
+            {sentido.quien}
           </p>
         }
       />
@@ -86,7 +78,7 @@ export function PilaresOrigen() {
             data-type
             className={`${PILAR_TITULO} mx-auto md:mx-0 md:max-w-[15ch]`}
           >
-            <SplitChars text={PREGUNTA} />
+            <SplitChars text={evolucion.pregunta} />
             <span
               data-caret
               aria-hidden="true"
@@ -96,9 +88,7 @@ export function PilaresOrigen() {
         }
         cuerpo={
           <p data-sub className={PILAR_CUERPO}>
-            Esa convicción se volvió maestría, doctorado e investigación, y
-            después procesos de desarrollo profesional en México y
-            Argentina.
+            {evolucion.respuesta}
           </p>
         }
       />

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FOTOS } from "./data";
+import { estiloDeFoco, type ValorFoto } from "@/lib/contenido/fotos";
 import { GRILLA } from "./estilos";
 
 /**
@@ -9,7 +9,7 @@ import { GRILLA } from "./estilos";
  * muesca del borde izquierdo viaja con el scroll (reinterpretación sobria de
  * la referencia editorial). Solo desktop + motion. Lo anima `panel-fotos.ts`.
  */
-export function PanelFotos() {
+export function PanelFotos({ fotos }: { fotos: readonly ValorFoto[] }) {
   return (
     <div
       data-photo-panel
@@ -21,7 +21,7 @@ export function PanelFotos() {
             data-photo-lamina
             className="relative h-full w-full overflow-hidden rounded-[1.75rem] bg-white/[0.04] shadow-[0_60px_140px_-50px_rgb(0_0_0/0.7)]"
           >
-            {FOTOS.map((f, i) => (
+            {fotos.map((f, i) => (
               <div
                 key={f.src}
                 data-photo={i}
@@ -35,6 +35,7 @@ export function PanelFotos() {
                     fill
                     sizes="(max-width: 767px) 1px, (min-width: 1280px) 560px, 44vw"
                     className="object-cover"
+                    style={estiloDeFoco(f.foco)}
                   />
                 </div>
                 {/* Velos navy: integran la foto al sistema visual de la lámina */}
