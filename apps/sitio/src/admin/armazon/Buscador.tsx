@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ENTRADA } from "@/admin/campos/clases";
+import { ENTRADA } from "@ed/kit-admin";
 import { Boton } from "./Boton";
 import { claseDeBoton } from "./clases";
 

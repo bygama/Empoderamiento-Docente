@@ -1,10 +1,15 @@
+import { posicionDelFoco, type Foco, type ValorDeFoto } from "@ed/kit-admin/foto";
+
 // Cómo se muestra una foto guardada en el contenido: `src`, `alt` y el
 // `object-position` que sale del punto de foco (SPEC §4.4). Sin Zod y sin
 // sharp: lo importan componentes del navegador. El esquema del campo vive en
-// campos.ts y usa lo de acá.
+// campos.ts y usa lo de acá. Qué es una foto y su foco lo define el control
+// que la edita (`@ed/kit-admin/foto`, sin React): acá se re-exporta, así el
+// sitio y el admin dicen lo mismo.
 
-export type Foco = { x: number; y: number };
-export type ValorFoto = { src: string; alt: string; foco: Foco };
+export { posicionDelFoco };
+export type { Foco };
+export type ValorFoto = ValorDeFoto;
 
 /** 4 MB: Vercel corta el cuerpo de una función en 4,5 MB (DECISIONS, 3). Se chequea en el navegador y en el servidor. */
 export const MAXIMO_BYTES = 4 * 1024 * 1024;
@@ -30,11 +35,6 @@ const SRC_PERMITIDO = new RegExp(
 
 export function esSrcDeFoto(src: string): boolean {
   return SRC_PERMITIDO.test(src);
-}
-
-/** `{ x: 0.25, y: 0.5 }` → `"25% 50%"`, lo que `object-position` entiende. */
-export function posicionDelFoco(foco: Foco): string {
-  return `${Math.round(foco.x * 100)}% ${Math.round(foco.y * 100)}%`;
 }
 
 /**

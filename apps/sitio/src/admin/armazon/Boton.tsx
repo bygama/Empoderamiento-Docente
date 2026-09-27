@@ -1,25 +1,14 @@
 import Link from "next/link";
-import { claseDeBoton, type Variante } from "./clases";
+import { claseDeBoton, type Variante } from "@ed/kit-admin";
 
-type PropsDeBoton = {
-  variante: Variante;
-  /** Está sobre `azul-principal` (DESIGN.md §11, la columna «sobre azul»). */
-  sobreAzul?: boolean;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
-
-/**
- * Un botón del admin, en una de las cuatro variantes de DESIGN.md §11. No se
- * deshabilita para explicar algo: solo mientras corre una acción, y el que
- * corre lo dice («Guardando…») y lleva `aria-busy`, que lo deja a opacidad
- * plena mientras los demás esperan.
- */
-export function Boton({ variante, sobreAzul = false, type = "button", className, ...props }: PropsDeBoton) {
-  return <button type={type} {...props} className={`${claseDeBoton(variante, sobreAzul)} ${className ?? ""}`} />;
-}
+// El botón vive en el kit, con los controles que lo usan
+// (work/novedades-y-kit/DECISIONS, A).
+// Se va con la mudanza de armazon al kit.
+export { Boton } from "@ed/kit-admin";
 
 type PropsDeEnlace = { variante: Variante } & React.ComponentProps<typeof Link>;
 
-/** Un link con cara de botón: navega, no hace. */
+/** Un link con cara de botón (DESIGN.md §11): navega, no hace. */
 export function BotonEnlace({ variante, className, ...props }: PropsDeEnlace) {
   return <Link {...props} className={`${claseDeBoton(variante)} ${className ?? ""}`} />;
 }

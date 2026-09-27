@@ -34,7 +34,7 @@ export function PieDelCampo({ nombre, largo, aviso, error }: { nombre: string; l
           {error}
         </p>
       ) : null}
-      {/* maxLength corta la tecla en silencio: sin esto, quien edita no entiende por qué dejó de escribir (Importante 2 de la revisión). */}
+      {/* maxLength corta la tecla en silencio: sin esto, quien edita no entiende por qué dejó de escribir. */}
       {/* El span vive siempre en el DOM y solo cambia el texto: si naciera junto con el texto, el lector de pantalla puede no llegar a anunciarlo. */}
       <span className="sr-only" aria-live="polite">
         {largo.alTope ? "Llegaste al máximo de caracteres." : ""}

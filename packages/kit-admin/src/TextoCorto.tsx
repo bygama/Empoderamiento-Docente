@@ -1,6 +1,5 @@
-import type { Recomendado } from "@/lib/contenido/descripcion";
 import { ENTRADA } from "./clases";
-import { estadoDelLargo, idsQueDescriben } from "./largo";
+import { estadoDelLargo, idsQueDescriben, type Recomendado } from "./largo";
 import { Contador, PieDelCampo } from "./PieDelCampo";
 
 type Props = {
@@ -17,10 +16,10 @@ type Props = {
 };
 
 // Por encima de esto, una sola línea obliga a scrollear adentro del campo
-// para ver lo escrito (la bajada del hero, de 140, se cortaba a la mitad).
+// para ver lo escrito (una bajada de 140 se cortaba a la mitad).
 const LARGO_EN_DOS_RENGLONES = 80;
 
-/** Una línea con su largo máximo a la vista y un contador (SPEC §2). */
+/** Una línea con su largo máximo a la vista y un contador. */
 export function TextoCorto({ nombre, etiqueta, maximo, recomendado, ayuda, valor, alCambiar, error }: Props) {
   const idCampo = `${nombre}-campo`;
   const largo = estadoDelLargo(valor.length, maximo, recomendado);

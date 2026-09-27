@@ -1,15 +1,10 @@
 import { use } from "react";
+import { CampoFoto, ListaFija, Parrafo, resolverCambio, Seleccion, TextoCorto, type Cambio } from "@ed/kit-admin";
 import { subirFoto } from "@/datos/acciones/fotos";
 import { valorVacio, type Descripcion } from "@/lib/contenido/descripcion";
-import type { ValorFoto } from "@/lib/contenido/fotos";
+import { MAXIMO_BYTES, type ValorFoto } from "@/lib/contenido/fotos";
 import { resumirItem } from "@/lib/contenido/resumen";
-import { resolverCambio, type Cambio } from "./cambio";
-import { CampoFoto } from "./CampoFoto";
 import { ContextoDeErrores, errorDe, estaEn } from "./errores";
-import { ListaFija } from "./ListaFija";
-import { Parrafo } from "./Parrafo";
-import { RutaInterna } from "./RutaInterna";
-import { TextoCorto } from "./TextoCorto";
 
 export type PropsDeCampo = {
   /** Camino del campo («hero.tarjetas.0.foto»): solo para ids únicos. */
@@ -43,11 +38,11 @@ export type PropsDeCampo = {
  * `ListaFija`), para no pisar una edición hecha en otro campo mientras algo
  * todavía no resolvió.
  *
- * Es el único archivo de `admin/campos/` que conoce `Descripcion`, `datos/` y
- * los errores del último guardado (`errores.ts`): los controles reciben props
- * planas (etiqueta, ayuda, máximo, su `error`…) y la subida de fotos por
- * prop, para mudarse a `packages/kit-admin` en la fase 2 sin llevarse este
- * dibujante (AGENTS.md §12). Un control que cambia borra su error.
+ * Los controles son los de `@ed/kit-admin`, que no conocen este dibujante:
+ * reciben props planas (etiqueta, ayuda, máximo, su `error`…) y la subida de
+ * fotos por prop (AGENTS.md §12). Este archivo es el que conoce `Descripcion`,
+ * `datos/` y los errores del último guardado (`errores.ts`), y se queda en la
+ * app. Un control que cambia borra su error.
  */
 export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false, columnas = false }: PropsDeCampo) {
   const { errores, limpiar } = use(ContextoDeErrores);
@@ -69,7 +64,8 @@ export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false, col
     case "parrafo":
       return <Parrafo {...hoja} maximo={descripcion.maximo} valor={texto} />;
     case "rutaInterna":
-      return <RutaInterna {...hoja} opciones={descripcion.opciones} valor={texto} />;
+      // Una ruta se lee como es: la etiqueta de cada opción es la ruta misma.
+      return <Seleccion {...hoja} opciones={descripcion.opciones.map((ruta) => ({ valor: ruta, etiqueta: ruta }))} sinElegir="Elegí una ruta" valor={texto} />;
     case "foto":
       // Si el valor no es un objeto (nulo, viejo, corrupto), lo reemplaza un
       // vacío del mismo tipo: los dos `as ValorFoto` son seguros porque acá
@@ -79,6 +75,7 @@ export function Campo({ nombre, descripcion, valor, alCambiar, raiz = false, col
           {...hoja}
           valor={valor && typeof valor === "object" ? (valor as ValorFoto) : (valorVacio(descripcion) as ValorFoto)}
           subir={subirFoto}
+          maximoBytes={MAXIMO_BYTES}
         />
       );
     case "listaFija":

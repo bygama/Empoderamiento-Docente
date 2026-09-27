@@ -1,7 +1,12 @@
-import type { Recomendado } from "@/lib/contenido/descripcion";
-
 // El largo de un texto contra su tope duro (`maxLength`) y, si lo tiene,
 // contra su largo recomendado. Lo comparten `TextoCorto` y `Parrafo`.
+
+/**
+ * Un largo que conviene no pasar sin que sea un tope (un buscador corta el
+ * título hacia los 60 caracteres). Pasado, el control lo dice con `aviso`,
+ * pero guarda igual: es un aviso, no un error.
+ */
+export type Recomendado = { largo: number; aviso: string };
 
 export type Largo = {
   /** Por encima del tope: solo con un valor guardado antes de bajar el máximo, porque el control no deja escribir de más. Es un aviso de un dato viejo, no el límite. */

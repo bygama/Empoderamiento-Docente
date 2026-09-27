@@ -1,9 +1,14 @@
 import { ENTRADA } from "./clases";
 
+/** Una opción: lo que se guarda y lo que se lee. */
+export type Opcion = { valor: string; etiqueta: string };
+
 type Props = {
   nombre: string;
   etiqueta: string;
-  opciones: string[];
+  opciones: readonly Opcion[];
+  /** Lo que dice el campo cuando el valor guardado no está en la lista («Elegí una ruta»). */
+  sinElegir: string;
   ayuda?: string;
   valor: string;
   alCambiar: (valor: string) => void;
@@ -11,9 +16,13 @@ type Props = {
   error?: string;
 };
 
-/** Un enlace interno se elige de la lista cerrada de rutas del sitio (SPEC §2): no hay enlaces libres. */
-export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambiar, error }: Props) {
-  const conocida = opciones.includes(valor);
+/**
+ * Un valor de una lista cerrada: no hay texto libre. Si el valor guardado ya
+ * no está en la lista (la lista cambió), se ve que falta elegir, y se lee
+ * `sinElegir`.
+ */
+export function Seleccion({ nombre, etiqueta, opciones, sinElegir, ayuda, valor, alCambiar, error }: Props) {
+  const conocida = opciones.some((o) => o.valor === valor);
   const idCampo = `${nombre}-campo`;
   const idAyuda = `${nombre}-ayuda`;
   const idError = `${nombre}-error`;
@@ -36,11 +45,10 @@ export function RutaInterna({ nombre, etiqueta, opciones, ayuda, valor, alCambia
         onChange={(e) => alCambiar(e.target.value)}
         className={`mt-1 ${ENTRADA}`}
       >
-        {/* Si el valor guardado ya no está en la lista, que se vea que falta elegir. */}
-        {conocida ? null : <option value="">Elegí una ruta</option>}
-        {opciones.map((ruta) => (
-          <option key={ruta} value={ruta}>
-            {ruta}
+        {conocida ? null : <option value="">{sinElegir}</option>}
+        {opciones.map((o) => (
+          <option key={o.valor} value={o.valor}>
+            {o.etiqueta}
           </option>
         ))}
       </select>
