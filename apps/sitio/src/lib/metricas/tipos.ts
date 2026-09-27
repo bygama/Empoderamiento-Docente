@@ -17,3 +17,9 @@ export type FilaDiaria = {
   vistas: number;
   visitantes: number;
 };
+
+/**
+ * Un filtro por país de la copia: un país, o todos menos unos. Códigos ISO
+ * alfa-2. Cada fuente lo traduce a su sintaxis (`cliente.ts`).
+ */
+export type FiltroDePais = { pais: string } | { fueraDe: readonly string[] };
