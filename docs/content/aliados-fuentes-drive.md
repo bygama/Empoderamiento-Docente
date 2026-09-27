@@ -6,8 +6,10 @@ dentro de «EQUIPO ALIANZAS CVS PAGINA»), la hoja ALIANZAS ED de `EQUIPO Y ALIA
 carpeta.
 
 Regla: en la web van **solo** los logos que ED puso en esa carpeta (AGENTS.md §5.4). La lista
-única vive en `apps/sitio/src/config/aliados.ts` y la usan la tira de la home (`DatosDuros.tsx`) y el
-Footer. Si ED suma un logo a la carpeta, se agrega ahí; si no está en la carpeta, no se publica.
+vive en la tabla `aliados` (desde el 2026-09-27; antes, en `config/aliados.ts`) y la usan la tira
+del pie, la del Inicio (`DatosDuros.tsx`) y la de Qué hacemos. Si ED suma un logo a la carpeta, se
+agrega en `/admin/contenido/aliados` y quien dirige o administra le pone la marca «Autorizado» con
+la nota de dónde consta; sin la marca no se publica, y si no está en la carpeta, no se marca.
 
 ## 1. Los cinco que están
 
