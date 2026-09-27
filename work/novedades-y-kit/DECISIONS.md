@@ -43,3 +43,14 @@
 - 2026-09-26 — **Las fechas de la tabla son `TIMESTAMP(3)`, como las de las
   demás tablas**, y no `timestamptz` como decía el SPEC §4: lo que manda es
   que el esquema sea uno solo.
+- 2026-09-27 — **El padre (mensaje del 2026-09-27): `main` trae de la lane 7
+  `Buscador`, `Volver`, `Filtro`, `Confirmacion`, la casilla, el número de la
+  sidebar y de las pestañas, y la tabla `avisos`.** Al rebasear se consumen y
+  no quedan dos; si una no alcanza, se extiende en su archivo y en §11. Rebasé
+  sobre `490547f` después del paso 7: `Buscador` importaba `ENTRADA` de
+  `admin/campos/clases`, que esta lane mudó al kit, y sigue el import
+  (`2876603`). **La casilla de `main` es una regla de §11, no un componente**
+  (la nativa, `accent-azul-principal`, 16 px, la etiqueta la envuelve, meta
+  medium cuando prende un campo): la `Casilla` del kit es esa misma regla hecha
+  componente, así que no hay dos versiones; §11 pasa a nombrarla. Las
+  pantallas de Novedades usan `Buscador`, `Volver` y `Confirmacion` de `main`.

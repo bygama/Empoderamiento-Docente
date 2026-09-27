@@ -123,6 +123,51 @@
   el 3024: el RSS da 9 `<item>` y `Content-Type: application/rss+xml;
   charset=utf-8`; `/novedades/relime-2025/imagen-para-redes` → `200
   image/png`; una ficha o una imagen que no existe → 404.
+- **Rebase sobre `main` (`490547f`, con Mensajes)**, pedido por el padre
+  (DECISIONS, 2026-09-27): sin conflictos; `Buscador` seguía el import
+  viejo de `ENTRADA` → `2876603`. `pnpm migrate:deploy` aplicó
+  `20260926231819_mensajes` en `ed_novedades` (la nuestra, `…002934`, va
+  después); `migrate:status` al día; typecheck, lint y `pnpm test` (kit 3/3,
+  auth 28/28, sitio 229 pass, 0 fail, 1 skipped, el de A1) en verde.
+- **Paso 8 — la página Novedades se edita** (`70410f6`). Seis secciones en
+  `features/novedades/contenido/` (`hero`, `destacadas`, `ultimas`,
+  `movimiento` con el acento validado contra la frase, `lanzamientos` con la
+  tarjeta del final, que el INVENTARIO no listaba y es copy visible,
+  `cierre` con los dos textos según haya redes) y `seoDeNovedadesInicial`; la
+  línea de `novedades` en `contenido/paginas.ts`. Los componentes reciben su
+  `contenido`; `EdEnMovimiento` (226) y `LanzamientosRecientes` (239) se
+  parten al tocarlos: `coreografia-movimiento.ts` y `lanzamientos/`
+  (`useRiel`, `Lanzamiento`, `FinalDelRiel`). Las listas fijas usan el texto
+  de clave (react-doctor frena la del índice). `openGraphDeLaPagina` en
+  `config/metadata.ts`, igual a la de la 4c (que todavía no está en `main`):
+  sin eso, el `openGraph` de la página pisaba la imagen del sitio. El
+  `data.ts` se borra. Aceptación: `pnpm --filter sitio test` 229/0/1, lint,
+  react-doctor 100/100, `pnpm build`; `comparar-render` contra la base vieja:
+  en `novedades.html` las mismas 803 palabras y los mismos 51 links (solo el
+  orden de §7.2), y en la cabecera el RSS y el SEO propio (og/twitter title y
+  description de la página, con la misma imagen del sitio); en las dos fichas
+  solo la cabecera (og/twitter con el título, la bajada y la imagen
+  generada). Contacto y `sumate-al-equipo` difieren por Mensajes, que esta
+  rama no toca.
+- **Paso 9 — escribir en la base** (`cc0ba61`, `8321173`, `43a9657`).
+  `modelo.ts` pasaba las 100 líneas: fechas a `fechas.ts` y los nombres de
+  los campos (`dondeEsta`) a `etiquetas.ts`. `datos/acciones/novedades-en-base.ts`
+  (errores por campo, slug ocupado —publicado o en un borrador, con
+  `borrador.path`—, `tituloDe`, `columnasDe`, `borradorSinTapa`),
+  `editar-novedades.ts` (crear, guardar, descartar, borrar) y
+  `publicar-novedades.ts` (publicar con la destacada única y el 308 sin
+  cadenas, despublicar). `choqueCon` dice qué se abrió. Aceptación: `tsx
+  --test` de `editar-novedades.test.ts` 3/3 y `publicar-novedades.test.ts`
+  4/4, sin saltear; después, la destacada de verdad sigue siendo
+  `relime-2025` y hay 9 filas. React-doctor pidió el `Promise.all` al soltar
+  las destacadas (`43a9657`).
+- **Paso 10 — las acciones del admin** (`5e271b5`). `novedades.ts` (crear,
+  guardar, borrar), `ciclo-de-novedades.ts` (publicar, despublicar,
+  descartar), `abrirVistaPreviaDeNovedad` en `vista-previa.ts`,
+  `revalidar-novedades.ts` y `datos/vista-previa.ts` (`encenderVistaPrevia`,
+  sin «use server»). Cuatro tipos en `datos/actividad.ts`. Partidas en tres
+  para quedar bajo 100 líneas. Aceptación: `acciones-con-sesion.test.ts` y
+  `actividad.test.ts` 17/17; lint; react-doctor 100/100.
 
 ## Abierto
 
