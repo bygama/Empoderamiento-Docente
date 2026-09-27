@@ -55,3 +55,22 @@
   largos de hoy y de lo que la escena aguanta (la pregunta, dos renglones de
   48ch en la tapa; el indicio, una caja de `h-5`). Los dos
   `origen-03-pregunta.webp` son idénticos byte a byte.
+- 2026-09-27 — **Rebase sobre `main` en `782aeb27` (la lane de Ajustes)**,
+  como pidió el padre antes del `worker_done`. Conflictos, resueltos juntando
+  las dos lanes: los tipos, las frases y quién ve cada cosa en la actividad
+  (los de Ajustes primero, los de esta lane después); el layout del sitio lee
+  los datos del sitio y los aliados en un `Promise.all` y el `Footer` recibe
+  los dos (`sitio` y `aliados`); el renglón de §11 de DESIGN.md, el árbol de
+  AGENTS.md §3 y el resumen del README suman las dos cosas. Las cuatro
+  migraciones de Ajustes tienen fecha anterior a las de esta lane: el orden
+  del historial queda Ajustes → fotos, casos, aliados, igual que en
+  producción. La columna nueva `redirecciones.a_mano` tiene default `false`,
+  así que las 308 que escribe `redirigir` al cambiar el slug de un caso
+  quedan como «del sitio», que Ajustes no deja borrar: es lo que corresponde.
+  `config/rutas.ts` (nuevo en `main`) declaraba la carpeta
+  `public/quienes-somos/`, que esta lane borró al deduplicar
+  `origen-03-pregunta.webp`: se saca de la lista. Las rutas nuevas del admin
+  y `/api/fotos/[id]` ya están cubiertas por `/admin/[[...todo]]` y
+  `/api/[[...todo]]`. Queda en la rama local
+  `respaldo/casos-aliados-fotos-pre-rebase` (no se sube) por si hace falta
+  comparar.

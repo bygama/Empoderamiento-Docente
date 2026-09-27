@@ -31,7 +31,7 @@ export const RUTAS_DE_LA_APP: readonly RutaDeclarada[] = [
   { ruta: "/api/[[...todo]]", contesta: "sola" },
   // Lo que empieza con «_» es interno de Next (/_next, /_not-found, /_global-error): nunca pasa por la atrapa-todo.
   { ruta: "/_*/[[...todo]]", contesta: "sola" },
-  ...["aliados", "biblioteca", "brand", "equipo", "firma", "fotos", "investigacion", "novedades", "quienes-somos"].map((carpeta) => ({
+  ...["aliados", "biblioteca", "brand", "equipo", "firma", "fotos", "investigacion", "novedades"].map((carpeta) => ({
     ruta: `/${carpeta}`,
     contesta: "archivos" as const,
   })),
