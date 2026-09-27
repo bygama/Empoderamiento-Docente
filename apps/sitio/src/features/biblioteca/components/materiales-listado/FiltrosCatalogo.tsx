@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Search } from "@/components/ui/icons";
-import { ANIOS, PUBLICOS, TIPOS } from "@/features/biblioteca/data/materiales";
+import { PUBLICOS, TIPOS } from "@/features/biblioteca/contenido/modelo";
 import type { Filtros } from "./filtros";
 
 function Pildora({
@@ -71,9 +71,11 @@ function FiltroGrupo({
  * píldoras (tipo, público, año), sticky en desktop. El tema NO tiene grupo
  * propio: el sidebar tiene que entrar completo en un viewport de laptop
  * (~800px) y era el grupo más alto; sigue como chip en cada fila y la
- * búsqueda lo matchea. El estado vive en el listado.
+ * búsqueda lo matchea. El estado vive en el listado, y los años salen de los
+ * materiales que tiene.
  */
 export function FiltrosCatalogo({
+  anios,
   busqueda,
   filtros,
   hayFiltros,
@@ -81,6 +83,7 @@ export function FiltrosCatalogo({
   onCambiar,
   onLimpiar,
 }: {
+  anios: readonly number[];
   busqueda: string;
   filtros: Filtros;
   hayFiltros: boolean;
@@ -139,7 +142,7 @@ export function FiltrosCatalogo({
       />
       <FiltroGrupo
         label="Año"
-        opciones={ANIOS.map(String)}
+        opciones={anios.map(String)}
         valor={filtros.anio === null ? null : String(filtros.anio)}
         onChange={(anio) =>
           onCambiar({ anio: anio === null ? null : Number(anio) })

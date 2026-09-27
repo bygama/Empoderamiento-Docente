@@ -1,4 +1,4 @@
-import { TIPOS } from "@/features/biblioteca/data/materiales";
+import { TIPOS } from "@/features/biblioteca/contenido/modelo";
 
 // El estado de los filtros del catálogo y su ida y vuelta con la URL.
 

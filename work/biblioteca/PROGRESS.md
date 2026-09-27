@@ -43,3 +43,22 @@
   4 destacados (1 a 4), 3 con `autores` escrita, 37 citas guardadas; 134
   autorías, 69 con persona (13 personas distintas); 0 materiales sin autoría;
   `pnpm typecheck` → exit 0.
+
+- **Paso 3 — el sitio lee los materiales de la base.**
+  `datos/consultas/materiales.ts` (`materialesVisibles`, pura;
+  `materialesDelSitio` y `destacadosDelSitio` con `cache` y `leerSinRomper`;
+  `publicadoDe`) y `features/biblioteca/contenido/del-sitio.ts`
+  (`materialDelSitio`: la firma, la fecha que se lee, la portada propia o la
+  generada, la cita guardada o la generada con el link absoluto;
+  `destacadosDe`: uno por lugar). La página de la Biblioteca pasa los
+  materiales y los destacados por props a `MaterialesListado` (los años del
+  filtro salen de ellos), a `DestacadosBiblioteca` y sus tres piezas
+  (`DestacadoDelSitio`: `frase` en lugar de `tagline`), y el Inicio a
+  `BibliotecaNovedades`. Las listas cerradas salen de `contenido/modelo.ts`.
+  `data/materiales.ts` queda solo para Novedades (paso 4). Aceptación:
+  `pnpm exec tsx --test src/datos/consultas/materiales.test.ts` → 4 pass;
+  `tsc --noEmit` → exit 0; `pnpm build` → exit 0; `node
+  scripts/comparar-render.mjs "$LOCALAPPDATA/Temp/ed-biblioteca-base"
+  apps/sitio` → «12 páginas, render idéntico», exit 0 (el JS de la Biblioteca
+  y del Inicio baja unos 91 KB: el catálogo ya no viaja en el bundle, viaja
+  como props).

@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Catalogo } from "@/features/biblioteca/contenido/catalogo";
+import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
 import { getLenis } from "@/lib/lenis";
 import { EVENTO_URL } from "@/lib/navegar";
-import { MATERIALES } from "../data/materiales";
 import { FilaMaterial } from "./materiales-listado/FilaMaterial";
 import { FiltrosCatalogo } from "./materiales-listado/FiltrosCatalogo";
 import {
@@ -32,10 +32,11 @@ const PASO = 8;
  * (como la referencia), "Todos" lo destilda. Sin animación de entrada — es
  * una sección utilitaria y el contenido cambia con los filtros. Se muestra
  * de a PASO filas con «Ver más»: con 57 piezas la página no puede ser un
- * rollo. El aviso sin resultados llega por props (de
- * `features/biblioteca/contenido/catalogo.ts` o de la base).
+ * rollo. Los materiales llegan por props, de la base; el aviso sin
+ * resultados también (de `features/biblioteca/contenido/catalogo.ts` o de
+ * la base).
  */
-export function MaterialesListado({ contenido }: { contenido: Catalogo }) {
+export function MaterialesListado({ contenido, materiales }: { contenido: Catalogo; materiales: readonly MaterialDelSitio[] }) {
   const [busqueda, setBusqueda] = useState("");
   const [filtros, setFiltros] = useState<Filtros>(SIN_FILTROS);
   // Tramos extra pedidos con «Ver más», atados a la búsqueda con la que se
@@ -60,6 +61,9 @@ export function MaterialesListado({ contenido }: { contenido: Catalogo }) {
       window.removeEventListener("popstate", leer);
     };
   }, []);
+
+  // Los años del filtro, de más nuevo a más viejo: los que tiene el catálogo.
+  const anios = useMemo(() => [...new Set(materiales.map((m) => m.anio))].sort((a, b) => b - a), [materiales]);
 
   const hayFiltros =
     busqueda !== "" || Object.values(filtros).some((v) => v !== null);
@@ -112,7 +116,7 @@ export function MaterialesListado({ contenido }: { contenido: Catalogo }) {
 
   const resultados = useMemo(() => {
     const q = normalizar(busqueda.trim());
-    return MATERIALES.filter((m) => {
+    return materiales.filter((m) => {
       if (filtros.tipo && m.tipo !== filtros.tipo) return false;
       if (filtros.publico && m.publico !== filtros.publico) return false;
       if (filtros.anio && m.anio !== filtros.anio) return false;
@@ -121,7 +125,7 @@ export function MaterialesListado({ contenido }: { contenido: Catalogo }) {
         `${m.titulo} ${m.autores} ${m.descripcion} ${m.tema} ${m.tipo}`,
       ).includes(q);
     });
-  }, [busqueda, filtros]);
+  }, [busqueda, filtros, materiales]);
 
   const firma = `${busqueda}|${filtros.tipo}|${filtros.publico}|${filtros.anio}`;
   const extraActivo = extra.firma === firma ? extra.n : 0;
@@ -147,6 +151,7 @@ export function MaterialesListado({ contenido }: { contenido: Catalogo }) {
         <div className="grid gap-y-10 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-x-14">
           {/* ── Sidebar: buscador + filtros (sticky en desktop) ─────────── */}
           <FiltrosCatalogo
+            anios={anios}
             busqueda={busqueda}
             filtros={filtros}
             hayFiltros={hayFiltros}
@@ -171,7 +176,7 @@ export function MaterialesListado({ contenido }: { contenido: Catalogo }) {
               <>
                 <ul className="divide-azul-principal/10 mt-2 divide-y">
                   {resultados.slice(0, visibles).map((m) => (
-                    <li key={m.titulo}>
+                    <li key={m.id}>
                       <FilaMaterial material={m} />
                     </li>
                   ))}

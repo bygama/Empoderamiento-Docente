@@ -1,10 +1,12 @@
 import Image from "next/image";
 import type { RefObject } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { accionDe, type ItemDestacado } from "@/features/biblioteca/data/materiales";
+import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material";
+import { accionDe } from "@/features/biblioteca/contenido/modelo";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
 
 type ArticuloDestacadoProps = {
-  item: ItemDestacado;
+  item: DestacadoDelSitio;
   i: number;
   activo: number;
   reduced: boolean;
@@ -20,7 +22,8 @@ type ArticuloDestacadoProps = {
  * reduced-motion la imagen va inline.
  */
 export function ArticuloDestacado({ item, i, activo, reduced, refItem, refSlot }: ArticuloDestacadoProps) {
-  const { titulo, tagline, detalle, material } = item;
+  const { frase, detalle, material } = item;
+  const { titulo } = material;
   // Con reduced-motion no hay pila fija: las imágenes inline se muestran
   // también en desktop.
   const claseImagenInline = reduced ? "" : "lg:hidden";
@@ -48,11 +51,12 @@ export function ArticuloDestacado({ item, i, activo, reduced, refItem, refSlot }
           className={`${claseImagenInline} bg-azul-medio/25 relative mb-6 aspect-[16/9] overflow-hidden rounded-xl`}
         >
           <Image
-            src={material.portada}
+            src={material.portada.src}
             alt=""
             fill
             sizes="100vw"
             className="object-cover"
+            style={estiloDeFoco(material.portada.foco)}
           />
         </div>
 
@@ -67,7 +71,7 @@ export function ArticuloDestacado({ item, i, activo, reduced, refItem, refSlot }
           {titulo}
         </h3>
         <p className="text-verde-concepto mt-3 font-sans text-[1.05rem] font-semibold">
-          {tagline}
+          {frase}
         </p>
         <p className="mt-6 max-w-[58ch] font-sans text-[0.98rem] leading-relaxed text-white/80">
           {material.descripcion}

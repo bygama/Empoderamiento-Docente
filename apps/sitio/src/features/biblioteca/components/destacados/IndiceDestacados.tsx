@@ -1,4 +1,4 @@
-import type { ItemDestacado } from "@/features/biblioteca/data/materiales";
+import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material";
 
 /** Índice lateral sticky (solo desktop): marca el artículo en foco y navega. */
 export function IndiceDestacados({
@@ -6,7 +6,7 @@ export function IndiceDestacados({
   activo,
   onIr,
 }: {
-  items: ReadonlyArray<ItemDestacado>;
+  items: ReadonlyArray<DestacadoDelSitio>;
   activo: number;
   onIr: (i: number) => void;
 }) {
@@ -17,8 +17,8 @@ export function IndiceDestacados({
           Destacados
         </p>
         <ul>
-          {items.map(({ titulo, rotulo }, i) => (
-            <li key={titulo} className="border-b border-white/12">
+          {items.map(({ material, rotulo }, i) => (
+            <li key={material.id} className="border-b border-white/12">
               <button
                 type="button"
                 aria-current={activo === i}

@@ -1,5 +1,6 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { openGraphDeLaPagina } from "@/config/metadata";
+import { destacadosDelSitio, materialesDelSitio } from "@/datos/consultas/materiales";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { BibliotecaHero } from "@/features/biblioteca/components/BibliotecaHero";
 import { DestacadosBiblioteca } from "@/features/biblioteca/components/DestacadosBiblioteca";
@@ -18,12 +19,17 @@ export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Pr
 
 export default async function BibliotecaPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, destacados, catalogo, puente, cierre } = await contenidoDe("biblioteca");
+  // Los materiales y los destacados, de la base (sin base, ninguno).
+  const [{ hero, destacados, catalogo, puente, cierre }, materiales, materialesDestacados] = await Promise.all([
+    contenidoDe("biblioteca"),
+    materialesDelSitio(),
+    destacadosDelSitio(),
+  ]);
   return (
     <main id="contenido" tabIndex={-1}>
       <BibliotecaHero contenido={hero} />
-      <DestacadosBiblioteca contenido={destacados} />
-      <MaterialesListado contenido={catalogo} />
+      <DestacadosBiblioteca contenido={destacados} destacados={materialesDestacados} />
+      <MaterialesListado contenido={catalogo} materiales={materiales} />
       <PuenteInvestigacion contenido={puente} />
       <CierreBiblioteca contenido={cierre} />
     </main>

@@ -62,7 +62,7 @@ export const NAV_LINKS: readonly NavItem[] = [
     href: "/biblioteca",
     // Los tipos de material llegan con el filtro del catálogo ya aplicado
     // (MaterialesListado lee `?tipo=` de la URL). Los valores son los de
-    // TIPOS en features/biblioteca/data/materiales.ts.
+    // TIPOS en features/biblioteca/contenido/modelo.ts.
     submenu: [
       { label: "Destacados", href: "/biblioteca#destacados" },
       { label: "Artículos", href: "/biblioteca?tipo=Art%C3%ADculos#materiales" },

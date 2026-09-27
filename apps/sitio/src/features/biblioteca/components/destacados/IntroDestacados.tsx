@@ -1,7 +1,8 @@
 import Image from "next/image";
 import type { RefObject } from "react";
 import type { Destacados } from "@/features/biblioteca/contenido/destacados";
-import type { ItemDestacado } from "@/features/biblioteca/data/materiales";
+import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { fragmentos } from "@/lib/contenido/resaltado";
 
 /**
@@ -37,7 +38,7 @@ export function IntroDestacados({
   refRow,
 }: {
   contenido: Destacados;
-  items: ReadonlyArray<ItemDestacado>;
+  items: ReadonlyArray<DestacadoDelSitio>;
   refRow: RefObject<HTMLDivElement | null>;
 }) {
   return (
@@ -69,18 +70,19 @@ export function IntroDestacados({
           ref={refRow}
           className="z-30 mt-10 grid grid-cols-2 gap-3 md:col-span-9 md:mt-0 md:grid-cols-4 md:gap-4"
         >
-          {items.map(({ titulo, material }) => (
+          {items.map(({ material }) => (
             <div
-              key={titulo}
+              key={material.id}
               data-viajera
               className="bg-azul-claro/30 relative aspect-[3/4] overflow-hidden rounded-xl"
             >
               <Image
-                src={material.portada}
+                src={material.portada.src}
                 alt=""
                 fill
                 sizes="(min-width: 768px) 25vw, 50vw"
                 className="object-cover"
+                style={estiloDeFoco(material.portada.foco)}
               />
             </div>
           ))}

@@ -21,7 +21,7 @@ import {
  * esta lista a `features/biblioteca/data/` para compartirla con el listado.
  */
 const CATEGORIAS: { label: string; Icon: (p: IconProps) => React.JSX.Element }[] = [
-  // Los rótulos son los TIPOS de data/materiales.ts, tal cual: el riel
+  // Los rótulos son los TIPOS de contenido/modelo.ts, tal cual: el riel
   // filtra por ese texto.
   { label: "Todo el catálogo", Icon: Compass },
   { label: "Artículos", Icon: BookOpen },
