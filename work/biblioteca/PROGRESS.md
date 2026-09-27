@@ -176,3 +176,25 @@
   3,6 s, 7,1 s, 18,1 s y 2,8 s; 15 + 15 + 15 + 12 = los 57; ningún roto; ERIC
   sin respuesta (8 s), ResearchGate 403 (sin respuesta, como se quería: no es
   roto), Acta Scientiae sin chequear (`http:`).
+
+- **Paso 10 — la lista del admin.** `(protegido)/biblioteca/`: `layout.tsx`
+  con `<Guarda capacidad="editarBiblioteca">`, `error.tsx` y `page.tsx` (la
+  sesión y `puede` antes de leer). `admin/biblioteca/`: `filtros.ts` (tipo,
+  estado, salud, lo buscado y la página, validados con Zod en el borde),
+  `PantallaDeBiblioteca.tsx` (los tres filtros apilados, el de salud con el
+  número de links rotos; el buscador; paginada de a 50; el primario «Agregar
+  material» en el encabezado, o en el estado vacío si no hay ninguno) y
+  `ListaDeMateriales.tsx` (miniatura, título, firma · tipo · año, el estado y
+  las insignias de salud). `datos/consultas/lista-de-materiales.ts`
+  (`filasDeLaLista`, pura: cada material como se edita, su estado, su salud
+  —link roto por el último chequeo; sin portada y datos incompletos, por lo
+  que se edita—, los filtros y la búsqueda sin tildes). `Lista` suma
+  `miniatura` (DESIGN.md §11, «Lista», y el Filtro de la Biblioteca). La guía
+  de Biblioteca sale de `admin/por-hacer/guias.ts`. Aceptación: `pnpm exec
+  tsx --test src/admin/armazon/guarda.test.ts
+  src/datos/consultas/lista-de-materiales.test.ts` → 9 pass; `tsc --noEmit` →
+  exit 0. En el navegador de Orca (perfil propio `ed-biblioteca`, dev server
+  en el 3046 — DECISIONS), con una cuenta que edita: la lista de los 57, los
+  tres filtros, el buscador y «Página 1 de 2»; las capturas no salen mientras
+  la ventana de Orca muestra otro worktree («Screenshot timed out»): el
+  recorrido visual queda para la verificación.

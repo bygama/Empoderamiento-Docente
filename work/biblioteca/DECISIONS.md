@@ -37,3 +37,7 @@
   alfabético** y marcan las que no están en el sitio («· no está en el
   sitio»): con 57 y creciendo, se buscan por título; el botón de una que no
   está en el sitio no sale.
+- 2026-09-27 — **El dev server corre en el 3046, no en el 3026** (paso 10): el
+  3026 lo tiene un `next start` de la lane hermana `ajustes` (su worktree,
+  visto con `Get-NetTCPConnection`), que no es mío para cortarlo. El 3046
+  estaba libre; `NEXT_PUBLIC_SITE_URL` apunta a él.

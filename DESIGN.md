@@ -685,6 +685,13 @@ Filas separadas por un divisor, en una caja con el mismo borde
   chevron que gira; adentro, links en meta `azul-medio` que subrayan en hover.
 - **Una acción que navega** es un link con cara de botón secundario, con el
   nombre de la fila para el lector («Editar Inicio»).
+- **Con miniatura**, cuando una imagen chica ayuda a reconocer la fila más
+  rápido que el nombre (la portada de un material): un cuadrado de 48 px,
+  `rounded-lg`, a la izquierda de lo principal, decorativo (`aria-hidden` y
+  alt vacío: el nombre ya dice qué es). Sin imagen, el mismo cuadrado en
+  `gris-fondo` con el ícono de la cosa en `azul-medio`, también decorativo.
+  Primer consumidor: la lista de la Biblioteca (sumado el 2026-09-27,
+  `work/biblioteca/`).
 - Primer consumidor: la lista de Páginas. También las guías de los módulos
   por hacer, las cuatro listas de Métricas › Búsquedas (sin acción: lo
   principal y sus cifras en el detalle), las versiones de una página (la más
@@ -714,7 +721,8 @@ pestañas: van debajo del encabezado, a la izquierda del buscador.
 - Primer consumidor: los estados de las bandejas de Mensajes (Nuevo · En
   curso · Cerrado · Spam). También Cuentas › Actividad, con tres filtros
   apilados (módulo, persona y cuándo), cada uno con su «todos» primero; cada
-  opción conserva los otros filtros y la búsqueda.
+  opción conserva los otros filtros y la búsqueda. Y la Biblioteca, con los
+  suyos (estado, tipo y salud), y el número en «Link roto».
 
 ### Buscador
 
