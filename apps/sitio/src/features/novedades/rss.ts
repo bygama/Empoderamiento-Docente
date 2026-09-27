@@ -18,8 +18,8 @@ export function feedDeNovedades(novedades: readonly NovedadDelSitio[], { sitio, 
     novedades.map((n) => ({
       titulo: n.titulo,
       link: n.cuerpo.length > 0 ? new URL(`/novedades/${n.slug}`, sitio).href : listado,
-      // El slug y no el link: una novedad sin ficha comparte el link del listado.
-      guid: `${listado}/${n.slug}`,
+      // El id de la fila, que no cambia: con el slug, cambiar la URL de una publicada la duplicaba en los lectores.
+      guid: `urn:uuid:${n.id}`,
       fecha: diaDe(n.fecha),
       descripcion: n.bajada,
       categoria: etiquetaDeCategoria(n.categoria),
