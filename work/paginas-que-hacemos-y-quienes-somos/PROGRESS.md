@@ -6,7 +6,7 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- Paso 12 del PLAN (Nuestra mirada).
+- Paso 15 del PLAN (las siete áreas, una sola fuente).
 
 ## Abierto
 
@@ -16,6 +16,59 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
   archivo; el padre lo anota en su lane.
 
 ## Hecho
+
+- **Paso 14 — SEO de Quiénes somos** (`49ef7aa`).
+  `features/quienes-somos/contenido/seo.ts` («Quiénes somos | Empoderamiento
+  Docente», la descripción de hoy, sin imagen), su línea `seo` y
+  `generateMetadata` con `openGraphDeLaPagina(padre)`. typecheck 0 · lint 0 ·
+  test 0 (179) · build 0 (`/quienes-somos` sigue ○) · react-doctor 100/100 ·
+  comparar-render contra el paso anterior **1, solo `head` de
+  `/quienes-somos`** (la excepción 3 del SPEC §7):
+
+  ```
+  - og:title / twitter:title             «Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas»
+  - og:description / twitter:description «Consultora especializada … en Chile, México, Argentina, Colombia y Brasil.»
+  + og:title / twitter:title             «Quiénes somos | Empoderamiento Docente»
+  + og:description / twitter:description «Empoderamiento Docente no es una capacitación más: investigación, diseño y acompañamiento para transformar la relación con el saber matemático escolar.»
+  ```
+
+  `<title>`, `description`, `og:image` y `twitter:image`, iguales.
+
+- **Paso 13 — Quiénes sostienen ED** (`ec3ef0b`).
+  `features/quienes-somos/contenido/equipo.ts` (volanta, título con un
+  resaltado, bajada, rótulos de los cuatro niveles: dirección general,
+  dirección, y volanta y título de líderes y de facilitación); `ImpulsanEd`
+  por props (164 → 169 líneas de código). Las personas siguen en
+  `data/equipo.ts` (lane 8). **Nombre accesible**: antes `aria-label`
+  «Quiénes sostienen ED — el equipo»; ahora `aria-labelledby="equipo-titulo"`
+  → «Quiénes sostienen ED» (pierde « — el equipo», como anotó DECISIONS).
+  typecheck 0 · lint 0 · test 0 (179) · build 0 · react-doctor 100/100 ·
+  comparar-render contra el paso anterior **0**.
+
+  **Nombres accesibles de `/quienes-somos`, antes → ahora:**
+
+  | Región | Antes (`aria-label`) | Ahora |
+  | --- | --- | --- |
+  | hero | Quiénes somos — Empoderamiento Docente | No capacitamos. Transformamos. (`aria-labelledby`) |
+  | `#origen` | Origen, sentido y evolución | igual, `aria-label` fijo (sin título propio) |
+  | `#mirada` | Nuestra mirada | Nuestra mirada (`aria-labelledby`, la volanta) |
+  | `#equipo` | Quiénes sostienen ED — el equipo | Quiénes sostienen ED (`aria-labelledby`, la volanta) |
+
+- **Paso 12 — Nuestra mirada** (`81bb8e7`).
+  `features/quienes-somos/contenido/mirada.ts` (volanta, título con un
+  resaltado, tres principios: nombre, frase sin punto final con lo tachado
+  como su resaltado —cero o uno—, afirmación con un resaltado, cinco fichas;
+  síntesis con un resaltado y puente). `constelacion-mirada.ts` cambia
+  `PERSPECTIVAS` por `ACENTOS` (número y color: la estructura) y
+  `armarPerspectivas(principios)`; `timeline-fases.ts` recorre `ACENTOS`;
+  `MiradaEd`, `MapaConstelacion`, `DetallePerspectiva` y `SintesisMirada` por
+  props. **Nombre accesible**: antes `aria-label` «Nuestra mirada»; ahora
+  `aria-labelledby="mirada-titulo"` → la volanta, el mismo texto.
+  typecheck 0 · lint 0 · test 0 (179) · build 0 · react-doctor 100/100 ·
+  comparar-render contra el paso anterior **0** (el «La educación es un
+  derecho<!-- -->.» del principio sin tachado sale igual porque el punto sigue
+  siendo un nodo aparte). En el navegador: los tres nombres en el mapa, las
+  tres frases con su punto, las tres afirmaciones y las 15 fichas.
 
 - **Paso 11 — Origen, sentido y evolución** (`457ddf9`).
   `features/quienes-somos/contenido/origen.ts` (origen: título y texto;
