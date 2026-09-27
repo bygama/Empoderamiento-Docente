@@ -1,0 +1,19 @@
+# El contexto de la imagen `fuente` (Dockerfile). La imagen `app` usa
+# `.compilado/` como contexto y no pasa por acá.
+
+# Ningún secreto entra a una imagen: ni el .env del compose ni el de la app.
+**/.env*
+!**/.env.example
+
+# Lo que se arma adentro o no le sirve a la imagen.
+**/node_modules
+**/.next
+apps/sitio/prisma/generado
+.compilado
+respaldos
+**/.fotos
+**/.cv
+.git
+.githooks
+work
+docs
