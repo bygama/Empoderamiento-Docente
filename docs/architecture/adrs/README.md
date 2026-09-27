@@ -40,9 +40,10 @@ internos (refactors).
 | 0009  | [Medir el tráfico con la analítica de Vercel y una copia diaria en Neon](0009-analitica-de-vercel-con-copia-diaria.md) | Accepted (enmendado por 0011: su cron pasa al único) |
 | 0010  | [Seguridad del acceso al admin](0010-seguridad-del-acceso.md) | Accepted (reemplaza el §2 de 0008) |
 | 0011  | [Copiar Search Console cada día y correr todo lo programado desde un solo cron](0011-search-console-y-un-solo-cron.md) | Accepted |
-| 0012  | [Los CV en un store privado de Blob, la retención de lo que llega y avisos sin datos](0012-mensajes-cv-privados-y-retencion.md) | Accepted |
+| 0012  | [Los CV en un store privado de Blob, la retención de lo que llega y avisos sin datos](0012-mensajes-cv-privados-y-retencion.md) | Accepted (enmendado por 0015: los plazos) |
 | 0013  | [Segundo factor por correo, obligatorio para quien dirige y administra](0013-segundo-factor-por-correo.md) | Accepted (completa 0010) |
 | 0014  | [Los controles del admin en `packages/kit-admin`, y cada entidad con lo publicado en columnas y el borrador en un documento](0014-kit-admin-y-modelo-de-entidad.md) | Accepted |
+| 0015  | [Llevar a la base lo que Ajustes edita, con el plazo prometido como techo](0015-ajustes-en-la-base.md) | Accepted (enmienda 0012) |
 
 ---
 
