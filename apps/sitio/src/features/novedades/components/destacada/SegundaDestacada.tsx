@@ -4,7 +4,8 @@ import { etiquetaDeCategoria, fechaCorta } from "@/features/novedades/contenido/
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { RevealFoco } from "../RevealFoco";
-import { LinkNota, VERDE_SOBRE_AZUL } from "./LinkNota";
+import { LinkNota } from "./LinkNota";
+import { VERDE_SOBRE_AZUL } from "./verde-sobre-azul";
 
 /**
  * Card 2, la que sigue: más chica, corrida abajo a la derecha y montada sobre
