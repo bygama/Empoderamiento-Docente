@@ -65,6 +65,7 @@ export function ListaDeConexiones({ conexiones }: { conexiones: readonly EstadoD
                 <div className="space-y-1">
                   <p>{c.para}</p>
                   <p>{c.faltan.length ? `${c.faltan.length === 1 ? "Falta" : "Faltan"} ${enLista(c.faltan)}. ${c.sinConfigurar}` : "Tiene sus variables."}</p>
+                  {c.aviso ? <p className="font-medium text-rojo-error">{c.aviso}</p> : null}
                   {c.tareasDeLaConexion.length ? (
                     <ul className="space-y-1">
                       {c.tareasDeLaConexion.map((t) => (

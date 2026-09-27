@@ -1,3 +1,5 @@
+import { urlDesviada } from "@/lib/correo/resend";
+
 // Los servicios de afuera de los que depende el sitio (Ajustes › Conexiones,
 // work/ajustes/SPEC.md §2.6): cómo se configura cada uno —por los nombres de
 // sus variables, nunca su valor— y qué tareas del cron dependen de él. Sumar
@@ -14,6 +16,8 @@ export type Conexion = {
   tareas: readonly string[] | "todas";
   /** Qué pasa mientras no está configurada. */
   sinConfigurar: string;
+  /** Algo raro de la configuración que hay que ver, aunque tenga sus variables; `null` si nada. */
+  avisar?: (entorno: Record<string, string | undefined>) => string | null;
 };
 
 export const CONEXIONES: readonly Conexion[] = [
@@ -40,6 +44,10 @@ export const CONEXIONES: readonly Conexion[] = [
     variables: ["RESEND_API_KEY", "CORREO_REMITENTE"],
     tareas: ["resumen-semanal"],
     sinConfigurar: "En producción los correos no salen, y sin el código nadie que dirige o administra puede entrar.",
+    avisar: (entorno) => {
+      const url = urlDesviada(entorno.RESEND_API_URL);
+      return url ? `Los correos van a ${url}, no a Resend: RESEND_API_URL es solo para la prueba local.` : null;
+    },
   },
   {
     clave: "blob-de-fotos",

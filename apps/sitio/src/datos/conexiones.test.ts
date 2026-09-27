@@ -56,3 +56,12 @@ test("cada tarea que nombra el registro es una del cron diario", () => {
     for (const tarea of tareas) assert.ok(claves.includes(tarea), `${nombre}: «${tarea}» no es una tarea del cron`);
   }
 });
+
+test("Resend avisa, y cuenta como error, si los correos van a otro lado", async () => {
+  const configurado = { ...ENTORNO, RESEND_API_KEY: "re_x", CORREO_REMITENTE: "ED <no-responder@ed.test>" };
+  const normal = (await estadoDeLasConexiones("administra", { entorno: configurado, leer })).find((c) => c.clave === "resend")!;
+  assert.equal(normal.aviso, null);
+  const desviado = (await estadoDeLasConexiones("administra", { entorno: { ...configurado, RESEND_API_URL: "http://correo:3000/emails" }, leer })).find((c) => c.clave === "resend")!;
+  assert.match(desviado.aviso ?? "", /van a http:\/\/correo:3000\/emails, no a Resend/);
+  assert.equal(desviado.conError, true);
+});

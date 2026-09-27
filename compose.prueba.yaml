@@ -1,0 +1,36 @@
+# Solo para la prueba local de la imagen de producción (docs/deploy/vps.md,
+# «Probarlo en local»). En el VPS no se usa.
+#
+# En producción la app nunca manda un correo a la consola (correos/mandar.ts),
+# así que sin Resend no llega el código del segundo factor. Acá un Resend falso
+# (`correo`) recibe cada correo, lo imprime en su log y contesta como Resend.
+#
+# Se suma al compose con dos líneas en el `.env` local:
+#   COMPOSE_FILE=compose.yaml:compose.prueba.yaml
+#   COMPOSE_PATH_SEPARATOR=:
+
+services:
+  app:
+    environment:
+      RESEND_API_KEY: re_prueba_local
+      CORREO_REMITENTE: ED <no-responder@localhost>
+      # Solo para la prueba local; en producción no se define. Si queda puesta,
+      # Ajustes › Conexiones y el log del arranque lo dicen.
+      RESEND_API_URL: http://correo:3000/emails
+
+  correo:
+    image: node:24-alpine
+    command:
+      - node
+      - -e
+      - >-
+        require("node:http").createServer((pedido, respuesta) => {
+          let cuerpo = "";
+          pedido.on("data", (parte) => (cuerpo += parte));
+          pedido.on("end", () => {
+            const c = JSON.parse(cuerpo || "{}");
+            console.log(`\n--- Para ${c.to} — ${c.subject}\n${c.text}\n`);
+            respuesta.setHeader("content-type", "application/json");
+            respuesta.end(JSON.stringify({ id: "prueba-local" }));
+          });
+        }).listen(3000);

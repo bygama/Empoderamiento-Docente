@@ -33,7 +33,7 @@ export async function mandarCorreo(
     if (!de) throw new Error("Falta CORREO_REMITENTE: con RESEND_API_KEY hace falta desde qué dirección sale el correo.");
     // Una clave por correo: si el primer intento llegó pero la respuesta se
     // perdió, el reintento del cliente no lo manda dos veces.
-    await crearClienteDeResend({ clave, fetchImpl }).mandar({ de, para, ...contenido, idempotencia: idempotencia ?? randomUUID() });
+    await crearClienteDeResend({ clave, url: entorno.RESEND_API_URL || undefined, fetchImpl }).mandar({ de, para, ...contenido, idempotencia: idempotencia ?? randomUUID() });
     return "resend";
   }
   if (entorno.NODE_ENV === "production") {
