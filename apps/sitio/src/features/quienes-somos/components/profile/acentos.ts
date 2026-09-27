@@ -1,4 +1,4 @@
-import type { ProfileStage } from "@/features/quienes-somos/data/equipo";
+import type { ProfileStage } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 
 /** Acentos de marca por familia temática. Clases LITERALES (Tailwind las escanea). */
 export const ACCENT: Record<

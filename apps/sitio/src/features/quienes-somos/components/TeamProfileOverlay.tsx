@@ -6,7 +6,7 @@ import { ArrowRight, Enlace } from "@/components/ui/icons";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useCopiar } from "@/lib/hooks/useCopiar";
-import type { Persona } from "@/features/quienes-somos/data/equipo";
+import type { PersonaDelSitio as Persona } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { ImmersiveProfile } from "@/features/quienes-somos/components/profile/ImmersiveProfile";
 import { usePortalModal } from "./overlay/usePortalModal";
 import { abrirOverlay } from "./overlay/apertura-overlay";

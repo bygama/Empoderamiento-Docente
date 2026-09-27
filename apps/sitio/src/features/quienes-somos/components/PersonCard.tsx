@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { fotoDe, type Persona, type Tier } from "@/features/quienes-somos/data/equipo";
+import type { PersonaDelSitio as Persona, Tier } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 
 /**
  * PersonCard — tarjeta base ÚNICA del equipo, a cuatro escalas jerárquicas.
@@ -217,18 +217,18 @@ export function PersonCard({
     >
       {/* Foto — cubre toda la card, color pleno, encuadre por persona. Quien
           pidió no publicar retrato lleva la superficie tipográfica. */}
-      {persona.sinFoto ? (
+      {persona.foto === null ? (
         <SinFoto persona={persona} cfg={cfg} />
       ) : (
         <Image
-          src={fotoDe(persona.key)}
-          alt={persona.nombre}
+          src={persona.foto.src}
+          alt={persona.foto.alt}
           fill
           sizes={persona.tier <= 2 ? "(max-width: 1024px) 90vw, 640px" : persona.tier === 3 ? "(max-width: 1024px) 45vw, 320px" : "(max-width: 1024px) 30vw, 240px"}
           style={
             {
-              objectPosition: persona.imagePosition,
-              "--foto-zoom": persona.imageZoom ?? 1,
+              objectPosition: persona.foto.posicion,
+              "--foto-zoom": persona.imageZoom,
             } as React.CSSProperties
           }
           /* El acercamiento de hover se multiplica por el zoom propio de la foto,

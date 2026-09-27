@@ -4,8 +4,8 @@ import { resaltadoExacto, resaltadoValido } from "@/lib/contenido/resaltado";
 
 // «Quiénes sostienen ED» de Quiénes somos: solo los textos propios de la
 // sección. Las personas —nombre, rol, país, foto, nivel, orden y perfil— son
-// el equipo, una entidad con su propio módulo (lane 8 del mapa del admin), y
-// hasta entonces siguen en features/quienes-somos/data/equipo.ts.
+// el equipo, una entidad con su propio módulo: la tabla `equipo`, que se edita
+// en Contenido › Equipo (work/equipo/).
 
 const nivelConTitulo = (etiqueta: string) =>
   grupo(

@@ -6,7 +6,7 @@ import type {
   ProfileCategory,
   ProfilePublication,
   ProfileStage,
-} from "@/features/quienes-somos/data/equipo";
+} from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { ACCENT } from "./acentos";
 
 /**

@@ -11,12 +11,13 @@ export function refrescarAdmin(): void {
 
 /**
  * Lo que el sitio muestra de un material: la Biblioteca (el catálogo y los
- * destacados), el Inicio (los destacados), su portada generada y la ficha de
- * cada novedad que lo abre. Las páginas son estáticas: esto las regenera en la
- * próxima visita (spec del admin §4).
+ * destacados), el Inicio (los destacados), Quiénes somos (las publicaciones
+ * de los perfiles: work/equipo/SPEC.md §8.1), su portada generada y la ficha
+ * de cada novedad que lo abre. Las páginas son estáticas: esto las regenera en
+ * la próxima visita (spec del admin §4).
  */
 export function revalidarSitio(id: string, novedades: readonly string[]): void {
   refrescarAdmin();
-  for (const ruta of ["/", "/biblioteca", `/biblioteca/portada/${id}`]) revalidatePath(ruta);
+  for (const ruta of ["/", "/biblioteca", "/quienes-somos", `/biblioteca/portada/${id}`]) revalidatePath(ruta);
   for (const slug of novedades) revalidatePath(`/novedades/${slug}`);
 }

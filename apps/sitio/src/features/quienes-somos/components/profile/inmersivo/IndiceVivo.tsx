@@ -1,5 +1,5 @@
 import type { Ref } from "react";
-import type { Profile } from "@/features/quienes-somos/data/equipo";
+import type { Profile } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { CategoryRail } from "../profileParts";
 
 type Props = {

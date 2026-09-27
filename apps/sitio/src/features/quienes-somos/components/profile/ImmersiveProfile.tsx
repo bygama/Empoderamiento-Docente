@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
-import type { Profile } from "@/features/quienes-somos/data/equipo";
+import type { Profile } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { useRefsPerfil } from "./inmersivo/refs-perfil";
 import { crearTransformacionHero, medirNombre } from "./inmersivo/viaje-nombre";
 import { crearCaminoMaestro, programarRecalculos } from "./inmersivo/camino-maestro";

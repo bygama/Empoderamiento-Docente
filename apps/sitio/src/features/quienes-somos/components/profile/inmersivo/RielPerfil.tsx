@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import type { Profile } from "@/features/quienes-somos/data/equipo";
+import type { Profile } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 
 // Alto del riel (fracción de la pantalla) y a qué altura de la pantalla
 // «llega» una etapa: la misma que usa `crearEtapas` para revelarla.

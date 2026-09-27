@@ -1,4 +1,4 @@
-import type { Profile } from "@/features/quienes-somos/data/equipo";
+import type { Profile } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 
 export type Figura = NonNullable<Profile["figura"]>;
 
@@ -9,7 +9,8 @@ const MEDIDAS_POR_DEFECTO = { width: 1200, height: 1600 };
 export type DatosFigura = {
   cutout: string;
   cutoutPosition: string | undefined;
-  fullName: string;
+  /** El alt de la figura donde no es decorativa (el perfil lineal): el de la foto, o el nombre completo. */
+  alt: string;
   medidas: { width: number; height: number };
   /** Marco apaisado (una lámina): misma altura de referencia, proporción 5:3. */
   apaisado: boolean;
@@ -25,7 +26,7 @@ export function leerDatosFigura(profile: Profile, figura: Figura): DatosFigura |
   return {
     cutout: profile.cutout,
     cutoutPosition: profile.cutoutPosition,
-    fullName: profile.fullName,
+    alt: profile.cutoutAlt ?? profile.fullName,
     medidas: profile.cutoutSize ?? MEDIDAS_POR_DEFECTO,
     apaisado: figura === "marco" && !!profile.marcoApaisado,
   };
