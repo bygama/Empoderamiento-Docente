@@ -5,9 +5,9 @@ import { SIN_PERMISO } from "@ed/auth";
 
 // El ciclo de un aliado y su marca contra el Postgres local. El de prueba se
 // llama «Prueba aliado» y se borra al final; mover lo lleva y lo trae, así los
-// cinco de verdad quedan en su orden. Los lugares se miran entre los cinco y
-// el de prueba, no por número: otro archivo de tests puede tener un aliado
-// suyo en la tabla al mismo tiempo (el de `registro.test.ts`, al principio).
+// cinco de verdad quedan en su orden. Los lugares se miran relativos (un lugar
+// más arriba que antes; los cinco en su orden), no por número: puede haber
+// otros aliados en la tabla, de otro archivo de tests o de una prueba a mano.
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
@@ -56,10 +56,13 @@ test("crear, que sin la marca no se publique, que quien edita no la ponga, y el 
   const despues = await m.base.aliado.findUniqueOrThrow({ where: { id: creado.id } });
   assert.deepEqual([despues.publicado, despues.nombre, despues.borrador, despues.autorizadoPor], [true, "Prueba aliado", null, "Ana"]);
 
-  // Moverlo antes y volverlo: la tira queda como estaba.
+  // Moverlo antes y volverlo: pasa un lugar para arriba, sea quien sea el vecino, y la tira queda como estaba.
+  const lugar = async () => (await todas()).findIndex((a) => a.id === creado.id);
+  const alFinal = await lugar();
   assert.deepEqual(await m.moverAliadoEnBase(m.base, { id: creado.id, hacia: "antes" }), { ok: true, movio: true });
-  assert.deepEqual(await tira(), ["UNESCO", "Techint", "Bloom", "UCSH", "Prueba aliado", "Science Up"]);
+  assert.equal(await lugar(), alFinal - 1);
   assert.deepEqual(await m.moverAliadoEnBase(m.base, { id: creado.id, hacia: "despues" }), { ok: true, movio: true });
+  assert.equal(await lugar(), alFinal);
   assert.deepEqual(await m.moverAliadoEnBase(m.base, { id: creado.id, hacia: "despues" }), { ok: true, movio: false });
 
   // Quitar la marca lo saca de la tira aunque siga publicado; despublicar y borrar.
