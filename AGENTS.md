@@ -180,7 +180,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos, casos, aliados, ciclo-de-aliados, vista-previa-de-contenido)
             │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, editar-, publicar-casos, editar-, publicar-, autorizar-aliados, subir-, editar-, reemplazar-foto, redirigir, choque, mover-mensajes)
             │   ├── biblioteca/  ← buscar los datos de un material afuera (Crossref, OpenAlex, la página) y chequear su link (ADR-0016)
-            │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, casos, aliados), que busca y reemplaza por URL
+            │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, materiales, casos, aliados), que busca y reemplaza por URL
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links, los archivos de fotos que ninguna fila usa
             ├── admin/         ← las pantallas del admin

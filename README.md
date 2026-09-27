@@ -250,10 +250,11 @@ actividad reciente, **Cuentas** (invitar, cambiar roles, suspender y la
 actividad; ver «Las cuentas»), **Métricas con sus búsquedas en Google** (ver
 «Las métricas y lo programado»), **la edición de las páginas** (ver «Editar
 las páginas»), **Mensajes**, lo que llega por los formularios del sitio (ver
-«Mensajes»), **Novedades**, la primera entidad (ver «Novedades»),
-**Ajustes**, lo que se configura una vez (ver «Ajustes»), y en Contenido **los
-casos, los aliados y la biblioteca de fotos** (ver «Casos, aliados y fotos»);
-la biblioteca de materiales y el equipo llegan en la fase siguiente.
+«Mensajes»), **Novedades**, la primera entidad (ver «Novedades»), **la
+Biblioteca** de materiales (ver «Biblioteca»), **Ajustes**, lo que se configura
+una vez (ver «Ajustes»), y en Contenido **los casos, los aliados y la
+biblioteca de fotos** (ver «Casos, aliados y fotos»); el equipo llega en la
+fase siguiente.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
 y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
