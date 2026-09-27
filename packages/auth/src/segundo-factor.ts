@@ -8,7 +8,7 @@ import { anotar } from "./sucesos";
 
 /**
  * El segundo factor: un código de 6 dígitos por correo, con el plugin de
- * better-auth (SPEC de `work/cuentas/` §5, ADR-0012). Sin app de
+ * better-auth (SPEC de `work/cuentas/` §5, ADR-0013). Sin app de
  * autenticación ni códigos de respaldo: quien pierde su buzón recupera la
  * cuenta cambiándole el correo desde Cuentas.
  *

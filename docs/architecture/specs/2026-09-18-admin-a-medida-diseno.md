@@ -231,7 +231,7 @@ con esos roles depende de Resend.
 
 Todo lo de esta sección que cambió el 2026-09-26 está decidido en el
 [ADR-0010](../adrs/0010-seguridad-del-acceso.md) y, el segundo factor, en el
-[ADR-0012](../adrs/0012-segundo-factor-por-correo.md).
+[ADR-0013](../adrs/0013-segundo-factor-por-correo.md).
 
 Lo que cierra respecto del estado anterior:
 
