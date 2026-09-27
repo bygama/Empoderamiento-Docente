@@ -137,7 +137,9 @@ son secundarias, como en «Sin permiso» y Mi cuenta.
   `cambio-su-nombre`) son de las cuentas: los ve `usarCuentas` (D A), como
   Cuentas › Actividad. Quien edita, hasta que un módulo registre algo de
   contenido, ve el vacío: «Todavía no hay actividad para mostrarte» · «Acá van
-  a aparecer las publicaciones y los cambios del contenido.»
+  a aparecer las publicaciones y los cambios del contenido.» (Al rebasear
+  sobre la 4a llegaron los tres de las páginas: `editarContenido`, los ven
+  los tres roles; DECISIONS.)
 - **Cómo se lee cada tipo** también es un `Record<TipoDeActividad, …>`: un
   tipo nuevo no compila hasta decir quién lo ve y cómo se lee. Es lo que
   obliga al que se mergea segundo (3b, 4a) a sumarlo.
