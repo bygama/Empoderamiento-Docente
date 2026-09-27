@@ -7,7 +7,7 @@ export type EventoReciente = { id: string; tipo: TipoDeActividad; quien: string;
 /**
  * Los últimos eventos del Inicio que ese rol puede ver, el más nuevo primero.
  * Qué tipos son lo deciden `QUIEN_VE` y `VA_AL_INICIO`, en
- * `datos/actividad.ts`: acá no se filtra nada a mano. Sin ningún tipo no
+ * `datos/actividad/`: acá no se filtra nada a mano. Sin ningún tipo no
  * consulta: devuelve la lista vacía.
  */
 export async function actividadReciente(rol: unknown, cuantos = 8): Promise<EventoReciente[]> {
