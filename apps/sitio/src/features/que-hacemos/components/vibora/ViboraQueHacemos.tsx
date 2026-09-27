@@ -32,10 +32,11 @@ export function ViboraQueHacemos() {
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
 
+  // Se decide entero cada vez: la preferencia de movimiento reducido llega
+  // después de hidratar, y si solo se salía temprano la víbora quedaba
+  // prendida sobre Niveles y Proyectos quietos.
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) return;
-    setLive(true);
+    setLive(!reduced && window.matchMedia("(hover: hover) and (min-width: 1024px)").matches);
   }, [reduced]);
 
   useEffect(() => {
