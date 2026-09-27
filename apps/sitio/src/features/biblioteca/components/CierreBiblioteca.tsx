@@ -9,6 +9,7 @@ import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ArrowUpRight } from "@/components/ui/icons";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
+import type { CierreDeBiblioteca } from "@/features/biblioteca/contenido/cierre";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -29,8 +30,10 @@ if (typeof window !== "undefined") {
  * el cierre de Novedades, que flota sobre gris-fondo en vez de blanco.
  *
  * Sin JS / prefers-reduced-motion: titular y CTA visibles, faro estático.
+ * Los textos llegan por props (de `features/biblioteca/contenido/cierre.ts`
+ * o de la base).
  */
-export function CierreBiblioteca() {
+export function CierreBiblioteca({ contenido }: { contenido: CierreDeBiblioteca }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -123,24 +126,23 @@ export function CierreBiblioteca() {
             className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em]"
             style={{ fontSize: "clamp(2.4rem, 1rem + 4.6vw, 5rem)", lineHeight: 1.02 }}
           >
-            Un faro para cada aula.
+            {contenido.titulo}
           </RevealLines>
 
           <p
             data-cierre-foot
             className="text-azul-claro mt-7 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed md:text-[1.2rem]"
           >
-            Todo lo que investigamos y diseñamos, abierto y listo para usar. La
-            biblioteca sigue creciendo: volvé cuando quieras.
+            {contenido.texto}
           </p>
 
           <div data-cierre-foot className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-            <ButtonPrimary href="/contacto?tema=otra">¿Buscás un material puntual?</ButtonPrimary>
+            <ButtonPrimary href="/contacto?tema=otra">{contenido.boton}</ButtonPrimary>
             <Link
               href="/novedades"
               className="group text-azul-claro hover:text-white inline-flex items-center gap-2 font-sans text-[0.95rem] font-medium transition-colors"
             >
-              Ver novedades
+              {contenido.enlace}
               <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
           </div>
