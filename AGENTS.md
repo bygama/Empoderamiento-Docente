@@ -197,7 +197,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── biblioteca/  ← la segunda entidad: la lista con miniatura, la ficha de un material y agregar por DOI, ISBN o link
             │   ├── casos/ · aliados/ ← Contenido › Casos y Aliados, con el molde de novedades/
             │   ├── fotos/       ← Contenido › Fotos: la grilla, la subida y la ficha de cada foto
-            │   ├── equipo/      ← los perfiles del Equipo: la ficha con la tarjeta, el recorrido y sus etapas (etapa-del-recorrido/), y lo que firma en la Biblioteca
+            │   ├── equipo/      ← los perfiles del Equipo: la lista por nivel, la ficha con la tarjeta, el recorrido y sus etapas (etapa-del-recorrido/), y lo que firma en la Biblioteca
             │   ├── campos/      ← el generador de formularios de las páginas (Campo.tsx) y sus errores; los controles son del kit
             │   └── <entidad>/   ← las que siguen, como novedades/ (fase 3)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)

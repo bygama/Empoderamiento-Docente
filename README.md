@@ -579,7 +579,8 @@ citaban con link.
 ### Equipo
 
 En Contenido › Equipo (`/admin/contenido/equipo`), los perfiles de «Quiénes
-sostienen ED», por nivel. La ficha de cada uno es la de una novedad (guardar
+sostienen ED», por nivel y en el orden de la página: «Subir» y «Bajar» los
+mueven dentro de su nivel y cambian el sitio en el momento. La ficha de cada uno es la de una novedad (guardar
 no publica, «Vista previa» abre su perfil en `/quienes-somos?persona=<url>`,
 y publicar, despublicar, descartar y borrar quedan en la actividad) con la
 tarjeta —nombre, rol, país, nivel, la foto y su acercamiento, o «Sin foto»—,
