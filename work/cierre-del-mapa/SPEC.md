@@ -1,7 +1,8 @@
 # SPEC — El cierre del mapa del admin
 
 - **Fecha:** 2026-09-27
-- **Estado:** esperando la aprobación del padre
+- **Estado:** aprobado por el padre el 2026-09-27, tal cual, con las siete
+  propuestas (DECISIONS)
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación: DECISIONS del padre, 2026-09-26)
 - **Tier:** L · la lane de cierre del XL `work/mapa-del-admin/` · worktree
