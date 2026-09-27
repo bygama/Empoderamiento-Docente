@@ -134,8 +134,44 @@
   contenido de la página: no salen de los datos del sitio. Los dos se editan desde
   el admin (la sección «En números» de Inicio y su pestaña SEO), así que si ED
   suma o saca un país en Ajustes, conviene revisar también esos dos textos.
+- 2026-09-27 — Re-revisión r2 (el mismo revisor) sobre `79b545d`: **PASS**, el
+  Important y el Minor cerrados (13 rutas vivas rechazadas, el caso bueno con
+  308, la mutación del test que falla como debe, las 60 rutas del manifiesto
+  cubiertas). Un Minor de borde para el cierre (lo trajo la tarea; el
+  veredicto lo tiene el padre).
+- 2026-09-27 — **Ronda 2 y cierre:** «desde» con «/_» se rechaza entero
+  (`/_*/[[...todo]]` en `config/rutas.ts`, en lugar de `/_next`), con
+  `/_not-found` y `/_global-error` en su test (`b6bf33e`). Barrido: sin
+  servidores en pie, las pestañas y los perfiles `ajustes` y `ajustes-edita`
+  del navegador de Orca borrados, nada sin commitear. La base `ed_ajustes`
+  queda (la borra quien cierre el worktree). Lane cerrada: el commit que
+  sigue a este borra `work/ajustes/`, adentro del PR #190.
 
 ## Verification
+
+### 2026-09-27 — L DoD, ronda 2 y cierre — PASS
+
+Sobre `b6bf33e`; `main` sigue en `77611c1`.
+
+- L1 static, en limpio (sin `next-env.d.ts` ni `.next`): `pnpm typecheck` →
+  exit 0; `pnpm lint` → exit 0; `node scripts/verificar-react-doctor.mjs` →
+  exit 0, «react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 844
+  archivos · packages/db/src: 3 archivos · packages/auth/src: 27 archivos ·
+  packages/kit-admin/src: 19 archivos)».
+- L2 behavioral: `pnpm test` → exit 0: kit-admin 3/3, auth 46/46, sitio
+  369/370 (el salteado de siempre). Mutación: con `/_next/[[...todo]]` en vez
+  de `/_*/[[...todo]]`, `config/rutas.test.ts` falla 2 de 5 (en
+  `/_not-found`); restaurado, 5/5. `pnpm build` → exit 0 (`.next` borrada
+  justo antes). Cruce con el manifiesto del build: **60 rutas**, las 43
+  concretas las contesta el sitio solo (ninguna se acepta como «desde») y las
+  17 con segmentos están declaradas. Arranca: `next start -p 3026` → `/`,
+  `/contacto`, `/admin/entrar` y `/sitemap.xml` en 200; `/_not-found` 404 y
+  `/_global-error` 500, los contesta Next sin pasar por la atrapa-todo.
+- L3: el flujo de las redirecciones no cambió desde la ronda 1 (abajo); el
+  arreglo es la declaración, y lo prueban su test y el cruce.
+- Close review — r2, el mismo revisor (Opus 5.5, medium): PASS sobre
+  `79b545d`, con el Minor de «/_» arreglado acá (mecánico: su prueba es el
+  test y la mutación de arriba).
 
 ### 2026-09-27 — L DoD, ronda de arreglos 1 — PASS
 
@@ -151,7 +187,9 @@ Sobre `7c49911` más los arreglos de la ronda; `main` sigue en `77611c1`.
   `app/` y `public/`, las cuatro rutas de la revisión y el caso bueno) y 2 de
   `editar-redirecciones.test.ts` contra la base. `pnpm build` → exit 0. El
   cruce de `RUTAS_DE_LA_APP` con `.next/app-path-routes-manifest.json`: 58
-  rutas, ninguna sin cubrir.
+  de sus 60 rutas, ninguna sin cubrir. *(El cruce salteaba las que empiezan con
+  «/_»: son 60, y `/_not-found` y `/_global-error` las cubría la atrapa-todo;
+  lo encontró r2 y se arregló en la ronda 2.)*
 - L3 end-to-end (`next start` en 3026, navegador de Orca, perfil `ajustes`,
   Ada): `/sumate-al-equipo`, `/sitemap.xml`, `/robots.txt` y
   `/novedades/rss.xml` dan el error en «Desde» («… ya existe en el sitio: una
