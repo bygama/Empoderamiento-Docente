@@ -16,6 +16,8 @@ export type DatosDelInicio = {
   /** `null` si no se pudo leer. */
   actividad: EventoReciente[] | null;
   verMetricas: boolean;
+  /** Si llega a Cuentas › Actividad, donde está toda: el Inicio muestra solo lo que cambia algo. */
+  verActividad: boolean;
 };
 
 /** Una lectura que no es de un registro, aislada igual: si tira, el bloque dice que no se pudo leer. */
@@ -47,5 +49,13 @@ export async function inicioPara(sesion: SesionDelInicio): Promise<DatosDelInici
     numerosPara(rol),
     oNull("la actividad reciente", () => actividadReciente(rol)),
   ]);
-  return { nombre: sesion.user.name, desdeTuVisita: visita, pendientes, numeros, actividad, verMetricas: puede(rol, "verMetricas") };
+  return {
+    nombre: sesion.user.name,
+    desdeTuVisita: visita,
+    pendientes,
+    numeros,
+    actividad,
+    verMetricas: puede(rol, "verMetricas"),
+    verActividad: puede(rol, "usarCuentas"),
+  };
 }

@@ -878,7 +878,8 @@ el sitio?» de un vistazo. `apps/sitio/src/admin/inicio/`.
   derecha (la semana, que ocupa las dos filas). Las dos preguntas quedan
   arriba del pliegue.
 - **Sin primario:** nada es «la» acción de esta pantalla. Las acciones de
-  los pendientes son secundarias, «Ver métricas» es terciario, y los accesos
+  los pendientes son secundarias, «Ver métricas» y «Ver toda la actividad»
+  (quien usa Cuentas, hacia Cuentas › Actividad) son terciarios, y los accesos
   rápidos («Nueva novedad», cuando exista) van como secundarios en las
   acciones del encabezado.
 - **Lo único con peso fuerte es la cuenta de pendientes:** una insignia
