@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { OPEN_GRAPH_COMUN } from "@/config/metadata";
+import { materialDelSitioPorId } from "@/datos/consultas/materiales";
 import { novedadPorSlug, slugsConFicha } from "@/datos/consultas/novedades";
 import { redireccionDe } from "@/datos/consultas/redirecciones";
 import { FichaNovedad } from "@/features/novedades/components/FichaNovedad";
@@ -35,9 +36,11 @@ export default async function NovedadPage({ params }: Props) {
     if (hacia) permanentRedirect(hacia);
     notFound();
   }
+  // El material de la Biblioteca que abre al final, si el sitio lo muestra.
+  const material = n.material ? await materialDelSitioPorId(n.material) : null;
   return (
     <main id="contenido" tabIndex={-1}>
-      <FichaNovedad n={n} />
+      <FichaNovedad n={n} material={material} />
     </main>
   );
 }

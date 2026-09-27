@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { MATERIALES } from "@/features/biblioteca/data/materiales";
 import { anclasDe, borradorVacio } from "./modelo";
 import { compararFechas } from "./fechas";
 import { esquemaBorrador, esquemaNovedad, type Novedad } from "./novedad";
@@ -14,7 +13,7 @@ const completa: Novedad = {
   imagen: { src: "/fotos/formadora-explica.webp", alt: "Una formadora explica frente a un grupo", foco: { x: 0.5, y: 0.5 } },
   cuerpo: [{ titulo: "Qué estudia", parrafos: ["Un párrafo.", "Otro párrafo."] }],
   destacada: true,
-  publicacion: MATERIALES[0].titulo,
+  material: "4fbeac14-2250-47ec-adcf-6d44399c2426",
   imagenParaRedes: null,
 };
 
@@ -41,9 +40,9 @@ test("un borrador vacío se guarda pero no se publica", () => {
   assert.equal(esquemaBorrador.safeParse({ ...vacio, fecha: "20" }).success, false);
 });
 
-test("la publicación tiene que ser un título del catálogo", () => {
-  assert.equal(esquemaNovedad.safeParse({ ...completa, publicacion: "Un artículo que no existe" }).success, false);
-  assert.equal(esquemaNovedad.safeParse({ ...completa, publicacion: null }).success, true);
+test("el material es un id: que exista lo chequea la base", () => {
+  assert.equal(esquemaNovedad.safeParse({ ...completa, material: "Un título, no un id" }).success, false);
+  assert.equal(esquemaNovedad.safeParse({ ...completa, material: null }).success, true);
 });
 
 test("el orden: la más nueva primero, y el año solo después de las fechas más precisas", () => {

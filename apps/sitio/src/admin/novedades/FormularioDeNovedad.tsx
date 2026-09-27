@@ -16,8 +16,8 @@ type Props = {
   cambiar: <K extends keyof NovedadEnElFormulario>(campo: K, cambio: Cambio<NovedadEnElFormulario[K]>) => void;
   /** Los errores del último guardado, por camino del campo. */
   errores: Readonly<Record<string, string>>;
-  /** Los títulos del catálogo de la Biblioteca, para la publicación que abre la ficha. */
-  publicaciones: readonly Opcion[];
+  /** Los materiales de la Biblioteca, para el que abre la ficha: el id y cómo se lee. */
+  materiales: readonly Opcion[];
   /** Lo que dice la casilla de la destacada: quién lo es hoy. */
   ayudaDeLaDestacada: string;
   /** Lo que dice la URL: cómo queda y qué pasa si cambia. */
@@ -43,7 +43,7 @@ function Bloque({ id, titulo, children }: { id: string; titulo: string; children
  * en el esquema, así los errores del guardado caen en su lugar y el foco
  * encuentra el primero.
  */
-export function FormularioDeNovedad({ form, cambiar, errores, publicaciones, ayudaDeLaDestacada, ayudaDeLaUrl }: Props) {
+export function FormularioDeNovedad({ form, cambiar, errores, materiales, ayudaDeLaDestacada, ayudaDeLaUrl }: Props) {
   const error = (camino: string) => errorDe(errores, camino);
   return (
     <div className="space-y-10">
@@ -93,14 +93,14 @@ export function FormularioDeNovedad({ form, cambiar, errores, publicaciones, ayu
       <CuerpoDeNovedad cuerpo={form.cuerpo} alCambiar={(v) => cambiar("cuerpo", v)} errores={errores} />
       <Bloque id="bloque-enlaces" titulo="Enlaces">
         <Seleccion
-          nombre="publicacion"
-          etiqueta="Publicación de la Biblioteca"
-          ayuda="Si la novedad habla de una publicación del catálogo, la ficha termina con el botón que la abre."
-          opciones={[{ valor: "", etiqueta: "Ninguna" }, ...publicaciones]}
-          sinElegir="Elegí una publicación"
-          valor={form.publicacion ?? ""}
-          alCambiar={(v) => cambiar("publicacion", v || null)}
-          error={error("publicacion")}
+          nombre="material"
+          etiqueta="Material de la Biblioteca"
+          ayuda="Si la novedad habla de un material del catálogo, la ficha termina con el botón que lo abre, mientras el material esté en el sitio."
+          opciones={[{ valor: "", etiqueta: "Ninguno" }, ...materiales]}
+          sinElegir="Elegí un material"
+          valor={form.material ?? ""}
+          alCambiar={(v) => cambiar("material", v || null)}
+          error={error("material")}
         />
         <TextoCorto nombre="slug" etiqueta="URL" ayuda={ayudaDeLaUrl} maximo={LARGO_MAXIMO} valor={form.slug} alCambiar={(v) => cambiar("slug", v)} error={error("slug")} />
       </Bloque>

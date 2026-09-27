@@ -8,7 +8,7 @@ const ETIQUETAS: Record<string, string> = {
   imagen: "Imagen",
   cuerpo: "Cuerpo",
   destacada: "Destacada",
-  publicacion: "Publicación de la Biblioteca",
+  material: "Material de la Biblioteca",
   imagenParaRedes: "Imagen para redes",
 };
 const PARTES: Record<string, string> = { src: "Archivo", alt: "Texto alternativo", foco: "Punto de foco", titulo: "Título", parrafos: "Texto" };

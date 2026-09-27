@@ -28,10 +28,10 @@ function deArriba(d: BorradorDeNovedad): Campo[] {
   ];
 }
 
-/** Los de abajo, después del cuerpo: los enlaces y la imagen para redes. */
-function deAbajo(d: BorradorDeNovedad): Campo[] {
+/** Los de abajo, después del cuerpo: los enlaces y la imagen para redes. El material, por su nombre. */
+function deAbajo(d: BorradorDeNovedad, nombreDelMaterial: (id: string) => string): Campo[] {
   return [
-    [["publicacion"], texto(d.publicacion ?? "")],
+    [["material"], texto(d.material ? nombreDelMaterial(d.material) : "")],
     [["slug"], texto(d.slug ? `/novedades/${d.slug}` : "")],
     [["imagenParaRedes"], foto(d.imagenParaRedes)],
   ];
@@ -58,7 +58,8 @@ function cuerpo(antes: BorradorDeNovedad, despues: BorradorDeNovedad): Diferenci
   ).flat();
 }
 
-/** Las diferencias entre lo publicado y lo que hay, en el orden del formulario. */
-export function cambiosDeNovedad(antes: BorradorDeNovedad, despues: BorradorDeNovedad): Diferencia[] {
-  return [...distintos(deArriba(antes), deArriba(despues)), ...cuerpo(antes, despues), ...distintos(deAbajo(antes), deAbajo(despues))];
+/** Las diferencias entre lo publicado y lo que hay, en el orden del formulario. `nombreDelMaterial` dice cómo se lee el material que abre la ficha. */
+export function cambiosDeNovedad(antes: BorradorDeNovedad, despues: BorradorDeNovedad, nombreDelMaterial: (id: string) => string = (id) => id): Diferencia[] {
+  const abajo = (d: BorradorDeNovedad) => deAbajo(d, nombreDelMaterial);
+  return [...distintos(deArriba(antes), deArriba(despues)), ...cuerpo(antes, despues), ...distintos(abajo(antes), abajo(despues))];
 }

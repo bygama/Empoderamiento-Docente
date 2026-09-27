@@ -88,6 +88,11 @@ export async function materialesDelSitio(): Promise<MaterialDelSitio[]> {
   return (await visiblesDelSitio()).map(({ id, material }) => materialDelSitio(material, id));
 }
 
+/** El material que abre una novedad, si el sitio lo muestra; si no, `null` (la ficha va sin botón). */
+export async function materialDelSitioPorId(id: string): Promise<MaterialDelSitio | null> {
+  return (await materialesDelSitio()).find((m) => m.id === id) ?? null;
+}
+
 /** Los destacados, en su lugar: los de «Material destacado» y los del Inicio. */
 export async function destacadosDelSitio(): Promise<DestacadoDelSitio[]> {
   return destacadosDe(await visiblesDelSitio());

@@ -23,7 +23,7 @@ type Props = {
   /** La novedad; en `/nueva`, sin id. */
   ficha: Omit<Ficha, "id"> & { id: string | null };
   vecinas: Vecinas;
-  publicaciones: readonly Opcion[];
+  materiales: readonly Opcion[];
 };
 
 /** Qué dice la casilla de la destacada: quién lo es hoy, y qué pasa si se marca esta. */
@@ -41,7 +41,7 @@ function ayudaDeLaDestacada(vecinas: Vecinas, id: string | null): string {
  * documento en pantalla contra el último guardado, y frena la salida. Mientras
  * la novedad no se publicó y nadie tocó la URL, la URL sigue al título.
  */
-export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
+export function FichaDeNovedad({ ficha, vecinas, materiales }: Props) {
   const [form, setForm] = useState(() => aFormulario(ficha.documento));
   const [guardado, setGuardado] = useState(() => ficha.documento);
   // Lo que está en el sitio (para «Qué cambió» y descartar), o nada si nunca se publicó.
@@ -143,7 +143,7 @@ export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
           form={form}
           cambiar={cambiar}
           errores={errores.contexto.errores}
-          publicaciones={publicaciones}
+          materiales={materiales}
           ayudaDeLaDestacada={ayudaDeLaDestacada(vecinas, id)}
           ayudaDeLaUrl={
             ficha.publicado
@@ -162,7 +162,7 @@ export function FichaDeNovedad({ ficha, vecinas, publicaciones }: Props) {
           />
         </div>
         <div className="space-y-10">
-          <QueCambio publicado={publicado} actual={documento} />
+          <QueCambio publicado={publicado} actual={documento} materiales={materiales} />
           {id ? (
             <SalidaDeNovedad
               titulo={form.titulo.trim() || "Sin título"}

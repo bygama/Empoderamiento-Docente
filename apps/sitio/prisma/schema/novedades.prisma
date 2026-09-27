@@ -29,9 +29,11 @@ model Novedad {
   /// [{ titulo, parrafos }]. Sin cuerpo, la novedad no tiene ficha.
   cuerpo          Json?
   destacada       Boolean   @default(false)
-  /// El título exacto del material de la Biblioteca que abre la ficha. Texto
-  /// hasta la lane 8, que lo pasa a una relación con materiales.
-  publicacion     String?
+  /// El material de la Biblioteca que abre la ficha: su botón sale solo si el
+  /// material está publicado. SET NULL: borrar el material deja la novedad
+  /// sin botón, no la borra (work/biblioteca/SPEC.md §4.2).
+  materialId      String?   @map("material_id")
+  material        Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
   /// La que reemplaza a la imagen para redes generada.
   imagenParaRedes Json?     @map("imagen_para_redes")
   /// El sitio la muestra. Despublicar la deja en false y conserva las columnas.

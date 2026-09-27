@@ -3,7 +3,7 @@ import { publicadoDe } from "@/datos/consultas/novedades";
 import { esquemaNovedad } from "@/features/novedades/contenido/novedad";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { falloPorIndice } from "./indices-de-novedades";
-import { borradorSinTapa, columnasDe, problemasDeNovedad, tituloDe } from "./novedades-en-base";
+import { borradorSinTapa, columnasDe, materialQueNoEsta, problemasDeNovedad, tituloDe } from "./novedades-en-base";
 
 // Publicar y despublicar una novedad (SPEC §5.3 de `work/novedades-y-kit/`),
 // con el cliente inyectado como editar-novedades.ts. Publicar copia el
@@ -50,6 +50,8 @@ export async function publicarNovedadEnBase(
   const valido = esquemaNovedad.safeParse(fila.borrador ?? publicadoDe(fila));
   if (!valido.success) return problemasDeNovedad(valido.error);
   const n = valido.data;
+  const sinMaterial = await materialQueNoEsta(base, n.material);
+  if (sinMaterial) return sinMaterial;
   const ahora = new Date();
   try {
     const exDestacada = await base.$transaction(async (tx) => {

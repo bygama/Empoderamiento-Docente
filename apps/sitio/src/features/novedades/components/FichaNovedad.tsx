@@ -6,6 +6,7 @@ import Link from "next/link";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { ArrowRight } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
+import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
 import { etiquetaDeCategoria } from "@/features/novedades/contenido/modelo";
 import { fechaCorta } from "@/features/novedades/contenido/fechas";
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
@@ -24,6 +25,8 @@ import { AccionPublicacion } from "./AccionPublicacion";
  *
  * Si se llegó vía la transición del faro (flag en sessionStorage), los
  * reveals del titular y la foto esperan a que el telón destape (~0.7s).
+ * `material` es el de la Biblioteca que la nota abre al final, ya resuelto:
+ * `null` si no abre ninguno o si ese material no está en el sitio.
  */
 const irASeccion = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
   e.preventDefault();
@@ -37,7 +40,7 @@ const irASeccion = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
   }
 };
 
-export function FichaNovedad({ n }: { n: NovedadDelSitio }) {
+export function FichaNovedad({ n, material }: { n: NovedadDelSitio; material: MaterialDelSitio | null }) {
   const abrir = useTransicionFaro();
   const secciones = n.cuerpo;
   const [activa, setActiva] = useState(secciones[0]?.ancla ?? "");
@@ -151,7 +154,7 @@ export function FichaNovedad({ n }: { n: NovedadDelSitio }) {
               </section>
             ))}
 
-            {n.publicacion && <AccionPublicacion titulo={n.publicacion} />}
+            {material && <AccionPublicacion material={material} />}
 
             <div className="border-azul-principal/10 mt-14 border-t pt-8">
               <Link

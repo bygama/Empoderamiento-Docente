@@ -57,6 +57,13 @@ export async function slugOcupado(base: PrismaClient | Prisma.TransactionClient,
   return otra ? tituloDe(otra) : null;
 }
 
+/** El material que abre la novedad, si ya no existe: el campo lo dice. `null` si existe o no hay. */
+export async function materialQueNoEsta(base: PrismaClient, material: string | null): Promise<Fallo | null> {
+  if (!material) return null;
+  const hay = await base.material.findUnique({ where: { id: material }, select: { id: true } });
+  return hay ? null : falloEnCampo("material", "Ese material ya no está en la Biblioteca: elegí otro, o ninguno.");
+}
+
 /**
  * Una novedad válida, lista para sus columnas. Los `as` valen porque cada
  * valor salió de Zod: es JSON válido. Sin cuerpo, la columna queda nula (no
@@ -72,7 +79,7 @@ export function columnasDe(n: Novedad) {
     imagen: n.imagen as Prisma.InputJsonObject,
     cuerpo: n.cuerpo.length > 0 ? (n.cuerpo as Prisma.InputJsonArray) : Prisma.DbNull,
     destacada: n.destacada,
-    publicacion: n.publicacion,
+    materialId: n.material,
     imagenParaRedes: n.imagenParaRedes ? (n.imagenParaRedes as Prisma.InputJsonObject) : Prisma.DbNull,
   };
 }

@@ -23,7 +23,7 @@ export function publicadoDe(fila: Fila): unknown {
     imagen: fila.imagen,
     cuerpo: fila.cuerpo ?? [],
     destacada: fila.destacada,
-    publicacion: fila.publicacion,
+    material: fila.materialId,
     imagenParaRedes: fila.imagenParaRedes,
   };
 }

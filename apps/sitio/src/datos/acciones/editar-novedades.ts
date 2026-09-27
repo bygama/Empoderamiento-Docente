@@ -1,7 +1,7 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorrador } from "@/features/novedades/contenido/novedad";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
-import { falloEnCampo, problemasDeNovedad, slugOcupado, tituloDe } from "./novedades-en-base";
+import { falloEnCampo, materialQueNoEsta, problemasDeNovedad, slugOcupado, tituloDe } from "./novedades-en-base";
 
 // Crear, guardar, descartar y borrar una novedad en la base (SPEC §5.3 de
 // `work/novedades-y-kit/`), con el cliente inyectado para probarlo contra el
@@ -20,6 +20,8 @@ export async function crearNovedadEnBase(base: PrismaClient, { contenido, quien 
   if (!valido.success) return problemasDeNovedad(valido.error);
   const ocupado = valido.data.slug ? await slugOcupado(base, valido.data.slug, null) : null;
   if (ocupado) return falloEnCampo("slug", `Esa URL ya la usa «${ocupado}».`);
+  const sinMaterial = await materialQueNoEsta(base, valido.data.material);
+  if (sinMaterial) return sinMaterial;
   const ahora = new Date();
   // El `as`: el borrador salió de Zod, así que es JSON válido.
   const fila = await base.novedad.create({ data: { borrador: valido.data as Prisma.InputJsonObject, borradorEn: ahora, borradorPor: quien, creadaPor: quien } });
@@ -37,6 +39,8 @@ export async function guardarNovedadEnBase(
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila, "la novedad");
   const ocupado = valido.data.slug ? await slugOcupado(base, valido.data.slug, id) : null;
   if (ocupado) return falloEnCampo("slug", `Esa URL ya la usa «${ocupado}».`);
+  const sinMaterial = await materialQueNoEsta(base, valido.data.material);
+  if (sinMaterial) return sinMaterial;
   const ahora = new Date();
   // La condición sobre `borradorEn` va a la base: cero filas es que otra persona guardó antes.
   const { count } = await base.novedad.updateMany({

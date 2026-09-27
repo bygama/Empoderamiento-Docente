@@ -62,7 +62,9 @@ model Material {
   chequeo        String?
   chequeoDetalle String?   @map("chequeo_detalle")
 
-  autorias Autoria[]
+  autorias  Autoria[]
+  /// Las novedades que lo abren al final de su ficha.
+  novedades Novedad[]
 
   @@map("materiales")
 }
