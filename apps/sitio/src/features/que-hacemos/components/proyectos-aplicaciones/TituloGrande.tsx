@@ -1,4 +1,5 @@
-import { PROYECTOS_INTRO } from "@/features/que-hacemos/data/proyectos";
+import { sinMarcas } from "@/lib/contenido/resaltado";
+import type { IntroDelArchivo } from "./LadoArchivo";
 import { TituloPractica } from "./TituloPractica";
 
 /**
@@ -10,7 +11,7 @@ import { TituloPractica } from "./TituloPractica";
  * no se pierda el foco de qué estamos mostrando. Es un duplicado visual
  * (aria-hidden): el h2 real vive en el encabezado.
  */
-export function TituloGrande() {
+export function TituloGrande({ intro }: { intro: IntroDelArchivo }) {
   return (
     <div
       data-titulo-grande
@@ -19,7 +20,7 @@ export function TituloGrande() {
       style={{ opacity: 0 }}
     >
       <p className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
-        {PROYECTOS_INTRO.volanta}
+        {sinMarcas(intro.volanta)}
       </p>
       <p
         className="font-display mt-5 font-extrabold tracking-[-0.03em] text-balance"
@@ -28,7 +29,7 @@ export function TituloGrande() {
           lineHeight: 1,
         }}
       >
-        <TituloPractica />
+        <TituloPractica titulo={intro.titulo} />
       </p>
     </div>
   );

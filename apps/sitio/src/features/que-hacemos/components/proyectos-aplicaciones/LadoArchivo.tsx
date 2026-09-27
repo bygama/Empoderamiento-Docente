@@ -1,21 +1,23 @@
-import type { Capitulo } from "@/features/que-hacemos/data/proyectos";
-import { PROYECTOS_INTRO } from "@/features/que-hacemos/data/proyectos";
+import { partirResaltado } from "@/lib/contenido/resaltado";
 import { ColumnaCapitulo } from "./ColumnaCapitulo";
+import type { Capitulo } from "./fichas";
 import { FichaProyecto } from "./FichaProyecto";
 import { TituloGrande } from "./TituloGrande";
+
+/** La volanta y el título de la sección, cada uno con su parte resaltada entre dobles asteriscos. */
+export type IntroDelArchivo = { volanta: string; titulo: string };
 
 const TITULO = "font-display font-bold tracking-[-0.02em] text-balance";
 
 /** «Proyectos y aplicaciones» con la palabra que enlaza con la práctica en
  *  azul medio, el mismo acento del título grande (Gastón, 2026-09-11). */
-function Volanta() {
-  const { volanta, volantaResaltada } = PROYECTOS_INTRO;
-  const i = volanta.indexOf(volantaResaltada);
+function Volanta({ volanta }: { volanta: string }) {
+  const { antes, clave, despues } = partirResaltado(volanta);
   return (
     <>
-      {volanta.slice(0, i)}
-      <span className="text-azul-medio">{volantaResaltada}</span>
-      {volanta.slice(i + volantaResaltada.length)}
+      {antes}
+      {clave === null ? null : <span className="text-azul-medio">{clave}</span>}
+      {despues}
     </>
   );
 }
@@ -34,11 +36,13 @@ const TITULO_ESTILO = {
  */
 export function LadoArchivo({
   lado,
+  intro,
   capitulos,
   desde,
   total,
 }: {
   lado: "a" | "b";
+  intro: IntroDelArchivo;
   capitulos: readonly Capitulo[];
   /** Cuántas fichas van antes de este lado. */
   desde: number;
@@ -62,11 +66,12 @@ export function LadoArchivo({
       >
         {espejo ? (
           <p aria-hidden="true" className={TITULO} style={TITULO_ESTILO}>
-            <Volanta />
+            <Volanta volanta={intro.volanta} />
           </p>
         ) : (
-          <h2 className={TITULO} style={TITULO_ESTILO}>
-            <Volanta />
+          // Nombra la sección (aria-labelledby): en vivo, el h2 real es este.
+          <h2 id="proyectos-titulo" className={TITULO} style={TITULO_ESTILO}>
+            <Volanta volanta={intro.volanta} />
           </h2>
         )}
       </header>
@@ -77,7 +82,7 @@ export function LadoArchivo({
         total={total}
         espejo={espejo}
       />
-      {!espejo && <TituloGrande />}
+      {!espejo && <TituloGrande intro={intro} />}
 
       {/* La pila de fichas, centrada, del lado opuesto a la columna. */}
       <div

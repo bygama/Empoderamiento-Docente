@@ -1,21 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import {
-  CAPITULOS,
-  FICHAS,
-  PROYECTOS_INTRO,
-} from "@/features/que-hacemos/data/proyectos";
+import { useMemo, useState } from "react";
+import type { ProyectosDeQueHacemos } from "@/features/que-hacemos/contenido/proyectos";
+import { sinMarcas } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { EscenarioFichas } from "./proyectos-aplicaciones/EscenarioFichas";
 import { FichaProyecto } from "./proyectos-aplicaciones/FichaProyecto";
 import { TituloPractica } from "./proyectos-aplicaciones/TituloPractica";
 import { Bajada } from "./proyectos-aplicaciones/Bajada";
-
-// Los dos lados del archivo: el capítulo de desarrollo profesional, y
-// currículo con el remate. El doblez es el de los capítulos (4 + 3 + 1).
-const LADOS = [CAPITULOS.slice(0, 1), CAPITULOS.slice(1)] as const;
+import { armarCapitulos } from "./proyectos-aplicaciones/fichas";
 
 /**
  * «Así se ve en la práctica»: la prueba de Qué hacemos, como un ARCHIVO DE
@@ -34,13 +28,27 @@ const LADOS = [CAPITULOS.slice(0, 1), CAPITULOS.slice(1)] as const;
  * una costura donde la víbora nacía cortada.
  *
  * Solo desktop con mouse y con motion (celular: fallback estático, sin
- * más trabajo por ahora). Piezas: datos en `proyectos.ts`; el resto en
+ * más trabajo por ahora). Piezas: los textos llegan por props
+ * (`contenido/proyectos.ts` o la base) y se juntan con la estructura del
+ * archivo en `proyectos-aplicaciones/fichas.ts`; el resto en
  * `proyectos-aplicaciones/` (escenario, escena, coreografías, cinta,
  * ficha, dibujos).
  */
-export function ProyectosAplicaciones() {
+export function ProyectosAplicaciones({ contenido }: { contenido: ProyectosDeQueHacemos }) {
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
+  // Memorizado: el escenario rearma su coreografía cuando cambian sus lados.
+  const { capitulos, lados, fichas } = useMemo(() => {
+    const caps = armarCapitulos(contenido);
+    return {
+      capitulos: caps,
+      // Los dos lados del archivo: el capítulo de desarrollo profesional, y
+      // currículo con el remate. El doblez es el de los capítulos (4 + 3 + 1).
+      lados: [caps.slice(0, 1), caps.slice(1)] as const,
+      // Todas las fichas en orden, con el capítulo al que pertenecen.
+      fichas: caps.flatMap((cap, c) => cap.fichas.map((f) => ({ ...f, cap: c }))),
+    };
+  }, [contenido]);
 
   useIsomorphicLayoutEffect(() => {
     if (reduced) return;
@@ -59,26 +67,26 @@ export function ProyectosAplicaciones() {
         "text-azul-principal " +
         (live ? "relative" : "bg-gris-fondo scroll-mt-28")
       }
-      aria-label="Proyectos y aplicaciones"
+      aria-labelledby="proyectos-titulo"
     >
       {live ? (
-        <EscenarioFichas lados={LADOS} total={FICHAS.length} />
+        <EscenarioFichas intro={contenido} lados={lados} total={fichas.length} />
       ) : (
         <div className="relative mx-auto w-full max-w-[88rem] px-5 py-20 md:px-10 md:py-28">
           <header className="max-w-[62ch]">
-            <p className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
-              {PROYECTOS_INTRO.volanta}
+            <p id="proyectos-titulo" className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
+              {sinMarcas(contenido.volanta)}
             </p>
             <h2
               className="font-display mt-3 font-bold tracking-[-0.02em] text-balance"
               style={{ fontSize: "2.75rem", lineHeight: 1.1 }}
             >
-              <TituloPractica />
+              <TituloPractica titulo={contenido.titulo} />
             </h2>
           </header>
 
           <div className="mt-12 space-y-16 md:mt-16">
-            {CAPITULOS.map((cap, c) => (
+            {capitulos.map((cap, c) => (
               <div key={cap.id}>
                 <h3 className="font-display text-[1.75rem] leading-tight font-extrabold tracking-[-0.02em]">
                   {cap.titulo}
@@ -88,7 +96,7 @@ export function ProyectosAplicaciones() {
                   className="text-gris-texto mt-3 max-w-[48ch] font-sans text-[1.05rem] leading-relaxed"
                 />
                 <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                  {FICHAS.map((f, i) =>
+                  {fichas.map((f, i) =>
                     f.cap === c ? (
                       <FichaProyecto
                         key={f.id}

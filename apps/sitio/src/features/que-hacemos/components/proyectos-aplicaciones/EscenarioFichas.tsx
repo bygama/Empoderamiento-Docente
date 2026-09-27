@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import type { Capitulo } from "@/features/que-hacemos/data/proyectos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { ritmo } from "./proyectos-escena";
 import { crearFichas } from "./coreografia-fichas";
-import { LadoArchivo } from "./LadoArchivo";
+import type { Capitulo } from "./fichas";
+import { LadoArchivo, type IntroDelArchivo } from "./LadoArchivo";
 
 /** Índice (dentro del lado) de la primera ficha de cada capítulo. */
 function capInicio(capitulos: readonly Capitulo[]) {
@@ -24,9 +24,12 @@ function capInicio(capitulos: readonly Capitulo[]) {
  * víbora vive en la capa fija de la página (`../vibora/`).
  */
 export function EscenarioFichas({
+  intro,
   lados,
   total,
 }: {
+  /** La volanta y el título de la sección, con su parte resaltada entre dobles asteriscos. */
+  intro: IntroDelArchivo;
   /** Los capítulos de cada lado: [lado A, lado B]. */
   lados: readonly [readonly Capitulo[], readonly Capitulo[]];
   /** Fichas del archivo entero. */
@@ -74,8 +77,8 @@ export function EscenarioFichas({
             hace el zoom de los dos solos. */}
         <div data-camara className="absolute inset-0">
           <div className="absolute inset-0 z-10 mx-auto w-full max-w-[88rem] px-5 md:px-10">
-            <LadoArchivo lado="a" capitulos={capsA} desde={0} total={total} />
-            <LadoArchivo lado="b" capitulos={capsB} desde={fichasA} total={total} />
+            <LadoArchivo lado="a" intro={intro} capitulos={capsA} desde={0} total={total} />
+            <LadoArchivo lado="b" intro={intro} capitulos={capsB} desde={fichasA} total={total} />
           </div>
         </div>
       </div>
