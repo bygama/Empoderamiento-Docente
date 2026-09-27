@@ -6,6 +6,7 @@ import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Filtro } from "@/admin/armazon/Filtro";
 import { Paginado } from "@/admin/armazon/Paginado";
 import { listaDeMateriales } from "@/datos/consultas/lista-de-materiales";
+import { consultasDelMes } from "@/datos/consultas/materiales-consultados";
 import { TIPOS } from "@/features/biblioteca/contenido/modelo";
 import { conservados, ESTADOS, SALUDES, urlDeBiblioteca, type Filtros } from "./filtros";
 import { ListaDeMateriales } from "./ListaDeMateriales";
@@ -35,7 +36,8 @@ function vacioDe(filtros: Filtros, hayMateriales: boolean) {
  * vacío y no en el encabezado: un solo primario por pantalla.
  */
 export async function PantallaDeBiblioteca({ filtros, borrado }: { filtros: Filtros; borrado: boolean }) {
-  const { filas, hayMateriales, rotos } = await listaDeMateriales(filtros);
+  // La lista y las consultas del mes (el contador de Métricas) no dependen una de la otra: van juntas.
+  const [{ filas, hayMateriales, rotos }, consultas] = await Promise.all([listaDeMateriales(filtros), consultasDelMes()]);
   const paginas = Math.max(1, Math.ceil(filas.length / POR_PAGINA));
   const pagina = Math.min(filtros.pagina, paginas);
   const agregar = (
@@ -67,7 +69,7 @@ export async function PantallaDeBiblioteca({ filtros, borrado }: { filtros: Filt
         </div>
       ) : null}
       {filas.length ? (
-        <ListaDeMateriales filas={filas.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA)} />
+        <ListaDeMateriales filas={filas.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA)} consultas={consultas} />
       ) : (
         <EstadoVacio titulo={vacio.titulo} texto={vacio.texto} accion={hayMateriales ? undefined : agregar} />
       )}
