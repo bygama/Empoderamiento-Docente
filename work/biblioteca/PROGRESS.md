@@ -99,3 +99,18 @@
   un dominio inexistente → «dns»; Redalyc → 200 con 13 KB de HTML; y el DOI de
   RELIME por su link → «tiempo» a los 8 s (la revista tarda: por eso los DOI se
   chequean en doi.org, paso 9).
+
+- **Paso 6 — leer los datos de afuera.** `lib/metadatos/` (sin ED ni `@/`):
+  `datos.ts` (la forma común `DatosDeAfuera`, `decodificarEntidades`,
+  `enLimpio`, `jatsATexto`, `conRaya`), `entrada.ts` (`reconocerEntrada`: DOI
+  suelto o de doi.org, ISBN-10 o 13 que pasa su verificador, link),
+  `crossref.ts` (`leerCrossref`, `publicacionDeCrossref` para `works/{doi}` y
+  para la búsqueda por ISBN), `openalex.ts` (`leerOpenAlex`, el resumen desde
+  el índice invertido) y `etiquetas.ts` (`etiquetasDe`, un lector de `<meta>`
+  sin parser; `leerCitation` —autores «Apellido, Nombre» de SciELO,
+  duplicados fuera, fechas «2026/01/01» y «08/2022», páginas solo si son un
+  rango— y `leerOpenGraph`). Respuestas grabadas el 2026-09-27 y recortadas en
+  `lib/metadatos/respuestas/` (Crossref y OpenAlex del artículo de RELIME;
+  SciELO, la RMF E y la Fundación Roberto Rocca). Aceptación: `pnpm exec tsx
+  --test "src/lib/metadatos/*.test.ts"` → 7 pass, 0 fail; `tsc --noEmit` →
+  exit 0.

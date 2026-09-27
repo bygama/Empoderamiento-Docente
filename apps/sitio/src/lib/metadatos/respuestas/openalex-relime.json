@@ -1,0 +1,91 @@
+{
+ "id": "https://openalex.org/W7151737651",
+ "doi": "https://doi.org/10.12802/relime.2025.28.e805",
+ "title": "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
+ "display_name": "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
+ "publication_year": 2025,
+ "publication_date": "2025-12-19",
+ "type": "article",
+ "primary_location": {
+  "landing_page_url": "https://doi.org/10.12802/relime.2025.28.e805",
+  "source": {
+   "display_name": "Revista Latinoamericana de Investigación en Matemática Educativa"
+  }
+ },
+ "authorships": [
+  {
+   "raw_author_name": "Daniela Reyes-Gasperini",
+   "author": {
+    "display_name": "Daniela Reyes-Gasperini"
+   }
+  },
+  {
+   "raw_author_name": "Karla Gómez-Osalde",
+   "author": {
+    "display_name": "K. Alison Gomez"
+   }
+  }
+ ],
+ "biblio": {
+  "volume": "28",
+  "issue": null,
+  "first_page": "1",
+  "last_page": "1"
+ },
+ "abstract_inverted_index": {
+  "Se": [
+   0,
+   26,
+   130
+  ],
+  "analiza": [
+   1
+  ],
+  "cómo": [
+   2
+  ],
+  "se": [
+   3,
+   33,
+   45,
+   79,
+   125
+  ],
+  "configura": [
+   4,
+   80
+  ],
+  "la": [
+   5,
+   55,
+   75,
+   118,
+   133,
+   153
+  ],
+  "resignificación": [
+   6,
+   63,
+   76,
+   134
+  ],
+  "del": [
+   7,
+   77,
+   135
+  ],
+  "conocimiento": [
+   8
+  ],
+  "matemático": [
+   9
+  ],
+  "escolar": [
+   10,
+   57
+  ],
+  "(cme)": [
+   11
+  ]
+ }
+}

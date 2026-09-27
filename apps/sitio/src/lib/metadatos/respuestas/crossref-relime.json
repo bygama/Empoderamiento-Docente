@@ -1,0 +1,49 @@
+{
+ "status": "ok",
+ "message-type": "work",
+ "message": {
+  "DOI": "10.12802/relime.2025.28.e805",
+  "type": "journal-article",
+  "title": [
+   "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente"
+  ],
+  "author": [
+   {
+    "given": "Daniela",
+    "family": "Reyes-Gasperini",
+    "sequence": "first"
+   },
+   {
+    "given": "Karla",
+    "family": "Gómez-Osalde",
+    "sequence": "additional"
+   }
+  ],
+  "container-title": [
+   "Revista Latinoamericana de Investigación en Matemática Educativa"
+  ],
+  "publisher": "Colegio Mexicano de Matemática Educativa A. C.",
+  "issued": {
+   "date-parts": [
+    [
+     2025,
+     12,
+     19
+    ]
+   ]
+  },
+  "published": {
+   "date-parts": [
+    [
+     2025,
+     12,
+     19
+    ]
+   ]
+  },
+  "page": "1",
+  "volume": "28",
+  "URL": "https://doi.org/10.12802/relime.2025.28.e805",
+  "abstract": "<jats:p>Se analiza cómo se configura la resignificación del conocimiento matemático escolar (cme) en docentes en servicio durante un programa de desarrollo profesional orientado al empoderamiento docente. Se diseñó e implementó dicho programa y se analizaron dos episodios correspondientes a los pensamientos algebraico y geométrico. Metodológicamente, se construyeron indicadores basados en el modelo de problematización de la matemática escolar para identificar evidencias de confrontación, resignificación y cambio de relación con el cme. Los resultados muestran que la resignificación del cme se configura como un proceso cíclico, colectivo y progresivo, que articula el carácter epistémico y didáctico de sus reconfiguraciones en las fases experiencial, de implementación en aula y de práctica reflexiva. El carácter epistémico emerge con mayor fuerza en la fase experiencial, mientras que el didáctico se consolida en las posteriores. Se concluye que la resignificación del cme no sólo constituye un mecanismo central para el empoderamiento docente, sino que es parte constitutiva de la profesión docente en matemáticas.</jats:p>"
+ }
+}
