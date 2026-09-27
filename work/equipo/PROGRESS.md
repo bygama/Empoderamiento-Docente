@@ -223,11 +223,113 @@
   `validator.ts` de `.next/` seguía nombrando la ruta borrada), `pnpm lint`
   0, react-doctor 100/100, `pnpm test` → 545 (544 pass, 1 skip).
 
+- **Paso 12 — las fotos del equipo** (`6a8a273c`, `6ef3d981`, `342c7d83`):
+  la migración `20260927074549_fotos_del_equipo` (creada con `pnpm migrate
+  --create-only` y completada con el SQL de datos antes de aplicarla): las
+  15 `.jpg` de `public/equipo/` que usan los perfiles, medidas con sharp, con
+  el alt de la tarjeta; los dos recortes de Daniela quedan afuera (DECISIONS).
+  `pnpm migrate:deploy` → aplicada; `pnpm migrate:status` → «Database schema
+  is up to date!»; `fotos` → 62 filas, 15 de `/equipo/`. La entrada
+  `datos/fotos/del-equipo.ts` (tarjeta y figura, publicado y borrador;
+  reemplazar cambia `foto`, `figura` y `borrador` y regenera `/quienes-somos`
+  si tocó lo publicado) va en el registro entre Casos y Aliados, y
+  `registro.test.ts` suma un perfil de prueba (la tarjeta publicada, la
+  figura en el borrador) → 2 pass. La tarjeta y la figura de la ficha
+  ofrecen «Elegir una ya subida…». En el navegador: la ficha de
+  `/equipo/karla-gomez.jpg` en Fotos dice «Se usa en» «Perfil de Karla Gómez
+  › Tarjeta» (alt «Karla Gómez», En el sitio) y «› Figura» (alt «Karla Gómez
+  Osalde»), cada uno con «Editar» al bloque de su ficha; en la ficha de Karla,
+  «Elegir una ya subida…» abre la grilla con las fotos del equipo y marca
+  «Karla Gómez (la de ahora)».
+- **Los tests, sin depender de las filas de otros** (`6bf12c68`,
+  `2340d6dd`), por la nota del padre al mergear la 9: el intercambio de
+  mover pasó a `lib/orden.ts` (`unPasoMovido`, la `tiraMovida` de la 9, con
+  su test) y lo usan Aliados y Equipo; `mover-equipo.test.ts` prueba lo puro
+  y contra la base solo el perfil que no existe, y `publicar-equipo.test.ts`
+  mide «último en su nivel» contra los perfiles que no son de prueba.
+  typecheck 0, eslint 0; los 6 archivos que tocan esto → 12 pass.
+
+## Verification
+
+Sobre `04e34788`, rebasada sobre `main` en `ddc8ca1d` (la lane 9 adentro).
+
+- **Estático:** `pnpm typecheck` → exit 0 (los 4 proyectos); `pnpm lint` →
+  exit 0; `node scripts/verificar-react-doctor.mjs` → «react-doctor: 100/100,
+  sin diagnósticos (apps/sitio/src: 1104 archivos · packages/db/src: 3 ·
+  packages/auth/src: 27 · packages/kit-admin/src: 22)»; `pnpm build` → exit 0
+  («Compiled successfully», 64/64 páginas estáticas).
+- **Tests, 5 veces seguidas sobre una base recién migrada**
+  (`ed_equipo_tests`, creada vacía y con `pnpm migrate:deploy` de las 27
+  migraciones; `DATABASE_URL` apuntada a ella):
+
+  ```
+  === corrida 1  exit=0  kit-admin 3/3 · auth 46/46 · sitio 497: 496 pass, 0 fail, 1 skipped
+  === corrida 2  exit=0  kit-admin 3/3 · auth 46/46 · sitio 497: 496 pass, 0 fail, 1 skipped
+  === corrida 3  exit=0  kit-admin 3/3 · auth 46/46 · sitio 497: 496 pass, 0 fail, 1 skipped
+  === corrida 4  exit=0  kit-admin 3/3 · auth 46/46 · sitio 497: 496 pass, 0 fail, 1 skipped
+  === corrida 5  exit=0  kit-admin 3/3 · auth 46/46 · sitio 497: 496 pass, 0 fail, 1 skipped
+  ```
+
+  El salteado es de Métricas y no de esta lane («las respuestas grabadas de
+  la API se mapean enteras — sin respuestas grabadas: falta correr A1»).
+- **Migraciones:** las 27 desde cero en una base vacía (`ed_equipo_orden` y
+  `ed_equipo_tests`), con los mismos conteos que `ed_equipo`; `prisma migrate
+  diff --from-config-datasource --to-schema` → «This is an empty migration.»;
+  `pnpm migrate:status` → «Database schema is up to date!».
+- **El render del sitio**, `node scripts/comparar-render.mjs` con `main`
+  (`ddc8ca1d`, buildeado contra su base) antes y esta rama después → exit 1
+  por una sola página:
+
+  ```
+  _global-error.html: igual — 8→8 activos (js+css), +0 bytes
+  _not-found.html: igual — 8→8 activos (js+css), +0 bytes
+  biblioteca.html: DISTINTA en texto — 28→28 activos (js+css), +186 bytes
+  contacto.html: igual — 26→26 activos (js+css), +186 bytes
+  index.html: igual — 26→26 activos (js+css), +186 bytes
+  investigacion.html: igual — 28→28 activos (js+css), +172 bytes
+  novedades.html: igual — 30→30 activos (js+css), +186 bytes
+  novedades\relime-2025.html: igual — 28→28 activos (js+css), +186 bytes
+  novedades\unesco-montevideo.html: igual — 28→28 activos (js+css), +186 bytes
+  que-hacemos.html: igual — 28→28 activos (js+css), +186 bytes
+  quienes-somos.html: igual — 26→26 activos (js+css), -219852 bytes
+  sumate-al-equipo.html: igual — 16→16 activos (js+css), +86 bytes
+  ```
+
+  La diferencia de `biblioteca.html` es la cuenta: «57 materiales» → «62
+  materiales» (los 5 que suma la migración `equipo`, aprobados).
+  `quienes-somos.html` sale igual en texto, links, `<head>` e imágenes, con
+  ~215 KB menos de JS: el `data.ts` del equipo ya no viaja en el bundle.
+- **Las tarjetas de publicación de los perfiles** (script sin commitear que
+  arma las 78 desde la base y las compara con el `data.ts` borrado): «18
+  diferencias; 15 personas; 78 tarjetas de publicación», las mismas de
+  DECISIONS (14 títulos, 2 rótulos, 2 detalles).
+- **De punta a punta, en el navegador de Orca** (perfil aislado, cuenta
+  `edita`): lo de cada paso está en su entrada de «Hecho» (7 a 10, 11 y 12):
+  crear, guardar, publicar, cambiar la URL con su 308, vista previa,
+  «Agregar en Biblioteca», descartar, despublicar, borrar, la actividad y sus
+  frases, la lista con «Subir» y «Bajar» y el sitio en su orden nuevo, la
+  tarjeta del índice, la ficha de una foto con «Se usa en» y «Elegir una ya
+  subida…». Contraste AA medido en los tres temas (0 fallas); a 390, 0
+  desbordes con la caja simulada; teclado revisado en el código y el DOM.
+- **Lo que no se pudo verificar acá:** `orca screenshot`, `orca exec "set
+  viewport"` y `orca cookie get` tiran el runtime, y `orca keypress` no llega
+  a la página. La mirada visual (capturas, los tres temas a ojo, 390 con los
+  breakpoints reales) y el recorrido con Tab de verdad quedan para la
+  revisión de cierre.
+- **Revisión de cierre:** la lanza el padre después de `worker_done`.
+
 ## Abierto
 
-- `ed_equipo_orden` (la base donde se probó el orden de las migraciones) y
-  `ed_equipo_antes` (la de `comparar-render`) quedan en `ed-postgres`: son
-  locales y se pueden borrar al cerrar.
+- `ed_equipo_orden` y `ed_equipo_tests` (donde se probaron las migraciones
+  desde cero y los tests) y `ed_equipo_antes` (la de `comparar-render`)
+  quedan en `ed-postgres`: son locales y se pueden borrar al cerrar.
+- En `ed_equipo` queda la cuenta de prueba de la verificación (`equipo-prueba@ejemplo.org`,
+  edita, con su actividad); su clave no quedó guardada: para volver a entrar,
+  «Olvidé mi contraseña» y el link del log del dev server. El worktree
+  `C:/tmp/ed-antes` (`main` en `ddc8ca1d`, buildeado) es la línea de base de
+  `comparar-render`: se borra con `git worktree remove` al cerrar.
+- `docs/AI_GUIDELINES.md` §2 da de ejemplo un `data.ts` que ya no existe
+  (DECISIONS, «Visto al pasar»).
 - Fase 4: los ~110 KB del recorrido viajan en el payload del HTML de
   `/quienes-somos` (lo mismo que hoy pesa el `data.ts` en el bundle); cargar
   el perfil al abrirlo es de la fase 4 (nota del padre al aprobar).
