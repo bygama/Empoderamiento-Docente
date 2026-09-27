@@ -9,7 +9,9 @@ import { almacenDeCV } from "@/datos/formularios/cv";
 // manda el archivo, para bajar y sin guardarse en ningún caché.
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-const SIN_CACHE = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" };
+// El proxy pone lo mismo en todo /admin y es el que gana (lib/seguridad/cabeceras.ts);
+// va también acá por si esta ruta alguna vez no pasa por él.
+const SIN_CACHE = { "Cache-Control": "private, no-store, max-age=0", "X-Content-Type-Options": "nosniff" };
 
 function texto(estado: number, cuerpo: string): Response {
   return new Response(cuerpo, { status: estado, headers: { ...SIN_CACHE, "Content-Type": "text/plain; charset=utf-8" } });
