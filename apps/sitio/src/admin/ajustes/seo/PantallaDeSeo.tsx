@@ -1,7 +1,9 @@
 import { Apartado } from "@/admin/armazon/Apartado";
 import { Encabezado } from "@/admin/armazon/Encabezado";
+import { RUTAS_DE_LA_APP } from "@/config/rutas";
 import type { Indexacion as LaIndexacion } from "@/datos/consultas/indexacion";
 import type { FilaDeRedireccion } from "@/datos/consultas/redirecciones";
+import { porQueNoSeAplicaria } from "@/lib/seo/redirecciones";
 import { VOLVER_A_AJUSTES } from "../pantallas";
 import { FormularioDeRedireccion } from "./FormularioDeRedireccion";
 import { Indexacion } from "./Indexacion";
@@ -17,7 +19,12 @@ const LINK = "rounded-sm text-azul-medio underline underline-offset-2 focus-visi
  * página y de cada novedad está en su editor, no acá.
  */
 export function PantallaDeSeo({ redirecciones, indexacion, rutas, cvAbierto }: Props) {
-  const filas = redirecciones.map((r) => ({ ...r, creadaEn: r.creadaEn.toISOString() }));
+  // Una que el sitio tapó después (una novedad publicada con ese slug) sigue en la tabla, pero no se aplica.
+  const filas = redirecciones.map((r) => ({
+    ...r,
+    creadaEn: r.creadaEn.toISOString(),
+    seAplica: !porQueNoSeAplicaria(r.desde, { rutas, declaradas: RUTAS_DE_LA_APP }),
+  }));
   return (
     <>
       <Encabezado volver={VOLVER_A_AJUSTES} titulo="SEO" detalle="Lo que ayuda a que Google encuentre el sitio. El SEO de cada página está en su editor." />

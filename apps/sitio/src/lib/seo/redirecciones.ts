@@ -1,15 +1,18 @@
+import { laContestaSola, type RutaDeclarada } from "./rutas";
+
 // Si una redirección escrita a mano se puede guardar: rutas relativas del
-// sitio, sin cadenas ni ciclos. No sabe de ED: la app le pasa las rutas que
-// existen, las redirecciones que ya hay y los prefijos que no se tocan.
+// sitio, sin cadenas ni ciclos, y desde una ruta donde se aplicaría. No sabe de
+// ED: la app le pasa las rutas que existen, las redirecciones que ya hay y lo
+// que el sitio contesta por su cuenta.
 
 export type Redireccion = { desde: string; hacia: string };
 
 export type Contexto = {
-  /** Las rutas que existen hoy: «hacia» tiene que ser una, y «desde» ninguna. */
+  /** Las páginas que existen hoy (las del sitemap): «hacia» tiene que ser una, y «desde» ninguna. */
   rutas: readonly string[];
   existentes: readonly Redireccion[];
-  /** Prefijos que no se redirigen nunca («/admin», «/api»…). */
-  reservadas: readonly string[];
+  /** Todo lo que el sitio contesta por su cuenta: «desde» no puede caer en ninguna. */
+  declaradas: readonly RutaDeclarada[];
 };
 
 export type Validada = { ok: true; redireccion: Redireccion } | { ok: false; campo: "desde" | "hacia"; detalle: string };
@@ -42,21 +45,30 @@ export function rutaDeSegmentos(segmentos: readonly string[]): string {
   return `/${segmentos.map(decodificar).join("/")}`;
 }
 
-const esDe = (ruta: string, prefijo: string) => ruta === prefijo || ruta.startsWith(`${prefijo}/`);
-
 const noEsRuta = (nombre: string) =>
   `«${nombre}» tiene que ser una ruta del sitio, como /novedades/lo-viejo: empieza con una sola /, sin espacios, sin ? ni #, y hasta ${LARGO_MAXIMO} caracteres.`;
 
-export function validarRedireccion(pedida: Redireccion, { rutas, existentes, reservadas }: Contexto): Validada {
+/**
+ * Por qué una redirección desde `ruta` no se aplicaría nunca, o `null` si se
+ * aplica: el sitio ya la contesta, sea una declarada que no busca
+ * redirecciones o una de `rutas` (como la ficha de una novedad que existe).
+ */
+export function porQueNoSeAplicaria(ruta: string, { rutas, declaradas }: Pick<Contexto, "rutas" | "declaradas">): string | null {
+  const declarada = laContestaSola(ruta, declaradas);
+  if (declarada?.contesta === "archivos") return `«${ruta}» es la ruta de un archivo de ${declarada.ruta}, donde el sitio sirve sus archivos: esas no se redirigen.`;
+  if (declarada || rutas.includes(ruta)) return `«${ruta}» ya existe en el sitio: una redirección ahí nunca se aplicaría.`;
+  return null;
+}
+
+export function validarRedireccion(pedida: Redireccion, contexto: Contexto): Validada {
+  const { rutas, existentes } = contexto;
   const desde = normalizarRuta(pedida.desde);
   if (!desde) return { ok: false, campo: "desde", detalle: noEsRuta("Desde") };
   const hacia = normalizarRuta(pedida.hacia);
   if (!hacia) return { ok: false, campo: "hacia", detalle: noEsRuta("Hacia") };
   if (desde === hacia) return { ok: false, campo: "hacia", detalle: "Una redirección no puede llevar a la misma ruta." };
-  if (reservadas.some((r) => esDe(desde, r))) return { ok: false, campo: "desde", detalle: `«${desde}» no se redirige: es una ruta reservada del sitio.` };
-  if (rutas.includes(desde)) {
-    return { ok: false, campo: "desde", detalle: `«${desde}» es una página que existe: una redirección desde ahí no se usaría nunca.` };
-  }
+  const noSeAplicaria = porQueNoSeAplicaria(desde, contexto);
+  if (noSeAplicaria) return { ok: false, campo: "desde", detalle: noSeAplicaria };
   if (existentes.some((r) => r.desde === desde)) return { ok: false, campo: "desde", detalle: `Ya hay una redirección desde «${desde}».` };
   const siguiente = existentes.find((r) => r.desde === hacia);
   if (siguiente) return { ok: false, campo: "hacia", detalle: `«${hacia}» ya redirige a «${siguiente.hacia}»: apuntá directo ahí, sin cadenas.` };

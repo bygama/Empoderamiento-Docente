@@ -47,12 +47,12 @@ export async function borrarRedireccion(pedido: { id: string }): Promise<{ ok: b
     if (!puede(sesion.user.rol, "usarAjustes")) return { ok: false, detalle: SIN_PERMISO };
     const valido = esquemaDeBorrar.safeParse(pedido);
     if (!valido.success) return { ok: false, detalle: "El pedido no tiene la forma esperada." };
-    const resultado = await borrarRedireccionEnBase(base, valido.data.id);
+    const resultado = await borrarRedireccionEnBase(base, valido.data.id, await rutasDelSitio());
     if (!resultado.ok) return resultado;
     revalidatePath(resultado.redireccion.desde);
     revalidatePath(PANTALLA);
     await registrarActividad({ tipo: "borro-una-redireccion", quien: sesion.user.id, sobre: flecha(resultado.redireccion) });
-    return { ok: true, detalle: `Se borró la redirección desde ${resultado.redireccion.desde}: esa ruta vuelve a dar la página de error.` };
+    return { ok: true, detalle: resultado.detalle };
   } catch (e) {
     console.error("borrarRedireccion:", e instanceof Error ? e.message : e);
     return { ok: false, detalle: "No se pudo borrar; probá de nuevo en un rato." };
