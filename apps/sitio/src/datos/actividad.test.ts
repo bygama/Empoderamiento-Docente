@@ -56,6 +56,11 @@ test("entrar, salir y lo que alguien cambia de su cuenta lo ven solo quienes usa
       assert.ok(tiposQueVe(rol).includes(tipo), `${rol} ve ${tipo}`);
     }
   }
+  // Lo de Contacto lo ven los tres; que se borró un CV, solo quienes ven los CV.
+  const deContacto = ["tomo-un-mensaje", "cerro-un-mensaje", "marco-un-mensaje-como-spam", "borro-un-mensaje"] as const;
+  for (const tipo of deContacto) assert.ok(tiposQueVe("edita").includes(tipo), `edita ve ${tipo}`);
+  assert.ok(!tiposQueVe("edita").includes("borro-un-cv"));
+  assert.ok(tiposQueVe("administra").includes("borro-un-cv"));
   assert.deepEqual(tiposQueVe("inventado"), []);
   assert.deepEqual(tiposQueVe(undefined), []);
 });
