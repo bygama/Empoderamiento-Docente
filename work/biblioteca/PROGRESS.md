@@ -261,3 +261,21 @@
   sidebar «Biblioteca (1 con el link roto)», la fila «1 material con el link
   roto · «Oaxaca…»» con «Ver los materiales», y «Agregar material» entre los
   accesos rápidos; el chequeo se devolvió a como estaba.
+
+- **Paso 14 — la portada generada y «Copiar cita APA» en el sitio.**
+  `/biblioteca/portada/[id]` (estática, `generateStaticParams` de los
+  publicados sin portada propia —hoy ninguno—, 404 para lo demás;
+  `datos/consultas/portadas.ts`), y `CopiarCita.tsx` en la línea de la fecha de
+  cada fila del catálogo: copia la cita, dice «Cita copiada» y lo anuncia; si
+  el navegador no deja copiar, muestra la cita debajo, seleccionable.
+  Aceptación: `pnpm build` → exit 0; `comparar-render` → «biblioteca.html:
+  DISTINTA en texto» y las otras 11 iguales; el texto de `biblioteca.html`
+  sin «Copiar cita APA» es idéntico al de `main` (comprobado con un script:
+  8 botones, uno por fila de las que salen de entrada, `iguales sin el botón:
+  true`). `curl` al dev server con la portada de Oaxaca sacada a mano un
+  momento: `200 image/png` (la tipográfica, azul de Artículo, «ARTÍCULO ·
+  REDALYC · 2016»), y un id que no existe → 404; la portada se devolvió. En
+  el navegador de Orca, el clic en «Copiar cita APA» cae en el camino de falla
+  (el navegador embebido no da permiso de portapapeles a un clic simulado), y
+  la cita aparece debajo para copiarla a mano; el camino que copia queda para
+  la revisión en un navegador de verdad.

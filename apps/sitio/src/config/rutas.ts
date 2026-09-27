@@ -18,6 +18,8 @@ export const RUTAS_DE_LA_APP: readonly RutaDeclarada[] = [
   { ruta: "/sumate-al-equipo", contesta: "sola" },
   { ruta: "/novedades/[slug]/imagen-para-redes", contesta: "sola" },
   { ruta: "/novedades/rss.xml", contesta: "sola" },
+  // La portada tipográfica de un material sin portada propia; lo que no es un publicado, 404.
+  { ruta: "/biblioteca/portada/[id]", contesta: "sola" },
   // Los que Next arma desde los archivos de app/.
   { ruta: "/sitemap.xml", contesta: "sola" },
   { ruta: "/robots.txt", contesta: "sola" },
