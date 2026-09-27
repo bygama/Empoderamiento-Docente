@@ -116,9 +116,12 @@ export function CierreQueHacemos({ contenido }: { contenido: CierreDeQueHacemos 
             {contenido.texto}
           </p>
 
+          {/* En celular, las dos acciones a todo el ancho y una debajo de la
+              otra, con 48px de alto para el dedo (el botón es compartido: el
+              ancho y el centrado se los da este contenedor). */}
           <div
             data-qhc-foot
-            className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
+            className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 max-sm:w-full max-sm:flex-col max-sm:items-stretch max-sm:gap-y-2 max-sm:[&>a]:min-h-12 max-sm:[&>a]:justify-center"
           >
             <ButtonPrimary href="/contacto?tema=formacion">{contenido.boton}</ButtonPrimary>
             <Link
