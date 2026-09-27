@@ -55,12 +55,23 @@ export async function borrarFotoEnBase(
   almacen: Almacen,
   { id, registro = USOS_DE_FOTOS }: { id: string; registro?: readonly UsosDeUnModulo[] },
 ): Promise<{ ok: true; alt: string; delRepositorio: boolean } | Fallo> {
-  const fila = await base.foto.findUnique({ where: { id } });
-  if (!fila) return NO_EXISTE;
-  const usos = (await usosPorFoto(base, registro)).get(fila.url) ?? [];
-  if (usos.length) return { ok: false, detalle: `No se puede borrar: se usa en ${dondeSeUsa(usos)}. Sacala de ahí primero.` };
-  const { count } = await base.foto.deleteMany({ where: { id, url: fila.url } });
-  if (!count) return NO_EXISTE;
+  // Los usos y el borrado, en una transacción con la fila bloqueada: un reemplazo o
+  // un borrado a la vez espera. Un guardado que elige la foto no toma el bloqueo:
+  // esa ventana queda, y está escrita en DECISIONS.
+  const r = await base.$transaction(
+    async (tx) => {
+      const bloqueada = await tx.$queryRaw<{ url: string; alt: string }[]>`SELECT url, alt FROM fotos WHERE id = ${id} FOR UPDATE`;
+      const fila = bloqueada[0];
+      if (!fila) return NO_EXISTE;
+      const usos = (await usosPorFoto(tx, registro)).get(fila.url) ?? [];
+      if (usos.length) return { ok: false as const, detalle: `No se puede borrar: se usa en ${dondeSeUsa(usos)}. Sacala de ahí primero.` };
+      await tx.foto.delete({ where: { id } });
+      return { ok: true as const, fila };
+    },
+    { timeout: 20_000 },
+  );
+  if (!r.ok) return r;
+  const { fila } = r;
   const delRepositorio = esDelRepositorio(fila.url);
   if (!delRepositorio) {
     try {

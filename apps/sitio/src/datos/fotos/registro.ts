@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@/../prisma/generado/client";
+import type { Prisma } from "@/../prisma/generado/client";
 import { usosEnAliados } from "./de-los-aliados";
 import { usosEnCasos } from "./de-los-casos";
 import { usosEnMateriales } from "./de-los-materiales";
@@ -16,7 +16,7 @@ import type { Uso, UsosDeUnModulo } from "./uso";
 export const USOS_DE_FOTOS: readonly UsosDeUnModulo[] = [usosEnPaginas, usosEnNovedades, usosEnMateriales, usosEnCasos, usosEnAliados];
 
 /** Los usos de cada foto, por su URL. Una foto que no aparece no se usa en ningún lado. */
-export async function usosPorFoto(base: PrismaClient, registro: readonly UsosDeUnModulo[] = USOS_DE_FOTOS): Promise<Map<string, Uso[]>> {
+export async function usosPorFoto(base: Prisma.TransactionClient, registro: readonly UsosDeUnModulo[] = USOS_DE_FOTOS): Promise<Map<string, Uso[]>> {
   const todos = (await Promise.all(registro.map((m) => m.buscar(base)))).flat();
   const porFoto = new Map<string, Uso[]>();
   for (const uso of todos) porFoto.set(uso.src, [...(porFoto.get(uso.src) ?? []), uso]);
