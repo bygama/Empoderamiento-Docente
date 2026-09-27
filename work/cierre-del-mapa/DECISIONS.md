@@ -80,6 +80,14 @@
   hasta ubicar la clase de falla. Las cinco que cuentan corrieron seguidas,
   sin nada más contra la base, sobre `834af0d5`.
 
+- 2026-09-27 — **Revisión r1: PASS, sin Critical ni Important, cuatro
+  Minor para antes del merge** (el padre). Arreglados en la ronda de cierre.
+  El Minor 2 se extendió a los otros tres comentarios del kit que ponían de
+  ejemplo algo de ED (`Numero`, `Pestanas`, `ruta.ts`), por la misma regla;
+  y el 3, al ADR-0014 y al spec §3, que repetían la misma lista. El test del
+  Minor 4 va en `admin/actividad/` porque importa los cuatro registros, y
+  `admin/` puede leer `datos/`, no al revés.
+
 ## Lo que se queda en `admin/armazon/`, y por qué
 
 - **`BarraLateral` y `barra-lateral/`** — son los módulos de ED: su lista
