@@ -19,7 +19,7 @@ export const DIAS = 7;
 
 /**
  * Los visitantes de la ventana de 7 días, cortando donde corta Resumen
- * (`PanelMetricas`): sin variables, su motivo; sin ningún día copiado, nada.
+ * (`admin/metricas/Resumen.tsx`): sin variables, su motivo; sin ningún día copiado, nada.
  * Recibe el estado y la ventana para poder probar los cortes sin base.
  */
 export async function visitantesSegun(

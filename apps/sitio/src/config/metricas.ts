@@ -76,3 +76,6 @@ export const MINIMOS = {
 
 /** Por debajo de esto, una cifra de Origen no se muestra: podría señalar a alguien. */
 export const MENOS_DE = 3;
+
+/** Hasta cuánto puede decir una marca de la curva: entra al lado de una fecha, en una línea. */
+export const LARGO_DE_UNA_MARCA = 80;

@@ -51,10 +51,3 @@ export async function tarjetaDe(dias: Periodo): Promise<Tarjeta | null> {
     variacionVisitantes: variacion(actual.visitantes, anterior?.visitantes ?? null),
   };
 }
-
-/** Las cuatro tarjetas: 7 y 30 días, cada una contra la ventana anterior. */
-export async function tarjetas(): Promise<Tarjeta[]> {
-  // Las dos ventanas no dependen una de la otra: van juntas.
-  const porVentana = await Promise.all(([7, 30] as const).map(tarjetaDe));
-  return porVentana.filter((t): t is Tarjeta => t !== null);
-}

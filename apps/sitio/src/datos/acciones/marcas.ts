@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { SIN_PERMISO, puede } from "@ed/auth";
+import { LARGO_DE_UNA_MARCA } from "@/config/metricas";
 import { registrarActividad } from "@/datos/actividad";
 import { auth } from "@/datos/auth";
-import { borrarMarca as borrarEnBase, crearMarca, fechaDeMarcaValida, LARGO_DE_UNA_MARCA } from "@/datos/marcas";
+import { borrarMarca as borrarEnBase, crearMarca, fechaDeMarcaValida } from "@/datos/marcas";
 
 // Las marcas a mano de la curva del Resumen (work/metricas-completas/SPEC.md
 // §6.1.1): sesión, `verMetricas`, Zod y la actividad. Las de publicar salen

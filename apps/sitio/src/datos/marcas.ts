@@ -4,11 +4,10 @@ import { base } from "./cliente";
 /**
  * Las marcas que se agregan a mano en la curva del Resumen (tabla `marcas`,
  * SPEC de work/metricas-completas/ §6.1.1). Las de publicar no viven acá:
- * salen de `actividad` (`datos/consultas/marcas.ts`).
+ * salen de `actividad` (`datos/consultas/marcas.ts`). Su largo máximo,
+ * `LARGO_DE_UNA_MARCA`, está en `config/metricas.ts`: lo usa también el
+ * formulario.
  */
-
-/** Hasta cuánto puede decir una marca: entra al lado de una fecha, en una línea. */
-export const LARGO_DE_UNA_MARCA = 80;
 
 export async function crearMarca({ fecha, texto, creadaPor }: { fecha: string; texto: string; creadaPor: string }): Promise<{ id: string }> {
   return base.marca.create({ data: { fecha: fechaUTC(fecha), texto, creadaPor }, select: { id: true } });
