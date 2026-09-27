@@ -1,6 +1,8 @@
 import { cache } from "react";
+import { puede } from "@ed/auth";
 import type { DatosDelSitio as Fila } from "@/../prisma/generado/client";
 import { DATOS_INICIALES, esquemaDeDatosDelSitio, type DatosDelSitio } from "@/config/datos-del-sitio";
+import { aValores, type ValoresDelSitio } from "@/config/formulario-del-sitio";
 import { base } from "@/datos/cliente";
 
 // Lo que lee el sitio de sus datos institucionales (work/ajustes/SPEC.md §3):
@@ -42,3 +44,32 @@ export async function leerDatosDelSitio(consultar: () => Promise<Fila | null> = 
  * vez.
  */
 export const datosDelSitio = cache(() => leerDatosDelSitio());
+
+export type DatosParaEditar = { valores: ValoresDelSitio; cambiadoEn: Date | null; cambiadoPor: string | null };
+
+/**
+ * Lo que muestra Ajustes › Datos del sitio: la fila tal cual está, como texto,
+ * aunque no pase el esquema (el formulario dice qué corregir al guardar), y
+ * sin respaldo: si la base no contesta, la pantalla lo dice. Sin fila, los
+ * datos iniciales. Sin `usarAjustes`, `null`.
+ */
+export async function datosDelSitioParaEditar(rol: unknown): Promise<DatosParaEditar | null> {
+  if (!puede(rol, "usarAjustes")) return null;
+  const fila = await base.datosDelSitio.findUnique({ where: { id: 1 } });
+  if (!fila) return { valores: aValores(DATOS_INICIALES), cambiadoEn: null, cambiadoPor: null };
+  const texto = (valor: string | null) => valor ?? "";
+  const valores: ValoresDelSitio = {
+    correo: fila.correo,
+    whatsapp: texto(fila.whatsapp),
+    calle: fila.calle,
+    complemento: texto(fila.complemento),
+    ciudad: fila.ciudad,
+    region: texto(fila.region),
+    pais: fila.pais,
+    paises: fila.paises.join(", "),
+    instagram: texto(fila.instagram),
+    facebook: texto(fila.facebook),
+    linkedin: texto(fila.linkedin),
+  };
+  return { valores, cambiadoEn: fila.cambiadoEn, cambiadoPor: fila.cambiadoPor };
+}
