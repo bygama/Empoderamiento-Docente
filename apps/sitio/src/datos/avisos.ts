@@ -1,44 +1,85 @@
 import { puede } from "@ed/auth";
-import { BANDEJAS, CLAVES_DE_BANDEJA, capacidadDe, type Bandeja } from "@/config/mensajes";
+import { AVISOS, CLAVES_DE_AVISO, type ClaveDeAviso } from "@/config/avisos";
+import { BANDEJAS, type Bandeja } from "@/config/mensajes";
 import { mensajeNuevo } from "@/correos/mensaje-nuevo";
 import { mandarCorreo } from "@/correos/mandar";
 import { urlDelSitio } from "@/lib/url-del-sitio";
 import { base } from "./cliente";
 
 /**
- * Quién recibe un correo por cada mensaje nuevo (tabla `avisos`). Hoy hay un
- * aviso por bandeja, con la misma clave; el resumen semanal (lane 11) suma el
- * suyo. **Sin fila, activado**: así viene de fábrica. Ajustes › Avisos (lane
- * 10) lee y escribe con estas mismas funciones.
+ * Quién recibe cada aviso por correo (tabla `avisos`), recorriendo el registro
+ * de `config/avisos.ts`. **Sin fila, activado**: así viene de fábrica. Lo
+ * leen y escriben Mi cuenta › Avisos (la cuenta propia) y Ajustes › Avisos
+ * (todas), con estas mismas funciones. Recibe una cuenta activa cuyo rol
+ * tiene la capacidad del aviso (`puede`, nunca el string de un rol): una
+ * suspendida no entra al admin, y no recibe nada.
  */
 
 export type Destinatario = { id: string; nombre: string; correo: string };
 
-/**
- * Las cuentas que reciben el aviso de esa bandeja: las que su rol puede verla
- * (`puede`, nunca el string de un rol) y no lo apagaron.
- */
-export async function destinatariosDe(bandeja: Bandeja): Promise<Destinatario[]> {
+/** Las cuentas que reciben ese aviso: activas, con la capacidad, y sin haberlo apagado. */
+export async function destinatariosDe(aviso: ClaveDeAviso): Promise<Destinatario[]> {
   const cuentas = await base.user.findMany({
-    where: { avisos: { none: { aviso: bandeja, activo: false } } },
+    where: { suspendida: false, avisos: { none: { aviso, activo: false } } },
     select: { id: true, name: true, email: true, rol: true },
     orderBy: { createdAt: "asc" },
   });
-  return cuentas.filter((c) => puede(c.rol, capacidadDe(bandeja))).map((c) => ({ id: c.id, nombre: c.name, correo: c.email }));
+  return cuentas.filter((c) => puede(c.rol, AVISOS[aviso].capacidad)).map((c) => ({ id: c.id, nombre: c.name, correo: c.email }));
 }
 
-/** Los avisos de una cuenta: uno por bandeja que su rol ve, con si está activo. */
-export async function avisosDe(cuentaId: string, rol: unknown): Promise<Array<{ bandeja: Bandeja; activo: boolean }>> {
+/** Los avisos de una cuenta: uno por aviso del registro que su rol puede recibir, con si está activo. */
+export async function avisosDe(cuentaId: string, rol: unknown): Promise<Array<{ aviso: ClaveDeAviso; activo: boolean }>> {
   const apagados = await base.aviso.findMany({ where: { cuentaId, activo: false }, select: { aviso: true } });
-  return CLAVES_DE_BANDEJA.filter((b) => puede(rol, capacidadDe(b))).map((bandeja) => ({
-    bandeja,
-    activo: !apagados.some((a) => a.aviso === bandeja),
+  return CLAVES_DE_AVISO.filter((a) => puede(rol, AVISOS[a].capacidad)).map((aviso) => ({
+    aviso,
+    activo: !apagados.some((a) => a.aviso === aviso),
   }));
 }
 
-/** Prende o apaga un aviso de una cuenta. Quien llama ya verificó que es su cuenta y que su rol ve la bandeja. */
-export async function guardarAviso(cuentaId: string, bandeja: Bandeja, activo: boolean): Promise<void> {
-  await base.aviso.upsert({ where: { cuentaId_aviso: { cuentaId, aviso: bandeja } }, create: { cuentaId, aviso: bandeja, activo }, update: { activo } });
+/** Prende o apaga un aviso de una cuenta. Quien llama ya verificó que puede tocarla y que su rol lo recibe. */
+export async function guardarAviso(cuentaId: string, aviso: ClaveDeAviso, activo: boolean): Promise<void> {
+  await base.aviso.upsert({ where: { cuentaId_aviso: { cuentaId, aviso } }, create: { cuentaId, aviso, activo }, update: { activo } });
+}
+
+export type CuentaConAviso = Destinatario & { activo: boolean };
+export type AvisoConCuentas = { aviso: ClaveDeAviso; cuentas: CuentaConAviso[] };
+
+/**
+ * Para Ajustes › Avisos: cada aviso del registro con las cuentas que lo pueden
+ * recibir y si lo reciben. **Trae nombres y correos**: sin `usarAjustes` no
+ * devuelve nada, aunque quien llama ya lo haya chequeado.
+ */
+export async function avisosDeTodas(rol: unknown): Promise<AvisoConCuentas[]> {
+  if (!puede(rol, "usarAjustes")) return [];
+  const cuentas = await base.user.findMany({
+    where: { suspendida: false },
+    select: { id: true, name: true, email: true, rol: true, avisos: { where: { activo: false }, select: { aviso: true } } },
+    orderBy: { name: "asc" },
+  });
+  return CLAVES_DE_AVISO.map((aviso) => ({
+    aviso,
+    cuentas: cuentas
+      .filter((c) => puede(c.rol, AVISOS[aviso].capacidad))
+      .map((c) => ({ id: c.id, nombre: c.name, correo: c.email, activo: !c.avisos.some((a) => a.aviso === aviso) })),
+  }));
+}
+
+/**
+ * Deja ese aviso prendido para las cuentas de `cuentaIds` y apagado para las
+ * demás que lo pueden recibir; un id que no puede recibirlo no cuenta.
+ * Devuelve cuántas lo reciben. Quien llama ya chequeó `usarAjustes`.
+ */
+export async function ponerQuienRecibe(aviso: ClaveDeAviso, cuentaIds: readonly string[]): Promise<number> {
+  const elegidas = new Set(cuentaIds);
+  const pueden = (await base.user.findMany({ where: { suspendida: false }, select: { id: true, rol: true } })).filter((c) =>
+    puede(c.rol, AVISOS[aviso].capacidad),
+  );
+  await base.$transaction(
+    pueden.map(({ id }) =>
+      base.aviso.upsert({ where: { cuentaId_aviso: { cuentaId: id, aviso } }, create: { cuentaId: id, aviso, activo: elegidas.has(id) }, update: { activo: elegidas.has(id) } }),
+    ),
+  );
+  return pueden.filter(({ id }) => elegidas.has(id)).length;
 }
 
 /**

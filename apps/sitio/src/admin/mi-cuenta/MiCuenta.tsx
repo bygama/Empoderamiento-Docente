@@ -1,7 +1,7 @@
 import { QUE_PUEDE, esRol, esUnaSola, quienPuede } from "@ed/auth";
 import { Apartado } from "@/admin/armazon/Apartado";
 import { Encabezado } from "@/admin/armazon/Encabezado";
-import type { Bandeja } from "@/config/mensajes";
+import type { ClaveDeAviso } from "@/config/avisos";
 import type { SesionAbierta } from "@/datos/consultas/mi-cuenta";
 import { FormularioDeAvisos } from "./FormularioDeAvisos";
 import { FormularioDeLaContrasena } from "./FormularioDeLaContrasena";
@@ -17,8 +17,8 @@ type Props = {
   segundoFactor: boolean;
   sesiones: SesionAbierta[];
   idDeEstaSesion: string;
-  /** Un aviso por bandeja que su rol ve (`datos/avisos.ts`). */
-  avisos: ReadonlyArray<{ bandeja: Bandeja; activo: boolean }>;
+  /** Un aviso por cada uno del registro que su rol puede recibir (`datos/avisos.ts`). */
+  avisos: ReadonlyArray<{ aviso: ClaveDeAviso; activo: boolean }>;
 };
 
 /**
