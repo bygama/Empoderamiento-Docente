@@ -45,7 +45,7 @@ test("filtra por tipos, por persona, desde una fecha y por texto en el sobre o e
   const tipos = (await listarActividad({ tipos: TODOS, persona: ana, pagina: 1 })).filas.map((f) => f.tipo);
   assert.deepEqual(tipos, ["suspendio", "invito", "entro"]);
   assert.equal((await listarActividad({ tipos: ["invito"], persona: ana, pagina: 1 })).total, 1);
-  assert.equal((await listarActividad({ tipos: TODOS, persona: ana, desde: hace(7), pagina: 1 })).total, 2);
+  assert.equal((await listarActividad({ tipos: TODOS, persona: ana, dias: 7, pagina: 1 })).total, 2);
   assert.deepEqual((await listarActividad({ tipos: TODOS, persona: ana, texto: "pérez", pagina: 1 })).filas.map((f) => f.sobre), ["Juan Pérez"]);
   assert.equal((await listarActividad({ tipos: TODOS, persona: ana, texto: "ana filt", pagina: 1 })).total, 3);
   assert.equal((await listarActividad({ tipos: [], persona: ana, pagina: 1 })).total, 0);
