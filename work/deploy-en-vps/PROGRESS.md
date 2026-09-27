@@ -2,8 +2,20 @@
 
 ## In progress
 
-- Esperando la revisión de cierre del padre (la lanza al recibir
-  `worker_done`).
+- **Pausa: PR #198 abierto** (https://github.com/bygama/Empoderamiento-Docente/pull/198),
+  sin mergear, esperando la revisión de cierre del padre (la lanza al recibir
+  `worker_done`). Los 14 pasos del PLAN (más el 4b) están hechos y la
+  verificación L está en PASS (abajo).
+- **Lo que sigue:** los hallazgos de la revisión, si los hay (un arreglo por
+  hallazgo, re-verificar desde la capa que toque); cuando el padre lo pida,
+  rebase sobre `main`; y el cierre de la lane (el commit que borra
+  `work/deploy-en-vps/`) en el PR, antes del merge.
+- **Estado local de la prueba** (nada de esto va a git): el compose `ed` sigue
+  corriendo en Docker Desktop (80 y 443) con el `.env` de prueba de la raíz
+  (claves generadas, `COMPOSE_FILE` con `compose.prueba.yaml`) y
+  `respaldos/2026-09-27/` con datos de prueba. Para bajarlo:
+  `docker compose down` (conserva volúmenes) o `docker compose down -v`. La
+  base `ed_vps` de `ed-postgres` es la de los tests de esta lane.
 
 ## Verification
 
