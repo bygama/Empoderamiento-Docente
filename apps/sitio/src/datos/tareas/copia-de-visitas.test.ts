@@ -39,7 +39,7 @@ const clienteRoto: ClienteDeAnaliticas = {
 
 test("correr dos veces deja las mismas filas y dice qué días copió", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
-  const { sincronizarMetricas } = await import("./metricas-de-vercel");
+  const { sincronizarMetricas } = await import("./copia-de-visitas");
   // minimoDias en las dos corridas: si la base ya tiene una fila `total` real
   // (mucho más nueva que 2001), rangoFaltante da null y sin esto el test
   // dependería de qué haya sincronizado el cron antes. Con minimoDias el
@@ -65,7 +65,7 @@ test("correr dos veces deja las mismas filas y dice qué días copió", { skip: 
 
 test("la hora y el cruce por país se guardan con su propia dimensión", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
-  const { sincronizarMetricas } = await import("./metricas-de-vercel");
+  const { sincronizarMetricas } = await import("./copia-de-visitas");
   const filtros: FiltroDePais[] = [];
   const cliente: ClienteDeAnaliticas = {
     async porDia(rango, dimension, filtro) {
@@ -96,7 +96,7 @@ test("la hora y el cruce por país se guardan con su propia dimensión", { skip:
 
 test("si la API falla, la corrida sale fallida y no se copia nada", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
-  const { sincronizarMetricas } = await import("./metricas-de-vercel");
+  const { sincronizarMetricas } = await import("./copia-de-visitas");
   // minimoDias por la misma razón que arriba: sin esto, una marca de agua
   // real y lejana haría "Nada nuevo" antes de llamar a la API rota, y el
   // error nunca se vería.
@@ -111,7 +111,7 @@ test("si la API falla, la corrida sale fallida y no se copia nada", { skip: !hay
 
 test("una ventana que Vercel rechaza (400) no voltea la copia: va al detalle y la marca avanza igual", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
-  const { sincronizarMetricas } = await import("./metricas-de-vercel");
+  const { sincronizarMetricas } = await import("./copia-de-visitas");
   const hoy = new Date("2001-11-11T12:00:00.000Z");
   const pedidas: string[] = [];
   // Respuestas grabadas con la forma de la API: el total del día, y un 400 para la ventana de 30 días.

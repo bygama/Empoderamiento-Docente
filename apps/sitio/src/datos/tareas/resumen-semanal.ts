@@ -6,7 +6,7 @@ import { base } from "@/datos/cliente";
 import { ayerUTC, fechaUTC } from "@/lib/metricas/periodos";
 import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 import { urlDelSitio } from "@/lib/url-del-sitio";
-import { copiaDeVercel } from "./metricas-de-vercel";
+import { copiaDeVisitas } from "./copia-de-visitas";
 import { numerosDelResumen, paginaMasVista, semanaAntesDe, type Semana } from "./numeros-del-resumen";
 
 // El resumen semanal por correo (SPEC de work/metricas-completas/ §8): una
@@ -85,5 +85,5 @@ export const resumenSemanalDeMetricas: Tarea = {
   clave: "resumen-semanal",
   nombre: "Resumen semanal por correo",
   correr: () => mandarResumenSemanal(),
-  despuesDe: copiaDeVercel.clave,
+  despuesDe: copiaDeVisitas.clave,
 };

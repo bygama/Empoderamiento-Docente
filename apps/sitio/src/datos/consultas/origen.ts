@@ -1,6 +1,6 @@
 import { MENOS_DE, PAISES_FIJOS, ZONA_HORARIA, type PaisFijo } from "@/config/metricas";
 import { base } from "@/datos/cliente";
-import { DIMENSIONES_DEL_CRUCE } from "@/datos/tareas/consultas-de-vercel";
+import { DIMENSIONES_DEL_CRUCE } from "@/datos/tareas/consultas-de-la-copia";
 import { sumarPorValor, type FilaCopiada } from "@/lib/metricas/agregar";
 import { canalDe, type Canal } from "@/lib/metricas/canales";
 import { grillaDeHoras, mejoresFranjas, type Franja } from "@/lib/metricas/mejor-hora";

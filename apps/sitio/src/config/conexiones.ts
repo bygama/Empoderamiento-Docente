@@ -22,7 +22,7 @@ export const CONEXIONES: readonly Conexion[] = [
     nombre: "Vercel Analytics",
     para: "Las visitas de Métricas, copiadas una vez por día.",
     variables: ["VERCEL_TOKEN", "VERCEL_ANALYTICS_PROJECT_ID"],
-    tareas: ["metricas-de-vercel"],
+    tareas: ["copia-de-visitas"],
     sinConfigurar: "Métricas no se actualiza.",
   },
   {

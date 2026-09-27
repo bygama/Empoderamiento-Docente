@@ -4,7 +4,7 @@ import { archivosDeFotosSueltos } from "./archivos-de-fotos-sueltos";
 import { copiaDeSearchConsole } from "./busquedas-de-google";
 import { registrarCorrida } from "./corridas";
 import { indexacionDeGoogle } from "./indexacion-de-google";
-import { copiaDeVercel } from "./metricas-de-vercel";
+import { copiaDeVisitas } from "./copia-de-visitas";
 import { podaDeActividad } from "./poda-de-actividad";
 import { resumenSemanalDeMetricas } from "./resumen-semanal";
 import { podaDeLimitesPorIp, retencionDeContacto, retencionDeCV } from "./retencion-de-mensajes";
@@ -17,7 +17,7 @@ import { saludDeLinks } from "./salud-de-links";
  * suma su tarea acá, no un cron nuevo (ADR-0011).
  */
 export const TAREAS_DIARIAS = definirTareas([
-  copiaDeVercel,
+  copiaDeVisitas,
   copiaDeSearchConsole,
   indexacionDeGoogle,
   podaDeActividad,

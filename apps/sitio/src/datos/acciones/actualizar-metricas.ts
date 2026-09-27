@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { SIN_PERMISO, puede } from "@ed/auth";
 import { auth } from "@/datos/auth";
 import { correrAMano } from "@/datos/tareas/a-mano";
-import { copiaDeVercel, copiarMetricas } from "@/datos/tareas/metricas-de-vercel";
+import { copiaDeVisitas, copiarMetricas } from "@/datos/tareas/copia-de-visitas";
 import { hayVariablesDeMetricas } from "@/lib/metricas/entorno";
 
 // Una Server Action corre antes de que se renderice el layout protegido, así
@@ -21,7 +21,7 @@ export async function actualizarMetricasAhora(): Promise<{ ok: boolean; detalle:
     // tocó la API, así que no tiene por qué frenar al botón.
     if (!hayVariablesDeMetricas()) return { ok: false, detalle: "Faltan las variables de Vercel: ver el README." };
 
-    const resultado = await correrAMano(copiaDeVercel.clave, () => copiarMetricas({ minimoDias: 3 }));
+    const resultado = await correrAMano(copiaDeVisitas.clave, () => copiarMetricas({ minimoDias: 3 }));
     revalidatePath("/admin");
     revalidatePath("/admin/metricas");
     return resultado;
