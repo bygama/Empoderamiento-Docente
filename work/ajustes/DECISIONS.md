@@ -79,3 +79,32 @@
   padre y las otras lanes) y `screenshot` da timeout. Cambiar la vista de la
   ventana es intrusivo, así que la UI se verifica con el árbol de
   accesibilidad y sondas del DOM (estilos calculados, foco, `aria-*`).
+- 2026-09-27 — **Rebasada sobre `main` en `77611c1`** (Novedades y el kit, y las
+  páginas editables, mergeadas). Conciliaciones, cada una en su commit:
+  - **Contacto y Novedades** reciben a la vez su contenido editable (de las
+    lanes de páginas y Novedades) y los datos del sitio; el cierre de Novedades
+    toma sus textos del contenido y las redes de la base.
+  - **Una sola `redireccionDe`**, en `consultas/redirecciones.ts` sobre
+    `leerSinRomper`: Novedades tenía la suya en `consultas/novedades.ts`
+    (el SPEC §5.1 ya lo preveía). La ficha de una novedad importa esta.
+  - **El sitemap lista las fichas de la base** (`slugsConFicha`), y publicar una
+    novedad revalida `/sitemap.xml` (una ruta más en `revalidar-novedades.ts`).
+  - **`datosDelSitio` y `plazosDeGuarda` sobre `leerSinRomper`**, que llegó con
+    la misma regla de respaldo que yo había escrito dos veces.
+  - **Los controles del kit** (`TextoCorto`, `ENTRADA`, `Seleccion`) y
+    `useFrenarSalida` del armazón; «Hacia» pasa a la `Seleccion` del kit. El kit
+    no trae tabla: la `Tabla` del armazón queda.
+  - **El ADR de Ajustes es el 0015:** Novedades llegó antes con el 0014.
+  - Las migraciones de Ajustes son posteriores a la de Novedades
+    (`20260927002934`): no hubo que regenerarlas; en `ed_ajustes` se aplicó la
+    de Novedades con `migrate:deploy` y `migrate:status` quedó al día.
+- 2026-09-27 — **react-doctor dio 90/100 después del rebase, y se arregló por
+  código:** `no-derived-useState` en Datos del sitio (el estado pasa a ser
+  solo los cambios sobre lo guardado, y guardar revalida la pantalla) y
+  `async-await-in-loop` en la indexación (las inspecciones, a la vez y
+  aisladas, sin el freno de 35 s). Cambia un detalle del SPEC §5.3, que quedó
+  anotado ahí.
+- 2026-09-27 — **`datos/actividad.ts` pasa el tope de utilidades** (138
+  líneas de código; en `main` ya tenía 123): sus tres registros suman una
+  entrada por tipo, y Ajustes suma cinco. Partirlo es un cambio aparte, que
+  queda como seguimiento en el reporte.

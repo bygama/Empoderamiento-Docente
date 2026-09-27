@@ -288,11 +288,14 @@ una línea.
   veredicto, lo que dice Google y el último rastreo en `indexacion_de_urls`
   (§8). Borra las filas de rutas que ya no están.
 - **La cuota:** Google da 2000 inspecciones por día y 600 por minuto por
-  propiedad. La tarea revisa **como mucho 20 por corrida**, de a una, las
-  nunca revisadas primero y después las de revisión más vieja, y deja de
-  empezar nuevas a los 35 segundos (la tarea tiene 50). Hoy son 7 u 8 URLs:
-  todas, todos los días. Un 403 o un 429 corta la corrida con su explicación
-  en llano, y lo ya revisado queda guardado.
+  propiedad. La tarea revisa **como mucho 20 por corrida**, las nunca
+  revisadas primero y después las de revisión más vieja, **todas a la vez y
+  aisladas** (cada pedido tiene su tiempo máximo de 20 s, así la corrida entra
+  en sus 50). Hoy son 9 URLs: todas, todos los días. Una que falla sale en el
+  detalle de la corrida con su explicación en llano, y las demás quedan
+  guardadas. *(Cambió en la ejecución: decía «de a una, con un freno a los 35
+  segundos»; react-doctor pide no esperar en un loop, y 20 pedidos juntos
+  están lejos de los 600 por minuto. DECISIONS, 2026-09-27.)*
 - **El cliente** (`lib/busquedas/inspeccion.ts`) no sabe de ED: recibe la
   cuenta, la propiedad y una URL, y devuelve el resultado; usa el token de
   `lib/busquedas/token.ts`. Sin las variables, la corrida sale fallida con la
@@ -394,7 +397,8 @@ nuevas y el JSON-LD). Sin dependencias nuevas.
 - **Spec del admin** (`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`):
   Ajustes, las cuatro tablas, la regla de los plazos y, en la fase 4, las
   personas de referencia para el JSON-LD.
-- **ADR-0014** (nuevo, enmienda al 0012): lo que Ajustes edita pasa a la base
+- **ADR-0015** (nuevo, enmienda al 0012; era el 0014 hasta que Novedades
+  llegó antes con ese número): lo que Ajustes edita pasa a la base
   —los datos del sitio y los plazos—, y el plazo prometido al llegar es el
   techo de lo que se guarda. El índice de `adrs/` lo anota en la fila del 0012.
 - **README**: Ajustes, el sitemap, la indexación (las mismas variables de

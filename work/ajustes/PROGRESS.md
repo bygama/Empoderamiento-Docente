@@ -115,7 +115,52 @@
   `git grep -n "config/site.ts" -- AGENTS.md`: solo la línea de la marca y el
   tilde histórico de §13.
 - 2026-09-27 — Los 20 pasos hechos. Arranca work-verify.
+- 2026-09-27 — **Rebase sobre `main` (`77611c1`) y conciliación**, en siete
+  commits (DECISIONS); después, el gate entero y la verificación (abajo).
 
 ## Verification
+
+### 2026-09-27 — L DoD — PASS
+
+Sobre `main` en `77611c1`, HEAD `8f69840` (rebasada y conciliada: DECISIONS).
+
+- L1 static: `pnpm typecheck` → exit 0 (db, kit-admin, auth, sitio: Done);
+  `pnpm lint` → exit 0; `node scripts/verificar-react-doctor.mjs` → exit 0,
+  «react-doctor: 100/100, sin diagnósticos» (sitio 840 archivos, db 3, auth 27,
+  kit-admin 19). La primera corrida después del rebase dio 90/100 con dos
+  diagnósticos, arreglados por código en `92483b9` y `8f69840` (DECISIONS).
+- L2 behavioral: `pnpm test` → exit 0: kit-admin 3/3, auth 46/46, sitio
+  358/359 con 1 salteado que ya estaba (las respuestas grabadas de Vercel, «falta
+  correr A1»). `pnpm build` → exit 0: `/contacto`, `/` y `/sitemap.xml`
+  estáticas, `/[...resto]` y las seis de Ajustes dinámicas.
+  `pnpm migrate:status` → «Database schema is up to date!». Arranca:
+  `next start -p 3026` → «Ready in 215ms»; `next dev -p 3025` sirve todo.
+- L3 end-to-end, en el navegador de Orca (perfiles aislados `ajustes` y
+  `ajustes-edita`) y con curl:
+  - **Revalidación en producción** (`next start`, 3026, como Ada, administra):
+    Datos del sitio con un correo nuevo → `/contacto`, `/` y `/que-hacemos`
+    (estáticas) lo muestran en la visita siguiente; de vuelta al original,
+    igual. Privacidad, Contacto de 24 a 18 → `/contacto` dice «a los 18
+    meses»; de vuelta a 24, «a los 24». Filas de prueba borradas.
+  - **Permiso** (`next start`, como Eli, edita): las seis pantallas de
+    Ajustes dicen «Esta sección es de quien dirige o administra», y el HTML
+    entero (fetch con su sesión) no trae ninguno de 16 textos de Ajustes
+    (correos de las cuentas, `VERCEL_TOKEN`, «Rige desde», la dirección…).
+    Control: la misma sonda como Ada los encuentra en cada pantalla.
+  - **Redirecciones:** agregada desde la pantalla, `/taller-2025` → 308 a
+    `/contacto`; borrada con la confirmación en su lugar (foco en «Cancelar»),
+    404 otra vez; con «ñ» en la ruta, 308 (curl). Errores de «desde» y de
+    «hacia» en su campo.
+  - **Contraste WCAG** medido sobre cada texto visible de las seis pantallas,
+    en claro, mixto y oscuro (3026): ninguno por debajo de AA; el mínimo,
+    4,54:1 (el primario naranja de §7), 6,01:1 en el oscuro.
+  - **390 de ancho:** ninguna de las seis desborda; Datos del sitio lleva la
+    barra fija de abajo (65 px) con 112 px reservados.
+  - **Teclado:** todo lo enfocable (5, 13, 6, 6, 5 y 1 elementos) tiene su
+    anillo de foco declarado o es un control nativo, y nombre accesible. El
+    recorrido con Tab no se pudo manejar: el navegador embebido no mueve el
+    foco con la pestaña oculta (DECISIONS: sin capturas, por lo mismo).
+- Close review: la abre el padre al recibir `worker_done` (hija supervisada).
+
 
 ## Done
