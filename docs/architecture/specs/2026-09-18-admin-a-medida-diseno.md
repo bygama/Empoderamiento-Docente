@@ -242,7 +242,9 @@ uno de los cuatro lugares de destacado también. `chequeo_en`, `chequeo` y
 contenido, pero sus tablas viven en la misma base. `metricas_diarias` y
 `metricas_ventanas` son la copia diaria de Vercel (ADR-0009); la copia suma
 sistema, navegador, campaña, hora y el cruce página × país **como valores de
-`dimension`, sin migración**, y la ventana de 90 días. `contadores` guarda lo
+`dimension`, sin migración**, y pide solo lo que da el plan de Vercel
+(`PLAN_DE_VERCEL`: hoy 30 días y sin UTM, así que ni la ventana de 90 ni la
+campaña). `contadores` guarda lo
 que cuenta el sitio mismo —una suma por día, evento, canal y clave (el id de
 un material o de un link), sin IP, navegador ni hora—. `enlaces` son los
 links cortos (código único, nombre, destino, dónde se comparte, quién) y
