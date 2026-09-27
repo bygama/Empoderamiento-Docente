@@ -115,10 +115,6 @@ export const origenInicial: OrigenDeQuienesSomos = {
   fotos: [
     fotoDeRuta("/fotos/docentes-trabajan-aula.webp", "Docentes resuelven una tarea en un aula"),
     fotoDeRuta("/fotos/origen-02-inflexion.webp", "Encuentro de formación docente frente a la pizarra"),
-    // Copia de public/quienes-somos/origen-03-pregunta.webp, que sigue usando
-    // Novedades: el campo de foto solo acepta /fotos/. Se deduplica cuando
-    // Fotos (lane 9) consolide dónde vive cada archivo (DECISIONS de
-    // work/paginas-que-hacemos-y-quienes-somos/).
     fotoDeRuta("/fotos/origen-03-pregunta.webp", "Exposición ante la comunidad educativa en un auditorio"),
   ],
 };
