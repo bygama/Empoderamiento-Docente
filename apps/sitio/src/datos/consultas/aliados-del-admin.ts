@@ -10,8 +10,8 @@ import { publicadoDeAliado } from "./aliados";
 
 export type EstadoDelAliado = { publicado: boolean; publicadoEn: string | null; publicadoPor: string | null; borradorEn: string | null; borradorPor: string | null };
 
-/** La marca, con el logo y el nombre que se autorizaron (nulos sin la marca). */
-export type Autorizacion = { autorizado: boolean; nota: string; en: string | null; por: string | null; logo: string | null; nombre: string | null };
+/** La marca, con el logo, el nombre y el alt que se autorizaron (nulos sin la marca). */
+export type Autorizacion = { autorizado: boolean; nota: string; en: string | null; por: string | null; logo: string | null; nombre: string | null; alt: string | null };
 
 /** `autorizado`: si la marca vale para lo que se edita, no solo si está puesta. */
 export type FilaDeAliado = { id: string; nombre: string; logo: string; tamano: string; estado: EstadoDelAliado; autorizado: boolean };
@@ -32,7 +32,7 @@ export async function listaDeAliados(): Promise<FilaDeAliado[]> {
   return filas.map((f) => {
     const d = comoDocumento(f.borrador ?? publicadoDeAliado(f));
     const logo = comoDocumento(d.logo);
-    // Con otro logo u otro nombre que los autorizados, cuenta como sin autorizar: no se puede publicar así.
+    // Con otro logo, otro nombre u otro alt que los autorizados, cuenta como sin autorizar: no se puede publicar así.
     const aAutorizar = loQueSeAutoriza(f.borrador, publicadoDeAliado(f));
     const autorizado = aAutorizar ? estaAutorizado(aAutorizar, f) : false;
     return { id: f.id, nombre: texto(d.nombre).trim(), logo: texto(logo.src), tamano: texto(d.tamano), estado: estadoDe(f), autorizado };
@@ -72,6 +72,7 @@ export async function fichaDeAliado(id: string): Promise<FichaDeAliado | null> {
       por: fila.autorizadoPor,
       logo: fila.autorizadoLogo,
       nombre: fila.autorizadoNombre,
+      alt: fila.autorizadoAlt,
     },
   };
 }

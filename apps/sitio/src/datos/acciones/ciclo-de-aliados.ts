@@ -77,8 +77,8 @@ export async function descartarCambiosDeAliado(pedido: Pedido): Promise<{ ok: tr
   }
 }
 
-/** Al marcar, `visto` es el logo y el nombre que se le mostraron a quien autoriza. */
-type PedidoDeAutorizar = { id: string; autorizado: boolean; nota: string; visto: { logo: string; nombre: string } | null };
+/** Al marcar, `visto` es el logo, el nombre y el texto del logo que se le mostraron a quien autoriza. */
+type PedidoDeAutorizar = { id: string; autorizado: boolean; nota: string; visto: { logo: string; nombre: string; alt: string } | null };
 
 /**
  * Marca o quita «Autorizado», con la nota de dónde consta. Solo quien dirige o
@@ -89,7 +89,7 @@ export async function autorizarAliado(pedido: PedidoDeAutorizar): Promise<{ ok: 
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return SIN_SESION;
     if (!puede(sesion.user.rol, "autorizarAliados")) return { ok: false, detalle: SIN_PERMISO };
-    const visto = z.object({ logo: z.string().max(1000), nombre: z.string().max(200) });
+    const visto = z.object({ logo: z.string().max(1000), nombre: z.string().max(200), alt: z.string().max(500) });
     const valido = z.object({ id: z.uuid(), autorizado: z.boolean(), visto: visto.nullable() }).safeParse(pedido);
     if (!valido.success || (valido.data.autorizado && !valido.data.visto)) return MAL_PEDIDO;
     const { id, autorizado } = valido.data;

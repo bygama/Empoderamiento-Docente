@@ -7,8 +7,9 @@ import { choqueCon, vioLaFila, type Fallo } from "./choque";
 
 // Publicar y despublicar un aliado (`work/casos-aliados-fotos/SPEC.md` §5.1 y
 // §6), con el cliente inyectado. **Publicar exige la marca `autorizado`**
-// (AGENTS.md §5.4), **y para ese logo y ese nombre**: si cambiaron desde que se
-// autorizó, se niega, a cualquiera; publicar no reautoriza a nadie. Aunque se
+// (AGENTS.md §5.4), **y para ese logo, ese nombre y ese texto del logo**: si
+// cambiaron desde que se autorizó, se niega, a cualquiera; publicar no
+// reautoriza a nadie. Aunque se
 // colara, la consulta del sitio no lo mostraría. El logo tiene que estar en
 // Fotos: de ahí salen sus medidas.
 
@@ -34,7 +35,7 @@ export async function publicarAliadoEnBase(
   const ahora = new Date();
   // La condición sobre `borradorEn` hace que un guardado que se cuele en el medio no se publique sin haberse visto.
   const { count } = await base.aliado.updateMany({
-    where: { id, borradorEn: fila.borradorEn, autorizado: true, autorizadoLogo: valido.data.logo.src, autorizadoNombre: valido.data.nombre },
+    where: { id, borradorEn: fila.borradorEn, autorizado: true, autorizadoLogo: valido.data.logo.src, autorizadoNombre: valido.data.nombre, autorizadoAlt: valido.data.logo.alt },
     data: { ...columnasDelAliado(valido.data), publicado: true, publicadoEn: ahora, publicadoPor: quien, borrador: Prisma.DbNull, borradorEn: null, borradorPor: null },
   });
   if (count === 0) return choqueCon(await base.aliado.findUnique({ where: { id } }), "el aliado");

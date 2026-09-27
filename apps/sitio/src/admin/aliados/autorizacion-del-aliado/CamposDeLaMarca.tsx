@@ -22,7 +22,7 @@ export function CamposDeLaMarca({ bloqueada, notaGuardada, aAutorizar, mostrarQu
   return (
     <>
       {mostrarQueSeAutoriza && aAutorizar ? (
-        <LogoYNombre titulo="Se va a autorizar" src={aAutorizar.logo.src} nombre={aAutorizar.nombre} tamano={aAutorizar.tamano} />
+        <LogoYNombre titulo="Se va a autorizar" src={aAutorizar.logo.src} nombre={aAutorizar.nombre} alt={aAutorizar.logo.alt} tamano={aAutorizar.tamano} />
       ) : null}
       {falta ? <p className="text-admin-meta text-gris-texto">{falta}</p> : null}
       <TextoCorto

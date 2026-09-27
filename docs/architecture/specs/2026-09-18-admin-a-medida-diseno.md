@@ -160,7 +160,7 @@ Siete entidades, más las páginas y los ajustes:
 | `autorias` | quién firma cada material publicado, en orden, y el perfil del equipo si es de ED | la migración `biblioteca` |
 | `casos` | número, pregunta, eje, indicio, ficha, contexto, evidencias, análisis | la migración `casos` (era `features/investigacion/data/casos.ts`, borrado) |
 | `equipo` | perfil: nombre, rol, lugar, etapas con hitos y publicaciones | `features/quienes-somos/data/equipo.ts` |
-| `aliados` | nombre, logo, URL, **autorizado** (sin marcar no se publica: §5.4), atado al logo y al nombre que se autorizaron (`autorizado_logo`, `autorizado_nombre`): con otro logo u otro nombre, publicar se niega y el sitio no lo muestra | la migración `aliados` (era `config/aliados.ts`, borrado) |
+| `aliados` | nombre, logo, URL, **autorizado** (sin marcar no se publica: §5.4), atado al logo, al nombre y al texto del logo que se autorizaron (`autorizado_logo`, `autorizado_nombre`, `autorizado_alt`): con otro de los tres, publicar se niega y el sitio no lo muestra | la migración `aliados` (era `config/aliados.ts`, borrado) |
 | `cuentas` | mail, nombre, rol | no existe |
 | `paginas` | una fila por página, con su pestaña de SEO | los componentes y sus `data.ts` |
 | `versiones_de_paginas` | cada publicación de una página: el documento, quién y cuándo; las últimas 10 | no existe |

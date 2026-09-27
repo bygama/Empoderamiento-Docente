@@ -3,21 +3,29 @@ import type { Autorizacion } from "@/datos/consultas/aliados-del-admin";
 import { altoDe } from "@/features/aliados/contenido/modelo";
 import { LogoEnLaTira } from "../LogoEnLaTira";
 
-/** Un logo como en la tira, con su nombre: lo que se autorizó o lo que se va a autorizar. */
-export function LogoYNombre({ titulo, src, nombre, tamano }: { titulo: string; src: string; nombre: string; tamano: string }) {
+type PropsDelLogo = { titulo: string; src: string; nombre: string; alt: string; tamano: string };
+
+/**
+ * Un logo como en la tira, con su nombre y su texto: lo que se autorizó o lo
+ * que se va a autorizar. El texto va escrito (el logo, decorativo): es lo que
+ * leen un lector de pantalla y un buscador, y la marca lo ata también.
+ */
+export function LogoYNombre({ titulo, src, nombre, alt, tamano }: PropsDelLogo) {
   return (
     <figure className="space-y-2">
       <figcaption className="text-admin-meta font-medium">{titulo}</figcaption>
       <LogoEnLaTira src={src} alt="" alto={altoDe(tamano).inicio} />
       <p className="text-admin-cuerpo">«{nombre}»</p>
+      <p className="text-admin-meta text-gris-texto">Texto del logo: «{alt}»</p>
     </figure>
   );
 }
 
-/** Lo que se autorizó, si hay marca: el logo y el nombre que vio quien autorizó. */
+/** Lo que se autorizó, si hay marca: el logo, el nombre y el texto que vio quien autorizó. */
 export function LoQueSeAutorizo({ autorizacion, tamano }: { autorizacion: Autorizacion; tamano: string }) {
-  if (!autorizacion.autorizado || !autorizacion.logo || !autorizacion.nombre) return null;
-  return <LogoYNombre titulo="Se autorizó" src={autorizacion.logo} nombre={autorizacion.nombre} tamano={tamano} />;
+  const { autorizado, logo, nombre, alt } = autorizacion;
+  if (!autorizado || !logo || !nombre || alt === null) return null;
+  return <LogoYNombre titulo="Se autorizó" src={logo} nombre={nombre} alt={alt} tamano={tamano} />;
 }
 
 /** Quién la cambió y cuándo, o que llegó así con el sitio. */

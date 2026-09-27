@@ -4,8 +4,8 @@ import type { Aliado as Fila } from "@/../prisma/generado/client";
 import { aliadosVisibles } from "./aliados";
 
 // AGENTS.md §5.4: sin la marca `autorizado`, un logo no se publica nunca, y la
-// marca vale solo para el logo y el nombre que se autorizaron. La consulta del
-// sitio lo garantiza, también en la vista previa.
+// marca vale solo para el logo, el nombre y el texto del logo que se
+// autorizaron. La consulta del sitio lo garantiza, también en la vista previa.
 
 const logo = (src: string, alt = "Un logo") => ({ src, alt, foco: { x: 0.5, y: 0.5 } });
 
@@ -25,6 +25,7 @@ function fila(parcial: Partial<Fila> & { id: string; orden: number }): Fila {
     autorizacion: "La carpeta de ED",
     autorizadoLogo: `/aliados/${parcial.id}.png`,
     autorizadoNombre: "Aliado",
+    autorizadoAlt: "Un logo",
     autorizadoEn: new Date(),
     autorizadoPor: null,
     creadoEn: new Date(),
@@ -50,11 +51,11 @@ test("salen los publicados y autorizados, en el orden de la tira, con las medida
 
 test("en la vista previa, uno autorizado sin publicar sale con su borrador si se puede publicar", () => {
   const borrador = { nombre: "D", logo: logo("/aliados/d.png", "D"), tamano: "grande", url: "" };
-  const nuevo = fila({ id: "d", orden: 4, publicado: false, borrador, autorizadoNombre: "D" });
+  const nuevo = fila({ id: "d", orden: 4, publicado: false, borrador, autorizadoNombre: "D", autorizadoAlt: "D" });
   assert.deepEqual(aliadosVisibles([nuevo], fotos, false), []);
   assert.deepEqual(aliadosVisibles([nuevo], fotos, true).map((a) => [a.id, a.alt, a.tamano]), [["d", "D", "grande"]]);
   // Un borrador que todavía no se puede publicar no se ve.
-  assert.deepEqual(aliadosVisibles([fila({ id: "d", orden: 4, publicado: false, borrador: { ...borrador, nombre: "" }, autorizadoNombre: "D" })], fotos, true), []);
+  assert.deepEqual(aliadosVisibles([fila({ id: "d", orden: 4, publicado: false, borrador: { ...borrador, nombre: "" }, autorizadoNombre: "D", autorizadoAlt: "D" })], fotos, true), []);
 });
 
 test("un logo que no está en Fotos no se dibuja, y un SVG va sin optimizar", () => {
@@ -79,6 +80,16 @@ test("la vista previa no muestra un borrador que le cambió el nombre y el logo 
   assert.deepEqual(aliadosVisibles([unesco], fotos, true), []);
   // Fuera de la vista previa sigue lo publicado, que es lo autorizado.
   assert.deepEqual(aliadosVisibles([unesco], fotos, false).map((a) => a.src), ["/aliados/a.png"]);
+});
+
+test("con solo el texto del logo cambiado no sale: ni publicado ni el borrador en la vista previa", () => {
+  // El escenario de r2: el mismo logo y el mismo nombre, con otro alt.
+  const conOtroAlt = logo("/aliados/a.png", "Ministerio de Educación de Chile");
+  const publicadoConOtroAlt = fila({ id: "a", orden: 1, logo: conOtroAlt });
+  for (const enVistaPrevia of [false, true]) assert.deepEqual(aliadosVisibles([publicadoConOtroAlt], fotos, enVistaPrevia), [], String(enVistaPrevia));
+  const borradorConOtroAlt = fila({ id: "a", orden: 1, borrador: { nombre: "Aliado", logo: conOtroAlt, tamano: "chico", url: "" } });
+  assert.deepEqual(aliadosVisibles([borradorConOtroAlt], fotos, true), []);
+  assert.deepEqual(aliadosVisibles([borradorConOtroAlt], fotos, false).map((a) => a.alt), ["Un logo"]);
 });
 
 test("cambiar solo la URL o el tamaño no toca la autorización: el borrador se ve en la vista previa", () => {

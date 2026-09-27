@@ -87,7 +87,7 @@ export function FichaDeAliado({ ficha, puedeAutorizar, quienPuede }: Props) {
   // Lo que autorizaría la marca ahora (lo guardado, o lo publicado si lo guardado no se puede publicar), y si ya vale para eso.
   const a = ficha.autorizacion;
   const aAutorizar = loQueSeAutoriza(guardado, publicado);
-  const alDia = aAutorizar ? estaAutorizado(aAutorizar, { autorizado: a.autorizado, autorizadoLogo: a.logo, autorizadoNombre: a.nombre }) : false;
+  const alDia = aAutorizar ? estaAutorizado(aAutorizar, { autorizado: a.autorizado, autorizadoLogo: a.logo, autorizadoNombre: a.nombre, autorizadoAlt: a.alt }) : false;
   const recargar = () => {
     if (haySinGuardar && !window.confirm("Recargar tira lo que escribiste sin guardar. ¿Recargar igual?")) return;
     soltarSalida();

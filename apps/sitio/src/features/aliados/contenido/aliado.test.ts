@@ -34,13 +34,19 @@ test("el tamaño da las clases de alto de la tira, y uno que no existe va como c
 test("los cinco de la base están publicados, autorizados con su nota y pasan esquemaAliado", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
   const { publicadoDeAliado } = await import("@/datos/consultas/aliados");
-  const filas = await base.aliado.findMany({ where: { creadoPor: null, publicadoPor: null }, orderBy: { orden: "asc" } });
+  // Por su nombre, no por cómo se crearon: otros tests suman aliados a la tabla a la vez.
+  const filas = await base.aliado.findMany({ where: { nombre: { in: ["UNESCO", "Techint", "Bloom", "UCSH", "Science Up"] }, creadoPor: null, publicadoPor: null }, orderBy: { orden: "asc" } });
   assert.deepEqual(
     filas.map((f) => f.nombre),
     ["UNESCO", "Techint", "Bloom", "UCSH", "Science Up"],
   );
   for (const fila of filas) {
-    assert.equal(esquemaAliado.safeParse(publicadoDeAliado(fila)).success, true, fila.nombre ?? "");
+    const publicado = esquemaAliado.safeParse(publicadoDeAliado(fila));
+    assert.equal(publicado.success, true, fila.nombre ?? "");
     assert.ok(fila.publicado && fila.autorizado && fila.autorizacion, fila.nombre ?? "");
+    // Autorizados con su propio logo, su nombre y su texto: la marca vale para lo que se publica.
+    if (publicado.success) {
+      assert.deepEqual([fila.autorizadoLogo, fila.autorizadoNombre, fila.autorizadoAlt], [publicado.data.logo.src, publicado.data.nombre, publicado.data.logo.alt], fila.nombre ?? "");
+    }
   }
 });

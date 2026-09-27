@@ -20,7 +20,7 @@ const LUGARES = [
  */
 export function PanelDelAliado({ form, autorizado, enElSitio }: Props) {
   let aviso: string | null = null;
-  if (!autorizado) aviso = "En ningún lado: sin la autorización de este logo y este nombre, no se publica.";
+  if (!autorizado) aviso = "En ningún lado: sin la autorización de este logo, este nombre y este texto, no se publica.";
   else if (!enElSitio) aviso = "Todavía no está en el sitio. Al publicarlo, va a estar en:";
   return (
     <aside aria-label="El aliado en el sitio" className="space-y-10">
