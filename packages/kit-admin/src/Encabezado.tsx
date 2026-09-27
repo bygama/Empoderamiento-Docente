@@ -83,8 +83,8 @@ function Barra({ acciones, avisos, fijo, resaltado }: Pick<Props, "acciones" | "
 /**
  * El encabezado de una pantalla del admin (DESIGN.md §11): dónde estás, el
  * título, el estado, el detalle, las acciones y las pestañas. No sabe de ED.
- * El `-mx-6` lo lleva hasta los bordes del `main` del armazón, que tiene
- * `px-6`.
+ * El `-mx-6` lo lleva hasta los bordes del `main` que lo contiene, que se
+ * espera con `px-6`.
  */
 export function Encabezado({ titulo, volver, migas, estado, detalle, acciones, avisos, pestanas, fijo = false, resaltado = false }: Props) {
   return (

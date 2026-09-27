@@ -24,7 +24,7 @@ type Props = { slug: string; versiones: readonly VersionEnLista[]; cambios: stri
 
 /**
  * Las últimas publicaciones de una página (SPEC §3 de `work/paginas-inicio/`),
- * en la `Lista` del armazón: la más nueva es la que está en el sitio y no se
+ * en la `Lista` del kit: la más nueva es la que está en el sitio y no se
  * restaura; las demás, «Restaurar como borrador», que pregunta si hay un
  * borrador que se reemplaza y contesta en el aviso del encabezado.
  */

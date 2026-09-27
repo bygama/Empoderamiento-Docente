@@ -9,7 +9,7 @@ type Resultado = { ok: boolean; detalle: string };
  * «Actualizar ahora» de una copia diaria: el Resumen le pasa la de Vercel y
  * Búsquedas la de Search Console. Recibe la Server Action por prop, así cada
  * pantalla corre su tarea y el freno de una no toca a la otra. Es el botón
- * secundario del armazón (DESIGN.md §11): su borde de antes, `azul-claro`,
+ * secundario del kit (DESIGN.md §11): su borde de antes, `azul-claro`,
  * daba 1,77:1 y un control pide 3:1.
  */
 export function ActualizarAhora({ accion }: { accion: () => Promise<Resultado> }) {
