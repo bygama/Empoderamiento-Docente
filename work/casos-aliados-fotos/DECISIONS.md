@@ -108,3 +108,57 @@
   --no-verify). Es tu rama de lane, reescrita por el rebase que pide el
   cierre; el lease protege contra pisar algo ajeno. Anotalo en tu DECISIONS
   con esta autorización del padre.»
+- 2026-09-27 — **Ronda de arreglos 1: la marca «Autorizado» queda atada a lo
+  que se autorizó** (decisión del padre sobre el Critical de r1: quien edita
+  guardaba sobre UNESCO un borrador con el nombre «Ministerio de Educación» y
+  otra foto, y se publicaba con la marca vieja). Lo que decidió el padre:
+  - Dos columnas nuevas en `aliados`, `autorizado_logo` (el `src` del logo) y
+    `autorizado_nombre`. Marcar como autorizado (`autorizarAliados`, con la
+    nota obligatoria) guarda los del borrador si se puede publicar; si no, los
+    publicados. La confirmación muestra ese logo y ese nombre. Quitar la
+    autorización las vacía.
+  - Publicar se niega para todos si el logo o el nombre del documento difieren
+    de los autorizados («Cambió el logo o el nombre desde que se autorizó: lo
+    vuelve a autorizar quien dirige o administra, mirando el nuevo.»).
+    Publicar no reautoriza a nadie.
+  - La consulta del sitio, también en la vista previa, muestra una fila solo si
+    el documento que mostraría tiene ese logo y ese nombre.
+  - Fotos › Reemplazar no reemplaza el logo autorizado de un aliado, y lo dice.
+  - La migración `aliados` se regenera con las dos columnas (no va una
+    segunda): los cinco de hoy entran autorizados con su logo y su nombre.
+  Lo que se decidió al implementarlo:
+  - **Quien autoriza manda lo que vio** (`visto`: el `src` y el nombre que se
+    le mostraron). Si lo guardado ya es otro (alguien guardó mientras tanto),
+    no se autoriza y se pide recargar. La Server Action lo exige al marcar.
+    Además, el `update` exige que `autorizado_logo` y `autorizado_nombre` sigan
+    como se leyeron: dos que autorizan a la vez no se pisan sin verse.
+  - **Se autoriza lo guardado, nunca lo que está sin guardar**: con cambios sin
+    guardar, el botón queda deshabilitado y la ficha lo dice. «Guardar la
+    nota» cuando la marca ya vale y solo cambia la nota.
+  - **Un aliado cuyo documento cambió cuenta como sin autorizar** en la lista,
+    en la tarjeta de Contenido y en la fila del Inicio («N aliados sin
+    autorizar»): no se puede publicar así, y alguien que autoriza tiene que
+    mirarlo. En la ficha, un aviso de error lo explica.
+  - **La vista previa es estricta**: si el borrador que mostraría no es lo
+    autorizado, esa fila no sale (no cae a lo publicado). Es lo que pidió el
+    padre: la fila se muestra solo si el documento que mostraría coincide.
+  - Reemplazar chequea antes de subir el archivo nuevo y otra vez adentro de la
+    transacción; si en el medio alguien autorizó esa foto como logo, borra el
+    archivo nuevo y contesta lo mismo.
+  - La lectura de la tira sale a `tiraEnBase(db)`, para probar la consulta
+    contra la base sin `draftMode`.
+  - Para volver a 100 en react-doctor, `AutorizacionDelAliado` se partió en
+    `autorizacion-del-aliado/` (textos, estado, campos, controles y el hook
+    `useAutorizar`) y el control de reemplazo de `SalidaDeLaFoto` en
+    `salida-de-la-foto/ReemplazarElArchivo.tsx`.
+- 2026-09-27 — **Borrar una foto, en una transacción con la fila bloqueada**
+  (Minor 5 de r1): `SELECT … FOR UPDATE` sobre la fila de `fotos`, los usos
+  leídos con el mismo cliente de la transacción y el borrado de la fila
+  adentro; el archivo, después del commit. Un reemplazo o un borrado a la vez
+  espera. **La ventana que queda:** un guardado que elige esa foto (el
+  borrador de una página, una novedad, un caso, un material o un aliado) no
+  toma el bloqueo, así que puede sumar un uso entre la lectura de los usos y
+  el commit del borrado; ese uso quedaría apuntando a una foto que ya no está
+  en la biblioteca (el archivo de `public/` sigue; el de una subida se borra).
+  Es aceptable para el equipo de ED, que es chico y rara vez borra y elige la
+  misma foto en el mismo segundo: lo decidió el padre, y queda escrito acá.
