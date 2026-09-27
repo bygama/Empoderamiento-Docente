@@ -49,6 +49,30 @@
   guarda»); `pnpm test` → sitio 427 pass, 0 fail, 1 saltado (el de
   antes); auth 46; kit 3; `pnpm --filter sitio typecheck` 0; eslint de
   `src/datos` y `src/features/biblioteca` 0.
+- **Paso 3 — el sitio lee el equipo de la base** (`refactor` de los esquemas
+  genéricos en `publicar` + `feat(quienes-somos)`): `datos/consultas/equipo.ts`
+  (`publicadoDe`, `personasVisibles`, `firmadosPorPersona`, `equipoDelSitio`
+  con `leerSinRomper` y `cache`), `contenido/del-sitio.ts` (`personaDelSitio`:
+  la foto encuadrada, el recorrido y cada publicación resuelta contra lo
+  que el sitio muestra y la persona firma, el detalle vacío leyendo la
+  fuente) y `contenido/perfil-del-sitio.ts` (los tipos de los componentes,
+  mudados, sin `bio`, `linkedin` ni `pubs`); la página le pasa las personas a
+  `ImpulsanEd`; `PersonCard` y `PerfilShell` leen `persona.foto` y
+  `rotuloDelNivel`; `revalidar-materiales.ts` suma `/quienes-somos`;
+  `docs/content/equipo-sin-publicar.md` con la bio y el LinkedIn; `data/equipo.ts`
+  borrado. `pnpm --filter sitio exec tsx --test src/datos/consultas/equipo.test.ts src/features/quienes-somos/contenido/persona.test.ts`
+  → 11 pass, 0 fail. `pnpm build` 0 aquí y en un worktree de `main`
+  (`C:/tmp/ed-antes`, detached en `d051c6a0`, contra `ed_equipo_antes` recién
+  migrada); `node scripts/comparar-render.mjs C:/tmp/ed-antes/apps/sitio apps/sitio`
+  → todas «igual» salvo `biblioteca.html` («DISTINTA en texto»: solo «57
+  materiales» → «62»; las filas nuevas quedan fuera de la primera página
+  del HTML); `quienes-somos.html` igual, con −221 802 bytes de JS (el
+  `data.ts` ya no viaja en el bundle). El script de las tarjetas (scratch,
+  en `C:/tmp/tmp-comparar-perfiles.ts`): 15 personas, 78 tarjetas, 18
+  diferencias, todas las de DECISIONS (14 títulos, 2 rótulos, 2 detalles).
+  `pnpm lint` 0; `node scripts/verificar-react-doctor.mjs` → 100/100 sin
+  diagnósticos; `pnpm test` → sitio 431 pass, 0 fail, 1 saltado; auth 46;
+  kit 3.
 
 ## Abierto
 
