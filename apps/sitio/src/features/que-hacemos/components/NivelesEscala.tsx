@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { NIVELES } from "@/features/que-hacemos/data/niveles";
+import type { NivelesDeQueHacemos } from "@/features/que-hacemos/contenido/niveles";
+import { fragmentos, sinMarcas } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ALTO_SVH } from "./niveles-escala/niveles-escena";
@@ -49,16 +50,18 @@ import { NivelCard } from "./niveles-escala/NivelCard";
 // El final en verde, el acento de los conceptos: la frase grande sobre el
 // gris quedaba plana de un solo color (Gastón, 2026-09-10). Proyectos hace
 // lo opuesto: resalta el principio y en azul medio.
-// «sistema educativo» siempre en el segundo renglón (Gastón, 2026-09-10),
-// por eso el span es bloque y no depende del ancho.
-const TITULO = (
-  <>
-    Del aula al
-    <span className="text-verde-concepto-texto block">sistema educativo.</span>
-  </>
-);
+// El segundo renglón siempre en el suyo (Gastón, 2026-09-10), por eso el
+// span es bloque y no depende del ancho.
+function FraseGrande({ frase }: { frase: NivelesDeQueHacemos["frase"] }) {
+  return (
+    <>
+      {frase.primeraLinea}
+      <span className="text-verde-concepto-texto block">{frase.segundaLinea}</span>
+    </>
+  );
+}
 
-export function NivelesEscala() {
+export function NivelesEscala({ contenido }: { contenido: NivelesDeQueHacemos }) {
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
@@ -106,7 +109,7 @@ export function NivelesEscala() {
       // vive en una capa fija por debajo, se vea.
       className={live ? "relative" : "bg-gris-fondo"}
       style={live ? { height: `${ALTO_SVH}svh` } : undefined}
-      aria-label="Niveles en los que intervenimos"
+      aria-labelledby="niveles-titulo"
     >
       <div
         ref={stageRef}
@@ -137,26 +140,41 @@ export function NivelesEscala() {
               la apertura ya dijo en grande (Gastón, 2026-09-10). En el
               fallback, sin apertura, la frase va debajo del nombre. */}
           <h2
+            id="niveles-titulo"
             className="font-display text-azul-principal max-w-[16ch] font-bold tracking-[-0.02em] text-balance"
             style={{ fontSize: "clamp(1.4rem, 1rem + 1.2vw, 1.9rem)", lineHeight: 1.1 }}
           >
-            Niveles en los que{" "}
-            <span className="text-verde-concepto-texto">intervenimos</span>
+            {fragmentos(contenido.titulo).map((f) =>
+              f.resaltado ? (
+                <span key={f.texto} className="text-verde-concepto-texto">
+                  {f.texto}
+                </span>
+              ) : (
+                f.texto
+              ),
+            )}
           </h2>
           {!live && (
             <p
               className="font-display text-azul-principal mt-5 font-extrabold tracking-[-0.03em]"
               style={{ fontSize: "clamp(2rem, 1rem + 3vw, 3.4rem)", lineHeight: 1.02 }}
             >
-              {TITULO}
+              <FraseGrande frase={contenido.frase} />
             </p>
           )}
           {/* El verbo en verde y la idea que ordena en negrita (Gastón,
               2026-09-11): «intervenimos» es lo que ED hace, «de lo micro a
               lo macro» es lo que ordena los cinco niveles. */}
           <p className="text-gris-texto mt-3 max-w-[38ch] font-sans text-[1rem] leading-relaxed">
-            <strong className="text-azul-principal font-semibold">De lo micro a lo macro:</strong>{" "}
-            cinco niveles donde la transformación se sostiene.
+            {fragmentos(contenido.bajada).map((f) =>
+              f.resaltado ? (
+                <strong key={f.texto} className="text-azul-principal font-semibold">
+                  {f.texto}
+                </strong>
+              ) : (
+                f.texto
+              ),
+            )}
           </p>
         </div>
 
@@ -170,13 +188,13 @@ export function NivelesEscala() {
             className="text-azul-principal absolute top-1/2 right-5 z-20 w-[min(46vw,40rem)] -translate-y-1/2 md:right-10"
           >
             <p className="text-gris-texto font-sans text-[0.78rem] font-medium tracking-[0.22em] uppercase">
-              Niveles en los que intervenimos
+              {sinMarcas(contenido.titulo)}
             </p>
             <p
               className="font-display mt-5 font-extrabold tracking-[-0.03em] text-balance"
               style={{ fontSize: "clamp(2.6rem, 1.2rem + 3.2vw, 4.4rem)", lineHeight: 1 }}
             >
-              {TITULO}
+              <FraseGrande frase={contenido.frase} />
             </p>
           </div>
         )}
@@ -189,8 +207,8 @@ export function NivelesEscala() {
               : "mx-auto mt-12 grid w-full max-w-screen-xl grid-cols-1 gap-5 px-5 sm:grid-cols-2 md:px-10"
           }
         >
-          {NIVELES.map((niv, i) => (
-            <NivelCard key={niv.k} niv={niv} i={i} live={live} />
+          {contenido.niveles.map((niv, i) => (
+            <NivelCard key={niv.nombre} niv={niv} i={i} live={live} />
           ))}
         </div>
 

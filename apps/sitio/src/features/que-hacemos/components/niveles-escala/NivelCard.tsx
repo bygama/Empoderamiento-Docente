@@ -1,7 +1,5 @@
-import type { NIVELES } from "@/features/que-hacemos/data/niveles";
+import type { NivelDeQueHacemos } from "@/features/que-hacemos/contenido/niveles";
 import { POS } from "./niveles-escena";
-
-type Nivel = (typeof NIVELES)[number];
 
 /**
  * Un nivel como card. En vivo es un botón absoluto plantado en su `POS` con
@@ -9,7 +7,7 @@ type Nivel = (typeof NIVELES)[number];
  * `[data-collapse]` y `[data-collapse-icon]` son las cajas que la coreografía
  * mide (`scrollHeight`) y colapsa: su estructura no se toca.
  */
-export function NivelCard({ niv, i, live }: { niv: Nivel; i: number; live: boolean }) {
+export function NivelCard({ niv, i, live }: { niv: NivelDeQueHacemos; i: number; live: boolean }) {
   return (
     <article
       data-nivel-card
@@ -24,7 +22,7 @@ export function NivelCard({ niv, i, live }: { niv: Nivel; i: number; live: boole
             role: "button",
             tabIndex: 0,
             "aria-expanded": true,
-            "aria-label": `${niv.k}: ver detalle`,
+            "aria-label": `${niv.nombre}: ver detalle`,
           }
         : {})}
     >
@@ -53,11 +51,11 @@ export function NivelCard({ niv, i, live }: { niv: Nivel; i: number; live: boole
           </span>
         </div>
         <h3 className="font-display text-azul-principal text-[1.35rem] leading-tight font-bold">
-          {niv.k}
+          {niv.nombre}
         </h3>
         <div data-collapse className="overflow-hidden">
           <p className="text-gris-texto mt-3 font-sans text-[1.05rem] leading-relaxed">
-            {niv.d}
+            {niv.texto}
           </p>
         </div>
       </div>
