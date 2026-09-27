@@ -27,6 +27,16 @@ const MODULO_DE: Record<TipoDeActividad, ModuloDeActividad> = {
   "publico-una-pagina": "contenido",
   "descarto-un-borrador": "contenido",
   "restauro-una-version": "contenido",
+  "publico-un-caso": "contenido",
+  "descarto-cambios-de-un-caso": "contenido",
+  "autorizo-un-aliado": "contenido",
+  "quito-la-autorizacion-de-un-aliado": "contenido",
+  "publico-un-aliado": "contenido",
+  "despublico-un-aliado": "contenido",
+  "borro-un-aliado": "contenido",
+  "subio-una-foto": "contenido",
+  "reemplazo-una-foto": "contenido",
+  "borro-una-foto": "contenido",
   "publico-una-novedad": "novedades",
   "despublico-una-novedad": "novedades",
   "descarto-cambios-de-una-novedad": "novedades",
@@ -69,12 +79,18 @@ export function esModuloDeActividad(valor: string): valor is ModuloDeActividad {
 /** Lo que cancela o borra una cuenta deja sin pantalla adonde llevar. */
 const SIN_PANTALLA: readonly TipoDeActividad[] = ["cancelo-la-invitacion", "borro-una-cuenta"];
 
+/** Los de un caso, que tampoco se borran: son siempre cuatro. */
+const DE_UN_CASO: readonly TipoDeActividad[] = ["publico-un-caso", "descarto-cambios-de-un-caso"];
+
+/** Los de una página. Los demás de Contenido son de un aliado o de una foto, que se borran. */
+const DE_UNA_PAGINA: readonly TipoDeActividad[] = ["publico-una-pagina", "descarto-un-borrador", "restauro-una-version"];
+
 /**
  * Adónde lleva lo que se tocó, si todavía tiene pantalla: lo de Cuentas, a
- * esa cuenta si existe; lo de una página, a su editor (las páginas no se
+ * esa cuenta si existe; lo de una página o un caso, a su editor (no se
  * borran); lo de un material, a su ficha si existe. Un mensaje no: pudo
- * haberse borrado, a mano o por la retención; una novedad tampoco, porque
- * también se borra.
+ * haberse borrado, a mano o por la retención; una novedad, un aliado o una
+ * foto tampoco, porque también se borran.
  */
 export function pantallaDe(
   { tipo, sobreId }: { tipo: TipoDeActividad; sobreId: string | null },
@@ -84,7 +100,8 @@ export function pantallaDe(
   if (!sobreId || SIN_PANTALLA.includes(tipo)) return null;
   const modulo = moduloDe(tipo);
   if (modulo === "cuentas" && cuentasQueExisten.has(sobreId)) return { href: `/admin/cuentas/${sobreId}`, que: "Ver la cuenta" };
-  if (modulo === "contenido") return { href: `/admin/contenido/paginas/${sobreId}`, que: "Ver la página" };
+  if (DE_UNA_PAGINA.includes(tipo)) return { href: `/admin/contenido/paginas/${sobreId}`, que: "Ver la página" };
+  if (DE_UN_CASO.includes(tipo)) return { href: `/admin/contenido/casos/${sobreId}`, que: "Ver el caso" };
   if (modulo === "biblioteca" && materialesQueExisten.has(sobreId)) return { href: `/admin/biblioteca/${sobreId}`, que: "Ver el material" };
   return null;
 }

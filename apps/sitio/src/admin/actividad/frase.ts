@@ -21,6 +21,15 @@ const mensaje = (sobre: string | null | undefined) => (sobre && sobre !== "Conta
 /** La otra cuenta, por el nombre que tenía cuando se tocó; sin él, «alguien». */
 const persona = (sobre: string | null | undefined) => sobre ?? "alguien";
 
+/** Un caso, que se anota como se llama en la lista («Caso 01»): «el caso 01». */
+const caso = (sobre: string | null | undefined) => (sobre ? `el ${sobre.charAt(0).toLowerCase()}${sobre.slice(1)}` : "un caso");
+
+/** Un aliado por su nombre: lo que se publica y se autoriza es su logo. */
+const aliado = (sobre: string | null | undefined) => (sobre ? `el logo de ${sobre}` : "un logo de aliado");
+
+/** Una foto por su texto alternativo, como era en ese momento. */
+const foto = (sobre: string | null | undefined) => (sobre ? `la foto «${sobre}»` : "una foto");
+
 // Un verbo en pasado sobre quien lo hizo, como lo diría una persona. Es un
 // Record para que un tipo nuevo no compile hasta tener su frase.
 const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
@@ -65,6 +74,16 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "oculto-un-material": ({ quien, sobre }) => `${quien} ocultó el material ${material(sobre)}`,
   "descarto-cambios-de-un-material": ({ quien, sobre }) => `${quien} descartó los cambios del material ${material(sobre)}`,
   "borro-un-material": ({ quien, sobre }) => `${quien} borró el material ${material(sobre)}`,
+  "publico-un-caso": ({ quien, sobre }) => `${quien} publicó ${caso(sobre)}`,
+  "descarto-cambios-de-un-caso": ({ quien, sobre }) => `${quien} descartó los cambios de ${caso(sobre)}`,
+  "autorizo-un-aliado": ({ quien, sobre }) => `${quien} autorizó ${aliado(sobre)}`,
+  "quito-la-autorizacion-de-un-aliado": ({ quien, sobre }) => `${quien} le quitó la autorización a ${aliado(sobre)}`,
+  "publico-un-aliado": ({ quien, sobre }) => `${quien} publicó ${aliado(sobre)}`,
+  "despublico-un-aliado": ({ quien, sobre }) => `${quien} despublicó ${aliado(sobre)}`,
+  "borro-un-aliado": ({ quien, sobre }) => `${quien} borró ${aliado(sobre)}`,
+  "subio-una-foto": ({ quien, sobre }) => `${quien} subió ${foto(sobre)}`,
+  "reemplazo-una-foto": ({ quien, sobre }) => `${quien} reemplazó el archivo de ${foto(sobre)}`,
+  "borro-una-foto": ({ quien, sobre }) => `${quien} borró ${foto(sobre)}`,
 };
 
 /**

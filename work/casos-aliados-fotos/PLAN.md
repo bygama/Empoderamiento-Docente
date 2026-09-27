@@ -40,7 +40,7 @@ anotada en PROGRESS antes del siguiente.
    día), `SELECT count(*) FROM fotos WHERE subida_por IS NULL` da 47 y
    `pnpm --filter sitio exec tsx --test src/lib/contenido/fotos.test.ts` sale
    0. *(integration · high)*
-3. **Los tipos de actividad de la lane** — los trece de SPEC §9 en
+3. **Los tipos de actividad de la lane** — los diez de SPEC §9 en
    `datos/actividad.ts` (quién los ve, si van al Inicio), sus frases, su
    módulo y a qué ficha lleva «Ver» en Cuentas › Actividad. Aceptación:
    `pnpm --filter sitio exec tsx --test src/admin/actividad/frase.test.ts src/datos/actividad.test.ts src/admin/cuentas/actividad/filtros.test.ts`

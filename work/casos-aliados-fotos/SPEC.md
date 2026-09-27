@@ -405,8 +405,9 @@ cambios sin publicar **[propuesta J]**: el SPEC padre §6 lo define como
 
   Subir queda anotado también desde un formulario (el brief lo pide; el
   comentario de `subirFoto` que decía lo contrario se corrige). En Cuentas ›
-  Actividad van al módulo Contenido, y «Ver» lleva a la ficha del caso, del
-  aliado o de la foto (nada si se borró).
+  Actividad van al módulo Contenido, y «Ver» lleva a la ficha del caso; un
+  aliado o una foto, como una novedad, se pueden borrar, y no llevan link
+  (DECISIONS).
 
 - **Inicio**, dos filas de pendientes: «N aliados sin autorizar»
   (`sin-autorizar`, dirige y administra, a Aliados) y «N fotos sin texto

@@ -67,6 +67,19 @@ export const TIPOS_DE_ACTIVIDAD = [
   "oculto-un-material",
   "descarto-cambios-de-un-material",
   "borro-un-material",
+  // Casos (work/casos-aliados-fotos/): sobre el caso («Caso 01»), con su id.
+  "publico-un-caso",
+  "descarto-cambios-de-un-caso",
+  // Aliados: sobre el aliado, por su nombre como era, con su id.
+  "autorizo-un-aliado",
+  "quito-la-autorizacion-de-un-aliado",
+  "publico-un-aliado",
+  "despublico-un-aliado",
+  "borro-un-aliado",
+  // Fotos: sobre la foto, por su texto alternativo, con su id.
+  "subio-una-foto",
+  "reemplazo-una-foto",
+  "borro-una-foto",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
@@ -78,8 +91,10 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * edita el contenido; con un mensaje de Contacto, quien ve Contacto; que se
  * borró un CV, solo quien ve los CV; lo que se le hace a otra cuenta, quien
  * usa Cuentas; lo que se hace con una novedad, quien edita las novedades; con
- * un material, quien edita la Biblioteca; y lo que se cambia en Ajustes, quien
- * usa Ajustes.
+ * un material, quien edita la Biblioteca; con un caso, un aliado o una foto,
+ * quien edita el contenido (también que se autorizó un logo, aunque marcarlo
+ * sea de quien dirige o administra); y lo que se cambia en Ajustes, quien usa
+ * Ajustes.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -120,6 +135,16 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "oculto-un-material": "editarBiblioteca",
   "descarto-cambios-de-un-material": "editarBiblioteca",
   "borro-un-material": "editarBiblioteca",
+  "publico-un-caso": "editarContenido",
+  "descarto-cambios-de-un-caso": "editarContenido",
+  "autorizo-un-aliado": "editarContenido",
+  "quito-la-autorizacion-de-un-aliado": "editarContenido",
+  "publico-un-aliado": "editarContenido",
+  "despublico-un-aliado": "editarContenido",
+  "borro-un-aliado": "editarContenido",
+  "subio-una-foto": "editarContenido",
+  "reemplazo-una-foto": "editarContenido",
+  "borro-una-foto": "editarContenido",
 };
 
 /**
@@ -168,6 +193,17 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "oculto-un-material": true,
   "descarto-cambios-de-un-material": true,
   "borro-un-material": true,
+  "publico-un-caso": true,
+  "descarto-cambios-de-un-caso": true,
+  "autorizo-un-aliado": true,
+  "quito-la-autorizacion-de-un-aliado": true,
+  "publico-un-aliado": true,
+  "despublico-un-aliado": true,
+  "borro-un-aliado": true,
+  // Subir una foto no cambia el sitio hasta que un formulario la usa y se publica.
+  "subio-una-foto": false,
+  "reemplazo-una-foto": true,
+  "borro-una-foto": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */

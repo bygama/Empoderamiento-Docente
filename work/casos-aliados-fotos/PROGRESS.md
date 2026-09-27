@@ -26,6 +26,13 @@
   saca `quienes-somos`. `pnpm migrate:deploy` → aplicada; `select count(*)
   from fotos where "subidaPor" is null` → 47; la novedad apunta a
   `/fotos/origen-03-pregunta.webp`; `fotos.test.ts` + `fotos-en.test.ts` → 9
-  pass, 0 fail; typecheck 0; `migrate:status` al día.
+  pass, 0 fail; typecheck 0; `migrate:status` al día. Commit `6ba6403`.
+- **Paso 3 — los diez tipos de actividad**: `datos/actividad.ts` (tipos,
+  `QUIEN_VE` todos `editarContenido`, `VA_AL_INICIO` todos sí menos
+  `subio-una-foto`), sus frases en `admin/actividad/frase.ts`, su módulo
+  (Contenido) y «Ver» solo para los casos en
+  `admin/cuentas/actividad/modulos.ts` (DECISIONS), con `modulos.test.ts`
+  nuevo. `tsx --test frase.test.ts actividad.test.ts filtros.test.ts
+  modulos.test.ts` → 11 pass, 0 fail; typecheck 0.
 
 ## Abierto
