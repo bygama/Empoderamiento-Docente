@@ -44,3 +44,9 @@ Append-only: fecha — decisión — por qué.
 - 2026-09-26 — **`twitter:title` y `twitter:description` también cambian**
   (padre, mismo ask): Next los deriva del `openGraph` de la página, con los
   mismos valores. Es parte del cambio aprobado en el punto 1 de arriba.
+- 2026-09-26 — **Contacto entra** (padre, mensaje «Contacto libre: la 7 está
+  en main»): la lane 7 (`mensajes`) está en `main` (`490547f`) con el envío
+  del formulario conectado en `features/contacto/`. Al llegar al paso 17 se
+  rebasea sobre `main` y se hacen los textos y el SEO de Contacto sobre lo que
+  dejó la 7, **sin tocar el envío** (route handler, límite por IP, trampa) **ni
+  la línea de privacidad** que sumó debajo del formulario.
