@@ -65,3 +65,7 @@ fotos-local/
 # regla existe para evitar.
 /apps/*/AGENTS.md
 /apps/*/CLAUDE.md
+
+# El deploy del VPS: el build que arma `construir` y los respaldos del host.
+.compilado/
+respaldos/

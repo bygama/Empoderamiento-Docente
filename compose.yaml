@@ -1,0 +1,121 @@
+# El sitio en un VPS (docs/deploy/vps.md, ADR-0018).
+#
+# **Se levanta con `scripts/desplegar.sh`, no con `docker compose up` a
+# secas.** La imagen `app` se arma desde `.compilado/`, que deja el servicio
+# `construir` después de migrar: el sitio se prerenderiza leyendo la base, y
+# eso solo pasa adentro de esta red. Sin `.compilado/`, `up` no tiene de dónde
+# sacar la imagen.
+#
+# Solo `proxy` publica puertos. `app`, `db` y `analitica` se alcanzan nada más
+# por la red interna, y por eso la app puede confiar en la IP que le pasa Caddy.
+#
+# Las variables salen del `.env` de al lado (ver `.env.example`).
+
+name: ed
+
+x-base-de-la-app: &base-de-la-app
+  DATABASE_URL: postgresql://ed:${CLAVE_DB_ED:?falta CLAVE_DB_ED en .env}@db:5432/ed
+  DATABASE_URL_UNPOOLED: postgresql://ed:${CLAVE_DB_ED}@db:5432/ed
+
+x-entorno-de-la-app: &entorno-de-la-app
+  <<: *base-de-la-app
+  NEXT_PUBLIC_SITE_URL: https://${DOMINIO:?falta DOMINIO en .env}
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?falta BETTER_AUTH_SECRET en .env}
+  CRON_SECRET: ${CRON_SECRET:?falta CRON_SECRET en .env}
+  RESEND_API_KEY: ${RESEND_API_KEY:-}
+  CORREO_REMITENTE: ${CORREO_REMITENTE:-}
+  CV_ABIERTO: ${CV_ABIERTO:-}
+  SEARCH_CONSOLE_CLIENT_EMAIL: ${SEARCH_CONSOLE_CLIENT_EMAIL:-}
+  SEARCH_CONSOLE_PRIVATE_KEY: ${SEARCH_CONSOLE_PRIVATE_KEY:-}
+  SEARCH_CONSOLE_SITE_URL: ${SEARCH_CONSOLE_SITE_URL:-}
+  # Blob, solo si se quiere: sin token, las fotos y los CV van a sus volúmenes.
+  BLOB_READ_WRITE_TOKEN: ${BLOB_READ_WRITE_TOKEN:-}
+  CV_BLOB_READ_WRITE_TOKEN: ${CV_BLOB_READ_WRITE_TOKEN:-}
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${CLAVE_DB_ADMIN:?falta CLAVE_DB_ADMIN en .env}
+      CLAVE_DB_ED: ${CLAVE_DB_ED}
+      CLAVE_DB_UMAMI: ${CLAVE_DB_UMAMI:?falta CLAVE_DB_UMAMI en .env}
+    volumes:
+      - datos-db:/var/lib/postgresql/data
+      # Crea las bases `ed` y `umami`, cada una con su usuario, la primera vez.
+      - ./deploy/db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Por TCP: mientras corre la primera inicialización, Postgres escucha solo
+      # en el socket, y así no se da por listo antes de tiempo.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrar:
+    image: ed-fuente:actual
+    build:
+      context: .
+      target: fuente
+    command: ["pnpm", "migrate:deploy"]
+    environment: *base-de-la-app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  construir:
+    image: ed-fuente:actual
+    profiles: ["construir"]
+    command: ["sh", "deploy/construir.sh"]
+    environment: *entorno-de-la-app
+    volumes:
+      - ./.compilado:/compilado
+    depends_on:
+      migrar:
+        condition: service_completed_successfully
+
+  app:
+    image: ed-sitio:${ED_VERSION:-actual}
+    build:
+      context: ./.compilado
+      dockerfile: ../Dockerfile
+      target: app
+    restart: unless-stopped
+    environment: *entorno-de-la-app
+    volumes:
+      - fotos:/app/apps/sitio/.fotos
+      - cv:/app/apps/sitio/.cv
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/robots.txt"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    depends_on:
+      migrar:
+        condition: service_completed_successfully
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMINIO: ${DOMINIO}
+      CORREO_ACME: ${CORREO_ACME:?falta CORREO_ACME en .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-datos:/data
+      - caddy-config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  datos-db:
+  fotos:
+  cv:
+  caddy-datos:
+  caddy-config:

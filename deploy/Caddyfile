@@ -1,0 +1,15 @@
+# El único servicio que sale a internet (compose.yaml). Certificado
+# automático: de Let's Encrypt con un dominio de verdad, y de la CA interna de
+# Caddy con `localhost`, para la prueba local.
+{
+	email {$CORREO_ACME}
+}
+
+{$DOMINIO} {
+	encode zstd gzip
+
+	# Todo lo demás es el sitio y su admin.
+	handle {
+		reverse_proxy app:3000
+	}
+}
