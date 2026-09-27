@@ -8,6 +8,7 @@ import { esquemaMision, misionInicial } from "@/features/home/contenido/mision";
 import { esquemaQuienesSomos, quienesSomosInicial } from "@/features/home/contenido/quienes-somos";
 import { seoInicial } from "@/features/home/contenido/seo";
 import { esquemaHeroInvestigacion, heroInvestigacionInicial } from "@/features/investigacion/contenido/hero";
+import { esquemaLineas, lineasInicial } from "@/features/investigacion/contenido/lineas";
 import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import { cierreInicial as cierreDeQueHacemos, esquemaCierre as esquemaCierreDeQueHacemos } from "@/features/que-hacemos/contenido/cierre";
 import { esquemaFaro, faroInicial } from "@/features/que-hacemos/contenido/faro";
@@ -92,6 +93,7 @@ export const PAGINAS = {
     nombre: "Investigación",
     secciones: {
       hero: { nombre: "Hero", esquema: esquemaHeroInvestigacion, inicial: heroInvestigacionInicial },
+      lineas: { nombre: "Líneas de investigación", esquema: esquemaLineas, inicial: lineasInicial },
     },
   },
   biblioteca: { ruta: "/biblioteca", nombre: "Biblioteca", secciones: {} },

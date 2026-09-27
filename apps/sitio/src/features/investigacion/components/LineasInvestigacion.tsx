@@ -5,15 +5,16 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
-import { Highlight } from "@/components/ui/Highlight";
 import { FlechaManuscrita } from "@/features/investigacion/casos/Garabatos";
 import { ROTULO_MICRO } from "@/features/investigacion/casos/tintes";
+import type { Lineas } from "@/features/investigacion/contenido/lineas";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { alClicIrA } from "@/lib/navegar";
+import { ConResaltado } from "./ConResaltado";
 import { BocaCarpeta } from "./lineas-investigacion/BocaCarpeta";
 import { crearLineas } from "./lineas-investigacion/coreografia-lineas";
-import { Papel, type Linea } from "./lineas-investigacion/Papel";
+import { Papel } from "./lineas-investigacion/Papel";
 import { PuntosCampo } from "./PuntosCampo";
 
 if (typeof window !== "undefined") {
@@ -21,63 +22,20 @@ if (typeof window !== "undefined") {
 }
 
 /**
- * Taxonomía de 6 líneas del doc maestro, en su orden canónico (SÍNTESIS —
- * nombres oficiales en VALIDAR con ED antes del lanzamiento; después,
- * reconciliar el puente de Biblioteca con esta taxonomía). Preguntas
- * literales de docs/content/arquitectura-investigacion.md §5. Solo nombre
- * y pregunta: la protagonista es la pregunta (decisión 2026-09-14: menos
- * es más; los «incluye», la síntesis «buscamos» y el botón por línea se
- * fueron). `clave` es la frase de la pregunta que el marcador subraya, el
- * mismo recurso que usa la espiral en cada etapa: no toca el copy.
- * `caso` es el slug del caso del archivo (casos/data.ts) que la muestra en
- * acción: «Ver en acción» desliza hasta la pila y abre ese expediente. El
- * cruce línea → caso es editorial (Facundo, 2026-09-14) y hay que validarlo
- * con ED.
+ * El caso que muestra en acción a cada línea, por su lugar en la lista: el
+ * slug del expediente (data/casos.ts) que «Ver en acción» abre. El cruce es
+ * editorial (Facundo, 2026-09-14) y hay que validarlo con ED; no se edita
+ * desde el admin porque es un cruce con los casos, que son una entidad
+ * (SPEC §4 de work/paginas-investigacion-y-resto/).
  */
-const LINEAS: ReadonlyArray<Linea> = [
-  {
-    nombre: "Empoderamiento y desarrollo profesional docente",
-    pregunta:
-      "¿Cómo se transforma la relación de las y los docentes con el saber y qué condiciones fortalecen su autonomía y capacidad de acción?",
-    clave: "capacidad de acción",
-    caso: "oaxaca-transformacion-colectiva",
-  },
-  {
-    nombre: "Socioepistemología y construcción social del conocimiento matemático",
-    pregunta:
-      "¿Cómo se construye, usa y resignifica el conocimiento matemático en prácticas sociales y contextos educativos?",
-    clave: "resignifica",
-    caso: "resignificacion-escuelas-tecnicas",
-  },
-  {
-    nombre: "Discurso y problematización de la matemática escolar",
-    pregunta:
-      "¿Qué formas de presentar la matemática se han naturalizado y cómo pueden revisarse para ampliar sentidos, estrategias y posibilidades de aprendizaje?",
-    clave: "se han naturalizado",
-    caso: "oaxaca-transformacion-colectiva",
-  },
-  {
-    nombre: "Desarrollo y funcionalidad del pensamiento matemático",
-    pregunta:
-      "¿Cómo pueden los contenidos escolares convertirse en herramientas para decidir, argumentar, interpretar información y actuar en el mundo?",
-    clave: "herramientas para decidir",
-    caso: "contenido-curricular-herramienta-pensamiento",
-  },
-  {
-    nombre: "Escenarios, currículum y recursos para el aprendizaje",
-    pregunta:
-      "¿Qué condiciones, tareas, currículas y materiales habilitan participación, múltiples estrategias, debate y construcción de sentido?",
-    clave: "construcción de sentido",
-    caso: "contenido-curricular-herramienta-pensamiento",
-  },
-  {
-    nombre: "Evidencia, evaluación y mejora educativa",
-    pregunta:
-      "¿Qué evidencias permiten comprender una intervención, interpretar sus efectos y tomar mejores decisiones sin reducir el aprendizaje a una cifra?",
-    clave: "a una cifra",
-    caso: "evaluacion-mas-alla-del-puntaje",
-  },
-];
+const CASO_DE_CADA_LINEA = [
+  "oaxaca-transformacion-colectiva",
+  "resignificacion-escuelas-tecnicas",
+  "oaxaca-transformacion-colectiva",
+  "contenido-curricular-herramienta-pensamiento",
+  "contenido-curricular-herramienta-pensamiento",
+  "evaluacion-mas-alla-del-puntaje",
+] as const;
 
 /**
  * Sección 3 — Líneas de investigación (`#lineas`): UNA CARPETA A PANTALLA
@@ -93,9 +51,10 @@ const LINEAS: ReadonlyArray<Linea> = [
  * anterior y se asienta al centrarse (scrub corto ligado a su entrada, sin
  * pin); las filas se revelan en cascada al llegar
  * (lineas-investigacion/coreografia-lineas.ts). Touch / reduced-motion:
- * carpeta plana y filas quietas.
+ * carpeta plana y filas quietas. Los textos llegan por props (de
+ * `features/investigacion/contenido/lineas.ts` o de la base).
  */
-export function LineasInvestigacion() {
+export function LineasInvestigacion({ contenido }: { contenido: Lineas }) {
   const zonaRef = useRef<HTMLElement | null>(null);
   const carpetaRef = useRef<HTMLDivElement | null>(null);
   const listaRef = useRef<HTMLOListElement | null>(null);
@@ -171,7 +130,7 @@ export function LineasInvestigacion() {
             <div className="flex flex-col items-center text-center">
               <span className="text-azul-principal/75 inline-flex items-end gap-3">
                 <span className="border-azul-principal/60 font-display border-b-2 pb-0.5 text-[0.95rem] font-medium tracking-wide uppercase">
-                  No son servicios. Son preguntas.
+                  {contenido.antetitulo}
                 </span>
                 <FlechaManuscrita className="text-verde-concepto h-6 w-12 shrink-0 rotate-[40deg]" />
               </span>
@@ -179,18 +138,18 @@ export function LineasInvestigacion() {
                 className="font-display mt-5 font-extrabold tracking-[-0.02em] text-balance"
                 style={{ fontSize: "clamp(1.7rem, 0.9rem + 1.7vw, 2.6rem)", lineHeight: 1.12 }}
               >
-                Qué <Highlight>estudiamos</Highlight> y qué buscamos comprender.
+                <ConResaltado texto={contenido.titulo} />
               </h2>
               <p className={`${ROTULO_MICRO} text-azul-principal/70 mt-4 uppercase`}>
-                Los grandes temas que estudia ED
+                {contenido.bajada}
               </p>
             </div>
 
             {/* La mesa: seis papeles en dos columnas, la pregunta como
                 protagonista. Se lee en zigzag, como una lista. */}
             <ol ref={listaRef} className="mt-14 grid items-start gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-2 lg:gap-y-12">
-              {LINEAS.map((linea, i) => (
-                <Papel key={linea.nombre} linea={linea} indice={i} />
+              {contenido.lineas.map((linea, i) => (
+                <Papel key={linea.nombre} linea={linea} caso={CASO_DE_CADA_LINEA[i]} indice={i} />
               ))}
             </ol>
 
@@ -198,7 +157,7 @@ export function LineasInvestigacion() {
                 investiga. */}
             <div className="mt-12 flex justify-center lg:mt-14">
               <ButtonSecondary href="#en-accion" withArrow onClick={alClicIrA("en-accion")}>
-                Mirá la investigación en acción
+                {contenido.boton}
               </ButtonSecondary>
             </div>
           </div>
