@@ -182,7 +182,7 @@
   rechazo de la clave foránea con historia); «subir a administra prende el
   segundo factor y cierra las sesiones» lo cubre `roles.test.ts` (paso 1);
   react-doctor 100/100.
-- **Paso 12 — los patrones nuevos del armazón** (este commit).
+- **Paso 12 — los patrones nuevos del armazón** (`331f8aa`).
   `admin/armazon/Volver.tsx` y el slot `volver` de `Encabezado` (en el modo
   navy pasa a `azul-claro`, para la ficha de una novedad de la lane 6);
   `Buscador.tsx` (formulario `GET` con `next/form`, `role="search"`, caja con
@@ -192,5 +192,25 @@
   «Buscador» y «Paginado», con contrastes y primer consumidor, y la línea de
   historia del §11. Aceptación: `pnpm --filter sitio typecheck` y `lint` exit
   0; react-doctor 100/100.
+- **Paso 13 — Personas e Invitar** (este commit). `cuentas/layout.tsx` con
+  `<Guarda capacidad="usarCuentas">`; `cuentas/page.tsx` (Personas: el
+  encabezado con las pestañas Personas · Actividad y el primario «Invitar a
+  alguien», «Qué puede cada rol» y la lista) y `cuentas/invitar/page.tsx`
+  («← Cuentas» y el formulario). En `admin/cuentas/`: `pantallas.ts`,
+  `EncabezadoDeCuentas`, `EstadoDeLaCuenta` (la insignia; «Invitación
+  vencida» en fuerte), `QuePuedeCadaRol` (las tres frases a la vista y la
+  tabla en un `Desplegable`), `TablaDePermisos` (recorre `PUEDE` y
+  `QUE_PERMITE`), `ListaDePersonas` y `FormularioDeInvitacion` (`onSubmit`,
+  como el nombre de Mi cuenta; edita marcado de fábrica). `Lista.tsx` suma
+  `Desplegable`, que ahora usa también su `Fila`. La consulta suma
+  `invitacionVencida` (el lint del compilador de React no deja `Date.now()`
+  en un render). `HORAS_DE_LA_INVITACION` en `datos/sobre-cuentas.ts`. La guía
+  de Cuentas salió de `por-hacer/guias.ts`. DESIGN.md §11 suma «Tabla».
+  Aceptación: `pnpm --filter sitio typecheck`, `lint` (sin warnings) y `test`
+  (165 pass, `guarda.test.ts` incluido) exit 0; react-doctor 100/100; en el
+  3017, como administra entrada con código: `/admin/cuentas` → 200 con «Qué
+  puede cada rol», las tres cuentas e «Invitar a alguien», título «Cuentas ·
+  Admin ED»; `/admin/cuentas/invitar` → 200, «Invitar · Admin ED»; como
+  edita, `/admin/cuentas` → «Esta sección es de quien dirige o administra».
 
 ## Abierto

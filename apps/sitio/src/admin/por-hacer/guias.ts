@@ -34,16 +34,6 @@ const GUIAS: Record<string, Guia> = {
       { nombre: "Ficha de un material", ruta: "/admin/biblioteca/[id]", que: "Autores vinculados al Equipo, cita APA y el último chequeo del link." },
     ],
   },
-  cuentas: {
-    nombre: "Cuentas",
-    para: "Quién entra al admin y qué puede hacer. Solo para quien dirige y quien administra.",
-    pantallas: [
-      { nombre: "Personas", ruta: "/admin/cuentas", que: "Qué puede cada rol y la lista de cuentas, con su último acceso y su estado." },
-      { nombre: "Invitar", ruta: "/admin/cuentas/invitar", que: "Correo, nombre y rol. Llega «Elegí tu contraseña», que vence a las 72 horas." },
-      { nombre: "Una cuenta", ruta: "/admin/cuentas/[id]", que: "Cambiar el rol, cerrar sus sesiones o suspenderla en vez de borrarla." },
-      { nombre: "Actividad", ruta: "/admin/cuentas/actividad", que: "Quién hizo qué y cuándo, durante 12 meses." },
-    ],
-  },
   ajustes: {
     nombre: "Ajustes",
     para: "Lo que se configura una vez. Solo para quien dirige y quien administra.",

@@ -11,12 +11,10 @@ import { registrarActividad } from "@/datos/actividad";
 import { auth } from "@/datos/auth";
 import { base } from "@/datos/cliente";
 import { esquemaDelCorreo, esquemaDelNombre } from "@/datos/esquemas";
-import { NO_PUEDE, SIN_SESION, borrarEnlaces, borrarSiNuncaHizoNada, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
+import { HORAS_DE_LA_INVITACION as HORAS, NO_PUEDE, SIN_SESION, borrarEnlaces, borrarSiNuncaHizoNada, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
 
 // Invitar, reenviar y cancelar una invitación (SPEC de work/cuentas §4.2): la
 // invitación es «Elegí tu contraseña», que vence a las 72 horas.
-
-const HORAS = 72;
 
 const esquemaDeInvitacion = z.object({
   correo: esquemaDelCorreo,

@@ -10,6 +10,9 @@ import { esquemaDelId } from "./esquemas";
  * archivo de acciones: nada de acá lo puede llamar el navegador.
  */
 
+/** Lo que dura una invitación (SPEC de work/cuentas §4.2). */
+export const HORAS_DE_LA_INVITACION = 72;
+
 export type Sesion = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
 export type Resultado = { ok: boolean; detalle: string };
 
