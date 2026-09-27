@@ -70,7 +70,7 @@ export async function moverAliadoEnBase(base: PrismaClient, { id, hacia }: { id:
     hacia,
     ordenDe: async (tx) => (await tx.aliado.findMany({ orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true } })).map((f) => f.id),
     async renumerar(tx, ids) {
-      for (const [k, idDe] of ids.entries()) await tx.aliado.updateMany({ where: { id: idDe }, data: { orden: k + 1 } });
+      await Promise.all(ids.map((idDe, k) => tx.aliado.updateMany({ where: { id: idDe }, data: { orden: k + 1 } })));
     },
   });
   return movio === undefined ? NO_EXISTE : { ok: true, movio };

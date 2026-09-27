@@ -33,7 +33,7 @@ const ordenDe = (ids: readonly string[]) => async (tx: Prisma.TransactionClient)
   (await tx.persona.findMany({ where: { id: { in: [...ids] } }, orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true } })).map((f) => f.id);
 
 async function renumerar(tx: Prisma.TransactionClient, ids: readonly string[]) {
-  for (const [k, id] of ids.entries()) await tx.persona.updateMany({ where: { id }, data: { orden: k } });
+  await Promise.all(ids.map((id, k) => tx.persona.updateMany({ where: { id }, data: { orden: k } })));
 }
 
 test("cuatro «Subir» a la vez y un borrado: ni un deadlock, ni un paso perdido", sinBase, async () => {

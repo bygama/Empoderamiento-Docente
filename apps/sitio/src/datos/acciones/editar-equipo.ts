@@ -83,6 +83,28 @@ function sinLaPersona(borrador: Prisma.JsonValue, id: string): Prisma.InputJsonO
 }
 
 /**
+ * Saca a la persona de los borradores de materiales que la nombran: quedan de
+ * afuera, con su nombre. Esas filas quedan bloqueadas (`FOR UPDATE`) hasta el
+ * final de la transacción: un guardado que llegue en el medio espera, y no se
+ * pisa.
+ */
+async function sacarDeLosBorradores(tx: Prisma.TransactionClient, id: string) {
+  const conBorrador = await tx.$queryRaw<Array<{ id: string; borrador: Prisma.JsonValue }>>`
+    SELECT id, borrador FROM materiales
+    WHERE borrador @> jsonb_build_object('autorias', jsonb_build_array(jsonb_build_object('persona', ${id}::text)))
+    ORDER BY id FOR UPDATE`;
+  await Promise.all(
+    conBorrador.flatMap((m) => {
+      const limpio = sinLaPersona(m.borrador, id);
+      return limpio ? [tx.material.update({ where: { id: m.id }, data: { borrador: limpio } })] : [];
+    }),
+  );
+}
+
+/** Otra persona guardó el perfil entre la lectura y el borrado: se deshace todo y se contesta el choque. */
+class OtraLlegoAntes extends Error {}
+
+/**
  * Borra la fila y las redirecciones que llevaban a ella. Sus autorías quedan
  * de afuera, con su nombre: en las publicadas lo hace la fk (`SET NULL`), y en
  * los borradores de los materiales, esto (SPEC §6.1, propuesta O). Toma el
@@ -96,24 +118,19 @@ export async function borrarPersonaEnBase(
   if (!fila) return NO_EXISTE;
   // Borrar lo que otra persona guardó sin haberlo visto también es pisar.
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila, EL_PERFIL);
-  const borrada = await base.$transaction(async (tx) => {
-    await tomarLaLista(tx, LISTAS.equipo);
-    // Los borradores de materiales que la nombran quedan bloqueados hasta el final: un guardado que llegue en el
-    // medio espera y no se pisa. Antes de borrar la fila, que suelta sus autorías: es el orden en que publica un
-    // material (primero su fila, después sus autorías), así los dos no se esperan en cruz.
-    const conBorrador = await tx.$queryRaw<Array<{ id: string; borrador: Prisma.JsonValue }>>`
-      SELECT id, borrador FROM materiales
-      WHERE borrador @> jsonb_build_object('autorias', jsonb_build_array(jsonb_build_object('persona', ${id}::text)))
-      ORDER BY id FOR UPDATE`;
-    const { count } = await tx.persona.deleteMany({ where: { id, borradorEn: fila.borradorEn } });
-    if (count === 0) return false;
-    if (fila.slug) await tx.redireccion.deleteMany({ where: { hacia: `/quienes-somos/equipo/${fila.slug}` } });
-    for (const m of conBorrador) {
-      const limpio = sinLaPersona(m.borrador, id);
-      if (limpio) await tx.material.update({ where: { id: m.id }, data: { borrador: limpio } });
-    }
-    return true;
-  });
-  if (!borrada) return choqueCon(await base.persona.findUnique({ where: { id } }), EL_PERFIL);
+  try {
+    await base.$transaction(async (tx) => {
+      await tomarLaLista(tx, LISTAS.equipo);
+      // Los borradores antes que la fila, que suelta sus autorías: es el orden en que publica un material (primero
+      // su fila, después sus autorías), así los dos no se esperan en cruz.
+      await sacarDeLosBorradores(tx, id);
+      const { count } = await tx.persona.deleteMany({ where: { id, borradorEn: fila.borradorEn } });
+      if (count === 0) throw new OtraLlegoAntes();
+      if (fila.slug) await tx.redireccion.deleteMany({ where: { hacia: `/quienes-somos/equipo/${fila.slug}` } });
+    });
+  } catch (e) {
+    if (e instanceof OtraLlegoAntes) return choqueCon(await base.persona.findUnique({ where: { id } }), EL_PERFIL);
+    throw e;
+  }
   return { ok: true, nombre: nombreDe(fila), estabaPublicada: fila.publicado };
 }

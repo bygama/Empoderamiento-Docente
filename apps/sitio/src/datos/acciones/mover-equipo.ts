@@ -41,7 +41,7 @@ export async function moverPersonaEnBase(base: PrismaClient, { id, hacia }: { id
     },
     // `updateMany`: una fila que se borró sin pasar por el candado (la limpieza de un test) se saltea en vez de tirar.
     async renumerar(tx, ids) {
-      for (const [k, idDe] of ids.entries()) await tx.persona.updateMany({ where: { id: idDe }, data: { orden: k } });
+      await Promise.all(ids.map((idDe, k) => tx.persona.updateMany({ where: { id: idDe }, data: { orden: k } })));
     },
   });
   return movio === undefined ? NO_EXISTE : { ok: true, movio, nombre };
