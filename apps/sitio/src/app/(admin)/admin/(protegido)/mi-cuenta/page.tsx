@@ -4,6 +4,7 @@ import { MiCuenta } from "@/admin/mi-cuenta/MiCuenta";
 import { avisosDe } from "@/datos/avisos";
 import { sesionesAbiertas } from "@/datos/consultas/mi-cuenta";
 import { sesionActual } from "@/datos/sesion";
+import { diasQueFaltan } from "@/datos/tareas/resumen-semanal";
 
 export const metadata: Metadata = { title: "Mi cuenta" };
 
@@ -21,6 +22,7 @@ export default async function PaginaMiCuenta() {
       sesiones={await sesionesAbiertas(sesion.user.id)}
       idDeEstaSesion={sesion.session.id}
       avisos={await avisosDe(sesion.user.id, sesion.user.rol)}
+      faltanParaElResumen={await diasQueFaltan()}
     />
   );
 }

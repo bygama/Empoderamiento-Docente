@@ -6,6 +6,7 @@ import { registrarCorrida } from "./corridas";
 import { indexacionDeGoogle } from "./indexacion-de-google";
 import { copiaDeVercel } from "./metricas-de-vercel";
 import { podaDeActividad } from "./poda-de-actividad";
+import { resumenSemanalDeMetricas } from "./resumen-semanal";
 import { podaDeLimitesPorIp, retencionDeContacto, retencionDeCV } from "./retencion-de-mensajes";
 import { saludDeLinks } from "./salud-de-links";
 
@@ -25,6 +26,7 @@ export const TAREAS_DIARIAS = definirTareas([
   podaDeLimitesPorIp,
   saludDeLinks,
   archivosDeFotosSueltos,
+  resumenSemanalDeMetricas,
 ]);
 
 /**

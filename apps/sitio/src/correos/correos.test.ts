@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { elegiTuContrasena } from "./elegi-tu-contrasena";
 import { mandarCorreo } from "./mandar";
+import { resumenSemanal } from "./resumen-semanal";
 import { tuCodigo } from "./tu-codigo";
 import { tuContrasenaCambio } from "./tu-contrasena-cambio";
 import { tuCorreoCambio } from "./tu-correo-cambio";
@@ -93,4 +94,25 @@ test("«El correo de tu cuenta del admin cambió» dice de cuál a cuál y cuán
   assert.ok(correo.texto.includes("cambió el 26 de septiembre de 2026 a las 20:15, hora universal: era juan@viejo.test y ahora es juan@nuevo.test."));
   assert.ok(correo.texto.includes("Cerramos las sesiones"));
   assert.ok(correo.texto.includes("Si no lo pediste, avisale ya mismo a quien administra el sitio."));
+});
+
+test("el resumen semanal trae los números contra la semana anterior, la página más vista y el link", () => {
+  const correo = resumenSemanal({
+    nombre: "Ana",
+    semana: "del 21 al 27 de septiembre",
+    numeros: [
+      { etiqueta: "Visitantes", valor: 1234, variacion: "+12 %" },
+      { etiqueta: "Contactos enviados", valor: 0, variacion: "sin datos previos" },
+      { etiqueta: "Clics desde Google", valor: null, nota: "No se pudo leer" },
+    ],
+    paginaMasVista: { nombre: "Inicio", vistas: 520 },
+    enlace: "https://ed.test/admin/metricas?periodo=7",
+  });
+  assert.equal(correo.asunto, "El sitio en la semana del 21 al 27 de septiembre");
+  assert.ok(correo.texto.includes("Visitantes: 1.234 (+12 % contra la semana anterior)"));
+  assert.ok(correo.texto.includes("Contactos enviados: 0 (sin datos de la semana anterior)"));
+  assert.ok(correo.texto.includes("Clics desde Google: — (No se pudo leer)"));
+  assert.ok(correo.texto.includes("La página más vista fue Inicio, con 520 vistas."));
+  assert.ok(correo.texto.includes("https://ed.test/admin/metricas?periodo=7"));
+  assert.match(correo.texto, /Lo apagás en Mi cuenta/);
 });
