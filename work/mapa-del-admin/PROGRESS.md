@@ -386,6 +386,25 @@
   arregla `linkDelDoi`, borra `admin/por-hacer/` y las portadas sin uso, y deja
   al día los documentos del cierre. Los `scrub: true` del sitio (11 en 8
   archivos) quedan afuera: van a una lane propia, con verificación visual.
+- 2026-09-27 — r1 de #195 (`cierre-del-mapa`): **PASS**, sin Critical ni Important.
+  Registros idénticos entre `main` y la rama, HTML del admin igual con los tres
+  roles y los tres temas (salvo la 404 de P5), 12 páginas idénticas, 5 de 5 en
+  test. Los cuatro Minor, arreglados en la ronda de cierre: el spec §11, ejemplos
+  neutros en el kit, `useErroresDelEditor` en la lista del armazón y un test que
+  frena una clave repetida entre módulos. El worker de la hija quedó cortado por
+  un reinicio de la máquina, después de pushear su cierre. El padre corrió el
+  gate sobre la cabeza de la rama (`756a60a1`, sobre `f50cf408`), con Docker
+  vuelto a levantar: typecheck en limpio 0, lint 0, react-doctor 100/100 (sitio
+  1197, kit 52), test (kit 11/11, auth 46/46, sitio 569 pasan, 0 fallan, 2
+  saltados), build 0. **#195 mergeado** → `main` en `eb4b4e19`, con el mismo árbol
+  que se midió. Fuera: su worktree, su terminal, la rama, `%TEMP%/cierre` y el
+  checkout del gate (`%TEMP%/ed-gate`); la copia `ed_cierre` ya la había borrado
+  la hija.
+- 2026-09-27 — **El código del mapa está entero en `main`**: las once lanes de
+  código y el cierre. Del criterio de cierre del SPEC §11 falta lo que no es
+  código: la lane 0 (deploy) y el recorrido en producción (entrar con segundo
+  factor, publicar una novedad, recibir un contacto, verla en el Inicio). La
+  lane padre queda abierta solo para eso.
 
 ## Hecho
 
@@ -440,3 +459,17 @@
   HTML).
 - La base `ed_panel` del contenedor no es de ninguna lane de este XL: preguntarle
   a Mateo antes de tocarla.
+- De `cierre-del-mapa`, para después:
+  - **Dos corridas de la suite a la vez contra la misma base se ensucian.**
+    Pisan destacados, el orden de los aliados y los chequeos de links. Hasta
+    que los tests con filas fijas pasen a filas propias, un gate por base a la
+    vez.
+  - El README (sección del deploy) todavía dice que el build va a correr las
+    migraciones «cuando llegue la fase 1»: es de la lane 0.
+  - AGENTS.md §6 cuenta los `.tsx` sobre el tope con una medición del
+    2026-09-26. El cierre sacó 27 archivos de la app (24 al kit y 3 borrados),
+    así que conviene volver a medir.
+  - Una 404 propia del admin, con su armazón (idea de P5).
+- Las cuentas de prueba de las lanes (`cierre-*@ed.test`, `equipo-prueba@ejemplo.org`
+  y las anteriores) quedan en la base `ed` local. Tienen actividad, y la clave
+  foránea no deja borrarlas. Es solo la base de desarrollo.
