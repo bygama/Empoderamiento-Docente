@@ -14,17 +14,7 @@ export type Pantalla = {
 
 export type Guia = { nombre: string; para: string; pantallas: readonly Pantalla[] };
 
-const GUIAS: Record<string, Guia> = {
-  biblioteca: {
-    nombre: "Biblioteca",
-    para: "Los 63 materiales, que llevan a la revista o a la editorial.",
-    pantallas: [
-      { nombre: "Lista de materiales", ruta: "/admin/biblioteca", que: "Buscador, filtros por tipo y por estado, consultas del mes y links rotos." },
-      { nombre: "Agregar material", ruta: "/admin/biblioteca/nuevo", que: "Se pega un DOI, un ISBN o un link y el formulario se completa solo." },
-      { nombre: "Ficha de un material", ruta: "/admin/biblioteca/[id]", que: "Autores vinculados al Equipo, cita APA y el último chequeo del link." },
-    ],
-  },
-};
+const GUIAS: Record<string, Guia> = {};
 
 /** La guía de un módulo, o `undefined` si esa clave no es un módulo por hacer. */
 export function guiaDe(modulo: string): Guia | undefined {

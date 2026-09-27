@@ -9,6 +9,8 @@ export function Lista({ children }: { children: React.ReactNode }) {
 }
 
 type PropsDeFila = {
+  /** A la izquierda de todo, una imagen chica que la identifica (la portada de un material): decorativa. */
+  miniatura?: React.ReactNode;
   /** Lo principal: un nombre, y si hace falta algo al lado en meta. */
   principal: React.ReactNode;
   /** Una línea en meta debajo. */
@@ -27,16 +29,29 @@ type PropsDeFila = {
  * Una fila de la `Lista`. Lo principal y el detalle a la izquierda; las
  * insignias y la acción a la derecha, y abajo si no entran. Atenuada, lo
  * principal baja a `gris-texto` (4,83:1) y la nota ocupa el lugar de la
- * acción: no se esconde, se explica.
+ * acción: no se esconde, se explica. Con miniatura, va a la izquierda de lo
+ * principal, y lo principal y el detalle se corren junto a ella.
  */
-export function Fila({ principal, detalle, insignias, accion, atenuada, desplegable }: PropsDeFila) {
+export function Fila({ miniatura, principal, detalle, insignias, accion, atenuada, desplegable }: PropsDeFila) {
+  const texto = (
+    <div className="min-w-0">
+      <div className={`font-medium ${atenuada ? "text-gris-texto" : ""}`}>{principal}</div>
+      {detalle ? <div className="mt-0.5 text-admin-meta text-gris-texto">{detalle}</div> : null}
+    </div>
+  );
   return (
     <li className="px-5 py-4">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-        <div className="min-w-0">
-          <div className={`font-medium ${atenuada ? "text-gris-texto" : ""}`}>{principal}</div>
-          {detalle ? <div className="mt-0.5 text-admin-meta text-gris-texto">{detalle}</div> : null}
-        </div>
+        {miniatura ? (
+          <div className="flex min-w-0 items-center gap-4">
+            <div aria-hidden="true" className="shrink-0">
+              {miniatura}
+            </div>
+            {texto}
+          </div>
+        ) : (
+          texto
+        )}
         <div className="flex flex-wrap items-center gap-3">
           {insignias}
           {atenuada ? <span className="text-admin-meta text-gris-texto">{atenuada}</span> : accion}
