@@ -18,7 +18,7 @@
   si el correo no salió —falta `RESEND_API_KEY` o Resend contestó un error—,
   `/admin/entrar/codigo` dice en llano que no se pudo mandar el código y a
   quién avisar, en vez de «Te mandamos un código». En desarrollo sin clave,
-  el código sale por la consola, como los otros correos. En el ADR-0012 y en
+  el código sale por la consola, como los otros correos. En el ADR-0013 y en
   el README, como condición del primer deploy: Resend configurado y probado
   antes de que esta lane llegue a producción (el padre lo anota en la lane 0).
   **Cómo:** el código no sale en segundo plano. Quien lo pide ya puso bien la
@@ -66,3 +66,32 @@
   la acción no lo pregunta: intenta el `DELETE` y contesta lo que diga la
   clave foránea. Una pendiente no muestra «Borrar»: muestra «Cancelar la
   invitación», que hace lo mismo.
+- 2026-09-26 — **Rebase sobre `main` (`490547f`, con `paginas-inicio` y
+  `mensajes`) y conciliación** (el padre: el que rebasea segundo concilia, y
+  queda una de cada pieza):
+  - **«← volver» y el buscador son los de `main`** (lane 7). Los míos se
+    borraron; Invitar y la ficha usan su `Volver` por el slot `volver` del
+    `Encabezado`, igual que antes.
+  - **Los filtros de Actividad pasan a ser el `Filtro` de píldoras** de
+    `main` (persona, módulo y cuándo), no `select` dentro de un buscador
+    propio: en §11 el patrón para recortar una lista por un valor de la URL
+    es ese. Cada filtro conserva los otros y la búsqueda (`conservar` del
+    `Buscador`); «Sacar los filtros» se fue (cada fila tiene su «todos», y
+    el buscador su «Borrar la búsqueda»).
+  - **Confirmar con `Confirmacion`, no con `window.confirm`** (reemplaza la
+    línea de arriba sobre `window.confirm`): §11 de `main` pide confirmar en el
+    lugar del botón **lo que no se deshace**. Preguntan borrar la cuenta,
+    cancelar la invitación y pasar la dirección; suspender, cerrar sus
+    sesiones y cambiar el correo se deshacen con otro clic y no preguntan.
+  - **El ADR del segundo factor pasa a ser el 0013** (la lane 7 mergeó antes
+    su 0012).
+  - **Los tipos de actividad de `main`** tienen su visibilidad (páginas:
+    `editarContenido`; Contacto: `verContacto`; el CV: `verCV`), su frase y
+    su módulo (Contenido y Mensajes). Lo de una página linkea a su editor; lo
+    de un mensaje no, porque pudo haberse borrado. La 3c (con
+    `VA_AL_INICIO`) todavía no está en `main`: concilia ella.
+  - **El `CHECK` alcanza a los tests de Mensajes**: sus cuentas de prueba de
+    administra llevan el segundo factor. Y `avisos.ts` pide solo algo que
+    mande, porque `mandarCorreo` ahora contesta si salió.
+  - Las migraciones de `main` (`…231213`, `…231819`) van antes que la mía
+    (`…232051`): no se regeneró nada. Probado desde una base vacía.

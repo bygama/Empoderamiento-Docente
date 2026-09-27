@@ -145,7 +145,7 @@ aceptación corrida y anotada en PROGRESS.
     módulo de cada tipo en `admin/cuentas/`. Aceptación: `pnpm --filter sitio
     typecheck` y `lint` en verde; `?pagina=2&modulo=cuentas&q=…` da 200. *(medium)*
 
-16. **Los documentos.** ADR-0012 «Segundo factor por correo»; spec del admin
+16. **Los documentos.** ADR-0013 (era 0012 antes del rebase) «Segundo factor por correo»; spec del admin
     §7; AGENTS.md §12 (la línea de la sesión) y §3 (las acciones de cuentas);
     README (invitar, el código en local, Resend como condición del primer
     deploy); `docs/README.md` si lista los ADR. Aceptación: `git diff --stat`
