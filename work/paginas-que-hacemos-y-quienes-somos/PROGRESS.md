@@ -1,13 +1,18 @@
 # PROGRESS — Páginas: Qué hacemos, Quiénes somos y lo compartido
 
 Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
-[`SPEC.md`](SPEC.md).
+[`SPEC.md`](SPEC.md), plan en [`PLAN.md`](PLAN.md), rulings en
+[`DECISIONS.md`](DECISIONS.md).
 
 ## In progress
 
-STATE: design-first approval window, waiting for owner approval of SPEC.md before PLAN.md
+- Paso 1 del PLAN (partir `ImpulsanEd`).
 
 ## Hecho
+
+- **SPEC aprobado por el padre** (2026-09-26) con una condición (nombres
+  accesibles por `aria-labelledby` al título editable) y un pedido (probar la
+  vista previa de `/` con un borrador de Qué hacemos); PLAN escrito.
 
 - **Arranque del worktree** (2026-09-26) — `pnpm install` (549 paquetes) y
   `pnpm generate` (Prisma 7.10.0); `.env.local` copiado y apuntado a la base

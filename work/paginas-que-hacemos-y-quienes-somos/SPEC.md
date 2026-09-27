@@ -1,8 +1,9 @@
 # SPEC — Páginas: Qué hacemos, Quiénes somos y lo que comparten con Inicio
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first); el PLAN se
-  escribe después
+- **Estado:** aprobado por el padre el 2026-09-26 con una condición y un
+  pedido, ya escritos acá (§3, §4, §6, §11; rulings en
+  [`DECISIONS.md`](DECISIONS.md)); plan en [`PLAN.md`](PLAN.md)
 - **Decide:** Mateo; aprueba el padre (`work/mapa-del-admin/DECISIONS.md`,
   2026-09-26: «procede en automatico»). Esta lane **no crea tablas ni suma
   dependencias**.
@@ -191,10 +192,12 @@ y la ayuda de cada campo dice cómo se ve (verde, azul, negrita, tachado).
 - **El texto de una ficha:** el tipo de hoy pide «≤ 20 palabras»; el campo lo
   dice en la ayuda y el tope es de caracteres (140).
 - **El sello** se parte en renglones en « · », como hoy; la ayuda lo dice.
-- **Lo que un `aria-label` repite de un texto editable sale de ese texto**
-  (el `nav` de las áreas, el de Niveles, el de Proyectos, el `h2` sr-only del
-  faro): con el mismo texto de hoy, el HTML no cambia, y si alguien lo edita
-  lo siguen. Es lo que la revisión de la 4a encontró en Inicio.
+- **El nombre accesible de una región sale de su título editable** (condición
+  del padre, como en la 4a): el hero, el faro, el `nav` de las áreas,
+  Niveles, Proyectos y el cierre pasan de un `aria-label` fijo a
+  `aria-labelledby` al id de su título (DECISIONS tiene la lista y el porqué
+  de cada una). Lo que es una copia del mismo texto en otro elemento (el `h2`
+  sr-only del faro, el eyebrow animado de Niveles) sale del mismo campo.
 
 ## 4. Quiénes somos: cuatro secciones
 
@@ -226,9 +229,10 @@ y la ayuda de cada campo dice cómo se ve (verde, azul, negrita, tachado).
 - **El botón del hero y la volanta del equipo dicen hoy lo mismo** que el menú
   («Quiénes sostienen ED»): los dos se editan, cada ayuda nombra al otro, y el
   menú sigue en `config/nav.ts`.
-- `aria-label` que repiten texto editable: el de Nuestra mirada sale de su
-  volanta, el del equipo de su volanta más « — el equipo», el `h1` sr-only
-  del hero de sus dos renglones. HTML igual.
+- **Nombres accesibles:** el hero pasa a `aria-labelledby` a su `h1` (cuyo
+  texto sr-only se arma con los dos renglones), Nuestra mirada y Quiénes
+  sostienen ED a su volanta; el Origen sigue con su `aria-label` fijo
+  (DECISIONS).
 
 ## 5. SEO de las dos
 
@@ -252,9 +256,9 @@ páginas y en ese paso, y la evidencia lista las etiquetas.
 
 - **Los nombres con que se navega:** las anclas (`#areas`, `#area-<id>`,
   `#equipo`…), los `data-indice` del índice del celular, el menú
-  (`config/nav.ts`) y los `aria-label` que nombran una región sin repetir un
-  texto de la página («Qué hacemos», «Qué hace Empoderamiento Docente»,
-  «Cierre», «Origen, sentido y evolución»).
+  (`config/nav.ts`) y el `aria-label` de la única región sin título editable
+  («Origen, sentido y evolución»), más los de las listas que no son una
+  región (los chips del hero, el indicador de pasos).
 - **Los nombres de los tres tiempos del origen** («01 — Origen», «Sentido»,
   «Evolución»): nombran los movimientos de la escena, como su `aria-label`.
 - **Números e íconos que salen del índice** («01», «Área 01», «Proyecto 01»,
@@ -365,10 +369,14 @@ quien rebasea segundo); la lane 6 muda `admin/campos/` a `packages/kit-admin`
 - **Render:** comparar-render después de cada paso (§7).
 - **En el navegador** (Orca, `localhost:3022`, los tres temas, 390 de ancho y
   teclado): las dos páginas en el editor, sus pestañas SEO, el aviso en las
-  dos puntas y su link; editar una área en Qué hacemos y verla en la vista
-  previa de `/`; y **la revalidación de punta a punta**: con un build de
-  producción (`next start -p 3022`), publicar Qué hacemos y ver `/` con el
-  cambio sin rebuildear.
+  dos puntas y su link; **la vista previa** (pedido del padre): con un
+  borrador de Qué hacemos que cambia un área, qué muestra `/` en la vista
+  previa y qué el sitio publicado, escrito en PROGRESS; y **la revalidación de
+  punta a punta**: con un build de producción (`next start -p 3022`),
+  publicar Qué hacemos y ver `/` con el cambio sin rebuildear.
+- **Nombres accesibles:** como comparar-render no mira atributos, PROGRESS
+  anota el nombre de cada región de antes y de después (del árbol de
+  accesibilidad del navegador).
 
 ## 12. Fuera de alcance
 
