@@ -245,3 +245,19 @@
   del Equipo; «Guardar borrador» → la fila con el DOI, las 4 autorías, la
   persona y la cita de Crossref (visto con `psql`), y las marcas se van;
   después se borró desde la ficha.
+
+- **Paso 13 — lo que el módulo le suma al admin.** La sidebar suma el número
+  de Biblioteca (los publicados con el link roto, «con el link roto»), cada
+  número aislado en su consulta (`BarraLateral.tsx`); el Inicio, la fila
+  «Materiales con el link roto» (`datos/inicio/de-la-biblioteca.ts`, urgencia
+  `a-corregir`, capacidad `editarBiblioteca`, a la lista filtrada por Link
+  roto) y el acceso rápido «Agregar material» (su línea de `modulos.ts`);
+  Cuentas › Actividad, «Ver el material» mientras exista (`pantallaDe`).
+  `datos/consultas/materiales-del-admin.ts` junta esas lecturas. Aceptación:
+  `pnpm exec tsx --test "src/datos/inicio/*.test.ts"
+  "src/admin/cuentas/actividad/*.test.ts" src/admin/armazon/guarda.test.ts` →
+  29 pass; `tsc --noEmit` → exit 0; react-doctor → 100/100. En el navegador
+  (cuenta que edita), con el chequeo de Oaxaca puesto en `roto` a mano: la
+  sidebar «Biblioteca (1 con el link roto)», la fila «1 material con el link
+  roto · «Oaxaca…»» con «Ver los materiales», y «Agregar material» entre los
+  accesos rápidos; el chequeo se devolvió a como estaba.
