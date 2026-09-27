@@ -422,13 +422,15 @@ esa misma guía).
       verifica; no hay forma de "casi".
 - [ ] Componentes **≤ 200 líneas**, y cuando se parten, sus piezas van a una
       subcarpeta (`docs/AI_GUIDELINES.md` §2). react-doctor recién frena a las
-      300; el tope del proyecto es 200, y **hoy lo pasan 17 de 210** —contando
-      código, sin comentarios—: `profileParts.tsx` (428), `FaroEscena.tsx`
-      (377), `MaterialesListado.tsx` (348) y catorce más, casi todos de las
-      páginas que crecieron después de la migración. Medido el 2026-09-18; este
-      apartado decía que el tope «se cumple» y hacía rato que no. La dirección
-      es que no se sumen: un componente nuevo por encima de 200 se parte antes
-      del PR, y los 17 bajan cuando se toque la página que los usa.
+      300; el tope del proyecto es 200, y **hoy lo pasan 9 de los 296 `.tsx`
+      de `apps/sitio/src`** —contando código, sin comentarios—:
+      `profileParts.tsx` (428), `FaroEscena.tsx` (377), el set de íconos (356)
+      y seis más, de Quiénes somos, Novedades e Investigación
+      (`LinternaFaro.tsx`, 211). Medido el 2026-09-26; eran 17 de 210 el
+      2026-09-18, y bajaron partiéndose al tocar su página (Inicio,
+      Investigación y Biblioteca). La dirección es que no se sumen: un
+      componente nuevo por encima de 200 se parte antes del PR, y los que
+      quedan bajan cuando se toque la página que los usa.
 - [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
       partir un hook por debajo de 80 suele separar el efecto de su limpieza,
       que es justo lo que hay que evitar. Ahí manda el tope de 200. La otra
@@ -722,6 +724,11 @@ define al implementar cada fase.
       las siete áreas y las frases del método viven en Qué hacemos, Inicio las
       lee con `usa` en el registro, el editor lo avisa en las dos puntas y
       publicar regenera todas las rutas que lo muestran.
+- [x] **Páginas, fase C — Investigación, Biblioteca y Contacto:** todas sus
+      secciones y el SEO de cada una, por el camino de la fase B; de lo que
+      muestra una entidad (casos, materiales), solo los textos propios de la
+      sección. Una página que no es la raíz hereda la imagen del sitio con
+      `openGraphDeLaPagina` (`config/metadata.ts`), y un test lo cuida.
 - [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
       novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`.
 - [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
