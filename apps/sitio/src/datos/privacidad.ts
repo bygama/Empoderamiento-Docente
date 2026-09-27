@@ -1,5 +1,6 @@
 import { cache } from "react";
-import { PLAZOS_INICIALES, vencidos, type PlazosDeGuarda, type Tramo } from "@/config/privacidad";
+import { puede } from "@ed/auth";
+import { PLAZOS_INICIALES, vencidos, type Plazo, type PlazosDeGuarda, type Tramo } from "@/config/privacidad";
 import { base } from "./cliente";
 
 // Los plazos de retención de la base (`plazos_de_retencion`, work/ajustes/SPEC.md
@@ -64,3 +65,17 @@ export const plazosDeGuarda = cache(() => leerPlazos());
 export const llegoVencido = (tramos: readonly Tramo[], hoy: Date) => ({
   OR: vencidos(tramos, hoy).map(({ desde, antesDe }) => ({ recibidoEn: { gte: desde, lt: antesDe } })),
 });
+
+export type PlazoParaEditar = { valor: number; /** null: rige desde siempre. */ desde: Date | null; puestoPor: string | null };
+
+/** Lo que rige de cada plazo, con desde cuándo y quién lo puso: Ajustes › Privacidad. Sin `usarAjustes`, `null`. */
+export async function plazosParaEditar(rol: unknown): Promise<Record<Plazo, PlazoParaEditar> | null> {
+  if (!puede(rol, "usarAjustes")) return null;
+  const filas = await base.plazoDeRetencion.findMany({ orderBy: { desde: "desc" } });
+  const de = (que: Plazo): PlazoParaEditar => {
+    const fila = filas.find((f) => f.que === que && Number.isInteger(f.valor) && f.valor >= 1);
+    if (!fila) return { valor: PLAZOS_INICIALES[que], desde: null, puestoPor: null };
+    return { valor: fila.valor, desde: fila.desde.getTime() === SIEMPRE.getTime() ? null : fila.desde, puestoPor: fila.puestoPor };
+  };
+  return { cv: de("cv"), contacto: de("contacto"), spam: de("spam") };
+}
