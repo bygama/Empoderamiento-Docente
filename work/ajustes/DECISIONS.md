@@ -37,3 +37,24 @@
     `usarAjustes` antes de leer**, y las consultas de `datos/` con datos de
     Ajustes reciben el rol y exigen la capacidad. Se prueba con `next start`
     logueada con edita, buscando los datos en el HTML entero.
+- 2026-09-26 — **Los pasos 4 y 5 del PLAN van en un commit.** Pasar
+  `seBorraEl` y los bordes a recibir los plazos cambia la firma de lo que usan
+  la retención, la ficha, el Inicio y los formularios: a mitad de camino no
+  compila. El cambio sigue siendo uno: de dónde salen los plazos.
+- 2026-09-26 — **Vencido es `lt`, también en el Inicio.** La tarea borra lo
+  recibido antes del borde (`lt`); el pendiente de los CV que se borran en 7
+  días usaba `lte`. Ahora los dos usan la misma condición
+  (`llegoVencido`, en `datos/privacidad.ts`), y el test de la política
+  compara la consulta con la ficha en cada fecha, con la misma regla.
+- 2026-09-26 — **La retención no usa respaldo.** Si la base no contesta al
+  leer los plazos, la tarea falla y queda en su corrida: borrar con un plazo
+  supuesto borraría antes de lo prometido o guardaría de más. Lo que se
+  muestra (formularios, ficha, Inicio) sí cae a los plazos de antes.
+- 2026-09-26 — **Un error previo, arreglado porque esta lane lo vuelve
+  alcanzable:** en un campo de opción opcional, un valor de más contestaba
+  «Invalid input», en inglés (la unión de Zod sin su error). Con los países
+  editables, un formulario abierto antes de sacar un país llega a ese caso.
+  Una línea en `lib/formularios/campos.ts`.
+- 2026-09-26 — **Las fechas nuevas son `timestamp(3)`**, el tipo que Prisma
+  da a `DateTime` en todo el esquema, y no `timestamptz` como decía la tabla
+  del SPEC §8: se sigue la convención del repo.
