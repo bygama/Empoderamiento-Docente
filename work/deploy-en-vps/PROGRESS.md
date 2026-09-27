@@ -2,7 +2,75 @@
 
 ## In progress
 
-- work-verify.
+- Esperando la revisión de cierre del padre (la lanza al recibir
+  `worker_done`).
+
+## Verification
+
+### 2026-09-27 — L DoD — PASS
+
+- **L1 estática:** `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
+  `node scripts/verificar-react-doctor.mjs` → exit 0, «react-doctor: 100/100,
+  sin diagnósticos» (apps/sitio/src 1206 archivos, packages/db, auth y
+  kit-admin).
+- **L2 comportamiento:** `pnpm test` cinco veces seguidas → exit 0 las cinco,
+  cada una kit-admin 11/11, auth 46/46, sitio 587 pass + 1 skipped (el fixture
+  de Vercel que nunca se grabó, de antes de esta lane), 0 fail; `pnpm build` →
+  exit 0 («Generating static pages … (68/68)»).
+- **L3 punta a punta, `docker compose` desde cero** (sin volúmenes ni imágenes
+  del proyecto `ed`, sin respaldos; `docker compose down -v`, `docker rmi` de
+  `ed-sitio:*` y `ed-fuente:*`): `bash scripts/desplegar.sh` → exit 0 en 99 s,
+  «Listo: https://localhost corre abf4351b761f». Umami configurado por su API
+  (sitio y API key) y un segundo `desplegar.sh` → exit 0. Después, `/tmp/e2e.sh`:
+  - por Caddy, `/`, `/novedades`, `/quienes-somos` y `/admin/entrar` → 200; el
+    HTML de `/` trae `src="/umami/script.js"` (1) y `_vercel` (0);
+  - cuenta `administra` por `herramientas`, contraseña por el enlace del Resend
+    falso, `sign-in` → `twoFactorRedirect`, el código del correo, `verify-otp`
+    → 200 y `GET /admin` 200 con «Prueba Local»;
+  - foto por la Server Action `subirFoto` → `"ok":true`; `/api/fotos/<id>` 200
+    antes y **después de `docker compose restart app`**, con los mismos bytes;
+  - CV con `CV_ABIERTO=si` (solo para la prueba, después se volvió a vaciar)
+    → `{"ok":true}` y el PDF en `/app/apps/sitio/.cv/cv/…pdf`;
+  - tres vistas a `/umami/api/send` por Caddy → 200; corridas a ayer en la base
+    de Umami; **el cron a mano** → `copia-de-visitas` ok, «9 filas, 6
+    ventanas», con la página, el total y la campaña `prueba-local`;
+  - cuatro logins con `X-Forwarded-For` y `X-Real-IP` falsificados distintos →
+    401, 401, 401, **429**, y la única clave del tope es
+    `172.18.0.1|/sign-in/email|3`;
+  - respaldo a mano → «listo: /respaldos/2026-09-27, 192.0K»; `docker compose
+    down`, `docker volume rm ed_datos-db ed_fotos`, la base con 0 tablas,
+    `scripts/restaurar.sh 2026-09-27` → la foto 200 con los mismos bytes, la
+    fila de la foto, el CV, las 9 novedades, las 9 filas de métricas y la
+    sesión de antes (`GET /admin` 200);
+  - `docker compose ps`: solo `proxy` tiene `->` (80, 443, 443/udp); `app`,
+    `db`, `analitica` y `respaldo` solo exponen.
+- **Ningún secreto en las imágenes** (condición 3): para cada valor de
+  `CLAVE_DB_ADMIN`, `CLAVE_DB_ED`, `CLAVE_DB_UMAMI`, `BETTER_AUTH_SECRET`,
+  `CRON_SECRET`, `UMAMI_API_KEY` y `UMAMI_APP_SECRET`, en `ed-sitio:actual` y
+  `ed-fuente:actual`: `grep -rlF` en `/app` → 0 archivos, `docker history
+  --no-trunc` → 0, `Config.Env` → 0; ningún `.env*` en la imagen. Control
+  positivo: el `UMAMI_WEBSITE_ID` (público, va en el HTML) aparece en 40
+  archivos de `ed-sitio`.
+- **Corte de un deploy** (condición 4): 5,3 s (arriba, «Corte de un deploy»).
+- **`node scripts/comparar-render.mjs <main> apps/sitio`** → exit 0, «12
+  páginas, render idéntico», +0 bytes de JS (main armado con `git archive main`
+  en una carpeta temporal, con la misma base). La diferencia del script de
+  analítica no se ve en el render porque ninguno de los dos builds corre en
+  Vercel ni tiene `UMAMI_WEBSITE_ID`: en `main` el payload del layout lleva el
+  `<Analytics />` de Vercel (el `index.html` pesa 344 bytes más), que fuera de
+  Vercel pide `/_vercel/insights/script.js` y da 404; en la rama no se
+  renderiza nada. Con `UMAMI_WEBSITE_ID` (el compose), el HTML trae el script de
+  Umami (arriba). El chunk de `@vercel/analytics` sigue referenciado en los dos
+  builds porque el módulo lo importa.
+- **No probado:** el tracker de Umami corriendo en un navegador de verdad. El
+  navegador embebido de Orca se queda en el aviso del certificado interno de
+  Caddy (`ERR_CERT_AUTHORITY_INVALID`), el CLI no tiene cómo aceptarlo y no se
+  instaló la CA de Caddy en la máquina. La vista se mandó con el mismo pedido
+  que arma el tracker (`POST /umami/api/send`), por Caddy; que el script se
+  sirve (`/umami/script.js` 200) y que arma su endpoint desde su propia URL
+  está verificado en su código (`src/tracker/index.ts` de v3.4.0).
+- **Revisión de cierre:** la lanza el padre al recibir `worker_done`
+  (orchestrate, paso 6); no se abrió ningún asiento acá.
 
 ## Done
 
@@ -178,3 +246,22 @@
   Conexiones), `apps/sitio/.env.example` (Umami al lado de Vercel) y AGENTS.md
   §1, §2, §3, §12 y §13. `git grep "cuando llegue la fase 1"` vacío; `pnpm lint`
   → 0.
+- 2026-09-27 — **work-verify** (arriba, «Verification»): SPEC al día con lo
+  que cambió en la lane (el tar en lugar de `.compilado/`, una sola red,
+  `herramientas`, `compose.prueba.yaml`, el cron en `node:24-alpine`,
+  `scripts/restaurar.sh`), cada cambio con su entrada en DECISIONS.
+
+## Seguimientos (fuera de esta lane)
+
+- **El script de mudanza de archivos** entre Blob y disco: las fotos cambian de
+  URL (reescribir cada uso con `datos/fotos/`), los CV se copian con la misma
+  clave. Sin token de Blob no se podía probar (DECISIONS). Mientras tanto, el
+  procedimiento está en `docs/deploy/vps.md` §10.
+- **El tracker de Umami en un navegador real**, cuando haya un dominio con
+  certificado de verdad (el recorrido final del runbook lo cubre).
+- **La memoria del build** (~5 GB, Turbopack): un VPS de 4 GB necesita swap.
+  Si molesta, probar `next build --webpack` o limitar el prerender.
+- **`www.`**: el `Caddyfile` atiende solo `DOMINIO`; si ED quiere `www.`, se
+  suma como redirección.
+- **Un fixture de Vercel** (`__fixtures__/pagina-por-dia.json`) sigue sin
+  grabarse: su test se saltea desde la lane de métricas.

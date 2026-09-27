@@ -59,48 +59,55 @@ buildx con `--driver-opt network=` no resuelve el nombre `db` en el `RUN`
     La usan `migrar` y `construir`, y sirve para los comandos de `scripts/`
     (`crear-cuenta`, `nombrar-direccion`).
   - **`app`** (`ed-sitio:<commit>` y `ed-sitio:actual`): Node 24 alpine con el
-    standalone y nada más, usuario `node`, `node apps/sitio/server.js`. Se arma
-    desde `.compilado/` (su propio contexto de build).
+    standalone y nada más, usuario `node`, `node apps/sitio/server.js`. Su
+    contexto de build es el tar que saca `construir` (abajo).
 - `next.config.ts` pasa a `output: "standalone"` con `outputFileTracingRoot` en
   la raíz del workspace (la misma que `turbopack.root`).
 - El servicio one-shot **`construir`** (imagen `fuente`, en la red interna,
-  después de `migrar`) corre `pnpm build` con la base y deja en `.compilado/`
-  (bind mount, git-ignorado y fuera del contexto de `fuente`) el standalone,
-  `.next/static` y `public/`.
+  después de `migrar`) corre `pnpm build` con la base y saca por stdout un tar
+  con el Dockerfile y el standalone (`.next/static` y `public/` incluidos), que
+  `desplegar.sh` pasa directo a `docker build -`. *(Cambió durante la lane: la
+  carpeta `.compilado/` del host no sobrevive a los symlinks de pnpm en Docker
+  Desktop; DECISIONS, 2026-09-27.)*
 - **`scripts/desplegar.sh` es la única entrada del deploy** (`set -euo
   pipefail`, idempotente, frena en el primer paso que falla sin tocar el `app`
   que corre): build de `fuente` → `up -d db analitica` → `run --rm migrar` →
-  `run --rm construir` → build de `ed-sitio:<commit>` → tag `actual` → `up -d`
-  → borra las imágenes de `app` más viejas que las **últimas 5**. `docker
-  compose up` a secas no arranca desde cero (falta `.compilado/`), y el runbook
-  y el README lo dicen.
+  `run --rm construir | docker build -t ed-sitio:<commit> -` → tag `actual` →
+  `up -d` → `caddy reload` → borra las imágenes de `app` más viejas que las
+  **últimas 5**. `docker compose up` a secas no arranca desde cero (la imagen
+  `app` no existe hasta que `construir` corrió), y el runbook y el README lo
+  dicen.
 - **`scripts/volver.sh <commit>`** retaguea `ed-sitio:<commit>` como `actual` y
   hace `up -d app`. **Una migración aplicada no se revierte**: volver a una
   imagen anterior a una migración deja código viejo sobre un esquema nuevo; el
   runbook dice cuándo eso es seguro (migraciones que solo agregan) y cuándo no.
-- **Ningún secreto en la imagen ni en `.compilado/`:** `construir` lee las
-  variables del entorno del compose; `.dockerignore` deja afuera `.env*`,
-  `.compilado`, `.fotos`, `.cv`, `node_modules` y `.next`. Se verifica con
-  `grep` sobre `.compilado/` y dentro de la imagen (la contraseña de la base,
-  `BETTER_AUTH_SECRET`, `CRON_SECRET`, `UMAMI_API_KEY`).
+- **Ningún secreto en las imágenes ni en el build:** `construir` lee las
+  variables del entorno del compose y su salida no pasa por el disco del host;
+  `.dockerignore` deja afuera `.env*`, `.fotos`, `.cv`, `node_modules` y
+  `.next`. Se verifica con `grep` dentro de las dos imágenes, en su historia y
+  en su configuración (las claves de la base, `BETTER_AUTH_SECRET`,
+  `CRON_SECRET`, `UMAMI_API_KEY`, `UMAMI_APP_SECRET`).
 - **El corte de un deploy se mide**: segundos sin respuesta durante un
   `desplegar.sh` en local, en PROGRESS.
 
 ### 3.2 El compose
 
-`compose.yaml` en la raíz, proyecto `ed`. Dos redes: `borde` (solo `proxy`) e
-`interna` (todo lo demás, más `proxy`). **Solo `proxy` publica puertos: 80 y
-443** (más 443/udp para HTTP/3).
+`compose.yaml` en la raíz, proyecto `ed`, en una sola red *(el diseño decía
+dos; `app` y `proxy` necesitan salir a internet, así que una red `internal` no
+servía: DECISIONS, 2026-09-27)*. **Solo `proxy` publica puertos: 80 y 443**
+(más 443/udp para HTTP/3). Se sumaron durante la lane `herramientas` (los
+comandos de `scripts/` con el entorno de la app) y, solo para la prueba local,
+`compose.prueba.yaml` con un Resend falso (`RESEND_API_URL`, DECISIONS).
 
 | Servicio | Imagen | Qué hace | Volúmenes | Depende de |
 | --- | --- | --- | --- | --- |
 | `db` | `postgres:17-alpine` | Postgres con las bases `ed` (el sitio) y `umami`, cada una con su usuario; un script de `deploy/db/` las crea en el primer arranque | `datos-db` | — |
 | `migrar` | `ed-fuente:actual` | `pnpm migrate:deploy` y termina | — | `db` sano |
-| `construir` | `ed-fuente:actual` | `pnpm build` con la base; copia el standalone a `.compilado/` y termina (perfil `construir`: solo lo corre `desplegar.sh`) | `./.compilado` | `migrar` completado |
+| `construir` | `ed-fuente:actual` | `pnpm build` con la base; saca el standalone como tar por stdout y termina (perfil `construir`: solo lo corre `desplegar.sh`) | — | `migrar` completado |
 | `app` | `ed-sitio:actual` | el sitio y el admin, `node server.js` en el 3000 interno | `fotos`, `cv` | `migrar` completado |
 | `analitica` | `ghcr.io/umami-software/umami` fijado en v3.4.0 | Umami, en el 3000 interno | — | `db` sano |
 | `proxy` | `caddy:2-alpine` | TLS automático, `/umami/script.js` y `/umami/api/send` a `analitica`, el resto a `app` | `caddy-datos`, `caddy-config` | `app`, `analitica` |
-| `cron` | `alpine` | busybox `crond`: a las 04:00 UTC llama al cron diario (§3.4) | — | `app` |
+| `cron` | `node:24-alpine` | busybox `crond`: a las 04:00 UTC llama al cron diario (§3.4) | — | `app` |
 | `respaldo` | `postgres:17-alpine` | busybox `crond`: a las 03:30 UTC respalda (§3.7) | `fotos:ro`, `cv:ro`, `./respaldos` | `db` sano |
 
 Volúmenes nombrados: `datos-db`, `fotos`, `cv`, `caddy-datos`, `caddy-config`.
@@ -130,13 +137,15 @@ se commitea un `.env` con valores** (`.gitignore` ya tiene `.env*` con
 
 ### 3.4 El cron diario
 
-- `cron` (alpine) guarda `CRON_SECRET` en un archivo `0600` al arrancar,
-  instala el crontab `0 4 * * *` (el contenedor está en UTC) y corre
-  `crond -f`. El trabajo es `deploy/cron/correr.sh`: `wget` a
+- `cron` (`node:24-alpine`: trae el `crond` de busybox y un `fetch` que
+  muestra el cuerpo aunque la respuesta sea 500) guarda `CRON_SECRET` en un
+  archivo `0600` al arrancar, instala el crontab `0 4 * * *` (el contenedor
+  está en UTC) y corre `crond -f`. El trabajo es `deploy/cron/correr.mjs`: un
+  pedido a
   `http://app:3000/api/cron/diario` por la red interna, con
   `Authorization: Bearer <secreto>`, y la salida —el JSON de las corridas, o el
   error— va al log del contenedor (`/proc/1/fd/1`).
-- **A mano:** `docker compose exec cron /etc/ed-cron/correr.sh`; el log, con
+- **A mano:** `docker compose exec cron node /etc/ed-cron/correr.mjs`; el log, con
   `docker compose logs cron`.
 - La ruta habla de los dos que la llaman (el cron de `vercel.json` y el
   servicio `cron`); `maxDuration` se queda (en `next start` no hace nada y en
@@ -263,10 +272,11 @@ vista por Caddy, Umami la cuenta y «Actualizar ahora» / el cron la trae.
 - **Dónde:** en el host, así se copian afuera (el runbook propone `rsync` o
   `rclone` a otro lado y los respaldos semanales de Hostinger). Un respaldo que
   vive solo en el mismo VPS no cubre perder el VPS, y se dice.
-- **A mano y restaurar:** `docker compose exec respaldo /respaldo/respaldar.sh`
-  y `docker compose run --rm respaldo /respaldo/restaurar.sh <fecha>` (para
-  `app` y `analitica`, recrea las dos bases desde el dump, vacía y rellena los
-  volúmenes de fotos y CV, y los vuelve a levantar).
+- **A mano y restaurar:** `docker compose exec respaldo sh
+  /respaldo/respaldar.sh` y `scripts/restaurar.sh <fecha>` (pide confirmación;
+  para `app`, `analitica` y `cron`, corre `/respaldo/restaurar.sh` en el
+  servicio `respaldo` —recrea las dos bases desde el dump, vacía y rellena los
+  volúmenes de fotos y CV— y vuelve a levantar todo).
 - **Probado en local**: respaldar, borrar el volumen de la base y el de fotos,
   restaurar, y que las fotos y la base vuelvan.
 
@@ -359,7 +369,7 @@ factor, publicar una novedad, recibir un contacto y verla en el Inicio.
   - `X-Forwarded-For` y `X-Real-IP` falsificados no cambian la IP;
   - respaldo, borrar volúmenes, restaurar, y que vuelvan la base y las fotos;
   - `docker compose ps`: solo `proxy` con puertos;
-  - ningún secreto en `.compilado/` ni en la imagen;
+  - ningún secreto en las imágenes;
   - los segundos de corte de un segundo `desplegar.sh`, y `volver.sh` a la
     imagen anterior.
 - **El test de `scriptDeAnalitica`**: Umami, Vercel, ninguno, y los dos
