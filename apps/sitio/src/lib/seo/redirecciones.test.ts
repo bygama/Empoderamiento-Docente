@@ -3,12 +3,20 @@ import assert from "node:assert/strict";
 import { normalizarRuta, rutaDeSegmentos, validarRedireccion, type Contexto } from "./redirecciones";
 
 // Cuándo se guarda una redirección escrita a mano: rutas relativas, «hacia»
-// una página que existe, «desde» una que no, y sin cadenas ni ciclos.
+// una página que existe, «desde» una que el sitio no contesta, y sin cadenas
+// ni ciclos.
 
 const CONTEXTO: Contexto = {
   rutas: ["/", "/contacto", "/novedades", "/novedades/nueva"],
   existentes: [{ desde: "/novedades/vieja", hacia: "/novedades/nueva" }],
-  reservadas: ["/admin", "/api"],
+  declaradas: [
+    { ruta: "/admin/[[...todo]]", contesta: "sola" },
+    { ruta: "/api/[[...todo]]", contesta: "sola" },
+    { ruta: "/robots.txt", contesta: "sola" },
+    { ruta: "/equipo", contesta: "archivos" },
+    { ruta: "/novedades/[slug]", contesta: "o-redirige" },
+    { ruta: "/[...resto]", contesta: "o-redirige" },
+  ],
 };
 const validar = (desde: string, hacia: string, contexto = CONTEXTO) => validarRedireccion({ desde, hacia }, contexto);
 const error = (resultado: ReturnType<typeof validar>) => (resultado.ok ? null : `${resultado.campo}: ${resultado.detalle}`);
@@ -26,11 +34,17 @@ test("solo rutas relativas del sitio: nada de otro dominio, espacios, ? ni #", (
   assert.match(error(validar("/viejo", "https://otro.org")) ?? "", /^hacia: /);
 });
 
-test("desde no puede ser una página que existe, una reservada ni una que ya redirige", () => {
-  assert.match(error(validar("/contacto", "/")) ?? "", /es una página que existe/);
-  assert.match(error(validar("/admin/cuentas", "/")) ?? "", /reservada/);
-  assert.match(error(validar("/api", "/")) ?? "", /reservada/);
+test("desde no puede ser una ruta que el sitio contesta, ni una que ya redirige", () => {
+  const yaExiste = /^desde: «.+» ya existe en el sitio: una redirección ahí nunca se aplicaría\.$/;
+  assert.match(error(validar("/contacto", "/")) ?? "", yaExiste);
+  assert.match(error(validar("/admin/cuentas", "/")) ?? "", yaExiste);
+  assert.match(error(validar("/api", "/")) ?? "", yaExiste);
+  assert.match(error(validar("/robots.txt", "/")) ?? "", yaExiste);
+  assert.match(error(validar("/equipo/foto.jpg", "/")) ?? "", /^desde: «\/equipo\/foto\.jpg» es la ruta de un archivo de \/equipo/);
   assert.equal(validar("/administracion", "/").ok, true);
+  assert.equal(validar("/equipo", "/").ok, true);
+  // La ficha de una novedad que no existe busca la redirección: ahí sí se aplica.
+  assert.equal(validar("/novedades/otra-vieja", "/").ok, true);
   assert.match(error(validar("/novedades/vieja", "/contacto")) ?? "", /Ya hay una redirección desde/);
 });
 
