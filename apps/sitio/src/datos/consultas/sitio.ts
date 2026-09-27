@@ -4,13 +4,14 @@ import type { DatosDelSitio as Fila } from "@/../prisma/generado/client";
 import { DATOS_INICIALES, esquemaDeDatosDelSitio, type DatosDelSitio } from "@/config/datos-del-sitio";
 import { aValores, type ValoresDelSitio } from "@/config/formulario-del-sitio";
 import { base } from "@/datos/cliente";
+import { leerSinRomper } from "./leer-sin-romper";
 
 // Lo que lee el sitio de sus datos institucionales (work/ajustes/SPEC.md §3):
-// la fila de `datos_del_sitio`, validada. Con las reglas de `contenidoDe`: sin
-// DATABASE_URL, sin fila o si la consulta tira en una visita, los valores
-// iniciales, así el sitio compila y sirve sin base; durante `next build`, con
-// base configurada, un error tira: `/` y las demás son estáticas, y lo que no
-// se leyó quedaría horneado en el HTML hasta el próximo guardado.
+// la fila de `datos_del_sitio`, validada, con `leerSinRomper`: sin
+// DATABASE_URL o si la consulta tira en una visita, los valores iniciales, así
+// el sitio compila y sirve sin base; durante `next build`, con base
+// configurada, un error tira. Sin fila o con una que no pasa el esquema,
+// también los iniciales, y el log lo dice.
 
 /** Las columnas de la fila, con la forma que usa el sitio. */
 export function deLaFila(fila: Fila): unknown {
@@ -20,22 +21,17 @@ export function deLaFila(fila: Fila): unknown {
 
 /** `consultar` se inyecta para probar esto sin una base; el default es la fila de verdad. */
 export async function leerDatosDelSitio(consultar: () => Promise<Fila | null> = () => base.datosDelSitio.findUnique({ where: { id: 1 } })): Promise<DatosDelSitio> {
-  if (!process.env.DATABASE_URL) return DATOS_INICIALES;
-  try {
-    const fila = await consultar();
-    if (!fila) {
-      console.error("datosDelSitio: no hay fila en datos_del_sitio; van los valores iniciales.");
-      return DATOS_INICIALES;
-    }
-    const valido = esquemaDeDatosDelSitio.safeParse(deLaFila(fila));
-    if (valido.success) return valido.data;
-    console.error("datosDelSitio: la fila no pasa el esquema; van los valores iniciales:", valido.error.issues[0]?.message);
-    return DATOS_INICIALES;
-  } catch (e) {
-    if (process.env.NEXT_PHASE === "phase-production-build") throw e;
-    console.error("datosDelSitio:", e instanceof Error ? e.message : e);
+  // `undefined`: no hay base, o no contestó. `null`: hay base, y no tiene la fila.
+  const fila = await leerSinRomper<Fila | null | undefined>("datosDelSitio", consultar, undefined);
+  if (fila === undefined) return DATOS_INICIALES;
+  if (fila === null) {
+    console.error("datosDelSitio: no hay fila en datos_del_sitio; van los valores iniciales.");
     return DATOS_INICIALES;
   }
+  const valido = esquemaDeDatosDelSitio.safeParse(deLaFila(fila));
+  if (valido.success) return valido.data;
+  console.error("datosDelSitio: la fila no pasa el esquema; van los valores iniciales:", valido.error.issues[0]?.message);
+  return DATOS_INICIALES;
 }
 
 /**

@@ -2,6 +2,7 @@ import { cache } from "react";
 import { puede } from "@ed/auth";
 import { PLAZOS_INICIALES, vencidos, type Plazo, type PlazosDeGuarda, type Tramo } from "@/config/privacidad";
 import { base } from "./cliente";
+import { leerSinRomper } from "./consultas/leer-sin-romper";
 
 // Los plazos de retención de la base (`plazos_de_retencion`, work/ajustes/SPEC.md
 // §4): cada plazo con su historial. La política —cómo se cuentan— vive en
@@ -39,20 +40,12 @@ export async function plazosDeLaBase(): Promise<PlazosDeGuarda> {
 
 /**
  * Los plazos para lo que se muestra (las líneas de privacidad de los
- * formularios, la ficha, el Inicio), con las reglas de `datosDelSitio`: sin
- * DATABASE_URL o si la consulta tira en una visita, los de antes; durante
- * `next build`, con base configurada, el error. `consultar` se inyecta para
- * probarlo sin base.
+ * formularios, la ficha, el Inicio), con `leerSinRomper`: sin DATABASE_URL o
+ * si la consulta tira en una visita, los de antes; durante `next build`, con
+ * base configurada, el error. `consultar` se inyecta para probarlo sin base.
  */
 export async function leerPlazos(consultar: () => Promise<Fila[]> = consultarFilas): Promise<PlazosDeGuarda> {
-  if (!process.env.DATABASE_URL) return armarPlazos([]);
-  try {
-    return armarPlazos(await consultar());
-  } catch (e) {
-    if (process.env.NEXT_PHASE === "phase-production-build") throw e;
-    console.error("plazosDeGuarda:", e instanceof Error ? e.message : e);
-    return armarPlazos([]);
-  }
+  return armarPlazos(await leerSinRomper("plazosDeGuarda", consultar, []));
 }
 
 /** Los plazos para mostrar, una vez por pedido (`cache` de React). */
