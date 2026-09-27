@@ -15,6 +15,9 @@ test("un caso, un aliado y una foto se nombran como en su lista", () => {
   assert.equal(fraseDe({ tipo: "publico-un-caso", quien: "Ana", sobre: "Caso 01" }), "Ana publicó el caso 01");
   assert.equal(fraseDe({ tipo: "autorizo-un-aliado", quien: "Ana", sobre: "UNESCO" }), "Ana autorizó el logo de UNESCO");
   assert.equal(fraseDe({ tipo: "quito-la-autorizacion-de-un-aliado", quien: "Ana", sobre: null }), "Ana le quitó la autorización a un logo de aliado");
+  assert.equal(fraseDe({ tipo: "quito-la-autorizacion-de-un-aliado", quien: "Ana", sobre: "UNESCO" }), "Ana le quitó la autorización al logo de UNESCO");
+  assert.equal(fraseDe({ tipo: "descarto-cambios-de-un-caso", quien: "Ana", sobre: "Caso 01" }), "Ana descartó los cambios del caso 01");
+  assert.equal(fraseDe({ tipo: "descarto-cambios-de-un-caso", quien: "Ana", sobre: null }), "Ana descartó los cambios de un caso");
   assert.equal(fraseDe({ tipo: "reemplazo-una-foto", quien: "Ana", sobre: "Un aula" }), "Ana reemplazó el archivo de la foto «Un aula»");
 });
 
