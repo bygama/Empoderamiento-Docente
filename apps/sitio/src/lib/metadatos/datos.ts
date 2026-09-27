@@ -70,9 +70,9 @@ export function enLimpio(texto: string): string {
     .trim();
 }
 
-/** El resumen en JATS de Crossref, en texto: sin su título («Resumen», «Abstract») ni etiquetas. */
+/** El resumen en JATS de Crossref, en texto: sin su título («Resumen», «Abstract»), ni cuando viene pegado al texto, ni etiquetas. */
 export function jatsATexto(jats: string): string {
-  return enLimpio(jats.replace(/<jats:title>[\s\S]*?<\/jats:title>/gi, " "));
+  return enLimpio(jats.replace(/<jats:title>[\s\S]*?<\/jats:title>/gi, " ")).replace(/^(?:resumen|abstract|resumo)\b[:.]?\s*/i, "");
 }
 
 /** Un rango de páginas con la raya: «157-177» → «157–177». */
