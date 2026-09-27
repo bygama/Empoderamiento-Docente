@@ -55,7 +55,7 @@ export function Inicio({ datos, rol }: { datos: DatosDelInicio; rol: unknown }) 
           <EstaSemana numeros={datos.numeros} verMetricas={datos.verMetricas} />
         </div>
         <div className="lg:col-span-3">
-          <ActividadReciente eventos={datos.actividad} />
+          <ActividadReciente eventos={datos.actividad} verActividad={datos.verActividad} />
         </div>
       </div>
     </>
