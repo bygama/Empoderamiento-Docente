@@ -6,10 +6,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
+import type { Puente } from "@/features/biblioteca/contenido/puente";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { crearPuente } from "./puente-investigacion/coreografia-puente";
-import { PanelRecurso, type Recurso } from "./puente-investigacion/PanelRecurso";
+import { PanelRecurso } from "./puente-investigacion/PanelRecurso";
 import { PASO, TEMAS } from "./puente-investigacion/temas";
 
 if (typeof window !== "undefined") {
@@ -35,40 +36,15 @@ if (typeof window !== "undefined") {
  * Mapeo recurso→línea: inferido del modelo conceptual — VALIDAR con cliente.
  * Mobile / touch / prefers-reduced-motion: sin pin — los paneles se apilan
  * verticales con todo el contenido visible (`live` arranca false = SSR).
+ * Los textos y las fotos llegan por props (de
+ * `features/biblioteca/contenido/puente.ts` o de la base).
  */
 
-const CARDS: ReadonlyArray<Recurso> = [
-  {
-    tipo: "Publicaciones",
-    desc: "La producción académica que sostiene todo lo demás: artículos, capítulos y libros con lo que investigamos junto a escuelas y equipos docentes.",
-    linea: "Resignificación del conocimiento matemático escolar",
-    imagen: "/fotos/contexto-significacion.webp",
-    tema: TEMAS.navy,
-  },
-  {
-    tipo: "Materiales",
-    desc: "Secuencias y tareas probadas en aulas reales, listas para adaptar y llevar a la propia práctica.",
-    linea: "Tareas disruptivas y matemática funcional",
-    imagen: "/fotos/cubos-mano.webp",
-    tema: TEMAS.gris,
-  },
-  {
-    tipo: "Proyectos",
-    desc: "El trabajo sostenido con escuelas y comunidades, documentado para que otros equipos puedan retomarlo.",
-    linea: "Desarrollo profesional docente sostenido",
-    imagen: "/fotos/docentes-trabajan-aula.webp",
-    tema: TEMAS.navy,
-  },
-  {
-    tipo: "Guías",
-    desc: "Orientaciones paso a paso para llevar las ideas al aula sin perderse en el camino.",
-    linea: "Desarrollo del pensamiento matemático",
-    imagen: "/fotos/formadora-recorre-aula.webp",
-    tema: TEMAS.gris,
-  },
-];
+/** Los paneles alternan navy y gris por su lugar en la pila: el primero, navy. */
+const temaDe = (i: number) => (i % 2 === 0 ? TEMAS.navy : TEMAS.gris);
 
-export function PuenteInvestigacion() {
+export function PuenteInvestigacion({ contenido }: { contenido: Puente }) {
+  const { recursos } = contenido;
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const pilaRef = useRef<HTMLDivElement | null>(null);
@@ -122,11 +98,11 @@ export function PuenteInvestigacion() {
                 className="font-display text-azul-principal max-w-[18ch] font-bold tracking-[-0.02em] md:col-span-7"
                 style={{ fontSize: "clamp(2rem, 1rem + 3vw, 3.6rem)", lineHeight: 1.06 }}
               >
-                Detrás de cada recurso, una investigación.
+                {contenido.titulo}
               </RevealLines>
               <div className="mt-8 flex flex-wrap items-center gap-4 md:col-span-4 md:col-start-9 md:mt-0">
-                <ButtonPrimary href="/investigacion">Ir a Investigación</ButtonPrimary>
-                <ButtonSecondary href="/novedades">Ver novedades</ButtonSecondary>
+                <ButtonPrimary href="/investigacion">{contenido.botonPrincipal}</ButtonPrimary>
+                <ButtonSecondary href="/novedades">{contenido.botonSecundario}</ButtonSecondary>
               </div>
             </div>
           </div>
@@ -146,8 +122,8 @@ export function PuenteInvestigacion() {
               className={live ? "relative h-full" : "flex flex-col gap-5"}
               style={{ "--pila-paso": PASO } as React.CSSProperties}
             >
-              {CARDS.map((c, i) => (
-                <PanelRecurso key={c.tipo} recurso={c} i={i} total={CARDS.length} live={live} />
+              {recursos.map((recurso, i) => (
+                <PanelRecurso key={recurso.nombre} recurso={recurso} tema={temaDe(i)} i={i} total={recursos.length} live={live} />
               ))}
             </div>
           </div>
