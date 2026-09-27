@@ -1270,7 +1270,10 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
   lista»). Sin publicar, una frase lo avisa: «Todavía no está en el sitio. Al
   publicarla, va a estar en:». Publicada, «Ver en el sitio», terciario, abre
   en otra pestaña y lo dice al lector. En `lg` el panel no va al lado: con la
-  sidebar, el formulario quedaría en unos 300 px.
+  sidebar, el formulario quedaría en unos 300 px. Por debajo de `xl` la
+  grilla es de una columna **`grid-cols-1`**, que es `minmax(0, 1fr)`: sin
+  eso, lo que no se corta (un título con `truncate`) ensancha la ficha más
+  que la pantalla del celular (medido: 530 px en una de 390).
 - **Debajo del formulario**, «Qué cambió» plegado y, al final, **«Deshacer o
   sacar del sitio»**: una fila por acción con qué pasa si se toca a la
   izquierda y su botón a la derecha. Descartar y borrar son destructivos y

@@ -141,7 +141,7 @@ export function FichaDeMaterial({ ficha, vecinos, origenInicial = {}, parecidosI
       />
       <AvisoDeParecidos parecidos={parecidos.filter((p) => p.id !== id)} />
       {/* Desde `xl`, el panel ocupa las dos filas de la derecha; la segunda fila se lleva el sobrante, así «Qué cambió» no se despega del formulario. */}
-      <div className="grid items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
+      <div className="grid grid-cols-1 items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
         <FormularioDeMaterial form={form} cambiar={cambiar} errores={errores.contexto.errores} origen={origen} portadaGenerada={portadaGenerada} {...opciones} />
         <div className="xl:col-start-2 xl:row-span-2 xl:row-start-1">
           <PanelDelMaterial
