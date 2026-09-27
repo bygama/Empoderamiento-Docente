@@ -112,7 +112,7 @@
   Commit `74197f5c`.
 - **Paso 10 — lo que se hace con una foto**: `datos/consultas/fotos.ts`
   (`grillaDe`/`grillaDeFotos` con los filtros y sus cuentas, `fichaDeFoto`
-  con «Se usa en», `paraElegir` solo jpg/png/webp, `resumenDeFotos`,
+  con «Se usa en», `paraElegir` solo jpg/png/webp, `resumenDeFotos` (en el paso 18 pasó a llamarse `cuentaDeFotos`),
   `esDelRepositorio`); `editar-fotos.ts` (`editarAltEnBase`,
   `borrarFotoEnBase`: solo sin usos, la fila y después el archivo, nunca uno
   de `public/`); `reemplazar-foto.ts` (por los bytes; frena si un uso es del
@@ -253,6 +253,20 @@
   (`set viewport`) la lista, la ficha y `/nuevo` sin desborde; en oscuro la
   caja del logo va sobre `gris-fondo`. `cambios.test.ts` 1 pass;
   `pnpm typecheck` 0, `pnpm lint` 0, react-doctor 100/100 (el `await` doble
-  de la lista pasó a `Promise.all`).
+  de la lista pasó a `Promise.all`). Commit `93535dc8`.
+- **Paso 18 — el índice de Contenido**: `admin/contenido/resumenes.ts`
+  (`resumenDeCasos`, `resumenDeAliados`, `resumenDeFotos`: la cuenta y, si
+  hay, lo que pide atención) y la página del índice los lee con
+  `Promise.all`; Equipo sigue «Por hacer». `cuentaDeFotos` (antes
+  `resumenDeFotos`, sin usar todavía) cuenta las sin alt con la misma vara
+  que el filtro (`trim`). El punto de Contenido en la sidebar
+  (`hayContenidoSinPublicar`) suma casos y aliados con borrador. Se borran
+  las guías de casos, aliados y fotos de `por-hacer/guias-de-contenido.ts`.
+  `resumenes.test.ts` (los tres resúmenes con y sin pendientes, el
+  singular, y `guiaDeContenido` solo con Equipo) + `paginas/resumen.test.ts`
+  → 7 pass. En el navegador: «7 páginas | 4 casos | Por hacer | 5 aliados |
+  47 fotos»; un borrador en el caso 01 → «4 casos · 1 con cambios sin
+  publicar» y «Contenido (cambios sin publicar)» en la sidebar; descartado
+  después. `pnpm --filter sitio typecheck` 0, lint 0, react-doctor 100/100.
 
 ## Abierto
