@@ -5,8 +5,8 @@ Lane 4c del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- Próximo: paso 17 del PLAN (rebase sobre `main` y Contacto: la lane 7 ya
-  está en `main`, DECISIONS).
+- Los 18 pasos del PLAN hechos y la verificación en PASS (abajo). Próximo:
+  push, PR y `worker_done`; la revisión de cierre la lanza el padre.
 
 ## Done
 
@@ -213,5 +213,111 @@ Lane 4c del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
   - Teclado: desde el aviso del catálogo, Tab pasa a la sección del puente
     (contorno 2 px), sus tres campos (anillo) y los recursos (contorno).
   - La fila de `biblioteca` se borró de `ed_paginasinv` al terminar.
+- 2026-09-26 — **Paso 17, rebase y Contacto.** `git rebase origin/main`
+  sobre `15def2c` (64 commits nuevos, la lane 7 `mensajes` entre ellos),
+  sin conflictos: `main` no tocó nada de Investigación, Biblioteca, el
+  registro, `config/metadata.ts` ni `lib/contenido/` (`git diff --stat
+  48ed711 origin/main` sobre esas rutas, vacío). `pnpm install`,
+  `pnpm generate` y `pnpm migrate:deploy` (la migración de mensajes, en
+  `ed_paginasinv`). El typecheck dio 2 una vez, solo en
+  `.next/dev/types/validator.ts` (los tipos que genera el dev server, con
+  las rutas de antes del rebase): se reinició el dev server y se borró
+  `.next/dev/types`, y volvió a 0. Un «Uncaught TypeError» en el navegador
+  vino de la pestaña abierta durante ese reinicio; dos recargas limpias, sin
+  errores nuevos. Nueva referencia de render: el build del HEAD rebasado,
+  antes de Contacto, en `%TEMP%\ed-4c\antes-contacto` («12 páginas, render
+  idéntico» contra sí mismo). La lista de Contacto se cerró contra el código
+  de la 7 y quedó en DECISIONS (`05bc3b7`) antes del primer commit:
+  - **Titular** (`a442c33`): `contenido/titular.ts`; `PanelHero` y
+    `ColumnaIdentidad` por props; el clon que viaja copia el texto del
+    destino (`crearGhostTitulo(texto, …)`); `TITULO` sale de `data.ts`.
+    comparar-render 0; en el navegador el clon agregado dice «Hablemos.» y
+    no queda ninguno al terminar.
+  - **Apertura** (`3a1625e`): `contenido/apertura.ts` (frase con su parte
+    verde, el equipo con foto, título, bajada y el texto del celular, y
+    «¿Preferís escribir directo?»). comparar-render 0; la frase pilar sale
+    byte a byte igual (md5 `1dab31b3…` antes y después).
+  - **Cierre** (`5cae532`): `contenido/cierre.ts`. comparar-render 0.
+  - **SEO** (`77a62f7`): `contenido/seo.ts`, `generateMetadata` con
+    `openGraphDeLaPagina(padre)`; el test de metadata ya la cubre.
+    comparar-render sale 1 solo por `contacto.html` en `head`, con el mismo
+    diff que las otras dos: `og:title`, `og:description`, `twitter:title` y
+    `twitter:description` pasan a «Contacto | Empoderamiento Docente» y la
+    descripción de la página.
+  - Cada paso: typecheck 0 · lint 0 · test 0 (238: 237 pass, 1 skip) ·
+    build 0 · react-doctor 100/100.
+  - **De punta a punta** (Orca): el editor de Contacto dibuja sus tres
+    secciones y las cuatro pestañas; titular «Charlemos.», la frase, el
+    título del cartel y el del cierre editados, guardados y publicados; en
+    `/contacto` la intro viaja con «Charlemos.», la apertura muestra la
+    frase (con su `<span>` verde) y el cartel nuevos; elegido el primer tema
+    y enviada una consulta de verdad, el cierre sale con el título editado,
+    y el mensaje quedó en `mensajes` con el tema «Formación y
+    acompañamiento» (el título de código). Tres temas: 13.63/13.63/13.59:1
+    en rótulo y campo, ayuda 4.83/4.83/7.08:1; 390 px sin desborde; Tab
+    desde el titular pasa a la apertura, la frase, el control de la foto y
+    su campo. Filas de prueba (`paginas` y `mensajes`) borradas.
+- 2026-09-26 — **Paso 18, docs** (`99b8a22`, `412b1d7`): README «Editar
+  las páginas» (las cuatro páginas, qué queda en código y el helper de
+  metadata); AGENTS.md §13 (fase C) y §6 (9 de 296 `.tsx` por encima de 200,
+  medido con el conteo de la preparación: `profileParts` 428, `FaroEscena`
+  377, íconos 356, `ImpulsanEd` 300, `LanzamientosRecientes` 233,
+  `EdEnMovimiento` 222, `RotadorPalabras` 214, `LinternaFaro` 211,
+  `NovedadDestacada` 209). `pnpm lint` 0.
+
+## Verification
+
+### 2026-09-26 — L DoD — PASS (HEAD `412b1d7`, rebasado sobre `main` `15def2c`)
+
+Sin `feature_list.json` en el repo: el DoD es la aceptación de cada paso del
+PLAN (arriba, en Done) y el gate del brief, corrido entero sobre el árbol
+final.
+
+- L1 static: `pnpm typecheck` → exit 0 (db, auth y sitio); `pnpm lint` →
+  exit 0; `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor:
+  100/100, sin diagnósticos (apps/sitio/src: 650 archivos · packages/db/src:
+  3 archivos · packages/auth/src: 17 archivos)»).
+- L2 behavioral: `pnpm test` → exit 0 (`packages/auth` 28/28; `apps/sitio`
+  238: 237 pass, 0 fail, 1 skip ajeno a la lane: «las respuestas grabadas de
+  la API se mapean enteras # sin respuestas grabadas: falta correr A1», de
+  métricas); `pnpm build` → exit 0 (`/investigacion`, `/biblioteca` y
+  `/contacto` siguen `○` estáticas); arranca: el dev server de la lane
+  (`localhost:3023`) sirve `/`, `/investigacion`, `/biblioteca`, `/contacto`
+  y `/admin/entrar` con 200.
+- Render: `node scripts/comparar-render.mjs %TEMP%\ed-4c\antes apps/sitio`
+  (build de `48ed711`) → exit 1 con `investigacion.html` y `biblioteca.html`
+  DISTINTA **solo en head** (el cambio aprobado, DECISIONS) y `contacto.html`
+  en texto, links y head más `sumate-al-equipo.html` nueva, que son de la
+  lane 7 ya en `main`. Contra `%TEMP%\ed-4c\antes-contacto` (el HEAD
+  rebasado antes de Contacto) → exit 1 con **solo** `contacto.html` en head:
+  `og:title`, `og:description`, `twitter:title` y `twitter:description`,
+  nada más (diff de `<meta>` con `/tmp/ed4c/diff-head.cjs`). `main` no tocó
+  Investigación ni Biblioteca (`git diff --stat 48ed711 origin/main` sobre
+  sus rutas, vacío), así que las dos comparaciones juntas cubren la lane
+  entera.
+- L3 end-to-end (Orca, `localhost:3023`, base `ed_paginasinv`): los
+  recorridos completos de cada editor (pasos 8, 16 y 17, arriba) y, después
+  del rebase, un humo de Investigación y Biblioteca: el editor dibuja sus 5
+  secciones, un campo editado, guardado y publicado («Publicado: el sitio ya
+  muestra esta versión.») sale en la página (`curl`, 1 aparición cada uno);
+  Contacto con una consulta enviada de verdad hasta el cierre editado. Filas
+  de prueba borradas.
+- Close review: la lanza el padre al recibir el `worker_done` (1 revisor,
+  Opus 5.5, medium, «el cambio entero contra su SPEC»). Esta sesión no abre
+  asientos propios.
 
 ## Open
+
+- **Dos `scrub: true`** (anti-patrón de AGENTS.md §8) en páginas de esta
+  lane, mudados tal cual (SPEC §11): la carpeta de Líneas
+  (`lineas-investigacion/coreografia-lineas.ts`) y la entrada del cierre de
+  Biblioteca (`CierreBiblioteca.tsx`). Cambiarlos cambia cómo se mueven: se
+  levantan aparte, con su verificación visual.
+- **Restaurar una versión que no trae una parte la deja como está** (diseño
+  de la 4a): una versión publicada antes de tocar el SEO no lo restaura. Se
+  vio en Investigación y Biblioteca; no es de esta lane, pero conviene que
+  la pantalla de Versiones lo diga.
+- **Los temas de Contacto no se editan** mientras el envío guarde el título
+  de código (DECISIONS): si ED quiere editarlos, el envío tiene que leer el
+  título del contenido publicado. Es una decisión de la lane 7 o del padre.
+- `LinternaFaro.tsx` (211) sigue por encima de 200; esta lane no lo tocó.
