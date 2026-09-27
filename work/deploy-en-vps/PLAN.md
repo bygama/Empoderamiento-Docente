@@ -50,6 +50,13 @@ SPEC aprobado por el padre el 2026-09-27, con el cambio «Código para los dos»
    https://localhost/ -o /dev/null -w "%{http_code}"` → 200; `docker compose
    ps --format "{{.Service}} {{.Ports}}"` muestra puertos solo en `proxy`.
    *(integration · high)*
+4b. **Un Resend falso para la prueba local** (DECISIONS). `RESEND_API_URL`
+   opcional en `lib/correo/resend.ts` (la de Resend por defecto) y
+   `mandar.ts`; la fila de Resend de Conexiones y una línea en el log al
+   arrancar (`instrumentation.ts`) avisan si apunta a otro lado, con su test;
+   `compose.prueba.yaml` con el servicio `correo` y la variable, solo para la
+   prueba. Acepta: `pnpm --filter sitio test` → 0 con los tests nuevos.
+   *(integration · medium)*
 5. **Umami en el compose.** Servicio `analitica` (v3.4.0, base `umami`), y en el
    `Caddyfile` solo `/umami/script.js` y `/umami/api/send` hacia él. Acepta:
    `curl -sk https://localhost/umami/script.js` → 200 y
