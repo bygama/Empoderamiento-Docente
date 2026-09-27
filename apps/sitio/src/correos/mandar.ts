@@ -19,10 +19,12 @@ import type { Contenido } from "./plantilla";
 export type SalidaDelCorreo = "resend" | "consola" | "no-salio";
 
 /**
- * Manda un correo por donde diga el entorno (arriba).
+ * Manda un correo por donde diga el entorno (arriba). `idempotencia` es para
+ * el que no puede salir dos veces aunque se pida dos veces (el resumen
+ * semanal: una por persona y por lunes); Resend guarda la clave 24 horas.
  */
 export async function mandarCorreo(
-  { para, contenido }: { para: string; contenido: Contenido },
+  { para, contenido, idempotencia }: { para: string; contenido: Contenido; idempotencia?: string },
   { entorno = process.env, fetchImpl }: { entorno?: NodeJS.ProcessEnv; fetchImpl?: typeof fetch } = {},
 ): Promise<SalidaDelCorreo> {
   const clave = entorno.RESEND_API_KEY;
@@ -31,7 +33,7 @@ export async function mandarCorreo(
     if (!de) throw new Error("Falta CORREO_REMITENTE: con RESEND_API_KEY hace falta desde qué dirección sale el correo.");
     // Una clave por correo: si el primer intento llegó pero la respuesta se
     // perdió, el reintento del cliente no lo manda dos veces.
-    await crearClienteDeResend({ clave, fetchImpl }).mandar({ de, para, ...contenido, idempotencia: randomUUID() });
+    await crearClienteDeResend({ clave, fetchImpl }).mandar({ de, para, ...contenido, idempotencia: idempotencia ?? randomUUID() });
     return "resend";
   }
   if (entorno.NODE_ENV === "production") {

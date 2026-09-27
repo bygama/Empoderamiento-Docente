@@ -18,13 +18,16 @@ import { base } from "./cliente";
 
 export type Destinatario = { id: string; nombre: string; correo: string };
 
+/** A quién le sale un aviso, con su rol: el resumen semanal cambia según quién lo recibe. */
+export type DestinatarioConRol = Destinatario & { rol: string };
+
 /** Si una cuenta recibe el aviso, con sus filas de `avisos`: la suya si la tiene, o lo de fábrica. */
 function recibe(aviso: ClaveDeAviso, filas: ReadonlyArray<{ aviso: string; activo: boolean }>): boolean {
   return filas.find((f) => f.aviso === aviso)?.activo ?? AVISOS[aviso].deFabrica;
 }
 
 /** Las cuentas que reciben ese aviso: activas, con la capacidad, y con el aviso prendido. */
-export async function destinatariosDe(aviso: ClaveDeAviso): Promise<Destinatario[]> {
+export async function destinatariosDe(aviso: ClaveDeAviso): Promise<DestinatarioConRol[]> {
   // Prendido de fábrica: todas menos las que lo apagaron. Apagado: solo las que lo prendieron.
   const filtro = AVISOS[aviso].deFabrica ? { none: { aviso, activo: false } } : { some: { aviso, activo: true } };
   const cuentas = await base.user.findMany({
@@ -32,7 +35,7 @@ export async function destinatariosDe(aviso: ClaveDeAviso): Promise<Destinatario
     select: { id: true, name: true, email: true, rol: true },
     orderBy: { createdAt: "asc" },
   });
-  return cuentas.filter((c) => puede(c.rol, AVISOS[aviso].capacidad)).map((c) => ({ id: c.id, nombre: c.name, correo: c.email }));
+  return cuentas.filter((c) => puede(c.rol, AVISOS[aviso].capacidad)).map((c) => ({ id: c.id, nombre: c.name, correo: c.email, rol: c.rol }));
 }
 
 /** Los avisos de una cuenta: uno por aviso del registro que su rol puede recibir, con si está activo. */

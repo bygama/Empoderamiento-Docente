@@ -19,6 +19,8 @@ type Props = {
   idDeEstaSesion: string;
   /** Un aviso por cada uno del registro que su rol puede recibir (`datos/avisos.ts`). */
   avisos: ReadonlyArray<{ aviso: ClaveDeAviso; activo: boolean }>;
+  /** Cuántos días de datos faltan para el primer resumen semanal; 0 si ya sale. */
+  faltanParaElResumen?: number;
 };
 
 /**
@@ -27,9 +29,13 @@ type Props = {
  * el primario de la pantalla: todos los botones son secundarios. Avisos
  * llegó con Mensajes y Seguridad, con el segundo factor.
  */
-export function MiCuenta({ nombre, correo, rol, segundoFactor, sesiones, idDeEstaSesion, avisos }: Props) {
+export function MiCuenta({ nombre, correo, rol, segundoFactor, sesiones, idDeEstaSesion, avisos, faltanParaElResumen = 0 }: Props) {
   // La cuenta de quien dirige no la toca nadie más: ni su rol ni su correo.
   const dirige = esRol(rol) && esUnaSola(rol);
+  const notaDelResumen =
+    faltanParaElResumen > 0
+      ? `Empieza cuando haya un mes de datos: faltan ${faltanParaElResumen} ${faltanParaElResumen === 1 ? "día" : "días"}.`
+      : "Llega los lunes a la madrugada, hora de Chile.";
   const quienLaCambia = dirige ? "La dirección no se cambia: se pasa a otra persona, desde Cuentas." : `Lo cambia ${quienPuede("usarCuentas")}, desde Cuentas.`;
   return (
     <>
@@ -70,9 +76,9 @@ export function MiCuenta({ nombre, correo, rol, segundoFactor, sesiones, idDeEst
           <Apartado
             id="avisos"
             titulo="Avisos"
-            descripcion="Te llega un correo con cada mensaje nuevo de las bandejas que marques. No trae lo que escribieron: lo leés en el admin."
+            descripcion="Te llega un correo con cada mensaje nuevo de las bandejas que marques, sin lo que escribieron: lo leés en el admin. Y, si lo marcás, el resumen de las métricas de la semana."
           >
-            <FormularioDeAvisos avisos={avisos} />
+            <FormularioDeAvisos avisos={avisos} notas={{ "resumen-semanal": notaDelResumen }} />
           </Apartado>
         ) : null}
       </div>

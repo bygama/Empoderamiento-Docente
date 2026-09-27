@@ -36,9 +36,9 @@ export const CONEXIONES: readonly Conexion[] = [
   {
     clave: "resend",
     nombre: "Resend",
-    para: "Los correos: los avisos de mensajes nuevos, las contraseñas y los códigos para entrar.",
+    para: "Los correos: los avisos de mensajes nuevos, el resumen semanal, las contraseñas y los códigos para entrar.",
     variables: ["RESEND_API_KEY", "CORREO_REMITENTE"],
-    tareas: [],
+    tareas: ["resumen-semanal"],
     sinConfigurar: "En producción los correos no salen, y sin el código nadie que dirige o administra puede entrar.",
   },
   {
