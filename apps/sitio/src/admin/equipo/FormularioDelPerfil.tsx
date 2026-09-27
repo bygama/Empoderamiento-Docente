@@ -7,8 +7,14 @@ import { BloqueDeLaFigura } from "./BloqueDeLaFigura";
 import { BloqueDeLaTarjeta } from "./BloqueDeLaTarjeta";
 import { BloqueDelCierre } from "./BloqueDelCierre";
 import { BloqueDelRecorrido } from "./BloqueDelRecorrido";
+import { EnLaBiblioteca } from "./EnLaBiblioteca";
+import { EtapasDelRecorrido } from "./EtapasDelRecorrido";
 
-type Props = PropsDeBloque & { vecinos: VecinosDePersona };
+type Props = PropsDeBloque & {
+  /** `null` mientras el perfil no se guardó nunca: todavía no firma nada. */
+  id: string | null;
+  vecinos: VecinosDePersona;
+};
 
 /**
  * El formulario de un perfil del Equipo (SPEC §7.2 de `work/equipo/`), escrito
@@ -17,7 +23,7 @@ type Props = PropsDeBloque & { vecinos: VecinosDePersona };
  * errores del guardado caen en su lugar. Sin recorrido, los bloques que
  * cuelgan de él no están.
  */
-export function FormularioDelPerfil({ vecinos, ...bloque }: Props) {
+export function FormularioDelPerfil({ id, vecinos, ...bloque }: Props) {
   const { form, cambiar, errores } = bloque;
   const cambiarRecorrido: CambiarRecorrido = (campo, cambio) => cambiar("recorrido", (r) => (r ? { ...r, [campo]: resolverCambio(cambio, r[campo]) } : r));
   const delRecorrido = form.recorrido ? { recorrido: form.recorrido, cambiar: cambiarRecorrido, errores } : null;
@@ -28,9 +34,11 @@ export function FormularioDelPerfil({ vecinos, ...bloque }: Props) {
       {delRecorrido ? (
         <>
           <BloqueDeLaFigura {...delRecorrido} />
-          <BloqueDelCierre {...delRecorrido} />
+          <EtapasDelRecorrido {...delRecorrido} firmados={vecinos.firmados} />
         </>
       ) : null}
+      <EnLaBiblioteca id={id} firmados={vecinos.firmados} recorrido={form.recorrido} />
+      {delRecorrido ? <BloqueDelCierre {...delRecorrido} /> : null}
     </div>
   );
 }
