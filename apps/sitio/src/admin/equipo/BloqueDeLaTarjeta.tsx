@@ -4,7 +4,7 @@ import { LARGO_MAXIMO } from "@ed/db/slug";
 import { CampoFoto, Casilla, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { Bloque } from "@/admin/armazon/Bloque";
 import { errorDe } from "@/admin/campos/errores";
-import { subirFoto } from "@/datos/acciones/fotos";
+import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import { ACERCAMIENTO, NIVELES, NUMEROS_DE_NIVEL, TOPES, type Nivel } from "@/features/quienes-somos/contenido/modelo-del-equipo";
 import { MAXIMO_BYTES } from "@/lib/contenido/fotos";
 import type { PropsDeBloque } from "./bloques";
@@ -75,6 +75,7 @@ export function BloqueDeLaTarjeta({ form, cambiar, errores, porNivel, slugPublic
               valor={form.foto}
               alCambiar={(v) => cambiar("foto", v)}
               subir={subirFoto}
+              elegir={fotosParaElegir}
               maximoBytes={MAXIMO_BYTES}
               error={error("foto")}
             />

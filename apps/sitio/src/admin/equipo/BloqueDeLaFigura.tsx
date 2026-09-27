@@ -3,7 +3,7 @@
 import { CampoFoto, Casilla, resolverCambio, Seleccion } from "@ed/kit-admin";
 import { Bloque } from "@/admin/armazon/Bloque";
 import { errorDe } from "@/admin/campos/errores";
-import { subirFoto } from "@/datos/acciones/fotos";
+import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import { FIGURAS } from "@/features/quienes-somos/contenido/modelo-del-equipo";
 import { MAXIMO_BYTES } from "@/lib/contenido/fotos";
 import type { PropsDelRecorrido } from "./bloques";
@@ -48,6 +48,7 @@ export function BloqueDeLaFigura({ recorrido, cambiar, errores }: PropsDelRecorr
             valor={figura.foto ?? SIN_ARCHIVO}
             alCambiar={(cambio) => cambiar("figura", (actual) => ({ ...actual, foto: resolverCambio(cambio, actual.foto ?? SIN_ARCHIVO) }))}
             subir={subirFoto}
+            elegir={fotosParaElegir}
             maximoBytes={MAXIMO_BYTES}
             error={errorDe(errores, "recorrido.figura.foto")}
           />
