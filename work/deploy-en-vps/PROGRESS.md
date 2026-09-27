@@ -2,7 +2,7 @@
 
 ## In progress
 
-- Paso 5 del PLAN.
+- Paso 12 del PLAN.
 
 ## Done
 
@@ -50,3 +50,93 @@
   arranque (`src/instrumentation.ts`), y `compose.prueba.yaml` con el servicio
   `correo`. Tests nuevos en `resend.test.ts` y `conexiones.test.ts`; `pnpm
   --filter sitio test` → 572 pass, 0 fail; typecheck y lint → 0.
+- 2026-09-27 — **Paso 5** (`44bc4fda`): servicio `analitica` (Umami
+  `ghcr.io/umami-software/umami:3.4.0`, base `umami`) y en el `Caddyfile` solo
+  `/umami/script.js` y `/umami/api/send`. Por Caddy: `/umami/script.js` 200,
+  `/umami/api/send` 405 a un GET (existe, pide POST), `/umami/api/websites`,
+  `/umami/login` y `/umami/api/heartbeat` 404. **Hallazgo:** Caddy no relee su
+  archivo solo, así que `desplegar.sh` suma `caddy reload` al final.
+- 2026-09-27 — **Paso 6** (`e0a73857`): `lib/metricas/umami.ts` y
+  `mapear-umami.ts`, con respuestas grabadas en `__fixtures__/umami/` (sin la
+  API key ni el id del sitio: `grep` vacío). Para grabarlas: sitio y API key
+  creados por la API de Umami desde adentro de la red (`/api/auth/login`,
+  `/api/websites`, `/api/me/api-keys`) y cinco vistas mandadas por Caddy a
+  `/umami/api/send` con un User-Agent de navegador. Lo que mostraron: en
+  `/metrics/expanded` las vistas vienen como texto («"3"») y los visitantes como
+  número; `x` de `/pageviews` viene en ISO («2026-09-27T21:00:00Z»); y
+  `country=neq.CL,MX,AR` deja afuera las visitas sin país (en local no hay país:
+  `[]`), igual que el `not in` de Vercel. `pnpm --filter sitio test` → 581
+  pass, 0 fail.
+- 2026-09-27 — **Paso 7** (`8e84e524`): `fuenteDeVisitas()` /
+  `fuenteEsperada()` / `clienteDesdeEntorno()` en `lib/metricas/entorno.ts`;
+  `PLANES_DE_LA_FUENTE` en `config/metricas.ts` (solo datos: lo importan
+  componentes del navegador) y `planDeLaFuente()` en
+  `datos/fuente-de-visitas.ts`; la copia, las cifras, Links para compartir,
+  Origen, Conexiones (`mostrar`: una sola fuente) y los textos «de Vercel» del
+  admin. Los tests de la copia con base fijan el plan de Vercel (prueban la
+  ventana de 30 días) y uno nuevo prueba el de Umami. Una corrida con el plan
+  equivocado había dejado 6 ventanas de prueba en `ed_vps`; se borraron.
+  Typecheck → 0, `pnpm --filter sitio test` → 584 pass, lint → 0, `git grep
+  PLAN_DE_VERCEL` vacío.
+- 2026-09-27 — **Paso 8** (`bf145ebe`): `scriptDeAnalitica` con su test (4
+  combinaciones) y `components/layout/Analitica.tsx` en el layout; comentario
+  de la CSP. Tests → 587 pass; `verificar-react-doctor.mjs` → 100/100. En el
+  compose (deploy `2daf9e898a3e`): el HTML de `/` trae `<script defer
+  src="/umami/script.js" data-website-id="…">` y 0 apariciones de `_vercel`.
+- 2026-09-27 — **Paso 9** (`0f73e322`): `header_up X-Real-IP {remote_host}` en
+  las dos rutas del `Caddyfile` y `CLIENT_IP_HEADER: x-real-ip` en Umami (sin
+  eso toma la primera de una lista que incluye `CF-Connecting-IP`). Prueba por
+  Caddy: cuatro intentos de login, cada uno con `X-Forwarded-For`, `X-Real-IP`
+  y `CF-Connecting-IP` falsificados distintos (1.2.3.4, 5.6.7.8, 9.9.9.9,
+  8.8.4.4) → 401, 401, 401, **429**; la tabla `rateLimit` tiene una sola clave,
+  `172.18.0.1|/sign-in/email|3` (la IP de la conexión). Control, directo a
+  `app:3000` desde otro contenedor con `X-Forwarded-For: 1.2.3.4` → aparece la
+  clave `1.2.3.4`: la app confía en la cabecera, y por eso solo Caddy le habla.
+- 2026-09-27 — **Paso 10** (`2daf9e89`): servicio `cron` (`node:24-alpine`,
+  busybox `crond`, `0 4 * * *` en UTC) con `deploy/cron/correr.mjs`. A mano
+  (`docker compose exec cron node /etc/ed-cron/correr.mjs`): la respuesta
+  entera en el log, 500 porque Search Console no está configurado (esperado) y
+  `copia-de-visitas` ok. **Copia de punta a punta:** las vistas de hoy no las
+  trae (la copia nunca toma el día en curso), así que se corrió su fecha a
+  ayer en la base de Umami (`UPDATE website_event … - interval '1 day'`) y se
+  corrió el cron: «Del 2026-08-28 al 2026-09-26: 30 días, 15 filas, 6
+  ventanas», con páginas, referidos (google.com, linkedin.com), dispositivo,
+  sistema, navegador, hora, la campaña `prueba-local` y las ventanas de 7, 30
+  y 90 días.
+- 2026-09-27 — **Entrar con segundo factor, foto y CV en el compose** (con
+  `compose.prueba.yaml`: `COMPOSE_FILE` en el `.env` local). **Hallazgos:**
+  compose interpola `${…}` también adentro del comando del Resend falso
+  (`0c7dd20c`); los comandos de `scripts/` necesitan el entorno entero de la
+  app, así que se sumó el servicio `herramientas` (perfil propio);
+  `prueba@localhost` no pasa la validación de correo de better-auth; y el
+  navegador embebido de Orca se queda en el aviso del certificado interno de
+  Caddy (`ERR_CERT_AUTHORITY_INVALID`, el CLI no tiene cómo aceptarlo, y
+  `snapshot`/`eval` cortan la conexión con el runtime), así que el flujo se hizo
+  por HTTP contra las mismas rutas que usa el navegador. Al arrancar, el log de
+  `app` dice «[correo] Los correos van a http://correo:3000/emails, no a
+  Resend…». Recorrido: `crear-cuenta prueba@ed.test … administra` por
+  `herramientas` → `POST /api/auth/request-password-reset` 200 → el enlace en
+  el log de `correo` → `reset-password` 200 → `sign-in/email` 200
+  `{"twoFactorRedirect":true,"twoFactorMethods":["otp"]}` → `two-factor/send-otp`
+  200 → el código de 6 dígitos en el log de `correo` → `verify-otp` 200 → `GET
+  /admin` 200 con «Prueba Local». **Foto:** la Server Action `subirFoto` (id
+  del `server-reference-manifest.json` de la imagen) con la sesión, por Caddy →
+  `{"ok":true,…"src":"/api/fotos/87917126-…"}`, el archivo en el volumen `fotos`
+  (dueño `node`) y la fila con `subidaPor = Prueba Local`. (Un detalle del
+  protocolo de React 19.2: la raíz `0` va después de los campos `_1_…`, como la
+  arma el navegador.) `/api/fotos/<id>` → 200, 11 906 bytes; **después de
+  `docker compose restart app`**, 200 y `cmp` idéntico al archivo subido. **CV:**
+  con `CV_ABIERTO=si` solo para la prueba, `POST /api/cv` por Caddy → `{"ok":true}`;
+  el PDF en `/app/apps/sitio/.cv/cv/094ba75c-….pdf` (volumen `cv`) y la fila en
+  `mensajes` (bandeja `cv`); por la web no se llega a `.cv`.
+- 2026-09-27 — **Paso 11** (`623788df`): servicio `respaldo`
+  (`postgres:17-alpine`, `30 3 * * *`), `deploy/respaldo/respaldar.sh` y
+  `restaurar.sh`, y `scripts/restaurar.sh` (pide escribir «restaurar»). Prueba:
+  `docker compose exec respaldo sh /respaldo/respaldar.sh` → `respaldos/2026-09-27/`
+  con `ed.dump` (114 KB), `umami.dump` (66 KB), `fotos.tar.gz` y `cv.tar.gz` (con
+  el PDF). Después `docker compose down` y `docker volume rm ed_datos-db
+  ed_fotos`; `up -d db` → la base `ed` con 0 tablas. `echo restaurar | bash
+  scripts/restaurar.sh 2026-09-27` → exit 0. Volvieron: la foto por Caddy (200,
+  `cmp` idéntico), la fila de la foto, el CV (fila y archivo), las 9 novedades,
+  las 2 cuentas, Umami (1 sitio, 5 eventos) y hasta la sesión de antes (`GET
+  /admin` 200 con la misma cookie).
