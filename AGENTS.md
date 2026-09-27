@@ -158,9 +158,9 @@ un release candidate de la 8 (ADR-0007).
         │                     next.config.ts, postcss.config.mjs
         └── src/
             ├── app/
-            │   ├── (sitio)/   ← el sitio: sus páginas y su layout; [...resto] da el 308 de una redirección o el 404
+            │   ├── (sitio)/   ← el sitio: sus páginas y su layout; [...resto] da el 308 de una redirección o el 404; l/[codigo] es el link corto (307, ADR-0017)
             │   ├── (admin)/   ← SOLO rutas del admin
-            │   ├── api/       ← auth/ · contacto/ y cv/ (los formularios públicos, que delegan en datos/formularios/)
+            │   ├── api/       ← auth/ · contacto/ y cv/ (los formularios públicos, que delegan en datos/formularios/) · contar/ (los eventos raros del sitio, 204 siempre)
             │   └── globals.css
             ├── datos/         ← la ÚNICA puerta a la base
             │   ├── cliente.ts   ← el PrismaClient de la app
@@ -173,23 +173,26 @@ un release candidate de la 8 (ADR-0007).
             │   ├── privacidad.ts ← los plazos de retención de la base, con su historial (ADR-0015)
             │   ├── conexiones.ts ← el estado de cada servicio de afuera: sus variables y sus corridas
             │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
+            │   ├── contadores.ts ← lo que cuenta el sitio mismo: sumas por día, sin nada de la persona (ADR-0017); recibir-evento.ts, POST /api/contar
+            │   ├── enlaces.ts   ← los links cortos de Métricas; abrir-enlace.ts, lo que hace /l/<codigo>; marcas.ts, las marcas a mano de la curva
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
             │   ├── roles.ts     ← el único camino para cambiar un rol (ponerRol: prende el segundo factor si lo pide)
             │   ├── sobre-cuentas.ts ← lo común de las acciones de Cuentas (queSePuede sobre la cuenta, borrar si nunca hizo nada)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes, materiales, lista- y ficha-de-material, materiales-del-admin, portadas, casos, casos-del-admin, aliados —nunca uno sin autorizar—, aliados-del-admin, fotos)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos, casos, aliados, ciclo-de-aliados, vista-previa-de-contenido)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes, materiales, lista- y ficha-de-material, materiales-del-admin, portadas, casos, casos-del-admin, aliados —nunca uno sin autorizar—, aliados-del-admin, fotos, resumen, marcas, origen, que-hace-la-gente, enlaces, nombres-de-rutas, materiales-consultados)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos, casos, aliados, ciclo-de-aliados, vista-previa-de-contenido, enlaces, marcas)
             │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, editar-, publicar-casos, editar-, publicar-, autorizar-aliados, subir-, editar-, reemplazar-foto, redirigir, choque, mover-mensajes)
             │   ├── biblioteca/  ← buscar los datos de un material afuera (Crossref, OpenAlex, la página) y chequear su link (ADR-0016)
             │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, materiales, casos, aliados), que busca y reemplaza por URL
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
-            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links, los archivos de fotos que ninguna fila usa
+            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links, los archivos de fotos que ninguna fila usa, el resumen semanal (los lunes, en Chile)
             ├── admin/         ← las pantallas del admin
-            │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/), el número de sin leer, la cifra
+            │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/), el número de sin leer, la cifra, la curva
             │   ├── inicio/      ← el Inicio: el saludo, los pendientes, la semana y la actividad
             │   ├── actividad/   ← cómo se lee cada tipo de actividad (frase.ts), para el Inicio y Cuentas
             │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)
             │   ├── mensajes/    ← las bandejas de Contacto y CV y la ficha de cada mensaje
             │   ├── novedades/   ← la primera entidad: la lista, la ficha con su formulario y su panel, «Qué cambió» (cambios.ts)
+            │   ├── metricas/    ← las cinco pestañas: Resumen (la curva y sus marcas), Búsquedas (busquedas/), Origen (la mejor hora), Qué hace la gente y Links para compartir
             │   ├── ajustes/     ← el índice de Ajustes y sus cinco pantallas (sitio, seo, avisos, privacidad, conexiones)
             │   ├── biblioteca/  ← la segunda entidad: la lista con miniatura, la ficha de un material y agregar por DOI, ISBN o link
             │   ├── casos/ · aliados/ ← Contenido › Casos y Aliados, con el molde de novedades/
@@ -217,8 +220,8 @@ un release candidate de la 8 (ADR-0007).
             │   │                   (cita.ts) y lo que ve el sitio (del-sitio.ts); y portada/ (la tipográfica, next/og)
             │   ├── investigacion/contenido/ ← los dos esquemas de un caso (caso.ts) y su modelo; casos/, la escena, recibe los casos por prop
             │   └── aliados/     ← los esquemas de un aliado (contenido/) y el logo de la tira (LogoDeAliado)
-            ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO)
-            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed): sin dominio de ED
+            ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO) · metricas.ts (lo de ED en Métricas: países fijos, la hora de Chile, los eventos, los mínimos)
+            └── lib/           ← hooks/, metricas/ (la copia de Vercel, los canales, los robots, la mejor hora, el código de un link), contadores/ (avisar un evento desde el navegador), busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
