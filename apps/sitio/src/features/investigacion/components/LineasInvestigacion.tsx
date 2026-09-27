@@ -2,18 +2,19 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ButtonSecondary } from "@/components/ui/ButtonSecondary";
 import { Highlight } from "@/components/ui/Highlight";
+import { FlechaManuscrita } from "@/features/investigacion/casos/Garabatos";
+import { ROTULO_MICRO } from "@/features/investigacion/casos/tintes";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { alClicIrA } from "@/lib/navegar";
-import { alClicVerCaso } from "../casos/abrir-caso";
-import { ClipPapel, FlechaManuscrita, Pestana, SubrayadoMarcador } from "../casos/Garabatos";
+import { BocaCarpeta } from "./lineas-investigacion/BocaCarpeta";
+import { crearLineas } from "./lineas-investigacion/coreografia-lineas";
+import { Papel, type Linea } from "./lineas-investigacion/Papel";
 import { PuntosCampo } from "./PuntosCampo";
-import { ROTULO_MICRO, ROTULO_TAB } from "../casos/tintes";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -33,7 +34,7 @@ if (typeof window !== "undefined") {
  * cruce línea → caso es editorial (Facundo, 2026-09-14) y hay que validarlo
  * con ED.
  */
-const LINEAS: ReadonlyArray<{ nombre: string; pregunta: string; clave: string; caso: string }> = [
+const LINEAS: ReadonlyArray<Linea> = [
   {
     nombre: "Empoderamiento y desarrollo profesional docente",
     pregunta:
@@ -79,135 +80,19 @@ const LINEAS: ReadonlyArray<{ nombre: string; pregunta: string; clave: string; c
 ];
 
 /**
- * La mesa de trabajo: seis papeles sobre la carpeta, de TRES materiales que
- * rotan (hoja con clip, nota adhesiva con cinta, ficha de archivo), cada
- * uno dos veces y nunca dos iguales seguidos, apoyados con un giro leve
- * alternado. La variedad es material, no de contenido: la pregunta va
- * siempre en Manrope, al mismo tamaño; el manuscrito queda para las
- * anotaciones (el número de las fichas, la flecha de las notas) y el
- * marcador subraya la clave. Si se sacan los papeles, la información es
- * idéntica.
- */
-const MATERIALES = ["hoja", "nota", "ficha"] as const;
-const GIROS = [
-  "lg:-rotate-[0.8deg]",
-  "lg:rotate-[0.6deg]",
-  "lg:-rotate-[0.5deg]",
-  "lg:rotate-[0.7deg]",
-  "lg:-rotate-[0.6deg]",
-  "lg:rotate-[0.5deg]",
-] as const;
-
-/** Cinta adhesiva translúcida, como la de las láminas de los casos. */
-function Cinta({ className = "" }: { className?: string }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`pointer-events-none absolute h-6 w-20 border border-white/70 bg-white/35 shadow-sm ${className}`}
-    />
-  );
-}
-
-/** La pregunta con su clave subrayada a marcador (doble pasada, temblor humano). */
-function Pregunta({ texto, clave }: { texto: string; clave: string }) {
-  const donde = texto.indexOf(clave);
-  if (donde < 0) return <>{texto}</>;
-  return (
-    <>
-      {texto.slice(0, donde)}
-      <span className="relative whitespace-nowrap">
-        {clave}
-        <SubrayadoMarcador className="text-verde-concepto pointer-events-none absolute inset-x-0 -bottom-[0.18em] h-[0.5em] w-full" />
-      </span>
-      {texto.slice(donde + clave.length)}
-    </>
-  );
-}
-
-/** Un papel de la mesa: el material cambia, la pregunta no. */
-function Papel({ linea, indice }: { linea: (typeof LINEAS)[number]; indice: number }) {
-  const material = MATERIALES[indice % 3];
-  const numero = String(indice + 1).padStart(2, "0");
-  // Tres tonos que se distinguen entre sí y de la carpeta (que es
-  // azul-claro): la hoja blanca, la nota en un azul más claro que la carpeta
-  // y la ficha en el gris del sitio, con borde.
-  const superficie = {
-    hoja: "bg-white bg-grain-light rounded-[4px] pt-9",
-    nota: "bg-[color-mix(in_srgb,var(--color-azul-claro)_42%,white)] bg-grain-light rounded-[3px] pt-10",
-    ficha: "bg-gris-fondo bg-grain-light rounded-[2px] border border-azul-principal/15 pt-8",
-  }[material];
-  return (
-    <li
-      data-linea
-      className={`text-azul-principal relative px-7 pb-7 shadow-[0_22px_50px_-26px_rgb(31_45_77/0.55),0_2px_6px_-2px_rgb(31_45_77/0.2)] lg:px-8 ${superficie} ${GIROS[indice] ?? ""}`}
-    >
-      {material === "hoja" && (
-        <ClipPapel className="text-azul-principal/45 absolute -top-3 right-7 h-11 w-6" />
-      )}
-      {material === "nota" && <Cinta className="-top-3 left-1/2 -translate-x-1/2 -rotate-3" />}
-
-      {/* Número: mono en la hoja y la nota; a mano en la ficha (la única
-          anotación manuscrita de ese papel). */}
-      {material === "ficha" ? (
-        <span aria-hidden="true" className="font-hand text-azul-medio absolute top-3 right-6 text-[2rem] leading-none">
-          {numero}
-        </span>
-      ) : null}
-      <div className="flex items-center gap-3">
-        <span
-          className={`font-display text-verde-concepto-texto text-[1.05rem] font-bold tabular-nums ${material === "ficha" ? "sr-only" : ""}`}
-        >
-          {numero}
-        </span>
-        <span className={`${ROTULO_MICRO} text-gris-texto/80`}>{linea.nombre}</span>
-      </div>
-      <h3 className="font-display mt-4 text-[1.32rem] leading-[1.24] font-bold tracking-[-0.015em] text-balance lg:text-[1.42rem]">
-        {material === "nota" && (
-          <FlechaManuscrita className="text-verde-concepto float-left mt-1 mr-2 h-5 w-8 rotate-[12deg]" />
-        )}
-        <Pregunta texto={linea.pregunta} clave={linea.clave} />
-      </h3>
-      {/* Al caso que la muestra en acción: en la misma página desliza hasta
-          la pila y abre el expediente (abrir-caso.ts); el href es el link
-          directo del caso, por si se abre en otra pestaña. */}
-      <Link
-        href={`#${linea.caso}`}
-        onClick={alClicVerCaso(linea.caso)}
-        aria-label={`Ver en acción: ${linea.nombre}`}
-        className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto mt-5 inline-flex items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
-        Ver en acción
-        <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none">
-          →
-        </span>
-      </Link>
-    </li>
-  );
-}
-
-/** Inclinación de la carpeta al entrar y al salir (grados, sentido de la referencia). */
-const INCLINACION = -5;
-
-/** Puntas de papel asomando por la boca de la carpeta (mal guardadas). */
-const PAPELES = [
-  "left-[42%] -top-[9px] h-4 w-24 rotate-[0.6deg] bg-white/95",
-  "left-[54%] -top-[6px] h-3.5 w-14 -rotate-[1deg] bg-white/75",
-  "left-[70%] -top-[8px] h-4 w-28 rotate-[0.3deg] bg-white/90",
-] as const;
-
-/**
  * Sección 3 — Líneas de investigación (`#lineas`): UNA CARPETA A PANTALLA
  * COMPLETA, la Hoja 02 del archivo, con la lista de las seis preguntas.
  *
- * Seis papeles sobre la carpeta (ver MATERIALES): número, nombre de la
- * línea chico y la pregunta grande, en el orden del doc maestro. Nada más
- * que leer, y un solo CTA al pie hacia los casos («Mirá la investigación
- * en acción», el de la arquitectura editorial).
+ * Seis papeles sobre la carpeta (lineas-investigacion/Papel.tsx): número,
+ * nombre de la línea chico y la pregunta grande, en el orden del doc
+ * maestro. Nada más que leer, y un solo CTA al pie hacia los casos («Mirá
+ * la investigación en acción», el de la arquitectura editorial).
  *
  * Como en la referencia, la carpeta ocupa toda la pantalla y lleva su
  * título adentro, con aire. Entra inclinada sobre el navy de la sección
  * anterior y se asienta al centrarse (scrub corto ligado a su entrada, sin
- * pin); las filas se revelan en cascada al llegar. Touch / reduced-motion:
+ * pin); las filas se revelan en cascada al llegar
+ * (lineas-investigacion/coreografia-lineas.ts). Touch / reduced-motion:
  * carpeta plana y filas quietas.
  */
 export function LineasInvestigacion() {
@@ -224,48 +109,7 @@ export function LineasInvestigacion() {
     const carpeta = carpetaRef.current;
     const lista = listaRef.current;
     if (!zona || !carpeta || !lista) return;
-    const ctx = gsap.context(() => {
-      // El hint acompaña al giro por scroll y se va con el contexto.
-      gsap.set(carpeta, { willChange: "transform" });
-      // La regla de la referencia: la carpeta está derecha solo cuando está
-      // CENTRADA en la ventana. Viene inclinada, se aplana al llegar al
-      // medio y se vuelve a inclinar (mismo ángulo, mismo sentido) al irse.
-      // El tramo "top bottom → bottom top" tiene su mitad exacta cuando el
-      // centro de la carpeta pasa por el centro de la ventana. Pivote en el
-      // centro para que al girar no se desplace.
-      const tl = gsap.timeline({
-        defaults: { transformOrigin: "50% 50%" },
-        scrollTrigger: {
-          trigger: carpeta,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-          invalidateOnRefresh: true,
-        },
-      });
-      tl.fromTo(
-        carpeta,
-        { rotation: INCLINACION },
-        { rotation: 0, duration: 0.42, ease: "power2.out", immediateRender: false },
-        0,
-      );
-      tl.to(carpeta, { rotation: INCLINACION, duration: 0.42, ease: "power2.in" }, 0.58);
-
-      // Las filas se revelan en cascada, una vez, cuando la lista llega.
-      gsap.fromTo(
-        lista.querySelectorAll("[data-linea]"),
-        { autoAlpha: 0, y: 18 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power3.out",
-          stagger: 0.08,
-          scrollTrigger: { trigger: lista, start: "top 78%", once: true },
-        },
-      );
-    }, zona);
-    return () => ctx.revert();
+    return crearLineas({ zona, carpeta, lista });
   }, [reduced]);
 
   return (
@@ -301,29 +145,7 @@ export function LineasInvestigacion() {
         data-lineas-carpeta
         className="bg-azul-claro bg-grain-light relative z-10 w-full shadow-[0_-28px_70px_-30px_rgb(0_0_0/0.65)] lg:-ml-[10vw] lg:w-[120vw]"
       >
-        {/* Pestaña troquelada, grande como en la referencia. */}
-        <span
-          aria-hidden="true"
-          className="text-azul-claro absolute -top-12 left-[4vw] z-0 block h-12 w-[22rem] lg:-top-14 lg:left-[13vw] lg:h-14 lg:w-[26rem]"
-        >
-          <Pestana className="h-full w-full">
-            <span className={`${ROTULO_TAB} text-azul-principal whitespace-nowrap`}>
-              02 · Líneas de investigación
-            </span>
-          </Pestana>
-        </span>
-
-        {/* Papeles mal guardados asomando por la boca. */}
-        {PAPELES.map((clases) => (
-          <span
-            key={clases}
-            aria-hidden="true"
-            className={`pointer-events-none absolute z-0 block rounded-t-[3px] shadow-[0_-2px_5px_-2px_rgb(31_45_77/0.4)] ${clases}`}
-          />
-        ))}
-
-        {/* Canto iluminado de la tapa. */}
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-white/40" />
+        <BocaCarpeta />
 
         {/* Contenido: dentro del viewport (en desktop compensa el ancho extra). */}
         <div className="relative px-6 pt-28 pb-24 md:px-10 lg:mx-[10vw] lg:pt-32 lg:pb-28">
