@@ -50,6 +50,12 @@ test("entrar, salir y lo que alguien cambia de su cuenta lo ven solo quienes usa
     );
   }
   assert.deepEqual(tiposQueVe("edita").filter((t) => deLasCuentas.includes(t)), []);
+  // Lo de las páginas es contenido: lo ven los tres roles.
+  for (const rol of ["dirige", "administra", "edita"]) {
+    for (const tipo of ["publico-una-pagina", "descarto-un-borrador", "restauro-una-version"] as const) {
+      assert.ok(tiposQueVe(rol).includes(tipo), `${rol} ve ${tipo}`);
+    }
+  }
   assert.deepEqual(tiposQueVe("inventado"), []);
   assert.deepEqual(tiposQueVe(undefined), []);
 });
