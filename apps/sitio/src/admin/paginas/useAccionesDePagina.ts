@@ -2,7 +2,7 @@ import { createElement, useState } from "react";
 import { descartarBorrador, publicar } from "@/datos/acciones/paginas";
 import { abrirVistaPrevia } from "@/datos/acciones/vista-previa";
 import type { EstadoDePagina } from "@/datos/consultas/editor-de-paginas";
-import type { AvisoDelEditor } from "./AvisoDeLaPagina";
+import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
 import type { EstadoPendiente } from "./EncabezadoDelEditor";
 import { VistaPreviaFrenada } from "./VistaPreviaFrenada";
 

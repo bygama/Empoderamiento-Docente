@@ -3,16 +3,16 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { resolverCambio, type Cambio } from "@ed/kit-admin";
 import { ContextoDeErrores } from "@/admin/campos/errores";
+import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
 import type { Pestana } from "@/admin/armazon/Pestanas";
+import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
+import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { guardarBorrador } from "@/datos/acciones/paginas";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 import { resumenDeErrores, type ErrorDeCampo } from "@/lib/contenido/errores";
-import { AvisoDeLaPagina } from "./AvisoDeLaPagina";
 import { EncabezadoDelEditor } from "./EncabezadoDelEditor";
 import { Seccion } from "./Seccion";
 import { useAccionesDePagina } from "./useAccionesDePagina";
-import { useErroresDelEditor } from "./useErroresDelEditor";
-import { useFrenarSalida } from "./useFrenarSalida";
 
 type Props = {
   pagina: PaginaParaEditar;
@@ -131,7 +131,7 @@ export function EditorDePagina({ pagina, pestanas, aparte }: Props) {
         estado={estado}
         haySinGuardar={haySinGuardar}
         pendiente={acciones.pendiente}
-        aviso={<AvisoDeLaPagina aviso={acciones.aviso} alCerrar={() => setAviso(null)} alRecargar={acciones.recargar} />}
+        aviso={<AvisoDeLaAccion aviso={acciones.aviso} alCerrar={() => setAviso(null)} alRecargar={acciones.recargar} />}
         alGuardar={guardar}
         alVerBorrador={() => acciones.verBorrador(preparar)}
         alPublicar={() => acciones.publicar(preparar)}

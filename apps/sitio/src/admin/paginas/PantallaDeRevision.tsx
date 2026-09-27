@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { Pestana } from "@/admin/armazon/Pestanas";
 import type { PaginaEnRevision } from "@/datos/consultas/historial-de-paginas";
-import { AvisoDeLaPagina } from "./AvisoDeLaPagina";
+import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
 import { EncabezadoDelEditor } from "./EncabezadoDelEditor";
 import { useAccionesDePagina } from "./useAccionesDePagina";
 
@@ -37,7 +37,7 @@ export function PantallaDeRevision({ pagina, pestanas, conAcciones, children }: 
         estado={acciones.estado}
         haySinGuardar={false}
         pendiente={acciones.pendiente}
-        aviso={<AvisoDeLaPagina aviso={acciones.aviso} alCerrar={() => acciones.setAviso(null)} alRecargar={acciones.recargar} />}
+        aviso={<AvisoDeLaAccion aviso={acciones.aviso} alCerrar={() => acciones.setAviso(null)} alRecargar={acciones.recargar} />}
         alVerBorrador={conAcciones ? () => acciones.verBorrador() : undefined}
         alPublicar={conAcciones ? () => acciones.publicar() : undefined}
         alDescartar={conAcciones ? acciones.descartar : undefined}
