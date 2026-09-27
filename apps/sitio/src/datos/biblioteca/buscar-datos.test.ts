@@ -12,7 +12,7 @@ const respuestas = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".
 const grabada = (archivo: string) => readFileSync(path.join(respuestas, archivo), "utf8");
 
 const CROSSREF_RELIME = "https://api.crossref.org/works/10.12802%2Frelime.2025.28.e805";
-const OPENALEX_RELIME = "https://api.openalex.org/works/doi:10.12802/relime.2025.28.e805?mailto=contacto%40ejemplo.org";
+const OPENALEX_RELIME = "https://api.openalex.org/works/doi:10.12802%2Frelime.2025.28.e805?mailto=contacto%40ejemplo.org";
 
 /** Un pedido que contesta según la URL, y anota qué se pidió. */
 function pedidoDe(guion: Record<string, { tipo: string; cuerpo: string }>, pedidas: string[] = []): Pedir {
@@ -76,4 +76,16 @@ test("una página con solo Open Graph; un PDF, algo que no es nada y lo que no s
   assert.match("error" in nada ? nada.error : "", /no parece un DOI/);
   const isbn = await buscarDatos("978-84-16919-43-7", { pedir: pedidoDe({}), contacto });
   assert.match("error" in isbn ? isbn.error : "", /No encontramos datos/);
+});
+
+test("un DOI con caracteres raros va codificado entero: a Crossref y a OpenAlex", async () => {
+  // Un DOI SICI, con «#» y «?» al final: sin codificar, cortarían la ruta y armarían otra consulta.
+  const pedidas: string[] = [];
+  await buscarDatos("10.1002/(sici)1097-4571(199806)49:8<693::aid-asi4>3.0.co;2-o#x?y", { pedir: pedidoDe({}, pedidas), contacto });
+  assert.deepEqual(pedidas, [
+    "https://api.crossref.org/works/10.1002%2F(sici)1097-4571(199806)49%3A8%3C693%3A%3Aaid-asi4%3E3.0.co%3B2-o%23x%3Fy",
+    "https://api.openalex.org/works/doi:10.1002%2F(sici)1097-4571(199806)49%3A8%3C693%3A%3Aaid-asi4%3E3.0.co%3B2-o%23x%3Fy?mailto=contacto%40ejemplo.org",
+  ]);
+  const openalex = new URL(pedidas[1]!);
+  assert.deepEqual([[...openalex.searchParams.keys()], openalex.hash], [["mailto"], ""]);
 });
