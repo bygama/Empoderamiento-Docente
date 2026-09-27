@@ -98,9 +98,10 @@ persona y por lunes.
   dan un piso, no el número exacto.
 - **La atribución de un CV a un link es corta** (arriba): la pantalla y el
   README lo dicen.
-- **Las visitas de un link dependen de Vercel** (`utm_campaign`): sin la
-  copia diaria, o con un plan que no cuenta por UTM (Hobby, hoy), la pantalla
-  las muestra «—».
+- **Las visitas de un link dependen de Vercel** (`utm_campaign`): en Hobby,
+  el plan de hoy, Vercel no cuenta por UTM y no se pueden medir; la pantalla
+  lo dice una vez y muestra los clics y los CV, que sí se miden.
+  `PLAN_DE_VERCEL` es el único lugar para prenderlas si ED cambia de plan.
 - **Un script puede inflar los contadores** hasta el tope por IP. Es un costo
   aceptado: no hay nada que robar y el tope lo acota.
 
