@@ -6,14 +6,16 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- Rebasada sobre `main` `15def2c` y verificada de nuevo (el bloque de
-  arriba en Verification). Falta la revisión de cierre, que abre el padre al
-  recibir `worker_done` (1 asiento, Opus 5.5, medium, «el cambio entero
-  contra su SPEC»).
+- **Cerrando.** La revisión r1 dio PASS y su ronda de arreglos está hecha
+  (Hecho y DECISIONS). Lo que sigue va en el mismo PR, en este orden: el
+  commit que borra esta carpeta, el rebase sobre `main` `293e7ba`, el gate
+  entero con el typecheck en limpio y comparar-render contra el `main` nuevo.
+  Esa última evidencia queda en el cuerpo del PR #187 y en el `worker_done`,
+  porque esta carpeta ya no va a existir.
 
-**En pausa con el PR #187 abierto**
-(https://github.com/bygama/Empoderamiento-Docente/pull/187), esperando la
-revisión de cierre del padre. Para retomar en frío:
+Notas de la pausa con el PR #187 abierto
+(https://github.com/bygama/Empoderamiento-Docente/pull/187), de antes de la
+revisión; quedan como historia de cómo se retomaba:
 
 - **Entorno:** base `ed_paginasqh` (`.env.local` apunta ahí; está en
   `.gitignore`), cuenta de prueba `prueba-4b@empoderamientodocente.local`
@@ -36,6 +38,21 @@ revisión de cierre del padre. Para retomar en frío:
   este mismo PR.
 
 ## Verification
+
+### 2026-09-26 — Revisión de cierre r1 — PASS
+
+- **Close review — el cambio entero contra su SPEC (Opus 5.5, medium), sobre
+  `07c2b6b`: PASS**, 0 Critical, 0 Important, 4 Minor y una nota fuera de su
+  lente (relayado por el padre). Probó lo compartido, la vista previa, la
+  revalidación de las dos rutas con un build de producción y el render con
+  solo las cuatro diferencias aprobadas.
+- **Ronda de arreglos** (rulings en DECISIONS): el hero de Qué hacemos recibe
+  solo los nombres cortos (`23f5b2e`); test de `rutasQueMuestran` sobre el
+  registro real (`c9e1e6b`); el Minor 2 (la frase del aviso se arma en el
+  cliente) ratificado sin cambiar código; los Minor 1 y 4, sin tocar. Antes
+  del commit: `pnpm typecheck` → 0 · `pnpm lint` → 0 · `pnpm test` → 0
+  (apps/sitio 245 ok, 0 fallas) · `tsx --test src/contenido/paginas.test.ts`
+  → 5/5, con el test nuevo.
 
 ### 2026-09-26 — Rebase sobre `main` `15def2c` — gate entero — PASS
 
