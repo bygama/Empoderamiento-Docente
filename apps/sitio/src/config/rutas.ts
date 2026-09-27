@@ -24,10 +24,11 @@ export const RUTAS_DE_LA_APP: readonly RutaDeclarada[] = [
   { ruta: "/favicon.ico", contesta: "sola" },
   { ruta: "/apple-icon*.png", contesta: "sola" },
   { ruta: "/opengraph-image*.png", contesta: "sola" },
-  // El admin, la API y lo de Next, enteros.
+  // El admin y la API, enteros.
   { ruta: "/admin/[[...todo]]", contesta: "sola" },
   { ruta: "/api/[[...todo]]", contesta: "sola" },
-  { ruta: "/_next/[[...todo]]", contesta: "sola" },
+  // Lo que empieza con «_» es interno de Next (/_next, /_not-found, /_global-error): nunca pasa por la atrapa-todo.
+  { ruta: "/_*/[[...todo]]", contesta: "sola" },
   ...["aliados", "biblioteca", "brand", "equipo", "firma", "fotos", "investigacion", "novedades", "quienes-somos"].map((carpeta) => ({
     ruta: `/${carpeta}`,
     contesta: "archivos" as const,

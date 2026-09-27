@@ -16,8 +16,8 @@ const SITIO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.."
 const APP = path.join(SITIO, "src/app");
 const PUBLICO = path.join(SITIO, "public");
 
-/** Lo de Next que no tiene carpeta en app/. */
-const DE_NEXT = ["/_next/[[...todo]]"];
+/** Lo interno de Next, que no tiene carpeta en app/: una carpeta «_x» ahí es privada. */
+const DE_NEXT = ["/_*/[[...todo]]"];
 
 /** La ruta que Next arma con un archivo de app/, escrita como se declara; `null` si el archivo no arma una. */
 function rutaDelArchivo(carpeta: string, archivo: string): string | null {
@@ -93,13 +93,13 @@ test("no acepta una redirección desde una ruta que el sitio contesta por su cue
   for (const ruta of ["/sumate-al-equipo", "/sitemap.xml", "/robots.txt", "/novedades/rss.xml"]) {
     assert.deepEqual(desde(ruta), { ok: false, campo: "desde", detalle: `«${ruta}» ya existe en el sitio: una redirección ahí nunca se aplicaría.` });
   }
-  for (const ruta of ["/novedades/una-que-existe", "/novedades/otra/imagen-para-redes", "/admin", "/api/cv", "/_next/static/x.js", "/opengraph-image-1whei1.png", "/equipo/daniela-reyes.jpg"]) {
+  for (const ruta of ["/novedades/una-que-existe", "/novedades/otra/imagen-para-redes", "/admin", "/api/cv", "/_next/static/x.js", "/_not-found", "/_global-error", "/opengraph-image-1whei1.png", "/equipo/daniela-reyes.jpg"]) {
     assert.equal(desde(ruta).ok, false, ruta);
   }
 });
 
 test("acepta una redirección desde una ruta que cae en la atrapa-todo o en una ficha que no existe", () => {
-  for (const ruta of ["/taller-2025", "/novedades/lo-viejo", "/quienes-somos/viejo", "/equipo", "/administracion"]) {
+  for (const ruta of ["/taller-2025", "/taller_2025", "/novedades/lo-viejo", "/quienes-somos/viejo", "/equipo", "/administracion"]) {
     assert.deepEqual(desde(ruta), { ok: true, redireccion: { desde: ruta, hacia: "/contacto" } });
   }
 });
