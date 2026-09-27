@@ -13,7 +13,7 @@ export function ListaDeActividad({ filas, cuentasQueExisten }: { filas: FilaDeAc
   return (
     <Lista>
       {filas.map((f) => {
-        const pantalla = f.sobreId && cuentasQueExisten.has(f.sobreId) ? pantallaDe(f.tipo, f.sobreId) : null;
+        const pantalla = pantallaDe(f, cuentasQueExisten);
         const frase = fraseDe(f);
         return (
           <Fila
@@ -27,7 +27,7 @@ export function ListaDeActividad({ filas, cuentasQueExisten }: { filas: FilaDeAc
             }
             accion={
               pantalla ? (
-                <BotonEnlace variante="secundario" href={pantalla} aria-label={`Ver la cuenta: ${frase}`}>
+                <BotonEnlace variante="secundario" href={pantalla.href} aria-label={`${pantalla.que}: ${frase}`}>
                   Ver
                 </BotonEnlace>
               ) : null
