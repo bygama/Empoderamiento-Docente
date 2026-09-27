@@ -104,9 +104,16 @@ SPEC aprobado por el padre el 2026-09-27, con el cambio «Código para los dos»
     lista. *(judgment · medium)*
 13. **El runbook y la guía de Vercel.** `docs/deploy/vps.md` (§3.9 del SPEC,
     con el recorrido del §11 del padre al final) y `docs/deploy/vercel.md`,
-    cada uno con la mudanza al otro. Acepta: los dos archivos existen y cada
-    comando que nombran existe en el repo (`git grep` de los scripts y
-    servicios). *(judgment · medium)*
+    cada uno con la mudanza al otro. En el del VPS, además (padre, «se usa todo
+    lo del VPS»): las tres capas de backup con lo que cubre cada una (el dump
+    diario, los backups y snapshots de Hostinger verificados en su
+    documentación, y una copia fuera del VPS con el comando y la periodicidad);
+    la memoria medida con `docker stats` durante `construir` y con el compose en
+    marcha, el plan mínimo de Hostinger y la swap (cuánta y cómo); y el disco
+    (base, fotos y 14 días de respaldos, cómo mirar el espacio libre y qué hacer
+    si se llena). Acepta: los dos archivos existen y cada comando que nombran
+    existe en el repo (`git grep` de los scripts y servicios); las mediciones,
+    en PROGRESS. *(judgment · medium)*
 14. **README, AGENTS.md y los `.env.example`.** Getting started y deploy con
     los dos caminos (sin la línea «cuando llegue la fase 1…»); AGENTS.md §1,
     §2, §3 (el árbol con `Dockerfile`, `compose.yaml`, `deploy/`, los

@@ -74,6 +74,13 @@
   `interna`), pero `app` necesita salir a internet (Resend, Search Console,
   Crossref) y `proxy` también (ACME): una red `internal` no sirve para ninguna.
   Lo que protege es que solo `proxy` publica puertos.
+- 2026-09-27 — **En el VPS se usa todo lo del VPS.** El padre, con la
+  precisión de Mateo: «La base, las fotos y los CV en el disco del VPS y los
+  backups ahí, sin servicios de afuera, salvo Resend para los mails.» Suma al
+  runbook: tres capas de backup (el dump diario, los de Hostinger, una copia
+  fuera del VPS: «Un backup que vive en el mismo disco que los datos no es un
+  backup»), la memoria medida y el plan mínimo con su swap, y el disco estimado
+  con qué hacer si se llena.
 - 2026-09-27 — **N = 5 imágenes de `app` guardadas.** Una imagen standalone pesa
   del orden de 200-300 MB; cinco entran holgadas en el disco de un VPS chico y
   cubren una semana de deploys diarios.
