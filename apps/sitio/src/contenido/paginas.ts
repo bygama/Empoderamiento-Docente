@@ -42,7 +42,13 @@ export const PAGINAS = {
       quienesSomos: { nombre: "¿Quiénes somos?", esquema: esquemaQuienesSomos, inicial: quienesSomosInicial },
       mision: { nombre: "Misión", esquema: esquemaMision, inicial: misionInicial },
       enNumeros: { nombre: "En números", esquema: esquemaEnNumeros, inicial: enNumerosInicial },
-      comoTrabajamos: { nombre: "Cómo trabajamos", esquema: esquemaComoTrabajamos, inicial: comoTrabajamosInicial },
+      // La frase en verde de cada paso es la idea del verbo de Qué hacemos: se edita allá.
+      comoTrabajamos: {
+        nombre: "Cómo trabajamos",
+        esquema: esquemaComoTrabajamos,
+        inicial: comoTrabajamosInicial,
+        usa: { pagina: "que-hacemos", seccion: "comoTrabajamos", que: "Las frases en verde de los pasos" },
+      },
       // Las siete áreas son las de Qué hacemos: acá se editan el título, la bajada y el enlace.
       areas: {
         nombre: "Áreas de especialización",
