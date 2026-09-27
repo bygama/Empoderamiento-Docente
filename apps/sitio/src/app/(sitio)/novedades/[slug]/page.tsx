@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
+import { OPEN_GRAPH_COMUN } from "@/config/metadata";
 import { novedadPorSlug, redireccionDe, slugsConFicha } from "@/datos/consultas/novedades";
 import { FichaNovedad } from "@/features/novedades/components/FichaNovedad";
+import { TAMANO } from "@/features/novedades/imagen-para-redes/tamano";
 
 // Solo las novedades con cuerpo tienen ficha. Las publicadas se prerenderizan;
 // una que se publica después se arma en su primera visita (y publicar la
@@ -15,7 +17,12 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const n = await novedadPorSlug((await params).slug);
   if (!n) return {};
-  return { title: n.titulo, description: n.bajada };
+  // La imagen para redes: la propia, si la cargaron, o la generada con el título.
+  const imagen = n.imagenParaRedes
+    ? { url: n.imagenParaRedes.src, alt: n.imagenParaRedes.alt }
+    : { url: `/novedades/${n.slug}/imagen-para-redes`, ...TAMANO, alt: n.titulo };
+  // Un `openGraph` de página reemplaza el del layout entero: lleva lo común.
+  return { title: n.titulo, description: n.bajada, openGraph: { ...OPEN_GRAPH_COMUN, title: n.titulo, description: n.bajada, images: [imagen] } };
 }
 
 export default async function NovedadPage({ params }: Props) {
