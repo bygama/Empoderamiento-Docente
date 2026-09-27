@@ -20,7 +20,11 @@ import { PASOS_DEL_METODO } from "../components/mirada-pasos/grupos";
 
 const paso = grupo({
   verbo: textoCorto({ maximo: 16, etiqueta: "Verbo", ayuda: "Una palabra, en infinitivo: «Escuchar». También va en el indicador de arriba." }),
-  idea: textoCorto({ maximo: 60, etiqueta: "Idea", ayuda: "La idea fuerza del paso, destacada, sin punto final." }),
+  idea: textoCorto({
+    maximo: 60,
+    etiqueta: "Idea",
+    ayuda: "La idea fuerza del paso, destacada, sin punto final. Las cinco primeras son también las frases en verde de los pasos de Inicio.",
+  }),
   texto: textoCorto({ maximo: 180, etiqueta: "Texto", ayuda: "Qué pasa concretamente en este paso, en una o dos oraciones." }),
   foto: foto({ etiqueta: "Foto" }),
 });

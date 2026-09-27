@@ -22,7 +22,7 @@ import { PasoMetodo } from "./como-trabajamos/PasoMetodo";
  * puntos en `IndicadorPasos`. Este compositor solo arma la sección y dispara
  * la coreografía.
  */
-export function ComoTrabajamos({ contenido }: { contenido: ContenidoDeComoTrabajamos }) {
+export function ComoTrabajamos({ contenido, frases }: { contenido: ContenidoDeComoTrabajamos; frases: readonly string[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reducedMotion = useReducedMotion();
 
@@ -34,7 +34,8 @@ export function ComoTrabajamos({ contenido }: { contenido: ContenidoDeComoTrabaj
   }, [reducedMotion]);
 
   // El número de cada paso («01»…) sale de su lugar: es estructura, no copy.
-  const pasos = contenido.pasos.map((paso, i) => ({ ...paso, n: String(i + 1).padStart(2, "0") }));
+  // La frase de cada paso es la idea del verbo de Qué hacemos en el mismo lugar (la única fuente).
+  const pasos = contenido.pasos.map((paso, i) => ({ ...paso, frase: frases[i], n: String(i + 1).padStart(2, "0") }));
 
   return (
     <section

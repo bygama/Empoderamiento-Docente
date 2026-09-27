@@ -2,8 +2,8 @@ import Image from "next/image";
 import type { ComoTrabajamos } from "@/features/home/contenido/como-trabajamos";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 
-/** Un paso del contenido, con su número («01») ya puesto por el compositor. */
-export type Paso = ComoTrabajamos["pasos"][number] & { n: string };
+/** Un paso del contenido, con su número («01») y su frase (la idea del verbo de Qué hacemos) ya puestos por el compositor. */
+export type Paso = ComoTrabajamos["pasos"][number] & { n: string; frase: string };
 
 /**
  * Un paso del recorrido: foto real a un lado del eje central y texto al otro,

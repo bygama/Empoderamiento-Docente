@@ -6,7 +6,7 @@ import { DatosDuros } from "@/features/home/components/DatosDuros";
 import { ComoTrabajamos } from "@/features/home/components/ComoTrabajamos";
 import { LineasAccion } from "@/features/home/components/LineasAccion";
 import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNovedades";
-import { areasDeInicio } from "@/features/home/contenido/compartido";
+import { areasDeInicio, ideasDelMetodo } from "@/features/home/contenido/compartido";
 import { metadataDeSeo } from "@/lib/contenido/seo";
 
 // El título, la descripción y la imagen para redes salen del SEO de la página
@@ -36,7 +36,7 @@ export default async function Home() {
           entró el 2026-09-08 y Gastón lo sacó al día siguiente. Su código se
           borró el 2026-09-18; está en el historial si vuelve a hacer falta. */}
       <DatosDuros contenido={enNumeros} />
-      <ComoTrabajamos contenido={comoTrabajamos} />
+      <ComoTrabajamos contenido={comoTrabajamos} frases={ideasDelMetodo(queHacemos.comoTrabajamos, comoTrabajamos.pasos.length)} />
       {/* Áreas de especialización (el abanico de siete cartas). Había salido
           de la home junto con la llegada del bloque plano y vuelve a su lugar
           original, después de «Cómo trabajamos» (2026-09-09). */}
