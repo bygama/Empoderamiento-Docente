@@ -24,53 +24,9 @@ type ConDominios = Exclude<Canal, "directo" | "otros-sitios">;
 // (`l.facebook.com`, `www.linkedin.com`). Los asistentes se miran antes que
 // los buscadores: `gemini.google.com` no es Google.
 const DOMINIOS: ReadonlyArray<[ConDominios, readonly string[]]> = [
-  [
-    "asistentes-ia",
-    [
-      "chatgpt.com",
-      "chat.openai.com",
-      "claude.ai",
-      "perplexity.ai",
-      "gemini.google.com",
-      "bard.google.com",
-      "copilot.microsoft.com",
-      "deepseek.com",
-      "meta.ai",
-      "grok.com",
-      "you.com",
-      "phind.com",
-      "poe.com",
-    ],
-  ],
-  [
-    "buscador",
-    ["bing.com", "duckduckgo.com", "yahoo.com", "ecosia.org", "search.brave.com", "yandex.com", "yandex.ru", "baidu.com", "startpage.com", "qwant.com"],
-  ],
-  [
-    "redes",
-    [
-      "facebook.com",
-      "fb.com",
-      "instagram.com",
-      "linkedin.com",
-      "lnkd.in",
-      "twitter.com",
-      "x.com",
-      "t.co",
-      "youtube.com",
-      "youtu.be",
-      "whatsapp.com",
-      "wa.me",
-      "tiktok.com",
-      "threads.net",
-      "threads.com",
-      "bsky.app",
-      "t.me",
-      "telegram.org",
-      "pinterest.com",
-      "reddit.com",
-    ],
-  ],
+  ["asistentes-ia", "chatgpt.com chat.openai.com claude.ai perplexity.ai gemini.google.com bard.google.com copilot.microsoft.com deepseek.com meta.ai grok.com you.com phind.com poe.com".split(" ")],
+  ["buscador", "bing.com duckduckgo.com yahoo.com ecosia.org search.brave.com yandex.com yandex.ru baidu.com startpage.com qwant.com".split(" ")],
+  ["redes", "facebook.com fb.com instagram.com linkedin.com lnkd.in twitter.com x.com t.co youtube.com youtu.be whatsapp.com wa.me tiktok.com threads.net threads.com bsky.app t.me telegram.org pinterest.com reddit.com".split(" ")],
 ];
 
 // Google tiene un dominio por país: google.com, google.cl, google.com.ar.
