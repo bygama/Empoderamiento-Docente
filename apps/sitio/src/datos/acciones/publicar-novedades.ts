@@ -20,7 +20,7 @@ class OtraLlegoAntes extends Error {}
 /** Suelta la destacada de las demás, en la columna y en su borrador (si no, publicar un arreglo de la vieja le devolvería la tapa). Da el título de la que estaba en el sitio. */
 async function soltarLaDestacada(tx: Prisma.TransactionClient, id: string): Promise<string | null> {
   const otras = await tx.novedad.findMany({ where: { id: { not: id }, OR: [{ destacada: true }, { borrador: { path: ["destacada"], equals: true } }] } });
-  for (const o of otras) await tx.novedad.update({ where: { id: o.id }, data: { destacada: false, ...borradorSinTapa(o.borrador) } });
+  await Promise.all(otras.map((o) => tx.novedad.update({ where: { id: o.id }, data: { destacada: false, ...borradorSinTapa(o.borrador) } })));
   const enElSitio = otras.find((o) => o.destacada && o.publicada);
   return enElSitio ? tituloDe(enElSitio) : null;
 }
