@@ -73,7 +73,7 @@ export function borradorVacio(hoy: string): BorradorDeNovedad {
     imagen: fotoVacia(),
     cuerpo: [],
     destacada: false,
-    publicacion: null,
+    material: null,
     imagenParaRedes: null,
   };
 }

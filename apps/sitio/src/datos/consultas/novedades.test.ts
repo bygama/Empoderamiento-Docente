@@ -8,7 +8,7 @@ import { novedadesVisibles } from "./novedades";
 const imagen = { src: "/fotos/formadora-explica.webp", alt: "Una formadora explica", foco: { x: 0.5, y: 0.5 } };
 
 function contenido(slug: string, fecha: string, titulo = `Título de ${slug}`) {
-  return { slug, titulo, bajada: "Una bajada.", fecha, categoria: "publicaciones", imagen, cuerpo: [], destacada: false, publicacion: null, imagenParaRedes: null };
+  return { slug, titulo, bajada: "Una bajada.", fecha, categoria: "publicaciones", imagen, cuerpo: [], destacada: false, material: null, imagenParaRedes: null };
 }
 
 /** Una fila publicada con ese contenido, y lo que se le pise. */
@@ -17,6 +17,7 @@ function fila(slug: string, fecha: string, otros: Partial<Fila> = {}): Fila {
     id: `id-${slug}`,
     ...contenido(slug, fecha),
     cuerpo: null,
+    materialId: null,
     publicada: true,
     publicadaEn: new Date(),
     publicadaPor: null,

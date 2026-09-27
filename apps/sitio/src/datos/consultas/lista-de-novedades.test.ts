@@ -18,7 +18,7 @@ function fila(id: string, otros: Partial<Fila>): Fila {
     imagen: null,
     cuerpo: null,
     destacada: false,
-    publicacion: null,
+    materialId: null,
     imagenParaRedes: null,
     publicada: false,
     publicadaEn: null,

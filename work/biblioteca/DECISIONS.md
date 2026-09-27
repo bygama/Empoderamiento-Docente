@@ -25,3 +25,15 @@
 - 2026-09-27 — **`biblioteca/portadas` entra en las carpetas de fotos** en el
   paso 1 y no en el 2: el esquema de la portada la valida, y sin ella las 57
   de hoy no pasarían.
+- 2026-09-27 — **La migración `material_de_las_novedades` sale de `prisma
+  migrate diff`, no de `migrate dev --create-only`** (paso 4): `migrate dev`
+  se niega a correr sin terminal interactiva cuando la migración borra una
+  columna con datos (`publicacion` tenía uno). El SQL del esquema es el que
+  Prisma escribe (`migrate diff --from-config-datasource --to-schema`), partido
+  para mover los datos antes del `DROP`, y el comentario del archivo lo dice.
+  Después de aplicarla, `migrate diff` da «This is an empty migration» (sin
+  drift) y `migrate status`, al día.
+- 2026-09-27 — **Las opciones del material de una novedad van en orden
+  alfabético** y marcan las que no están en el sitio («· no está en el
+  sitio»): con 57 y creciendo, se buscan por título; el botón de una que no
+  está en el sitio no sale.

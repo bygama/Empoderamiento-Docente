@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "@/components/ui/icons";
-import { accionDe, MATERIALES } from "@/features/biblioteca/data/materiales";
+import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
+import { accionDe } from "@/features/biblioteca/contenido/modelo";
 
 /**
- * Cierre de una ficha que habla de una publicación: el botón que abre el
- * archivo donde está publicado («Leer en RELIME», como en la Biblioteca) y
- * el link a la Biblioteca. Si el título no matchea el catálogo (typo al
- * editar la data), no se muestra nada.
+ * Cierre de una ficha que habla de un material de la Biblioteca: el botón que
+ * abre el archivo donde está publicado («Leer en RELIME», como en la
+ * Biblioteca) y el link a la Biblioteca. Llega solo si el material está en el
+ * sitio: si no, la ficha va sin este cierre.
  */
-export function AccionPublicacion({ titulo }: { titulo: string }) {
-  const material = MATERIALES.find((m) => m.titulo === titulo);
-  if (!material) return null;
+export function AccionPublicacion({ material }: { material: MaterialDelSitio }) {
   const externa = !material.url.startsWith("/");
   return (
     <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">

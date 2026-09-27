@@ -82,3 +82,12 @@ test("borrar se lleva la fila y las redirecciones que llevaban a ella", sinBase,
   assert.equal(await base.novedad.count({ where: { id: creada.id } }), 0);
   assert.equal(await base.redireccion.count({ where: { hacia: "/novedades/prueba-editar-c" } }), 0);
 });
+
+test("el material que abre la novedad tiene que estar en la Biblioteca", sinBase, async () => {
+  const { base, crearNovedadEnBase } = await modulos();
+  const noEsta = await crearNovedadEnBase(base, { contenido: { ...completa("prueba-editar-d"), material: "00000000-0000-4000-8000-000000000000" }, quien: "Ana" });
+  assert.equal(!noEsta.ok && noEsta.errores?.[0]?.camino, "material");
+  const alguno = await base.material.findFirst({ select: { id: true } });
+  if (!alguno) return assert.fail("la base no tiene materiales: falta aplicar la migración `biblioteca`");
+  assert.equal((await crearNovedadEnBase(base, { contenido: { ...completa("prueba-editar-d"), material: alguno.id }, quien: "Ana" })).ok, true);
+});

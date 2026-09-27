@@ -62,3 +62,23 @@
   apps/sitio` → «12 páginas, render idéntico», exit 0 (el JS de la Biblioteca
   y del Inicio baja unos 91 KB: el catálogo ya no viaja en el bundle, viaja
   como props).
+
+- **Paso 4 — Novedades abre un material de la base.** La migración
+  `20260927031500_material_de_las_novedades` (DECISIONS: sale de `prisma
+  migrate diff`): `material_id` con fk `SET NULL`, la columna convertida por
+  título exacto y la clave `publicacion` de los borradores pasada a `material`,
+  y `publicacion` borrada. Probada con dos borradores sembrados a mano (uno con
+  título, otro con nulo): quedaron `{"material": "<id de Oaxaca>"}` y
+  `{"material": null}`; `relime-2025` quedó con su material; los borradores de
+  prueba se borraron. El esquema de una novedad lleva `material` (uuid o nulo);
+  `materialQueNoEsta` lo chequea al crear, guardar y publicar; el select del
+  formulario sale de `datos/consultas/materiales-para-elegir.ts`; «Qué cambió»
+  lee el material por su nombre; la ficha del sitio recibe el material ya
+  resuelto (`materialDelSitioPorId`) y el botón sale solo si el sitio lo
+  muestra. `features/biblioteca/data/materiales.ts` y
+  `admin/novedades/publicaciones.ts` borrados. Aceptación: `pnpm migrate:deploy`
+  → aplicada; `migrate diff` → «This is an empty migration»; `pnpm test` →
+  sitio 320 pass, 0 fail, 1 skipped (el de métricas que espera A1), auth 46,
+  kit 3; `pnpm build` → exit 0; `comparar-render` → «12 páginas, render
+  idéntico», exit 0; `git ls-files apps/sitio/src/features/biblioteca/data` →
+  vacío.

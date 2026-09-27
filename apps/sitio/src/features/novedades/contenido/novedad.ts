@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { esValido, LARGO_MAXIMO } from "@ed/db/slug";
-import { MATERIALES } from "@/features/biblioteca/data/materiales";
 import { esSrcDeFoto } from "@/lib/contenido/fotos";
 import { CATEGORIAS, TOPES } from "./modelo";
 
@@ -69,8 +68,6 @@ function seccionDe(publicar: boolean) {
   });
 }
 
-const TITULOS_DEL_CATALOGO = MATERIALES.map((m) => m.titulo);
-
 function esquemaDe(publicar: boolean) {
   return z.object({
     slug: slugDe(publicar),
@@ -81,9 +78,9 @@ function esquemaDe(publicar: boolean) {
     imagen: fotoDe(publicar),
     cuerpo: z.array(seccionDe(publicar)).max(TOPES.secciones, `Como mucho ${TOPES.secciones} secciones.`),
     destacada: z.boolean(),
-    // El título exacto del material de la Biblioteca que la ficha abre. Texto
-    // hasta la lane 8, que lo pasa a una relación (DECISIONS, B).
-    publicacion: z.enum(TITULOS_DEL_CATALOGO, { error: "Esa publicación no está en la Biblioteca." }).nullable(),
+    // El id del material de la Biblioteca que la ficha abre (work/biblioteca/
+    // SPEC §4.2). Que exista lo chequea `datos/` al guardar y al publicar.
+    material: z.uuid({ error: "Ese material no está en la Biblioteca." }).nullable(),
     imagenParaRedes: fotoDe(publicar).nullable(),
   });
 }

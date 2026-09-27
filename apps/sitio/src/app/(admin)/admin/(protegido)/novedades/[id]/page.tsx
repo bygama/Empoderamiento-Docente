@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { FichaDeNovedad } from "@/admin/novedades/FichaDeNovedad";
-import { opcionesDePublicacion } from "@/admin/novedades/publicaciones";
 import { fichaDeNovedad, vecinasDe } from "@/datos/consultas/ficha-de-novedad";
+import { materialesParaElegir } from "@/datos/consultas/materiales-para-elegir";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PaginaDeLaNovedad({ params }: Props) {
   const id = await idDe(params);
-  const [ficha, vecinas] = await Promise.all([id ? fichaDeNovedad(id) : null, vecinasDe()]);
+  const [ficha, vecinas, materiales] = await Promise.all([id ? fichaDeNovedad(id) : null, vecinasDe(), materialesParaElegir()]);
   if (!ficha) notFound();
   // La `key` rearma la ficha si se navega de una novedad a otra.
-  return <FichaDeNovedad key={ficha.id} ficha={ficha} vecinas={vecinas} publicaciones={opcionesDePublicacion()} />;
+  return <FichaDeNovedad key={ficha.id} ficha={ficha} vecinas={vecinas} materiales={materiales.map((m) => ({ valor: m.id, etiqueta: m.etiqueta }))} />;
 }
