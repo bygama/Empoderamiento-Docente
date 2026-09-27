@@ -182,7 +182,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos, casos, aliados, ciclo-de-aliados, vista-previa-de-contenido, enlaces, marcas, equipo, ciclo-de-equipo)
             │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, editar-, publicar-casos, editar-, publicar-, autorizar-aliados, editar-, publicar-, mover-equipo, chequeos-del-perfil, subir-, editar-, reemplazar-foto, redirigir, choque, mover-mensajes)
             │   ├── biblioteca/  ← buscar los datos de un material afuera (Crossref, OpenAlex, la página) y chequear su link (ADR-0016)
-            │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, materiales, casos, aliados), que busca y reemplaza por URL
+            │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, materiales, casos, equipo, aliados), que busca y reemplaza por URL
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links, los archivos de fotos que ninguna fila usa, el resumen semanal (los lunes, en Chile)
             ├── admin/         ← las pantallas del admin
@@ -225,7 +225,7 @@ un release candidate de la 8 (ADR-0007).
             │                       campos-de-persona.ts, modelo-del-equipo.ts) y lo que reciben sus componentes
             │                       (perfil-del-sitio.ts, armado por del-sitio.ts)
             ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO) · metricas.ts (lo de ED en Métricas: países fijos, la hora de Chile, los eventos, los mínimos)
-            └── lib/           ← hooks/, metricas/ (la copia de Vercel, los canales, los robots, la mejor hora, el código de un link, si un pedido a /l/ es un clic), contadores/ (avisar un evento desde el navegador), busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed): sin dominio de ED
+            └── lib/           ← hooks/, metricas/ (la copia de Vercel, los canales, los robots, la mejor hora, el código de un link, si un pedido a /l/ es un clic), contadores/ (avisar un evento desde el navegador), busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed), orden.ts (mover un lugar en una lista): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -789,7 +789,8 @@ define al implementar cada fase.
   - [x] **Equipo:** `equipo`, con los 15 perfiles entrados por la migración y
         su `data.ts` borrado, y la fk de `autorias` a su fila; las
         publicaciones de cada perfil salen de la Biblioteca (lo que la persona
-        firma) y las 5 que faltaban con link entraron a ella. Diseño en
+        firma) y las 5 que faltaban con link entraron a ella; el módulo, con
+        la lista por nivel que se ordena, y sus 15 fotos en Fotos. Diseño en
         `work/equipo/`.
 - [ ] **Admin, fase 4 — URLs y SEO:** las 26 rutas nuevas (15 perfiles, 4 casos,
       7 landings de tipo), `sitemap.xml`, canonicals, redirecciones y JSON-LD.
