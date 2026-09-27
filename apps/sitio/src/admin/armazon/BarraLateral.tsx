@@ -2,6 +2,7 @@ import { puede } from "@ed/auth";
 import { listaDeAliados } from "@/datos/consultas/aliados-del-admin";
 import { listaDeCasos } from "@/datos/consultas/casos-del-admin";
 import { listaDePaginas } from "@/datos/consultas/editor-de-paginas";
+import { listaDelEquipo } from "@/datos/consultas/equipo-del-admin";
 import { cuantosLinksRotos } from "@/datos/consultas/materiales-del-admin";
 import { nuevosPorBandeja } from "@/datos/consultas/mensajes";
 import { ContenidoDeLaBarra, type Usuario } from "./barra-lateral/ContenidoDeLaBarra";
@@ -11,13 +12,13 @@ import type { Cuenta } from "./Numero";
 import type { Tema } from "./tema";
 
 /**
- * Si algo de Contenido (una página, un caso, un aliado) tiene cambios sin
- * publicar. Si la base no contestó, `false`: la sidebar nunca voltea el admin,
- * se dibuja igual sin el punto, y el error queda en el log.
+ * Si algo de Contenido (una página, un caso, un perfil, un aliado) tiene
+ * cambios sin publicar. Si la base no contestó, `false`: la sidebar nunca
+ * voltea el admin, se dibuja igual sin el punto, y el error queda en el log.
  */
 async function hayContenidoSinPublicar(): Promise<boolean> {
   try {
-    const listas = await Promise.all([listaDePaginas(), listaDeCasos(), listaDeAliados()]);
+    const listas = await Promise.all([listaDePaginas(), listaDeCasos(), listaDelEquipo(), listaDeAliados()]);
     return listas.some((filas) => filas.some((f) => f.estado.borradorEn));
   } catch (e) {
     console.error("BarraLateral: sin el punto de «sin publicar»:", e);

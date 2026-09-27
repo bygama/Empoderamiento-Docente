@@ -11,6 +11,13 @@ export function resumenDeCasos(filas: ReadonlyArray<{ estado: { borradorEn: stri
   return conCambios ? `${total} · ${conCambios} con cambios sin publicar` : total;
 }
 
+/** «15 perfiles · 1 con cambios sin publicar», o «15 perfiles». */
+export function resumenDeEquipo(filas: ReadonlyArray<{ estado: { borradorEn: string | null } }>): string {
+  const total = cuenta(filas.length, "perfil", "perfiles");
+  const conCambios = filas.filter((f) => f.estado.borradorEn).length;
+  return conCambios ? `${total} · ${conCambios} con cambios sin publicar` : total;
+}
+
 /** «5 aliados · 1 sin autorizar», o «5 aliados». */
 export function resumenDeAliados(filas: ReadonlyArray<{ autorizado: boolean }>): string {
   const total = cuenta(filas.length, "aliado", "aliados");

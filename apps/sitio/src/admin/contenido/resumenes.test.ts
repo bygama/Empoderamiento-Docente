@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { guiaDeContenido } from "@/admin/por-hacer/guias-de-contenido";
-import { resumenDeAliados, resumenDeCasos, resumenDeFotos } from "./resumenes";
+import { resumenDeAliados, resumenDeCasos, resumenDeEquipo, resumenDeFotos } from "./resumenes";
 
 const caso = (borradorEn: string | null) => ({ estado: { borradorEn } });
 
@@ -21,7 +20,7 @@ test("fotos: la cuenta y las sin texto alternativo", () => {
   assert.equal(resumenDeFotos({ total: 1, sinAlt: 0 }), "1 foto");
 });
 
-test("las guías de Contenido: solo queda la de Equipo", () => {
-  assert.equal(guiaDeContenido("equipo")?.nombre, "Equipo");
-  for (const hecha of ["paginas", "casos", "aliados", "fotos", "otra"]) assert.equal(guiaDeContenido(hecha), undefined, hecha);
+test("equipo: la cuenta y los que tienen cambios sin publicar, con el singular", () => {
+  assert.equal(resumenDeEquipo([caso("2026-09-27T10:00:00.000Z"), caso(null)]), "2 perfiles · 1 con cambios sin publicar");
+  assert.equal(resumenDeEquipo([caso(null)]), "1 perfil");
 });
