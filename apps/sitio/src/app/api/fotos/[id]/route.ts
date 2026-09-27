@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
-import { buscarEnDisco, carpetaLocal, hayBlob } from "@/lib/contenido/almacen";
+import { hayBlob } from "@/lib/contenido/almacen";
+import { buscarEnDisco, carpetaLocal } from "@/lib/contenido/almacen-en-disco";
 
 // Las fotos subidas en local viven en apps/sitio/.fotos/ y salen por acá. En
 // Vercel están en Blob y esta ruta no sirve nada: no hay carpeta que mirar.

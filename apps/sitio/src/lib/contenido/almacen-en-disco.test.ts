@@ -4,7 +4,7 @@ import { mkdtempSync } from "node:fs";
 import { readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { almacenEnDisco, buscarEnDisco } from "./almacen";
+import { almacenEnDisco, buscarEnDisco } from "./almacen-en-disco";
 
 // Sincrónico a propósito: un await de nivel superior depende de que el
 // archivo se cargue como ESM, y eso lo decide el package.json más cercano.

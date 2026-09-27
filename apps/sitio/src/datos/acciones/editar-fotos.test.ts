@@ -7,7 +7,7 @@ import path from "node:path";
 import { config as cargarEntorno } from "dotenv";
 import sharp from "sharp";
 import type { UsosDeUnModulo } from "@/datos/fotos/uso";
-import { almacenEnDisco } from "@/lib/contenido/almacen";
+import { almacenEnDisco } from "@/lib/contenido/almacen-en-disco";
 
 // Editar el alt, reemplazar el archivo y borrar una foto contra el Postgres
 // local, con los archivos en una carpeta temporal. Lo de prueba lleva el alt
