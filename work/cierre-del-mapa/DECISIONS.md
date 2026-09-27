@@ -32,6 +32,35 @@
     prueba principal de que la mudanza no cambió nada; su resumen va a
     PROGRESS.
 
+- 2026-09-27 — **`moduloDe` de `barra-lateral/modulos.ts` se va con la ruta
+  `[modulo]`** (paso 3): nació en el mismo commit que la guarda de esa ruta
+  (`cde864cf`) y nadie más lo usaba. Dejarlo era un export muerto.
+- 2026-09-27 — **Los registros de actividad reparten sus ayudas** (paso 4):
+  `porTipo` y `tiposDe` viven en `datos/actividad/regla.ts`, al lado del
+  tipo `Regla`, para que el índice quede por debajo de 100 líneas sin sacar
+  de él la composición ni `registrarActividad` (sacarlos a otro archivo que
+  el índice re-exporte arma un ciclo de imports, y el esquema de Zod leería
+  `TIPOS_DE_ACTIVIDAD` antes de que exista).
+- 2026-09-27 — **El kit exporta lo que la app usa** (paso 9): de cada pieza
+  mudada sale por el índice lo que algún archivo de la app importa (los
+  componentes y los tipos `Tono`, `Pestana`, `Cuenta`, `AvisoDelEditor`, y
+  `diaLargo`, que usa la curva con marcas). `Volver`, `DestinoDeVolver`,
+  `estaEn`, `pestanaActiva` y los tipos de la tabla quedan internos: los usa
+  el kit y nadie de afuera.
+- 2026-09-27 — **`Boton as BotonDelAdmin` se va** (paso 9): el alias existía
+  en `FormularioCodigo.tsx` porque el `Boton` de acceso le ganaba el nombre.
+  Con `BotonDeAcceso` ya no choca, así que importa `Boton` a secas (P2: «no
+  queda ningún alias viejo»).
+- 2026-09-27 — **Los comentarios del kit no nombran módulos de ED** (paso 9,
+  segundo commit): las piezas traían de ejemplo novedades, materiales,
+  casos, Contacto, Search Console, `lib/metricas/periodos.ts` y
+  `work/armazon-del-admin/`. El README del kit pone la prueba («si aparece
+  "novedad" acá adentro, está mal puesto») y el `main` del kit la pasaba:
+  los ejemplos pasan a ser genéricos, en un commit aparte para que el de la
+  mudanza sea solo renombres e imports. Las referencias a DESIGN.md §11 se
+  quedan, como en `campo-foto/ElegirYaSubida.tsx` de `main`; los datos de
+  `ruta.test.ts` también (los tests no se tocan).
+
 ## Lo que se queda en `admin/armazon/`, y por qué
 
 - **`BarraLateral` y `barra-lateral/`** — son los módulos de ED: su lista
