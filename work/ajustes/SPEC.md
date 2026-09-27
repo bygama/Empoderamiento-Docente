@@ -1,9 +1,10 @@
 # SPEC — Ajustes
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first). Crea tablas y
-  cambia AGENTS.md §5.3: Mateo le delegó al padre las dos aprobaciones
-  (DECISIONS del padre, 2026-09-26, «procede en automatico»).
+- **Estado:** aprobado por el padre el 2026-09-26, con las cuatro
+  recomendaciones de §12 (DECISIONS). Crea tablas y cambia AGENTS.md §5.3:
+  Mateo le delegó al padre las dos aprobaciones (DECISIONS del padre,
+  2026-09-26, «procede en automatico»). Rebasado sobre `main` en `293e7ba`.
 - **Decide:** el padre de `work/mapa-del-admin/`
 - **Tier:** L · lane 10 del XL `work/mapa-del-admin/` · worktree propio, rama
   `mateo/ajustes`, dev server en el 3025, base `ed_ajustes`
@@ -16,9 +17,10 @@
   `VA_AL_INICIO`, los patrones de `admin/armazon/` (índice de tarjetas,
   apartado, volver, lista, casilla, confirmar, aviso, estado vacío), el cron
   diario con `corridas_de_tareas`, la tabla `redirecciones`, la tabla `avisos`
-  y `datos/avisos.ts` (lane 7), `config/privacidad.ts` (lane 7) y el cliente
-  de Search Console con su token (lane 5). **No hay un `Tabla` en `main`** (el
-  brief lo nombra): las listas de acá son `Lista`.
+  y `datos/avisos.ts` (lane 7), `config/privacidad.ts` (lane 7), el cliente
+  de Search Console con su token (lane 5) y la `Tabla` de Cuentas (lane 3b),
+  que vive con su único consumidor hasta que llegue un segundo: redirecciones
+  e indexación lo son, así que sube a `admin/armazon/Tabla.tsx` (DECISIONS).
 
 ---
 
@@ -66,8 +68,10 @@ Las cinco pantallas, en ese orden, en una sola lista
 ### 2.2. Datos del sitio — `/admin/ajustes/sitio`
 
 Lo que hoy vive en `config/site.ts` y cambia sin tocar código: **el correo, el
-WhatsApp, la dirección, los países y las redes** (§12, pregunta 2: las
-personas de referencia). Lo que es de la marca y no de un dato de contacto —el
+WhatsApp, la dirección, los países y las redes**. Las personas de referencia
+no se mudan: nada del sitio las lee, y su bloque muerto sale de
+`config/site.ts`, anotado en el spec del admin para el JSON-LD de la fase 4
+(§12, pregunta 2). Lo que es de la marca y no de un dato de contacto —el
 nombre, la URL, la descripción, las frases pilares— se queda en
 `config/site.ts`.
 
@@ -99,16 +103,16 @@ nombre, la URL, la descripción, las frases pilares— se queda en
 
 Tres `Apartado`s independientes (sin primario, como Mi cuenta):
 
-- **Redirecciones.** La lista de todas: «desde → hacia», con la insignia
-  «Automática» (la escribió Novedades al cambiar una URL) o «A mano», y cuándo
-  se creó. Las a mano se borran (con `Confirmacion`: «¿Borrar la redirección
+- **Redirecciones.** Una `Tabla` con todas: desde (el encabezado de la fila),
+  hacia, la insignia «Automática» (la escribió Novedades al cambiar una URL) o
+  «A mano», y cuándo se creó. Las a mano se borran (con `Confirmacion`: «¿Borrar la redirección
   desde /viejo? Quien entre por ese link va a ver la página de error.»); las
   automáticas no se tocan desde acá, porque borrarlas rompe los links viejos.
   Debajo, **«Agregar una redirección»**: desde y hacia, validados (§5).
   Vacía: «Todavía no hay redirecciones. Se escriben solas cuando cambia la URL
   de una novedad, y acá se agregan las de un link viejo.»
-- **Indexación en Google.** Una fila por URL del sitemap: la ruta, la
-  insignia («En Google», normal · «Fuera de Google», fuerte · «Sin revisar»,
+- **Indexación en Google.** Una `Tabla` con una fila por URL del sitemap: la
+  ruta, la insignia («En Google», normal · «Fuera de Google», fuerte · «Sin revisar»,
   apagada), lo que dice Google en castellano («Rastreada, todavía sin
   indexar») y el último rastreo; arriba, cuándo corrió la revisión y si salió
   bien. Sin Search Console conectado: el estado vacío «Search Console no está
@@ -179,7 +183,7 @@ no hubo).
 | Resend | `RESEND_API_KEY`, `CORREO_REMITENTE` | — (sale con cada correo) | los correos no salen |
 | Blob de fotos | `BLOB_READ_WRITE_TOKEN` | — | las fotos van al disco: solo sirve en local |
 | Blob de CV (privado) | `CV_BLOB_READ_WRITE_TOKEN` | `retencion-de-cv` | los CV no se reciben en Vercel |
-| Cron diario (Vercel) — **§12 pregunta 3** | `CRON_SECRET` | la última corrida de cualquier tarea | nada programado corre |
+| Cron diario (Vercel) — §12 pregunta 3 | `CRON_SECRET` | la última corrida de cualquier tarea | nada programado corre |
 
 La insignia: «Configurada» (normal), «Sin configurar» (apagada) o «Con error»
 (fuerte, si la última corrida de alguna de sus tareas falló). El registro de
@@ -218,7 +222,7 @@ una línea.
 - **La tabla `plazos_de_retencion`** (§8) guarda cada plazo con **desde
   cuándo rige**: una fila por cambio, nunca se edita una. La migración carga
   los tres de hoy (CV 12, Contacto 24, Spam 30) como vigentes desde siempre.
-- **La regla** (§12 pregunta 1, la que recomiendo): a un mensaje de Contacto o
+- **La regla** (§12 pregunta 1, aprobada): a un mensaje de Contacto o
   a un CV se le aplica **el menor entre el plazo que regía cuando llegó y
   cualquiera posterior**. Así, alargar no guarda lo ya recibido más de lo que
   se le prometió a quien lo mandó (ADR-0012: «lo que se promete en el
@@ -388,14 +392,19 @@ nuevas y el JSON-LD). Sin dependencias nuevas.
   `datos/privacidad.ts`, `datos/conexiones.ts`, `config/avisos.ts`,
   `config/datos-del-sitio.ts`, `app/sitemap.ts`) y §12 si hace falta.
 - **Spec del admin** (`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`):
-  Ajustes, las cuatro tablas y la regla de los plazos.
+  Ajustes, las cuatro tablas, la regla de los plazos y, en la fase 4, las
+  personas de referencia para el JSON-LD.
+- **ADR-0014** (nuevo, enmienda al 0012): lo que Ajustes edita pasa a la base
+  —los datos del sitio y los plazos—, y el plazo prometido al llegar es el
+  techo de lo que se guarda. El índice de `adrs/` lo anota en la fila del 0012.
 - **README**: Ajustes, el sitemap, la indexación (las mismas variables de
   Search Console) y que los datos institucionales ya no se cambian en el
   código.
-- **DESIGN.md §11**: solo si nace un patrón. **Lectura:** no nace ninguno —
-  índice de tarjetas, apartado, casilla, lista, volver y confirmar alcanzan—;
-  §11 suma a Ajustes como consumidor donde el registro lo anota («Lo reusa
-  Ajustes» pasa a decir qué usa).
+- **DESIGN.md §11**: no nace ningún patrón —índice de tarjetas, apartado,
+  casilla, lista, volver y confirmar alcanzan—, pero `Tabla` sube al armazón
+  con su segundo consumidor y su entrada lo dice; §11 anota a Ajustes como
+  consumidor donde el registro lo pide («Lo reusa Ajustes» pasa a decir qué
+  usa).
 
 ## 11. Cómo se verifica
 
@@ -416,6 +425,8 @@ nuevas y el JSON-LD). Sin dependencias nuevas.
   HTML no trae ni un dato de Ajustes.
 
 ## 12. Preguntas para el padre
+
+**Respondidas el 2026-09-26: las cuatro, como recomiendo** (DECISIONS).
 
 1. **Alargar un plazo, ¿vale para lo que ya llegó?** Recomiendo que **no**:
    el plazo que rige es el menor entre el prometido al llegar y cualquiera
