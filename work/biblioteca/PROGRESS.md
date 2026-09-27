@@ -198,3 +198,36 @@
   tres filtros, el buscador y «Página 1 de 2»; las capturas no salen mientras
   la ventana de Orca muestra otro worktree («Screenshot timed out»): el
   recorrido visual queda para la verificación.
+
+- **Paso 11 — la ficha de un material.** `/admin/biblioteca/[id]` y
+  `/admin/biblioteca/nuevo` (cargar a mano), las dos con la sesión y `puede`
+  antes de leer. `admin/biblioteca/`: `FichaDeMaterial.tsx` (el orquestador,
+  con «cambios sin guardar», el choque, los errores en el campo y el aviso de
+  parecidos después del primer guardado), `EncabezadoDeLaFicha.tsx` (usa las
+  acciones de la ficha de Novedades, que ahora aceptan cualquier pendiente),
+  `FormularioDeMaterial.tsx` y sus bloques (`AutoresDelMaterial` con el
+  Equipo y la firma escrita, `PortadaDelMaterial` con la generada en vivo y
+  «Usar otra», `CitaDelMaterial` con la generada y «Escribirla a mano»,
+  `DestacadoDelMaterial` con quién tiene cada lugar), `PanelDelMaterial.tsx`
+  (salud del link y «Se ve en»), `QueCambio.tsx` + `cambios.ts`,
+  `SalidaDelMaterial.tsx` y los tres hooks. La portada tipográfica
+  (`features/biblioteca/portada/generar.tsx`, `next/og`, el color de cada tipo
+  como las 57) con su ruta del admin (`/admin/biblioteca/portada`, sesión y
+  `editarBiblioteca`). En el kit, `Fecha` suma `conDia`; en el armazón,
+  `QueCambioPlegado` (el plegado de Novedades, compartido: react-doctor lo
+  pedía por el JSX duplicado). DESIGN.md §11: la fecha sin día, el plegado,
+  y la ficha de un material (portada y cita generadas, «Se parece a…», la
+  salud en el panel). Aceptación: `pnpm exec tsx --test
+  "src/admin/biblioteca/*.test.ts"` → 2 pass; `editar-materiales`,
+  `cambios` de Novedades, `guarda` y `acciones-con-sesion` → 26 pass; `tsc
+  --noEmit` → exit 0; `node scripts/verificar-react-doctor.mjs` → «100/100,
+  sin diagnósticos» (antes de los arreglos, 91: el plegado duplicado, un
+  `await` que leía la fila y las novedades por separado al borrar, y un
+  `includes` de texto en el catálogo). En el navegador (cuenta que edita):
+  la ficha de un destacado con todos sus bloques; y el ciclo entero de uno
+  nuevo cargado a mano —guardar crea la fila y pasa a su URL, publicar, ocultar
+  («Oculto: ya no se ve en el sitio.»), borrar con confirmación y vuelta a la
+  lista con «Se borró el material.»—, con la actividad anotada
+  (`agrego-`, `publico-`, `oculto-`, `borro-un-material`). El clic de Orca no
+  llega a los botones del formulario: se probó con `eval` sobre el DOM (la
+  maña conocida del navegador embebido).

@@ -48,6 +48,6 @@ function ordenado(valor: unknown): unknown {
  * mirar el orden de las claves, que no es contenido: el `jsonb` de la base
  * las guarda en el suyo, y el formulario arma el cuerpo al final.
  */
-export function mismoDocumento(a: BorradorDeNovedad, b: BorradorDeNovedad): boolean {
+export function mismoDocumento<T>(a: T, b: T): boolean {
   return JSON.stringify(ordenado(a)) === JSON.stringify(ordenado(b));
 }

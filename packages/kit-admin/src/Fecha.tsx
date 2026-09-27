@@ -10,6 +10,8 @@ type Props = {
   alCambiar: (valor: string) => void;
   /** Lo que el último guardado dijo de este campo. */
   error?: string;
+  /** Si la fecha puede llevar día. Sin él, año y mes: lo que muestra quien la usa. */
+  conDia?: boolean;
 };
 
 const ETIQUETA = "block text-admin-meta text-gris-texto";
@@ -19,13 +21,14 @@ const ETIQUETA = "block text-admin-meta text-gris-texto";
  * día. Tres controles en un `fieldset`: el año se escribe (cuatro cifras) y el
  * mes y el día se eligen, con «Sin mes» y «Sin día». El día depende del mes:
  * sin mes queda deshabilitado, y sus opciones son las de ese mes. Si el mes
- * nuevo no tiene el día elegido (el 31 en abril), el día se suelta.
+ * nuevo no tiene el día elegido (el 31 en abril), el día se suelta. Con
+ * `conDia` en falso, son dos: el año y el mes.
  */
-export function Fecha({ nombre, etiqueta, ayuda, valor, alCambiar, error }: Props) {
+export function Fecha({ nombre, etiqueta, ayuda, valor, alCambiar, error, conDia = true }: Props) {
   const partes = partesDeFecha(valor);
   const cambiar = (nuevas: Partial<PartesDeFecha>) => {
     const juntas = { ...partes, ...nuevas };
-    if (!juntas.mes) juntas.dia = "";
+    if (!juntas.mes || !conDia) juntas.dia = "";
     if (juntas.dia && Number(juntas.dia) > diasDelMes(juntas.anio, juntas.mes)) juntas.dia = "";
     alCambiar(fechaDePartes(juntas));
   };
@@ -42,7 +45,7 @@ export function Fecha({ nombre, etiqueta, ayuda, valor, alCambiar, error }: Prop
           {ayuda}
         </p>
       ) : null}
-      <div className="mt-1 grid grid-cols-[6rem_1fr_6rem] gap-2">
+      <div className={`mt-1 grid gap-2 ${conDia ? "grid-cols-[6rem_1fr_6rem]" : "grid-cols-[6rem_1fr]"}`}>
         <label>
           <span className={ETIQUETA}>Año</span>
           {/* `-campo`: el editor lleva el foco acá cuando la fecha no pasa. */}
@@ -70,24 +73,26 @@ export function Fecha({ nombre, etiqueta, ayuda, valor, alCambiar, error }: Prop
             ))}
           </select>
         </label>
-        <label>
-          <span className={ETIQUETA}>Día</span>
-          <select
-            value={partes.dia}
-            disabled={!partes.mes}
-            aria-describedby={describe}
-            aria-invalid={invalido}
-            onChange={(e) => cambiar({ dia: e.target.value })}
-            className={`mt-1 ${ENTRADA} disabled:cursor-not-allowed disabled:opacity-60`}
-          >
-            <option value="">Sin día</option>
-            {Array.from({ length: dias }, (_, i) => (
-              <option key={i} value={dosDigitos(i + 1)}>
-                {i + 1}
-              </option>
-            ))}
-          </select>
-        </label>
+        {conDia ? (
+          <label>
+            <span className={ETIQUETA}>Día</span>
+            <select
+              value={partes.dia}
+              disabled={!partes.mes}
+              aria-describedby={describe}
+              aria-invalid={invalido}
+              onChange={(e) => cambiar({ dia: e.target.value })}
+              className={`mt-1 ${ENTRADA} disabled:cursor-not-allowed disabled:opacity-60`}
+            >
+              <option value="">Sin día</option>
+              {Array.from({ length: dias }, (_, i) => (
+                <option key={i} value={dosDigitos(i + 1)}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
       </div>
       {error ? (
         <p id={idError} className="mt-1 text-admin-meta text-rojo-error">

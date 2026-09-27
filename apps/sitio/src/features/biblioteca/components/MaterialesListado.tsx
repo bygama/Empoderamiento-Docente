@@ -8,6 +8,7 @@ import { EVENTO_URL } from "@/lib/navegar";
 import { FilaMaterial } from "./materiales-listado/FilaMaterial";
 import { FiltrosCatalogo } from "./materiales-listado/FiltrosCatalogo";
 import {
+  coincide,
   escribirTipoEnUrl,
   normalizar,
   SIN_FILTROS,
@@ -120,10 +121,7 @@ export function MaterialesListado({ contenido, materiales }: { contenido: Catalo
       if (filtros.tipo && m.tipo !== filtros.tipo) return false;
       if (filtros.publico && m.publico !== filtros.publico) return false;
       if (filtros.anio && m.anio !== filtros.anio) return false;
-      if (!q) return true;
-      return normalizar(
-        `${m.titulo} ${m.autores} ${m.descripcion} ${m.tema} ${m.tipo}`,
-      ).includes(q);
+      return !q || coincide(`${m.titulo} ${m.autores} ${m.descripcion} ${m.tema} ${m.tipo}`, q);
     });
   }, [busqueda, filtros, materiales]);
 

@@ -892,7 +892,10 @@ el día. `packages/kit-admin/src/Fecha.tsx`.
   las de ese mes; si el mes nuevo no tiene el día elegido, el día se suelta.
   Un 30 de febrero no se puede elegir.
 - **Un error marca los tres** (`aria-invalid`) y el foco va al año.
-- Primer consumidor: la fecha de una novedad.
+- **Sin día** (`conDia={false}`), cuando lo que se muestra es el mes y el
+  año («Dic 2025»): son dos controles, el año y el mes.
+- Primer consumidor: la fecha de una novedad. Sin día: la de un material
+  (2026-09-27, `work/biblioteca/`).
 
 ### Selección
 
@@ -1085,7 +1088,9 @@ y la ficha de una novedad, por campo.
   `details` con el título de sección y la cuenta a la vista en meta
   `gris-texto` («Qué cambió · 2 campos contra lo publicado»). Compara lo que
   está en pantalla, sin guardar incluido, porque es lo que «Publicar» va a
-  publicar. Una que nunca se publicó no lo lleva.
+  publicar. Una que nunca se publicó no lo lleva. El plegado es
+  `apps/sitio/src/admin/armazon/QueCambioPlegado.tsx`; cada entidad arma sus
+  diferencias (una novedad y un material).
 
 ### Vista previa de buscador y redes
 
@@ -1146,3 +1151,20 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
   buscador a la derecha y «Nueva novedad» como primario del encabezado.
 - Primer consumidor: Novedades. Las entidades que siguen (materiales, casos,
   equipo) la repiten con sus campos.
+- **Segundo consumidor: un material** (2026-09-27, `work/biblioteca/`), con
+  las acciones de la ficha compartidas (`admin/novedades/AccionesDeLaFicha.tsx`)
+  y tres piezas que suma:
+  - **La imagen generada con «Usar otra»** vale también para la portada: sin
+    una propia, la ficha muestra la tipográfica generada en vivo (240 px,
+    `rounded-lg`, borde `azul-claro/60`, alt vacío y lo que es escrito
+    debajo), y el mismo botón terciario que cambia de nombre. La cita APA usa
+    el mismo par: la generada en una caja con borde (nunca `gris-fondo` con
+    texto encima) y «Escribirla a mano» / «Volver a la generada».
+  - **«Se parece a…»**: una línea con el estilo de «Sección compartida»
+    (meta `azul-principal`, el ícono `Enlace` en `azul-medio`, el link
+    subrayado), entre el encabezado y el formulario, con `role="status"`:
+    avisa que ya hay un material con un título parecido y lo abre en otra
+    pestaña. No es rojo ni frena nada.
+  - **El panel** lleva «Salud del link» arriba de «Se ve en»: el resultado del
+    último chequeo en meta medium, qué pasó y cuándo, y en `gris-texto` cómo
+    se chequea.

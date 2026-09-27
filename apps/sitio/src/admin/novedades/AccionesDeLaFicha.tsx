@@ -1,9 +1,9 @@
 import { Boton } from "@/admin/armazon/Boton";
 import { ArrowUpRight } from "@/components/ui/icons";
-import type { Pendiente } from "./useGuardarNovedad";
 
 type Props = {
-  pendiente: Pendiente;
+  /** Lo que corre, por su nombre («guardar», «publicar»…), o nada: cada ficha tiene los suyos. */
+  pendiente: string | null;
   /** Sobre el encabezado navy (cambios sin guardar). */
   azul: boolean;
   alGuardar: () => void;
@@ -15,7 +15,8 @@ type Props = {
  * Guardar borrador, Vista previa y Publicar, el único primario (DESIGN.md
  * §11, «Botones»). Mientras una corre, las demás esperan, y la que corre lo
  * dice. En el celular «Guardar borrador» dice «Guardar»: la barra de abajo no
- * tiene lugar; el lector lee el nombre entero.
+ * tiene lugar; el lector lee el nombre entero. Las usan la ficha de una
+ * novedad y la de un material (DESIGN.md §11, «Ficha de una entidad»).
  */
 export function AccionesDeLaFicha({ pendiente, azul, alGuardar, alVerBorrador, alPublicar }: Props) {
   const corriendo = pendiente !== null;
