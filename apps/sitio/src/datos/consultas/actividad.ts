@@ -16,7 +16,8 @@ export type FiltrosDeActividad = {
   tipos: readonly TipoDeActividad[];
   /** El id de una cuenta. */
   persona?: string;
-  desde?: Date;
+  /** Solo los últimos tantos días: un rango relativo, que no depende de la zona de quien mira. */
+  dias?: number;
   /** Se busca, sin distinguir mayúsculas, en el `sobre` y en el nombre de quien lo hizo. */
   texto?: string;
   pagina: number;
@@ -35,8 +36,9 @@ export type FilaDeActividad = {
 
 export type PaginaDeActividad = { filas: FilaDeActividad[]; total: number; pagina: number; paginas: number };
 
-export async function listarActividad({ tipos, persona, desde, texto, pagina }: FiltrosDeActividad): Promise<PaginaDeActividad> {
+export async function listarActividad({ tipos, persona, dias, texto, pagina }: FiltrosDeActividad): Promise<PaginaDeActividad> {
   if (!tipos.length) return { filas: [], total: 0, pagina: 1, paginas: 1 };
+  const desde = dias ? new Date(Date.now() - dias * 24 * 60 * 60 * 1000) : undefined;
   const where: Prisma.ActividadWhereInput = {
     tipo: { in: [...tipos] },
     ...(persona ? { cuentaId: persona } : {}),

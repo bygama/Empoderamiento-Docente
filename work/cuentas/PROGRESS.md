@@ -212,7 +212,7 @@
   puede cada rol», las tres cuentas e «Invitar a alguien», título «Cuentas ·
   Admin ED»; `/admin/cuentas/invitar` → 200, «Invitar · Admin ED»; como
   edita, `/admin/cuentas` → «Esta sección es de quien dirige o administra».
-- **Paso 14 — una cuenta** (este commit). `cuentas/[id]/page.tsx` (título con
+- **Paso 14 — una cuenta** (`9d3cde4`). `cuentas/[id]/page.tsx` (título con
   el nombre, 404 si no existe, `queSePuede` con la sesión, y el aviso de
   Invitar por `?invitacion=salio|no-salio`). `admin/cuentas/FichaDeLaCuenta.tsx`
   compone: «← Cuentas», el nombre con la insignia, correo y último acceso, y
@@ -233,5 +233,22 @@
   Datos, Rol, Estado, Segundo factor y Sesiones, y «Suspender», «Cambiar el
   rol», «Cambiar el correo», «Cerrar sus sesiones»; la de quien dirige →
   sin acciones y «no se suspende ni se borra: se pasa la dirección».
+- **Paso 15 — Actividad** (este commit). `cuentas/actividad/page.tsx`: el
+  encabezado con la pestaña Actividad, el `Buscador` con tres `Filtro`
+  (persona, módulo, cuándo), la lista, el vacío (con o sin filtros) y el
+  `Paginado`; muestra solo `tiposQueVe(rol)`. En `admin/cuentas/actividad/`:
+  `modulos.ts` (el módulo de cada tipo, un `Record<TipoDeActividad, …>`, y
+  `pantallaDe` para linkear lo de Cuentas), `filtros.ts` (los filtros de la
+  URL con Zod, lo que no sirve se ignora; `urlDeActividad`; los rangos de
+  «Cuándo»; test nuevo) y `ListaDeActividad.tsx` (la frase de `fraseDe`, el
+  módulo, el momento, y «Ver» solo si la cuenta todavía existe).
+  `listarActividad` pasa a recibir `dias` y calcula la fecha adentro (el
+  lint del compilador de React no deja `Date.now()` en el render).
+  Aceptación: `pnpm --filter sitio typecheck`, `lint` y `test` (167 pass)
+  exit 0; react-doctor 100/100; en el 3017 como administra:
+  `/admin/cuentas/actividad` → 200, «Actividad · Admin ED», `role="search"`,
+  la pestaña encendida, las frases; `?pagina=2&modulo=cuentas&q=juan` → 200
+  con «No hay actividad con esos filtros» y «Sacar los filtros»; parámetros
+  basura → 200.
 
 ## Abierto
