@@ -48,6 +48,24 @@
   Blob en este worktree, así que no se puede probar: se escribe el
   procedimiento y se anota el script como seguimiento (el padre lo dejó a
   criterio: «si no entra en la lane, anotalo»).
+- 2026-09-27 — **El segundo factor se prueba con un Resend falso (opción 1).**
+  En producción `mandar.ts` nunca manda un correo a la consola (a propósito), y
+  el standalone fuerza `NODE_ENV=production`: sin Resend, dirige y administra
+  no entran. El padre: «La 1, aprobada. Es la única forma de probar la imagen
+  de producción de punta a punta, con el segundo factor incluido, antes del
+  VPS real.» Condiciones: `RESEND_API_URL` es opcional y **no** va en el
+  `.env.example` de producción, solo en `compose.prueba.yaml` («solo para la
+  prueba local; en producción no se define»); si está definida y no es la de
+  Resend, Ajustes › Conexiones lo dice en la fila de Resend («los correos van a
+  <url>, no a Resend») y la app lo advierte en el log al arrancar, con su test;
+  el servicio `correo` de prueba imprime el cuerpo y contesta como Resend; en
+  el runbook, el primer paso con Resend real es mandar un correo de prueba
+  antes de nombrar a quien dirige. Descartada: una variable que deje salir el
+  correo por la consola en producción.
+- 2026-09-27 — **Una sola red en el compose.** El SPEC decía dos (`borde` e
+  `interna`), pero `app` necesita salir a internet (Resend, Search Console,
+  Crossref) y `proxy` también (ACME): una red `internal` no sirve para ninguna.
+  Lo que protege es que solo `proxy` publica puertos.
 - 2026-09-27 — **N = 5 imágenes de `app` guardadas.** Una imagen standalone pesa
   del orden de 200-300 MB; cinco entran holgadas en el disco de un VPS chico y
   cubren una semana de deploys diarios.
