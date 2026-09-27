@@ -30,24 +30,32 @@ export const usosEnNovedades: UsosDeUnModulo = {
     });
   },
   async reemplazar(tx, vieja, nueva) {
-    const regenerar: string[] = [];
-    for (const fila of await tx.novedad.findMany()) {
-      const imagen = cambiarFoto(fila.imagen, vieja, nueva);
-      const redes = cambiarFoto(fila.imagenParaRedes, vieja, nueva);
-      const borrador = cambiarFoto(fila.borrador, vieja, nueva);
-      if (!imagen.cambio && !redes.cambio && !borrador.cambio) continue;
-      // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
-      await tx.novedad.update({
-        where: { id: fila.id },
-        data: {
-          ...(imagen.cambio ? { imagen: imagen.valor as Prisma.InputJsonValue } : {}),
-          ...(redes.cambio ? { imagenParaRedes: redes.valor as Prisma.InputJsonValue } : {}),
-          ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
-        },
-      });
-      // Lo que el sitio muestra de una novedad: el Inicio, el listado y su ficha con su imagen para redes.
-      if (fila.publicada && (imagen.cambio || redes.cambio)) regenerar.push("/", "/novedades", `/novedades/${fila.slug}`, `/novedades/${fila.slug}/imagen-para-redes`);
-    }
+    const filas = await tx.novedad.findMany({ select: { id: true, slug: true, publicada: true, imagen: true, imagenParaRedes: true, borrador: true } });
+    const cambios = filas
+      .map((f) => ({
+        ...f,
+        imagen: cambiarFoto(f.imagen, vieja, nueva),
+        redes: cambiarFoto(f.imagenParaRedes, vieja, nueva),
+        borrador: cambiarFoto(f.borrador, vieja, nueva),
+      }))
+      .filter((c) => c.imagen.cambio || c.redes.cambio || c.borrador.cambio);
+    await Promise.all(
+      cambios.map(({ id, imagen, redes, borrador }) =>
+        // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
+        tx.novedad.update({
+          where: { id },
+          data: {
+            ...(imagen.cambio ? { imagen: imagen.valor as Prisma.InputJsonValue } : {}),
+            ...(redes.cambio ? { imagenParaRedes: redes.valor as Prisma.InputJsonValue } : {}),
+            ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
+          },
+        }),
+      ),
+    );
+    // Lo que el sitio muestra de una novedad publicada: el Inicio, el listado y su ficha con su imagen para redes.
+    const regenerar = cambios
+      .filter((c) => c.publicada && (c.imagen.cambio || c.redes.cambio))
+      .flatMap((c) => ["/", "/novedades", `/novedades/${c.slug}`, `/novedades/${c.slug}/imagen-para-redes`]);
     return [...new Set(regenerar)].map((ruta) => ({ ruta }));
   },
 };

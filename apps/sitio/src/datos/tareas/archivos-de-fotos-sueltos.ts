@@ -20,7 +20,7 @@ export async function borrarArchivosSueltos(
   const archivos = await almacen.listar();
   const usados = new Set((await base.foto.findMany({ select: { url: true } })).map((f) => f.url));
   const sueltos = archivos.filter((a) => !usados.has(a.url) && ahora.getTime() - a.guardadoEn.getTime() > ESPERA_MS);
-  for (const { url } of sueltos) await almacen.borrar(url);
+  await Promise.all(sueltos.map(({ url }) => almacen.borrar(url)));
   return {
     ok: true,
     detalle: sueltos.length

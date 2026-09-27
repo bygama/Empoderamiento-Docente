@@ -10,7 +10,7 @@ import type { Uso } from "@/datos/fotos/uso";
 export const FILTROS_DE_FOTOS = ["todas", "sin-alt", "sin-usar"] as const;
 export type FiltroDeFotos = (typeof FILTROS_DE_FOTOS)[number];
 
-export type TarjetaDeFoto = { id: string; src: string; alt: string; ancho: number; alto: number; usos: number };
+export type TarjetaDeFoto = { id: string; src: string; alt: string; tipo: string; usos: number };
 
 /** Cuántas hay en cada filtro, para el número de cada píldora. */
 export type CuentasDeFotos = Record<FiltroDeFotos, number>;
@@ -24,7 +24,7 @@ function masNuevaPrimero(a: Foto, b: Foto): number {
 
 /** Las tarjetas de un filtro y las cuentas de los tres. Pura: se prueba sin base. */
 export function grillaDe(filas: readonly Foto[], usos: ReadonlyMap<string, readonly Uso[]>, filtro: FiltroDeFotos): { fotos: TarjetaDeFoto[]; cuentas: CuentasDeFotos } {
-  const tarjetas = [...filas].sort(masNuevaPrimero).map((f) => ({ id: f.id, src: f.url, alt: f.alt, ancho: f.ancho, alto: f.alto, usos: usos.get(f.url)?.length ?? 0 }));
+  const tarjetas = [...filas].sort(masNuevaPrimero).map((f) => ({ id: f.id, src: f.url, alt: f.alt, tipo: f.tipo, usos: usos.get(f.url)?.length ?? 0 }));
   const cuentas = { todas: tarjetas.length, "sin-alt": tarjetas.filter(sinAlt).length, "sin-usar": tarjetas.filter((t) => t.usos === 0).length };
   const fotos = filtro === "sin-alt" ? tarjetas.filter(sinAlt) : filtro === "sin-usar" ? tarjetas.filter((t) => t.usos === 0) : tarjetas;
   return { fotos, cuentas };

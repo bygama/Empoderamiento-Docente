@@ -22,21 +22,22 @@ export const usosEnCasos: UsosDeUnModulo = {
     });
   },
   async reemplazar(tx, vieja, nueva) {
-    let enElSitio = false;
-    for (const fila of await tx.caso.findMany({ select: { id: true, lamina: true, borrador: true } })) {
-      const lamina = cambiarFoto(fila.lamina, vieja, nueva);
-      const borrador = cambiarFoto(fila.borrador, vieja, nueva);
-      if (!lamina.cambio && !borrador.cambio) continue;
-      // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
-      await tx.caso.update({
-        where: { id: fila.id },
-        data: {
-          ...(lamina.cambio ? { lamina: lamina.valor as Prisma.InputJsonValue } : {}),
-          ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
-        },
-      });
-      enElSitio ||= lamina.cambio;
-    }
-    return enElSitio ? [{ ruta: "/investigacion" }] : [];
+    const filas = await tx.caso.findMany({ select: { id: true, lamina: true, borrador: true } });
+    const cambios = filas
+      .map((f) => ({ id: f.id, lamina: cambiarFoto(f.lamina, vieja, nueva), borrador: cambiarFoto(f.borrador, vieja, nueva) }))
+      .filter((c) => c.lamina.cambio || c.borrador.cambio);
+    await Promise.all(
+      cambios.map(({ id, lamina, borrador }) =>
+        // Los `as`: salieron de una columna Json y solo cambió un texto adentro, así que siguen siendo JSON.
+        tx.caso.update({
+          where: { id },
+          data: {
+            ...(lamina.cambio ? { lamina: lamina.valor as Prisma.InputJsonValue } : {}),
+            ...(borrador.cambio ? { borrador: borrador.valor as Prisma.InputJsonValue } : {}),
+          },
+        }),
+      ),
+    );
+    return cambios.some((c) => c.lamina.cambio) ? [{ ruta: "/investigacion" }] : [];
   },
 };

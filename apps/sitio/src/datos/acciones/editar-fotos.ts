@@ -33,13 +33,14 @@ export async function editarAltEnBase(base: PrismaClient, { id, alt }: { id: str
   return count ? { ok: true, alt: valido.data } : NO_EXISTE;
 }
 
-/** Dónde se usa, en una frase: «Inicio › Hero y Caso 01 › Lámina». */
+const Y = new Intl.ListFormat("es", { type: "conjunction" });
+
+/** Dónde se usa, en una frase: «Inicio › Hero y Caso 01 › Lámina»; de cuatro en adelante, los tres primeros y cuántos más. */
 export function dondeSeUsa(usos: readonly Uso[]): string {
   const lugares = [...new Set(usos.map((u) => u.donde))];
   const primeros = lugares.slice(0, 3);
   const resto = lugares.length - primeros.length;
-  const lista = new Intl.ListFormat("es", { type: "conjunction" }).format(resto > 0 ? [...primeros, `${resto} lugar${resto === 1 ? "" : "es"} más`] : primeros);
-  return lista;
+  return Y.format(resto > 0 ? [...primeros, `${resto} lugar${resto === 1 ? "" : "es"} más`] : primeros);
 }
 
 /**
