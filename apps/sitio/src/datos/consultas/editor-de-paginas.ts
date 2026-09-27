@@ -1,6 +1,7 @@
 import type { Pagina } from "@/../prisma/generado/client";
 import { PAGINAS, SLUGS, type Slug } from "@/contenido/paginas";
 import { base } from "@/datos/cliente";
+import { comparticionDe, type Comparticion } from "@/lib/contenido/compartido";
 import { describir } from "@/lib/contenido/describir";
 import type { Descripcion } from "@/lib/contenido/descripcion";
 import { comoDocumento, completarPagina, parteDe, type SeccionRegistrada } from "@/lib/contenido/documento";
@@ -72,7 +73,8 @@ export type PaginaParaEditar = {
   nombre: string;
   ruta: string;
   estado: EstadoDePagina;
-  secciones: Array<{ clave: string; nombre: string; descripcion: Descripcion; contenido: unknown }>;
+  /** `compartida`: si la sección usa lo de otra página o la muestran otras, para avisarlo. */
+  secciones: Array<{ clave: string; nombre: string; descripcion: Descripcion; contenido: unknown; compartida?: Comparticion }>;
 };
 
 /** La página con lo que se está editando (el borrador, o lo publicado, o el inicial) y la descripción de cada parte de esa pestaña. */
@@ -85,6 +87,12 @@ export async function paginaParaEditar(slug: Slug, parte: ParteDelEditor): Promi
     nombre: pagina.nombre,
     ruta: pagina.ruta,
     estado: estadoDe(fila),
-    secciones: partesDeLaPestana(slug, parte).map(([clave, s]) => ({ clave, nombre: s.nombre, descripcion: describir(s.esquema, s.nombre), contenido: documento[clave] })),
+    secciones: partesDeLaPestana(slug, parte).map(([clave, s]) => ({
+      clave,
+      nombre: s.nombre,
+      descripcion: describir(s.esquema, s.nombre),
+      contenido: documento[clave],
+      compartida: comparticionDe(PAGINAS, slug, clave),
+    })),
   };
 }

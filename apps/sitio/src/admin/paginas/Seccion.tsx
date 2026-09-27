@@ -1,7 +1,9 @@
 import { Campo } from "@/admin/campos/Campo";
 import { ChevronDown } from "@/components/ui/icons";
 import type { Cambio } from "@/admin/campos/cambio";
+import type { Comparticion } from "@/lib/contenido/compartido";
 import type { Descripcion } from "@/lib/contenido/descripcion";
+import { AvisoDeCompartida } from "./AvisoDeCompartida";
 
 type Props = {
   clave: string;
@@ -9,6 +11,9 @@ type Props = {
   descripcion: Descripcion;
   valor: unknown;
   alCambiar: (valor: Cambio<unknown>) => void;
+  /** Si la sección comparte algo con otra página, y el nombre de esta, para el aviso. */
+  compartida?: Comparticion;
+  pagina: string;
 };
 
 /**
@@ -21,7 +26,7 @@ type Props = {
  * hace scroll con la página y las acciones van abajo, así que alcanza con un
  * respiro.
  */
-export function Seccion({ clave, nombre, descripcion, valor, alCambiar }: Props) {
+export function Seccion({ clave, nombre, descripcion, valor, alCambiar, compartida, pagina }: Props) {
   return (
     <details id={`seccion-${clave}`} open className="group/seccion scroll-mt-4 lg:scroll-mt-28">
       <summary className="flex cursor-pointer list-none items-center gap-2 rounded-sm border-b border-azul-claro/60 pb-2 font-display text-admin-seccion font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio [&::-webkit-details-marker]:hidden">
@@ -30,6 +35,11 @@ export function Seccion({ clave, nombre, descripcion, valor, alCambiar }: Props)
       </summary>
       {/* El `@container` es lo que mide la raíz para decidir si va en dos columnas. */}
       <div className="@container pt-5">
+        {compartida ? (
+          <div className="mb-5">
+            <AvisoDeCompartida compartida={compartida} pagina={pagina} />
+          </div>
+        ) : null}
         <Campo raiz columnas nombre={clave} descripcion={descripcion} valor={valor} alCambiar={alCambiar} />
       </div>
     </details>

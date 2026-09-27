@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { problemasDeCompartidos, quienesUsan, rutasQueMuestran } from "./compartido";
+import { comparticionDe, problemasDeCompartidos, quienesUsan, rutasQueMuestran } from "./compartido";
 import type { RegistroDePaginas, SeccionRegistrada } from "./documento";
 
 const seccion = (usa?: SeccionRegistrada["usa"]): SeccionRegistrada => ({ nombre: "Sección", esquema: z.object({}), inicial: {}, ...(usa ? { usa } : {}) });
@@ -23,6 +23,18 @@ test("publicar la dueña regenera su ruta y la de quien usa; publicar quien usa,
 test("quienesUsan dice qué páginas muestran una sección y qué toman de ella", () => {
   assert.deepEqual(quienesUsan(registro, "duena", "lista"), [{ slug: "usa", nombre: "Usa", que: "Los ítems" }]);
   assert.deepEqual(quienesUsan(registro, "duena", "propia"), []);
+});
+
+test("comparticionDe dice qué avisar en cada punta, y nada donde no se comparte", () => {
+  assert.deepEqual(comparticionDe(registro, "usa", "lista"), {
+    tipo: "usa",
+    que: "Los ítems",
+    pagina: { slug: "duena", nombre: "Dueña" },
+    seccion: { clave: "lista", nombre: "Sección" },
+  });
+  assert.deepEqual(comparticionDe(registro, "duena", "lista"), { tipo: "muestran", paginas: [{ nombre: "Usa", que: "Los ítems" }] });
+  assert.equal(comparticionDe(registro, "duena", "propia"), undefined);
+  assert.equal(comparticionDe(registro, "no-existe", "lista"), undefined);
 });
 
 test("problemasDeCompartidos encuentra lo que apunta mal", () => {
