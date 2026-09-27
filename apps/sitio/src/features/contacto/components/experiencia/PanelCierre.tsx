@@ -1,3 +1,4 @@
+import type { ContactoDelSitio } from "@/config/datos-del-sitio";
 import type { CierreDeContacto } from "@/features/contacto/contenido/cierre";
 import { CanalDirecto } from "../CanalDirecto";
 
@@ -7,11 +8,13 @@ type Props = {
   titulo: string;
   /** Los textos del cierre, de `features/contacto/contenido/cierre.ts` o de la base. */
   contenido: CierreDeContacto;
+  /** El correo y el WhatsApp del canal directo, de Ajustes › Datos del sitio. */
+  contacto: Pick<ContactoDelSitio, "correo" | "whatsapp">;
   onOtra: () => void;
 };
 
 /** 3 · CIERRE — al enviar: «Cada propuesta empieza con una conversación.» */
-export function PanelCierre({ activo, titulo, contenido, onOtra }: Props) {
+export function PanelCierre({ activo, titulo, contenido, contacto, onOtra }: Props) {
   return (
     <div
       data-panel="cierre"
@@ -42,7 +45,7 @@ export function PanelCierre({ activo, titulo, contenido, onOtra }: Props) {
         {contenido.texto}
       </p>
       <div data-fin-bit className="mt-5">
-        <CanalDirecto />
+        <CanalDirecto correo={contacto.correo} whatsapp={contacto.whatsapp} />
       </div>
       <button
         data-fin-bit

@@ -1,6 +1,5 @@
 import { ArrowUpRight } from "@/components/ui/icons";
 import { MESES_DE_GUARDA } from "@/config/privacidad";
-import { siteConfig } from "@/config/site";
 import { PaisDropdown } from "../PaisDropdown";
 import type { Envio } from "./contexto";
 import { INPUT_BASE, LABEL_BASE } from "./estilos";
@@ -10,9 +9,10 @@ import { INPUT_BASE, LABEL_BASE } from "./estilos";
  * desktop, sin borde superior en mobile). Cada campo es un [data-campo] para
  * la cascada; la CTA de envío es el único naranja en pantalla. Mientras el
  * mensaje viaja, la CTA dice «Enviando…»; si no salió, el error va arriba de
- * ella, en `rojo-error` (6,57:1), y se anuncia en el acto.
+ * ella, en `rojo-error` (6,57:1), y se anuncia en el acto. El correo y los
+ * países salen de Ajustes › Datos del sitio: los mismos que acepta /api/contacto.
  */
-export function CamposContacto({ envio }: { envio: Envio }) {
+export function CamposContacto({ envio, correo, paises }: { envio: Envio; correo: string; paises: readonly string[] }) {
   return (
     <div className="border-azul-claro/50 grid content-center gap-x-8 gap-y-6 rounded-b-3xl border border-t-0 bg-white/80 p-6 backdrop-blur-sm md:grid-cols-2 md:p-8 lg:rounded-r-3xl lg:rounded-bl-none lg:border-t lg:border-l-0">
       <div data-campo>
@@ -39,7 +39,7 @@ export function CamposContacto({ envio }: { envio: Envio }) {
         </label>
         {/* Dropdown propio (no <select> nativo): comparte la caja de los
             demás campos y despliega un menú accesible con teclado. */}
-        <PaisDropdown id="ct-pais" name="pais" options={[...siteConfig.paises, "Otro"]} />
+        <PaisDropdown id="ct-pais" name="pais" options={[...paises, "Otro"]} />
       </div>
       <div data-campo className="md:col-span-2">
         <label htmlFor="ct-mensaje" className={LABEL_BASE}>
@@ -91,8 +91,8 @@ export function CamposContacto({ envio }: { envio: Envio }) {
       <p data-campo className="text-gris-texto text-center font-sans text-[0.8rem] leading-relaxed md:col-span-2">
         Usamos tus datos solo para responderte, y los borramos a los {MESES_DE_GUARDA.contacto} meses. Si querés que los
         borremos antes, escribinos a{" "}
-        <a href={`mailto:${siteConfig.contacto.email}`} className="text-azul-principal underline underline-offset-2">
-          {siteConfig.contacto.email}
+        <a href={`mailto:${correo}`} className="text-azul-principal underline underline-offset-2">
+          {correo}
         </a>
         .
       </p>

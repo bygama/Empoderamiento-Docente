@@ -1,10 +1,13 @@
-import { siteConfig } from "@/config/site";
+import type { DireccionDelSitio } from "@/config/datos-del-sitio";
 import type { Tema } from "./data";
 import { DOTS_NAVY } from "./estilos";
 
 type Props = {
   temaActivo: Tema | undefined;
   temaIdx: number;
+  /** El correo y la oficina, de Ajustes › Datos del sitio. */
+  correo: string;
+  direccion: DireccionDelSitio;
 };
 
 /**
@@ -13,7 +16,7 @@ type Props = {
  * datos institucionales reales (mail y oficina). Es un [data-campo]: entra y
  * sale con la cascada del formulario.
  */
-export function RailTema({ temaActivo, temaIdx }: Props) {
+export function RailTema({ temaActivo, temaIdx, correo, direccion }: Props) {
   // Ícono del tema elegido: aterriza en la baldosa del rail (destino del vuelo).
   const ChipIcon = temaActivo?.Icon;
   return (
@@ -54,21 +57,19 @@ export function RailTema({ temaActivo, temaIdx }: Props) {
           Escribinos
         </p>
         <a
-          href={`mailto:${siteConfig.contacto.email}`}
+          href={`mailto:${correo}`}
           className="hover:text-verde-concepto mt-1.5 block font-sans text-[0.92rem] font-medium break-words text-white transition-colors"
         >
-          {siteConfig.contacto.email}
+          {correo}
         </a>
 
         <p className="text-azul-claro/55 mt-5 font-mono text-[0.6rem] font-medium tracking-[0.2em] uppercase">
           Oficina
         </p>
         <address className="text-azul-claro/80 mt-1.5 font-sans text-[0.84rem] leading-relaxed not-italic">
-          {siteConfig.contacto.direccion.calle},{" "}
-          {siteConfig.contacto.direccion.complemento}
+          {direccion.complemento ? `${direccion.calle}, ${direccion.complemento}` : direccion.calle}
           <br />
-          {siteConfig.contacto.direccion.ciudad},{" "}
-          {siteConfig.contacto.direccion.pais}
+          {direccion.ciudad}, {direccion.pais}
         </address>
       </div>
     </aside>

@@ -64,6 +64,8 @@ export const esquemaDeDatosDelSitio = z.object({
 export type DatosDelSitio = z.output<typeof esquemaDeDatosDelSitio>;
 export type Redes = DatosDelSitio["redes"];
 export type DireccionDelSitio = DatosDelSitio["direccion"];
+/** Lo que usa Contacto: el correo, el WhatsApp, la oficina y los países del formulario. */
+export type ContactoDelSitio = Pick<DatosDelSitio, "correo" | "whatsapp" | "direccion" | "paises">;
 
 /**
  * Los datos con que arrancó la tabla (la migración `datos_del_sitio` cargó

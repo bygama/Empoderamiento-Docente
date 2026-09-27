@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
-import { siteConfig } from "@/config/site";
 
 /**
- * Canal directo de contacto: el mail para copiar de un toque y, cuando el
- * cliente confirme un número, WhatsApp. Acompaña al formulario para quien
- * prefiere escribir por su cuenta: en un celular sin app de correo, un
+ * Canal directo de contacto: el mail para copiar de un toque y, si hay un
+ * número en Ajustes › Datos del sitio, WhatsApp. Acompaña al formulario para
+ * quien prefiere escribir por su cuenta: en un celular sin app de correo, un
  * `mailto:` no abre nada, y copiar el mail sí sirve.
  */
-export function CanalDirecto({ className }: { className?: string }) {
+export function CanalDirecto({ correo, whatsapp, className }: { correo: string; whatsapp: string | null; className?: string }) {
   const [copiado, setCopiado] = useState(false);
 
   useEffect(() => {
@@ -19,8 +18,6 @@ export function CanalDirecto({ className }: { className?: string }) {
     return () => window.clearTimeout(t);
   }, [copiado]);
 
-  const email = siteConfig.contacto.email;
-  const whatsapp = siteConfig.contacto.whatsapp;
   const waHref = whatsapp ? `https://wa.me/${whatsapp}` : null;
 
   const copiar = async (texto: string) => {
@@ -41,14 +38,14 @@ export function CanalDirecto({ className }: { className?: string }) {
       className={`flex flex-wrap items-center justify-center gap-2.5 ${className ?? ""}`}
     >
       <a
-        href={`mailto:${email}`}
+        href={`mailto:${correo}`}
         className="text-azul-principal hover:text-verde-concepto font-sans text-[0.95rem] font-medium break-all transition-colors"
       >
-        {email}
+        {correo}
       </a>
       <button
         type="button"
-        onClick={() => copiar(email)}
+        onClick={() => copiar(correo)}
         className={chip}
         aria-live="polite"
       >

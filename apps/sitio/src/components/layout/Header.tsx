@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { DatosDelSitio } from "@/config/datos-del-sitio";
 import { NAV_LINKS, CTA_LINK, HOME_LINK, esPaginaActiva } from "@/config/nav";
 import { NavDropdown } from "./NavDropdown";
 import { crearIntroNavbar } from "./header/coreografia-intro";
@@ -31,9 +32,12 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * arrancaban juntas. Hoy `onReveal` corre de inmediato, así que es lo mismo que
  * el mount, y la rama de espera queda por si algún día vuelve un gate. Con
  * reduced-motion el JSX ya muestra el estado ABIERTO (final).
+ *
+ * `sitio` es lo que el menú del celular muestra al pie (el correo y las redes),
+ * de Ajustes › Datos del sitio: lo lee el layout.
  */
 
-export function Header() {
+export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes"> }) {
   const ref = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
   // El intro coreografiado del navbar (wordmark que se sostiene y colapsa a los
@@ -168,7 +172,7 @@ export function Header() {
       </div>
 
       {/* Navegación mobile (< lg): hamburguesa + panel a pantalla completa. */}
-      <MobileNav />
+      <MobileNav sitio={sitio} />
     </nav>
   );
 }

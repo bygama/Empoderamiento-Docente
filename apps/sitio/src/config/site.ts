@@ -1,14 +1,15 @@
-// Configuración institucional canónica.
-//
-// Cualquier dato que aparezca en más de un componente (mail, dirección,
-// dirección de ED, nombre de marca, países donde opera) vive acá. Nunca
-// hardcodear estos valores en JSX ni en metadata — importar de
+// Lo de la marca: el nombre, la URL, la descripción y las frases pilares.
+// Nunca hardcodear estos valores en JSX ni en metadata — importar de
 // '@/config/site'.
+//
+// Los datos de contacto (correo, WhatsApp, dirección, países y redes) ya no
+// viven acá: se editan en Ajustes › Datos del sitio, están en la tabla
+// `datos_del_sitio` y el sitio los lee por `datosDelSitio()`
+// (`datos/consultas/sitio.ts`), que los pasa por props.
 //
 // Reglas relacionadas:
 // - AGENTS.md §5.3 (datos institucionales centralizados)
 // - AGENTS.md §5.4 (logos de aliados — no se publican sin autorización)
-// - docs/GLOSSARY.md (Raquel Ayala — rol exacto pendiente)
 
 export const siteConfig = {
   name: "Empoderamiento Docente",
@@ -18,57 +19,6 @@ export const siteConfig = {
   // Google y lo que se comparte.
   description:
     "Consultora especializada en la transformación del aprendizaje matemático. Investigación, diseño de materiales didácticos, desarrollo profesional docente, acompañamiento, currículo y evaluación, en Chile, México, Argentina, Colombia y Brasil.",
-
-  contacto: {
-    email: "contacto@empoderamientodocente.org",
-    // Número de WhatsApp en formato internacional sin signos (ej. 56912345678).
-    // Sin número no se muestra ningún botón: no inventar (pendiente de Raquel).
-    whatsapp: undefined as string | undefined,
-    direccion: {
-      calle: "Avenida Irarrázaval 2821",
-      complemento: "Torre B, Oficina 527",
-      ciudad: "Santiago",
-      region: "Región Metropolitana",
-      pais: "Chile",
-      lineas: [
-        "Avenida Irarrázaval 2821",
-        "Torre B, Oficina 527",
-        "Santiago, Región Metropolitana",
-        "Chile",
-      ],
-    },
-  },
-
-  paises: ["Chile", "México", "Argentina", "Colombia", "Brasil"],
-
-  // Personas destacadas en el sitio. El rol exacto de Raquel Ayala y su
-  // vínculo con ED están pendientes de confirmar con el cliente — antes
-  // de redactar copy que mencione el cargo, consultar (docs/GLOSSARY.md).
-  direccion: {
-    fundadora: {
-      nombre: "Daniela Reyes-Gasperini",
-      titulo: "Doctora en Matemática Educativa",
-    },
-    referente: {
-      nombre: "Raquel Ayala",
-      // titulo, rol y vínculo — pendiente de definir con el cliente.
-    },
-  },
-
-  // Redes sociales — pendientes de confirmar con el cliente. Dejar el
-  // bloque vacío hasta tener los handles oficiales. No inventar URLs.
-  // El render condicional de ComunidadRedes y Footer las muestra cuando
-  // se llenen.
-  // URLs pasadas por Facundo el 2026-09-08. LinkedIn institucional no existe
-  // todavía: cuando lo creen, se agrega acá y el ícono aparece solo.
-  redes: {
-    instagram: "https://www.instagram.com/empoderamientodocente/",
-    facebook: "https://www.facebook.com/profile.php?id=100068726124781",
-  } as {
-    instagram?: string;
-    linkedin?: string;
-    facebook?: string;
-  },
 
   // Frases pilares que el sitio reusa verbatim (AGENTS.md §5.5).
   // No parafrasear sin chequear con docs/GLOSSARY.md.

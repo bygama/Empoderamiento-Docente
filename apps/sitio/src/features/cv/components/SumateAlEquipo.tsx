@@ -9,7 +9,7 @@ import { FormularioCV } from "./FormularioCV";
  * la grilla 2/3 del formulario, con el texto a la izquierda y el panel de
  * campos a la derecha. Es del sitio: sale de DESIGN.md §1 a §10, no del admin.
  */
-export function SumateAlEquipo({ campos }: { campos: readonly CampoDeFormulario[] }) {
+export function SumateAlEquipo({ campos, correo }: { campos: readonly CampoDeFormulario[]; correo: string }) {
   return (
     <section
       aria-labelledby="sumate-titulo"
@@ -28,7 +28,7 @@ export function SumateAlEquipo({ campos }: { campos: readonly CampoDeFormulario[
             nosotros. Contanos quién sos y dejanos tu CV.
           </p>
         </header>
-        <FormularioCV campos={campos} />
+        <FormularioCV campos={campos} correo={correo} />
       </div>
     </section>
   );

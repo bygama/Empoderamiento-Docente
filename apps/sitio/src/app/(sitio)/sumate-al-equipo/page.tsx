@@ -13,14 +13,15 @@ export const metadata: Metadata = {
  * La entrada pública del CV. **Apagada hasta `CV_ABIERTO=si`**: ED todavía
  * tiene que confirmar qué datos pide y publicar la política de privacidad
  * (work/mensajes/SPEC.md §5.2). Apagada da 404 y ningún link del sitio lleva
- * acá. El país se elige entre los de Ajustes › Datos del sitio.
+ * acá. El país se elige entre los de Ajustes › Datos del sitio, y el correo
+ * de sus errores es el de ahí.
  */
 export default async function SumateAlEquipoPage() {
   if (!cvAbierto()) notFound();
   const sitio = await datosDelSitio();
   return (
     <main id="contenido" tabIndex={-1}>
-      <SumateAlEquipo campos={camposDelCV(sitio.paises)} />
+      <SumateAlEquipo campos={camposDelCV(sitio.paises)} correo={sitio.correo} />
     </main>
   );
 }

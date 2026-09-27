@@ -7,7 +7,7 @@ import { RevealLines } from "@/components/ui/RevealLines";
 import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { Instagram, Linkedin, Facebook } from "@/components/ui/icons";
-import { siteConfig } from "@/config/site";
+import type { Redes } from "@/config/datos-del-sitio";
 import type { CierreDeNovedades } from "@/features/novedades/contenido/cierre";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -29,13 +29,14 @@ const REDES = [
  * que el cierre de Biblioteca: es una PIEZA, no una lámina, y no se funde con
  * el footer. Comparte el fondo COMPLETO del hero de Novedades (glow + bola
  * espejada + PuntosFaro con el haz al cursor), así el remate cierra con la
- * misma firma con la que abre la página. CTA naranja → Contacto + redes.
+ * misma firma con la que abre la página. CTA naranja → Contacto + redes (las
+ * de Ajustes › Datos del sitio, que le pasa la página).
  *
  * Como acá el envoltorio es gris-fondo y no blanco, marca la página con
  * data-footer-dock-tint="gris" para que la muesca del footer tome ese mismo
  * gris (regla en globals.css) y el encuentro no muestre triángulos blancos.
  */
-export function CierreNovedades({ contenido }: { contenido: CierreDeNovedades }) {
+export function CierreNovedades({ contenido, redes }: { contenido: CierreDeNovedades; redes: Redes }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -132,7 +133,7 @@ export function CierreNovedades({ contenido }: { contenido: CierreDeNovedades })
             data-cierre-foot
             className="text-azul-claro mt-7 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed md:text-[1.2rem]"
           >
-            {REDES.some(({ key }) => siteConfig.redes[key]) ? contenido.conRedes : contenido.sinRedes}
+            {REDES.some(({ key }) => redes[key]) ? contenido.conRedes : contenido.sinRedes}
           </p>
 
           <div
@@ -141,10 +142,10 @@ export function CierreNovedades({ contenido }: { contenido: CierreDeNovedades })
           >
             <ButtonPrimary href="/contacto">{contenido.boton}</ButtonPrimary>
             {/* Solo las redes con URL confirmada: un ícono a «#» es un link muerto. */}
-            {REDES.some(({ key }) => siteConfig.redes[key]) && (
+            {REDES.some(({ key }) => redes[key]) && (
               <ul className="flex items-center gap-5">
                 {REDES.map(({ key, label, Icon }) => {
-                  const url = siteConfig.redes[key];
+                  const url = redes[key];
                   if (!url) return null;
                   return (
                     <li key={key}>

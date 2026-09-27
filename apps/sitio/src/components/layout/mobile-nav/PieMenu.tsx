@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { ArrowUpRight, Facebook, Instagram, Linkedin } from "@/components/ui/icons";
+import type { Redes } from "@/config/datos-del-sitio";
 import { CTA_LINK } from "@/config/nav";
-import { siteConfig } from "@/config/site";
 
-// Redes a mostrar — mismo criterio que el Footer: el href sale de
-// siteConfig.redes y, sin handle oficial, el ícono no se muestra.
+// Redes a mostrar — mismo criterio que el Footer: el href sale de las redes
+// de Ajustes › Datos del sitio y, sin URL, el ícono no se muestra.
 const REDES = [
   { key: "instagram", label: "Instagram", Icon: Instagram },
   { key: "linkedin", label: "LinkedIn", Icon: Linkedin },
   { key: "facebook", label: "Facebook", Icon: Facebook },
 ] as const satisfies ReadonlyArray<{
-  key: keyof typeof siteConfig.redes;
+  key: keyof Redes;
   label: string;
   Icon: typeof Instagram;
 }>;
@@ -20,10 +20,14 @@ const REDES = [
  *  de la página actual en el menú. */
 export function PieMenu({
   pathname,
+  correo,
+  redes,
   onCerrar,
   onSubirEnPagina,
 }: {
   pathname: string;
+  correo: string;
+  redes: Redes;
   onCerrar: () => void;
   onSubirEnPagina: () => void;
 }) {
@@ -48,23 +52,23 @@ export function PieMenu({
 
       {/* Mail de contacto: centrado, justo debajo del CTA. */}
       <a
-        href={`mailto:${siteConfig.contacto.email}`}
+        href={`mailto:${correo}`}
         className="text-gris-texto hover:text-azul-principal text-center font-mono text-[0.78rem] tracking-wide transition-colors"
       >
-        {siteConfig.contacto.email}
+        {correo}
       </a>
 
       {/* Redes sociales — con rótulo y botones circulares (buen target
           táctil). Solo las que tienen URL confirmada; sin ninguna, la
           fila entera no se muestra. */}
-      {REDES.some(({ key }) => siteConfig.redes[key]) && (
+      {REDES.some(({ key }) => redes[key]) && (
         <div className="border-azul-principal/10 flex items-center justify-between gap-4 border-t pt-5">
           <span className="text-gris-texto font-mono text-[0.72rem] font-medium tracking-[0.18em] uppercase">
             Seguinos
           </span>
           <ul className="flex items-center gap-2.5">
             {REDES.map(({ key, label, Icon }) => {
-              const url = siteConfig.redes[key];
+              const url = redes[key];
               if (!url) return null;
               return (
                 <li key={key}>
