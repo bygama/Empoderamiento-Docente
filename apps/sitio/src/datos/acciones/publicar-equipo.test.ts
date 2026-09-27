@@ -77,3 +77,28 @@ test("despublicar lo saca del sitio y conserva sus columnas", sinBase, async () 
   assert.match(r.ok ? r.detalle : "", /ya no se ve/);
   assert.deepEqual(await base.persona.findUnique({ where: { id: creado.id }, select: { publicado: true, nombre: true } }), { publicado: false, nombre: "Prueba f" });
 });
+
+test("dos que publican a la vez en la Dirección con un solo lugar libre: entra una", sinBase, async () => {
+  const { base, crearPersonaEnBase, publicarPersonaEnBase } = await modulos();
+  // Un lugar libre en la Dirección mientras dura el test: Raquel Ayala, sin publicar. Al final se borran las de
+  // prueba y recién ahí vuelve, así la Dirección nunca queda con tres. Ningún otro archivo de tests publica ahí.
+  const raquel = await base.persona.findUnique({ where: { slug: "raquel-ayala" }, select: { id: true, publicado: true } });
+  if (!raquel?.publicado) return assert.fail("Raquel Ayala tiene que estar publicada en la base de los tests");
+  const prefijo = `${PREFIJO}-lugar`;
+  await base.persona.update({ where: { id: raquel.id }, data: { publicado: false } });
+  try {
+    const creados = [];
+    for (const letra of ["a", "b"]) {
+      const r = await crearPersonaEnBase(base, { contenido: perfil(`${prefijo}-${letra}`, 2), quien: "Ana" });
+      if (!r.ok) return assert.fail(r.detalle);
+      creados.push(r);
+    }
+    const resultados = await Promise.all(creados.map((r) => publicarPersonaEnBase(base, { id: r.id, borradorEnVisto: r.borradorEn, quien: "Ana" })));
+    assert.deepEqual(resultados.map((r) => r.ok).sort(), [false, true]);
+    assert.match(resultados.flatMap((r) => (r.ok ? [] : [r.detalle])).join(), /Dirección lleva 2 personas en el sitio/);
+    assert.equal(await base.persona.count({ where: { id: { in: creados.map((r) => r.id) }, publicado: true } }), 1);
+  } finally {
+    await limpiarEquipo(base, prefijo);
+    await base.persona.update({ where: { id: raquel.id }, data: { publicado: true } });
+  }
+});
