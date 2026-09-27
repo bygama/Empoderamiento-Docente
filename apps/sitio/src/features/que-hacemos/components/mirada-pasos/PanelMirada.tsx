@@ -110,7 +110,7 @@ export function PanelMirada({
       }
       className={`${tono.fondo} border-azul-principal/10 flex flex-col rounded-[1.25rem] border lg:sticky`}
     >
-      <div className="flex shrink-0 items-center gap-5 px-6 py-5 md:px-8 lg:h-[var(--mirada-solapa,4rem)] lg:py-0">
+      <div data-mirada-lomo className="flex shrink-0 items-center gap-5 px-6 py-5 md:px-8 lg:h-[var(--mirada-solapa,4rem)] lg:py-0">
         <p className={`${tono.numero} font-mono text-[0.8rem] tracking-[0.18em]`}>
           0{numero}
         </p>
@@ -127,7 +127,7 @@ export function PanelMirada({
           la card siguiente asoma, `coreografia-achicado.ts` lo achica y lo
           sube hasta la cabecera antes de que lo tapen. Solo transform, y solo
           desde ahí: sin JS el bloque queda en reposo, abajo. */}
-      <div className="grid flex-1 gap-8 px-6 pb-6 md:px-8 md:pb-8 lg:min-h-0 lg:grid-cols-2 lg:gap-10">
+      <div data-mirada-cuerpo className="grid flex-1 gap-8 px-6 pb-6 md:px-8 md:pb-8 lg:min-h-0 lg:grid-cols-2 lg:gap-10">
         <div data-mirada-texto className="lg:self-end">
           <p className={`${tono.idea} font-display text-[1.15rem] font-semibold lg:text-[1.5rem] lg:leading-snug`}>
             {paso.idea}
@@ -137,7 +137,7 @@ export function PanelMirada({
           </p>
         </div>
 
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[1rem] lg:aspect-auto lg:h-full">
+        <div data-mirada-foto className="relative aspect-[4/3] overflow-hidden rounded-[1rem] lg:aspect-auto lg:h-full">
           <Image
             src={paso.foto.src}
             alt={paso.foto.alt}
