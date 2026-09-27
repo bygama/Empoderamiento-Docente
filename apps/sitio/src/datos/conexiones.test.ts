@@ -11,7 +11,7 @@ const HOY = new Date("2026-09-26T06:00:00.000Z");
 
 /** Las corridas que devuelve cada tarea: la de Vercel falló hoy y salió bien ayer; las demás, bien. */
 async function leer(tarea: string | null) {
-  if (tarea === "metricas-de-vercel") return { ultima: { corridaEn: HOY, ok: false, detalle: "Vercel respondió 401." }, ultimaCorrecta: AYER };
+  if (tarea === "copia-de-visitas") return { ultima: { corridaEn: HOY, ok: false, detalle: "Vercel respondió 401." }, ultimaCorrecta: AYER };
   return { ultima: { corridaEn: HOY, ok: true, detalle: "Nada nuevo: ya estaba al día." }, ultimaCorrecta: HOY };
 }
 
@@ -36,7 +36,7 @@ test("con error si está configurada y su última corrida falló, con la última
   const estado = await estadoDeLasConexiones("dirige", { entorno: ENTORNO, leer });
   const vercel = estado.find((c) => c.clave === "vercel-analytics")!;
   assert.equal(vercel.conError, true);
-  assert.deepEqual(vercel.tareasDeLaConexion.map((t) => [t.nombre, t.ultima?.ok, t.ultimaCorrecta]), [["Copia de Vercel Analytics", false, AYER]]);
+  assert.deepEqual(vercel.tareasDeLaConexion.map((t) => [t.nombre, t.ultima?.ok, t.ultimaCorrecta]), [["Copia de las visitas", false, AYER]]);
   // Sin configurar no es un error: es lo que falta hacer.
   const sinConfigurar = await estadoDeLasConexiones("dirige", { entorno: {}, leer });
   assert.equal(sinConfigurar.find((c) => c.clave === "vercel-analytics")!.conError, false);

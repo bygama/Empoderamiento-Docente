@@ -7,7 +7,7 @@
 /// error. Sin columnas de rango, porque no toda tarea copia días.
 model CorridaDeTarea {
   id        Int      @id @default(autoincrement())
-  tarea     String   // la clave de la tarea: metricas-de-vercel | busquedas-de-google
+  tarea     String   // la clave de la tarea: copia-de-visitas | busquedas-de-google
   corridaEn DateTime @default(now())
   ok        Boolean
   detalle   String

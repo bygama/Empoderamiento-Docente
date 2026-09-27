@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { puede } from "@ed/auth";
 import type { NumeroDelResumen } from "@/correos/resumen-semanal";
-import { copiaDeVercel } from "./metricas-de-vercel";
+import { copiaDeVisitas } from "./copia-de-visitas";
 import { enLaZona, mandarResumenSemanal, resumenSemanalDeMetricas } from "./resumen-semanal";
 
 // El lunes 28 de septiembre de 2026 a las 4 UTC (la hora del cron) es lunes en Chile.
@@ -105,5 +105,5 @@ test("todos los números cuentan la misma semana: de lunes a domingo, la anterio
 });
 
 test("el resumen espera a la copia de Vercel: lee la ventana que esa copia escribe en la misma corrida", () => {
-  assert.equal(resumenSemanalDeMetricas.despuesDe, copiaDeVercel.clave);
+  assert.equal(resumenSemanalDeMetricas.despuesDe, copiaDeVisitas.clave);
 });

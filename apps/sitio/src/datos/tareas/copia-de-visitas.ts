@@ -5,7 +5,7 @@ import { ayerUTC, diaISO, fechaUTC, rangoFaltante, sumarDias } from "@/lib/metri
 import type { FilaDiaria } from "@/lib/metricas/tipos";
 import type { ClienteDeAnaliticas } from "@/lib/metricas/cliente";
 import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
-import { CONSULTAS, DIAS_POR_CORRIDA, ventanasQueSePiden } from "./consultas-de-vercel";
+import { CONSULTAS, DIAS_POR_CORRIDA, ventanasQueSePiden } from "./consultas-de-la-copia";
 
 // Copia a nuestra base lo que la API de Web Analytics tiene y todavía no
 // guardamos. Idempotente: correr dos veces deja lo mismo. Es una tarea del
@@ -97,4 +97,4 @@ export async function copiarMetricas({ minimoDias = 0 }: { minimoDias?: number }
   return sincronizarMetricas({ cliente, base: baseDeLaApp, minimoDias });
 }
 
-export const copiaDeVercel: Tarea = { clave: "metricas-de-vercel", nombre: "Copia de Vercel Analytics", correr: () => copiarMetricas() };
+export const copiaDeVisitas: Tarea = { clave: "copia-de-visitas", nombre: "Copia de las visitas", correr: () => copiarMetricas() };
