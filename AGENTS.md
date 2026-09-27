@@ -169,7 +169,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── sesion.ts    ← la sesión del pedido, preguntada una vez (sesionActual)
             │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados, QUIEN_VE)
             │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
-            │   ├── avisos.ts    ← quién recibe cada aviso por correo, del registro de config/avisos.ts, y mandarlo (tabla avisos)
+            │   ├── avisos.ts    ← quién recibe cada aviso por correo, del registro de config/avisos.ts (tabla avisos); avisar-mensaje-nuevo.ts lo manda
             │   ├── privacidad.ts ← los plazos de retención de la base, con su historial (ADR-0015)
             │   ├── conexiones.ts ← el estado de cada servicio de afuera: sus variables y sus corridas
             │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
