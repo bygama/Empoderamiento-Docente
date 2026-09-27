@@ -13,6 +13,7 @@ import { esquemaFaro, faroInicial } from "@/features/que-hacemos/contenido/faro"
 import { esquemaHero as esquemaHeroDeQueHacemos, heroInicial as heroDeQueHacemos } from "@/features/que-hacemos/contenido/hero";
 import { esquemaNiveles, nivelesInicial } from "@/features/que-hacemos/contenido/niveles";
 import { esquemaProyectos, proyectosInicial } from "@/features/que-hacemos/contenido/proyectos";
+import { seoQueHacemosInicial } from "@/features/que-hacemos/contenido/seo";
 import {
   comoTrabajamosInicial as comoTrabajamosDeQueHacemos,
   esquemaComoTrabajamos as esquemaComoTrabajamosDeQueHacemos,
@@ -55,6 +56,7 @@ export const PAGINAS = {
       proyectos: { nombre: "Proyectos y aplicaciones", esquema: esquemaProyectos, inicial: proyectosInicial },
       cierre: { nombre: "Cierre", esquema: esquemaCierreDeQueHacemos, inicial: cierreDeQueHacemos },
     },
+    seo: seoQueHacemosInicial,
   },
   "quienes-somos": { ruta: "/quienes-somos", nombre: "Quiénes somos", secciones: {} },
   investigacion: { ruta: "/investigacion", nombre: "Investigación", secciones: {} },
