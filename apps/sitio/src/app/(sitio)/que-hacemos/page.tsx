@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 // preguntas del método, que repetían «Cómo trabajamos».
 export default async function QueHacemosPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, comoTrabajamos, areas } = await contenidoDe("que-hacemos");
+  const { hero, faro, comoTrabajamos, areas } = await contenidoDe("que-hacemos");
   return (
     <main id="contenido" tabIndex={-1}>
       {/* FONDO COMPARTIDO: el hero y la escena del faro son dos cielos
@@ -66,7 +66,7 @@ export default async function QueHacemosPage() {
         <QueHacemosHero contenido={hero} areas={areas.areas} />
         {/* Escena del faro por capas de profundidad (cámara scrubbed). Su
             CTA final («Ver las siete áreas») baja a #areas. */}
-        <QueHacemosHeroFaro />
+        <QueHacemosHeroFaro contenido={faro} />
       </div>
       <MiradaPasos contenido={comoTrabajamos} />
       <AreasQueHacemos contenido={areas} />

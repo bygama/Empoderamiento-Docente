@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { Highlight } from "@/components/ui/Highlight";
+import type { FaroDeQueHacemos } from "@/features/que-hacemos/contenido/faro";
+import { partirResaltado, sinMarcas } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { FaroEscena } from "./FaroEscena";
@@ -55,7 +57,8 @@ import { CierreFaro } from "./hero-faro/CierreFaro";
  * no, queda la escena estática encendida con el mensaje central (default
  * del JSX) y el runway colapsa a una pantalla (h-svh).
  */
-export function QueHacemosHeroFaro() {
+export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos }) {
+  const mensaje = partirResaltado(contenido.mensaje);
   const rootRef = useRef<HTMLElement | null>(null);
   const altoRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
@@ -80,7 +83,7 @@ export function QueHacemosHeroFaro() {
       data-indice="El faro"
       ref={rootRef}
       className="relative z-10 lg:-mt-[100svh] lg:motion-reduce:mt-0"
-      aria-label="Qué hace Empoderamiento Docente"
+      aria-labelledby="faro-titulo"
     >
       {/* El runway solo existe donde corre la coreografía: en mobile o con
           reduced-motion colapsa a una pantalla (nada de scroll muerto).
@@ -109,9 +112,8 @@ export function QueHacemosHeroFaro() {
           {/* Titular de la sección, siempre perceptible para AT (h2: el h1
               de la página vive en QueHacemosHero, que va primero): la
               versión visual de abajo entra y sale con la coreografía. */}
-          <h2 className="sr-only">
-            Consultora especializada en la transformación del aprendizaje
-            matemático.
+          <h2 id="faro-titulo" className="sr-only">
+            {sinMarcas(contenido.mensaje)}
           </h2>
 
           {/* ══ Overlays de texto — una idea por momento ══ */}
@@ -120,8 +122,7 @@ export function QueHacemosHeroFaro() {
           <div data-esc="0" aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center" style={{ opacity: 0 }}>
             <div className="mx-auto w-full max-w-screen-xl px-5 md:px-10">
               <p className="text-azul-claro/90 font-display max-w-[30ch] text-[1.65rem] font-medium leading-snug md:text-[2rem]">
-                Cada contexto educativo presenta actores, objetivos, tensiones
-                y posibilidades diferentes.
+                {contenido.apertura}
               </p>
             </div>
           </div>
@@ -160,8 +161,9 @@ export function QueHacemosHeroFaro() {
                   className="font-display max-w-[21ch] font-extrabold tracking-[-0.03em] text-balance text-white [&_mark]:text-azul-claro [&_mark]:bg-[linear-gradient(var(--color-verde-concepto),var(--color-verde-concepto))] [&_mark]:bg-no-repeat [&_mark]:[background-position:0_96%] [&_mark]:[background-size:100%_0.14em] [&_mark]:no-underline"
                   style={{ fontSize: "1em", lineHeight: 1.06 }}
                 >
-                  Consultora especializada en la transformación del{" "}
-                  <Highlight>aprendizaje matemático</Highlight>.
+                  {mensaje.antes}
+                  {mensaje.clave === null ? null : <Highlight>{mensaje.clave}</Highlight>}
+                  {mensaje.despues}
                 </p>
               </div>
             </div>
@@ -172,7 +174,7 @@ export function QueHacemosHeroFaro() {
               cada momento tenga UNA sola lectura. */}
 
           {/* S2 · Las cuatro frases del enfoque: un golpe por momento */}
-          <PreguntasFaro />
+          <PreguntasFaro frases={contenido.frases} />
 
           {/* S3 RETIRADO. Mostraba «Niveles en los que intervenimos» + «Del
               sistema al aula» con cinco estaciones — es, textual, el título y
@@ -181,7 +183,7 @@ export function QueHacemosHeroFaro() {
               existe, así que quedaban flotando sobre el agua. */}
 
           {/* S4 · Cierre sobre la noche: titular + única acción del plano final. */}
-          <CierreFaro />
+          <CierreFaro titulo={contenido.cierre.titulo} boton={contenido.cierre.boton} />
         </div>
       </div>
     </section>

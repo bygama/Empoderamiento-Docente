@@ -8,6 +8,7 @@ import { esquemaMision, misionInicial } from "@/features/home/contenido/mision";
 import { esquemaQuienesSomos, quienesSomosInicial } from "@/features/home/contenido/quienes-somos";
 import { seoInicial } from "@/features/home/contenido/seo";
 import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
+import { esquemaFaro, faroInicial } from "@/features/que-hacemos/contenido/faro";
 import { esquemaHero as esquemaHeroDeQueHacemos, heroInicial as heroDeQueHacemos } from "@/features/que-hacemos/contenido/hero";
 import {
   comoTrabajamosInicial as comoTrabajamosDeQueHacemos,
@@ -44,6 +45,7 @@ export const PAGINAS = {
     nombre: "Qué hacemos",
     secciones: {
       hero: { nombre: "Hero", esquema: esquemaHeroDeQueHacemos, inicial: heroDeQueHacemos },
+      faro: { nombre: "Escena del faro", esquema: esquemaFaro, inicial: faroInicial },
       comoTrabajamos: { nombre: "Cómo trabajamos", esquema: esquemaComoTrabajamosDeQueHacemos, inicial: comoTrabajamosDeQueHacemos },
       areas: { nombre: "Áreas de especialización", esquema: esquemaAreasDeQueHacemos, inicial: areasDeQueHacemos },
     },

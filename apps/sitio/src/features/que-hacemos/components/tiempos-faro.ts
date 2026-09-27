@@ -1,4 +1,4 @@
-import { PREGUNTAS } from "./preguntas-faro";
+import { VERBO_POS } from "./preguntas-faro";
 
 /* ── Escala de tiempo de la coreografía ────────────────────────────────────
  *
@@ -19,7 +19,7 @@ const INICIO_PREGUNTAS = 0.4;
 // se acortó un poco: el cliente pidió llegar antes a lo concreto.
 export const PASO_PREGUNTA = 0.24;
 /** Un beat por pregunta. */
-export const BEATS = PREGUNTAS.map((_, i) => INICIO_PREGUNTAS + i * PASO_PREGUNTA);
+export const BEATS = VERBO_POS.map((_, i) => INICIO_PREGUNTAS + i * PASO_PREGUNTA);
 /**
  * La última pregunta dura lo mismo que las otras: se va 0.03 antes de donde
  * caería un beat siguiente. Con +0.06 (herencia de cuando los beats medían
