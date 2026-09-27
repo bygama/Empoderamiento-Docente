@@ -108,3 +108,34 @@
   líneas de código; en `main` ya tenía 123): sus tres registros suman una
   entrada por tipo, y Ajustes suma cinco. Partirlo es un cambio aparte, que
   queda como seguimiento en el reporte.
+- 2026-09-27 — **Ronda de arreglos 1 (revisión r1 del padre): una sola
+  declaración de lo que contesta el sitio.** «Desde» se chequeaba solo contra
+  el sitemap, y así se guardaban redirecciones que nunca se aplican
+  (`/sumate-al-equipo` con el CV cerrado, `/sitemap.xml`, `/robots.txt`, el
+  RSS). Ahora `config/rutas.ts` (`RUTAS_DE_LA_APP`) declara cada ruta de
+  `app/` con la sintaxis de sus carpetas, el admin, la API y `/_next` enteros,
+  y las carpetas de `public/`; `lib/seo/rutas.ts` (sin ED) dice si una ruta
+  cae en alguna. `config/rutas.test.ts` recorre `app/` y `public/` y falla por
+  una ruta sin declarar o una declarada que ya no está (control negativo: una
+  `/l/[codigo]` y una `public/.well-known` de prueba lo hicieron fallar).
+  Reemplaza a `RESERVADAS`. Decisiones de adentro:
+  - **Solo dos rutas buscan una redirección** (`o-redirige`): la atrapa-todo y
+    la ficha de una novedad sin novedad. Lo demás que Next arma es `sola`.
+  - **`public/` por carpeta, no archivo por archivo:** 137 archivos en 9
+    carpetas. Una carpeta declarada abarca lo de adentro con extensión, y el
+    test exige que todo archivo de `public/` la tenga. Rechaza también una ruta
+    con extensión que no existe (`/equipo/viejo.jpg`), y el mensaje lo dice
+    como regla («esas no se redirigen»), no como hecho.
+  - **`.well-known` y `/l/` no se declaran de antemano:** no existen, y una
+    redirección ahí hoy sí se aplica. Si aparecen en `app/` o en `public/`, el
+    test frena hasta declararlas.
+  - **Borrar dice lo que pasa, y la tabla también:** una redirección cuya ruta
+    el sitio contesta después (una novedad publicada con ese slug) sigue
+    guardada y no se aplica. La fila lo dice («No se aplica: esa ruta la
+    contesta el sitio.»), la confirmación y el aviso de borrar dicen que no
+    cambia nada, y las demás, que vuelve la página de error.
+  - Comprobado contra el manifiesto de rutas del build: las 58 cubiertas.
+- 2026-09-27 — **Quién recibe un aviso se anota solo si cambió algo**
+  (MINOR de r1): `ponerQuienRecibe` escribe solo las cuentas que cambian y
+  devuelve `{ reciben, cambiaron }`; con `cambiaron` en 0, la acción no
+  revalida ni anota.

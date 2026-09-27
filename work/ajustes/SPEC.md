@@ -134,8 +134,8 @@ las funciones de `datos/avisos.ts`; sin fila, activado, como hoy).
   no aparece ahí (`puede(rol, "verCV")`, nunca el string del rol).
 - Si nadie queda marcado, se guarda igual y el aviso lo dice: «Nadie va a
   recibir un correo por los CV nuevos: los vas a ver solo al entrar al admin.»
-- Cada guardado anota `cambio-quien-recibe-un-aviso` (sobre: «Contacto» o
-  «CV»).
+- Cada guardado que cambia algo anota `cambio-quien-recibe-un-aviso` (sobre:
+  «Contacto» o «CV»); guardar lo mismo no se anota.
 - **El resumen semanal no está en la pantalla:** lo suma la lane 11 en el
   registro de avisos, y la pantalla lo dibuja sola (§6).
 
@@ -253,16 +253,27 @@ una línea.
   - las dos son **rutas relativas del sitio**: empiezan con una sola `/`
     (`//` sería una redirección abierta a otro dominio), sin `\`, espacios,
     `?` ni `#`, hasta 200 caracteres; la barra final se saca;
-  - **desde** no es una ruta que existe (una redirección desde una página viva
-    no se usaría nunca), ni del admin, `/api` o `/_next`, y no tiene ya una
-    redirección;
+  - **desde** no es una ruta que el sitio contesta por su cuenta, porque ahí
+    una redirección no se aplicaría nunca: ni una página del sitemap, ni nada
+    de lo declarado en `config/rutas.ts` (`RUTAS_DE_LA_APP`: cada ruta de
+    `app/`, el admin, la API, lo de Next y los archivos de `public/`), y no
+    tiene ya una redirección. Solo se aplica donde el sitio busca una: la
+    atrapa-todo y la ficha de una novedad que no existe.
+    `config/rutas.test.ts` recorre `app/` y `public/` y falla si algo no está
+    declarado, o si algo declarado ya no está. *(Cambió en la ronda de
+    arreglos: decía «no es una ruta que existe» y se chequeaba solo contra el
+    sitemap, así que `/sumate-al-equipo` con el CV cerrado, `/sitemap.xml`,
+    `/robots.txt` y el RSS se guardaban y nunca se aplicaban. DECISIONS,
+    2026-09-27.)*
   - **hacia** es una ruta que existe: una de las del sitemap (§5.2);
   - **sin cadenas ni ciclos:** hacia no es el «desde» de otra redirección y
     desde no es el «hacia» de otra; desde ≠ hacia. Con las dos reglas de
     arriba ya no pueden darse, y se chequean igual, con su mensaje.
 - Agregar revalida la ruta de desde (por si su 404 quedó en caché) y anota
   `agrego-una-redireccion`; borrar anota `borro-una-redireccion` (sobre: «/viejo
-  → /nuevo»).
+  → /nuevo») y dice qué pasa con la ruta: vuelve a la página de error, o no
+  cambia nada si el sitio ya la contesta (una novedad publicada después con
+  ese slug).
 
 ### 5.2. Sitemap
 
