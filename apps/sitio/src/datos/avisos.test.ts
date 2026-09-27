@@ -2,6 +2,7 @@ import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { config as cargarEntorno } from "dotenv";
+import { segundoFactorObligatorio } from "@ed/auth";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const hayBase = Boolean(process.env.DATABASE_URL);
@@ -22,7 +23,10 @@ const correoDe = (id: string) => `prueba-${id}@ed.test`;
 before(async () => {
   if (!hayBase) return;
   const { base } = await import("@/datos/cliente");
-  await base.user.createMany({ data: CUENTAS.map(({ id, rol }) => ({ id, rol, name: `Prueba ${rol}`, email: correoDe(id) })) });
+  // Dirige y administra no existen sin el segundo factor (el CHECK de la base).
+  await base.user.createMany({
+    data: CUENTAS.map(({ id, rol }) => ({ id, rol, twoFactorEnabled: segundoFactorObligatorio(rol), name: `Prueba ${rol}`, email: correoDe(id) })),
+  });
   await base.aviso.create({ data: { cuentaId: CALLADA, aviso: "cv", activo: false } });
 });
 

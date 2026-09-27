@@ -27,7 +27,8 @@ after(async () => {
 async function preparar() {
   const { base } = await import("@/datos/cliente");
   if (!(await base.user.findUnique({ where: { id: cuenta } }))) {
-    await base.user.create({ data: { id: cuenta, name: "Prueba", email: `cuenta-${cuenta}@ed.test`, rol: "administra" } });
+    // Administra no existe sin el segundo factor (el CHECK de la base).
+    await base.user.create({ data: { id: cuenta, name: "Prueba", email: `cuenta-${cuenta}@ed.test`, rol: "administra", twoFactorEnabled: true } });
   }
   return base;
 }
