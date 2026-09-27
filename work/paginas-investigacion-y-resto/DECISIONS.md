@@ -50,3 +50,27 @@ Append-only: fecha — decisión — por qué.
   rebasea sobre `main` y se hacen los textos y el SEO de Contacto sobre lo que
   dejó la 7, **sin tocar el envío** (route handler, límite por IP, trampa) **ni
   la línea de privacidad** que sumó debajo del formulario.
+- 2026-09-26 — **La lista de Contacto, cerrada contra el código de la 7**
+  (SPEC §6, después del rebase sobre `main` `15def2c`). Tres secciones y el
+  SEO:
+  - **Titular** (`titular`): «Hablemos.» (12 caracteres). Es el único
+    titular de la experiencia: se arma letra por letra en el hero y viaja
+    al selector. El clon que viaja copia el texto del destino en vez de la
+    constante (dos líneas en `ghost-titulo.ts` y `coreografia-intro.ts`,
+    sin tocar tiempos ni geometría).
+  - **Apertura** (`apertura`): la frase pilar con su parte verde (80,
+    una parte resaltada), el equipo —foto con su alt, título (30), bajada
+    (40) y el texto que lo reemplaza en el celular (60)— y «¿Preferís
+    escribir directo?» (40).
+  - **Cierre** (`cierre`): título (60), texto (150) y el botón «Hacer otra
+    consulta» (30).
+  - **Quedan en código, y por qué:** los **cinco temas**, porque el envío de
+    la 7 los usa (`datos/formularios/contacto.ts` valida la clave con
+    `TEMAS` y guarda el **título** del tema en cada mensaje): editarlos acá
+    haría que la bandeja muestre un título distinto del sitio, y cambiar eso
+    es tocar el envío. El panel del formulario entero (rótulos, «Enviar
+    consulta», «Volver a los temas», «Sumate al equipo» y la línea de
+    privacidad) es de la 7. Las etiquetas del rail («Tema · 0N»,
+    «Escribinos», «Oficina») y del canal directo son interfaz; el mail y la
+    oficina salen de `config/site.ts`. Las caras del equipo y el «+8» son de
+    la entidad Equipo (lane 8).
