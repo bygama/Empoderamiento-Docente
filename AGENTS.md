@@ -144,8 +144,10 @@ un release candidate de la 8 (ADR-0007).
 ├── packages/              ← LO REUSABLE, cero dominio de ED adentro
 │   ├── db/                ← cliente Prisma, slugs, redirecciones
 │   ├── auth/              ← better-auth configurado, permisos, guarda
-│   └── kit-admin/         ← los controles de un formulario, el botón y el aviso; el
-│                            README dice qué tokens espera de la app (ADR-0014)
+│   └── kit-admin/         ← los controles de un formulario, el botón y el aviso, y
+│                            las piezas de una pantalla (encabezado, pestañas, lista,
+│                            tabla, estado vacío…); el README dice qué tokens espera
+│                            de la app (ADR-0014)
 └── apps/
     └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz
@@ -167,7 +169,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── auth.ts      ← la sesión, armada con esa base (y cómo salen sus correos)
             │   ├── bloqueos-de-acceso.ts ← dónde guarda el bloqueo por cuenta sus fallos
             │   ├── sesion.ts    ← la sesión del pedido, preguntada una vez (sesionActual)
-            │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados, QUIEN_VE)
+            │   ├── actividad/   ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados, QUIEN_VE): un archivo por módulo con sus tipos, y el índice que los compone
             │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
             │   ├── avisos.ts    ← quién recibe cada aviso por correo, del registro de config/avisos.ts (tabla avisos); avisar-mensaje-nuevo.ts lo manda; quien-recibe.ts, cambiar quién recibe (solo las cuentas mostradas, trabadas en una transacción)
             │   ├── privacidad.ts ← los plazos de retención de la base, con su historial (ADR-0015)
@@ -183,12 +185,12 @@ un release candidate de la 8 (ADR-0007).
             │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, editar-, publicar-casos, editar-, publicar-, autorizar-aliados, editar-, publicar-, mover-equipo, chequeos-del-perfil, lista-ordenada (mover con el candado de la lista), subir-, editar-, reemplazar-foto, redirigir, choque, mover-mensajes)
             │   ├── biblioteca/  ← buscar los datos de un material afuera (Crossref, OpenAlex, la página) y chequear su link (ADR-0016)
             │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, materiales, casos, equipo, aliados), que busca y reemplaza por URL
-            │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
+            │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes (pendientes/, un archivo por módulo), de la semana y de lo nuevo (inicioPara)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links, los archivos de fotos que ninguna fila usa, el resumen semanal (los lunes, en Chile)
             ├── admin/         ← las pantallas del admin
-            │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/), el número de sin leer, la cifra, la curva
+            │   ├── armazon/     ← lo del armazón que sabe de ED: la sidebar (barra-lateral/), la guarda y «Sin permiso», salir, el tema, la pantalla de acceso, y lo que usa lib/contenido/ (el momento, el encabezado de la ficha, «Qué cambió», «Cómo se ve»); lo demás es del kit
             │   ├── inicio/      ← el Inicio: el saludo, los pendientes, la semana y la actividad
-            │   ├── actividad/   ← cómo se lee cada tipo de actividad (frase.ts), para el Inicio y Cuentas
+            │   ├── actividad/   ← cómo se lee cada tipo de actividad (frase/, un archivo por módulo), para el Inicio y Cuentas
             │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)
             │   ├── mensajes/    ← las bandejas de Contacto y CV y la ficha de cada mensaje
             │   ├── novedades/   ← la primera entidad: la lista, la ficha con su formulario y su panel, «Qué cambió» (cambios.ts)
@@ -199,7 +201,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── fotos/       ← Contenido › Fotos: la grilla, la subida y la ficha de cada foto
             │   ├── equipo/      ← los perfiles del Equipo: la lista por nivel, la ficha con la tarjeta, el recorrido y sus etapas (etapa-del-recorrido/), y lo que firma en la Biblioteca
             │   ├── campos/      ← el generador de formularios de las páginas (Campo.tsx) y sus errores; los controles son del kit
-            │   └── <entidad>/   ← las que siguen, como novedades/ (fase 3)
+            │   └── <entidad>/   ← la que siga, con el molde de novedades/
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
             ├── proxy.ts       ← sesión · cabeceras (CSP con nonce en el admin) · rebote Strict
             ├── correos/       ← las plantillas de los correos y por dónde salen (Resend o consola)
@@ -618,8 +620,9 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 > `packages/auth`, `apps/sitio/prisma/` con sus migraciones,
 > `apps/sitio/src/datos/`, `apps/sitio/src/admin/`, `proxy.ts` y
 > `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
-> lo que hay. La fase 2 también: `packages/kit-admin` nació con Novedades, la
-> primera entidad. De las tablas de contenido existen `paginas`,
+> lo que hay. Las fases 2 y 3 también: `packages/kit-admin` nació con
+> Novedades, la primera entidad, y tiene además las piezas de una pantalla que
+> no saben de ED. De las tablas de contenido existen `paginas`,
 > `versiones_de_paginas`, `fotos`, `novedades`, `materiales`, `autorias`,
 > `casos`, `aliados` y `equipo` (spec del admin §6); las de las demás
 > entidades llegan con ellas.
@@ -716,15 +719,16 @@ Reglas para el admin y sus datos:
   y las consultas de `datos/` que devuelven algo reservado reciben el rol y
   sin la capacidad no devuelven nada. Cada Server Action chequea la suya justo
   después de la sesión, y lo que se hace se anota con `registrarActividad`
-  (`datos/actividad.ts`). `guarda.test.ts` y `acciones-con-sesion.test.ts`
+  (`datos/actividad/`). `guarda.test.ts` y `acciones-con-sesion.test.ts`
   fallan si algo se olvida.
 - **Lo que un módulo le suma al Inicio va por registro, nunca tocando su
   pantalla:** una fila de pendientes (con su urgencia y su capacidad), un
   número de la semana o lo nuevo desde tu visita, en `datos/inicio/`; quién
-  ve un tipo de actividad y si va al Inicio, en `QUIEN_VE` y `VA_AL_INICIO`
-  (`datos/actividad.ts`), y cómo se lee, en `admin/actividad/frase.ts`; su
-  acceso rápido, en su línea de
-  `modulos.ts`. Cada registro filtra por capacidad antes de consultar y lee
+  ve un tipo de actividad y si va al Inicio, en su archivo de
+  `datos/actividad/`; cómo se lee, en el suyo de `admin/actividad/frase/`, y
+  de qué módulo es y adónde lleva, en `admin/cuentas/actividad/modulos/`
+  (cada registro, una carpeta con un archivo por módulo y un índice que los
+  compone); su acceso rápido, en su línea de `barra-lateral/modulos.ts`. Cada registro filtra por capacidad antes de consultar y lee
   cada entrada aislada: la que tira lo dice en su lugar y las demás siguen.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
   tablas. No inventar tablas ni columnas que no estén acordadas.
@@ -780,8 +784,9 @@ define al implementar cada fase.
       (`/novedades`, cada ficha, el Inicio y `/novedades/rss.xml`). Las nueve de
       hoy entraron por la migración y su `data.ts` se borró. Diseño en
       `work/novedades-y-kit/` y el modelo en el ADR-0014.
-- [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
-      aliados, páginas y ajustes.
+- [x] **Admin, fase 3 — el resto del contenido**, cerrada el 2026-09-27 con el
+      mapa del admin (`work/mapa-del-admin/`), que sumó además los módulos que
+      no son contenido. Una línea por módulo:
   - [x] **Biblioteca:** `materiales` y `autorias`, con los 57 de hoy entrados
         por la migración y su `data.ts` borrado; el módulo, agregar por DOI,
         ISBN o link, y la salud de los links en el cron diario. Diseño en
@@ -792,8 +797,31 @@ define al implementar cada fase.
         firma) y las 5 que faltaban con link entraron a ella; el módulo, con
         la lista por nivel que se ordena, y sus 15 fotos en Fotos. Diseño en
         `work/equipo/`.
+  - [x] **Casos, Aliados y Fotos:** `casos`, `aliados` y `fotos`, cada uno en
+        su pestaña de Contenido. Un aliado se publica solo con «Autorizado»,
+        atado al logo, al nombre y al alt que se autorizaron, y la consulta del
+        sitio nunca devuelve uno sin él; un SVG entra solo por importación; y
+        reemplazar una foto reescribe todos sus usos. `work/casos-aliados-fotos/`.
+  - [x] **Páginas:** las siete, sección por sección, con su SEO, sus versiones
+        y «Qué cambió» (las fases A, B y C de arriba), en Contenido › Páginas.
+  - [x] **Ajustes:** los datos del sitio en la base, el SEO (redirecciones,
+        indexación y `sitemap.xml`), quién recibe cada aviso, los plazos de
+        privacidad y las conexiones (ADR-0015).
+  - [x] **Mensajes:** los formularios de Contacto y CV, sus dos bandejas, los
+        CV privados, la retención y el aviso por correo (ADR-0012).
+  - [x] **Métricas:** el Resumen con la curva y sus marcas, las búsquedas de
+        Search Console, el origen, qué hace la gente y los links cortos `/l/`,
+        más el resumen semanal (ADR-0009, ADR-0011, ADR-0017).
+  - [x] **Cuentas, Mi cuenta y el Inicio:** tres roles con la guarda y la
+        actividad, invitar, suspender, pasar la dirección y el segundo factor
+        por correo (ADR-0010, ADR-0013), y el Inicio con los pendientes, la
+        semana y lo último que pasó.
+  - [x] **El cierre:** lo del armazón que no sabe de ED pasó al kit, y los
+        registros de la actividad y de los pendientes quedaron con un archivo
+        por módulo. `work/cierre-del-mapa/`.
 - [ ] **Admin, fase 4 — URLs y SEO:** las 26 rutas nuevas (15 perfiles, 4 casos,
-      7 landings de tipo), `sitemap.xml`, canonicals, redirecciones y JSON-LD.
-      Reemplaza al «sitemap definitivo» que este §13 venía arrastrando.
+      7 landings de tipo), canonicals y JSON-LD; el `sitemap.xml` y las
+      redirecciones de las rutas de hoy ya los hizo Ajustes. Reemplaza al
+      «sitemap definitivo» que este §13 venía arrastrando.
 - [ ] Vercel: Root Directory = `apps/sitio` cuando exista el proyecto
 - [ ] CI/CD
