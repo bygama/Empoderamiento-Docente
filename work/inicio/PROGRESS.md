@@ -126,7 +126,63 @@
   un «entró» no aparece y un «publicó» sí, para dirige y para edita. Visto en
   rojo con `entro: true` («dirige no ve el "entró"») y en verde restaurado.
 
+### Después de la revisión r1 (PASS) y del rebase sobre Mensajes
+
+- **Rebase sobre `origin/main` en `490547f`** (Mensajes mergeada), con un
+  `--exec` que frenaba en cada commit que usara el `Numero` viejo: `Numero`
+  pasa a `Cifra` en el commit que lo crea (Mensajes estrenó su propio
+  `Numero`, la pastilla de sin leer). Conflictos de texto en DESIGN.md §11,
+  el árbol de AGENTS.md y el README, resueltos sumando los dos lados. Los
+  hashes de arriba son los de antes de este rebase.
+- `919e33b` — los cinco tipos de actividad de Mensajes en `QUIEN_VE`,
+  `VA_AL_INICIO` y `frase.ts`, con su test.
+- `068511d` — Minor 1: Esta semana corta donde cortan Resumen y Búsquedas
+  (`lecturas-de-la-semana.ts`, con su test de los cortes, visto en rojo sin
+  el corte de las variables); `SIN_VARIABLES_DE_METRICAS` compartida.
+- `7065011` — la nota del revisor: el test de la actividad con fechas de
+  ahora, limpieza en un `finally` y una ventana amplia.
+- `676e236` — pendientes de Mensajes (`de-los-mensajes.ts`), con sus tests;
+  el registro se separa de lo que arma las filas (`filas-de-pendientes.ts`).
+- `dcb9e9e` — «CV recibidos» en Esta semana, con su test contra la base.
+- `be7ef56` — lo que llegó a Mensajes, en «desde tu última visita».
+- `2a9a050` — DESIGN.md §11: la Cifra dice por qué no hay número.
+
 ## Verification
+
+### 2026-09-26 — M DoD de cierre, sobre Mensajes — PASS
+
+Sobre `2a9a050`, encima de `origin/main` en `490547f`.
+
+- L1 static, en limpio: `rm -rf apps/sitio/.next apps/sitio/next-env.d.ts` y
+  después `pnpm typecheck` → exit 0 · `pnpm lint` → exit 0 ·
+  `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor:
+  100/100, sin diagnósticos», apps/sitio/src 620 archivos · packages/db/src
+  3 · packages/auth/src 17).
+- L2 behavioral: `pnpm migrate:status` contra `ed` → «Database schema is up
+  to date!». `pnpm test` contra `ed` → exit 0: packages/auth 28 pasan, 0
+  fallan; apps/sitio 235, 234 pasan, 0 fallan, 1 saltado (el de antes: las
+  respuestas grabadas de A1). Después, en `ed`: 0 filas de `actividad` en el
+  futuro y 0 `mensajes` de prueba. `pnpm build` → exit 0 («Compiled
+  successfully», `ƒ /admin`).
+- L3 end-to-end (navegador de Orca, perfil aislado, `ed_inicio` con la
+  migración de Mensajes y sembrada con 3 contactos nuevos, 2 CV nuevos, uno
+  por borrarse y actividad de Mensajes; dev server sin las variables de
+  Vercel ni de Search Console):
+  - dirige → «Desde tu última visita, el 24/9 a las 20:07: llegaron 2 CV;
+    llegaron 3 mensajes de contacto; se publicó Inicio.» · Pendientes 5, en
+    orden: «2 CV nuevos», «3 mensajes de contacto sin leer», «1 CV se borra
+    en 7 días», «2 páginas con cambios sin publicar», «Conectá Search
+    Console» · Visitantes «—» «Faltan las variables de Vercel» (con la
+    ventana en la base: el Minor 1), Clics «—» «Search Console no está
+    conectado», CV recibidos 2 «+100 % contra la semana anterior»,
+    Materiales «—» · actividad con «tomó un mensaje sobre Investigación»,
+    «cerró un mensaje sobre Talleres y cursos», «borró un CV».
+  - edita → solo «llegó 1 mensaje de contacto» en la frase, Pendientes 2
+    (contacto y páginas), tres números sin «CV recibidos», y la actividad sin
+    «borró un CV».
+  - Captura rehecha: `inicio-dirige-mixto.png` (1568 × 921).
+- Close review: r1 PASS del padre sobre `2f58d20`; esta vuelta la revisa el
+  padre.
 
 ### 2026-09-26 — M DoD, con el ajuste de la actividad — PASS
 
