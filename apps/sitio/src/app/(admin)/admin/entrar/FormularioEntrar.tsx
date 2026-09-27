@@ -12,12 +12,13 @@ import { destinoSeguro } from "./destino";
 
 /**
  * La URL del paso del código: adónde se mandó (enmascarado), adónde volver y,
- * si el correo no salió, eso, para que la pantalla no diga «te lo mandamos».
+ * si el pedido falló, cómo, para que la pantalla no diga «te lo mandamos»: el
+ * correo no salió, hay que esperar (429), o cualquier otra cosa.
  */
-function urlDelCodigo(correo: string, destino: string, fallo: { code?: string } | null): string {
+function urlDelCodigo(correo: string, destino: string, fallo: { code?: string; status?: number } | null): string {
   const params = new URLSearchParams({ correo: enmascararCorreo(correo) });
   if (destino !== "/admin") params.set("volver", destino);
-  if (fallo) params.set("envio", fallo.code === CODIGO_NO_SALIO ? "no-salio" : "esperar");
+  if (fallo) params.set("envio", fallo.code === CODIGO_NO_SALIO ? "no-salio" : fallo.status === 429 ? "esperar" : "fallo");
   return `/admin/entrar/codigo?${params}`;
 }
 
