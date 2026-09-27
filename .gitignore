@@ -66,6 +66,5 @@ fotos-local/
 /apps/*/AGENTS.md
 /apps/*/CLAUDE.md
 
-# El deploy del VPS: el build que arma `construir` y los respaldos del host.
-.compilado/
+# Los respaldos del VPS, en el host (compose.yaml, servicio `respaldo`).
 respaldos/

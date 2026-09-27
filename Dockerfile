@@ -9,9 +9,9 @@
 #
 # **`next build` no corre acá, y es a propósito**: el sitio se prerenderiza
 # leyendo el contenido publicado de la base, y un `docker build` no llega a la
-# base del compose. Lo corre el servicio `construir` adentro de la red, y deja
-# el standalone en `.compilado/`; la imagen `app` se arma copiando eso, con
-# `.compilado/` como contexto (`scripts/desplegar.sh` hace los dos pasos).
+# base del compose. Lo corre el servicio `construir` adentro de la red y saca
+# el standalone como un tar por stdout, que es el contexto de la imagen `app`
+# (`scripts/desplegar.sh` encadena los dos; ver `deploy/construir.sh`).
 
 ARG NODE=node:24-alpine
 
@@ -34,8 +34,9 @@ RUN pnpm generate
 FROM ${NODE} AS app
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
-# El contexto es `.compilado/`: el standalone con `.next/static` y `public/`.
-COPY --chown=node:node . .
+# El contexto es el tar de `deploy/construir.sh`: el standalone, con
+# `.next/static` y `public/`, en `compilado/`.
+COPY --chown=node:node compilado/ ./
 # Las fotos y los CV van a disco (sin token de Blob) en `<cwd>/.fotos` y
 # `<cwd>/.cv`, donde el compose monta sus volúmenes. Se crean del usuario que
 # corre: un volumen nuevo hereda el dueño de la carpeta que tapa.
