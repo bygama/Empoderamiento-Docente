@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
-import { Aviso, Boton, claseDeBoton } from "@ed/kit-admin";
+import { useState, useTransition } from "react";
+import { Aviso, Boton } from "@ed/kit-admin";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
 import { FilaDeAccion } from "@/admin/armazon/FilaDeAccion";
-import { borrarFoto, reemplazarFoto } from "@/datos/acciones/fotos";
-import { MAXIMO_BYTES } from "@/lib/contenido/fotos";
+import { borrarFoto } from "@/datos/acciones/fotos";
+import { noSeReemplazaElLogo } from "@/features/aliados/contenido/autorizacion";
+import { ReemplazarElArchivo } from "./salida-de-la-foto/ReemplazarElArchivo";
 
 const SIN_RED = "No hubo respuesta del servidor. Fijate la conexión y probá de nuevo.";
 
@@ -16,6 +17,8 @@ type Props = {
   /** Cuántos de esos usos son contenido del código: ahí no se reemplaza. */
   enElCodigo: number;
   delRepositorio: boolean;
+  /** El aliado del que es el logo autorizado: entonces no se reemplaza desde acá. */
+  logoAutorizadoDe: string | null;
 };
 
 /** Qué pasa si se borra: que no se puede mientras se use, o qué se lleva. */
@@ -30,7 +33,8 @@ function siSeBorra(usos: number, delRepositorio: boolean): string {
  * sección que nunca se publicó desde el admin), lo dice antes: ahí no se
  * puede reemplazar, y la acción lo contestaría igual.
  */
-function siSeReemplaza(usos: number, enElCodigo: number): string {
+function siSeReemplaza(usos: number, enElCodigo: number, logoAutorizadoDe: string | null): string {
+  if (logoAutorizadoDe) return noSeReemplazaElLogo(logoAutorizadoDe);
   if (enElCodigo) {
     return `${enElCodigo === 1 ? "Un lugar que la usa todavía muestra" : `${enElCodigo} lugares que la usan todavía muestran`} el contenido del código, y ahí no se puede cambiar desde acá: cambiala desde el editor de esa página, o publicá la página y volvé.`;
   }
@@ -45,33 +49,11 @@ function siSeReemplaza(usos: number, enElCodigo: number): string {
  * confirma en el lugar; si la foto se usa, en lugar del botón dice dónde
  * sacarla primero.
  */
-export function SalidaDeLaFoto({ id, usos, enElCodigo, delRepositorio }: Props) {
+export function SalidaDeLaFoto({ id, usos, enElCodigo, delRepositorio, logoAutorizadoDe }: Props) {
   const router = useRouter();
-  const [archivo, setArchivo] = useState<File | null>(null);
   const [confirmando, setConfirmando] = useState(false);
   const [aviso, setAviso] = useState<{ ok: boolean; detalle: string } | null>(null);
   const [pendiente, empezar] = useTransition();
-  const refArchivo = useRef<HTMLInputElement>(null);
-
-  const reemplazar = () => {
-    if (!archivo) return;
-    if (archivo.size > MAXIMO_BYTES) return setAviso({ ok: false, detalle: "La foto pesa más de 4 MB: achicala antes de subirla." });
-    const datos = new FormData();
-    datos.append("id", id);
-    datos.append("archivo", archivo);
-    empezar(async () => {
-      try {
-        const r = await reemplazarFoto(datos);
-        setAviso(r);
-        if (!r.ok) return;
-        setArchivo(null);
-        if (refArchivo.current) refArchivo.current.value = "";
-        router.refresh();
-      } catch {
-        setAviso({ ok: false, detalle: SIN_RED });
-      }
-    });
-  };
 
   const borrar = () =>
     empezar(async () => {
@@ -97,31 +79,10 @@ export function SalidaDeLaFoto({ id, usos, enElCodigo, delRepositorio }: Props) 
       <ul className="divide-y divide-azul-claro/60">
         <FilaDeAccion
           titulo="Reemplazar el archivo"
-          consecuencia={siSeReemplaza(usos, enElCodigo)}
+          consecuencia={siSeReemplaza(usos, enElCodigo, logoAutorizadoDe)}
         >
-          <div className="flex flex-wrap items-center gap-2">
-            {/* El input nativo, oculto pero enfocable; su label hace de botón, como en el campo de foto. */}
-            <input
-              ref={refArchivo}
-              id="reemplazo"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              disabled={pendiente}
-              onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
-              className="peer sr-only"
-            />
-            <label
-              htmlFor="reemplazo"
-              className={`${claseDeBoton("secundario")} cursor-pointer peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-azul-medio peer-disabled:cursor-not-allowed peer-disabled:opacity-60`}
-            >
-              {archivo ? archivo.name : "Elegir el archivo nuevo…"}
-            </label>
-            {archivo ? (
-              <Boton variante="secundario" disabled={pendiente} aria-busy={pendiente || undefined} onClick={reemplazar}>
-                {pendiente ? "Reemplazando…" : "Reemplazar"}
-              </Boton>
-            ) : null}
-          </div>
+          {/* El logo autorizado de un aliado no se reemplaza: la frase dice cómo cambiarlo. */}
+          {logoAutorizadoDe ? null : <ReemplazarElArchivo id={id} alAvisar={setAviso} sinRed={SIN_RED} />}
         </FilaDeAccion>
         <FilaDeAccion titulo="Borrar" consecuencia={siSeBorra(usos, delRepositorio)}>
           {/* Usada, no hay botón: la frase dice dónde sacarla primero. */}

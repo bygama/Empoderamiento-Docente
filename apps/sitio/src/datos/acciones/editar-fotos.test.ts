@@ -80,6 +80,17 @@ test("reemplazar cambia el archivo en cada uso y en la fila, y borra el viejo de
   assert.equal(readdirSync(carpeta).some((a) => a.startsWith(path.basename(fila.url))), true);
 });
 
+test("el logo autorizado de un aliado no se reemplaza: cambiaría el logo sin que nadie lo autorice", sinBase, async () => {
+  const { base, reemplazarFotoEnBase } = await modulos();
+  const logo = await base.foto.findUniqueOrThrow({ where: { url: "/aliados/unesco.png" } });
+  const antes = readdirSync(carpeta).length;
+  const r = await reemplazarFotoEnBase(base, almacen, { id: logo.id, archivo: await webp("#e36c2d") });
+  assert.deepEqual(r, { ok: false, detalle: "Es el logo autorizado de UNESCO: subí el nuevo y cambialo desde su ficha, que pide volver a autorizarlo." });
+  // Ni la fila ni el archivo cambiaron, y no quedó un archivo nuevo.
+  assert.equal((await base.foto.findUniqueOrThrow({ where: { id: logo.id } })).url, "/aliados/unesco.png");
+  assert.equal(readdirSync(carpeta).length, antes);
+});
+
 after(async () => {
   if (process.env.DATABASE_URL) {
     const { base } = await modulos();
