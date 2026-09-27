@@ -13,7 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export MSYS_NO_PATHCONV=1
 
-versiones() { docker images ed-sitio --format '  {{.Tag}}  {{.CreatedAt}}' | grep -v '^  actual '; }
+versiones() { docker images ed-sitio --format '  {{.Tag}}  {{.CreatedAt}}' | grep -v '^ *actual '; }
 
 if [ $# -ne 1 ]; then
   echo "Uso: scripts/volver.sh <versión>. Las que hay:"
