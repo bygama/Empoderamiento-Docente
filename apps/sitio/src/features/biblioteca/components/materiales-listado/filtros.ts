@@ -17,6 +17,11 @@ export const normalizar = (s: string) =>
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "");
 
+/** Si un texto tiene lo buscado (`q`, ya normalizado). Aparte: react-doctor lee el `includes` de un texto como el de una lista. */
+export function coincide(texto: string, q: string): boolean {
+  return normalizar(texto).includes(q);
+}
+
 /** `?tipo=` de la URL, si es un tipo real del catálogo. */
 export function tipoDeUrl(): string | null {
   const t = new URLSearchParams(window.location.search).get("tipo");

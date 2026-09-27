@@ -2,7 +2,6 @@ import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorrador } from "@/features/biblioteca/contenido/material";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { doiOcupado, doiRepetido, problemasDeMaterial, tituloDe } from "./materiales-en-base";
-import { novedadesQueLoAbren } from "./vecinos-de-materiales";
 
 // Crear, guardar, descartar y borrar un material en la base (SPEC §7 de
 // `work/biblioteca/`), con el cliente inyectado para probarlo contra el
@@ -72,12 +71,12 @@ export async function borrarMaterialEnBase(
   base: PrismaClient,
   { id, borradorEnVisto }: { id: string; borradorEnVisto: string | null },
 ): Promise<{ ok: true; titulo: string; estabaPublicado: boolean; novedades: string[] } | Fallo> {
-  const fila = await base.material.findUnique({ where: { id } });
+  // Las novedades que lo abren se leen con la fila: después de borrar, la fk ya las soltó.
+  const fila = await base.material.findUnique({ where: { id }, include: { novedades: { where: { slug: { not: null } }, select: { slug: true } } } });
   if (!fila) return NO_EXISTE;
   // Borrar lo que otra persona guardó sin haberlo visto también es pisar.
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila, EL_MATERIAL);
-  const novedades = await novedadesQueLoAbren(base, id);
   const { count } = await base.material.deleteMany({ where: { id, borradorEn: fila.borradorEn } });
   if (count === 0) return choqueCon(await base.material.findUnique({ where: { id } }), EL_MATERIAL);
-  return { ok: true, titulo: tituloDe(fila), estabaPublicado: fila.publicado, novedades };
+  return { ok: true, titulo: tituloDe(fila), estabaPublicado: fila.publicado, novedades: fila.novedades.flatMap((n) => (n.slug ? [n.slug] : [])) };
 }

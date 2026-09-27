@@ -19,6 +19,11 @@ function linkDeLaCita(url: string): string {
   return url.startsWith("/") ? new URL(url, siteConfig.url).toString() : url;
 }
 
+/** La cita generada con los datos de hoy: la que va cuando nadie escribió otra. La muestra también la ficha del admin. */
+export function citaGenerada(m: Pick<Material, "autorias" | "fecha" | "titulo" | "fuente" | "doi" | "url">): string {
+  return citaApa({ autores: m.autorias, fecha: m.fecha, titulo: m.titulo, fuente: m.fuente, doi: m.doi, url: linkDeLaCita(m.url) });
+}
+
 export function materialDelSitio(m: Material, id: string): MaterialDelSitio {
   return {
     id,
@@ -35,7 +40,7 @@ export function materialDelSitio(m: Material, id: string): MaterialDelSitio {
     portada: m.portada ? { src: m.portada.src, foco: m.portada.foco } : { src: portadaGenerada(id), foco: CENTRO },
     url: m.url,
     fuente: m.fuente,
-    cita: m.cita || citaApa({ autores: m.autorias, fecha: m.fecha, titulo: m.titulo, fuente: m.fuente, doi: m.doi, url: linkDeLaCita(m.url) }),
+    cita: m.cita || citaGenerada(m),
   };
 }
 
