@@ -117,8 +117,51 @@
 - 2026-09-27 — Los 20 pasos hechos. Arranca work-verify.
 - 2026-09-27 — **Rebase sobre `main` (`77611c1`) y conciliación**, en siete
   commits (DECISIONS); después, el gate entero y la verificación (abajo).
+- 2026-09-27 — PR #190 abierto y `worker_done`. Revisión r1 del padre (Opus
+  5.5, medium) sobre `7c49911`: PASS con 1 Important y 1 Minor (el veredicto
+  lo tiene el padre; acá, lo que trajo la tarea de la ronda).
+- 2026-09-27 — **Ronda de arreglos 1:**
+  - **Important — éxito falso en las redirecciones a mano:** «desde» se
+    chequeaba solo contra el sitemap. Arreglo: `config/rutas.ts`
+    (`RUTAS_DE_LA_APP`), `lib/seo/rutas.ts` y `config/rutas.test.ts`, que
+    recorre `app/` y `public/`; borrar y la tabla dicen si la ruta la
+    contesta el sitio (DECISIONS).
+  - **Minor — avisos:** `cambio-quien-recibe-un-aviso` solo si cambió algo.
+  - **Queda como está** (lo decidió el padre): los hashes viejos de este
+    archivo, que se borra al cerrar, y el texto de «Nadie recibe…».
+- **Observación para ED** (de la revisión, fuera de esta lane): los países que
+  nombran «En números» del Inicio y la meta description siguen escritos en el
+  contenido de la página: no salen de los datos del sitio. Los dos se editan desde
+  el admin (la sección «En números» de Inicio y su pestaña SEO), así que si ED
+  suma o saca un país en Ajustes, conviene revisar también esos dos textos.
 
 ## Verification
+
+### 2026-09-27 — L DoD, ronda de arreglos 1 — PASS
+
+Sobre `7c49911` más los arreglos de la ronda; `main` sigue en `77611c1`.
+
+- L1 static, en limpio (sin `next-env.d.ts` ni `.next`): `pnpm typecheck` →
+  exit 0; `pnpm lint` → exit 0; `node scripts/verificar-react-doctor.mjs` →
+  exit 0, «react-doctor: 100/100, sin diagnósticos» (sitio 844 archivos, db 3,
+  auth 27, kit-admin 19).
+- L2 behavioral: `pnpm test` → exit 0: kit-admin 3/3, auth 46/46, sitio
+  369/370 con el mismo salteado de antes («falta correr A1»). Nuevos: los 4 de
+  `lib/seo/rutas.test.ts`, los 5 de `config/rutas.test.ts` (el recorrido de
+  `app/` y `public/`, las cuatro rutas de la revisión y el caso bueno) y 2 de
+  `editar-redirecciones.test.ts` contra la base. `pnpm build` → exit 0. El
+  cruce de `RUTAS_DE_LA_APP` con `.next/app-path-routes-manifest.json`: 58
+  rutas, ninguna sin cubrir.
+- L3 end-to-end (`next start` en 3026, navegador de Orca, perfil `ajustes`,
+  Ada): `/sumate-al-equipo`, `/sitemap.xml`, `/robots.txt` y
+  `/novedades/rss.xml` dan el error en «Desde» («… ya existe en el sitio: una
+  redirección ahí nunca se aplicaría.»), y `/equipo/daniela-reyes.jpg` el de
+  los archivos; siguen dando 404/200/200/200 (curl). `/taller-ronda-1` se
+  agrega («Listo…»), da 308 a `/`, y borrada dice «vuelve a dar la página de
+  error» y da 404. Una fila a mano desde `/robots.txt` puesta en la base: la
+  fila dice «No se aplica…», la confirmación y el aviso dicen que no cambia
+  nada, y `/robots.txt` sigue en 200. Filas de prueba borradas.
+- Close review: la vuelve a abrir el padre, con el mismo revisor.
 
 ### 2026-09-27 — L DoD — PASS
 
