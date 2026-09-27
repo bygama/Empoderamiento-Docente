@@ -414,7 +414,10 @@ previa, «Qué cambió» y publicar):
 **Métricas** (`/admin/metricas`) tiene cinco pestañas, y la regla de todo el
 módulo: **todo dato gratis y legal, sin cookies, y nunca se identifica a una
 persona ni a una institución**. Resumen, Origen y Qué hace la gente eligen el
-período arriba: 7, 30 o 90 días, contra el anterior.
+período arriba: 7, 30 o 90 días, contra el anterior. El plan de Vercel de hoy
+(Hobby) contesta hasta 30 días atrás y no cuenta por UTM
+(`PLAN_DE_VERCEL` en `config/metricas.ts`): en 90 días las vistas se suman
+día por día y los visitantes van «—» con el porqué.
 
 | Pestaña | Qué ve ED | De dónde sale | Cuándo llega |
 | --- | --- | --- | --- |
@@ -422,7 +425,7 @@ período arriba: 7, 30 o 90 días, contra el anterior.
 | **Búsquedas** | Qué buscó la gente en Google: clics, impresiones y puesto por búsqueda, página y país, y «Casi nos encuentran» | la copia diaria de Search Console | con 2 o 3 días de atraso |
 | **Origen** | Países (Chile, México y Argentina arriba), de dónde llegan, dispositivo, sistema y navegador, la página por país y la mejor hora para publicar, en hora de Chile. **Regiones no hay**: Vercel da el país y nada más fino. Lo que tiene menos de 3 visitas no se nombra | la copia diaria de Vercel | hasta ayer |
 | **Qué hace la gente** | El camino del CV por canal (vio la página, empezó el formulario, lo envió), los contactos enviados y los materiales más consultados | los **contadores propios** (`contadores`): sumas por día, sin IP, sin navegador, sin cookies | en el momento |
-| **Links para compartir** | Links cortos propios (`/l/<codigo>`) con sus clics, visitas y CV | los clics, del servidor; las visitas, de Vercel por su `utm_campaign`; los CV, de los contadores | en el momento; las visitas, hasta ayer |
+| **Links para compartir** | Links cortos propios (`/l/<codigo>`) con sus clics, visitas y CV | los clics, del servidor; las visitas, de Vercel por su `utm_campaign` (con un plan que cuente por UTM: Hobby no, y van «—»); los CV, de los contadores | en el momento; las visitas, hasta ayer |
 
 Con poco tráfico, cada bloque dice «Todavía no hay datos suficientes» y cuánto
 falta, en vez de dibujar un gráfico que engaña. Un CV cuenta para un link solo
@@ -433,9 +436,10 @@ La Biblioteca del admin dice cuántas veces se consultó cada material este mes,
 y el Inicio suma los materiales consultados de la semana.
 
 El **resumen semanal por correo** sale los lunes (en Chile) a quien lo active
-en Mi cuenta › Avisos —viene apagado—, con los números de la semana según su
-rol; empieza cuando la copia de Vercel tiene un mes de datos, y hasta entonces
-Mi cuenta dice cuántos días faltan.
+en Mi cuenta › Avisos —viene apagado—, con los números de la semana de lunes
+a domingo según su rol, todos de la misma semana; empieza cuando la copia de
+Vercel tiene un mes de datos, y hasta entonces Mi cuenta dice cuántos días
+faltan. Espera a la copia de Vercel de esa corrida, que escribe la semana.
 
 Ninguna pantalla consulta a Vercel ni a Google al renderizar. **Un solo cron**
 (`/api/cron/diario`, a las 4 UTC) corre cada día las tareas registradas en
