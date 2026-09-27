@@ -14,10 +14,10 @@ import type { EnlaceConCifras } from "@/datos/consultas/enlaces";
 import { cuantas } from "../formato";
 import { Copiar } from "./Copiar";
 
-/** «12 clics · 8 visitas · 1 CV»; sin la copia de Vercel, las visitas van «—». */
+/** «12 clics · 8 visitas · 1 CV»; cuando las visitas no se miden, «12 clics · 1 CV» (el porqué va una vez, arriba). */
 function cifras(e: EnlaceConCifras): string {
-  const visitas = e.visitas === null ? "— visitas" : cuantas(e.visitas, "visita", "visitas");
-  return `${cuantas(e.clics, "clic", "clics")} · ${visitas} · ${cuantas(e.cv, "CV", "CV")}`;
+  const visitas = e.visitas === null ? [] : [cuantas(e.visitas, "visita", "visitas")];
+  return [cuantas(e.clics, "clic", "clics"), ...visitas, cuantas(e.cv, "CV", "CV")].join(" · ");
 }
 
 /**

@@ -1,6 +1,6 @@
 import { PLAN_DE_VERCEL } from "@/config/metricas";
 import { base } from "@/datos/cliente";
-import { hayVariablesDeMetricas } from "@/lib/metricas/entorno";
+import { hayVariablesDeMetricas, SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 import { urlDelSitio } from "@/lib/url-del-sitio";
 import { nombresDeRutas } from "./nombres-de-rutas";
 import { rutasDelSitio } from "./rutas-del-sitio";
@@ -22,7 +22,7 @@ export type EnlaceConCifras = {
   creadoPor: string;
   /** Los de `/l/`, contados en el servidor. */
   clics: number;
-  /** Las visitas que Vercel contó con su `utm_campaign`; `null` sin la copia de Vercel o sin UTM en el plan. */
+  /** Las visitas que Vercel contó con su `utm_campaign`; `null` cuando no se miden (`sinVisitasPorque`). */
   visitas: number | null;
   /** Los CV que se mandaron en la carga en que se llegó por el link. */
   cv: number;
@@ -42,8 +42,7 @@ export async function enlacesConCifras(): Promise<EnlaceConCifras[]> {
   ]);
   const de = <T extends { _sum: Record<string, number | null> }>(filas: T[], clave: (f: T) => string, id: string, campo: string) =>
     filas.find((f) => clave(f) === id)?._sum[campo] ?? 0;
-  // Sin UTM en el plan (Hobby), Vercel no cuenta las visitas por campaña: no hay número.
-  const conVercel = hayVariablesDeMetricas() && PLAN_DE_VERCEL.utm;
+  const conVercel = sinVisitasPorque() === null;
   return enlaces.map((e) => ({
     id: e.id,
     codigo: e.codigo,
@@ -58,6 +57,17 @@ export async function enlacesConCifras(): Promise<EnlaceConCifras[]> {
     visitas: conVercel ? de(visitas, (f) => f.valor, e.codigo, "visitantes") : null,
     cv: de(cv, (f) => f.clave, e.id, "cuenta"),
   }));
+}
+
+/**
+ * Por qué los links no traen visitas, o `null` si las traen. La pantalla lo
+ * dice una vez, arriba de la lista, y no en cada fila. En Hobby, Vercel no
+ * cuenta por UTM: prenderlas es cambiar `PLAN_DE_VERCEL` si ED cambia de plan.
+ */
+export function sinVisitasPorque(): string | null {
+  if (!PLAN_DE_VERCEL.utm) return "Vercel no da de dónde vienen las visitas en el plan gratuito: acá se ven los clics y los CV.";
+  if (!hayVariablesDeMetricas()) return `${SIN_VARIABLES_DE_METRICAS}: por ahora, acá se ven los clics y los CV.`;
+  return null;
 }
 
 /** Las páginas a las que puede llevar un link: las que el sitio muestra hoy, por su nombre. */

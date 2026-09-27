@@ -1,5 +1,4 @@
-import { PLAN_DE_VERCEL } from "@/config/metricas";
-import { baseDeLosLinks, destinosPosibles, enlacesConCifras } from "@/datos/consultas/enlaces";
+import { baseDeLosLinks, destinosPosibles, enlacesConCifras, sinVisitasPorque } from "@/datos/consultas/enlaces";
 import { CrearEnlace } from "./enlaces/CrearEnlace";
 import { ListaDeEnlaces } from "./enlaces/ListaDeEnlaces";
 import { Bloque } from "./Seccion";
@@ -8,10 +7,12 @@ import { Bloque } from "./Seccion";
  * Métricas › Links para compartir (SPEC de work/metricas-completas/ §6.4):
  * crear un link corto propio arriba y la lista abajo. El clic se cuenta en
  * el servidor, sin cookies; las visitas, con el `utm_campaign` que agrega la
- * redirección.
+ * redirección, cuando el plan de Vercel las cuenta. Si no se miden, se dice
+ * una vez en la explicación de la lista, no en cada fila.
  */
 export async function Enlaces() {
   const [enlaces, destinos] = await Promise.all([enlacesConCifras(), destinosPosibles()]);
+  const sinVisitas = sinVisitasPorque();
   return (
     <div className="space-y-10">
       <Bloque id="crear" titulo="Crear un link" explicacion="Elegí la página, dónde lo vas a compartir y un nombre: sale un link corto que cuenta cuánta gente llega por ahí.">
@@ -20,7 +21,11 @@ export async function Enlaces() {
       <Bloque
         id="links"
         titulo="Tus links"
-        explicacion={`Clics: las veces que se abrió el link. Visitas: las que contó la analítica al llegar${PLAN_DE_VERCEL.utm ? "" : " (el plan de Vercel de hoy no las cuenta por link: van «—»)"}. CV: los que se mandaron desde ahí.`}
+        explicacion={
+          sinVisitas
+            ? `Clics: las veces que se abrió el link. CV: los que se mandaron desde ahí. ${sinVisitas}`
+            : "Clics: las veces que se abrió el link. Visitas: las que contó la analítica al llegar. CV: los que se mandaron desde ahí."
+        }
       >
         <ListaDeEnlaces enlaces={enlaces} />
         <p className="max-w-prose text-admin-meta text-gris-texto">
