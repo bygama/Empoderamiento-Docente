@@ -46,6 +46,12 @@ export const TIPOS_DE_ACTIVIDAD = [
   "borro-una-cuenta",
   "paso-la-direccion",
   "cerro-las-sesiones",
+  // Novedades (work/novedades-y-kit/): sobre la novedad, con su título como
+  // era en ese momento y su id. Guardar un borrador no se anota.
+  "publico-una-novedad",
+  "despublico-una-novedad",
+  "descarto-cambios-de-una-novedad",
+  "borro-una-novedad",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
