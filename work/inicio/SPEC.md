@@ -110,8 +110,7 @@ son secundarias, como en «Sin permiso» y Mi cuenta.
 
 - Cuatro números, cada uno contra los 7 días anteriores, con el patrón nuevo
   **Número** (§5): la etiqueta, el número y la comparación («+12 % contra la
-  semana anterior», «Igual que la semana anterior», «Sin datos de la semana
-  anterior»).
+  semana anterior», «Igual que la semana anterior», «Sin datos previos»).
 - **Lo que todavía no existe o no tiene datos muestra «—» con «Todavía no hay
   datos»**, nunca un cero inventado. Un cero es un cero solo si la fuente
   existe y contó cero.

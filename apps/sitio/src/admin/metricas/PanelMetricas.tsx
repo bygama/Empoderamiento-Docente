@@ -1,9 +1,9 @@
 import { Aviso } from "@/admin/armazon/Campos";
 import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { Cifra } from "@/admin/armazon/Cifra";
 import { actualizarMetricasAhora } from "@/datos/acciones/actualizar-metricas";
 import { estadoDeMetricas, tarjetas } from "@/datos/consultas/metricas";
 import { ActualizarAhora } from "./ActualizarAhora";
-import { Tarjeta } from "./Tarjeta";
 
 const fechaLarga = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "long", timeZone: "UTC" });
 // Sin `timeZoneName`: Intl no lo admite junto con `dateStyle`/`timeStyle`
@@ -48,8 +48,8 @@ export async function PanelMetricas() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cards.flatMap((t) => [
-            <Tarjeta key={`v${t.dias}`} etiqueta={`Visitantes, últimos ${t.dias} días`} valor={t.visitantes} variacion={t.variacionVisitantes} />,
-            <Tarjeta key={`p${t.dias}`} etiqueta={`Vistas, últimos ${t.dias} días`} valor={t.vistas} variacion={t.variacionVistas} />,
+            <Cifra key={`v${t.dias}`} etiqueta={`Visitantes, últimos ${t.dias} días`} valor={t.visitantes} variacion={t.variacionVisitantes} />,
+            <Cifra key={`p${t.dias}`} etiqueta={`Vistas, últimos ${t.dias} días`} valor={t.vistas} variacion={t.variacionVistas} />,
           ])}
         </div>
       );

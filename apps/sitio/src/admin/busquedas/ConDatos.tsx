@@ -1,6 +1,6 @@
 import type { FilaDeBusquedas, ResumenDeBusquedas } from "@/datos/consultas/busquedas";
 import { nombreDelPais } from "@/lib/busquedas/paises";
-import { Tarjeta } from "@/admin/metricas/Tarjeta";
+import { Cifra } from "@/admin/armazon/Cifra";
 import { cifras, motivo, rutaDe } from "./formato";
 import { Seccion, type FilaDeSeccion } from "./Seccion";
 
@@ -18,9 +18,9 @@ export function ConDatos({ resumen }: { resumen: ResumenDeBusquedas }) {
   return (
     <div className="space-y-10">
       <div className="grid gap-4 sm:grid-cols-3">
-        <Tarjeta etiqueta="Clics desde Google" valor={resumen.clics} variacion={resumen.variacionClics} />
-        <Tarjeta etiqueta="Veces que apareció el sitio" valor={resumen.impresiones} variacion={resumen.variacionImpresiones} />
-        {resumen.posicion !== null ? <Tarjeta etiqueta="Puesto promedio" valor={Math.round(resumen.posicion * 10) / 10} /> : null}
+        <Cifra etiqueta="Clics desde Google" valor={resumen.clics} variacion={resumen.variacionClics} />
+        <Cifra etiqueta="Veces que apareció el sitio" valor={resumen.impresiones} variacion={resumen.variacionImpresiones} />
+        {resumen.posicion !== null ? <Cifra etiqueta="Puesto promedio" valor={Math.round(resumen.posicion * 10) / 10} /> : null}
       </div>
       <Seccion
         id="casi-nos-encuentran"
