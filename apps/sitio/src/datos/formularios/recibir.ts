@@ -2,7 +2,7 @@ import type { Bandeja } from "@/config/mensajes";
 import type { Respuesta } from "@/lib/formularios/enviar";
 import { claveDeLimite, ipDelPedido } from "@/lib/formularios/limite";
 import { segundoPlano } from "@/lib/segundo-plano";
-import { avisarMensajeNuevo } from "@/datos/avisos";
+import { avisarMensajeNuevo } from "@/datos/avisar-mensaje-nuevo";
 import { sumarEnvio } from "@/datos/limites-por-ip";
 
 // Lo común a los formularios públicos (`/api/contacto`, `/api/cv`): la forma
