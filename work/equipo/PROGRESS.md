@@ -10,6 +10,13 @@
 - 2026-09-27 — **SPEC aprobado por el padre** con el cambio J (sin arrastre:
   «Subir» y «Bajar» como Aliados) y las precisiones H y N (DECISIONS).
   PLAN.md escrito: 13 pasos; el 11 y el 12 esperan a la lane 9.
+- 2026-09-27 — **Pausa para la revisión de cierre.** Los 13 pasos del PLAN
+  están hechos y verificados (`## Verification`), la rama rebasada sobre
+  `main` (`ddc8ca1d`) y el PR abierto. Sin bloqueos ni comandos en rojo.
+  **Lo que sigue:** la revisión de cierre, que lanza el padre después de
+  `worker_done`; sus hallazgos vuelven a esta lane como arreglos. Con su
+  PASS, el cierre: un commit con el veredicto en `## Verification` y otro que
+  borra `work/equipo/`, los dos en este mismo PR.
 
 ## Hecho
 
