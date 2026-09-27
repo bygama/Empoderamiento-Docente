@@ -3,7 +3,8 @@ import { estadoDeMetricas, tarjetaDe, type EstadoDeMetricas, type Tarjeta } from
 import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 import { cvRecibidos } from "./de-los-mensajes";
 import type { Agregado } from "@/lib/busquedas/lecturas";
-import { sumarDias, variacion } from "@/lib/metricas/periodos";
+import { sumasDe, totalDe } from "@/datos/contadores";
+import { diaISO, sumarDias, variacion } from "@/lib/metricas/periodos";
 
 // Lo que lee cada número de «Esta semana», con los mismos cortes que la
 // pantalla de su módulo: si Métricas › Resumen dice que faltan las variables,
@@ -61,6 +62,22 @@ export async function cvDeLaSemana(hoy: Date = new Date()): Promise<LecturaDeLaS
   const desde = new Date(hoy.getTime() - semana);
   const [actual, anterior] = await Promise.all([cvRecibidos(desde, hoy), cvRecibidos(new Date(desde.getTime() - semana), desde)]);
   return { valor: actual, variacion: variacion(actual, anterior) };
+}
+
+/**
+ * Los materiales que se abrieron en los últimos 7 días contra los 7
+ * anteriores, del contador propio: cuenta en el momento, como los CV. Recibe
+ * cómo sumar para poder probarlo sin base.
+ */
+export async function materialesSegun(sumar: (desde: string, hasta: string) => Promise<number>, hoy: Date = new Date()): Promise<LecturaDeLaSemana> {
+  const hasta = diaISO(hoy);
+  const desde = sumarDias(hasta, -(DIAS - 1));
+  const [actual, anterior] = await Promise.all([sumar(desde, hasta), sumar(sumarDias(desde, -DIAS), sumarDias(desde, -1))]);
+  return { valor: actual, variacion: variacion(actual, anterior) };
+}
+
+export async function materialesConsultados(): Promise<LecturaDeLaSemana> {
+  return materialesSegun(async (desde, hasta) => totalDe(await sumasDe({ eventos: ["material-consultado"], desde, hasta }), "material-consultado"));
 }
 
 export async function visitantes(): Promise<LecturaDeLaSemana> {

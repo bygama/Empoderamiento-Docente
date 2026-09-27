@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { config as cargarEntorno } from "dotenv";
 import type { Tarjeta } from "@/datos/consultas/metricas";
 import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
-import { clicsSegun, cvDeLaSemana, SIN_SEARCH_CONSOLE, visitantesSegun } from "./lecturas-de-la-semana";
+import { clicsSegun, cvDeLaSemana, materialesSegun, SIN_SEARCH_CONSOLE, visitantesSegun } from "./lecturas-de-la-semana";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
@@ -56,4 +56,15 @@ test("los CV recibidos cuentan los de la semana contra los de la anterior, y un 
     await base.mensaje.deleteMany({ where: { correo } });
     await base.$disconnect();
   }
+});
+
+test("los materiales consultados son los últimos 7 días hasta hoy contra los 7 anteriores, y un cero es un cero", async () => {
+  const pedidos: string[] = [];
+  const sumar = async (desde: string, hasta: string) => {
+    pedidos.push(`${desde}..${hasta}`);
+    return desde === "2026-09-21" ? 4 : 0;
+  };
+  const leido = await materialesSegun(sumar, new Date("2026-09-27T15:00:00.000Z"));
+  assert.deepEqual(leido, { valor: 4, variacion: "sin datos previos" });
+  assert.deepEqual(pedidos, ["2026-09-21..2026-09-27", "2026-09-14..2026-09-20"]);
 });
