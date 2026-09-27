@@ -52,7 +52,7 @@ export const CONEXIONES: readonly Conexion[] = [
   {
     clave: "blob-de-cv",
     nombre: "Blob de CV, privado",
-    para: "Los archivos de los CV, sin URL pública (ADR-0012).",
+    para: "Los archivos de los CV, guardados sin URL pública.",
     variables: ["CV_BLOB_READ_WRITE_TOKEN"],
     tareas: ["retencion-de-cv"],
     sinConfigurar: "En Vercel no se reciben CV.",
