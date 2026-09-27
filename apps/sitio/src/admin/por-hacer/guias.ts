@@ -15,16 +15,6 @@ export type Pantalla = {
 export type Guia = { nombre: string; para: string; pantallas: readonly Pantalla[] };
 
 const GUIAS: Record<string, Guia> = {
-  novedades: {
-    nombre: "Novedades",
-    para: "Lo que se publica con fecha: las noticias de ED.",
-    pantallas: [
-      { nombre: "Lista de novedades", ruta: "/admin/novedades", que: "Borradores y publicadas, con buscador y la destacada marcada." },
-      { nombre: "Nueva novedad", ruta: "/admin/novedades/nueva", que: "Crea el borrador y abre su ficha." },
-      { nombre: "Ficha de una novedad", ruta: "/admin/novedades/[id]", que: "Título, bajada, categoría, imagen y cuerpo, con la vista previa en Google y en redes." },
-      { nombre: "Feed de novedades", ruta: "/novedades/rss.xml", que: "En el sitio público, para quien siga las novedades con un lector." },
-    ],
-  },
   biblioteca: {
     nombre: "Biblioteca",
     para: "Los 63 materiales, que llevan a la revista o a la editorial.",
