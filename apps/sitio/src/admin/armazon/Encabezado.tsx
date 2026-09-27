@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { Volver, type DestinoDeVolver } from "./Volver";
 
 type Miga = { href: string; etiqueta: string };
 
 type Props = {
   /** El `h1` de la pantalla. */
   titulo: string;
+  /** En un detalle, la vuelta a su lista («← Contacto»), arriba del título. */
+  volver?: DestinoDeVolver;
   /** Lo que hay arriba de esta pantalla, en orden; van antes del título, en la misma línea. */
   migas?: Miga[];
   /** Al lado del título: una `Insignia`. */
@@ -83,12 +86,13 @@ function Barra({ acciones, avisos, fijo, resaltado }: Pick<Props, "acciones" | "
  * El `-mx-6` lo lleva hasta los bordes del `main` del armazón, que tiene
  * `px-6`.
  */
-export function Encabezado({ titulo, migas, estado, detalle, acciones, avisos, pestanas, fijo = false, resaltado = false }: Props) {
+export function Encabezado({ titulo, volver, migas, estado, detalle, acciones, avisos, pestanas, fijo = false, resaltado = false }: Props) {
   return (
     <header
       className={`-mx-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b px-6 py-3 transition-colors ${fijo ? "lg:sticky lg:top-0 lg:z-10" : ""} ${fondoDe(resaltado)} ${resaltado ? "text-white" : ""}`}
     >
       <div className="min-w-0">
+        {volver ? <Volver {...volver} resaltado={resaltado} /> : null}
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           {migas?.length ? <Migas migas={migas} resaltado={resaltado} /> : null}
           <h1 className="font-display text-admin-titulo font-bold">{titulo}</h1>

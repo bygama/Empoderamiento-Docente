@@ -361,7 +361,7 @@ el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso» y el apartado, el
 mismo día (`work/roles-y-actividad/`); las pestañas de una página, el error en
 el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
 vista previa de buscador y redes, también (`work/paginas-inicio/`); el
-número, el filtro y el buscador, ese mismo día (`work/mensajes/`). Todos los contrastes están
+número, el filtro, el buscador, «volver» y confirmar lo que no se deshace, ese mismo día (`work/mensajes/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -549,7 +549,42 @@ Fondo blanco con un divisor inferior; si es fijo, queda `sticky` arriba.
   barra fija abajo, con el mismo modo navy y el área segura del iPhone.
 - **Migas** solo donde hay tres niveles (hoy, el editor de páginas:
   Contenido / Páginas / Inicio). Las demás pantallas las ubican la sidebar y
-  las pestañas.
+  las pestañas, y un detalle, su «← volver» (abajo).
+
+### Volver
+
+La vuelta de un detalle a su lista: «← Contacto».
+`apps/sitio/src/admin/armazon/Volver.tsx`, en el slot `volver` del
+encabezado.
+
+- **Arriba del título, adentro del encabezado**, donde el editor lleva sus
+  migas: un detalle tiene dos niveles y no necesita más. Meta medium
+  `azul-medio` (5,11:1 · 7,14:1), subrayado en hover; sobre el encabezado
+  navy, `azul-claro` (7,68:1). La flecha es decorativa: el link se lee con el
+  nombre de la lista.
+- **El detalle, debajo del encabezado**: el `h1` es la cosa (el nombre de
+  quien escribió), con su insignia de estado; sus datos en una lista de
+  definición, la etiqueta en meta `gris-texto` y el valor en cuerpo, en dos
+  columnas desde `sm`; lo largo (un mensaje), en su sección con título.
+- Primer consumidor: la ficha de un mensaje y de un CV. Si otra lane deja
+  uno antes en `main`, queda uno solo (DECISIONS de `work/mensajes/`).
+
+### Confirmar lo que no se deshace
+
+Borrar algo para siempre («Borrar ahora») pide confirmación, **en el lugar
+del botón** y no en un diálogo del navegador, que no se puede estilar y
+frena todo. `apps/sitio/src/admin/armazon/Confirmacion.tsx`.
+
+- **Un grupo con la pregunta** en meta medium `rojo-error` (6,57:1) y un
+  borde izquierdo del mismo color, «Sí, borrar» destructivo y «Cancelar»
+  terciario. La pregunta dice qué y que no vuelve: «¿Borrar el mensaje para
+  siempre? No se puede deshacer.»
+- **El foco va a «Cancelar»**, lo seguro, que lleva la pregunta como
+  descripción (`aria-describedby`): el lector la lee entera. Mientras corre,
+  «Borrando…» con `aria-busy`.
+- **Hecho, vuelve a la lista** con un aviso de confirmación en su
+  encabezado: «Se borró el mensaje para siempre.»
+- Primer consumidor: «Borrar ahora» en la ficha de un mensaje y de un CV.
 
 ### Título de pestaña
 

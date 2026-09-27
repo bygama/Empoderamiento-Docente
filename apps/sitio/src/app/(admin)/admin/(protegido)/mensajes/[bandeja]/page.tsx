@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PaginaDeLaBandeja({ params, searchParams }: Props) {
   const { bandeja } = await params;
   if (!esBandeja(bandeja)) notFound();
-  const { estado, q } = await searchParams;
+  const { estado, q, borrado } = await searchParams;
   const sesion = await sesionActual();
   if (!sesion) redirect("/admin/entrar");
   return (
@@ -28,6 +28,7 @@ export default async function PaginaDeLaBandeja({ params, searchParams }: Props)
         estado={esEstado(estado) ? estado : "nuevo"}
         q={typeof q === "string" && q.trim() ? q.trim().slice(0, 100) : undefined}
         rol={sesion.user.rol}
+        borrado={borrado === "1"}
       />
     </Guarda>
   );

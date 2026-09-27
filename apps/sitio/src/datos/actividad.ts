@@ -25,6 +25,13 @@ export const TIPOS_DE_ACTIVIDAD = [
   "publico-una-pagina",
   "descarto-un-borrador",
   "restauro-una-version",
+  // Mensajes (work/mensajes/): de Contacto, con el tema en `sobre`, nunca el
+  // nombre ni el texto de quien escribió; de un CV, solo que se borró.
+  "tomo-un-mensaje",
+  "cerro-un-mensaje",
+  "marco-un-mensaje-como-spam",
+  "borro-un-mensaje",
+  "borro-un-cv",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 

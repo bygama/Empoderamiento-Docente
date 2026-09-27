@@ -8,7 +8,7 @@ import { EncabezadoDeMensajes } from "./EncabezadoDeMensajes";
 import { ListaDeMensajes } from "./ListaDeMensajes";
 import { COSA, nombreDe, vacioDe } from "./textos";
 
-type Props = { bandeja: Bandeja; estado: EstadoDeMensaje; q?: string; rol: unknown };
+type Props = { bandeja: Bandeja; estado: EstadoDeMensaje; q?: string; rol: unknown; borrado?: boolean };
 
 /** La URL de la bandeja en un estado, con la búsqueda si hay. Nuevo es la puerta: va sin `estado`. */
 function hrefDe(bandeja: Bandeja, estado: EstadoDeMensaje, q?: string): string {
@@ -21,7 +21,7 @@ function hrefDe(bandeja: Bandeja, estado: EstadoDeMensaje, q?: string): string {
  * bandejas en pestañas, el filtro de estados con sus sin leer en Nuevo, el
  * buscador y la lista, o qué pasa si no hay nada.
  */
-export async function BandejaDeMensajes({ bandeja, estado, q, rol }: Props) {
+export async function BandejaDeMensajes({ bandeja, estado, q, rol, borrado = false }: Props) {
   const [nuevos, { filas, hayMas }] = await Promise.all([nuevosPorBandeja(rol), listarMensajes({ bandeja, estado, busqueda: q })]);
   const nombre = nombreDe(bandeja);
   const vacio = q
@@ -34,7 +34,11 @@ export async function BandejaDeMensajes({ bandeja, estado, q, rol }: Props) {
   }));
   return (
     <div className="space-y-6">
-      <EncabezadoDeMensajes bandejas={bandejasDe(rol)} nuevos={nuevos} />
+      <EncabezadoDeMensajes
+        bandejas={bandejasDe(rol)}
+        nuevos={nuevos}
+        aviso={borrado ? `Se borró ${COSA[bandeja].una} para siempre.` : undefined}
+      />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Filtro etiqueta={`Estado de los ${COSA[bandeja].varias}`} opciones={opciones} activa={hrefDe(bandeja, estado, q)} />
         <Buscador
