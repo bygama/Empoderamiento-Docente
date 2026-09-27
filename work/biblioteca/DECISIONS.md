@@ -83,3 +83,27 @@
   Borrar `guias.ts`, `GuiaDelModulo.tsx` y esa ruta es un cambio aparte, para
   quien cierre el mapa del admin: otras lanes en vuelo pueden estar tocando
   `por-hacer/`.
+- 2026-09-27 — **Ratificado por el padre en la revisión de cierre (r1, Minor
+  2): la cita vacía es la generada.** Es un desvío de la propuesta I aprobada
+  («sigue a los datos hasta que se escribe»), y queda escrito como tal: las 20
+  citas sin DOI se guardan nulas y el sitio las arma con los campos de hoy, así
+  no se desfasan si cambia un dato; solo llevan `cita` las 37 que alguien
+  escribió o que traen de Crossref lo que la generada no sabe (volumen, número,
+  páginas).
+- 2026-09-27 — **Ratificado por el padre en la revisión de cierre (r1, Minor
+  3): la generalización al armazón.** `QueCambioPlegado` pasó a
+  `admin/armazon/` y `AccionesDeLaFicha` de Novedades aceptó un `pendiente`
+  de texto, para que la ficha de un material los use sin duplicar JSX; eso
+  tocó el `QueCambio` de Novedades. Lo pidió react-doctor (JSX duplicado) y el
+  render de Novedades no cambió.
+- 2026-09-27 — **Los tres arreglos de la revisión de cierre** (r1 PASS con un
+  Minor de SSRF y dos fuera de lente): (1) `ipQueNoSePide` lleva la IP a su
+  forma canónica (el parser de URL) y toma el camino IPv4 solo para
+  `::ffff:hhhh:hhhh`; la IPv4-translated (`::ffff:0:0/96`) cae en la regla de
+  las globales. (2) Crear, guardar, publicar y buscar datos parsean con
+  `sinForma`: lo que el esquema no dice con sus palabras contesta «El pedido no
+  tiene la forma esperada. Recargá la página y probá de nuevo.» y el camino y el
+  código van al log, sin los valores. (3) El DOI va con `encodeURIComponent` en
+  la consulta a OpenAlex, como en la de Crossref. Visto al pasar, sin tocar:
+  `linkDelDoi` (`lib/metadatos/doi.ts`) arma `https://doi.org/{doi}` sin
+  escapar `#` ni `?`; un DOI con esos caracteres guardaría un link cortado.
