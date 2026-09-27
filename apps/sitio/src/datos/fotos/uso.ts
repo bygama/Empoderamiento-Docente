@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from "@/../prisma/generado/client";
+import type { Prisma } from "@/../prisma/generado/client";
 
 // Qué es un uso de una foto y qué declara cada módulo en el registro
 // (registro.ts). Aparte del registro para que las entradas lo importen sin
@@ -24,7 +24,7 @@ export type Regenerar = { ruta: string; layout?: true };
 export type UsosDeUnModulo = {
   modulo: string;
   /** Todos los usos del módulo, de todas las fotos. Son decenas de filas: se leen enteras. */
-  buscar: (base: PrismaClient) => Promise<Uso[]>;
+  buscar: (base: Prisma.TransactionClient) => Promise<Uso[]>;
   /** Cambia la URL vieja por la nueva en todo lo que el módulo guarda en la base; dice qué regenerar. */
   reemplazar: (tx: Prisma.TransactionClient, vieja: string, nueva: string) => Promise<Regenerar[]>;
 };
