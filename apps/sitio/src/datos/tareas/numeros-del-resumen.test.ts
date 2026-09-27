@@ -23,7 +23,6 @@ async function limpiar() {
   await base.contador.deleteMany({ where: { clave: CLAVE } });
   await base.metricaVentana.deleteMany({ where: { fechaFin: EN_1997 } });
   await base.metricaDiaria.deleteMany({ where: { fecha: EN_1997 } });
-  await base.busquedaDiaria.deleteMany({ where: { fecha: EN_1997 } });
 }
 before(limpiar);
 after(limpiar);
@@ -49,18 +48,15 @@ test("cada número cuenta de lunes a domingo, contra la semana anterior: el lune
   await base.metricaVentana.createMany({ data: [ventana("1997-03-02", 50, 20), ventana("1997-03-09", 70, 30), ventana("1997-03-10", 999, 999)] });
   const pagina = (fecha: string, valor: string, vistas: number) => ({ fecha: fechaUTC(fecha), dimension: "pagina", valor, vistas, visitantes: 1 });
   await base.metricaDiaria.createMany({ data: [pagina("1997-03-04", "/la-de-la-semana", 40), pagina("1997-03-10", "/la-del-lunes", 500)] });
-  const busqueda = (fecha: string, clics: number) => ({ fecha: fechaUTC(fecha), dimension: "total", valor: "", clics, impresiones: 10, sumaDePosiciones: 10 });
-  await base.busquedaDiaria.createMany({ data: [busqueda("1997-02-26", 5), busqueda("1997-03-09", 8), busqueda("1997-03-10", 90)] });
 
   const cvPedidos: string[][] = [];
   const contarCV = async (desde: Date, hasta: Date) => (cvPedidos.push([desde.toISOString(), hasta.toISOString()]), cvPedidos.length === 1 ? 3 : 1);
-  const conectado = (hastaDia: string) => async () => ({ conectado: true, hastaDia, ultima: null });
 
-  const numeros = await numerosDelResumen("administra", SEMANA, { contarCV, estadoDeGoogle: conectado("1997-03-10") });
+  // Sin clics de Google, esté o no conectado Search Console: la semana cerrada casi nunca los tiene.
+  const numeros = await numerosDelResumen("administra", SEMANA, { contarCV });
   assert.deepEqual(numeros, [
     { etiqueta: "Visitantes", valor: 30, variacion: variacion(30, 20) },
     { etiqueta: "Vistas", valor: 70, variacion: variacion(70, 50) },
-    { etiqueta: "Clics desde Google", valor: 8, variacion: variacion(8, 5) },
     { etiqueta: "Contactos enviados", valor: 5, variacion: variacion(5, 2) },
     { etiqueta: "CV recibidos", valor: 3, variacion: variacion(3, 1) },
     { etiqueta: "Materiales consultados", valor: 3, variacion: "sin datos previos" },
@@ -72,16 +68,15 @@ test("cada número cuenta de lunes a domingo, contra la semana anterior: el lune
   ]);
   assert.deepEqual(await paginaMasVista(SEMANA), { nombre: "/la-de-la-semana", vistas: 40 });
 
-  // Si Search Console todavía no llegó al domingo, no hay número y se dice por qué; quien edita no recibe los CV.
-  const deQuienEdita = await numerosDelResumen("edita", SEMANA, { contarCV, estadoDeGoogle: conectado("1997-03-07") });
+  // Quien edita no recibe los CV.
+  const deQuienEdita = await numerosDelResumen("edita", SEMANA, { contarCV });
   assert.deepEqual(
-    deQuienEdita.map((n) => [n.etiqueta, n.valor, n.nota]),
+    deQuienEdita.map((n) => [n.etiqueta, n.valor]),
     [
-      ["Visitantes", 30, undefined],
-      ["Vistas", 70, undefined],
-      ["Clics desde Google", null, "Google los da con 2 o 3 días de atraso: todavía no llegó el domingo"],
-      ["Contactos enviados", 5, undefined],
-      ["Materiales consultados", 3, undefined],
+      ["Visitantes", 30],
+      ["Vistas", 70],
+      ["Contactos enviados", 5],
+      ["Materiales consultados", 3],
     ],
   );
   assert.equal(cvPedidos.length, 2);
