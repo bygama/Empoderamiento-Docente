@@ -11,6 +11,7 @@ import { FranjaDeBorrador } from "@/components/layout/FranjaDeBorrador";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { OPEN_GRAPH_COMUN, TITULO_DEL_SITIO } from "@/config/metadata";
 import { siteConfig } from "@/config/site";
+import { datosDelSitio } from "@/datos/consultas/sitio";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -86,11 +87,17 @@ export async function generateMetadata(): Promise<Metadata> {
   return isEnabled ? { ...METADATA, robots: { index: false, follow: false } } : METADATA;
 }
 
-export default function RootLayout({
+/**
+ * El pie y el menú del celular muestran los datos de Ajustes › Datos del
+ * sitio: se leen acá, una vez, y bajan por props. Guardarlos revalida este
+ * layout, y con él todas las páginas.
+ */
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { correo, redes, paises } = await datosDelSitio();
   return (
     <html
       lang="es"
@@ -108,7 +115,7 @@ export default function RootLayout({
           >
             Saltar al contenido
           </a>
-          <Header />
+          <Header sitio={{ correo, redes }} />
           <IndicePagina />
           <AterrizajePorLink />
           {children}
@@ -121,7 +128,7 @@ export default function RootLayout({
               transparente y sube el footer --footer-radio sobre el cierre
               para que el redondeo recorte la escena. */}
           <div data-footer-dock className="bg-white">
-            <Footer />
+            <Footer sitio={{ redes, paises }} />
           </div>
         </LenisProvider>
         {/* Cuenta vistas y visitantes sin cookies (ADR-0009). Solo en producción:

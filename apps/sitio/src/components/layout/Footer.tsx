@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Instagram, Linkedin, Facebook } from "@/components/ui/icons";
+import type { DatosDelSitio, Redes } from "@/config/datos-del-sitio";
 import { siteConfig } from "@/config/site";
 import { ALIADOS } from "@/config/aliados";
 import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
@@ -21,32 +22,33 @@ import { LinkPie } from "./footer/LinkPie";
  *     con el wordmark "EMPODERAMIENTO DOCENTE | ED" superpuesto (eco del
  *     "WOLVERINE WORLDWIDE | W").
  *
- * Datos siempre desde @/config (nunca hardcodear). Redes: el href sale de
- * siteConfig.redes; sin handle oficial cae a "#" (no inventar URLs).
+ * Datos nunca hardcodeados: la marca desde @/config/site, y las redes y los
+ * países de Ajustes › Datos del sitio, que le pasa el layout. Una red sin URL
+ * no se muestra (no inventar URLs).
  * Server component: sin JS; los estados de hover dan el sentido "diseñado".
  */
 
 // Las 7 rutas del sitemap: logo (Inicio) + nav principal + Contacto (acción).
 const FOOTER_NAV = [HOME_LINK, ...NAV_LINKS, CTA_LINK] as const;
 
-// Redes a mostrar. El href sale de siteConfig.redes: sin handle oficial el
-// ícono no se muestra (un ícono que lleva a «#» es un link muerto). Al
-// cargar los handles reales aparecen solos.
+// Redes a mostrar. El href sale de las redes de Ajustes › Datos del sitio: sin
+// URL el ícono no se muestra (un ícono que lleva a «#» es un link muerto). Al
+// cargar la URL en el admin aparece solo.
 const REDES = [
   { key: "instagram", label: "Instagram", Icon: Instagram },
   { key: "linkedin", label: "LinkedIn", Icon: Linkedin },
   { key: "facebook", label: "Facebook", Icon: Facebook },
 ] as const satisfies ReadonlyArray<{
-  key: keyof typeof siteConfig.redes;
+  key: keyof Redes;
   label: string;
   Icon: typeof Instagram;
 }>;
 
 // Aliados: la lista y sus alturas viven en @/config/aliados (misma tira que
 // la home; acá el renglón es un poco más bajo, por eso `alto.pie`).
-const { name, paises } = siteConfig;
+const { name } = siteConfig;
 
-export function Footer() {
+export function Footer({ sitio: { redes, paises } }: { sitio: Pick<DatosDelSitio, "redes" | "paises"> }) {
   const year = 2026;
 
   return (
@@ -89,10 +91,10 @@ export function Footer() {
           </div>
 
           {/* Redes al pie de la columna: solo las que tienen URL confirmada. */}
-          {REDES.some(({ key }) => siteConfig.redes[key]) && (
+          {REDES.some(({ key }) => redes[key]) && (
             <ul className="flex items-center gap-4">
               {REDES.map(({ key, label, Icon }) => {
-                const url = siteConfig.redes[key];
+                const url = redes[key];
                 if (!url) return null;
                 return (
                   <li key={key}>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import gsap from "gsap";
 import { MathField } from "@/components/ui/MathField";
+import type { ContactoDelSitio } from "@/config/datos-del-sitio";
 import type { Apertura } from "@/features/contacto/contenido/apertura";
 import type { CierreDeContacto } from "@/features/contacto/contenido/cierre";
 import type { Titular } from "@/features/contacto/contenido/titular";
@@ -77,11 +78,14 @@ export function ContactoExperiencia({
   titular,
   apertura,
   cierre,
+  contacto,
 }: {
   cvAbierto: boolean;
   titular: Titular;
   apertura: Apertura;
   cierre: CierreDeContacto;
+  /** El correo, el WhatsApp, la oficina y los países, de Ajustes › Datos del sitio. */
+  contacto: ContactoDelSitio;
 }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -184,7 +188,7 @@ export function ContactoExperiencia({
               temas a la derecha — renglones numerados, no un grid de fichas. */}
           <div className="my-auto w-full lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-stretch lg:gap-x-16 xl:gap-x-24">
             <ColumnaIdentidad titulo={titular.titulo} apertura={apertura} />
-            <IndiceTemas escribirDirecto={apertura.escribirDirecto} onElegir={(key, el) => elegirTema(contexto(), key, el)} />
+            <IndiceTemas escribirDirecto={apertura.escribirDirecto} contacto={contacto} onElegir={(key, el) => elegirTema(contexto(), key, el)} />
           </div>
         </div>
 
@@ -195,8 +199,9 @@ export function ContactoExperiencia({
           temaIdx={temaIdx}
           envio={envio}
           cvAbierto={cvAbierto}
+          contacto={contacto}
           onCambiar={() => cambiarTema(contexto())}
-          onEnviar={(e: FormEvent<HTMLFormElement>) => void enviar(contexto(), e)}
+          onEnviar={(e: FormEvent<HTMLFormElement>) => void enviar(contexto(), e, contacto.correo)}
         />
 
         {/* 3 · CIERRE */}
@@ -204,6 +209,7 @@ export function ContactoExperiencia({
           activo={vista === "cierre"}
           titulo={temaActivo?.titulo ?? "Consulta"}
           contenido={cierre}
+          contacto={contacto}
           onOtra={() => otraConsulta(contexto())}
         />
       </div>

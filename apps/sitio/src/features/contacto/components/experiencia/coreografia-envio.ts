@@ -1,16 +1,16 @@
 import gsap from "gsap";
 import type { FormEvent } from "react";
-import { siteConfig } from "@/config/site";
 import { enviarFormulario } from "@/lib/formularios/enviar";
 import { panelDe, type Contexto } from "./contexto";
 
-const SIN_RESPUESTA = `No pudimos enviar tu mensaje. Revisá tu conexión y probá de nuevo, o escribinos a ${siteConfig.contacto.email}.`;
+const sinRespuesta = (correo: string) => `No pudimos enviar tu mensaje. Revisá tu conexión y probá de nuevo, o escribinos a ${correo}.`;
 
 // ── FORMULARIO → CIERRE (envío + confirmación) ────────────────────────────
 // El mensaje viaja a /api/contacto, que lo guarda para el admin. Con
 // `{ ok: true }` sigue la transición al cierre de siempre; si no, se queda en
-// el formulario, con lo tipeado, y el error dice qué pasó.
-export async function enviar(c: Contexto, e: FormEvent<HTMLFormElement>) {
+// el formulario, con lo tipeado, y el error dice qué pasó. `correo` es el de
+// Ajustes › Datos del sitio, para el error sin respuesta.
+export async function enviar(c: Contexto, e: FormEvent<HTMLFormElement>, correo: string) {
   e.preventDefault();
   const data = new FormData(e.currentTarget);
   const campo = (clave: string) => String(data.get(clave) ?? "").trim();
@@ -27,7 +27,7 @@ export async function enviar(c: Contexto, e: FormEvent<HTMLFormElement>) {
       // El campo trampa: una persona lo deja vacío.
       web: campo("web"),
     },
-    SIN_RESPUESTA,
+    sinRespuesta(correo),
   );
   c.setEnvio({ enviando: false, error: respuesta.ok ? null : respuesta.error });
   if (!respuesta.ok) return;

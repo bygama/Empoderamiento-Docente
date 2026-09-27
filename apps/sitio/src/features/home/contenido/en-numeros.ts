@@ -10,9 +10,9 @@ import { partirCifra } from "./cifra";
 // Subsecretaría de Educación Media Superior de México (5.900 + 1.900 + 3.060 +
 // 3.500), Yucatán (75) y Techint (15) suman 14.450 docentes en cursos propios;
 // el Plan Nacional Aprender Matemática formó 500 formadores que llegaron a
-// 75.000 docentes. Los cinco países son los de siteConfig.paises. Falta que
-// Daniela confirme si cuenta la etapa 2018-2020, hecha desde el Cinvestav con
-// ella como coordinadora, y cuántas escuelas son.
+// 75.000 docentes. Los cinco países son los de Ajustes › Datos del sitio.
+// Falta que Daniela confirme si cuenta la etapa 2018-2020, hecha desde el
+// Cinvestav con ella como coordinadora, y cuántas escuelas son.
 
 const dato = grupo({
   cifra: textoCorto({

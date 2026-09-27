@@ -4,25 +4,25 @@ import { useState, type FormEvent } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
 import { CV_PESA_DE_MAS, MAXIMO_DEL_CV } from "@/config/cv";
 import { MESES_DE_GUARDA } from "@/config/privacidad";
-import { siteConfig } from "@/config/site";
 import { INPUT_BASE, LABEL_BASE } from "@/features/contacto/components/experiencia/estilos";
 import type { CampoDeFormulario } from "@/lib/formularios/campos";
 import { enviarFormulario } from "@/lib/formularios/enviar";
 import { CampoCV } from "./formulario-cv/CampoCV";
 import { ConfirmacionCV } from "./formulario-cv/ConfirmacionCV";
 
-const SIN_RESPUESTA = `No pudimos enviar tu CV. Revisá tu conexión y probá de nuevo, o escribinos a ${siteConfig.contacto.email}.`;
+const sinRespuesta = (correo: string) => `No pudimos enviar tu CV. Revisá tu conexión y probá de nuevo, o escribinos a ${correo}.`;
 const MEGAS = MAXIMO_DEL_CV / (1024 * 1024);
 
 /**
  * El formulario de CV (work/mensajes/SPEC.md §5.2), con la forma de enviar de
  * Contacto: viaja por `fetch` a /api/cv y la respuesta dice si salió o qué
  * pasó. Los campos llegan de la página (`camposDelCV`, con los países de la
- * base: los mismos que acepta /api/cv); el archivo, el campo trampa, el error
- * y la línea de privacidad son fijos. El peso se chequea antes de mandar:
- * pasado el tope, Vercel corta el pedido sin una respuesta legible.
+ * base: los mismos que acepta /api/cv), y el correo de los errores y de la
+ * línea de privacidad, de Ajustes › Datos del sitio; el archivo y el campo
+ * trampa son fijos. El peso se chequea antes de mandar: pasado el tope, Vercel
+ * corta el pedido sin una respuesta legible.
  */
-export function FormularioCV({ campos }: { campos: readonly CampoDeFormulario[] }) {
+export function FormularioCV({ campos, correo }: { campos: readonly CampoDeFormulario[]; correo: string }) {
   const [envio, setEnvio] = useState<{ enviando: boolean; error: string | null }>({ enviando: false, error: null });
   const [listo, setListo] = useState(false);
 
@@ -35,7 +35,7 @@ export function FormularioCV({ campos }: { campos: readonly CampoDeFormulario[] 
       return;
     }
     setEnvio({ enviando: true, error: null });
-    const respuesta = await enviarFormulario("/api/cv", datos, SIN_RESPUESTA);
+    const respuesta = await enviarFormulario("/api/cv", datos, sinRespuesta(correo));
     setEnvio({ enviando: false, error: respuesta.ok ? null : respuesta.error });
     if (respuesta.ok) setListo(true);
   }
@@ -93,8 +93,8 @@ export function FormularioCV({ campos }: { campos: readonly CampoDeFormulario[] 
       <p className="text-gris-texto text-center font-sans text-[0.8rem] leading-relaxed md:col-span-2">
         Tu CV lo ven solo quienes dirigen y administran ED. Lo guardamos {MESES_DE_GUARDA.cv} meses y después lo
         borramos, con el archivo. Si querés que lo borremos antes, escribinos a{" "}
-        <a href={`mailto:${siteConfig.contacto.email}`} className="text-azul-principal underline underline-offset-2">
-          {siteConfig.contacto.email}
+        <a href={`mailto:${correo}`} className="text-azul-principal underline underline-offset-2">
+          {correo}
         </a>
         .
       </p>

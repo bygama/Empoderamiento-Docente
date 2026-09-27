@@ -8,6 +8,7 @@ import { FiltrosNovedades } from "@/features/novedades/components/FiltrosNovedad
 import { EdEnMovimiento } from "@/features/novedades/components/EdEnMovimiento";
 import { LanzamientosRecientes } from "@/features/novedades/components/LanzamientosRecientes";
 import { CierreNovedades } from "@/features/novedades/components/CierreNovedades";
+import { datosDelSitio } from "@/datos/consultas/sitio";
 import { metadataDeSeo } from "@/lib/contenido/seo";
 
 // El título, la descripción y la imagen para redes salen del SEO de la página
@@ -24,10 +25,11 @@ export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Pr
 export default async function NovedadesPage() {
   // Los textos de la página y las novedades publicadas (o los borradores, en
   // vista previa), de la más nueva a la más vieja; sin base, los textos de
-  // hoy y ninguna novedad.
-  const [{ hero, destacadas, ultimas, movimiento, lanzamientos, cierre }, novedades] = await Promise.all([
+  // hoy y ninguna novedad. Las redes del cierre, de Ajustes › Datos del sitio.
+  const [{ hero, destacadas, ultimas, movimiento, lanzamientos, cierre }, novedades, { redes }] = await Promise.all([
     contenidoDe("novedades"),
     novedadesDelSitio(),
+    datosDelSitio(),
   ]);
   return (
     <main id="contenido" tabIndex={-1}>
@@ -36,7 +38,7 @@ export default async function NovedadesPage() {
       <FiltrosNovedades contenido={ultimas} novedades={novedades} />
       <EdEnMovimiento contenido={movimiento} />
       <LanzamientosRecientes contenido={lanzamientos} />
-      <CierreNovedades contenido={cierre} />
+      <CierreNovedades contenido={cierre} redes={redes} />
     </main>
   );
 }

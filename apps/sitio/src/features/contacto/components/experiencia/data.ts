@@ -1,5 +1,4 @@
 import { Compass, Lightbulb, School, TrendingUp, Users } from "@/components/ui/icons";
-import { siteConfig } from "@/config/site";
 
 export const TEMAS = [
   {
@@ -49,11 +48,10 @@ export const EQUIPO_FOTOS = [
 ];
 export const EQUIPO_RESTO = 8;
 
-// Segunda puerta del contacto: sumarse al equipo. Sin upload (todavía no hay
-// backend), el mailto precarga asunto y un cuerpo-plantilla que recuerda
-// adjuntar el CV.
-export const MAILTO_CV = `mailto:${siteConfig.contacto.email}?subject=${encodeURIComponent(
-  "[CV] Quiero sumarme al equipo",
-)}&body=${encodeURIComponent(
-  "Hola, me gustaría sumarme a Empoderamiento Docente.\n\n(Acordate de adjuntar tu CV.)\n\nNombre:\nÁrea (docencia / investigación / otra):\nPor qué me interesa:\n",
-)}`;
+// Segunda puerta del contacto: sumarse al equipo. Con el formulario de CV
+// apagado, el mailto al correo de ED precarga asunto y un cuerpo-plantilla que
+// recuerda adjuntar el CV.
+export const mailtoDelCV = (correo: string) =>
+  `mailto:${correo}?subject=${encodeURIComponent("[CV] Quiero sumarme al equipo")}&body=${encodeURIComponent(
+    "Hola, me gustaría sumarme a Empoderamiento Docente.\n\n(Acordate de adjuntar tu CV.)\n\nNombre:\nÁrea (docencia / investigación / otra):\nPor qué me interesa:\n",
+  )}`;

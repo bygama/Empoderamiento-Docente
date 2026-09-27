@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { DatosDelSitio } from "@/config/datos-del-sitio";
 import { NAV_LINKS, HOME_LINK, esPaginaActiva } from "@/config/nav";
 import { irEnPagina, partirDestino } from "@/lib/navegar";
 import { Menu, X } from "@/components/ui/icons";
@@ -40,7 +41,7 @@ import { PieMenu } from "./mobile-nav/PieMenu";
 // servidor (false) de cliente (true) sin disparar setState en un efecto.
 const emptySubscribe = () => () => {};
 
-export function MobileNav() {
+export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes"> }) {
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
   const pathname = usePathname();
@@ -185,7 +186,7 @@ export function MobileNav() {
               onIrADestino={irADestino}
             />
 
-            <PieMenu pathname={pathname} onCerrar={close} onSubirEnPagina={subir} />
+            <PieMenu pathname={pathname} correo={sitio.correo} redes={sitio.redes} onCerrar={close} onSubirEnPagina={subir} />
           </dialog>,
           document.body,
         )}

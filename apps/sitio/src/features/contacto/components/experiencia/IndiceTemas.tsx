@@ -1,8 +1,11 @@
 import { ArrowRight } from "@/components/ui/icons";
+import type { ContactoDelSitio } from "@/config/datos-del-sitio";
 import { CanalDirecto } from "../CanalDirecto";
 import { TEMAS, type TemaKey } from "./data";
 
 type Props = {
+  /** El correo y el WhatsApp del canal directo, de Ajustes › Datos del sitio. */
+  contacto: Pick<ContactoDelSitio, "correo" | "whatsapp">;
   /** Recibe el tema y la tarjeta clickeada (la coreografía la apaga primero). */
   onElegir: (key: TemaKey, cardEl: HTMLElement) => void;
   /** La línea al pie, arriba del mail: se edita en la apertura de Contacto. */
@@ -15,7 +18,7 @@ type Props = {
  * marca a la izquierda para identificar el tema y una flecha SIEMPRE visible
  * a la derecha que se enciende y avanza en hover. Al pie, el canal directo.
  */
-export function IndiceTemas({ onElegir, escribirDirecto }: Props) {
+export function IndiceTemas({ contacto, onElegir, escribirDirecto }: Props) {
   return (
     <div className="mt-10 lg:mt-0" role="group" aria-label="Tema de la consulta">
       {/* En pantallas bajas (≤ 860px de alto) las filas se compactan para
@@ -74,7 +77,7 @@ export function IndiceTemas({ onElegir, escribirDirecto }: Props) {
         <p className="text-gris-texto font-sans text-[0.85rem]">
           {escribirDirecto}
         </p>
-        <CanalDirecto className="mt-2.5" />
+        <CanalDirecto correo={contacto.correo} whatsapp={contacto.whatsapp} className="mt-2.5" />
       </div>
     </div>
   );
