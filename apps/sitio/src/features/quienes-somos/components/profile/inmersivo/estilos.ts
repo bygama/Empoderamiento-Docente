@@ -1,4 +1,4 @@
-import type { StageVariant } from "@/features/quienes-somos/data/equipo";
+import type { StageVariant } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 
 export const cx = (...p: Array<string | false | undefined>) => p.filter(Boolean).join(" ");
 

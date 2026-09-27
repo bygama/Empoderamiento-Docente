@@ -7,7 +7,7 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { partirResaltado } from "@/lib/contenido/resaltado";
 import { irAElemento } from "@/lib/indice";
 import type { EquipoDeQuienesSomos } from "@/features/quienes-somos/contenido/equipo";
-import { DANIELA, EQUIPO, porTier, type Persona } from "@/features/quienes-somos/data/equipo";
+import type { PersonaDelSitio as Persona, Tier } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { PersonCard } from "@/features/quienes-somos/components/PersonCard";
 import { TeamProfileOverlay } from "@/features/quienes-somos/components/TeamProfileOverlay";
 import { crearCoreografiaEquipo } from "./impulsan-ed/coreografia-equipo";
@@ -41,17 +41,20 @@ import { Nivel } from "./impulsan-ed/Nivel";
  * animación.
  */
 
-export function ImpulsanEd({ contenido }: { contenido: EquipoDeQuienesSomos }) {
+export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienesSomos; personas: readonly Persona[] }) {
   const { niveles } = contenido;
   const titulo = partirResaltado(contenido.titulo);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   const [selected, setSelected] = useState<{ persona: Persona; el: HTMLElement } | null>(null);
 
-  const lideres = porTier(3);
-  const facilitacion = porTier(4);
+  // Las personas llegan ya ordenadas por nivel y, dentro de cada uno, por su lugar.
+  const porNivel = (nivel: Tier) => personas.filter((p) => p.tier === nivel);
+  const [direccionGeneral] = porNivel(1);
+  const lideres = porNivel(3);
+  const facilitacion = porNivel(4);
   // Dirección (nivel 2): académica + institucional. Antes era una sola card.
-  const direccion = porTier(2);
+  const direccion = porNivel(2);
 
   // El perfil abierto queda en la URL (?persona=clave) sin sumar entradas
   // al historial: así se puede copiar y mandar; al cerrar, se limpia.
@@ -69,7 +72,7 @@ export function ImpulsanEd({ contenido }: { contenido: EquipoDeQuienesSomos }) {
   useEffect(() => {
     const clave = new URLSearchParams(window.location.search).get("persona");
     if (!clave) return;
-    const persona = EQUIPO.find((p) => p.key === clave);
+    const persona = personas.find((p) => p.key === clave);
     const el = rootRef.current?.querySelector<HTMLButtonElement>(
       `[data-persona-key="${clave}"]`,
     );
@@ -79,7 +82,7 @@ export function ImpulsanEd({ contenido }: { contenido: EquipoDeQuienesSomos }) {
       setSelected({ persona, el });
     }, 400);
     return () => window.clearTimeout(t);
-  }, []);
+  }, [personas]);
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -160,13 +163,15 @@ export function ImpulsanEd({ contenido }: { contenido: EquipoDeQuienesSomos }) {
           data-reveal-stagger="0.18"
           className="relative mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_30rem_minmax(0,1fr)] lg:gap-8"
         >
-          {/* N1 — Dirección General (retrato grande, al centro) */}
-          <div className="sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[30rem] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none">
-            <KickerRotulo>{niveles.direccionGeneral}</KickerRotulo>
-            <div data-reveal className="mt-4">
-              <PersonCard persona={DANIELA} onOpen={openProfile} />
+          {/* N1 — Dirección General (retrato grande, al centro); una sola, y la base lo garantiza */}
+          {direccionGeneral && (
+            <div className="sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[30rem] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none">
+              <KickerRotulo>{niveles.direccionGeneral}</KickerRotulo>
+              <div data-reveal className="mt-4">
+                <PersonCard persona={direccionGeneral} onOpen={openProfile} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* N2 — Dirección: una card de cada lado, más abajo, a la misma
               altura entre sí. Orden de lectura: académica a la izquierda,

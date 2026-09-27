@@ -7,13 +7,13 @@ import type { DatosFigura, Figura } from "./datos-figura";
  * va dentro de una caja de proporción fija: 5:3 si es apaisada, 4:5 si no.
  */
 export function FiguraLineal({ datos, figura }: { datos: DatosFigura; figura: Figura }) {
-  const { cutout, cutoutPosition, fullName, medidas, apaisado } = datos;
+  const { cutout, cutoutPosition, alt, medidas, apaisado } = datos;
 
   if (figura === "recorte") {
     return (
       <Image
         src={cutout}
-        alt={fullName}
+        alt={alt}
         width={medidas.width}
         height={medidas.height}
         className="mx-auto max-h-[52vh] w-auto object-contain"
@@ -31,7 +31,7 @@ export function FiguraLineal({ datos, figura }: { datos: DatosFigura; figura: Fi
     >
       <Image
         src={cutout}
-        alt={fullName}
+        alt={alt}
         fill
         sizes="(max-width: 768px) 90vw, 20rem"
         className="object-cover"

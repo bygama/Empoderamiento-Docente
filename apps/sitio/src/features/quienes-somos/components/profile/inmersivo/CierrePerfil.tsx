@@ -1,6 +1,6 @@
 import type { Ref } from "react";
 import { ArrowRight } from "@/components/ui/icons";
-import type { Profile } from "@/features/quienes-somos/data/equipo";
+import type { Profile } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { FiguraPerfil } from "./FiguraPerfil";
 
 type Props = {

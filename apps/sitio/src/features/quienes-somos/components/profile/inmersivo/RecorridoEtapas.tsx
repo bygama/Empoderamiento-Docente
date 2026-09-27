@@ -1,5 +1,5 @@
 import type { Ref } from "react";
-import type { Profile } from "@/features/quienes-somos/data/equipo";
+import type { Profile } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { ACCENT } from "../acentos";
 import { StageContent } from "../profileParts";
 import { CONTENT_W, cx } from "./estilos";

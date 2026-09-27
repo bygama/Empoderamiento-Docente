@@ -1,5 +1,5 @@
 import type { Ref } from "react";
-import type { Profile } from "@/features/quienes-somos/data/equipo";
+import type { Profile } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { leerDatosFigura, type Figura } from "./figura-perfil/datos-figura";
 import { FiguraLineal } from "./figura-perfil/FiguraLineal";
 import { FiguraCierre } from "./figura-perfil/FiguraCierre";
