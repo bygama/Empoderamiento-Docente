@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { SIN_SALTOS, deLaLista, linea, opcional } from "@/features/biblioteca/contenido/campos-del-material";
+import { SIN_SALTOS, linea, opcional } from "@/features/biblioteca/contenido/campos-del-material";
 import { TIPOS } from "@/features/biblioteca/contenido/modelo";
-import { clave, renglones, sinRepetir } from "./campos-de-persona";
+import { clave, deLista, renglones, sinRepetir } from "./campos-de-persona";
 import { COLORES, COMPOSICIONES, TOPES } from "./modelo-del-equipo";
 
 // Una etapa del recorrido (SPEC §4.1.1 de `work/equipo/`) y lo que cuelga de
@@ -36,7 +36,7 @@ function ramaDe(publicar: boolean) {
  * guarda y se escribe acá una sola vez. El detalle y los conceptos son del
  * perfil; el detalle vacío, en una de la Biblioteca, lee su fuente.
  */
-function publicacionDe(publicar: boolean) {
+function publicacionDe<P extends boolean>(publicar: P) {
   const delPerfil = {
     detalle: unaLinea(TOPES.detalleDePublicacion),
     conceptos: renglones(TOPES.concepto, TOPES.conceptos, publicar, "los conceptos"),
@@ -48,7 +48,7 @@ function publicacionDe(publicar: boolean) {
     z.object({
       origen: z.literal("sin-link"),
       titulo: linea(TOPES.tituloDePublicacion, publicar, "Falta el título."),
-      tipo: deLaLista(TIPOS, publicar, "Elegí un tipo de la lista."),
+      tipo: deLista(TIPOS, publicar, "Elegí un tipo de la lista."),
       // Texto y no número: hay períodos, como «2015 – 2017».
       anio: linea(TOPES.anioDePublicacion, publicar, "Falta el año."),
       ...delPerfil,
@@ -56,15 +56,18 @@ function publicacionDe(publicar: boolean) {
   ]);
 }
 
-export function etapaDe(publicar: boolean) {
+/** El material de una publicación de la Biblioteca; `""` en una sin link (no se compara). */
+const materialDe = (p: { origen: string; material?: string }) => (p.origen === "biblioteca" ? (p.material ?? "") : "");
+
+export function etapaDe<P extends boolean>(publicar: P) {
   return z.object({
     clave,
     // La clave de una categoría del recorrido; que esté la chequea el recorrido al publicar.
     categoria: z.string().trim().max(60),
     volanta: linea(TOPES.volanta, publicar, "Falta la volanta de la etapa."),
-    color: deLaLista(COLORES, publicar, "Elegí el color de la etapa."),
+    color: deLista(COLORES, publicar, "Elegí el color de la etapa."),
     periodo: unaLinea(TOPES.periodo),
-    composicion: deLaLista(COMPOSICIONES, publicar, "Elegí cómo se arma la etapa."),
+    composicion: deLista(COMPOSICIONES, publicar, "Elegí cómo se arma la etapa."),
     titulo: linea(TOPES.tituloDeEtapa, publicar, "Falta el título de la etapa."),
     texto: opcional(TOPES.textoDeEtapa).refine((t) => !publicar || t !== "", "Falta el texto de la etapa."),
     cita: opcional(TOPES.cita),
@@ -75,6 +78,6 @@ export function etapaDe(publicar: boolean) {
       .array(publicacionDe(publicar))
       .max(TOPES.publicaciones, `Como mucho ${TOPES.publicaciones} publicaciones por etapa.`)
       .refine((p) => p.filter((x) => x.destacada).length <= 1, "Una sola publicación destacada por etapa.")
-      .refine((p) => sinRepetir(p, (x) => (x.origen === "biblioteca" ? x.material : "")), "Ese material ya está en esta etapa."),
+      .refine((p) => sinRepetir(p, materialDe), "Ese material ya está en esta etapa."),
   });
 }

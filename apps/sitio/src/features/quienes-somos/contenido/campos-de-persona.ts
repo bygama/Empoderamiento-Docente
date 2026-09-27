@@ -37,6 +37,25 @@ export function renglones(maximo: number, cuantos: number, publicar: boolean, qu
   return z.array(linea(maximo, publicar, `Hay un renglón vacío en ${queEs}: escribilo o quitalo.`)).max(cuantos, `Como mucho ${cuantos} en ${queEs}.`);
 }
 
+/**
+ * Uno de una lista cerrada; en un borrador, también «todavía no se eligió».
+ * Genérico en `publicar` para que el tipo de lo publicado no arrastre el
+ * vacío del borrador: el sitio recibe un color, nunca «ninguno».
+ */
+export function deLista<const T extends readonly [string, ...string[]], P extends boolean>(lista: T, publicar: P, falta: string) {
+  const opciones = z.enum(lista, { error: falta });
+  const oVacio = z.union([opciones, z.literal("")], { error: falta });
+  // El `as`: TypeScript no angosta un tipo condicional con el valor de `publicar`; el ternario de abajo es exactamente ese condicional.
+  return (publicar ? opciones : oVacio) as P extends true ? typeof opciones : typeof oVacio;
+}
+
+/** Lo mismo con un campo que puede faltar solo en un borrador (el nivel): `null` es «todavía no se eligió». */
+export function exigido<S extends z.ZodType, P extends boolean>(esquema: S, publicar: P) {
+  const oNulo = esquema.nullable();
+  // El `as`, por lo mismo que en `deLista`.
+  return (publicar ? esquema : oNulo) as P extends true ? S : typeof oNulo;
+}
+
 /** La clave fija de una etapa o de una categoría: no se edita, y la lista no la repite. */
 export const clave = z.string().trim().min(1, "Falta la clave.").max(60, "Como mucho 60 caracteres.");
 
