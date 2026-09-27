@@ -142,3 +142,10 @@
     entrar de nuevo.», con «Volver a entrar» y sin el campo, porque no hay
     código que escribir. En «Mandar otro», la cookie vencida conserva su
     texto propio («Pasó mucho tiempo…»), que dice más que el genérico.
+- 2026-09-26 — **Cierre, la base de prueba:** se sacó de `ed_cuentas` lo que
+  se puso a mano (la invitación a Inés con su fila de actividad, el segundo
+  factor apagado de Eli y las sesiones abiertas para probar), pero la base no
+  se borró todavía: se borra con el worktree, al cerrar, porque hasta el
+  merge el padre puede pedir otra vuelta. La contraseña de Ada no se puede
+  volver a la de antes (no quedó el hash): queda la que se eligió, que no
+  está guardada en ningún lado, igual que las de las demás cuentas de prueba.
