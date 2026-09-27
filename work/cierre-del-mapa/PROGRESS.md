@@ -67,5 +67,73 @@
   `mensajes.ts`, 18). Las 9 filas, en el mismo orden y con los mismos
   campos que en `main`. `pendientes.test.ts` y los cinco `de-*.test.ts` → 17
   pass; `tsc` y `eslint` 0.
+- **Paso 8 — los tres puentes** (`0e03a129`): `BotonEnlace` pasó al
+  `Boton.tsx` del kit; `armazon/Boton.tsx` y `armazon/clases.ts` borrados, y
+  el `export { Aviso }` de `Campos.tsx` también. 77 archivos reescritos por
+  un script de paso (`%TEMP%/cierre/reescribir.mjs`, no se commitea) que
+  junta los nombres en el import de `@ed/kit-admin` que ya hubiera o lo pone
+  antes del primer import interno. `grep` de `armazon/Boton"`,
+  `armazon/clases"` y `export { Aviso }` → nada; `pnpm typecheck` y `pnpm
+  lint` 0; react-doctor **100/100 sin diagnósticos** en los cuatro
+  proyectos.
+- **Paso 9 — las piezas sin ED, al kit** (`830c7f8b` la mudanza, `e6bc649e`
+  los comentarios, `ff3b35b9` los hooks):
+  - 30 archivos con `git mv` (19 renombres puros, los demás solo con sus
+    imports), 136 archivos de la app reescritos con el mismo script.
+    `CampoSimple` y `BotonDeAcceso` (P2) en sus 7 formularios, sin alias
+    (`BotonDelAdmin` también se fue). Íconos del kit: `ChevronAbajo`,
+    `Check`, y `FlechaIzquierda`, `FlechaAfuera`, `Ojo` y `OjoTachado`
+    nuevos: un script compara sus trazos con los de la app y las props base
+    (iguales y en el mismo orden).
+  - `grep '"@/' packages/kit-admin/src` → nada; ningún módulo de ED en el
+    código ni, después de `e6bc649e`, en los comentarios.
+  - **El build se frenó** la primera vez: `useFrenarSalida` y
+    `useMoverEnOrden`, ahora en el índice del kit, entraban al grafo del
+    servidor por cualquier import de `@ed/kit-admin`. Con `"use client"`
+    (`ff3b35b9`) el build pasa.
+  - `pnpm typecheck`, `pnpm lint` y `pnpm --filter @ed/kit-admin test` (11
+    pass) en 0; react-doctor **100/100 sin diagnósticos**
+    (`packages/kit-admin/src: 52 archivos`).
+  - **El sitio:** `node scripts/comparar-render.mjs` contra el build de
+    `main` → **12 páginas, render idéntico**. El CSS de los dos builds es el
+    mismo archivo (mismo hash, 194 299 y 18 653 bytes); un chunk de JS
+    compartido baja 598 bytes (nombres del minificador y reparto de chunks).
+  - **El admin, por HTML** (`next start` de `main` en el 3033 y de la rama en
+    el 3034, contra la misma base; `%TEMP%/cierre/comparar-admin.mjs` recorre
+    todo link a `/admin/…` y cada redirección, y compara sin `<script>`,
+    nonce ni URL de `/_next/`):
+
+    | Rol (base) | Tema | Pantallas | Iguales | CSS |
+    | --- | --- | --- | --- | --- |
+    | administra (`ed`) | por defecto (mixto) | 695 | 695 | igual |
+    | administra (`ed`) | claro | 695 | 695 | igual |
+    | administra (`ed`) | oscuro | 695 | 695 | igual |
+    | edita (`ed`) | por defecto | 327 | 327 | igual |
+    | dirige (`ed_cierre`, P6) | por defecto | 695 | 695 | igual |
+
+    Entre 0 y 8 pantallas por corrida dieron igual recién al volver a
+    pedirlas: la metadata de Next se transmite aparte y el `<title>` cae en
+    el `<head>` o después según quién resuelve primero, en cualquiera de los
+    dos servidores. Controles: `/admin/nope` sale distinto (P5) y el mismo
+    `/admin` en claro y oscuro también; `/admin` normalizado tiene 32 919
+    caracteres y 321 etiquetas.
+  - **El admin, a ojo** (navegador de Orca, perfil aislado `cierre-del-mapa`,
+    sesión de quien dirige en `ed_cierre`): Inicio, Contenido, Novedades,
+    Biblioteca, Mensajes, Métricas, Cuentas, Ajustes, la ficha de un
+    material y la lista del Equipo, en los tres temas a 1440, y cinco
+    pantallas a 390. Cada captura de `main` y de la rama se compara por
+    SHA-1: **las 35 combinaciones tienen una captura byte a byte igual**. Las
+    que variaban lo hacían también repitiendo el mismo servidor (658 píxeles
+    de texto en Métricas, entre dos capturas seguidas de `main`).
+  - **Lo de cliente, andando** en la rama: las pestañas marcan la activa
+    («Contenido: Equipo»); «Bajar» y «Subir» en el Equipo mueven, anuncian
+    («Karla Gómez pasó al lugar 2 de Dirección.») y devuelven el foco (el
+    orden quedó como estaba); «Borrar el material» abre la confirmación en el
+    lugar con el foco en «Cancelar» y su `aria-describedby`, y «Cancelar» la
+    cierra; «Mostrar contraseña» pasa el campo a texto con `aria-pressed`;
+    con un cambio sin guardar, un `beforeunload` sintético queda frenado, y
+    al volver al valor original ya no. (En la copia, «Suspender» sobre
+    `cierre-edita` suspendió sin confirmar, como en `main`: esa acción no
+    pide confirmación; `ed` no se tocó.)
 
 ## Abierto
