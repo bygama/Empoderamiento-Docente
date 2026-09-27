@@ -36,3 +36,21 @@
   (`…030549_biblioteca`, `…031500_material_de_las_novedades`) son anteriores a
   la mía (`…051631`), así que la mía no se regenera. Después del rebase:
   typecheck, lint y test (470: 469 pasan, 1 saltado) en verde.
+- 2026-09-27 — **Arreglé un test intermitente que no era de esta lane**
+  (`datos/avisos.test.ts`, de Ajustes): fallaba en dos de cuatro corridas
+  enteras por una carrera con otros archivos que crean cuentas en paralelo
+  (PROGRESS, «Tried and failed»). El gate tiene que ser confiable y esta lane
+  toca ese archivo (el resumen semanal), así que el arreglo va acá: el test
+  mide «repetirlo no cambia nada» contra las cuentas que ya estaban, sin
+  aflojar el caso sin carreras (sigue exigiendo cero).
+- 2026-09-27 — **Dos utilidades que esta lane llevó por encima de 100 líneas
+  se achicaron** (AGENTS.md §6): `lib/metricas/canales.ts` (106 → 62, la
+  lista de dominios en una línea por canal) y `datos/avisos.ts` (114 → 92,
+  mandar el aviso de un mensaje nuevo pasó a `datos/avisar-mensaje-nuevo.ts`,
+  sin cambios). `datos/actividad.ts` ya pasaba en `main` (209); esta lane le
+  suma los cuatro tipos de Métricas: queda como seguimiento, como lo dejó la
+  Biblioteca.
+- 2026-09-27 — **`/l/[codigo]` es una página, no una ruta de API**: con
+  `route.ts`, `notFound()` contestaba un 404 vacío; como página da el 404 del
+  sitio y el `redirect()` es el mismo 307, sin caché por ser dinámica (en
+  `next start`: `private, no-cache, no-store, max-age=0, must-revalidate`).
