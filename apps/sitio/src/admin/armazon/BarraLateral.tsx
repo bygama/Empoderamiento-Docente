@@ -1,5 +1,6 @@
 import { puede } from "@ed/auth";
 import { listaDePaginas } from "@/datos/consultas/editor-de-paginas";
+import { cuantosLinksRotos } from "@/datos/consultas/materiales-del-admin";
 import { nuevosPorBandeja } from "@/datos/consultas/mensajes";
 import { ContenidoDeLaBarra, type Usuario } from "./barra-lateral/ContenidoDeLaBarra";
 import { MODULOS } from "./barra-lateral/modulos";
@@ -21,19 +22,28 @@ async function hayPaginasSinPublicar(): Promise<boolean> {
   }
 }
 
-/**
- * Los números de la sidebar: en Mensajes, los sin leer de las bandejas que
- * ese rol ve. Como el punto, si la base no contestó la sidebar se dibuja
- * igual, sin número.
- */
-async function numerosDe(rol: unknown): Promise<Record<string, Cuenta>> {
+/** Un número de la sidebar, aislado: si su consulta tira, la entrada va sin número y el error queda en el log. */
+async function numero(modulo: string, contar: () => Promise<number>, que: string): Promise<Record<string, Cuenta>> {
   try {
-    const nuevos = Object.values(await nuevosPorBandeja(rol)).reduce((suma, n) => suma + n, 0);
-    return nuevos ? { mensajes: { cuantos: nuevos, que: "sin leer" } } : {};
+    const cuantos = await contar();
+    return cuantos ? { [modulo]: { cuantos, que } } : {};
   } catch (e) {
-    console.error("BarraLateral: sin el número de Mensajes:", e);
+    console.error(`BarraLateral: sin el número de ${modulo}:`, e);
     return {};
   }
+}
+
+/**
+ * Los números de la sidebar: en Mensajes, los sin leer de las bandejas que
+ * ese rol ve; en Biblioteca, los publicados con el link roto. Como el punto,
+ * si la base no contestó la sidebar se dibuja igual, sin número.
+ */
+async function numerosDe(rol: unknown): Promise<Record<string, Cuenta>> {
+  const [mensajes, biblioteca] = await Promise.all([
+    numero("mensajes", async () => Object.values(await nuevosPorBandeja(rol)).reduce((suma, n) => suma + n, 0), "sin leer"),
+    puede(rol, "editarBiblioteca") ? numero("biblioteca", cuantosLinksRotos, "con el link roto") : {},
+  ]);
+  return { ...mensajes, ...biblioteca };
 }
 
 /**

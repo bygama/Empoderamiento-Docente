@@ -1,6 +1,7 @@
 import type { Capacidad } from "@ed/auth";
 import { BANDEJAS } from "@/config/mensajes";
 import { hayVariablesDeBusquedas } from "@/lib/busquedas/entorno";
+import { materialesConLinksRotos } from "./de-la-biblioteca";
 import { novedadesEnBorradorViejas } from "./de-las-novedades";
 import { paginasSinPublicar } from "./de-las-paginas";
 import { leerCvNuevos, leerCvQueSeBorran, leerMensajesSinLeer } from "./de-los-mensajes";
@@ -34,6 +35,7 @@ export const CLAVES_DE_PENDIENTES = [
   "cv-que-se-borran",
   "paginas-sin-publicar",
   "novedades-en-borrador",
+  "materiales-con-el-link-roto",
   "conectar-search-console",
 ] as const;
 export type ClaveDePendiente = (typeof CLAVES_DE_PENDIENTES)[number];
@@ -80,6 +82,14 @@ export const PENDIENTES: Record<ClaveDePendiente, Pendiente> = {
     href: "/admin/novedades/borradores",
     accion: "Ir a Borradores",
     leer: () => novedadesEnBorradorViejas(),
+  },
+  "materiales-con-el-link-roto": {
+    urgencia: "a-corregir",
+    capacidad: "editarBiblioteca",
+    que: "los links de la Biblioteca",
+    href: "/admin/biblioteca?salud=link-roto",
+    accion: "Ver los materiales",
+    leer: materialesConLinksRotos,
   },
   "conectar-search-console": {
     urgencia: "sin-conectar",

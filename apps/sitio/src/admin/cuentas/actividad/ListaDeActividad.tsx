@@ -9,11 +9,19 @@ import { MODULOS_DE_ACTIVIDAD, moduloDe, pantallaDe } from "./modulos";
  * Una página de la actividad: la frase («Ana Pérez invitó a Juan Pérez»), el
  * módulo y cuándo. Si lo que se tocó todavía tiene pantalla, un link a ella.
  */
-export function ListaDeActividad({ filas, cuentasQueExisten }: { filas: FilaDeActividad[]; cuentasQueExisten: ReadonlySet<string> }) {
+export function ListaDeActividad({
+  filas,
+  cuentasQueExisten,
+  materialesQueExisten,
+}: {
+  filas: FilaDeActividad[];
+  cuentasQueExisten: ReadonlySet<string>;
+  materialesQueExisten?: ReadonlySet<string>;
+}) {
   return (
     <Lista>
       {filas.map((f) => {
-        const pantalla = pantallaDe(f, cuentasQueExisten);
+        const pantalla = pantallaDe(f, cuentasQueExisten, materialesQueExisten);
         const frase = fraseDe(f);
         return (
           <Fila

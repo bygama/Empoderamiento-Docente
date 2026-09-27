@@ -72,16 +72,19 @@ const SIN_PANTALLA: readonly TipoDeActividad[] = ["cancelo-la-invitacion", "borr
 /**
  * Adónde lleva lo que se tocó, si todavía tiene pantalla: lo de Cuentas, a
  * esa cuenta si existe; lo de una página, a su editor (las páginas no se
- * borran). Un mensaje no: pudo haberse borrado, a mano o por la retención; una
- * novedad tampoco, porque también se borra.
+ * borran); lo de un material, a su ficha si existe. Un mensaje no: pudo
+ * haberse borrado, a mano o por la retención; una novedad tampoco, porque
+ * también se borra.
  */
 export function pantallaDe(
   { tipo, sobreId }: { tipo: TipoDeActividad; sobreId: string | null },
   cuentasQueExisten: ReadonlySet<string>,
+  materialesQueExisten: ReadonlySet<string> = new Set(),
 ): { href: string; que: string } | null {
   if (!sobreId || SIN_PANTALLA.includes(tipo)) return null;
   const modulo = moduloDe(tipo);
   if (modulo === "cuentas" && cuentasQueExisten.has(sobreId)) return { href: `/admin/cuentas/${sobreId}`, que: "Ver la cuenta" };
   if (modulo === "contenido") return { href: `/admin/contenido/paginas/${sobreId}`, que: "Ver la página" };
+  if (modulo === "biblioteca" && materialesQueExisten.has(sobreId)) return { href: `/admin/biblioteca/${sobreId}`, que: "Ver el material" };
   return null;
 }
