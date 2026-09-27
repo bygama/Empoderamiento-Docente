@@ -16,7 +16,7 @@ import { guardarDatosDelSitioEnBase } from "./editar-datos-del-sitio";
 // revalidado (el pie está en todas las páginas) y la actividad.
 
 export type ResultadoDeDatosDelSitio =
-  | { ok: true; detalle: string; cambiadoEn: string; cambiadoPor: string }
+  | { ok: true; detalle: string }
   | { ok: false; detalle: string; errores?: Partial<Record<CampoDelSitio, string>> };
 
 // Un texto por campo, todos: con un enum de claves, el registro de Zod 4 los pide todos.
@@ -40,10 +40,12 @@ export async function guardarDatosDelSitio(pedido: unknown): Promise<ResultadoDe
       const cuantos = campos.length === 1 ? "Hay 1 campo para revisar" : `Hay ${campos.length} campos para revisar`;
       return { ok: false, detalle: `${cuantos}. El primero: ${ETIQUETAS[campos[0]]}.`, errores };
     }
-    const cambiadoEn = await guardarDatosDelSitioEnBase(base, valido.data, sesion.user.name);
+    await guardarDatosDelSitioEnBase(base, valido.data, sesion.user.name);
     revalidatePath(EL_SITIO, "layout");
+    // La pantalla y la tarjeta del índice: la pantalla recibe lo guardado como su nuevo punto de partida.
+    revalidatePath("/admin/ajustes", "layout");
     await registrarActividad({ tipo: "cambio-los-datos-del-sitio", quien: sesion.user.id });
-    return { ok: true, detalle: "Listo: el sitio ya muestra los datos nuevos.", cambiadoEn: cambiadoEn.toISOString(), cambiadoPor: sesion.user.name };
+    return { ok: true, detalle: "Listo: el sitio ya muestra los datos nuevos." };
   } catch (e) {
     console.error("guardarDatosDelSitio:", e instanceof Error ? e.message : e);
     return { ok: false, detalle: "No se pudo guardar; probá de nuevo en un rato." };
