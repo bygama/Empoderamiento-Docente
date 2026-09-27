@@ -45,6 +45,64 @@
   "MESES_DE_GUARDA|DIAS_DE_SPAM"` sale 1; `T` de `config/privacidad`,
   `datos/privacidad`, `tareas/retencion-de-mensajes` e
   `inicio/de-los-mensajes`: 16/16; typecheck, lint y `migrate:status` verdes.
+- 2026-09-26 — **Paso 6** (`1044e27`): `config/avisos.ts` (el registro) y
+  `datos/avisos.ts` sobre él, con `avisosDeTodas(rol)` (vacío sin
+  `usarAjustes`) y `ponerQuienRecibe`; Mi cuenta dibuja el registro. Una
+  cuenta suspendida deja de recibir avisos (DECISIONS). `T src/datos/avisos.test.ts`:
+  5/5; typecheck y lint verdes.
+- 2026-09-26 — **Paso 7** (`f0f276b`): `rutasDelSitio()`, `app/sitemap.ts` y la
+  línea `Sitemap:` en robots. `T` de `rutas-del-sitio`: 3/3; en el 3025,
+  `/sitemap.xml` trae las 9 rutas con el dominio real y `/robots.txt` la línea.
+- 2026-09-26 — **Paso 8** (`760324a`): migración `redirecciones_a_mano`,
+  `lib/seo/redirecciones.ts` (validación y `rutaDeSegmentos`),
+  `datos/consultas/redirecciones.ts`, `datos/acciones/editar-redirecciones.ts`
+  (DECISIONS: el PLAN decía `datos/redirecciones.ts`) y la ruta atrapa-todo,
+  dinámica, con el 308. `T` de la validación y de la base: 9/9; con curl, una
+  fila en la base da `308 -> /contacto` (con «ñ» en la ruta) y, borrada, 404
+  sin caché.
+- 2026-09-26 — **Paso 9** (`492d4ab`): migración `indexacion_de_urls`,
+  `lib/busquedas/inspeccion.ts` con su respuesta grabada, la tarea
+  `indexacion-de-google` en `TAREAS_DIARIAS` y `leerIndexacion(rol)`. `T` de
+  la inspección y de la tarea: 8/8 (tope de 20, orden, borrado de las viejas,
+  corte con 429, freno de 35 s, sin variables).
+- 2026-09-26 — **Paso 10** (`ee40f44`): `config/conexiones.ts` y
+  `estadoDeLasConexiones`. `T src/datos/conexiones.test.ts`: 5/5 (nunca el
+  valor de una variable).
+- 2026-09-26 — **Paso 11** (`a613676`): los cinco tipos de actividad, con su
+  frase y el módulo «Ajustes» del filtro de Cuentas › Actividad. `T` de
+  actividad, frase y filtros: 10/10.
+- 2026-09-27 — **Paso 12** (`9f61bbd`): `admin/armazon/Tabla.tsx` (y `SiONo`);
+  la tabla de permisos la consume; DESIGN.md §11 «Tabla». En el 3025, la de
+  permisos sale igual: caption, encabezados con `scope`, «Sí» dicho, scroll de
+  costado.
+- 2026-09-27 — **Paso 13** (`1d7171d`): el módulo, su índice con las cinco
+  tarjetas leídas aisladas, y la guía de Ajustes fuera de `por-hacer/`.
+  `guarda.test.ts` 7/7. Hubo que reiniciar el dev server: guarda el cliente de
+  Prisma en `global` y no veía la tabla nueva.
+- 2026-09-27 — **Paso 14** (`2175513`): Datos del sitio. En el 3025: un correo
+  inválido vuelve a su campo con el foco y el resumen; editarlo borra el
+  error; con cambios, el encabezado navy (verificado terminando las
+  transiciones: la pestaña está oculta y no avanzan); guardar publica —el
+  aviso, «Cambiados el 27/9/2026 por Ada Ajustes», `/contacto` con el correo
+  nuevo, la fila y la actividad—. El correo volvió al original.
+- 2026-09-27 — **Paso 15** (`18e53ab`): SEO. En el 3025: «desde» una página
+  que existe y «desde = hacia» vuelven a su campo (el de «hacia» no se veía:
+  arreglado en el mismo paso); una válida se agrega, se sigue con 308 y se
+  borra confirmando, con el foco en «Cancelar»; el aviso sobrevive a la tabla
+  vacía. Con variables de Search Console falsas y filas de prueba, la tabla de
+  indexación y la revisión fallida en rojo; todo eso se sacó después.
+- 2026-09-27 — **Paso 16** (`53c57a0`): Avisos. Apagar el de CV de la única
+  que lo recibe: «Nadie va a recibir…», la insignia fuerte en el índice y la
+  casilla apagada en Mi cuenta; se volvió a prender.
+- 2026-09-27 — **Paso 17** (`738d1f4`): Privacidad. Con un CV de prueba de
+  hace 8 meses, CV a 6: la confirmación cuenta «1 CV» en el lugar del botón;
+  confirmar guarda, anota «CV, de 12 meses a 6 meses», la línea dice desde
+  cuándo rige y el Inicio muestra el pendiente con el plazo nuevo. Fila y CV
+  de prueba borrados. `T src/datos/privacidad.test.ts`: 5/5, en una
+  transacción que se descarta.
+- 2026-09-27 — **Paso 18** (`0d99268`): Conexiones. En el 3025, las seis, con
+  las variables que faltan por nombre y la corrida fallida en rojo con «Nunca
+  salió bien».
 
 ## Verification
 

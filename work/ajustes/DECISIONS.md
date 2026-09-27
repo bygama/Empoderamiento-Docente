@@ -58,3 +58,24 @@
 - 2026-09-26 — **Las fechas nuevas son `timestamp(3)`**, el tipo que Prisma
   da a `DateTime` en todo el esquema, y no `timestamptz` como decía la tabla
   del SPEC §8: se sigue la convención del repo.
+- 2026-09-27 — **Una cuenta suspendida deja de recibir avisos.** `destinatariosDe`
+  no la excluía (Cuentas sumó la suspensión después de Mensajes). Ajustes ›
+  Avisos tiene que decir la verdad sobre quién recibe, así que las dos
+  consultas miran `suspendida: false`.
+- 2026-09-27 — **Lo que escribe en la base una acción va en
+  `datos/acciones/editar-…`**, como `editar-paginas.ts`, y no en
+  `datos/redirecciones.ts` como decía el PLAN: es la convención del árbol
+  (AGENTS.md §3). Lo mismo con `editar-plazos.ts` y
+  `editar-datos-del-sitio.ts`.
+- 2026-09-27 — **Privacidad: una sola acción con `confirmado`**, no dos
+  (`cuantoSeBorraria` y `guardarPlazos` en el PLAN). Sin confirmar, la acción
+  cuenta lo que borraría de más y no guarda; así la cuenta y el guardado miran
+  los mismos plazos, y no hay una ventana entre las dos.
+- 2026-09-27 — **«Hacia» se elige en un desplegable** con las rutas del
+  sitemap, no se escribe: así no se puede apuntar a una página que no existe,
+  y la validación del servidor lo chequea igual.
+- 2026-09-27 — **Sin capturas de pantalla en la verificación de UI**: la
+  pestaña del navegador de Orca no está visible en la ventana (la comparten el
+  padre y las otras lanes) y `screenshot` da timeout. Cambiar la vista de la
+  ventana es intrusivo, así que la UI se verifica con el árbol de
+  accesibilidad y sondas del DOM (estilos calculados, foco, `aria-*`).
