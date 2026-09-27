@@ -414,8 +414,9 @@ la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
 compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`); el estado
 vacío con su acción, la fecha, la selección, la lista variable y la ficha de
 una entidad, también (`work/novedades-y-kit/`); Ajustes, que no suma
-patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); y la grilla de fotos y elegir una foto,
-el 2026-09-27 (`work/casos-aliados-fotos/`). Todos los contrastes están
+patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); y la
+grilla de fotos, elegir una foto y el logo de aliado, el 2026-09-27
+(`work/casos-aliados-fotos/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -742,6 +743,31 @@ tarjetas (dos columnas, tres desde `sm`, cuatro desde `lg`).
   `Lista` con cada lugar, su insignia (en el sitio, normal; sin publicar,
   apagada), el alt con que va ahí y «Editar»; y al pie «Reemplazar o borrar»,
   las filas de «Deshacer o sacar del sitio».
+
+### Logo de aliado
+
+Un logo como lo pinta la tira del sitio, para que quien edita vea lo que va a
+publicar: en blanco (`brightness(0) invert(1)`, el filtro de la tira, al 90 %)
+sobre `azul-principal` en el claro y el mixto, y sobre `gris-fondo` en el
+oscuro. Sobre blanco, un logo blanco desaparecería.
+`apps/sitio/src/admin/aliados/LogoEnLaTira.tsx`.
+
+- **Contraste:** blanco sobre `azul-principal` 13,63:1; sobre el `gris-fondo`
+  del oscuro, 18,0:1. Un logo es un gráfico: pide 3:1, y le sobra.
+- **Caja:** `rounded-lg`, `px-3 py-2`; el ancho lo da el logo (hasta 10 rem) y
+  el alto, su tamaño en la tira (chico, mediano o grande), el mismo que el
+  sitio. Sin logo todavía, «Sin logo» en meta dentro de la misma caja.
+- En la `Lista` de Aliados va chico, a la altura del pie, con alt vacío: el
+  nombre está al lado. En la ficha, «Cómo se ve» lo muestra a la altura del
+  Inicio.
+- **La autorización** (AGENTS.md §5.4) no es un campo del borrador: es un
+  `Bloque` propio debajo del formulario, con la casilla «Autorizado» (la
+  nativa, como en «Casilla»), la nota de dónde consta y «Guardar la
+  autorización», secundario, porque rige en el momento y no espera a
+  publicar. Para quien no la puede poner, la casilla va deshabilitada y
+  la explicación, en meta `gris-texto` debajo del título, dice quién la pone
+  (`aria-describedby`). En el encabezado y la lista, «Sin autorizar» es
+  fuerte y «Autorizado», normal, al lado de la insignia de la publicación.
 
 ### Lista
 
@@ -1282,6 +1308,11 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
   «Deshacer o sacar del sitio», que usa también la ficha de una foto) y
   `QueCambioPlegado` (el `details` con la cuenta, que recibe las diferencias
   ya armadas).
+- **Los aliados** (`admin/aliados/`) la repiten entera, con dos insignias en
+  el encabezado (la autorización y la publicación) y la autorización aparte
+  («Logo de aliado»). Su lista no tiene pestañas ni buscador: son pocos y el
+  orden es el de la tira, con «Subir» y «Bajar» terciarios en cada fila; al
+  mover, el foco sigue al aliado y un `status` lo anuncia.
 
 ### Agregar con datos de afuera
 

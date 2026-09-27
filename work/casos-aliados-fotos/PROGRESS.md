@@ -225,5 +225,34 @@
   volver; quitar la marca, despublicar y borrar; la tira queda
   UNESCO·Techint·Bloom·UCSH·Science Up en 1..5) + `acciones-con-sesion` +
   `consultas/aliados.test.ts` → 18 pass, 0 fail, 0 skipped; typecheck 0.
+  Commit `a3046b55`.
+- **Paso 17 — Aliados en el admin**: `datos/consultas/aliados-del-admin.ts`
+  (la lista en el orden de la tira, la ficha y el aliado vacío); `admin/aliados/`:
+  `LogoEnLaTira` (blanco sobre `azul-principal`, el filtro de la tira),
+  `ListaDeAliados` («Subir» · «Bajar» · «Editar»; al mover, el foco sigue al
+  aliado y un `status` lo anuncia), la ficha (`FichaDeAliado` con
+  `useGuardarAliado`, `usePublicarAliado`, `useSalidaDelAliado`,
+  `FormularioDelAliado`, `AutorizacionDelAliado`, `PanelDelAliado`,
+  `SalidaDelAliado`, `EncabezadoDelAliado`, `cambios.ts`) y las tres rutas
+  (`contenido/aliados`, `/nuevo`, `/[id]`), que le pasan a la ficha
+  `puede(rol, "autorizarAliados")` y `quienPuede(...)`. DESIGN.md §11:
+  «Logo de aliado» y los aliados en «Ficha de una entidad». En el navegador
+  de Orca: como `edita`, la lista con los cinco y sus logos; la ficha de
+  UNESCO con la casilla deshabilitada (`aria-describedby` a la explicación)
+  y la nota a la vista; «Nuevo aliado» → nombre, URL y el logo elegido de
+  los ya subidos → guardar crea la fila (URL con el id, «Sin autorizar»,
+  «Borrador») → «Publicar» contesta «Sin la autorización, el logo no se
+  publica…»; «Se ve en: En ningún lado…». Como `administra` (perfil de
+  navegador aparte, segundo factor por el log): marcar sin nota frena en el
+  campo; con nota → «Marcado por Ana Administra»; publicar → el link a
+  `oas.org` en el pie de `/` y en `/que-hacemos`; quitar la marca → 0 en
+  `/`; «Subir» con el foco en el botón → pasa al lugar 4 y el foco sigue en
+  su «Subir»; dos «Bajar» → lugar 6 y el foco cae en «Subir»; despublicar y
+  borrar (confirma en el lugar) → `?borrado=1` con «Se borró el aliado». La
+  actividad anotó autorizó, publicó, quitó, despublicó y borró. A 390 px
+  (`set viewport`) la lista, la ficha y `/nuevo` sin desborde; en oscuro la
+  caja del logo va sobre `gris-fondo`. `cambios.test.ts` 1 pass;
+  `pnpm typecheck` 0, `pnpm lint` 0, react-doctor 100/100 (el `await` doble
+  de la lista pasó a `Promise.all`).
 
 ## Abierto
