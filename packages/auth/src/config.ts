@@ -172,8 +172,11 @@ export function configDeAuth({
        */
       defaultCookieAttributes: { sameSite: "strict" },
       ipAddress: {
-        // En Vercel la IP real viene acá; sin decirlo, todas las requests
-        // parecerían venir del proxy y compartirían un solo cupo.
+        // La IP real la pone acá el proxy de delante (el borde de Vercel, o
+        // Caddy en un VPS, que descarta la que manda el cliente); sin
+        // decirlo, todas las requests parecerían venir del proxy y
+        // compartirían un solo cupo. Confiar en estas cabeceras es seguro solo
+        // si nadie le habla a la app sin pasar por ese proxy.
         ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
       },
     },

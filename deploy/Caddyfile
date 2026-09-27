@@ -5,6 +5,16 @@
 	email {$CORREO_ACME}
 }
 
+# La IP de quien pide. Caddy ignora el X-Forwarded-For que manda un cliente
+# (no hay `trusted_proxies`: no hay nada delante) y pone la de la conexión.
+# X-Real-IP, en cambio, pasaría tal cual, y la app la lee como segunda opción
+# (lib/formularios/limite.ts, better-auth): se pisa también. La app y Umami
+# confían en estas cabeceras porque nadie más que Caddy les habla (ADR-0018).
+# Si algún día va un CDN delante, sus rangos van en `trusted_proxies`.
+(ip-real) {
+	header_up X-Real-IP {remote_host}
+}
+
 {$DOMINIO} {
 	encode zstd gzip
 
@@ -14,7 +24,9 @@
 	@umami path /umami/script.js /umami/api/send
 	handle @umami {
 		uri strip_prefix /umami
-		reverse_proxy analitica:3000
+		reverse_proxy analitica:3000 {
+			import ip-real
+		}
 	}
 	handle /umami/* {
 		respond 404
@@ -22,6 +34,8 @@
 
 	# Todo lo demás es el sitio y su admin.
 	handle {
-		reverse_proxy app:3000
+		reverse_proxy app:3000 {
+			import ip-real
+		}
 	}
 }
