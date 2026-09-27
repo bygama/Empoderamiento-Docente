@@ -414,9 +414,10 @@ la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
 compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`); el estado
 vacío con su acción, la fecha, la selección, la lista variable y la ficha de
 una entidad, también (`work/novedades-y-kit/`); Ajustes, que no suma
-patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); y la
+patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); la
 grilla de fotos, elegir una foto y el logo de aliado, el 2026-09-27
-(`work/casos-aliados-fotos/`). Todos los contrastes están
+(`work/casos-aliados-fotos/`); y los gráficos y el estado de poco dato, el
+2026-09-27 (`work/metricas-completas/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -831,7 +832,9 @@ pestañas: van debajo del encabezado, a la izquierda del buscador.
   curso · Cerrado · Spam). También Cuentas › Actividad, con tres filtros
   apilados (módulo, persona y cuándo), cada uno con su «todos» primero; cada
   opción conserva los otros filtros y la búsqueda. Y la Biblioteca, con los
-  suyos (estado, tipo y salud), y el número en «Link roto».
+  suyos (estado, tipo y salud), y el número en «Link roto». Y el período de
+  Métricas (7 días · 30 días · 90 días, `?periodo=`, 30 si no dice), arriba
+  de Resumen, Origen y Qué hace la gente (`work/metricas-completas/`).
 
 ### Buscador
 
@@ -907,6 +910,13 @@ competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
   aclaración. Cada paso dice quién lo hace. Primer consumidor: «Conectá Search
   Console», en Métricas › Búsquedas (sumado el 2026-09-26,
   `work/busquedas-de-google/`).
+- **Con poco dato**, donde un gráfico o una lista engañarían: el título es
+  siempre «Todavía no hay datos suficientes» y la frase dice cuánto hay,
+  cuánto hace falta y qué probar («Hay 12 visitas en estos 30 días; para esta
+  lista hacen falta 20. Probá con 90 días, o esperá a que entre más gente.»).
+  No se dibuja el gráfico ni la lista. Los mínimos viven juntos
+  (`config/metricas.ts`). Primer consumidor: los bloques de Métricas (sumado
+  el 2026-09-27, `work/metricas-completas/`).
 - Primer consumidor: los tres estados sin datos del panel de métricas. Lo
   usan también las secciones de Búsquedas sin filas, cada estado de una
   bandeja de Mensajes, que dice qué llega ahí o cuándo se borra, y, en el
@@ -1094,6 +1104,36 @@ período anterior. `apps/sitio/src/admin/armazon/Cifra.tsx`. No confundir con
 - Primer consumidor: el panel de Métricas › Resumen, donde nació como su
   tarjeta; pasó al armazón con su segundo consumidor, el Inicio. Lo usa
   también Búsquedas.
+
+### Gráficos
+
+Un número que cambia con el tiempo o que se cruza con otro. Pocos y sobrios:
+el admin muestra un gráfico solo donde una lista no alcanza. Sin
+dependencias: SVG y HTML dibujados en el servidor. Sin verde ni naranja: una
+sola serie, en la familia azul.
+
+- **La curva** (`apps/sitio/src/admin/armazon/Curva.tsx`): una serie por
+  día. La línea de 2 px en `azul-medio` (5,11:1 · 7,14:1 en el oscuro: más
+  de 3:1, como pide un objeto gráfico), el área debajo en `azul-claro/30` y
+  la grilla (el piso, la mitad y el tope) en `azul-claro/60`, las dos
+  decorativas. El tope es 1, 2 o 5 × 10ⁿ, así la mitad es redonda. Las
+  etiquetas de los ejes van en HTML, en meta `gris-texto` (4,83:1 · 7,08:1),
+  para que no se achiquen con el SVG, que se estira al ancho. El último punto
+  lleva un punto de 10 px con un anillo de 2 px del color de la superficie.
+  Un día sin dato antes de la primera copia corta la línea: no se inventa.
+- **Las marcas de la curva:** una línea vertical punteada en `gris-texto` y,
+  arriba, una pastilla con su número (meta medium `azul-principal` sobre
+  `white`, borde `gris-texto`), que remite a la lista de debajo. Varias el
+  mismo día van en una pastilla («2, 3»).
+- **Para el lector:** el SVG es `role="img"` con una frase que lo resume
+  («Visitantes por día del 1 al 30 de septiembre: entre 3 y 41, con el pico
+  el 12 de septiembre») y, plegada debajo («Ver los números», el
+  `Desplegable` de la lista), la `Tabla` con cada día. Al pasar sobre un día,
+  el navegador dice su número (`title`): sin JavaScript.
+- **Estados:** sin copia, el `EstadoVacio` que dice por qué; con poco dato,
+  el de poco dato (arriba), sin dibujar la curva; con datos, la curva.
+- Primer consumidor: los visitantes por día de Métricas › Resumen, con sus
+  marcas (sumado el 2026-09-27, `work/metricas-completas/`).
 
 ### Inicio
 
