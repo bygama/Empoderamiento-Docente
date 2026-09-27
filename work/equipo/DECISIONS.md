@@ -101,6 +101,52 @@
   ficha de una novedad (sigue al título hasta que alguien la escribe o se
   publica), con su ayuda «Así queda: /quienes-somos?persona=…». Publicado,
   la ayuda nombra el link viejo que se pierde al cambiarla.
+- 2026-09-27 — **La migración del equipo se renombró, no se regeneró** (nota
+  del padre: «si la generaste antes de este rebase, volvé a generarla sobre
+  el main nuevo; no la edites a mano»). Su esquema toca solo `equipo` y
+  `autorias`, que la lane 9 no tocó; su contenido quedó igual (solo cambió el
+  nombre de la carpeta, a `20260927073013_equipo`, para que vaya después de
+  `aliados`). La prueba de que regenerarla daría lo mismo: las 27 migraciones
+  aplicadas desde cero en una base vacía (`ed_equipo_orden`,
+  `ed_equipo_tests`) y `migrate diff` contra el esquema, vacío.
+  `prisma migrate reset` sobre `ed_equipo` no se usó: Prisma lo frena para un
+  agente sin el consentimiento del usuario; se actualizó el nombre en su
+  `_prisma_migrations` y `migrate:deploy` aplicó las de la 9.
+- 2026-09-27 — **La rama se re-pusheó con `--force-with-lease`** después del
+  rebase sobre la lane 9: es la rama de esta lane, sin PR todavía, y el rebase
+  lo pidió el padre al aprobar el SPEC.
+- 2026-09-27 — **Los dos recortes de Daniela Reyes no entran a Fotos** (paso
+  12): `daniela-reyes-cutout.png` y `.webp` no los usa ningún perfil (el
+  `data.ts` viejo decía que quedaban «por si se retoma»), y una foto entra con
+  el alt de su primer uso. Entran las 15 `.jpg`, con el alt de la tarjeta (el
+  nombre). Es la regla de `fotos_de_public` de la lane 9.
+- 2026-09-27 — **Equipo en el registro de usos, en el orden de Contenido**
+  (paso 12): entre Casos y Aliados, como sus pestañas. Cada uso lleva al
+  bloque de la ficha (`#bloque-tarjeta`, `#bloque-figura`), y la foto de la
+  tarjeta de un perfil con «Sin foto» cuenta como sin publicar: está guardada,
+  pero el sitio no la muestra.
+- 2026-09-27 — **«Elegir de Fotos» se llama «Elegir una ya subida…»**: es el
+  rótulo del botón del kit (`CampoFoto`), el mismo en todas las fichas. El
+  error de una foto que no es de Fotos dice «La foto tiene que ser una foto de
+  Fotos.», como en Casos y Aliados; el viejo nombraba carpetas que ya no son
+  las únicas.
+- 2026-09-27 — **El intercambio de mover, una función pura en `lib/orden.ts`**
+  (`unPasoMovido`): era `tiraMovida` de la lane 9 y el Equipo tenía su copia.
+  Con eso, el test de mover del Equipo prueba lo puro (el intercambio y a qué
+  nivel va cada perfil) y contra la base solo el perfil que no existe: medido
+  en la tabla, el grupo «Sin nivel» lo comparte con los borradores de
+  `editar-equipo.test.ts`, que corre a la vez. Por la misma razón, publicar
+  mide «último en su nivel» contra los perfiles que no son de prueba (el test
+  del registro de fotos suma uno al nivel 4 en el medio).
+- 2026-09-27 — **«Lista que se ordena» es una sección de DESIGN.md §11, al lado de
+  «Lista»** (paso 11): el padre pidió subirla a «§11 Global › Patrones», pero
+  §11 no tiene ese bloque: sus patrones son sus secciones `###`, cada una una
+  regla que no nombra ruta. Va con su variante agrupada, y la entrada de
+  Aliados en «Ficha de una entidad» apunta a ella.
+- 2026-09-27 — **La lista del Equipo lleva la insignia solo si pide atención**
+  (paso 11): «Sin publicar», «Cambios sin publicar» y «Despublicado», como
+  pedía el SPEC §7.1 y como la lista de la Biblioteca; la de Aliados muestra
+  también «Publicado», porque al lado va la de la autorización.
 - 2026-09-27 — **Visto al pasar, sin tocar:** `docs/AI_GUIDELINES.md` §2
   («Dónde va un archivo de datos») da de ejemplo `quienes-somos/data/equipo.ts`,
   que esta lane borra; el único `data/` de contenido que queda es
