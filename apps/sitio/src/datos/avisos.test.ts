@@ -63,7 +63,7 @@ test("cada cuenta ve un aviso por cada uno que su rol recibe: los de bandeja pre
 
 test("el aviso sale a cada destinatario con el link a la ficha, y nada de quien escribió", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
-  const { avisarMensajeNuevo } = await import("./avisos");
+  const { avisarMensajeNuevo } = await import("./avisar-mensaje-nuevo");
   const { id } = await base.mensaje.create({
     data: { bandeja: "contacto", nombre: "Zoe Secreta", correo: "zoe-secreta@ed.test", mensaje: "un texto confidencial", tema: "Investigación" },
   });
