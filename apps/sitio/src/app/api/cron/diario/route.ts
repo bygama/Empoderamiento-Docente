@@ -1,8 +1,9 @@
 import { correrTareasDiarias } from "@/datos/tareas/diarias";
 
-// El único cron de Vercel pega acá una vez por día y corre todas las tareas
-// registradas (ADR-0011). Sin el secreto correcto, 401 y no se toca nada. En
-// el plan gratis corre con hasta una hora de imprecisión.
+// El cron diario pega acá una vez por día y corre todas las tareas registradas
+// (ADR-0011): en Vercel, el de `vercel.json` (en el plan gratis, con hasta una
+// hora de imprecisión); en el VPS, el servicio `cron` del compose, por la red
+// interna (ADR-0018). Sin el secreto correcto, 401 y no se toca nada.
 export const maxDuration = 60;
 
 export async function GET(req: Request): Promise<Response> {

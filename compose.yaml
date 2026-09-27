@@ -119,6 +119,27 @@ services:
       db:
         condition: service_healthy
 
+  cron:
+    # Todos los días a las 04:00 UTC (el contenedor está en UTC), la misma hora
+    # que `apps/sitio/vercel.json`. Node trae el crond de busybox y `fetch`.
+    image: node:24-alpine
+    restart: unless-stopped
+    environment:
+      CRON_SECRET: ${CRON_SECRET}
+    volumes:
+      - ./deploy/cron:/etc/ed-cron:ro
+    command:
+      - sh
+      - -c
+      - >-
+        umask 077 && mkdir -p /run/ed-cron &&
+        printenv CRON_SECRET > /run/ed-cron/secreto &&
+        echo "0 4 * * * node /etc/ed-cron/correr.mjs > /proc/1/fd/1 2>&1" | crontab - &&
+        exec crond -f -l 8
+    depends_on:
+      app:
+        condition: service_healthy
+
   proxy:
     image: caddy:2-alpine
     restart: unless-stopped
