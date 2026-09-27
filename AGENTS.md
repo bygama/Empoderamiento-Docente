@@ -178,9 +178,9 @@ un release candidate de la 8 (ADR-0007).
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
             │   ├── roles.ts     ← el único camino para cambiar un rol (ponerRol: prende el segundo factor si lo pide)
             │   ├── sobre-cuentas.ts ← lo común de las acciones de Cuentas (queSePuede sobre la cuenta, borrar si nunca hizo nada)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes, materiales, lista- y ficha-de-material, materiales-del-admin, portadas, casos, casos-del-admin, aliados —nunca uno sin autorizar—, aliados-del-admin, fotos, resumen, cifras-del-periodo, marcas, origen, que-hace-la-gente, enlaces, nombres-de-rutas, materiales-consultados)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos, casos, aliados, ciclo-de-aliados, vista-previa-de-contenido, enlaces, marcas)
-            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, editar-, publicar-casos, editar-, publicar-, autorizar-aliados, subir-, editar-, reemplazar-foto, redirigir, choque, mover-mensajes)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes, materiales, lista- y ficha-de-material, materiales-del-admin, portadas, casos, casos-del-admin, aliados —nunca uno sin autorizar—, aliados-del-admin, fotos, resumen, cifras-del-periodo, marcas, origen, que-hace-la-gente, enlaces, nombres-de-rutas, materiales-consultados, equipo, ficha-de-persona, equipo-del-admin)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos, casos, aliados, ciclo-de-aliados, vista-previa-de-contenido, enlaces, marcas, equipo, ciclo-de-equipo)
+            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, editar-, publicar-casos, editar-, publicar-, autorizar-aliados, editar-, publicar-, mover-equipo, chequeos-del-perfil, subir-, editar-, reemplazar-foto, redirigir, choque, mover-mensajes)
             │   ├── biblioteca/  ← buscar los datos de un material afuera (Crossref, OpenAlex, la página) y chequear su link (ADR-0016)
             │   ├── fotos/       ← dónde se usa cada foto: un registro con una entrada por módulo (páginas, novedades, materiales, casos, aliados), que busca y reemplaza por URL
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
@@ -197,6 +197,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── biblioteca/  ← la segunda entidad: la lista con miniatura, la ficha de un material y agregar por DOI, ISBN o link
             │   ├── casos/ · aliados/ ← Contenido › Casos y Aliados, con el molde de novedades/
             │   ├── fotos/       ← Contenido › Fotos: la grilla, la subida y la ficha de cada foto
+            │   ├── equipo/      ← los perfiles del Equipo: la ficha con la tarjeta, el recorrido y sus etapas (etapa-del-recorrido/), y lo que firma en la Biblioteca
             │   ├── campos/      ← el generador de formularios de las páginas (Campo.tsx) y sus errores; los controles son del kit
             │   └── <entidad>/   ← las que siguen, como novedades/ (fase 3)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
@@ -219,7 +220,10 @@ un release candidate de la 8 (ADR-0007).
             │   ├── biblioteca/contenido/ ← lo mismo para un material (material.ts, campos-del-material.ts, modelo.ts), la cita APA
             │   │                   (cita.ts) y lo que ve el sitio (del-sitio.ts); y portada/ (la tipográfica, next/og)
             │   ├── investigacion/contenido/ ← los dos esquemas de un caso (caso.ts) y su modelo; casos/, la escena, recibe los casos por prop
-            │   └── aliados/     ← los esquemas de un aliado (contenido/) y el logo de la tira (LogoDeAliado)
+            │   ├── aliados/     ← los esquemas de un aliado (contenido/) y el logo de la tira (LogoDeAliado)
+            │   └── quienes-somos/contenido/ ← además de sus secciones, una persona del Equipo (persona.ts, etapa.ts,
+            │                       campos-de-persona.ts, modelo-del-equipo.ts) y lo que reciben sus componentes
+            │                       (perfil-del-sitio.ts, armado por del-sitio.ts)
             ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO) · metricas.ts (lo de ED en Métricas: países fijos, la hora de Chile, los eventos, los mínimos)
             └── lib/           ← hooks/, metricas/ (la copia de Vercel, los canales, los robots, la mejor hora, el código de un link, si un pedido a /l/ es un clic), contadores/ (avisar un evento desde el navegador), busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed): sin dominio de ED
 ```
@@ -617,8 +621,8 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 > lo que hay. La fase 2 también: `packages/kit-admin` nació con Novedades, la
 > primera entidad. De las tablas de contenido existen `paginas`,
 > `versiones_de_paginas`, `fotos`, `novedades`, `materiales`, `autorias`,
-> `casos` y `aliados` (spec del admin §6); las de las demás entidades llegan
-> con ellas.
+> `casos`, `aliados` y `equipo` (spec del admin §6); las de las demás
+> entidades llegan con ellas.
 
 Reglas para el admin y sus datos:
 
@@ -782,6 +786,11 @@ define al implementar cada fase.
         por la migración y su `data.ts` borrado; el módulo, agregar por DOI,
         ISBN o link, y la salud de los links en el cron diario. Diseño en
         `work/biblioteca/` y el ADR-0016.
+  - [x] **Equipo:** `equipo`, con los 15 perfiles entrados por la migración y
+        su `data.ts` borrado, y la fk de `autorias` a su fila; las
+        publicaciones de cada perfil salen de la Biblioteca (lo que la persona
+        firma) y las 5 que faltaban con link entraron a ella. Diseño en
+        `work/equipo/`.
 - [ ] **Admin, fase 4 — URLs y SEO:** las 26 rutas nuevas (15 perfiles, 4 casos,
       7 landings de tipo), `sitemap.xml`, canonicals, redirecciones y JSON-LD.
       Reemplaza al «sitemap definitivo» que este §13 venía arrastrando.

@@ -252,9 +252,9 @@ actividad; ver «Las cuentas»), **Métricas con sus búsquedas en Google** (ver
 las páginas»), **Mensajes**, lo que llega por los formularios del sitio (ver
 «Mensajes»), **Novedades**, la primera entidad (ver «Novedades»), **la
 Biblioteca** de materiales (ver «Biblioteca»), **Ajustes**, lo que se configura
-una vez (ver «Ajustes»), y en Contenido **los casos, los aliados y la
-biblioteca de fotos** (ver «Casos, aliados y fotos»); el equipo llega en la
-fase siguiente.
+una vez (ver «Ajustes»), y en Contenido **los casos, los aliados, la
+biblioteca de fotos** (ver «Casos, aliados y fotos») y **el Equipo** (ver
+«Equipo»).
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
 y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
@@ -573,7 +573,29 @@ con tope de tamaño y de tiempo. Decisión en el
 
 El sitio lee los materiales de la base en `/biblioteca`, en los destacados del
 Inicio y en la ficha de la novedad que abre uno. Los 57 que había entraron con
-la migración `biblioteca`.
+la migración `biblioteca`; la migración `equipo` sumó 5 que los perfiles
+citaban con link.
+
+### Equipo
+
+En Contenido › Equipo (`/admin/contenido/equipo`), los perfiles de «Quiénes
+sostienen ED», por nivel. La ficha de cada uno es la de una novedad (guardar
+no publica, «Vista previa» abre su perfil en `/quienes-somos?persona=<url>`,
+y publicar, despublicar, descartar y borrar quedan en la actividad) con la
+tarjeta —nombre, rol, país, nivel, la foto y su acercamiento, o «Sin foto»—,
+la URL y, si lo tiene, el recorrido: quién es, la figura, el cierre y las
+etapas, cada una armada según su composición. La Dirección general lleva una
+sola persona y la Dirección, dos.
+
+**Las publicaciones salen de la Biblioteca.** Una etapa elige, de lo que la
+persona firma, qué muestra y en qué orden; el título, el año, el tipo y el
+link son los del material, y la línea de abajo (con quién, dónde) es del
+perfil. Lo que no tiene link se escribe en la etapa. «Agregar en
+Biblioteca», en la ficha, abre un material nuevo con la persona ya elegida
+como autora. Borrar un perfil deja sus autorías en la Biblioteca, con su
+nombre, como de alguien de afuera. Los 15 perfiles entraron con la migración
+`equipo`; la bio y el LinkedIn de cada uno, que el sitio no muestra, quedaron
+en [`docs/content/equipo-sin-publicar.md`](docs/content/equipo-sin-publicar.md).
 
 ### Mensajes
 
