@@ -25,8 +25,8 @@ export function CuerpoDelResumen({ resumen, marcas, periodo, hoy }: { resumen: R
     <div className="space-y-10">
       <div className="space-y-3">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Cifra etiqueta={`Visitantes, últimos ${periodo} días`} valor={cifras?.visitantes ?? null} variacion={cifras?.variacionVisitantes} periodo={contra} />
-          <Cifra etiqueta={`Vistas, últimos ${periodo} días`} valor={cifras?.vistas ?? null} variacion={cifras?.variacionVistas} periodo={contra} />
+          <Cifra etiqueta={`Visitantes, últimos ${periodo} días`} {...cifras.visitantes} periodo={contra} />
+          <Cifra etiqueta={`Vistas, últimos ${periodo} días`} {...cifras.vistas} periodo={contra} />
         </div>
         <p className="max-w-prose text-admin-meta text-gris-texto">
           <strong className="font-medium text-azul-principal">Visitantes</strong> son personas distintas en el período;{" "}

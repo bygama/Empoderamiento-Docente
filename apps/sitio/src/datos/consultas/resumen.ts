@@ -4,7 +4,7 @@ import type { Canal } from "@/lib/metricas/canales";
 import { diaISO, fechaUTC, sumarDias, type Periodo } from "@/lib/metricas/periodos";
 import type { Dia } from "@/lib/metricas/tipos";
 import { urlDelSitio } from "@/lib/url-del-sitio";
-import { tarjetaDe, type Tarjeta } from "./metricas";
+import { cifrasDelPeriodo, type CifrasDelPeriodo } from "./cifras-del-periodo";
 import { nombresDeRutas } from "./nombres-de-rutas";
 
 // Lo que lee Métricas › Resumen para un período (SPEC de
@@ -16,8 +16,8 @@ const PAGINAS_EN_LA_LISTA = 10;
 export type ResumenDelPeriodo = {
   desde: Dia;
   hasta: Dia;
-  /** Visitantes y vistas del período contra el anterior; `null` si todavía no hay una ventana de ese largo. */
-  cifras: Tarjeta | null;
+  /** Visitantes y vistas del período contra el anterior, o por qué no hay. */
+  cifras: CifrasDelPeriodo;
   /** Visitantes por día. */
   curva: PuntoDeLaCurva[];
   diasConDatos: number;
@@ -42,7 +42,7 @@ export async function resumenDe(periodo: Periodo, hasta: Dia): Promise<ResumenDe
   const campos = { valor: true, agrupado: true, vistas: true, visitantes: true } as const;
   // Cinco lecturas que no dependen una de la otra: van juntas.
   const [cifras, totales, primera, referidos, paginas] = await Promise.all([
-    tarjetaDe(periodo),
+    cifrasDelPeriodo(periodo, desde, hasta),
     base.metricaDiaria.findMany({ where: { dimension: "total", fecha }, select: { fecha: true, vistas: true, visitantes: true } }),
     base.metricaDiaria.findFirst({ where: { dimension: "total" }, orderBy: { fecha: "asc" }, select: { fecha: true } }),
     base.metricaDiaria.findMany({ where: { dimension: "referido", fecha }, select: campos }),

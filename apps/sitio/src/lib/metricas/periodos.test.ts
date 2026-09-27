@@ -35,6 +35,11 @@ test("nunca más de 31 días por corrida", () => {
   assert.deepEqual(r, { desde: "2026-08-21", hasta: "2026-09-20" });
 });
 
+test("ni más atrás que el máximo que se le pase: la ventana del plan", () => {
+  const r = rangoFaltante({ ultimoGuardado: "2026-01-01", hoy: new Date("2026-09-21T12:00:00.000Z"), maximo: 30 });
+  assert.deepEqual(r, { desde: "2026-08-22", hasta: "2026-09-20" });
+});
+
 test("las seis ventanas: 7, 30 y 90 días hasta el fin, y las anteriores", () => {
   assert.deepEqual(ventanasDe("2026-09-20"), [
     { fechaFin: "2026-09-20", dias: 7, desde: "2026-09-14" },
