@@ -1,3 +1,4 @@
+import { crearClienteDeInspeccion, type ClienteDeInspeccion } from "./inspeccion";
 import { crearClienteDeBusquedas, type ClienteDeBusquedas } from "./search-console";
 
 // La cuenta de servicio solo lee Search Console, pero su clave es un secreto:
@@ -17,6 +18,16 @@ export function hayVariablesDeBusquedas(): boolean {
 export function clienteDeBusquedasDesdeEntorno(): ClienteDeBusquedas | null {
   if (!hayVariablesDeBusquedas()) return null;
   return crearClienteDeBusquedas({
+    correo: process.env.SEARCH_CONSOLE_CLIENT_EMAIL!,
+    clave: process.env.SEARCH_CONSOLE_PRIVATE_KEY!,
+    propiedad: process.env.SEARCH_CONSOLE_SITE_URL!,
+  });
+}
+
+/** El de la inspección de URL: la misma cuenta de servicio y la misma propiedad que la copia. */
+export function clienteDeInspeccionDesdeEntorno(): ClienteDeInspeccion | null {
+  if (!hayVariablesDeBusquedas()) return null;
+  return crearClienteDeInspeccion({
     correo: process.env.SEARCH_CONSOLE_CLIENT_EMAIL!,
     clave: process.env.SEARCH_CONSOLE_PRIVATE_KEY!,
     propiedad: process.env.SEARCH_CONSOLE_SITE_URL!,

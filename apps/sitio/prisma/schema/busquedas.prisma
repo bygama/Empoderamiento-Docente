@@ -20,3 +20,22 @@ model BusquedaDiaria {
   @@id([fecha, dimension, valor])
   @@map("busquedas_diarias")
 }
+
+/// Si cada ruta del sitemap está en Google, según la API de inspección de URL
+/// de Search Console (work/ajustes/SPEC.md §5.3). La llena una tarea del cron
+/// diario, que borra las filas de las rutas que ya no están; Ajustes › SEO lee
+/// de acá, nunca de la API en el render.
+model IndexacionDeUrl {
+  /// La ruta, como en el sitemap: "/que-hacemos".
+  ruta          String    @id
+  /// El de Google, tal cual: PASS | PARTIAL | FAIL | NEUTRAL | VERDICT_UNSPECIFIED.
+  veredicto     String
+  /// El `coverageState` de Google, tal cual y en inglés («Submitted and
+  /// indexed»): la pantalla lo traduce.
+  cobertura     String
+  /// Cuándo pasó Google por última vez; null si nunca.
+  ultimoRastreo DateTime? @map("ultimo_rastreo")
+  revisadaEn    DateTime  @map("revisada_en")
+
+  @@map("indexacion_de_urls")
+}

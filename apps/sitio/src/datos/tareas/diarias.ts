@@ -2,6 +2,7 @@ import { correrTareas, type Corrida } from "@/lib/tareas/corredor";
 import { definirTareas } from "@/lib/tareas/registro";
 import { copiaDeSearchConsole } from "./busquedas-de-google";
 import { registrarCorrida } from "./corridas";
+import { indexacionDeGoogle } from "./indexacion-de-google";
 import { copiaDeVercel } from "./metricas-de-vercel";
 import { podaDeActividad } from "./poda-de-actividad";
 import { podaDeLimitesPorIp, retencionDeContacto, retencionDeCV } from "./retencion-de-mensajes";
@@ -15,6 +16,7 @@ import { podaDeLimitesPorIp, retencionDeContacto, retencionDeCV } from "./retenc
 export const TAREAS_DIARIAS = definirTareas([
   copiaDeVercel,
   copiaDeSearchConsole,
+  indexacionDeGoogle,
   podaDeActividad,
   retencionDeContacto,
   retencionDeCV,

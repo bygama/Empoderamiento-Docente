@@ -1,0 +1,19 @@
+{
+  "inspectionResult": {
+    "inspectionResultLink": "https://search.google.com/search-console/inspect?resource_id=sc-domain:ejemplo.org&id=respuesta-grabada",
+    "indexStatusResult": {
+      "sitemap": ["https://ejemplo.org/sitemap.xml"],
+      "referringUrls": ["https://ejemplo.org/"],
+      "verdict": "PASS",
+      "coverageState": "Submitted and indexed",
+      "robotsTxtState": "ALLOWED",
+      "indexingState": "INDEXING_ALLOWED",
+      "lastCrawlTime": "2026-09-24T08:15:42.123456Z",
+      "pageFetchState": "SUCCESSFUL",
+      "googleCanonical": "https://ejemplo.org/que-hacemos",
+      "userCanonical": "https://ejemplo.org/que-hacemos",
+      "crawledAs": "MOBILE"
+    },
+    "mobileUsabilityResult": { "verdict": "VERDICT_UNSPECIFIED" }
+  }
+}
