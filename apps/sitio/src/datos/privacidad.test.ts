@@ -53,3 +53,47 @@ test("la base arranca con los tres plazos de antes, vigentes desde siempre", { s
     { que: "spam", valor: 30 },
   ]);
 });
+
+/** Corre `hacer` en una transacción que se descarta al final: la base queda como estaba. */
+async function sinQueQuede(hacer: (tx: import("@/../prisma/generado/client").Prisma.TransactionClient) => Promise<void>) {
+  const { base } = await import("./cliente");
+  const DESCARTAR = new Error("descartar");
+  await assert.rejects(
+    base.$transaction(async (tx) => {
+      await hacer(tx);
+      throw DESCARTAR;
+    }),
+    (e) => e === DESCARTAR,
+  );
+}
+
+test("poner plazos deja una fila por cada uno que cambió, desde ahora", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+  const { ponerPlazos } = await import("./acciones/editar-plazos");
+  await sinQueQuede(async (tx) => {
+    const antes = await tx.plazoDeRetencion.count();
+    const cambios = await ponerPlazos(tx, { cv: 6, contacto: 24, spam: 30 }, "Prueba");
+    assert.deepEqual(cambios, [{ que: "cv", antes: 12, ahora: 6 }]);
+    assert.equal(await tx.plazoDeRetencion.count(), antes + 1);
+    assert.deepEqual(await ponerPlazos(tx, { cv: 6, contacto: 24, spam: 30 }, "Prueba"), [], "sin cambios, ninguna fila");
+  });
+});
+
+test("acortar cuenta lo que borraría de más; alargar, nada", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+  const { cuantoSeBorraria } = await import("./acciones/editar-plazos");
+  const hoy = new Date("2026-09-27T12:00:00.000Z");
+  const correo = `prueba-plazos-${Date.now()}@ed.test`;
+  await sinQueQuede(async (tx) => {
+    await tx.mensaje.createMany({
+      data: [
+        { bandeja: "cv", nombre: "Prueba", correo, recibidoEn: d("2026-01-15") },
+        { bandeja: "contacto", nombre: "Prueba", correo, recibidoEn: d("2025-12-01") },
+      ],
+    });
+    // La base de la lane puede tener mensajes suyos: se cuenta la diferencia contra no cambiar nada.
+    const base = await cuantoSeBorraria(tx, { cv: 12, contacto: 24, spam: 30 }, hoy);
+    assert.deepEqual(base, { contacto: 0, cv: 0 });
+    const acortado = await cuantoSeBorraria(tx, { cv: 6, contacto: 9, spam: 30 }, hoy);
+    assert.ok(acortado.cv >= 1 && acortado.contacto >= 1, JSON.stringify(acortado));
+    assert.deepEqual(await cuantoSeBorraria(tx, { cv: 24, contacto: 36, spam: 90 }, hoy), { contacto: 0, cv: 0 });
+  });
+});
