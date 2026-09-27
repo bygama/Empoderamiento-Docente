@@ -282,6 +282,14 @@
 - **Limpieza:** las dos novedades de prueba («Prueba de la ficha», «Otra
   prueba») borradas de `ed_novedades`; quedan las nueve publicadas.
 
+- **Pausa — 2026-09-26:** PR [#189](https://github.com/bygama/Empoderamiento-Docente/pull/189)
+  abierto sobre `main` en `15def2c`, con el DoD en PASS (abajo). Espera la
+  revisión de cierre del padre. **Siguiente:** cada hallazgo vuelve como Task
+  a esta terminal y se arregla acá, con el gate otra vez; con la revisión en
+  PASS, el commit que borra `work/novedades-y-kit/` entra al PR antes del
+  merge. El dev server de la lane sigue en :3024 para ese arreglo; la base
+  `ed_novedades` tiene solo las nueve publicadas.
+
 ## Verification
 
 ### 2026-09-26 — DoD de la lane (los 18 pasos + el gate del brief) — PASS
