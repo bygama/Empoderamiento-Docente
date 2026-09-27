@@ -142,11 +142,42 @@
   README (Equipo), el spec del admin §6 y DESIGN.md §11 (el encabezado de la
   ficha en el armazón y la lista variable anidada). Falta «Lista que se
   ordena», que es del paso 11.
-- **El navegador de Orca, trabado** (pasos 7 a 10 sin su prueba de punta a
-  punta todavía): las pestañas del perfil aislado `equipo` se cierran solas
-  o el runtime corta la conexión en el primer `snapshot`/`eval`; con el
-  perfil `default` un `eval` anduvo una vez y la pestaña se cerró en el
-  siguiente comando. Consultado al padre (abajo).
+- **Pasos 7 a 10 en el navegador de Orca** (perfil aislado `equipo`, cuenta
+  de prueba «Ana Prueba», edita), con sondas de DOM por `orca eval`:
+  crear un perfil en `/nuevo` (la URL pasa a `/[id]`, «Sin publicar»,
+  «Borrador guardado.»), publicarlo («Publicado: el sitio ya lo muestra.»,
+  la tarjeta en `/quienes-somos`, último del nivel 4 con `orden` 6),
+  cambiarle la URL y republicar (`/quienes-somos/equipo/prueba-navegador`
+  → **308** a `…-dos`), un borrador con vista previa (`?persona=` abre el
+  perfil básico con «Rol en borrador» e iniciales sin foto), «Agregar en
+  Biblioteca» (`/admin/biblioteca/nuevo?persona=<id>`; «Cargar a mano»
+  trae a la persona elegida en la primera autoría), descartar (el foco va
+  a «Cancelar»; vuelve a lo publicado), despublicar (sale del sitio),
+  borrar (vuelve a `/admin/contenido/equipo?borrado=1`, la fila y su
+  redirección se van) y la actividad: las cinco filas en `actividad` y sus
+  frases en el Inicio («Ana Prueba publicó el perfil de Prueba
+  Navegadora»…). En la ficha de Karla Gómez: **contraste AA en los tres
+  temas, 0 fallas** (cada texto contra su fondo real, con 2 s para la
+  transición del tema: a 300 ms salían 55 falsas en oscuro, y 10 iguales
+  en la ficha de un material); **a 390 px, 0 desbordes** (la caja a 390, una
+  sola columna, todos los `details` abiertos; los breakpoints siguen en
+  escritorio porque el viewport no se puede emular); **teclado**: 0 clics
+  sobre `div`, 0 campos sin etiqueta, y todo lo interactivo del perfil pasa
+  por `Boton`, `BotonEnlace` y los controles del kit, que llevan su
+  `focus-visible`.
+  - **Lo que el navegador no dejó:** `orca screenshot` (png y jpeg), `orca
+    exec "set viewport 390 844"` y `orca cookie get` tiran el runtime y
+    cierran la pestaña; `orca keypress` no llega a la página (la ventana
+    de Orca no tiene el foco). La pestaña además se recarga con la primera
+    evaluación después de un rato quieta: cada sonda va precedida de otra
+    que la despierta. Sin capturas ni Tab de verdad, la mirada visual y el
+    recorrido con teclado quedan para la revisión de cierre.
+  - **Encontró dos cosas, arregladas:** el aviso de publicar decía «El
+    primero: URL» con el nombre vacío, porque el `slug` iba primero en el
+    esquema (`ac32db55`, con su test); y un perfil nuevo no se publicaba sin
+    escribir la URL a mano: ahora sigue al nombre hasta que se escribe o se
+    publica, como la de una novedad (`83315106`). `persona.test.ts` → 8
+    pass; typecheck 0; eslint 0.
 
 ## Abierto
 
