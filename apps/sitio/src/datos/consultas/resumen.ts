@@ -27,9 +27,12 @@ export type ResumenDelPeriodo = {
   vistasDelPeriodo: number;
 };
 
-/** El dominio del sitio: sus filas de referido son de alguien que ya estaba adentro, y no son un canal. */
+/**
+ * El dominio del sitio, sin `www.`: sus filas de referido son de alguien que
+ * ya estaba adentro, y no son un canal. Sin el `www.`, cubre las dos formas.
+ */
 export function dominioPropio(): string {
-  return new URL(urlDelSitio()).hostname;
+  return new URL(urlDelSitio()).hostname.replace(/^www\./, "");
 }
 
 /** El Resumen del período que termina en `hasta` (el último día copiado). */
