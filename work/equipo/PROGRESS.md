@@ -13,7 +13,7 @@
 
 ## Hecho
 
-- **Paso 1 — los esquemas de una persona** (`13140059`):
+- **Paso 1 — los esquemas de una persona** (`28cbc763`):
   `features/quienes-somos/contenido/` suma `modelo-del-equipo.ts` (niveles
   con su rótulo y sus lugares, colores, composiciones, figuras, topes y
   `rotuloDePublicacion`, los cuatro rótulos de §5.2), `campos-de-persona.ts`
@@ -26,10 +26,10 @@
   de una línea reusan `linea`/`opcional`/`deLaLista` de la Biblioteca.
   `pnpm --filter sitio exec tsx --test src/features/quienes-somos/contenido/persona.test.ts`
   → 7 pass, 0 fail; `pnpm typecheck` 0; eslint de los archivos nuevos 0.
-- **Paso 2 — la migración `equipo` y la FK** (`4b5daf56`):
+- **Paso 2 — la migración `equipo` y la FK** (`5500823a`):
   `prisma/schema/equipo.prisma` (modelo `Persona`, tabla `equipo`) y
   `Autoria.personaId` con su relación `SET NULL`; la migración
-  `20260927060356_equipo` (esquema de `migrate diff`, partido para mover los
+  `20260927073013_equipo` (renombrada al rebasear sobre la lane 9, para que vaya después de `aliados`; esquema de `migrate diff`, partido para mover los
   datos antes del `DROP`): la tabla, el índice parcial de la Dirección
   general, los 15 perfiles con ids fijos (generados por un script que valida
   con `esquemaPersona`: 64 referencias a la Biblioteca, 14 `sin-link`, 7
@@ -73,7 +73,7 @@
   `pnpm lint` 0; `node scripts/verificar-react-doctor.mjs` → 100/100 sin
   diagnósticos; `pnpm test` → sitio 431 pass, 0 fail, 1 saltado; auth 46;
   kit 3.
-- **Paso 4 — el ciclo de un perfil en la base** (`938704b7`):
+- **Paso 4 — el ciclo de un perfil en la base** (`368adac7`):
   `datos/acciones/editar-equipo.ts` (crear —último en el orden—, guardar con
   choque, descartar, borrar: la fila, sus redirecciones y la persona en los
   borradores de materiales, con la fk `SET NULL` para las autorías
@@ -89,14 +89,14 @@
   corren a la vez y la limpieza de uno borraba el material del otro: visto y
   corregido). `pnpm --filter sitio exec tsx --test src/datos/acciones/editar-equipo.test.ts src/datos/acciones/publicar-equipo.test.ts`
   → 6 pass, 0 fail; `ed_equipo` queda con sus 15 y 62.
-- **Paso 5 — mover dentro del nivel** (`a51447a8`): `mover-equipo.ts`, con la
+- **Paso 5 — mover dentro del nivel** (`fd8f5f98`): `mover-equipo.ts`, con la
   forma de `moverAliadoEnBase` de la lane 9 (`hacia: "antes" | "despues"`,
   renumera el nivel en una transacción, en la punta no se mueve); el nivel
   de quien nunca se publicó es el de su borrador (`nivelEnLaLista`).
   `mover-equipo.test.ts` → 1 pass (con perfiles sin nivel, un grupo solo de
   la prueba: los 15 no se tocan, comprobado en psql).
 - **Paso 6 — las Server Actions, la vista previa y la actividad**
-  (`48b0cf12`, `501a6ac8`): los cinco tipos (`publico-`, `despublico-`,
+  (`3e27ca68`, `f5713c32`): los cinco tipos (`publico-`, `despublico-`,
   `descarto-cambios-de-`, `borro-un-perfil`, `movio-un-perfil`) en
   `datos/actividad.ts` (`editarContenido`, todos al Inicio), su frase, su
   módulo (Contenido) y su link en Cuentas › Actividad
@@ -107,7 +107,7 @@
   `/admin/contenido`), `revalidar-equipo.ts` y `abrirVistaPreviaDePersona`
   (`/quienes-somos?persona=<slug>`). `pnpm --filter sitio exec tsx --test src/datos/acciones/acciones-con-sesion.test.ts src/datos/actividad.test.ts src/admin/actividad/frase.test.ts`
   → 22 pass, 0 fail; typecheck 0; eslint 0; react-doctor 100/100.
-- **Paso 7 — la ficha: la tarjeta** (`04b733a3`): `/admin/contenido/equipo/nuevo`
+- **Paso 7 — la ficha: la tarjeta** (`42b95429`): `/admin/contenido/equipo/nuevo`
   y `/[id]` (cada una chequea `editarContenido` antes de leer),
   `datos/consultas/ficha-de-persona.ts` (la ficha, lo que firma, quiénes
   ocupan cada nivel), `admin/equipo/` con `FichaDelPerfil` (el molde de un
@@ -117,13 +117,13 @@
   «Sin foto», la foto, el acercamiento, la URL), `PanelDelPerfil` («Se ve
   en»), `SalidaDelPerfil` y «Qué cambió» (`cambios.ts`, campo por campo y
   etapa por etapa, con `cambios.test.ts` → 2 pass).
-- **Paso 8 — la ficha: el recorrido** (`bb06c883`): `BloqueDelRecorrido`
+- **Paso 8 — la ficha: el recorrido** (`a302156a`): `BloqueDelRecorrido`
   («Tiene recorrido», que no borra nada hasta guardar; quién es, titular,
   bajada, formación en renglones), `CategoriasDelRecorrido`,
   `BloqueDeLaFigura` (marco, recorte o sin foto; la foto y «apaisada») y
   `BloqueDelCierre`.
-- **Paso 9 — la ficha: las etapas y sus publicaciones** (`e4bf7b68`,
-  `7dfe6014`): `EtapasDelRecorrido` y `EtapaDelRecorrido` (lo común y lo que
+- **Paso 9 — la ficha: las etapas y sus publicaciones** (`5b8b3447`,
+  `226567cf`): `EtapasDelRecorrido` y `EtapaDelRecorrido` (lo común y lo que
   usa cada composición, en `etapa-del-recorrido/composiciones.ts`), con
   `HitosDeLaEtapa`, `RamasDeLaEtapa`, `PublicacionesDeLaEtapa` y
   `PublicacionDeLaEtapa` (de la Biblioteca —lo que firma— o sin link), y
@@ -132,13 +132,13 @@
   duplicado con el de un material y dos exports que no eran componentes: el
   encabezado subió al armazón (`EncabezadoDeFicha`, el refactor aparte) y
   los colores a `colores.ts`; queda en 100/100.
-- **Paso 10 — «Agregar en Biblioteca» con la persona elegida** (`95c5a0cc`):
+- **Paso 10 — «Agregar en Biblioteca» con la persona elegida** (`b2763ec6`):
   `/admin/biblioteca/nuevo?persona=<id>` (la persona que no existe se
   ignora), `personaParaAutoria`, `AgregarMaterial` (a mano: primera autora;
   con datos de afuera: `vincularPersona`, palabra por palabra sin tildes ni
   mayúsculas, o el aviso «Ningún autor de este material es…») y el aviso
   inicial de la ficha de un material. `vincular-persona.test.ts` → 2 pass.
-- **Paso 13, en parte** (`7600dc32`, `20c58d2c`): AGENTS.md §3 y §13, el
+- **Paso 13, en parte** (`3ff14bdd`, `3bda882c`): AGENTS.md §3 y §13, el
   README (Equipo), el spec del admin §6 y DESIGN.md §11 (el encabezado de la
   ficha en el armazón y la lista variable anidada). Falta «Lista que se
   ordena», que es del paso 11.
@@ -174,16 +174,60 @@
     recorrido con teclado quedan para la revisión de cierre.
   - **Encontró dos cosas, arregladas:** el aviso de publicar decía «El
     primero: URL» con el nombre vacío, porque el `slug` iba primero en el
-    esquema (`ac32db55`, con su test); y un perfil nuevo no se publicaba sin
+    esquema (`0c04a052`, con su test); y un perfil nuevo no se publicaba sin
     escribir la URL a mano: ahora sigue al nombre hasta que se escribe o se
-    publica, como la de una novedad (`83315106`). `persona.test.ts` → 8
+    publica, como la de una novedad (`585f468e`). `persona.test.ts` → 8
     pass; typecheck 0; eslint 0.
+
+- **Rebase sobre `main` con la lane 9** (`ddc8ca1d`, 43 commits): conflictos
+  en `lib/contenido/fotos.ts` (las carpetas de fotos: la lista nueva de la 9
+  más `equipo`), la actividad (`datos/actividad.ts`, `frase.ts` y su test,
+  `modulos.ts`: los tipos de las dos lanes, y `pantallaDe` con casos y
+  perfiles), el encabezado de la ficha de un material (la 9 solo movió el
+  import de `AccionesDeLaFicha` al armazón: queda `EncabezadoDeFicha` con
+  ese import) y los documentos (AGENTS.md §3 y §12, README, spec del admin
+  §6 y DESIGN.md §11: lo de las dos lanes). Después del rebase, la
+  migración del equipo se renombró de `…060356` a
+  **`20260927073013_equipo`** (`4c787a64`) para que vaya después de
+  `…065218_aliados`: solo estaba aplicada en `ed_equipo`, donde se
+  actualizó su fila de `_prisma_migrations` (mismo contenido) y
+  `pnpm migrate:deploy` aplicó las 3 de la 9. `prisma migrate reset` no se
+  usó: Prisma lo frena para un agente sin el consentimiento del usuario. El
+  orden completo se probó desde cero en una base nueva, `ed_equipo_orden`
+  (`migrate:deploy` de las 26), con los mismos conteos que `ed_equipo` (15
+  perfiles, 62 materiales, 74 autorías con persona, 5 aliados, 4 casos, 47
+  fotos); `migrate diff` contra el esquema, vacío. El perfil pasó al
+  `Bloque` y la `FilaDeAccion` del armazón que subió la 9 (`b67ad7ea`).
+  `pnpm typecheck` 0, `pnpm lint` 0, react-doctor 100/100, `pnpm test` →
+  545 (544 pass, 1 skip, 0 fail).
+- **Paso 11 — la lista del Equipo** (`2db8bd30`, `c41ddf2d`, `4fee870e`,
+  `d2e70342`): lo compartido de mover (el foco que sigue, el anuncio, los
+  botones quietos) subió al armazón (`useMoverEnOrden`,
+  `ListaQueSeOrdena`) y la lista de aliados lo usa sin cambiar su
+  comportamiento; `/admin/contenido/equipo` (chequea `editarContenido`
+  antes de leer) con `listaDelEquipo()`, un grupo por nivel (y «Sin nivel»
+  al final), miniatura, rol · país, la insignia si pide atención, «Subir»,
+  «Bajar» y «Editar»; la tarjeta del índice («15 perfiles · N con cambios
+  sin publicar», `resumenDeEquipo` con su test), el punto de Contenido con
+  los perfiles, y la guía de Contenido afuera (se fueron
+  `guias-de-contenido.ts`, `GuiaDeContenido.tsx` y la ruta
+  `contenido/[pantalla]/`: era la última). DESIGN.md §11 suma «Lista que
+  se ordena» (con su variante agrupada) y Aliados apunta a ella. En el
+  navegador: los cuatro niveles con su explicación y los botones justos en
+  cada punta; «Subir» a Judith Hernández deja quietos los 22 botones de
+  mover, la pasa al lugar 1, el foco va a su «Bajar», el `status` dice
+  «Judith Hernández pasó al lugar 1 de Líderes de área y proyecto.» y
+  `/quienes-somos` la muestra antes de Iván Pérez; «Bajar» la devuelve, y
+  quedan dos `movio-un-perfil` en la actividad. La tarjeta del índice dice
+  «15 perfiles». `pnpm typecheck` 0 (con `next typegen`: el
+  `validator.ts` de `.next/` seguía nombrando la ruta borrada), `pnpm lint`
+  0, react-doctor 100/100, `pnpm test` → 545 (544 pass, 1 skip).
 
 ## Abierto
 
-- La lane 9 (`casos-aliados-fotos`) no está en `main`: el registro de usos de
-  fotos, los cambios de la tabla `fotos` y el orden de Aliados son suyos
-  (SPEC §6.2 y §9; PLAN pasos 11 y 12).
+- `ed_equipo_orden` (la base donde se probó el orden de las migraciones) y
+  `ed_equipo_antes` (la de `comparar-render`) quedan en `ed-postgres`: son
+  locales y se pueden borrar al cerrar.
 - Fase 4: los ~110 KB del recorrido viajan en el payload del HTML de
   `/quienes-somos` (lo mismo que hoy pesa el `data.ts` en el bundle); cargar
   el perfil al abrirlo es de la fase 4 (nota del padre al aprobar).
