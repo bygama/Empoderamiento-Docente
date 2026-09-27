@@ -161,4 +161,66 @@
   `docs/COMMITS.md`; se reescribieron antes del primer push con un filtro
   de mensajes (el árbol, idéntico), y los hashes de acá, al día.
 
+## Verification
+
+### 2026-09-27 — L DoD — PASS (la revisión de cierre, pendiente: la lanza el padre)
+
+Todo sobre `834af0d5`, en un worktree limpio de ese commit
+(`%TEMP%/ed-cierre-limpio`: sin `.next` ni `next-env.d.ts`, `pnpm install
+--frozen-lockfile` y `pnpm generate`).
+
+- L1 static: `pnpm typecheck` → exit 0 (los cuatro proyectos); `pnpm lint`
+  → exit 0; `node scripts/verificar-react-doctor.mjs` → exit 0,
+  «react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 1196 archivos ·
+  packages/db/src: 3 · packages/auth/src: 27 · packages/kit-admin/src: 52)».
+- L2 behavioral: `pnpm test` **cinco veces seguidas → exit 0 las cinco**
+  (20, 21, 21, 21 y 20 s; 627 tests, 625 pass, 0 fail, 2 skipped, los mismos
+  627 y los mismos 2 saltados que `main`: «ya hay quien dirige en esta base»
+  y «sin respuestas grabadas: falta correr A1»). `pnpm build` → exit 0
+  (68 páginas). Arranca: `next start` del build en el 3034 → `/admin/entrar`
+  200.
+- L3 end-to-end:
+  - `node scripts/comparar-render.mjs <main> <limpio>` → exit 0, «12
+    páginas, render idéntico»; el CSS, los mismos dos archivos por hash.
+  - El admin por HTML, build de `main` (3033) contra el de `834af0d5`
+    (3034), los dos sobre `ed_cierre`, con la sesión de quien dirige: 695
+    pantallas, 695 iguales, CSS igual, 0 sin visitar. Las de administra
+    (695 × tres temas) y edita (327) sobre `ed`, en el paso 9, con el mismo
+    código: desde entonces solo cambiaron comentarios y documentos.
+  - A ojo y lo de cliente: paso 9 (35 combinaciones de pantalla, tema y
+    ancho con una captura byte a byte igual; pestañas, mover, confirmar, ver
+    la contraseña y frenar la salida, andando).
+- Después de las cinco corridas, las 24 tablas de contenido y de uso de `ed`
+  tienen la misma huella que la copia `ed_cierre` (de antes de correr la
+  suite): las corridas seguidas no tocan filas reales.
+- Close review: la lanza el padre al recibir `worker_done` (1 revisor Opus
+  5.5, effort medium, lente «el cambio entero contra su SPEC»). **Todavía no
+  corrió**: la lane no se cierra sin su veredicto.
+
+## Tried and failed
+
+- 2026-09-27 — **`pnpm test`, primeras cinco corridas sobre el árbol
+  limpio: 3 con exit 1.** Fallaron `bloqueos-de-acceso.test.ts` («diez
+  fallos al mismo tiempo cuentan diez», en las corridas 1, 3 y 4) y
+  `mover-equipo.test.ts` («un perfil que ya no existe…», en la 1), las dos
+  con `PrismaClientKnownRequestError: Transaction API error: Unable to start
+  a transaction in the given time`; eran las corridas lentas (49, 57 y 97 s
+  contra 23 y 24 s). Código que esta lane no tocó. Lo que se probó:
+  - `main` en su worktree, tres corridas en ese momento: 3 exit 0.
+  - `main` en un worktree recién instalado, cinco corridas: 5 exit 0 (así
+    que la instalación fresca sola no lo explica).
+  - La rama, cinco corridas más: 5 exit 0 (21–22 s).
+  - `main` y la rama **a la vez**, cuatro rondas: las dos fallan las cuatro,
+    con decenas de tests de base cada una. La suite no aguanta correr en
+    paralelo con otra contra la misma base: la clase de falla de las
+    corridas 1, 3 y 4. Qué otra carga hubo en ese momento no se pudo saber.
+  - **Esas rondas en paralelo escribieron sobre filas reales de `ed`**: los
+    chequeos de links de 11 materiales, los destacados 1 y 2 de la
+    Biblioteca, la novedad destacada, el orden de los 5 aliados (de 1–5 a
+    6–10) y 2 filas de prueba en `bloqueos_de_acceso`. Se vio porque el build
+    de la rama perdía dos destacados en Inicio y Biblioteca. Se restauró todo
+    desde `ed_cierre` (copia de antes de correr la suite), en una
+    transacción, columna por columna, y la huella de las 24 tablas volvió a
+    coincidir (DECISIONS).
+
 ## Abierto

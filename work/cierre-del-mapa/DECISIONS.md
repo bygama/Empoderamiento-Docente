@@ -61,6 +61,25 @@
   quedan, como en `campo-foto/ElegirYaSubida.tsx` de `main`; los datos de
   `ruta.test.ts` también (los tests no se tocan).
 
+- 2026-09-27 — **`ed` se devolvió al estado de antes de la suite** (la
+  verificación): las cuatro rondas de `main` y la rama en paralelo, que
+  lancé para diagnosticar las corridas lentas, escribieron sobre filas reales
+  (los chequeos de links de 11 materiales, los destacados 1 y 2, la novedad
+  destacada, el orden de los aliados y 2 filas de prueba en
+  `bloqueos_de_acceso`). Se restauraron desde `ed_cierre`, la copia de antes
+  de correr la suite, solo en las columnas que cambiaron y con la condición
+  de que siguieran como las dejó la prueba; la huella de las 24 tablas de
+  contenido y de uso volvió a coincidir con la copia, y cinco corridas
+  seguidas después no la movieron. Hallazgo para el padre, fuera de esta
+  lane: la suite no está aislada de las filas reales cuando corren dos a la
+  vez contra la misma base.
+- 2026-09-27 — **El gate de verdad es el de las cinco corridas finales**:
+  las primeras cinco tuvieron 3 fallas de tiempo de transacción en tests que
+  la lane no tocó (PROGRESS, «Tried and failed»), y no se descartan como
+  «ruido»: se comparó con `main` en las mismas condiciones y en paralelo
+  hasta ubicar la clase de falla. Las cinco que cuentan corrieron seguidas,
+  sin nada más contra la base, sobre `834af0d5`.
+
 ## Lo que se queda en `admin/armazon/`, y por qué
 
 - **`BarraLateral` y `barra-lateral/`** — son los módulos de ED: su lista
