@@ -26,9 +26,10 @@ export const MAXIMO_BYTES = 4 * 1024 * 1024;
 const SEGMENTO_DE_RUTA = /(?!\.{1,2}\/|\.{1,2}$)(?:(?!%2[eEfF])[^\s?#/])+/;
 // Las carpetas de public/ con fotos del contenido: la de fotos aprobadas y
 // las dos de donde salen las imágenes de las novedades de hoy
-// (work/novedades-y-kit/DECISIONS). Una lista, no «cualquier carpeta»:
-// public/ también tiene logos y PDF, que no son una foto del contenido.
-const CARPETAS_DE_FOTOS = ["fotos", "novedades", "quienes-somos"];
+// (work/novedades-y-kit/DECISIONS), más las portadas tipográficas de la
+// Biblioteca (work/biblioteca/). Una lista, no «cualquier carpeta»: public/
+// también tiene logos y PDF, que no son una foto del contenido.
+const CARPETAS_DE_FOTOS = ["fotos", "novedades", "quienes-somos", "biblioteca/portadas"];
 const RUTA_DE_FOTO = new RegExp(String.raw`/(?:${CARPETAS_DE_FOTOS.join("|")})/(?:${SEGMENTO_DE_RUTA.source}/)*${SEGMENTO_DE_RUTA.source}`);
 
 // Lo único que el sitio sabe mostrar: sus fotos de public/, las subidas en
