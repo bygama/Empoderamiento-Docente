@@ -2,6 +2,12 @@
 
 ## In progress
 
+- 2026-09-27 — **Cierre.** La revisión r1 dio PASS sobre `f7455e45`, sin
+  Critical ni Important, con cuatro Minor; la ronda de cierre los arregló
+  (`2d263353`, `f392f3ff`, `fe38f39d`) y la lane se cierra en este PR: el
+  commit que sigue a este borra `work/cierre-del-mapa/`. Después: borrar los
+  recursos de la verificación, rebasear sobre `origin/main` y correr el gate
+  entero; su salida va al `worker_done` y al PR.
 - 2026-09-27 — **Pausa para la revisión de cierre.** Los 11 pasos del PLAN
   están hechos y verificados (`## Verification`), sin bloqueos ni comandos
   en rojo; la rama, sobre `main` en `910dabf5`, y el PR abierto. **Lo que
@@ -170,6 +176,33 @@
   de mensajes (el árbol, idéntico), y los hashes de acá, al día.
 
 ## Verification
+
+### 2026-09-27 — Close review r1 — PASS (Opus 5.5, medium, «el cambio entero contra su SPEC»)
+
+Lo que el padre trasladó del revisor, sobre `f7455e45`: «PASS en r1, sin
+Critical ni Important». Midió el gate, cinco corridas de `pnpm test`, los
+cuatro registros exportados de `main` y de la rama (idénticos salvo el orden
+aprobado en P4), el HTML del admin con los tres roles y los tres temas (igual
+salvo la 404 de P5), lo que corre del lado del cliente en el navegador,
+`comparar-render` de las 12 páginas, los 40 DOI de la base con el mismo
+link, lo borrado sin referencias, la frontera del kit con 0 imports de `@/`
+y las rutas que citan los documentos. Cuatro Minor, arreglados:
+
+1. El spec §11 decía que Métricas «no depende del kit», y usa sus piezas →
+   dice lo que hay (`f392f3ff`).
+2. Comentarios del kit con ejemplos de Mensajes (`Volver`, `Encabezado`,
+   `Buscador`, `Confirmacion`) → ejemplos neutros, y de paso los de
+   `Numero`, `Pestanas` y `ruta.ts` (`2d263353`).
+3. `useErroresDelEditor` faltaba en la lista de lo que queda en el armazón →
+   sumado en AGENTS.md, DESIGN.md §11, el README del kit, el ADR-0014 y el
+   spec §3 (`f392f3ff`).
+4. Los índices con spreads perdieron el error por clave repetida → un test
+   (`admin/actividad/registros.test.ts`, `fe38f39d`) recorre los cuatro
+   registros y exige que la suma de las claves de sus módulos dé la cuenta
+   del índice. Probado a mano: con `entro` repetido en `mi-cuenta.ts` de
+   actividad, de frase y de módulos, y una fila de aliados repetida en
+   `pendientes/fotos.ts`, `tsc` da 0 y el test, 1 en los cuatro («claves en
+   dos módulos»); sin el cambio, pasa.
 
 ### 2026-09-27 — L DoD — PASS (la revisión de cierre, pendiente: la lanza el padre)
 
