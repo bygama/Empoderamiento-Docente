@@ -3,7 +3,7 @@
 import { CampoFoto, Casilla, Fecha, Seleccion, TextoCorto, type Cambio, type Opcion } from "@ed/kit-admin";
 import { LARGO_MAXIMO } from "@ed/db/slug";
 import { errorDe } from "@/admin/campos/errores";
-import { subirFoto } from "@/datos/acciones/fotos";
+import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import { CATEGORIAS, TOPES } from "@/features/novedades/contenido/modelo";
 import { MAXIMO_BYTES } from "@/lib/contenido/fotos";
 import { CuerpoDeNovedad } from "./CuerpoDeNovedad";
@@ -86,6 +86,7 @@ export function FormularioDeNovedad({ form, cambiar, errores, materiales, ayudaD
           valor={form.imagen}
           alCambiar={(v) => cambiar("imagen", v)}
           subir={subirFoto}
+          elegir={fotosParaElegir}
           maximoBytes={MAXIMO_BYTES}
           error={error("imagen")}
         />

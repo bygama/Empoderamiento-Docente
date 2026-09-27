@@ -3,7 +3,7 @@
 import { Boton, CampoFoto, resolverCambio, type Cambio } from "@ed/kit-admin";
 import { AlCompartir, EnGoogle } from "@/admin/armazon/ComoSeVe";
 import { siteConfig } from "@/config/site";
-import { subirFoto } from "@/datos/acciones/fotos";
+import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import type { Vecinas } from "@/datos/consultas/ficha-de-novedad";
 import { fotoVacia } from "@/features/novedades/contenido/modelo";
 import type { BorradorDeNovedad } from "@/features/novedades/contenido/novedad";
@@ -66,6 +66,7 @@ export function PanelDeLaNovedad({ form, cambiarImagen, error, id, vecinas, enEl
             valor={propia}
             alCambiar={(v) => cambiarImagen((actual) => resolverCambio(v, actual ?? fotoVacia()))}
             subir={subirFoto}
+            elegir={fotosParaElegir}
             maximoBytes={MAXIMO_BYTES}
             error={error}
           />

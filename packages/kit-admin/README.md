@@ -26,7 +26,8 @@ Sí sabe de Next: `CampoFoto` y `ListaFija` usan `next/image`. `react`,
 | `Seleccion` | un valor de una lista cerrada, con `{ valor, etiqueta }` |
 | `Casilla` | sí o no, con su etiqueta y lo que pasa si se marca |
 | `Fecha` | año, y si se sabe, mes y día: `AAAA-MM-DD`, `AAAA-MM` o `AAAA` |
-| `CampoFoto` | una foto: miniatura con el foco, alt obligatorio y la subida |
+| `CampoFoto` | una foto: miniatura con el foco, alt obligatorio y la subida; con `elegir` (las fotos ya subidas, que trae la app), un panel para elegir una; con `conFoco={false}`, la foto entera y sin punto de foco (un logo, una lámina) |
+| `ElegirFoto`, `FotoElegible`, `SubirFoto` | lo que `CampoFoto` le pide a la app: traer las fotos y subir una |
 | `ListaFija` | exactamente N ítems, en una grilla de miniaturas |
 | `ListaVariable` | ítems que se agregan, se quitan y se mueven, hasta un máximo; cada uno con una clave estable que da quien lo usa |
 | `Contador`, `PieDelCampo`, `estadoDelLargo` | el largo de un texto y lo que se dice de él |

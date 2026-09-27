@@ -414,9 +414,8 @@ la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
 compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`); el estado
 vacío con su acción, la fecha, la selección, la lista variable y la ficha de
 una entidad, también (`work/novedades-y-kit/`); Ajustes, que no suma
-patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); y la
-grilla de fotos, el 2026-09-27 (`work/casos-aliados-fotos/`). Todos los
-contrastes están
+patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); y la grilla de fotos y elegir una foto,
+el 2026-09-27 (`work/casos-aliados-fotos/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -987,6 +986,34 @@ del admin. `packages/kit-admin/src/Seleccion.tsx`.
   Biblioteca: Ninguna»).
 - Primer consumidor: la ruta interna del editor de páginas; en una novedad,
   la categoría y la publicación.
+
+### Elegir una foto
+
+El campo de foto de cualquier formulario deja elegir una ya subida, además de
+subir otra. `packages/kit-admin/src/CampoFoto.tsx` y sus piezas en
+`campo-foto/`.
+
+- **«Elegir una ya subida…»**, secundario, al lado de «Elegir foto…».
+  Abre **un panel en línea, debajo del campo, no un modal** (el admin no
+  tiene modales): el botón lo anuncia con `aria-expanded` y lo apunta con
+  `aria-controls`. Las fotos se piden en ese clic, así están las recién
+  subidas; solo jpg, png y webp, nunca un SVG.
+- **Adentro:** una caja para filtrar por lo que muestra (la `ENTRADA`, con su
+  etiqueta `sr-only`) y «Cancelar», terciario; debajo, la grilla (dos
+  columnas, tres desde `sm`, con scroll propio de hasta 24 rem), cada foto un
+  botón con su miniatura 4/3 sobre `gris-fondo` y su alt en meta `gris-texto`
+  (4,83:1 · 7,08:1) en dos renglones. Se lee «Elegir: …» con el alt; la de
+  ahora lleva borde `azul-principal` y «(la de ahora)» para el lector. Sin
+  fotos o sin resultados, una frase en meta `gris-texto` lo dice.
+- **El foco:** al abrir, va a la caja; Escape o «Cancelar» cierran, y al
+  cerrar o elegir vuelve al botón que abrió. Elegir pone la foto con el foco
+  al centro y, si el campo no tenía alt, el de la biblioteca: el que ya había
+  es de ese lugar.
+- **Sin foco** (`conFoco={false}`), para lo que no se recorta (un logo, una
+  lámina): la miniatura va entera sobre `gris-fondo`, sin el punto ni la
+  ayuda del foco.
+- Primer consumidor: el editor de páginas y las dos fotos de una novedad; lo
+  usan también los casos y los aliados.
 
 ### Lista variable
 
