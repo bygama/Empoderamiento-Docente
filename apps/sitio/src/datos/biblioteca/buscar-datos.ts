@@ -32,7 +32,7 @@ async function json(pedir: Pedir, url: string): Promise<unknown> {
 async function porDoi(pedir: Pedir, doi: string, contacto: string): Promise<Lectura[]> {
   const crossref = leerCrossref(publicacionDeCrossref(await json(pedir, `https://api.crossref.org/works/${encodeURIComponent(doi)}`)));
   if (crossref) return [{ fuente: "crossref", campos: camposDe(crossref, "crossref") }];
-  const openalex = leerOpenAlex(await json(pedir, `https://api.openalex.org/works/doi:${doi}?mailto=${encodeURIComponent(contacto)}`));
+  const openalex = leerOpenAlex(await json(pedir, `https://api.openalex.org/works/doi:${encodeURIComponent(doi)}?mailto=${encodeURIComponent(contacto)}`));
   return openalex ? [{ fuente: "openalex", campos: camposDe(openalex, "openalex") }] : [];
 }
 
