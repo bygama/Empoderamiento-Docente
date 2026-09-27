@@ -17,6 +17,17 @@
   3. **El SQL generado** de cada migración lleva un comentario con de qué
      salió y cómo se generó (el script no se commitea).
 
+- 2026-09-27 — **«Ver» en Cuentas › Actividad lleva a un caso, no a un
+  aliado ni a una foto** (paso 3). El SPEC decía «a la ficha del aliado o de
+  la foto, nada si se borró»; saber si todavía existen pedía otra consulta en
+  la pantalla de Actividad, que Ajustes (en vuelo) también toca. Se sigue el
+  precedente de Novedades: lo que se puede borrar no lleva link. Los casos,
+  que no se borran, sí. El SPEC §9 quedó al día.
+- 2026-09-27 — **La migración se crea en una terminal de Orca** (paso 2):
+  `migrate dev --create-only` pide confirmar el aviso del índice único y se
+  niega en un shell no interactivo. Se corre en una pestaña de Orca y se le
+  contesta ahí; el archivo es el que genera Prisma, con los datos sumados
+  antes de la primera aplicación.
 - 2026-09-27 — **Lo que la exploración encontró y el SPEC toma** (antes de la
   aprobación): los casos se consumen solo en componentes del navegador
   (`CasosInvestigacion`, `useAccionesLugar`, `useHistorialLugar`), así que

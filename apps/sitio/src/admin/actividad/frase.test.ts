@@ -11,7 +11,14 @@ test("cada fila se lee como una frase, con quién y sobre qué", () => {
   for (const tipo of TIPOS_DE_ACTIVIDAD) assert.match(fraseDe({ tipo, quien: "Ana", sobre: "Juan" }), /^Ana \S/, tipo);
 });
 
-test("cada rol ve la actividad de lo que usa: quien edita, la de páginas, Contacto, Novedades y la Biblioteca, y no la de cuentas ni CV", () => {
+test("un caso, un aliado y una foto se nombran como en su lista", () => {
+  assert.equal(fraseDe({ tipo: "publico-un-caso", quien: "Ana", sobre: "Caso 01" }), "Ana publicó el caso 01");
+  assert.equal(fraseDe({ tipo: "autorizo-un-aliado", quien: "Ana", sobre: "UNESCO" }), "Ana autorizó el logo de UNESCO");
+  assert.equal(fraseDe({ tipo: "quito-la-autorizacion-de-un-aliado", quien: "Ana", sobre: null }), "Ana le quitó la autorización a un logo de aliado");
+  assert.equal(fraseDe({ tipo: "reemplazo-una-foto", quien: "Ana", sobre: "Un aula" }), "Ana reemplazó el archivo de la foto «Un aula»");
+});
+
+test("cada rol ve la actividad de lo que usa: quien edita, la de Contenido, Contacto, Novedades y la Biblioteca, y no la de cuentas ni CV", () => {
   assert.deepEqual(tiposQueVe("administra"), [...TIPOS_DE_ACTIVIDAD]);
   assert.deepEqual(tiposQueVe("edita"), [
     "publico-una-pagina",
@@ -30,6 +37,16 @@ test("cada rol ve la actividad de lo que usa: quien edita, la de páginas, Conta
     "oculto-un-material",
     "descarto-cambios-de-un-material",
     "borro-un-material",
+    "publico-un-caso",
+    "descarto-cambios-de-un-caso",
+    "autorizo-un-aliado",
+    "quito-la-autorizacion-de-un-aliado",
+    "publico-un-aliado",
+    "despublico-un-aliado",
+    "borro-un-aliado",
+    "subio-una-foto",
+    "reemplazo-una-foto",
+    "borro-una-foto",
   ]);
 });
 
