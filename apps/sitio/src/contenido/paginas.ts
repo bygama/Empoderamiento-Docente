@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import { destacadosInicial, esquemaDestacados } from "@/features/biblioteca/contenido/destacados";
 import { esquemaHeroBiblioteca, heroBibliotecaInicial } from "@/features/biblioteca/contenido/hero";
 import { areasInicial, esquemaAreas } from "@/features/home/contenido/areas";
 import { bibliotecaYNovedadesInicial, esquemaBibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
@@ -110,6 +111,7 @@ export const PAGINAS = {
     nombre: "Biblioteca",
     secciones: {
       hero: { nombre: "Hero", esquema: esquemaHeroBiblioteca, inicial: heroBibliotecaInicial },
+      destacados: { nombre: "Material destacado", esquema: esquemaDestacados, inicial: destacadosInicial },
     },
   },
   novedades: { ruta: "/novedades", nombre: "Novedades", secciones: {} },

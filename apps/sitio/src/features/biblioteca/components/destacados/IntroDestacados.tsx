@@ -1,16 +1,42 @@
 import Image from "next/image";
 import type { RefObject } from "react";
+import type { Destacados } from "@/features/biblioteca/contenido/destacados";
 import type { ItemDestacado } from "@/features/biblioteca/data/materiales";
+import { fragmentos } from "@/lib/contenido/resaltado";
+
+/**
+ * El titular en dos tonos: lo resaltado (entre dobles asteriscos) en verde y
+ * lo demás en azul, cada tramo en su span y un espacio entre ellos, como
+ * estaba escrito a mano. Sin resaltado —un documento viejo—, todo azul.
+ */
+function TituloDosTonos({ texto }: { texto: string }) {
+  const partes = fragmentos(texto);
+  const i = partes.findIndex((f) => f.resaltado);
+  if (i === -1) return <span className="text-azul-principal">{texto}</span>;
+  const unir = (lista: typeof partes) => lista.map((f) => f.texto).join("").trim();
+  const antes = unir(partes.slice(0, i));
+  const despues = unir(partes.slice(i + 1));
+  return (
+    <>
+      {antes ? <><span className="text-azul-principal">{antes}</span>{" "}</> : null}
+      <span className="text-verde-concepto">{partes[i].texto}</span>
+      {despues ? <>{" "}<span className="text-azul-principal">{despues}</span></> : null}
+    </>
+  );
+}
 
 /**
  * Fase 1: intro con pantalla propia — eyebrow, titular a dos azules, párrafo
  * del equipo y la fila de las 4 portadas viajeras (que en desktop la
- * coreografía pinea, converge y barre).
+ * coreografía pinea, converge y barre). Los textos llegan por props; las
+ * portadas son de los materiales.
  */
 export function IntroDestacados({
+  contenido,
   items,
   refRow,
 }: {
+  contenido: Destacados;
   items: ReadonlyArray<ItemDestacado>;
   refRow: RefObject<HTMLDivElement | null>;
 }) {
@@ -22,22 +48,19 @@ export function IntroDestacados({
     <div className="mx-auto w-full max-w-screen-xl px-5 pt-14 pb-16 md:px-10 md:pt-20 md:pb-20">
       <div className="md:grid md:grid-cols-12 md:gap-x-8">
         <p className="text-gris-texto font-mono text-[0.7rem] tracking-[0.14em] uppercase md:col-span-3">
-          Material destacado
+          {contenido.antetitulo}
         </p>
         <h2
           className="font-display mt-6 font-extrabold tracking-[-0.02em] md:col-span-9 md:mt-0"
           style={{ fontSize: "clamp(2.2rem, 1rem + 4.5vw, 4.25rem)", lineHeight: 1.05 }}
         >
-          <span className="text-verde-concepto">Cuatro materiales</span>{" "}
-          <span className="text-azul-principal">para entrar a la biblioteca</span>
+          <TituloDosTonos texto={contenido.titulo} />
         </h2>
       </div>
 
       <div className="mt-20 md:mt-36 md:grid md:grid-cols-12 md:items-end md:gap-x-8">
         <p className="text-gris-texto max-w-[38ch] font-sans text-[0.97rem] leading-relaxed md:col-span-3">
-          Una selección corta del equipo: la investigación que da origen a
-          ED y tres materiales listos para el aula. Si llegás por primera
-          vez, empezá por acá.
+          {contenido.presentacion}
         </p>
         {/* Las 4 portadas "viajeras": acá son la fila de la intro; en
             desktop se pinean, convergen sobre el slot y las barre cada

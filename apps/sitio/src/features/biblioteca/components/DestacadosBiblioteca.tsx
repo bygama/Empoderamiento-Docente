@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { getLenis } from "@/lib/lenis";
+import type { Destacados } from "@/features/biblioteca/contenido/destacados";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { ITEMS_DESTACADOS } from "../data/materiales";
@@ -35,9 +36,11 @@ import { ArticuloDestacado } from "./destacados/ArticuloDestacado";
  *
  * Piezas: los destacados resueltos en `data/materiales.ts` (ITEMS_DESTACADOS),
  * la coreografía en `destacados/coreografia-destacados.ts`, el markup en
- * `IntroDestacados`, `IndiceDestacados` y `ArticuloDestacado`.
+ * `IntroDestacados`, `IndiceDestacados` y `ArticuloDestacado`. Los textos
+ * propios de la sección llegan por props (de
+ * `features/biblioteca/contenido/destacados.ts` o de la base).
  */
-export function DestacadosBiblioteca() {
+export function DestacadosBiblioteca({ contenido }: { contenido: Destacados }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const rowRef = useRef<HTMLDivElement | null>(null);
   const slotRef = useRef<HTMLDivElement | null>(null);
@@ -81,7 +84,7 @@ export function DestacadosBiblioteca() {
       aria-label="Material destacado"
     >
       {/* ── Fase 1: intro con pantalla propia ───────────────────────────── */}
-      <IntroDestacados items={ITEMS_DESTACADOS} refRow={rowRef} />
+      <IntroDestacados contenido={contenido} items={ITEMS_DESTACADOS} refRow={rowRef} />
 
       {/* ── Fases 2 y 3: banda azul con índice + artículos ──────────────── */}
       <div className="bg-azul-principal relative">
