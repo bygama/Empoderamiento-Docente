@@ -3,6 +3,7 @@ import { sumasDe, type SumaDeContador } from "@/datos/contadores";
 import { CANALES, type Canal } from "@/lib/metricas/canales";
 import { diaISO, sumarDias, variacion, type Periodo } from "@/lib/metricas/periodos";
 import type { Dia } from "@/lib/metricas/tipos";
+import { masConsultados, type MaterialConsultado } from "./materiales-consultados";
 
 // Lo que lee Métricas › Qué hace la gente (SPEC de work/metricas-completas/
 // §6.3): los contadores propios, que cuentan en el momento. El período
@@ -18,6 +19,8 @@ export type QueHaceLaGente = {
   /** El camino del CV por canal, en el orden de `CANALES`, y el total. */
   cv: { porCanal: Array<{ canal: Canal } & PasosDelCV>; total: PasosDelCV };
   contactos: { total: number; variacion: string; porCanal: Array<{ canal: Canal; cuenta: number }> };
+  /** Los diez materiales que más se abrieron en el período. */
+  materiales: MaterialConsultado[];
 };
 
 const suma = (sumas: readonly SumaDeContador[], evento: Evento, canal?: Canal) =>
@@ -33,10 +36,11 @@ export async function queHaceLaGente(periodo: Periodo, hoy: Date = new Date()): 
   const hasta = diaISO(hoy);
   const desde = sumarDias(hasta, -(periodo - 1));
   const eventos: Evento[] = [...PASOS_DEL_CV, "contacto-envio"];
-  // El período y el anterior no dependen uno del otro: van juntos.
-  const [actual, anterior] = await Promise.all([
+  // El período, el anterior y los materiales no dependen uno del otro: van juntos.
+  const [actual, anterior, materiales] = await Promise.all([
     sumasDe({ eventos, desde, hasta }),
     sumasDe({ eventos: ["contacto-envio"], desde: sumarDias(desde, -periodo), hasta: sumarDias(desde, -1) }),
+    masConsultados(desde, hasta),
   ]);
   const contactos = suma(actual, "contacto-envio");
   return {
@@ -48,5 +52,6 @@ export async function queHaceLaGente(periodo: Periodo, hoy: Date = new Date()): 
       variacion: variacion(contactos, suma(anterior, "contacto-envio")),
       porCanal: CANALES.map((canal) => ({ canal, cuenta: suma(actual, "contacto-envio", canal) })),
     },
+    materiales,
   };
 }

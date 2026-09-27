@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
 import { accionDe } from "@/features/biblioteca/contenido/modelo";
+import { contar } from "@/lib/contadores/contar";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { CopiarCita } from "./CopiarCita";
 
@@ -48,11 +49,12 @@ export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
             </p>
             {m.cita ? <CopiarCita cita={m.cita} /> : null}
           </div>
-          {/* Se abre en otra pestaña: la revista, la editorial o el PDF. */}
+          {/* Se abre en otra pestaña: la revista, la editorial o el PDF. El clic suma una consulta del material, sin nada de quien lo abre. */}
           <a
             href={m.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => contar("material-consultado", m.id)}
             className="text-naranja-accion group inline-flex items-center gap-1.5 font-sans text-[0.92rem] font-medium"
           >
             {accionDe(m)}

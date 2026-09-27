@@ -8,6 +8,7 @@ import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material"
 import type { BibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
 import { etiquetaDeCategoria } from "@/features/novedades/contenido/modelo";
 import { fechaCorta } from "@/features/novedades/contenido/fechas";
+import { contar } from "@/lib/contadores/contar";
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 
@@ -91,6 +92,7 @@ export function BibliotecaNovedades({
                     target="_blank"
                     rel="noopener noreferrer"
                     onMouseMove={trackPointer}
+                    onClick={() => contar("material-consultado", id)}
                     className="bn-row block"
                   >
                     <span aria-hidden="true" className="bn-glow" />

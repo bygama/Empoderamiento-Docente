@@ -3,6 +3,7 @@ import type { RefObject } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material";
 import { accionDe } from "@/features/biblioteca/contenido/modelo";
+import { contar } from "@/lib/contadores/contar";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 
 type ArticuloDestacadoProps = {
@@ -91,6 +92,7 @@ export function ArticuloDestacado({ item, i, activo, reduced, refItem, refSlot }
             href={material.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => contar("material-consultado", material.id)}
             className="bg-naranja-accion inline-flex items-center gap-2 rounded-lg px-5 py-2.5 font-sans text-[0.92rem] font-medium text-white transition-opacity hover:opacity-90"
           >
             {accionDe(material)}

@@ -3,6 +3,8 @@ import { queHaceLaGente } from "@/datos/consultas/que-hace-la-gente";
 import type { Periodo } from "@/lib/metricas/periodos";
 import { CaminoDelCV } from "./acciones/CaminoDelCV";
 import { Contactos } from "./acciones/Contactos";
+import { cuantas } from "./formato";
+import { Seccion } from "./Seccion";
 import { SelectorDePeriodo } from "./SelectorDePeriodo";
 
 /**
@@ -21,6 +23,13 @@ export async function QueHaceLaGente({ periodo }: { periodo: Periodo }) {
       <div className="space-y-10">
         <CaminoDelCV cv={datos.cv} periodo={periodo} abierto={cvAbierto()} />
         <Contactos contactos={datos.contactos} periodo={periodo} />
+        <Seccion
+          id="materiales"
+          titulo="Materiales más consultados"
+          explicacion="Los diez materiales de la Biblioteca que más se abrieron en el período, desde la Biblioteca o desde el Inicio."
+          filas={datos.materiales.map((m) => ({ clave: m.id, principal: m.titulo, detalle: cuantas(m.consultas, "consulta", "consultas") }))}
+          vacio={{ titulo: `Nadie abrió un material en estos ${periodo} días`, texto: "Se cuenta cada vez que alguien toca el link de un material, sin saber quién." }}
+        />
       </div>
     </div>
   );

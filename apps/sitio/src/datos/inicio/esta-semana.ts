@@ -1,10 +1,10 @@
 import type { Capacidad } from "@ed/auth";
-import { clicsDeGoogle, cvDeLaSemana, visitantes, type LecturaDeLaSemana } from "./lecturas-de-la-semana";
+import { clicsDeGoogle, cvDeLaSemana, materialesConsultados, visitantes, type LecturaDeLaSemana } from "./lecturas-de-la-semana";
 import { enOrden, leerAisladas, visiblesPara } from "./registro";
 
 // «Esta semana» en el Inicio: cada número, los últimos 7 días con datos de su
-// fuente contra los 7 anteriores. Lo que todavía no existe o no tiene datos
-// se dibuja «—»: un cero es un cero solo si la fuente existe y contó cero.
+// fuente contra los 7 anteriores. Lo que no tiene datos se dibuja «—»: un
+// cero es un cero solo si la fuente existe y contó cero.
 
 /** Los números, en el orden en que se ven. Un módulo que llega conecta el suyo en `NUMEROS`. */
 export const CLAVES_DE_NUMEROS = ["visitantes", "clics-de-google", "cv-recibidos", "materiales-consultados"] as const;
@@ -12,15 +12,12 @@ export type ClaveDeNumero = (typeof CLAVES_DE_NUMEROS)[number];
 
 type DefinicionDeNumero = { etiqueta: string; capacidad: Capacidad; leer: () => Promise<LecturaDeLaSemana> };
 
-/** Hasta que llegue su módulo: «—», nunca un cero. */
-const todaviaNo = async (): Promise<LecturaDeLaSemana> => null;
-
 const NUMEROS: Record<ClaveDeNumero, DefinicionDeNumero> = {
   visitantes: { etiqueta: "Visitantes", capacidad: "verMetricas", leer: visitantes },
   "clics-de-google": { etiqueta: "Clics desde Google", capacidad: "verMetricas", leer: clicsDeGoogle },
   "cv-recibidos": { etiqueta: "CV recibidos", capacidad: "verCV", leer: () => cvDeLaSemana() },
-  // Lo conecta la lane 11, metricas-completas, con los contadores de Acciones.
-  "materiales-consultados": { etiqueta: "Materiales consultados", capacidad: "verMetricas", leer: todaviaNo },
+  // El contador propio de Métricas (work/metricas-completas/): cuenta en el momento.
+  "materiales-consultados": { etiqueta: "Materiales consultados", capacidad: "verMetricas", leer: materialesConsultados },
 };
 
 export type NumeroDeLaSemana = {

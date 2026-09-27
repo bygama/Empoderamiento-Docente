@@ -4,6 +4,7 @@ import { comoJson, leerConTope } from "@/lib/formularios/cuerpo";
 import { claveDeLimite, ipDelPedido } from "@/lib/formularios/limite";
 import { canalDe } from "@/lib/metricas/canales";
 import { urlDelSitio } from "@/lib/url-del-sitio";
+import { base } from "./cliente";
 import { sumarContador, type CanalGuardado } from "./contadores";
 import { enlacePorCodigo } from "./enlaces";
 import { sumarEnvio } from "./limites-por-ip";
@@ -38,9 +39,10 @@ const esquema = z.object({
 
 type Pedido = z.infer<typeof esquema> & { evento: Evento };
 
-/** Si existe un material con ese id. Hasta que la Biblioteca esté en la base (lane 8a), ninguno. */
-export async function materialExiste(): Promise<boolean> {
-  return false;
+/** Si ese id es de un material publicado de la Biblioteca: lo que no, no se cuenta. */
+export async function materialExiste(id: string): Promise<boolean> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return false;
+  return (await base.material.count({ where: { id, publicado: true } })) > 0;
 }
 
 /** Si la IP de este pedido todavía entra en su tope; lo cuenta, como `sumarEnvio`, aunque no entre. */
