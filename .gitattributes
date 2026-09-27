@@ -6,3 +6,6 @@
 # haga checkout. Por eso van forzados a LF en toda plataforma.
 .githooks/** text eol=lf
 *.sh        text eol=lf
+
+# Lo que leen los contenedores de Linux del VPS (compose.yaml).
+deploy/** text eol=lf
