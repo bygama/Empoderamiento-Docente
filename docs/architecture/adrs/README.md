@@ -41,6 +41,7 @@ internos (refactors).
 | 0010  | [Seguridad del acceso al admin](0010-seguridad-del-acceso.md) | Accepted (reemplaza el §2 de 0008) |
 | 0011  | [Copiar Search Console cada día y correr todo lo programado desde un solo cron](0011-search-console-y-un-solo-cron.md) | Accepted |
 | 0012  | [Los CV en un store privado de Blob, la retención de lo que llega y avisos sin datos](0012-mensajes-cv-privados-y-retencion.md) | Accepted |
+| 0013  | [Segundo factor por correo, obligatorio para quien dirige y administra](0013-segundo-factor-por-correo.md) | Accepted (completa 0010) |
 
 ---
 
