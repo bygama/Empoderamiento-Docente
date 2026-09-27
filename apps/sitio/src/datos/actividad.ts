@@ -59,6 +59,14 @@ export const TIPOS_DE_ACTIVIDAD = [
   "borro-una-redireccion",
   "cambio-quien-recibe-un-aviso",
   "cambio-los-plazos-de-guarda",
+  // Biblioteca (work/biblioteca/): sobre el material, con su título como era
+  // en ese momento y su id. Agregarlo sí se anota (entra uno nuevo); guardar
+  // un borrador, no.
+  "agrego-un-material",
+  "publico-un-material",
+  "oculto-un-material",
+  "descarto-cambios-de-un-material",
+  "borro-un-material",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
@@ -69,8 +77,9 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * cuentas: lo ve quien usa Cuentas. Lo que se hace con una página lo ve quien
  * edita el contenido; con un mensaje de Contacto, quien ve Contacto; que se
  * borró un CV, solo quien ve los CV; lo que se le hace a otra cuenta, quien
- * usa Cuentas; lo que se hace con una novedad, quien edita las novedades; y lo
- * que se cambia en Ajustes, quien usa Ajustes.
+ * usa Cuentas; lo que se hace con una novedad, quien edita las novedades; con
+ * un material, quien edita la Biblioteca; y lo que se cambia en Ajustes, quien
+ * usa Ajustes.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -106,6 +115,11 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "borro-una-redireccion": "usarAjustes",
   "cambio-quien-recibe-un-aviso": "usarAjustes",
   "cambio-los-plazos-de-guarda": "usarAjustes",
+  "agrego-un-material": "editarBiblioteca",
+  "publico-un-material": "editarBiblioteca",
+  "oculto-un-material": "editarBiblioteca",
+  "descarto-cambios-de-un-material": "editarBiblioteca",
+  "borro-un-material": "editarBiblioteca",
 };
 
 /**
@@ -149,6 +163,11 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "borro-una-redireccion": true,
   "cambio-quien-recibe-un-aviso": true,
   "cambio-los-plazos-de-guarda": true,
+  "agrego-un-material": true,
+  "publico-un-material": true,
+  "oculto-un-material": true,
+  "descarto-cambios-de-un-material": true,
+  "borro-un-material": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */
