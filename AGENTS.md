@@ -422,13 +422,13 @@ esa misma guía).
       verifica; no hay forma de "casi".
 - [ ] Componentes **≤ 200 líneas**, y cuando se parten, sus piezas van a una
       subcarpeta (`docs/AI_GUIDELINES.md` §2). react-doctor recién frena a las
-      300; el tope del proyecto es 200, y **hoy lo pasan 9 de los 296 `.tsx`
+      300; el tope del proyecto es 200, y **hoy lo pasan 8 de los 323 `.tsx`
       de `apps/sitio/src`** —contando código, sin comentarios—:
       `profileParts.tsx` (428), `FaroEscena.tsx` (377), el set de íconos (356)
-      y seis más, de Quiénes somos, Novedades e Investigación
-      (`LinternaFaro.tsx`, 211). Medido el 2026-09-26; eran 17 de 210 el
-      2026-09-18, y bajaron partiéndose al tocar su página (Inicio,
-      Investigación y Biblioteca). La dirección es que no se sumen: un
+      y cinco más, cuatro de Novedades y `LinternaFaro.tsx` (211) de
+      Investigación. Medido el 2026-09-26; eran 17 de 210 el 2026-09-18, y
+      bajaron partiéndose al tocar la página que los usa (la fase C de las
+      páginas). La dirección es que no se sumen: un
       componente nuevo por encima de 200 se parte antes del PR, y los que
       quedan bajan cuando se toque la página que los usa.
 - [ ] Utilidades ≤ 100 líneas. Los hooks también, salvo los de coreografía:
