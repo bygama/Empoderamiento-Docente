@@ -1,64 +1,29 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
-import { Boton, BotonEnlace } from "@/admin/armazon/Boton";
-import { Aviso } from "@/admin/armazon/Campos";
+import { BotonEnlace } from "@/admin/armazon/Boton";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Fila, Lista } from "@/admin/armazon/Lista";
+import { AvisosDelOrden, BotonesDeOrden } from "@/admin/armazon/ListaQueSeOrdena";
+import { useMoverEnOrden } from "@/admin/armazon/useMoverEnOrden";
 import { moverAliado } from "@/datos/acciones/aliados";
 import type { FilaDeAliado } from "@/datos/consultas/aliados-del-admin";
 import { altoDe } from "@/features/aliados/contenido/modelo";
 import { insigniaDeLaPublicacion } from "./estado";
 import { LogoEnLaTira } from "./LogoEnLaTira";
 
-type Hacia = "antes" | "despues";
-
 /**
  * Los aliados en el orden de la tira (SPEC §7.2 de `work/casos-aliados-fotos/`):
  * cada fila con su logo como se ve (blanco sobre el azul), el nombre, si está
  * autorizado y cómo está su publicación; «Subir», «Bajar» (cambian el lugar en
  * la tira del sitio en el momento) y «Editar». Al mover, el foco sigue al
- * aliado, como en `ListaVariable` del kit.
+ * aliado (DESIGN.md §11, «Lista que se ordena»).
  */
 export function ListaDeAliados({ filas }: { filas: readonly FilaDeAliado[] }) {
-  const router = useRouter();
-  const [pendiente, empezar] = useTransition();
-  const [aviso, setAviso] = useState<string | null>(null);
-  const [anuncio, setAnuncio] = useState("");
-  const enfocarAlTerminar = useRef<{ id: string; hacia: Hacia } | null>(null);
-
-  // Mientras se mueve, el botón está deshabilitado y pierde el foco; y la fila
-  // recién está en su lugar nuevo cuando termina el refresco. Ahí vuelve: al
-  // mismo botón, o al otro si el aliado quedó en una punta.
-  useEffect(() => {
-    const destino = enfocarAlTerminar.current;
-    if (pendiente || !destino) return;
-    enfocarAlTerminar.current = null;
-    const [igual, contrario] = destino.hacia === "antes" ? ["subir", "bajar"] : ["bajar", "subir"];
-    (document.getElementById(`aliado-${destino.id}-${igual}`) ?? document.getElementById(`aliado-${destino.id}-${contrario}`))?.focus();
-  }, [pendiente]);
-
-  const mover = (id: string, nombre: string, lugar: number, hacia: Hacia) =>
-    empezar(async () => {
-      enfocarAlTerminar.current = { id, hacia };
-      try {
-        const r = await moverAliado({ id, hacia });
-        if (!r.ok) return setAviso(r.detalle);
-        setAviso(null);
-        setAnuncio(`${nombre} pasó al lugar ${hacia === "antes" ? lugar - 1 : lugar + 1} de la tira.`);
-        router.refresh();
-      } catch {
-        setAviso("No hubo respuesta del servidor. Fijate la conexión y probá de nuevo.");
-      }
-    });
+  const { pendiente, aviso, anuncio, mover } = useMoverEnOrden("aliado");
 
   return (
     <div className="space-y-3">
-      <p role="status" className="sr-only">
-        {anuncio}
-      </p>
-      {aviso ? <Aviso tono="error">{aviso}</Aviso> : null}
+      <AvisosDelOrden anuncio={anuncio} aviso={aviso} />
       <Lista>
         {filas.map((f, i) => {
           const nombre = f.nombre || "Sin nombre todavía";
@@ -80,16 +45,16 @@ export function ListaDeAliados({ filas }: { filas: readonly FilaDeAliado[] }) {
               }
               accion={
                 <span className="flex flex-wrap items-center gap-1">
-                  {i > 0 ? (
-                    <Boton id={`aliado-${f.id}-subir`} variante="terciario" disabled={pendiente} onClick={() => mover(f.id, nombre, i + 1, "antes")} aria-label={`Subir ${nombre} en la tira`}>
-                      Subir
-                    </Boton>
-                  ) : null}
-                  {i < filas.length - 1 ? (
-                    <Boton id={`aliado-${f.id}-bajar`} variante="terciario" disabled={pendiente} onClick={() => mover(f.id, nombre, i + 1, "despues")} aria-label={`Bajar ${nombre} en la tira`}>
-                      Bajar
-                    </Boton>
-                  ) : null}
+                  <BotonesDeOrden
+                    prefijo="aliado"
+                    id={f.id}
+                    nombre={nombre}
+                    donde="en la tira"
+                    primero={i === 0}
+                    ultimo={i === filas.length - 1}
+                    pendiente={pendiente}
+                    alMover={(hacia) => mover(f.id, hacia, () => moverAliado({ id: f.id, hacia }), `${nombre} pasó al lugar ${hacia === "antes" ? i : i + 2} de la tira.`)}
+                  />
                   <BotonEnlace variante="secundario" href={`/admin/contenido/aliados/${f.id}`} aria-label={`Editar ${nombre}`}>
                     Editar
                   </BotonEnlace>
