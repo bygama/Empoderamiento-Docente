@@ -66,20 +66,23 @@ export async function avisosDeTodas(rol: unknown): Promise<AvisoConCuentas[]> {
 
 /**
  * Deja ese aviso prendido para las cuentas de `cuentaIds` y apagado para las
- * demás que lo pueden recibir; un id que no puede recibirlo no cuenta.
- * Devuelve cuántas lo reciben. Quien llama ya chequeó `usarAjustes`.
+ * demás que lo pueden recibir; un id que no puede recibirlo no cuenta. Escribe
+ * solo las que cambian, y devuelve cuántas lo reciben y cuántas cambiaron.
+ * Quien llama ya chequeó `usarAjustes`.
  */
-export async function ponerQuienRecibe(aviso: ClaveDeAviso, cuentaIds: readonly string[]): Promise<number> {
+export async function ponerQuienRecibe(aviso: ClaveDeAviso, cuentaIds: readonly string[]): Promise<{ reciben: number; cambiaron: number }> {
   const elegidas = new Set(cuentaIds);
-  const pueden = (await base.user.findMany({ where: { suspendida: false }, select: { id: true, rol: true } })).filter((c) =>
-    puede(c.rol, AVISOS[aviso].capacidad),
-  );
+  const pueden = (
+    await base.user.findMany({ where: { suspendida: false }, select: { id: true, rol: true, avisos: { where: { aviso, activo: false }, select: { aviso: true } } } })
+  ).filter((c) => puede(c.rol, AVISOS[aviso].capacidad));
+  // Sin fila apagada, lo recibe: así viene de fábrica.
+  const cambian = pueden.filter((c) => (c.avisos.length === 0) !== elegidas.has(c.id));
   await base.$transaction(
-    pueden.map(({ id }) =>
+    cambian.map(({ id }) =>
       base.aviso.upsert({ where: { cuentaId_aviso: { cuentaId: id, aviso } }, create: { cuentaId: id, aviso, activo: elegidas.has(id) }, update: { activo: elegidas.has(id) } }),
     ),
   );
-  return pueden.filter(({ id }) => elegidas.has(id)).length;
+  return { reciben: pueden.filter(({ id }) => elegidas.has(id)).length, cambiaron: cambian.length };
 }
 
 /**
