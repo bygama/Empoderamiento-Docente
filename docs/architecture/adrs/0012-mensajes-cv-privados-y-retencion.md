@@ -85,6 +85,20 @@ bien y no se guarda nada) y un tope por IP **en la base**, porque el sitio
 corre en varias instancias: 5 contactos o 3 CV por hora, con la IP guardada
 como HMAC y nunca en claro.
 
+**Lo que no se hace**, a propósito (SPEC padre §5.6 y §5.7):
+
+- **Exportar a planilla.** Ni los CV ni los contactos se bajan en lote: una
+  planilla con cien nombres y correos sale del sistema y no la alcanzan ni la
+  retención ni «Borrar ahora». Lo que hay se lee en el admin, de a uno, y un
+  CV se baja de a uno, con sesión y `verCV`.
+- **Responder desde el admin.** «Responder» abre el programa de correo con la
+  dirección y el asunto. Un envío desde acá guardaría la conversación en la
+  base, con los datos de quien escribió, y pediría otra retención, otro
+  remitente y otro aviso de privacidad.
+- **Guardar el origen en un CV.** El embudo del CV (lane 11) cuenta por día y
+  por canal, sin IP, sin navegador y sin cookies; nunca se anota en la ficha
+  de una persona por qué link llegó.
+
 **La entrada pública del CV nace apagada** (`CV_ABIERTO=si` la enciende):
 apagada, `/sumate-al-equipo` y `/api/cv` dan 404 y ningún link del sitio
 lleva ahí. Los campos viven en `config/cv.ts`, marcados como provisorios,
