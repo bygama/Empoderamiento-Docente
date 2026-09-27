@@ -23,7 +23,7 @@ export type Modulo = {
   /**
    * Lo que se crea en este módulo, como acceso rápido en el Inicio («Nueva
    * novedad»): lo ve quien tiene la capacidad del módulo. El módulo lo suma
-   * en su línea cuando existe su pantalla; hoy no lo tiene ninguno.
+   * en su línea cuando existe su pantalla: hoy, Novedades.
    */
   accesoRapido?: { etiqueta: string; href: string };
 };
@@ -36,7 +36,15 @@ export const GRUPOS: readonly (readonly Modulo[])[] = [
   ],
   [
     { clave: "contenido", nombre: "Contenido", href: "/admin/contenido", Icono: Documento, segmentos: ["contenido"], capacidad: "editarContenido" },
-    { clave: "novedades", nombre: "Novedades", href: "/admin/novedades", Icono: Periodico, segmentos: ["novedades"], capacidad: "editarNovedades" },
+    {
+      clave: "novedades",
+      nombre: "Novedades",
+      href: "/admin/novedades",
+      Icono: Periodico,
+      segmentos: ["novedades"],
+      capacidad: "editarNovedades",
+      accesoRapido: { etiqueta: "Nueva novedad", href: "/admin/novedades/nueva" },
+    },
     { clave: "biblioteca", nombre: "Biblioteca", href: "/admin/biblioteca", Icono: BookOpen, segmentos: ["biblioteca"], capacidad: "editarBiblioteca" },
   ],
 ];

@@ -1,6 +1,7 @@
 import type { Capacidad } from "@ed/auth";
 import { BANDEJAS } from "@/config/mensajes";
 import { hayVariablesDeBusquedas } from "@/lib/busquedas/entorno";
+import { novedadesEnBorradorViejas } from "./de-las-novedades";
 import { paginasSinPublicar } from "./de-las-paginas";
 import { leerCvNuevos, leerCvQueSeBorran, leerMensajesSinLeer } from "./de-los-mensajes";
 
@@ -15,7 +16,7 @@ export const URGENCIAS = [
   "alguien-espera",
   /** Algo se borra solo: CV que se borran en 7 días. */
   "se-borra-pronto",
-  /** Trabajo sin terminar: páginas con cambios sin publicar, y novedades en borrador hace más de 7 días (lane 6). */
+  /** Trabajo sin terminar: páginas con cambios sin publicar, y novedades en borrador hace más de 7 días. */
   "sin-publicar",
   /** Algo se ve mal en el sitio: materiales con el link roto (lane 8) y fotos sin texto alternativo (lane 9). */
   "a-corregir",
@@ -27,7 +28,14 @@ export const URGENCIAS = [
 export type Urgencia = (typeof URGENCIAS)[number];
 
 /** Las filas que existen. Un módulo que llega suma su clave acá y su entrada en `PENDIENTES`. */
-export const CLAVES_DE_PENDIENTES = ["cv-nuevos", "mensajes-sin-leer", "cv-que-se-borran", "paginas-sin-publicar", "conectar-search-console"] as const;
+export const CLAVES_DE_PENDIENTES = [
+  "cv-nuevos",
+  "mensajes-sin-leer",
+  "cv-que-se-borran",
+  "paginas-sin-publicar",
+  "novedades-en-borrador",
+  "conectar-search-console",
+] as const;
 export type ClaveDePendiente = (typeof CLAVES_DE_PENDIENTES)[number];
 
 /** Lo que dice una fila con algo pendiente: «2 páginas con cambios sin publicar» · «Inicio y Qué hacemos». */
@@ -64,6 +72,14 @@ export const PENDIENTES: Record<ClaveDePendiente, Pendiente> = {
     href: "/admin/contenido/paginas",
     accion: "Ir a Páginas",
     leer: paginasSinPublicar,
+  },
+  "novedades-en-borrador": {
+    urgencia: "sin-publicar",
+    capacidad: "editarNovedades",
+    que: "las novedades",
+    href: "/admin/novedades/borradores",
+    accion: "Ir a Borradores",
+    leer: () => novedadesEnBorradorViejas(),
   },
   "conectar-search-console": {
     urgencia: "sin-conectar",
