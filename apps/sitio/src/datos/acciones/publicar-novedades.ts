@@ -2,7 +2,8 @@ import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { publicadoDe } from "@/datos/consultas/novedades";
 import { esquemaNovedad } from "@/features/novedades/contenido/novedad";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
-import { borradorSinTapa, columnasDe, esUnicoRepetido, falloEnCampo, problemasDeNovedad, tituloDe } from "./novedades-en-base";
+import { falloPorIndice } from "./indices-de-novedades";
+import { borradorSinTapa, columnasDe, problemasDeNovedad, tituloDe } from "./novedades-en-base";
 
 // Publicar y despublicar una novedad (SPEC §5.3 de `work/novedades-y-kit/`),
 // con el cliente inyectado como editar-novedades.ts. Publicar copia el
@@ -67,7 +68,8 @@ export async function publicarNovedadEnBase(
     return { ok: true, detalle, publicadaEn: ahora.toISOString(), publicadaPor: quien, titulo: n.titulo, slugs };
   } catch (e) {
     if (e instanceof OtraLlegoAntes) return choqueCon(await base.novedad.findUnique({ where: { id } }), "la novedad");
-    if (esUnicoRepetido(e)) return falloEnCampo("slug", "Esa URL ya la usa otra novedad publicada.");
+    const fallo = await falloPorIndice(base, e, { id, slug: n.slug });
+    if (fallo) return fallo;
     throw e;
   }
 }

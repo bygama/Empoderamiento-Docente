@@ -106,3 +106,32 @@ test("despublicar la saca del sitio, conserva las columnas y suelta la destacada
   const fila = await base.novedad.findUnique({ where: { id } });
   assert.deepEqual([fila?.publicada, fila?.destacada, fila?.titulo], [false, false, "Prueba prueba-publicar-f"]);
 });
+
+test("una URL que ya es de otra dice de quién y si está publicada, en el campo URL", sinBase, async () => {
+  const { base, publicarNovedadEnBase, despublicarNovedadEnBase } = await modulos();
+  const duena = await publicada("prueba-publicar-g");
+  // Guardar lo avisa antes; esto es la que se cuela entre el guardado y la publicación.
+  const otra = await base.novedad.create({ data: { borrador: completa("prueba-publicar-g", { titulo: "Prueba otra" }), borradorEn: new Date(), borradorPor: "Beto" } });
+  const publicarLaOtra = () => publicarNovedadEnBase(base, { id: otra.id, borradorEnVisto: otra.borradorEn?.toISOString() ?? null, quien: "Beto" });
+  const conPublicada = await publicarLaOtra();
+  assert.deepEqual(!conPublicada.ok && conPublicada.errores?.map((e) => [e.camino, e.mensaje]), [
+    ["slug", "Esa URL ya la usa «Prueba prueba-publicar-g», que está publicada."],
+  ]);
+  await despublicarNovedadEnBase(base, { id: duena, borradorEnVisto: null });
+  const conDespublicada = await publicarLaOtra();
+  assert.deepEqual(!conDespublicada.ok && conDespublicada.errores?.map((e) => e.camino), ["slug"]);
+  assert.match(!conDespublicada.ok ? conDespublicada.detalle : "", /es de «Prueba prueba-publicar-g», que está despublicada/);
+});
+
+test("la destacada que otra publicó al mismo tiempo se dice en el campo Destacada", sinBase, async () => {
+  const { base } = await modulos();
+  const { falloPorIndice } = await import("./indices-de-novedades");
+  await publicada("prueba-publicar-h", { destacada: true });
+  const id = await publicada("prueba-publicar-i");
+  // Lo que ve la segunda de dos publicaciones simultáneas: el índice parcial de la destacada.
+  const error = await base.novedad.update({ where: { id }, data: { destacada: true } }).catch((e: unknown) => e);
+  const fallo = await falloPorIndice(base, error, { id, slug: "prueba-publicar-i" });
+  assert.deepEqual(fallo && !fallo.ok && fallo.errores?.map((e) => e.camino), ["destacada"]);
+  assert.match(fallo?.detalle ?? "", /pasó a ser la destacada mientras publicabas/);
+  assert.equal(await falloPorIndice(base, new Error("otro"), { id, slug: "prueba-publicar-i" }), null);
+});
