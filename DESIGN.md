@@ -735,8 +735,10 @@ Filas separadas por un divisor, en una caja con el mismo borde
   `rounded-lg`, a la izquierda de lo principal, decorativo (`aria-hidden` y
   alt vacío: el nombre ya dice qué es). Sin imagen, el mismo cuadrado en
   `gris-fondo` con el ícono de la cosa en `azul-medio`, también decorativo.
-  Primer consumidor: la lista de la Biblioteca (sumado el 2026-09-27,
-  `work/biblioteca/`).
+  Lo principal parte su texto en renglones antes que empujar la acción abajo:
+  la acción queda a la derecha mientras a la izquierda le queden 16rem, y en
+  el celular baja. Primer consumidor: la lista de la Biblioteca (sumado el
+  2026-09-27, `work/biblioteca/`).
 - Primer consumidor: la lista de Páginas. También las guías de los módulos
   por hacer, las cuatro listas de Métricas › Búsquedas (sin acción: lo
   principal y sus cifras en el detalle), las versiones de una página (la más

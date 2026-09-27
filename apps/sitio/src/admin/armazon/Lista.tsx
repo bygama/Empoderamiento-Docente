@@ -30,7 +30,9 @@ type PropsDeFila = {
  * insignias y la acción a la derecha, y abajo si no entran. Atenuada, lo
  * principal baja a `gris-texto` (4,83:1) y la nota ocupa el lugar de la
  * acción: no se esconde, se explica. Con miniatura, va a la izquierda de lo
- * principal, y lo principal y el detalle se corren junto a ella.
+ * principal, y lo principal y el detalle se corren junto a ella; ese bloque
+ * crece y parte su texto antes de empujar la acción abajo (los títulos de
+ * los materiales son largos), y recién baja si no le quedan 16rem.
  */
 export function Fila({ miniatura, principal, detalle, insignias, accion, atenuada, desplegable }: PropsDeFila) {
   const texto = (
@@ -43,7 +45,7 @@ export function Fila({ miniatura, principal, detalle, insignias, accion, atenuad
     <li className="px-5 py-4">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         {miniatura ? (
-          <div className="flex min-w-0 items-center gap-4">
+          <div className="flex min-w-0 flex-1 basis-64 items-center gap-4">
             <div aria-hidden="true" className="shrink-0">
               {miniatura}
             </div>
