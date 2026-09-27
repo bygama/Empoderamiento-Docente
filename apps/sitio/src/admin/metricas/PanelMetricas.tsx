@@ -3,6 +3,7 @@ import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Cifra } from "@/admin/armazon/Cifra";
 import { actualizarMetricasAhora } from "@/datos/acciones/actualizar-metricas";
 import { estadoDeMetricas, tarjetas } from "@/datos/consultas/metricas";
+import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 import { ActualizarAhora } from "./ActualizarAhora";
 
 const fechaLarga = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "long", timeZone: "UTC" });
@@ -34,7 +35,7 @@ export async function PanelMetricas() {
   let cuerpo: React.ReactNode;
   if (!estado.hayVariables) {
     cuerpo = (
-      <EstadoVacio titulo="Faltan las variables de Vercel" texto="Sin el token y el ID del proyecto no hay nada que copiar. Están explicadas en el README, sección «Variables de entorno»." />
+      <EstadoVacio titulo={SIN_VARIABLES_DE_METRICAS} texto="Sin el token y el ID del proyecto no hay nada que copiar. Están explicadas en el README, sección «Variables de entorno»." />
     );
   } else if (!estado.hastaDia) {
     cuerpo = (
