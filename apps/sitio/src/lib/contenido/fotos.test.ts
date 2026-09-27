@@ -44,4 +44,9 @@ test("solo se aceptan las fotos que el sitio sabe mostrar", () => {
   // M-1: "%2e"/"%2f" percent-encoded no deben colarse como "." o "/" adentro del segmento.
   assert.equal(esSrcDeFoto("/fotos/..%2F.env.local"), false);
   assert.equal(esSrcDeFoto("/fotos/%2e%2e/%2e%2e/.env.local"), false);
+  // Las otras carpetas de fotos del contenido, con los mismos frenos; los logos de public/ no son una foto.
+  assert.equal(esSrcDeFoto("/novedades/alianza-unesco.webp"), true);
+  assert.equal(esSrcDeFoto("/quienes-somos/origen-03-pregunta.webp"), true);
+  assert.equal(esSrcDeFoto("/novedades/../.env.local"), false);
+  assert.equal(esSrcDeFoto("/brand/logo-ed-negativo.png"), false);
 });

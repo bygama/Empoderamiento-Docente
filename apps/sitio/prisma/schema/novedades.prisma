@@ -1,0 +1,51 @@
+// Novedades, la primera entidad del admin (work/novedades-y-kit/SPEC.md §4 y
+// §5): una columna por texto, como pide el spec del admin §6, y no un
+// documento como las páginas.
+
+/// Una novedad del sitio. **La fila tiene dos copias:** lo publicado, en
+/// columnas —es lo que lee el sitio, y sobre lo que la base garantiza el slug
+/// único y la destacada única—, y el borrador, en un documento que puede estar
+/// incompleto (una novedad recién empezada no tiene título ni foto). Las
+/// columnas del contenido son nulas solo mientras la novedad nunca se publicó.
+/// Las dos copias se validan con los esquemas de
+/// `features/novedades/contenido/novedad.ts`.
+///
+/// **La destacada es una sola**, con el índice parcial
+/// `novedades_una_sola_destacada`, que no está acá porque Prisma no escribe
+/// índices parciales sin un preview feature (migración `novedades`).
+model Novedad {
+  id              String    @id @default(uuid())
+  /// La URL publicada: /novedades/<slug>. Si cambia al publicar, queda el 308
+  /// del viejo en `redirecciones`.
+  slug            String?   @unique
+  titulo          String?
+  bajada          String?
+  /// AAAA-MM-DD, AAAA-MM o AAAA: la precisión que da la fuente.
+  fecha           String?
+  /// Una de la lista cerrada del código (modelo.ts).
+  categoria       String?
+  /// { src, alt, foco }, como una foto de una página.
+  imagen          Json?
+  /// [{ titulo, parrafos }]. Sin cuerpo, la novedad no tiene ficha.
+  cuerpo          Json?
+  destacada       Boolean   @default(false)
+  /// El título exacto del material de la Biblioteca que abre la ficha. Texto
+  /// hasta la lane 8, que lo pasa a una relación con materiales.
+  publicacion     String?
+  /// La que reemplaza a la imagen para redes generada.
+  imagenParaRedes Json?     @map("imagen_para_redes")
+  /// El sitio la muestra. Despublicar la deja en false y conserva las columnas.
+  publicada       Boolean   @default(false)
+  publicadaEn     DateTime? @map("publicada_en")
+  /// Quién, en llano. Nulo en las que entraron con la migración.
+  publicadaPor    String?   @map("publicada_por")
+  /// El documento que se edita; nulo es «el borrador es lo publicado».
+  borrador        Json?
+  /// El último guardado, y la marca del aviso de choque.
+  borradorEn      DateTime? @map("borrador_en")
+  borradorPor     String?   @map("borrador_por")
+  creadaEn        DateTime  @default(now()) @map("creada_en")
+  creadaPor       String?   @map("creada_por")
+
+  @@map("novedades")
+}
