@@ -56,6 +56,7 @@ packages/                     LO REUSABLE — cero dominio de ED adentro
 ├── db/                       cliente Prisma + Neon, slugs, redirecciones
 ├── auth/                     better-auth configurado, permisos, guarda
 └── kit-admin/                los controles de un formulario, el botón, el aviso
+                              y las piezas de una pantalla
 
 apps/sitio/
 ├── prisma/schema/            base · auth · contenido · sitio
@@ -88,9 +89,12 @@ que eran de `admin/campos/` —`TextoCorto`, `Parrafo`, `Seleccion`,
 nacieron con Novedades, y `Boton`, `claseDeBoton` y `Aviso`, porque
 `CampoFoto` los usa. Los tokens son de la app: su `README.md` dice cuáles
 espera. El generador de formularios de las páginas (`admin/campos/Campo.tsx`)
-y `admin/armazon/` se quedan en la app; el armazón se muda al kit en un
-cambio mecánico aparte. La tabla vive con la de permisos de Cuentas hasta que
-la use una segunda pantalla (DESIGN.md §11, «Tabla»).
+se queda en la app. **El armazón se mudó el 2026-09-27**
+(`work/cierre-del-mapa/`): las piezas de `admin/armazon/` que no saben de
+ED —el encabezado, las pestañas, la lista, la tabla, el estado vacío, la
+confirmación, el filtro, el buscador, el paginado, la cifra, la curva y las
+demás— están en el kit, y en la app queda lo que sabe de ED: la sidebar, la
+guarda, el tema, la pantalla de acceso y lo que depende de `lib/contenido/`.
 
 ## 4. Cómo lee el sitio
 
@@ -288,7 +292,8 @@ capacidad después de la sesión. `guarda.test.ts` y
 `acciones-con-sesion.test.ts` fallan si un módulo o una acción se olvida.
 
 **La actividad** (tabla `actividad`: quién, qué, sobre qué, cuándo) se anota
-desde `datos/actividad.ts`, con una lista cerrada de tipos; se guarda 12 meses
+desde `datos/actividad/`, con una lista cerrada de tipos que cada módulo
+declara en su archivo, con quién los ve y si van al Inicio; se guarda 12 meses
 y de un CV registra solo que se borró. Entrar, salir y cambiar la contraseña
 los anotan los ganchos de `@ed/auth`. «Olvidé mi contraseña» manda un correo por
 Resend, en segundo plano, y elegir una contraseña nueva avisa con otro («Tu
@@ -397,7 +402,7 @@ producción como «la tabla no existe».
 | **0** | **Escisión.** Payload afuera, repo en verde, sitio idéntico, ADRs y docs al día. | sí, y es reversible |
 | **1** | **Cimientos.** `packages/db` + `packages/auth`, middleware (cabeceras, rate limit), login en `/admin`. Sin contenido. | sí |
 | **2** | **El kit y una entidad entera.** `packages/kit-admin` + novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`. **Hecha** (2026-09-26). | sí |
-| **3** | **El resto del contenido.** Materiales, casos, equipo, aliados, páginas, ajustes. | por entidad |
+| **3** | **El resto del contenido.** Materiales, casos, equipo, aliados, páginas, ajustes. **Hecha** (2026-09-27), con el mapa del admin (`work/mapa-del-admin/`). | por entidad |
 | **4** | **Las URLs y el SEO.** Las 26 rutas nuevas, canonicals y JSON-LD (con las personas de referencia de la organización). El `sitemap.xml` de las rutas de hoy y las redirecciones ya los hizo Ajustes (`work/ajustes/`): las rutas nuevas se suman a `rutasDelSitio()`. | sí |
 
 **Sección por sección:** cada sección cambia su lectura a `datos/consultas/` en
@@ -435,9 +440,16 @@ secciones, con su pestaña SEO, como las demás páginas.
   historial de versiones con restaurar, que estaba acá, entró para las
   páginas el 2026-09-26 (§6).
 - Editor de texto enriquecido, más de un idioma, comentarios.
-- Analíticas: quedaron afuera de este diseño y entran aparte, como módulo que
-  no depende del kit, por el [ADR-0009](../adrs/0009-analitica-de-vercel-con-copia-diaria.md)
-  y la lane `work/metricas/` (2026-09-21).
+- Analíticas: quedaron afuera de este diseño y entraron aparte, como el
+  módulo Métricas, que no depende del kit
+  ([ADR-0009](../adrs/0009-analitica-de-vercel-con-copia-diaria.md),
+  [ADR-0011](../adrs/0011-search-console-y-un-solo-cron.md),
+  [ADR-0017](../adrs/0017-contadores-propios-y-links-cortos.md)). De ellas
+  sigue afuera saber qué instituciones visitan, contar personas únicas y el
+  uptime y los Core Web Vitals en el admin.
 - Cambios de diseño del sitio, de geometría o de animaciones.
-- Aprobación previa a publicar.
+- Aprobación previa a publicar, y publicación programada.
+- Lo que el mapa del admin dejó afuera (`work/mapa-del-admin/SPEC.md` §10):
+  roles a medida, un Inicio con widgets, el buscador global (⌘K), el
+  newsletter, importar CSV, BibTeX o RIS y las taxonomías editables.
 - Fichas propias para los 57 materiales (ver §5).

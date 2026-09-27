@@ -28,10 +28,11 @@ medida** en `/admin` con **better-auth**, con fotos en Vercel Blob y correos por
 Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
 [ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md).
 
-> **Estado:** el admin tiene sus cimientos —entrar, salir y elegir contraseña—
-> y todavía ninguna pantalla de contenido. El plan de las fases que faltan, en
-> [la spec](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md) §9,
-> y cómo levantarlo, más abajo en [Admin](#admin).
+> **Estado:** el admin tiene sus ocho módulos —Inicio, Mensajes, Métricas,
+> Contenido, Novedades, Biblioteca, Cuentas y Ajustes— (las fases 2 y 3 de
+> [la spec](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md) §9);
+> falta la fase 4, las URLs nuevas y su SEO. Cómo levantarlo, más abajo en
+> [Admin](#admin).
 
 Versiones exactas en [`apps/sitio/package.json`](apps/sitio/package.json):
 el repo es un workspace pnpm y las dependencias viven en la app.
@@ -154,7 +155,7 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
 ├── packages/              ← lo reutilizable, sin dominio de ED
 │   ├── db/     ← cliente Prisma, slugs, redirecciones
 │   ├── auth/   ← better-auth configurado, permisos, guarda
-│   └── kit-admin/  ← los controles de los formularios del admin (su README: los tokens)
+│   └── kit-admin/  ← los controles y las piezas de pantalla del admin (su README: los tokens)
 └── apps/
     └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz

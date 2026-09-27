@@ -57,16 +57,16 @@ buscar:
 
 | Qué es | Dónde va | Ejemplo |
 | --- | --- | --- |
-| **Contenido del sitio** — lo que algún día administra el panel: personas, materiales, novedades, casos, áreas, proyectos | `features/<feature>/data/<tema>.ts` | `quienes-somos/data/equipo.ts` |
-| **Constantes de un componente partido** — los pasos de una animación, las cartas de una escena | junto a sus piezas, en la subcarpeta del componente | `home/components/lineas-accion/data.ts` |
+| **Contenido del sitio** — lo que administra el panel: personas, materiales, novedades, casos, áreas, proyectos | en la base, y se lee por `datos/consultas/`; su esquema Zod (y, en una página, el contenido inicial de cada sección), en `features/<feature>/contenido/<tema>.ts` | `novedades/contenido/novedad.ts` |
+| **Constantes de un componente partido** — los pasos de una animación, las cartas de una escena | junto a sus piezas, en la subcarpeta del componente | `quienes-somos/components/origen/data.ts` |
 
 La prueba para distinguirlas: **si el cambio lo puede pedir el cliente, es
 contenido**; si solo tiene sentido leyéndolo al lado de la coreografía que lo
 consume, es una constante del componente.
 
-Un feature con contenido tiene `data/` aunque hoy sea un solo archivo: el
-nombre del tema (`novedades.ts`, `casos.ts`) dice más que `data.ts`, y cuando
-llegue el segundo tema no hay que mover nada.
+Un feature con contenido tiene `contenido/` aunque hoy sea un solo archivo:
+el nombre del tema (`novedad.ts`, `caso.ts`) dice más que `data.ts`, y
+cuando llegue el segundo tema no hay que mover nada.
 
 ---
 
