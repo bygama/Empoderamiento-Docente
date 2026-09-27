@@ -42,7 +42,7 @@ con este repo (Mateo, 2026-09-26).
 
 | # | Lane | `work/<lane>/` | Rama | Ola | Depende de | Runner |
 | --- | --- | --- | --- | --- | --- | --- |
-| 0 | deploy-al-dia | `work/deploy-al-dia/` | `mateo/deploy-al-dia` | 1 | — (respuestas del §8) | Claude, `--command "claude"` |
+| 0 | deploy-en-vps (era deploy-al-dia, en Vercel) | `work/deploy-en-vps/` | `mateo/deploy-en-vps` | 6 | todas (el VPS de Hostinger, 2026-09-27) | Claude, `--command "claude"` |
 | 1 | patrones-del-admin | `work/patrones-del-admin/` | `mateo/patrones-del-admin` | 1 | — | Claude, `--command "claude"` |
 | 2 | seguridad-del-acceso | `work/seguridad-del-acceso/` | `mateo/seguridad-del-acceso` | 1 | — | Claude, `--command "claude"` |
 | 3a | roles-y-actividad | `work/roles-y-actividad/` | `mateo/roles-y-actividad` | 2 | 1, 2 | Claude, `--command "claude"` |
