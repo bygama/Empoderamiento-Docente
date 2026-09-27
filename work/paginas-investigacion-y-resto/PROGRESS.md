@@ -5,7 +5,9 @@ Lane 4c del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- **En pausa con el PR #188 abierto**
+- **Cerrando:** la revisión r1 dio PASS y su ronda está hecha; esta carpeta
+  se borra en el commit siguiente, dentro del PR #188, antes del merge.
+- Antes: **en pausa con el PR #188 abierto**
   (https://github.com/bygama/Empoderamiento-Docente/pull/188): los 18 pasos
   del PLAN hechos y la verificación en PASS (abajo); el pre-push dio «Todo en
   verde». Falta la revisión de cierre, que lanza el padre al recibir el
@@ -274,7 +276,28 @@ Lane 4c del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
   `EdEnMovimiento` 222, `RotadorPalabras` 214, `LinternaFaro` 211,
   `NovedadDestacada` 209). `pnpm lint` 0.
 
+- 2026-09-26 — **Ronda r1** (DECISIONS): las keys de Líneas, del puente y
+  de las dos versiones del ciclo pasan al número de cada ítem (`d45afa1`,
+  `7a8b7f9`) y los imports del registro se ordenan (`e2316c9`).
+  `pnpm --filter sitio typecheck` 0 · `lint` 0 ·
+  `node scripts/verificar-react-doctor.mjs` 0 (100/100; `key={i}` daba
+  `no-array-index-as-key` ×2 y el helper exportado desde el componente,
+  `only-export-components` ×2, los dos resueltos por código) ·
+  `pnpm --filter sitio test` 0 (238: 237 pass, 1 skip ajeno) · `pnpm build`
+  0 · comparar-render contra `antes-contacto`: igual salvo el `head`
+  aprobado de `contacto.html`.
+
 ## Verification
+
+### 2026-09-26 — Close review r1 — PASS
+
+- Close review — el cambio entero contra su SPEC (Opus 5.5, medium): PASS
+  sobre `83a332c`, 0 Critical, 0 Important, 2 Minor (las keys desde un texto
+  editable y el orden de imports, arreglados arriba) y dos notas fuera de su
+  lente (hashes viejos de PROGRESS y `constelacion.ts`, que quedan). Probó
+  el `head` (solo los cuatro campos aprobados, `og:image` intacta), cada
+  sección editando y publicando, y el envío de Contacto. Veredicto tal como
+  lo transmitió el padre; el texto entero del revisor está en su lane.
 
 ### 2026-09-26 — L DoD — PASS (HEAD `412b1d7`, rebasado sobre `main` `15def2c`)
 
