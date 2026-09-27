@@ -75,8 +75,3 @@ export function borradorSinTapa(borrador: Prisma.JsonValue): { borrador?: Prisma
   const documento = comoDocumento(borrador);
   return borrador && documento.destacada === true ? { borrador: { ...documento, destacada: false } as Prisma.InputJsonObject } : {};
 }
-
-/** El error de Postgres de un índice único (el slug publicado, o la destacada si dos publican a la vez). */
-export function esUnicoRepetido(e: unknown): boolean {
-  return e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
-}
