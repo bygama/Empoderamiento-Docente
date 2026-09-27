@@ -228,6 +228,32 @@
   muestran con la barra «Volver al sitio publicado», y `curl` sin la cookie
   no; «Volver al sitio publicado» la apaga. RELIME quedó como estaba
   (publicada, destacada, sin borrador).
+- **Rebase sobre `15def2c`** (la lane del Inicio en `main`). Sus registros
+  tipados (`QUIEN_VE`, `VA_AL_INICIO`, `FRASES`) exigen una entrada por
+  tipo de actividad: las cuatro de una novedad las ve quien edita novedades,
+  van al Inicio y se leen «Ana publicó la novedad «…»».
+- **Paso 14 — el panel lateral** (`8286a36`, `54bff98`). Las figuras de
+  «Cómo se ve» pasan a `armazon/ComoSeVe.tsx` (la pestaña SEO de una página
+  las compone igual, comprobado en `/admin/contenido/paginas/novedades/seo`);
+  `PanelDeLaNovedad`, `SeVeEn` + `se-ve-en.ts` (test 4/4),
+  `useImagenGenerada` (pide la imagen cuando lo escrito queda quieto 600 ms)
+  y la ruta `/admin/novedades/imagen-para-redes` con su lógica en
+  `datos/consultas/imagen-para-redes.ts`. `NOVEDADES_EN_EL_INICIO` (4) lo
+  leen el Inicio del sitio y «Se ve en». Aceptación: react-doctor 100/100;
+  `curl` sin cookie → **307** a `/admin/entrar` (el proxy) y con una cookie
+  falsa → **401** «Hay que entrar al admin…» (la ruta misma). Con sesión, en
+  la ficha de RELIME la imagen del panel carga `1200 × 630`; al escribir en
+  el título, a los 200 ms sigue la dirección vieja y a los 2,7 s la nueva, y
+  carga. «Usar otra» deja el foco en el mismo botón, que pasa a «Volver a la
+  generada», y aparece el campo; volver lo saca y apaga «Cambios sin
+  guardar». En `/nueva`: «Todavía no está en el sitio. Al publicarla, va a
+  estar en:», la segunda nota de la tapa, sin ficha y en el Inicio.
+- **Paso 15 — Novedades en el Inicio** (`37115b8`). `datos/inicio/de-las-novedades.ts`
+  (el pendiente «N novedades en borrador hace más de 7 días», con los títulos)
+  registrado en `PENDIENTES` con `editarNovedades` y «Ir a Borradores»; el
+  acceso rápido «Nueva novedad» en `modulos.ts`. Test 3/3 (la frase, que lo
+  ven los tres roles, y contra la base: cuenta el de 8 días y no el de 2).
+  `pnpm --filter sitio test` 260/260 (1 salteado), lint y react-doctor 100.
 
 ## Abierto
 

@@ -54,3 +54,21 @@
   medium cuando prende un campo): la `Casilla` del kit es esa misma regla hecha
   componente, así que no hay dos versiones; §11 pasa a nombrarla. Las
   pantallas de Novedades usan `Buscador`, `Volver` y `Confirmacion` de `main`.
+- 2026-09-26 — **El panel va al lado del formulario desde `xl`, no desde
+  `lg`** (SPEC §6.2). El contenido del admin mide 976 px a 1568 de ancho
+  (formulario 576 · 48 · panel 352); en `lg`, con la sidebar, quedan unos
+  700 y el formulario bajaría a unos 300. Por debajo de `xl` el panel va
+  entre el formulario y «Qué cambió».
+- 2026-09-26 — **«Qué cambió» queda debajo del formulario y no en el panel**
+  (el SPEC §6.2 lo listaba en el panel): su «Antes» y «Ahora» van uno al lado
+  del otro desde `md` (DESIGN.md §11) y en 22 rem no entran. Plegado, como
+  estaba.
+- 2026-09-26 — **«Se ve en» usa las reglas del sitio enteras**: además de la
+  lista, su ficha y las cuatro del Inicio (propuesta E), dice si va en la tapa
+  como la destacada, por ser la más nueva sin destacada, o como la segunda
+  nota. Es lo que `NovedadDestacada` elige, y `se-ve-en.ts` lo prueba.
+- 2026-09-26 — **La lógica de `/admin/novedades/imagen-para-redes` vive en
+  `datos/consultas/imagen-para-redes.ts`**, como la descarga de un CV: la
+  ruta solo la llama (`app/` son rutas). Lo que llega en la dirección pasa
+  por los campos de `esquemaBorrador` con `.catch`: un título a medio
+  escribir dibuja igual.
