@@ -18,8 +18,11 @@ export function nuevoNonce(): string {
  * - **El sitio, con `'unsafe-inline'`, y es una concesión.** Un nonce distinto
  *   en cada respuesta obliga a renderizar dinámico, y el sitio público es
  *   estático a propósito —es lo que le da el LCP—. El sitio no renderiza
- *   input de nadie ni carga scripts de terceros: su superficie de XSS es
- *   mínima y acá la CSP es defensa en profundidad.
+ *   input de nadie ni carga scripts de otro origen: su superficie de XSS es
+ *   mínima y acá la CSP es defensa en profundidad. El de la analítica
+ *   también es del mismo origen (`/_vercel/insights/` en Vercel, `/umami/` en
+ *   el VPS, que sirve el proxy), así que pasa con `'self'` sin abrir nada:
+ *   ADR-0018.
  *
  * `'unsafe-eval'` solo en `next dev`: React lo usa para rearmar las pilas de
  * los errores; en producción nunca.

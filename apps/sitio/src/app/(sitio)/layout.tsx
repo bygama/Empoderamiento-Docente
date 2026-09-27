@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { Caveat, Courier_Prime, Inter, Manrope, JetBrains_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { IndicePagina } from "@/components/layout/IndicePagina";
+import { Analitica } from "@/components/layout/Analitica";
 import { AterrizajePorLink } from "@/components/layout/AterrizajePorLink";
 import { FranjaDeBorrador } from "@/components/layout/FranjaDeBorrador";
 import { LenisProvider } from "@/components/providers/LenisProvider";
@@ -133,10 +133,7 @@ export default async function RootLayout({
             <Footer sitio={{ redes, paises }} aliados={aliados} />
           </div>
         </LenisProvider>
-        {/* Cuenta vistas y visitantes sin cookies (ADR-0009). Solo en producción:
-            en desarrollo cargaría un script de depuración desde un dominio de
-            Vercel que la CSP bloquea, y no hay nada que medir. */}
-        {process.env.NODE_ENV === "production" ? <Analytics /> : null}
+        <Analitica />
       </body>
     </html>
   );
