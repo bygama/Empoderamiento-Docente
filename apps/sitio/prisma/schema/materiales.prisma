@@ -1,0 +1,87 @@
+// La Biblioteca (work/biblioteca/SPEC.md §3 y §4): los materiales, que llevan
+// a la revista o a la editorial, y quién firma cada uno. El molde es el de
+// Novedades (ADR-0014): lo publicado en columnas, el borrador en un documento.
+
+/// Un material de la Biblioteca. **La fila tiene dos copias:** lo publicado,
+/// en columnas —lo que lee el sitio, y sobre lo que la base garantiza el DOI
+/// único y un material por lugar de destacado—, y el borrador, en un documento
+/// que puede estar incompleto. Las columnas del contenido son nulas solo
+/// mientras el material nunca se publicó. Las dos copias se validan con los
+/// esquemas de `features/biblioteca/contenido/material.ts`; las listas
+/// cerradas (tipo, tema, público, formato) viven en código, no en un enum de
+/// Postgres: sumar una no pide migración.
+model Material {
+  id             String    @id @default(uuid())
+  titulo         String?
+  /// La firma escrita, solo si no es una lista de nombres («… (editores)»).
+  /// Nula, el sitio une las autorías: «A, B y C» (DECISIONS, C).
+  autores        String?
+  descripcion    String?
+  tipo           String?
+  tema           String?
+  publico        String?
+  /// AAAA o AAAA-MM: la precisión que da la fuente. El año del filtro y el
+  /// «Dic 2025» del sitio salen de acá.
+  fecha          String?
+  /// PDF | ZIP | Video | Web.
+  formato        String?
+  paginas        Int?
+  /// { src, alt, foco }. Nula: el sitio muestra la portada tipográfica
+  /// generada con los datos del material.
+  portada        Json?
+  /// Adónde lleva la acción: la revista, la editorial, el DOI o un PDF propio.
+  url            String?
+  /// Dónde se lee, para «Leer en RELIME».
+  fuente         String?
+  /// En minúsculas y sin «https://doi.org/». Único: el mismo DOI no entra dos veces.
+  doi            String?   @unique
+  /// La cita APA escrita a mano, o la de Crossref. Nula, va la generada.
+  cita           String?
+  /// El lugar entre los destacados de Biblioteca (1 a 4); nulo, no lo es. Único:
+  /// un material por lugar (en Postgres, dos nulos no chocan).
+  destacado      Int?      @unique @db.SmallInt
+  /// Los textos del destacado: el rótulo del índice, la frase y el detalle.
+  rotulo         String?
+  frase          String?
+  detalle        String?
+  /// El sitio lo muestra. Ocultarlo lo deja en false y conserva las columnas.
+  publicado      Boolean   @default(false)
+  publicadoEn    DateTime? @map("publicado_en")
+  /// Quién, en llano. Nulo en los que entraron con la migración.
+  publicadoPor   String?   @map("publicado_por")
+  /// El documento que se edita; nulo es «el borrador es lo publicado».
+  borrador       Json?
+  borradorEn     DateTime? @map("borrador_en")
+  borradorPor    String?   @map("borrador_por")
+  /// También el orden de carga: dentro de un año, el sitio los muestra así.
+  creadoEn       DateTime  @default(now()) @map("creado_en")
+  creadoPor      String?   @map("creado_por")
+  /// El último chequeo del link (la tarea `salud-de-links`), su resultado
+  /// —bien | roto | sin-respuesta | sin-chequear— y qué pasó, en llano.
+  chequeoEn      DateTime? @map("chequeo_en")
+  chequeo        String?
+  chequeoDetalle String?   @map("chequeo_detalle")
+
+  autorias Autoria[]
+
+  @@map("materiales")
+}
+
+/// Quién firma un material publicado, en orden. El borrador lleva las suyas en
+/// su documento; publicar reemplaza estas filas en la misma transacción, así
+/// «los materiales de tal persona» no mira borradores.
+model Autoria {
+  materialId String   @map("material_id")
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  orden      Int      @db.SmallInt
+  /// Como figura en la publicación: «Daniela Reyes-Gasperini».
+  nombre     String
+  /// La clave del perfil del Equipo (`daniela-reyes`) si es de ED; nula, es de
+  /// afuera. Texto hasta que la lane 8b cree la tabla del Equipo y le ponga la
+  /// fk (DECISIONS, D).
+  persona    String?
+
+  @@id([materialId, orden])
+  @@index([persona])
+  @@map("autorias")
+}
