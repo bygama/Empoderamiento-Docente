@@ -424,3 +424,25 @@ Sobre `bfcc4629`, el árbol final de la lane.
     lista claro 1280 y 390, lista con link roto mixto, lista oscuro 390, ficha
     claro 1280 y oscuro 390, Inicio mixto, `/biblioteca` 1280.
 - Revisión de cierre: la lanza el padre (lane supervisada; work-run §4).
+
+### 2026-09-27 — Revisión de cierre (r1, Opus 5.5, medium) — PASS, con arreglos
+
+El veredicto, como lo trajo el padre: «El revisor r1 (Opus 5.5, medium) dio
+PASS sobre 0d4f5af, con un Minor de SSRF: probó más de 25 ataques contra
+pedirProtegido (todos rechazados sin conectar), la migración fila por fila (0
+diferencias), el render, el cron con 404 reales y el ciclo completo con
+edita.»
+
+- `48bfc976` fix(red) — el Minor de SSRF. Antes del arreglo, `npx tsx --test
+  src/lib/red/ip.test.ts` → 2 fail («::ffff:0:7f00:1 · false !== true»);
+  después, `src/lib/red/*.test.ts` → 11 pass, 0 fail (tres tests nuevos en
+  `ip.test.ts` y dos casos en `destino.test.ts`). El ataque del revisor,
+  `pedirProtegido("https://[::ffff:0:a9fe:a9fe]/latest/meta-data/")` con un
+  `abrir` que anota si se conecta → `{"ok":false,"motivo":"ip"}`,
+  `conecto: false`.
+- `75ccedff` fix(biblioteca) — el mensaje de Zod en inglés.
+  `materiales-en-base.test.ts` (nuevo) → 3 pass; `editar-materiales`,
+  `acciones-con-sesion` y `material.test.ts` → 21 pass, 0 fail.
+- `c267cd86` fix(biblioteca) — el DOI en OpenAlex. `buscar-datos.test.ts` y
+  `lib/metadatos` → 12 pass, 0 fail, con un test nuevo de un DOI SICI con `#` y
+  `?`; en vivo, OpenAlex contesta 200 con la barra codificada.
