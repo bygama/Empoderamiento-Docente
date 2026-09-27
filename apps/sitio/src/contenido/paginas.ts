@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import { catalogoInicial, esquemaCatalogo } from "@/features/biblioteca/contenido/catalogo";
+import { cierreDeBibliotecaInicial, esquemaCierreDeBiblioteca } from "@/features/biblioteca/contenido/cierre";
 import { destacadosInicial, esquemaDestacados } from "@/features/biblioteca/contenido/destacados";
 import { esquemaHeroBiblioteca, heroBibliotecaInicial } from "@/features/biblioteca/contenido/hero";
 import { esquemaPuente, puenteInicial } from "@/features/biblioteca/contenido/puente";
@@ -116,6 +117,7 @@ export const PAGINAS = {
       destacados: { nombre: "Material destacado", esquema: esquemaDestacados, inicial: destacadosInicial },
       catalogo: { nombre: "Catálogo", esquema: esquemaCatalogo, inicial: catalogoInicial },
       puente: { nombre: "Puente a Investigación", esquema: esquemaPuente, inicial: puenteInicial },
+      cierre: { nombre: "Cierre", esquema: esquemaCierreDeBiblioteca, inicial: cierreDeBibliotecaInicial },
     },
   },
   novedades: { ruta: "/novedades", nombre: "Novedades", secciones: {} },
