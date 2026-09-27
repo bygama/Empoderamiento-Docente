@@ -13,7 +13,7 @@ import { leerSinRomper } from "./leer-sin-romper";
 // pantalla. Son decenas de filas: se leen todas y se filtran acá.
 
 /** Las columnas de lo publicado, como documento: lo que `esquemaNovedad` valida. */
-function publicadoDe(fila: Fila): unknown {
+export function publicadoDe(fila: Fila): unknown {
   return {
     slug: fila.slug,
     titulo: fila.titulo,
