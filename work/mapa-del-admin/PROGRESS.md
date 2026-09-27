@@ -405,6 +405,20 @@
   código: la lane 0 (deploy) y el recorrido en producción (entrar con segundo
   factor, publicar una novedad, recibir un contacto, verla en el Inicio). La
   lane padre queda abierta solo para eso.
+- 2026-09-27 — **Lane 0 rehecha como `deploy-en-vps`** (VPS de Hostinger con
+  Docker Compose y Umami; ver DECISIONS). Brief en `ed-orq/brief-deploy-vps.md`.
+  La cuenta está en 93 % del semanal: si se corta, se retoma cuando se renueve.
+- 2026-09-27 — **`deploy-en-vps` abrió #198.** El mismo código corre en Vercel o en
+  el VPS según las variables. `desplegar.sh` se probó desde cero en local, con
+  segundo factor, fotos, CV, cron, Umami, IP falsificada, respaldo y
+  restauración, y 5 s de corte. r1 (Opus 5.5, medium): **FAIL** por dos Important.
+  Los scripts no tienen el bit de ejecución, y `restaurar.sh` no levanta `db` en
+  un escenario con los volúmenes vacíos. Un tercero, plausible: el
+  endurecimiento de SSH no mira `sshd_config.d/`. La superficie, la IP, los
+  secretos, la idempotencia y la vuelta atrás se reprodujeron en limpio. Ronda 1:
+  task `task_3ed490b47257`, dispatch `ctx_70dd670c98b9`. El VPS de ED es
+  `2.24.68.136` (Hostinger). La clave `ed-vps` está generada del lado de Mateo y
+  espera que la instale.
 
 ## Hecho
 

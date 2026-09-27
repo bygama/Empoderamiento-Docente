@@ -338,3 +338,22 @@
   app. `/admin/<algo>` desconocido pasa a dar la misma 404 que ya daba
   `/admin/<a>/<b>`. La prueba principal es el HTML del admin, igual pantalla por
   pantalla y rol por rol entre `main` y la rama.
+- 2026-09-27 — **El deploy va a un VPS, no a Vercel.** Mateo, en sus palabras:
+  «esto se va a deployar en un vps al final», «vps de hostinger», y eligió
+  «Docker Compose». La lane 0 pasa de `deploy-al-dia` (Vercel) a `deploy-en-vps`:
+  la imagen standalone, un compose (app, Postgres, la migración, Caddy con TLS,
+  Umami y el cron), la IP real que pisa Caddy, backups con restauración probada
+  y el runbook desde un Hostinger vacío. **La analítica pasa a Umami instalado
+  en el mismo VPS.** Lo eligió el padre como opción por defecto, porque Mateo no
+  eligió otra: es gratis y sin cookies, y su API da lo que Métricas muestra. El
+  cliente entra por la interfaz `ClienteDeAnaliticas` que ya existe. Del SPEC §8
+  dejan de hacer falta el token de Vercel, el `prj_…` y Neon. Siguen haciendo
+  falta el DNS (dominio, Resend, Search Console), el acceso al VPS, los campos
+  del CV y el texto de privacidad.
+- 2026-09-27 — **El código queda listo para Vercel y para el VPS** (Mateo eligió
+  «Código para los dos», después de preguntar cómo quedaba el admin en
+  Vercel). No se borran `vercel.json` ni `@vercel/analytics`. Las variables
+  eligen cada servicio: Blob o disco para las fotos y los CV, Umami o Vercel
+  Analytics para Métricas y su script, y el cron de `vercel.json` o el servicio
+  del compose. Dónde se publica primero se decide sin tocar código, y mudarse es
+  mover datos.
