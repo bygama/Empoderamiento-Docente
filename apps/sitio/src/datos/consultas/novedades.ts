@@ -72,14 +72,18 @@ export const novedadesDelSitio = cache(async (): Promise<NovedadDelSitio[]> => {
 });
 
 /**
- * Los slugs de las fichas publicadas, para prerenderizarlas en el build. Sin
- * `draftMode`: `generateStaticParams` corre fuera de un pedido.
+ * Las publicadas, sin mirar la vista previa: lo que ven el RSS, la imagen
+ * para redes y el prerender de las fichas, que corren fuera de un pedido de
+ * alguien que edita.
  */
+export const novedadesPublicadas = cache(async (): Promise<NovedadDelSitio[]> => {
+  const filas = await leerSinRomper("novedadesPublicadas", () => base.novedad.findMany({ where: { publicada: true } }), []);
+  return novedadesVisibles(filas, false);
+});
+
+/** Los slugs de las fichas publicadas, para prerenderizarlas en el build. */
 export async function slugsConFicha(): Promise<string[]> {
-  const filas = await leerSinRomper("slugsConFicha", () => base.novedad.findMany({ where: { publicada: true } }), []);
-  return novedadesVisibles(filas, false)
-    .filter((n) => n.cuerpo.length > 0)
-    .map((n) => n.slug);
+  return (await novedadesPublicadas()).filter((n) => n.cuerpo.length > 0).map((n) => n.slug);
 }
 
 /** La novedad de una ficha, o `undefined`. */
