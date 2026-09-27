@@ -24,17 +24,6 @@ const GUIAS: Record<string, Guia> = {
       { nombre: "Ficha de un material", ruta: "/admin/biblioteca/[id]", que: "Autores vinculados al Equipo, cita APA y el último chequeo del link." },
     ],
   },
-  ajustes: {
-    nombre: "Ajustes",
-    para: "Lo que se configura una vez. Solo para quien dirige y quien administra.",
-    pantallas: [
-      { nombre: "Datos del sitio", ruta: "/admin/ajustes/sitio", que: "Correo, teléfono, dirección, países y redes: lo que hoy vive en el código." },
-      { nombre: "SEO", ruta: "/admin/ajustes/seo", que: "Las redirecciones, la indexación según Search Console y el sitemap." },
-      { nombre: "Avisos", ruta: "/admin/ajustes/avisos", que: "Quién recibe el mail de cada contacto y de cada CV." },
-      { nombre: "Privacidad", ruta: "/admin/ajustes/privacidad", que: "Los plazos de retención: CV 12 meses, Contacto 24 y Spam 30 días." },
-      { nombre: "Conexiones", ruta: "/admin/ajustes/conexiones", que: "El estado de Vercel Analytics, Search Console, Resend y Blob." },
-    ],
-  },
 };
 
 /** La guía de un módulo, o `undefined` si esa clave no es un módulo por hacer. */
