@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import gsap from "gsap";
 import { MathField } from "@/components/ui/MathField";
+import type { Apertura } from "@/features/contacto/contenido/apertura";
 import type { Titular } from "@/features/contacto/contenido/titular";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -70,7 +71,15 @@ import { PanelCierre } from "./experiencia/PanelCierre";
  * PanelFormulario (RailTema + CamposContacto) y PanelCierre. Los textos que se
  * editan desde el admin llegan por props (`features/contacto/contenido/`).
  */
-export function ContactoExperiencia({ cvAbierto, titular }: { cvAbierto: boolean; titular: Titular }) {
+export function ContactoExperiencia({
+  cvAbierto,
+  titular,
+  apertura,
+}: {
+  cvAbierto: boolean;
+  titular: Titular;
+  apertura: Apertura;
+}) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
   const [vista, setVista] = useState<Vista>("hero");
@@ -171,8 +180,8 @@ export function ContactoExperiencia({ cvAbierto, titular }: { cvAbierto: boolean
               identidad a la izquierda (titular + equipo real) y el ÍNDICE de
               temas a la derecha — renglones numerados, no un grid de fichas. */}
           <div className="my-auto w-full lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-stretch lg:gap-x-16 xl:gap-x-24">
-            <ColumnaIdentidad titulo={titular.titulo} />
-            <IndiceTemas onElegir={(key, el) => elegirTema(contexto(), key, el)} />
+            <ColumnaIdentidad titulo={titular.titulo} apertura={apertura} />
+            <IndiceTemas escribirDirecto={apertura.escribirDirecto} onElegir={(key, el) => elegirTema(contexto(), key, el)} />
           </div>
         </div>
 

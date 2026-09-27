@@ -5,6 +5,8 @@ import { TEMAS, type TemaKey } from "./data";
 type Props = {
   /** Recibe el tema y la tarjeta clickeada (la coreografía la apaga primero). */
   onElegir: (key: TemaKey, cardEl: HTMLElement) => void;
+  /** La línea al pie, arriba del mail: se edita en la apertura de Contacto. */
+  escribirDirecto: string;
 };
 
 /**
@@ -13,7 +15,7 @@ type Props = {
  * marca a la izquierda para identificar el tema y una flecha SIEMPRE visible
  * a la derecha que se enciende y avanza en hover. Al pie, el canal directo.
  */
-export function IndiceTemas({ onElegir }: Props) {
+export function IndiceTemas({ onElegir, escribirDirecto }: Props) {
   return (
     <div className="mt-10 lg:mt-0" role="group" aria-label="Tema de la consulta">
       {/* En pantallas bajas (≤ 860px de alto) las filas se compactan para
@@ -70,7 +72,7 @@ export function IndiceTemas({ onElegir }: Props) {
           jerarquía menor. Centrado bajo la columna del índice. */}
       <div data-ap-head className="mt-5 text-center [@media(max-height:860px)_and_(min-height:761px)]:mt-3.5 [@media(max-height:760px)]:mt-2.5">
         <p className="text-gris-texto font-sans text-[0.85rem]">
-          ¿Preferís escribir directo?
+          {escribirDirecto}
         </p>
         <CanalDirecto className="mt-2.5" />
       </div>
