@@ -27,7 +27,11 @@ export function normalizarDoi(texto: string): string | null {
   return esDoi(doi) ? doi : null;
 }
 
-/** El link de un DOI: `10.1590/abc` → `https://doi.org/10.1590/abc`. */
+/**
+ * El link de un DOI: `10.1590/abc` → `https://doi.org/10.1590/abc`. Cada
+ * segmento va escapado y las `/` quedan: el sufijo admite `#`, `?` o `%`, que
+ * sin escapar cortarían la URL o la harían decir otra cosa.
+ */
 export function linkDelDoi(doi: string): string {
-  return `https://doi.org/${doi}`;
+  return `https://doi.org/${doi.split("/").map(encodeURIComponent).join("/")}`;
 }

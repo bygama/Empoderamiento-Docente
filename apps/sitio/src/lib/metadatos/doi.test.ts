@@ -12,3 +12,11 @@ test("un DOI pegado de cualquier forma se normaliza; lo que no es un DOI, no", (
   assert.equal(normalizarDoi("%E0%A4%A"), null);
   assert.equal(linkDelDoi("10.1590/abc"), "https://doi.org/10.1590/abc");
 });
+
+test("el link de un DOI escapa lo que cortaría la URL, y conserva las barras", () => {
+  assert.equal(linkDelDoi("10.24844/somidem/s3/2026/01-05"), "https://doi.org/10.24844/somidem/s3/2026/01-05");
+  assert.equal(linkDelDoi("10.1000/a#b"), "https://doi.org/10.1000/a%23b");
+  assert.equal(linkDelDoi("10.1000/a?b=c"), "https://doi.org/10.1000/a%3Fb%3Dc");
+  assert.equal(linkDelDoi("10.1000/100%"), "https://doi.org/10.1000/100%25");
+  assert.equal(linkDelDoi("10.1000/a b/c"), "https://doi.org/10.1000/a%20b/c");
+});
