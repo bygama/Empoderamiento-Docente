@@ -16,8 +16,16 @@
 - 2026-09-27 — SPEC.md escrito (`37d2272`) y aprobado por el padre con las
   siete recomendaciones de §12 (DECISIONS). PLAN.md escrito: 19 pasos, los dos
   de la 8a al final.
-- 2026-09-27 — Los 19 pasos hechos y verificados (abajo). Lista para la
-  revisión de cierre del padre: el PR y `worker_done` salen ahora.
+- 2026-09-27 — Los 19 pasos hechos y verificados (abajo). **PR #193**
+  (https://github.com/bygama/Empoderamiento-Docente/pull/193) abierto sobre
+  `b2bbe1e`. **En pausa, esperando la revisión de cierre del padre** (1
+  revisor Opus 5.5, medium, «el cambio entero contra su SPEC»).
+- **Lo que sigue:** la ronda de arreglos que vuelva de la revisión, en esta
+  misma terminal; después, a pedido del padre, rebase sobre `main`, el gate
+  otra vez y el commit que cierra la lane (saca `work/metricas-completas/`)
+  dentro del PR, antes del merge. El dev server sigue en la pestaña «dev
+  metricas-completas» (3029) y los dos perfiles del navegador
+  (`metricas-completas`, `metricas-completas-admin`) quedan para esa ronda.
 
 ## Verification
 
