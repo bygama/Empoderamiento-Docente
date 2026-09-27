@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 // preguntas del método, que repetían «Cómo trabajamos».
 export default async function QueHacemosPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, faro, comoTrabajamos, areas, niveles, proyectos } = await contenidoDe("que-hacemos");
+  const { hero, faro, comoTrabajamos, areas, niveles, proyectos, cierre } = await contenidoDe("que-hacemos");
   return (
     <main id="contenido" tabIndex={-1}>
       {/* FONDO COMPARTIDO: el hero y la escena del faro son dos cielos
@@ -75,7 +75,7 @@ export default async function QueHacemosPage() {
       <ViboraQueHacemos />
       <NivelesEscala contenido={niveles} />
       <ProyectosAplicaciones contenido={proyectos} />
-      <CierreQueHacemos />
+      <CierreQueHacemos contenido={cierre} />
     </main>
   );
 }

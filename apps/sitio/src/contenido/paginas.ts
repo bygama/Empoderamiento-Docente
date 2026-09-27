@@ -8,6 +8,7 @@ import { esquemaMision, misionInicial } from "@/features/home/contenido/mision";
 import { esquemaQuienesSomos, quienesSomosInicial } from "@/features/home/contenido/quienes-somos";
 import { seoInicial } from "@/features/home/contenido/seo";
 import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
+import { cierreInicial as cierreDeQueHacemos, esquemaCierre as esquemaCierreDeQueHacemos } from "@/features/que-hacemos/contenido/cierre";
 import { esquemaFaro, faroInicial } from "@/features/que-hacemos/contenido/faro";
 import { esquemaHero as esquemaHeroDeQueHacemos, heroInicial as heroDeQueHacemos } from "@/features/que-hacemos/contenido/hero";
 import { esquemaNiveles, nivelesInicial } from "@/features/que-hacemos/contenido/niveles";
@@ -52,6 +53,7 @@ export const PAGINAS = {
       areas: { nombre: "Áreas de especialización", esquema: esquemaAreasDeQueHacemos, inicial: areasDeQueHacemos },
       niveles: { nombre: "Niveles", esquema: esquemaNiveles, inicial: nivelesInicial },
       proyectos: { nombre: "Proyectos y aplicaciones", esquema: esquemaProyectos, inicial: proyectosInicial },
+      cierre: { nombre: "Cierre", esquema: esquemaCierreDeQueHacemos, inicial: cierreDeQueHacemos },
     },
   },
   "quienes-somos": { ruta: "/quienes-somos", nombre: "Quiénes somos", secciones: {} },
