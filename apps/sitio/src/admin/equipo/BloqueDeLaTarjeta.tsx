@@ -19,12 +19,24 @@ function opcionDe(nivel: Nivel, ocupan: readonly string[]) {
   return { valor: String(nivel), etiqueta: `${rotulo} · ${cuantos}${ocupan.length ? ` (hoy ${EN_LISTA.format(ocupan)})` : ""}` };
 }
 
+/** La ayuda de la URL: sigue al nombre hasta que se escribe o se publica; después, el link viejo se pierde. */
+function ayudaDeLaUrl(slug: string, slugPublicado: string | null) {
+  const asi = `Así queda: /quienes-somos?persona=${slug || "…"}.`;
+  if (slugPublicado === null) return `${asi} Sigue al nombre hasta que la escribas vos o se publique.`;
+  return `${asi} Si la cambiás, el link viejo (?persona=${slugPublicado}) abre la página sin el perfil; cuando cada persona tenga su página propia, el viejo va a llevar al nuevo.`;
+}
+
 /**
  * La tarjeta y la URL de un perfil (SPEC §7.2 de `work/equipo/`): lo que se
  * ve en la grilla de Quiénes somos y la dirección del perfil. Con «Sin foto»,
  * el campo de la foto se va: la tarjeta es tipográfica.
  */
-export function BloqueDeLaTarjeta({ form, cambiar, errores, porNivel }: PropsDeBloque & { porNivel: Readonly<Record<Nivel, readonly string[]>> }) {
+type Props = PropsDeBloque & {
+  porNivel: Readonly<Record<Nivel, readonly string[]>>;
+  slugPublicado: string | null;
+};
+
+export function BloqueDeLaTarjeta({ form, cambiar, errores, porNivel, slugPublicado }: Props) {
   const error = (camino: string) => errorDe(errores, camino);
   return (
     <>
@@ -82,7 +94,7 @@ export function BloqueDeLaTarjeta({ form, cambiar, errores, porNivel }: PropsDeB
         <TextoCorto
           nombre="slug"
           etiqueta="URL del perfil"
-          ayuda="Su perfil se abre con /quienes-somos?persona= y esto. Si la cambiás, el link viejo abre la página sin el perfil; cuando cada persona tenga su página propia, el viejo va a llevar al nuevo."
+          ayuda={ayudaDeLaUrl(form.slug, slugPublicado)}
           maximo={LARGO_MAXIMO}
           valor={form.slug}
           alCambiar={(v) => cambiar("slug", v)}
