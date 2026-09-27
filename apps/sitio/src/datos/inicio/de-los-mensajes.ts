@@ -11,7 +11,7 @@ import { llegoVencido, plazosDeGuarda } from "@/datos/privacidad";
 const DIA_MS = 86_400_000;
 export const DIAS_DE_AVISO = 7;
 
-/** Lo que dice una fila con algo pendiente (el tipo de `pendientes.ts`). */
+/** Lo que dice una fila con algo pendiente (el tipo de `pendientes/pendiente.ts`). */
 type Fila = { titulo: string; detalle?: string };
 
 /** Los sin leer de una bandeja. */

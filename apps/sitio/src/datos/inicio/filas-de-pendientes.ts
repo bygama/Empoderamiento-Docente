@@ -1,7 +1,7 @@
 import { PENDIENTES, URGENCIAS, type ClaveDePendiente, type LoPendiente, type Pendiente } from "./pendientes";
 import { enOrden, leerAisladas, visiblesPara } from "./registro";
 
-// Lo que el Inicio hace con el registro de pendientes (`pendientes.ts`):
+// Lo que el Inicio hace con el registro de pendientes (`pendientes/`):
 // filtrar por rol, leer cada fila aislada y ordenarlas por urgencia.
 
 export type FilaDePendiente<C extends string = ClaveDePendiente> = LoPendiente & {
