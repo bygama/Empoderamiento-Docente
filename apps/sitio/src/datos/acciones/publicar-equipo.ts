@@ -5,18 +5,27 @@ import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { nivelSinLugar, publicacionQueNoFirma } from "./chequeos-del-perfil";
 import { columnasDe, nombreDe, problemasDePersona } from "./equipo-en-base";
 import { falloPorIndice } from "./indices-del-equipo";
+import { LISTAS, tomarLaLista } from "./lista-ordenada";
 
 // Publicar y despublicar un perfil del Equipo (SPEC §6.1 de `work/equipo/`),
 // con el cliente inyectado como editar-equipo.ts. Publicar valida entero,
 // chequea que cada publicación de la Biblioteca la firme la persona y que su
 // nivel tenga lugar, y copia el borrador a las columnas en una transacción que
-// escribe el 308 si cambió la URL.
+// escribe el 308 si cambió la URL. El lugar se cuenta adentro, con el candado
+// del Equipo tomado (lista-ordenada.ts): contar sin él deja pasar a dos que
+// publican a la vez en la Dirección, y el último lugar del nivel, también.
 
 export type ResultadoDePublicar = { ok: true; detalle: string; publicadoEn: string; publicadoPor: string; nombre: string } | Fallo;
 
 const NO_EXISTE: Fallo = { ok: false, detalle: "Ese perfil ya no existe: lo borraron desde que lo abriste." };
 /** Otra persona escribió entre la lectura y la transacción: se deshace todo y se contesta el choque. */
 class OtraLlegoAntes extends Error {}
+/** El nivel no tenía lugar, contado con el candado: se deshace todo y se contesta en el campo. */
+class SinLugar extends Error {
+  constructor(readonly fallo: Fallo) {
+    super(fallo.detalle);
+  }
+}
 
 /** La ficha pública de un perfil: es de la fase 4, pero su 308 ya queda (SPEC §6.3). */
 const fichaDe = (slug: string) => `/quienes-somos/equipo/${slug}`;
@@ -45,11 +54,14 @@ export async function publicarPersonaEnBase(
   const valido = esquemaPersona.safeParse(fila.borrador ?? publicadoDe(fila));
   if (!valido.success) return problemasDePersona(valido.error);
   const p = valido.data;
-  const problema = (await publicacionQueNoFirma(base, id, p)) ?? (await nivelSinLugar(base, id, p.nivel));
+  const problema = await publicacionQueNoFirma(base, id, p);
   if (problema) return problema;
   const ahora = new Date();
   try {
     await base.$transaction(async (tx) => {
+      await tomarLaLista(tx, LISTAS.equipo);
+      const sinLugar = await nivelSinLugar(tx, id, p.nivel);
+      if (sinLugar) throw new SinLugar(sinLugar);
       await redirigir(tx, fila.publicadoEn ? fila.slug : null, p.slug);
       // La primera vez, o en otro nivel, queda último en el suyo; si no, conserva su lugar.
       const ultima = fila.publicadoEn && fila.nivel === p.nivel ? null : await tx.persona.aggregate({ where: { nivel: p.nivel, id: { not: id } }, _max: { orden: true } });
@@ -63,6 +75,7 @@ export async function publicarPersonaEnBase(
     });
     return { ok: true, detalle: "Publicado: el sitio ya lo muestra.", publicadoEn: ahora.toISOString(), publicadoPor: quien, nombre: p.nombre };
   } catch (e) {
+    if (e instanceof SinLugar) return e.fallo;
     if (e instanceof OtraLlegoAntes) return choqueCon(await base.persona.findUnique({ where: { id } }), "el perfil");
     const fallo = await falloPorIndice(base, e, { id, slug: p.slug });
     if (fallo) return fallo;
