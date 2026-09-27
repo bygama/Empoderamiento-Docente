@@ -10,7 +10,7 @@ test("cada fila se lee como una frase, con quién y sobre qué", () => {
   for (const tipo of TIPOS_DE_ACTIVIDAD) assert.match(fraseDe({ tipo, quien: "Ana", sobre: "Juan" }), /^Ana \S/, tipo);
 });
 
-test("cada rol ve la actividad de lo que usa: quien edita, la de páginas y Contacto, y no la de cuentas ni CV", () => {
+test("cada rol ve la actividad de lo que usa: quien edita, la de páginas, Contacto y Novedades, y no la de cuentas ni CV", () => {
   assert.deepEqual(tiposQueVe("administra"), [...TIPOS_DE_ACTIVIDAD]);
   assert.deepEqual(tiposQueVe("edita"), [
     "publico-una-pagina",
@@ -20,5 +20,9 @@ test("cada rol ve la actividad de lo que usa: quien edita, la de páginas y Cont
     "cerro-un-mensaje",
     "marco-un-mensaje-como-spam",
     "borro-un-mensaje",
+    "publico-una-novedad",
+    "despublico-una-novedad",
+    "descarto-cambios-de-una-novedad",
+    "borro-una-novedad",
   ]);
 });

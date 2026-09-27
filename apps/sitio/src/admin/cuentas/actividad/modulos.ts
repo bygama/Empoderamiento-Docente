@@ -10,6 +10,7 @@ export const MODULOS_DE_ACTIVIDAD = {
   "mi-cuenta": "Mi cuenta",
   cuentas: "Cuentas",
   contenido: "Contenido",
+  novedades: "Novedades",
   mensajes: "Mensajes",
 } as const;
 export type ModuloDeActividad = keyof typeof MODULOS_DE_ACTIVIDAD;
@@ -24,6 +25,10 @@ const MODULO_DE: Record<TipoDeActividad, ModuloDeActividad> = {
   "publico-una-pagina": "contenido",
   "descarto-un-borrador": "contenido",
   "restauro-una-version": "contenido",
+  "publico-una-novedad": "novedades",
+  "despublico-una-novedad": "novedades",
+  "descarto-cambios-de-una-novedad": "novedades",
+  "borro-una-novedad": "novedades",
   "tomo-un-mensaje": "mensajes",
   "cerro-un-mensaje": "mensajes",
   "marco-un-mensaje-como-spam": "mensajes",
@@ -55,7 +60,8 @@ const SIN_PANTALLA: readonly TipoDeActividad[] = ["cancelo-la-invitacion", "borr
 /**
  * Adónde lleva lo que se tocó, si todavía tiene pantalla: lo de Cuentas, a
  * esa cuenta si existe; lo de una página, a su editor (las páginas no se
- * borran). Un mensaje no: pudo haberse borrado, a mano o por la retención.
+ * borran). Un mensaje no: pudo haberse borrado, a mano o por la retención; una
+ * novedad tampoco, porque también se borra.
  */
 export function pantallaDe(
   { tipo, sobreId }: { tipo: TipoDeActividad; sobreId: string | null },
