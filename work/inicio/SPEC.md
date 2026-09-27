@@ -97,7 +97,7 @@ son secundarias, como en «Sin permiso» y Mi cuenta.
 | Clave | Urgencia | Quién la ve | Qué dice | Lleva a |
 | --- | --- | --- | --- | --- |
 | `paginas-sin-publicar` | `sin-publicar` | `editarContenido` (los tres) | «2 páginas con cambios sin publicar» · «Inicio y Qué hacemos» | «Ir a Páginas», `/admin/contenido/paginas` |
-| `conectar-search-console` | `sin-conectar` | `configurarConexiones` (D A) | «Conectá Search Console» · «Para saber qué busca la gente en Google antes de llegar al sitio.» | «Ver los pasos», `/admin/metricas/busquedas` |
+| `conectar-search-console` | `sin-conectar` | `configurarConexiones` (D A) | «Conectá Search Console» · «Para ver qué busca la gente en Google.» | «Ver los pasos», `/admin/metricas/busquedas` |
 
   «Páginas sin publicar» lee `paginas.borradorEn` con una consulta propia de
   esta lane, sin tocar las de la 4a. «Conectado» es lo mismo que dice
