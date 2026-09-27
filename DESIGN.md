@@ -368,7 +368,9 @@ la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
 (`work/inicio/`); el paginado y la tabla, también (`work/cuentas/`); la sección
 compartida, también (`work/paginas-que-hacemos-y-quienes-somos/`); el estado
 vacío con su acción, la fecha, la selección, la lista variable y la ficha de
-una entidad, también (`work/novedades-y-kit/`). Todos los contrastes están
+una entidad, también (`work/novedades-y-kit/`); y Ajustes, que no suma
+patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`). Todos
+los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -663,7 +665,9 @@ columna, dos desde `sm`, tres desde `lg`).
   `azul-principal` o una insignia («Por hacer», apagada).
 - **Caja:** `rounded-xl`, `p-5`, borde `azul-claro/60` decorativo, que pasa a
   `azul-medio` en hover. Sin sombra.
-- Primer consumidor: `/admin/contenido`. Lo reusa Ajustes.
+- Primer consumidor: `/admin/contenido`. Lo usa también `/admin/ajustes`, con
+  el estado de cada pantalla; una que pide atención («Nadie recibe los avisos
+  de CV», «1 conexión con error») va como insignia fuerte.
 
 ### Lista
 
@@ -831,8 +835,14 @@ pasa si se toca**; a la derecha, lo que se toca.
 - **Sin primario si los apartados son independientes**: en Mi cuenta hay tres
   formularios y ninguno es la acción de la pantalla, así que los tres botones
   son secundarios. El aviso de cada uno va entre sus campos y su botón.
+- **Un solo formulario partido en apartados** (Ajustes › Datos del sitio):
+  cuando los apartados se guardan juntos, el primario va en el encabezado
+  fijo, y con cambios sin guardar el encabezado pasa a navy y salir pregunta,
+  como en el editor de páginas. La frase de cada apartado dice dónde se ve lo
+  que tiene.
 - Primer consumidor: Mi cuenta (Perfil, Contraseña, Tu rol, Sesiones y
-  Avisos). Lo reusa Ajustes.
+  Avisos). Lo usa Ajustes: apartados independientes en SEO, Avisos y
+  Privacidad, y uno solo partido en Datos del sitio (arriba).
 
 ### Casilla
 
@@ -852,10 +862,14 @@ frase y no solo el cuadrito.
   (4,83:1 · 7,08:1) y el error del campo, como cualquier otro. La ayuda dice
   la consecuencia: «Hoy la destacada es «…». Al publicar esta, aquella deja
   de serlo: hay una sola.»
+- **Si la fila lleva un dato al lado** (el correo de una cuenta, en meta
+  `gris-texto`), una coma solo para el lector los separa: sin ella, el nombre
+  de la casilla junta los dos.
 - Primer consumidor: el campo opcional del editor (`admin/campos/Campo.tsx`);
   registrada con los avisos de Mi cuenta (2026-09-26, `work/mensajes/`). La
   `Casilla` del kit es esta misma regla hecha componente: la usa la destacada
-  de una novedad.
+  de una novedad. Ajustes › Avisos las usa como lo que se elige, una fila por
+  cuenta (`work/ajustes/`).
 
 ### Fecha
 
