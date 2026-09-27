@@ -2,7 +2,7 @@ import { BotonEnlace } from "@/admin/armazon/Boton";
 import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
 import { Insignia } from "@/admin/armazon/Insignia";
 import { Fila, Lista } from "@/admin/armazon/Lista";
-import type { FilaDePendiente } from "@/datos/inicio/pendientes";
+import type { FilaDePendiente } from "@/datos/inicio/filas-de-pendientes";
 
 /**
  * «¿Qué tengo que hacer?»: solo las filas con algo pendiente, ya ordenadas
