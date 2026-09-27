@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { Search } from "@/components/ui/icons";
+import type { HeroBiblioteca } from "@/features/biblioteca/contenido/hero";
 import { CategoriasRail } from "./CategoriasRail";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -33,6 +34,9 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * barrido, y bajada + buscador + riel rematan con el haz ya entregado al
  * cursor. Los tiempos de este timeline están ACOPLADOS a las constantes del
  * barrido en PuntosFaro. Sin motion / prefers-reduced-motion: todo visible.
+ *
+ * El titular y la bajada llegan por props (de
+ * `features/biblioteca/contenido/hero.ts` o de la base).
  */
 // Enter en el campo y clic en la lupa hacen lo MISMO (hoy, bajar al listado):
 // un solo lugar donde cambiarlo cuando el buscador filtre de verdad. Vive en
@@ -41,7 +45,8 @@ function irAMateriales() {
   document.getElementById("materiales")?.scrollIntoView({ behavior: "smooth" });
 }
 
-export function BibliotecaHero() {
+export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
+  const { titulo } = contenido;
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -104,15 +109,15 @@ export function BibliotecaHero() {
         >
           {/* Visible en dos líneas enmascaradas; el sr-only evita que el
               lector las concatene sin espacio ("Publicacionesy recursos"). */}
-          <span className="sr-only">Publicaciones y recursos</span>
+          <span className="sr-only">{`${titulo.primeraLinea} ${titulo.segundaLinea}`}</span>
           <span aria-hidden="true" className="block overflow-hidden pb-[0.06em]">
             <span data-bh-word className="block">
-              Publicaciones
+              {titulo.primeraLinea}
             </span>
           </span>
           <span aria-hidden="true" className="block overflow-hidden pb-[0.06em]">
             <span data-bh-word className="text-verde-concepto block">
-              y recursos
+              {titulo.segundaLinea}
             </span>
           </span>
         </h1>
@@ -121,8 +126,7 @@ export function BibliotecaHero() {
           data-bh-rise
           className="mt-6 max-w-[46ch] font-sans text-[1.02rem] leading-relaxed text-white/85 md:text-[1.15rem]"
         >
-          Materiales de investigación y recursos pedagógicos, abiertos y
-          listos para llevar al aula.
+          {contenido.bajada}
         </p>
 
         {/* Buscador — por ahora ancla al futuro listado (#materiales);
