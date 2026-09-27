@@ -1,0 +1,79 @@
+import { after, before, test } from "node:test";
+import assert from "node:assert/strict";
+import { config as cargarEntorno } from "dotenv";
+import type { Prisma } from "@/../prisma/generado/client";
+
+// El registro de usos contra el Postgres local: la misma foto de prueba en una
+// página (borrador), una novedad, un caso (borrador) y un aliado, y el
+// contenido del código. Todo lo de prueba se deshace al final.
+
+cargarEntorno({ path: [".env.local"], quiet: true });
+const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
+
+const VIEJA = "/fotos/prueba-usos-vieja.webp";
+const NUEVA = "/fotos/prueba-usos-nueva.webp";
+const foto = (src: string, alt: string) => ({ src, alt, foco: { x: 0.5, y: 0.5 } });
+
+async function modulos() {
+  const { base } = await import("@/datos/cliente");
+  const { Prisma } = await import("@/../prisma/generado/client");
+  const registro = await import("./registro");
+  // Volver a dejar una columna Json como estaba, nula incluida.
+  const comoEstaba = (v: Prisma.JsonValue | undefined) => (v === null || v === undefined ? Prisma.DbNull : (v as Prisma.InputJsonValue));
+  return { base, comoEstaba, ...registro };
+}
+
+let contacto: { borrador: Prisma.JsonValue } | null = null;
+let caso04: { borrador: Prisma.JsonValue } | null = null;
+
+before(async () => {
+  if (!process.env.DATABASE_URL) return;
+  const { base } = await modulos();
+  contacto = await base.pagina.findUnique({ where: { slug: "contacto" }, select: { borrador: true } });
+  caso04 = await base.caso.findUnique({ where: { id: "caso-04" }, select: { borrador: true } });
+  const enContacto = { apertura: { equipo: { foto: foto(VIEJA, "En Contacto") } } };
+  await base.pagina.upsert({ where: { slug: "contacto" }, create: { slug: "contacto", borrador: enContacto }, update: { borrador: enContacto } });
+  await base.caso.update({ where: { id: "caso-04" }, data: { borrador: { lamina: { foto: foto(VIEJA, "En el caso"), sujecion: "clip", rotulo: "L" } } } });
+  await base.novedad.create({ data: { slug: "prueba-usos", titulo: "Prueba usos", imagen: foto(VIEJA, "En la novedad"), publicada: true, publicadaEn: new Date() } });
+  await base.aliado.create({ data: { nombre: "Prueba usos", logo: foto(VIEJA, "En el aliado"), orden: 99, publicado: true, autorizado: true } });
+});
+
+after(async () => {
+  if (!process.env.DATABASE_URL) return;
+  const { base, comoEstaba } = await modulos();
+  await base.novedad.deleteMany({ where: { slug: "prueba-usos" } });
+  await base.aliado.deleteMany({ where: { nombre: "Prueba usos" } });
+  if (contacto) await base.pagina.update({ where: { slug: "contacto" }, data: { borrador: comoEstaba(contacto.borrador) } });
+  else await base.pagina.deleteMany({ where: { slug: "contacto" } });
+  await base.caso.update({ where: { id: "caso-04" }, data: { borrador: comoEstaba(caso04?.borrador) } });
+});
+
+test("cada módulo encuentra la foto donde está, y dice si está en el sitio, sin publicar o en el código", sinBase, async () => {
+  const { base, usosPorFoto } = await modulos();
+  const usos = await usosPorFoto(base);
+  assert.deepEqual(
+    (usos.get(VIEJA) ?? []).map((u) => [u.en, u.donde, u.enlace, u.alt]),
+    [
+      ["sin-publicar", "Contacto › Apertura › El equipo › Foto", "/admin/contenido/paginas/contacto#seccion-apertura", "En Contacto"],
+      ["sitio", "Novedad «Prueba usos»", (usos.get(VIEJA) ?? [])[1]?.enlace, "En la novedad"],
+      ["sin-publicar", "Caso 04 › Lámina", "/admin/contenido/casos/caso-04", "En el caso"],
+      ["sitio", "Aliado Prueba usos › Logo", (usos.get(VIEJA) ?? [])[3]?.enlace, "En el aliado"],
+    ],
+  );
+  // Lo que el sitio muestra del código también es un uso: la foto de Quiénes somos en el Inicio.
+  const delCodigo = usos.get("/fotos/formadoras-pizarra-umce.webp") ?? [];
+  assert.ok(delCodigo.some((u) => u.en === "codigo" && u.donde.startsWith("Inicio › ")), JSON.stringify(delCodigo));
+});
+
+test("reemplazar cambia la URL en cada módulo y dice qué regenerar", sinBase, async () => {
+  const { base, USOS_DE_FOTOS, usosPorFoto } = await modulos();
+  const regenerar = await base.$transaction(async (tx) => (await Promise.all(USOS_DE_FOTOS.map((m) => m.reemplazar(tx, VIEJA, NUEVA)))).flat());
+  const usos = await usosPorFoto(base);
+  assert.equal(usos.get(VIEJA), undefined);
+  assert.equal(usos.get(NUEVA)?.length, 4);
+  // Lo que estaba solo en borradores no regenera nada; la novedad y el logo publicados, sí.
+  assert.deepEqual(
+    regenerar.map((r) => r.ruta + (r.layout ? " (layout)" : "")),
+    ["/", "/novedades", "/novedades/prueba-usos", "/novedades/prueba-usos/imagen-para-redes", "/ (layout)"],
+  );
+});

@@ -94,6 +94,20 @@
   fail; typecheck 0; `pnpm build` y `comparar-render` contra `main` → las
   12 páginas iguales salvo las dos de Novedades del dedupe (el diff de sus
   `<img>` con la ruta nueva da igual), y los cinco logos con el mismo
-  `<img>` (p. ej. Techint 147×195, `h-12`, sin optimizar).
+  `<img>` (p. ej. Techint 147×195, `h-12`, sin optimizar). `pnpm --filter
+  sitio lint` 0. Commit `eef941d4` (enmendado: el primer `git add` falló por
+  una ruta ya borrada y el commit se había llevado solo el borrado).
+- **Paso 9 — el registro de usos**: `datos/fotos/uso.ts` (el uso, `Donde`,
+  `Regenerar`, `UsosDeUnModulo`, `sinRepetir`), `registro.ts`
+  (`USOS_DE_FOTOS`, `usosPorFoto`) y una entrada por módulo:
+  `de-las-paginas.ts` (lo publicado, el borrador y, por sección que no está
+  en la base, el contenido del código; la etiqueta con `caminoLegible`;
+  reemplazar cambia también las versiones), `de-las-novedades.ts`,
+  `de-los-casos.ts` y `de-los-aliados.ts` (en el sitio solo publicado y
+  autorizado; regenera el layout). `registro.test.ts` (la misma foto en el
+  borrador de Contacto, una novedad, el borrador del caso 04 y un aliado,
+  cada una con su `en` y su lugar; una foto del código de Inicio como uso
+  `codigo`; reemplazar la cambia en los cuatro y dice qué regenerar) → 2
+  pass, 0 fail, 0 skipped, y las filas de prueba se deshacen; typecheck 0.
 
 ## Abierto
