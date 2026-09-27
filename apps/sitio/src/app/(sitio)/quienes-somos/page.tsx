@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function QuienesSomosPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, origen, mirada } = await contenidoDe("quienes-somos");
+  const { hero, origen, mirada, equipo } = await contenidoDe("quienes-somos");
   return (
     <main id="contenido" tabIndex={-1}>
       <QuienesSomosHero contenido={hero} />
@@ -23,7 +23,7 @@ export default async function QuienesSomosPage() {
           acá entre la mirada y el equipo (2026-09-08) y se sacó al día
           siguiente por decisión de Gastón. Su copy quedó guardado en
           docs/content/copy-que-hacemos.md; el código se borró el 2026-09-18. */}
-      <ImpulsanEd />
+      <ImpulsanEd contenido={equipo} />
       {/* Acá estuvieron RedEd (el grafo de la red) y DistintoEd (la comparativa
           con una capacitación genérica): Gastón los sacó el 2026-07-22 porque
           la página quedaba muy larga, y su código se borró el 2026-09-18. */}

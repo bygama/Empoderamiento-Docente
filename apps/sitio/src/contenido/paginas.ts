@@ -15,6 +15,7 @@ import { esquemaNiveles, nivelesInicial } from "@/features/que-hacemos/contenido
 import { esquemaProyectos, proyectosInicial } from "@/features/que-hacemos/contenido/proyectos";
 import { seoQueHacemosInicial } from "@/features/que-hacemos/contenido/seo";
 import { esquemaHero as esquemaHeroDeQuienesSomos, heroInicial as heroDeQuienesSomos } from "@/features/quienes-somos/contenido/hero";
+import { equipoInicial, esquemaEquipo } from "@/features/quienes-somos/contenido/equipo";
 import { esquemaMirada, miradaInicial } from "@/features/quienes-somos/contenido/mirada";
 import { esquemaOrigen, origenInicial } from "@/features/quienes-somos/contenido/origen";
 import {
@@ -68,6 +69,7 @@ export const PAGINAS = {
       hero: { nombre: "Hero", esquema: esquemaHeroDeQuienesSomos, inicial: heroDeQuienesSomos },
       origen: { nombre: "Origen, sentido y evolución", esquema: esquemaOrigen, inicial: origenInicial },
       mirada: { nombre: "Nuestra mirada", esquema: esquemaMirada, inicial: miradaInicial },
+      equipo: { nombre: "Quiénes sostienen ED", esquema: esquemaEquipo, inicial: equipoInicial },
     },
   },
   investigacion: { ruta: "/investigacion", nombre: "Investigación", secciones: {} },
