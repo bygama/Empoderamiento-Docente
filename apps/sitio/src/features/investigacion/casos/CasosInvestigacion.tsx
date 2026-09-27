@@ -31,8 +31,11 @@ import { useTransicionesExpediente } from "./maquina/useTransicionesExpediente";
  * `useAccionesLugar` (abrir, cerrar, irA), `useHistorialLugar` (hash,
  * Escape, atrás), `useEntradaIndice` y `useTransicionesExpediente`
  * (opening / switching / closing). Acá queda el JSX y el cableado.
+ *
+ * `titulo` es el único texto propio de la sección y llega por props; los
+ * casos son una entidad (`data/casos.ts`).
  */
-export function CasosInvestigacion() {
+export function CasosInvestigacion({ titulo }: { titulo: string }) {
   const m = useLugarExpediente();
   const { abrir, cerrar, solicitarCierre, irA } = useAccionesLugar(m);
   useHistorialLugar(m, { abrir, cerrar, solicitarCierre });
@@ -110,7 +113,7 @@ export function CasosInvestigacion() {
                         start="top 66%"
                         className="font-display text-azul-principal max-w-3xl text-h2 font-extrabold tracking-[-0.02em]"
                       >
-                        Casos de investigación
+                        {titulo}
                       </RevealLines>
                     </div>
                   </div>
