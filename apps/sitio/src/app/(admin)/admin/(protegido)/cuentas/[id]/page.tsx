@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { queSePuede } from "@ed/auth";
+import { puede, queSePuede } from "@ed/auth";
+import { SinPermiso } from "@/admin/armazon/SinPermiso";
 import { AvisoDeDireccion, AvisoDeInvitacion, FichaDeLaCuenta } from "@/admin/cuentas/FichaDeLaCuenta";
 import { cuentaParaActuar, unaCuenta } from "@/datos/consultas/cuentas";
 import { sesionActual } from "@/datos/sesion";
@@ -8,17 +9,20 @@ import { sesionActual } from "@/datos/sesion";
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ invitacion?: string; direccion?: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const cuenta = await cuentaParaActuar((await params).id);
+  // También el título: sin el permiso, la consulta no devuelve la cuenta.
+  const cuenta = await cuentaParaActuar((await sesionActual())?.user.rol, (await params).id);
   return cuenta ? { title: cuenta.nombre } : {};
 }
 
-// Una cuenta (SPEC de work/cuentas §4.3). La guarda de Cuentas está en el
-// layout; lo que se le puede hacer lo dice `queSePuede`, la misma regla que
-// cada acción vuelve a verificar.
+// Una cuenta (SPEC de work/cuentas §4.3). Lo que se le puede hacer lo dice
+// `queSePuede`, la misma regla que cada acción vuelve a verificar.
 export default async function UnaCuenta({ params, searchParams }: Props) {
   const sesion = await sesionActual();
   if (!sesion) redirect("/admin/entrar");
-  const cuenta = await unaCuenta((await params).id);
+  // La guarda del layout solo oculta la interfaz: esta página se renderiza
+  // igual y viaja en el payload. El permiso se corta acá, antes de leer nada.
+  if (!puede(sesion.user.rol, "usarCuentas")) return <SinPermiso capacidad="usarCuentas" rol={sesion.user.rol} />;
+  const cuenta = await unaCuenta(sesion.user.rol, (await params).id);
   if (!cuenta?.rol) notFound();
   const conRol = { ...cuenta, rol: cuenta.rol };
   const esLaPropia = cuenta.id === sesion.user.id;
