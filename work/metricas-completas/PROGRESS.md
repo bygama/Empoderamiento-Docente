@@ -158,6 +158,50 @@
   `redes`, `enlace-clic` y basura no suman. **Cabecera:** en `next dev` la
   página redirige con `Cache-Control: no-cache, must-revalidate`; el `no-store`
   de producción se mide con `next start` en work-verify.
+- **Paso 15** — `config/avisos.ts` suma `resumen-semanal` (`verMetricas`) y
+  `deFabrica` (Contacto y CV `true`, el resumen `false`); `datos/avisos.ts`
+  lo respeta en `destinatariosDe` (prendido: `none` apagada; apagado: `some`
+  prendida), `avisosDe`, `avisosDeTodas` y `ponerQuienRecibe` (con `recibe()`),
+  y el índice de Ajustes alerta «Nadie recibe…» solo por uno que viene
+  prendido. `avisos.test.ts` (con uno nuevo del resumen): 6 pasan. `74534a5`.
+- **Paso 16** — `mandarCorreo` gana `idempotencia`; `correos/resumen-semanal.ts`
+  (la plantilla); `datos/tareas/numeros-del-resumen.ts` (los números de
+  «Esta semana» del Inicio con su corte por rol, más vistas y contactos; la
+  página más vista); `datos/tareas/resumen-semanal.ts` (`enLaZona` con
+  `ZONA_HORARIA`, `diasQueFaltan`, `mandarResumenSemanal`, la tarea
+  `resumen-semanal` en `TAREAS_DIARIAS`); Resend la lleva en
+  `config/conexiones.ts`; Mi cuenta › Avisos dice «Llega los lunes a la
+  madrugada, hora de Chile.» o cuántos días faltan. `Destinatario` suma
+  `DestinatarioConRol` para el corte por rol. Tests de correos, la tarea,
+  conexiones y avisos: 25 pasan; typecheck, eslint y react-doctor → 0 (el
+  primer intento dio 98 por `js-hoist-intl`: el `Intl.DateTimeFormat` de
+  `enLaZona` subió al módulo). En el navegador: Mi cuenta de quien edita
+  muestra la casilla del resumen apagada, con su nota. `97abefa`.
+- **Paso 17** — La 8a ya estaba en `main` (rebase de antes del paso 12):
+  `materialExiste` contra `materiales` publicados; `contar("material-consultado",
+  id)` en el link de un material del catálogo, de los destacados y del Inicio;
+  `datos/consultas/materiales-consultados.ts` (`masConsultados`,
+  `consultasDelMes`); «Materiales más consultados» en Qué hace la gente; el
+  número del Inicio lee `materialesConsultados()` (y con él, el resumen
+  semanal). Test nuevo de `materialesSegun`: 12 pasan con los de
+  `recibir-evento`. **De punta a punta:** el dev server, levantado antes del
+  rebase, tenía el cliente de Prisma viejo (`recibirEvento: TypeError` en su
+  log: `base.material` no existía); reiniciado (terminal
+  `term_ca18c1e1-…`), un `curl` con un material publicado suma 1, uno con un
+  id que no existe no suma, y un clic en «Leer en RELIME» de `/biblioteca`
+  suma otro; Qué hace la gente los lista y el Inicio dice «Materiales
+  consultados 2». `8571be2`.
+- **Paso 18** — La lista de `/admin/biblioteca` dice «Consultado N veces este
+  mes» (o «Sin consultas este mes») debajo de cada material, con
+  `consultasDelMes()` leído junto con la lista. En el navegador: las dos
+  filas consultadas dicen «Consultado 1 vez este mes». typecheck, eslint,
+  react-doctor → 0. `f876d3a`.
+- **Paso 19** — ADR-0017 (con el límite de atribución de un CV a un link y
+  por qué se acepta, como pidió el padre) y su fila en el índice; el README
+  («Las métricas y lo programado», con la tabla de qué ve ED, de dónde sale y
+  cuándo llega); AGENTS.md §3; el spec del admin (§5 las rutas, §6 las
+  tablas). `grep -n 0017 docs/architecture/adrs/README.md` → la fila 48.
+  `4b37e51`, `5681b08`, `788140b`, `e05da1d`.
 
 ## Abierto
 
