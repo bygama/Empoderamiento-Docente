@@ -27,10 +27,21 @@ export function falloEnCampo(camino: string, mensaje: string): Fallo {
   return { ok: false, detalle: resumenDeErrores(errores), errores };
 }
 
+type ConTitulo = { titulo: string | null; borrador: Prisma.JsonValue };
+
+function delBorrador(fila: ConTitulo): string {
+  const titulo = comoDocumento(fila.borrador).titulo;
+  return typeof titulo === "string" ? titulo.trim() : "";
+}
+
 /** Cómo se llama una novedad en llano, para la actividad y los avisos: su título publicado, el del borrador o «Sin título». */
-export function tituloDe(fila: { titulo: string | null; borrador: Prisma.JsonValue }): string {
-  const delBorrador = comoDocumento(fila.borrador).titulo;
-  return fila.titulo || (typeof delBorrador === "string" && delBorrador.trim()) || "Sin título";
+export function tituloDe(fila: ConTitulo): string {
+  return fila.titulo || delBorrador(fila) || "Sin título";
+}
+
+/** Lo mismo, con el del borrador primero: lo que se está escribiendo (el pendiente del Inicio de los borradores quietos). */
+export function tituloDelBorrador(fila: ConTitulo): string {
+  return delBorrador(fila) || fila.titulo || "Sin título";
 }
 
 /**

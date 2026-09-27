@@ -1,5 +1,5 @@
 import { base } from "@/datos/cliente";
-import { tituloDe } from "@/datos/acciones/novedades-en-base";
+import { tituloDelBorrador } from "@/datos/acciones/novedades-en-base";
 
 // Lo que el Inicio lee de la tabla `novedades` (SPEC de `work/novedades-y-kit/`
 // §10): las que están en borrador y nadie toca hace más de 7 días.
@@ -27,5 +27,6 @@ export async function novedadesEnBorradorViejas(ahora: Date = new Date()): Promi
     orderBy: { borradorEn: "asc" },
     select: { titulo: true, borrador: true },
   });
-  return filaDeBorradoresViejos(filas.map(tituloDe));
+  // El del borrador: una despublicada que se está reescribiendo se nombra por lo que se escribe.
+  return filaDeBorradoresViejos(filas.map(tituloDelBorrador));
 }
