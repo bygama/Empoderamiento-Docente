@@ -762,12 +762,17 @@ oscuro. Sobre blanco, un logo blanco desaparecería.
   Inicio.
 - **La autorización** (AGENTS.md §5.4) no es un campo del borrador: es un
   `Bloque` propio debajo del formulario, con la casilla «Autorizado» (la
-  nativa, como en «Casilla»), la nota de dónde consta y «Guardar la
-  autorización», secundario, porque rige en el momento y no espera a
-  publicar. Para quien no la puede poner, la casilla va deshabilitada y
-  la explicación, en meta `gris-texto` debajo del título, dice quién la pone
-  (`aria-describedby`). En el encabezado y la lista, «Sin autorizar» es
-  fuerte y «Autorizado», normal, al lado de la insignia de la publicación.
+  nativa, como en «Casilla»), la nota de dónde consta y su botón,
+  secundario, porque rige en el momento y no espera a publicar. **Vale para
+  un logo y un nombre**: arriba, «Se autorizó» con ese logo como en la tira y
+  su nombre; al marcar, «Se va a autorizar» con lo guardado, antes del botón
+  «Autorizar este logo» (lo que está sin guardar no se autoriza, y lo dice).
+  Si lo guardado cambió desde la autorización, un aviso de error lo dice y el
+  aliado cuenta como sin autorizar. Para quien no la puede poner, la casilla
+  va deshabilitada y la explicación, en meta `gris-texto` debajo del título,
+  dice quién la pone (`aria-describedby`). En el encabezado y la lista, «Sin
+  autorizar» es fuerte y «Autorizado», normal, al lado de la insignia de la
+  publicación.
 
 ### Lista
 

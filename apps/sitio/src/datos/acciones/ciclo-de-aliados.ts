@@ -77,15 +77,23 @@ export async function descartarCambiosDeAliado(pedido: Pedido): Promise<{ ok: tr
   }
 }
 
-/** Marca o quita «Autorizado», con la nota de dónde consta. Solo quien dirige o administra. */
-export async function autorizarAliado(pedido: { id: string; autorizado: boolean; nota: string }): Promise<{ ok: true; detalle: string } | Fallo> {
+/** Al marcar, `visto` es el logo y el nombre que se le mostraron a quien autoriza. */
+type PedidoDeAutorizar = { id: string; autorizado: boolean; nota: string; visto: { logo: string; nombre: string } | null };
+
+/**
+ * Marca o quita «Autorizado», con la nota de dónde consta. Solo quien dirige o
+ * administra. Si lo guardado ya no es lo que se le mostró, no se autoriza.
+ */
+export async function autorizarAliado(pedido: PedidoDeAutorizar): Promise<{ ok: true; detalle: string } | Fallo> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return SIN_SESION;
     if (!puede(sesion.user.rol, "autorizarAliados")) return { ok: false, detalle: SIN_PERMISO };
-    const valido = z.object({ id: z.uuid(), autorizado: z.boolean() }).safeParse(pedido);
-    if (!valido.success) return MAL_PEDIDO;
-    const r = await autorizarAliadoEnBase(base, { ...valido.data, nota: pedido.nota, rol: sesion.user.rol, quien: sesion.user.name });
+    const visto = z.object({ logo: z.string().max(1000), nombre: z.string().max(200) });
+    const valido = z.object({ id: z.uuid(), autorizado: z.boolean(), visto: visto.nullable() }).safeParse(pedido);
+    if (!valido.success || (valido.data.autorizado && !valido.data.visto)) return MAL_PEDIDO;
+    const { id, autorizado } = valido.data;
+    const r = await autorizarAliadoEnBase(base, { id, autorizado, visto: valido.data.visto ?? undefined, nota: pedido.nota, rol: sesion.user.rol, quien: sesion.user.name });
     if (!r.ok) return r;
     if (!r.cambio) return { ok: true, detalle: r.detalle };
     revalidarTira();
