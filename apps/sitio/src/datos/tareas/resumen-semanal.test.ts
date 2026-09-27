@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { puede } from "@ed/auth";
 import type { NumeroDelResumen } from "@/correos/resumen-semanal";
-import { enLaZona, mandarResumenSemanal } from "./resumen-semanal";
+import { copiaDeVercel } from "./metricas-de-vercel";
+import { enLaZona, mandarResumenSemanal, resumenSemanalDeMetricas } from "./resumen-semanal";
 
 // El lunes 28 de septiembre de 2026 a las 4 UTC (la hora del cron) es lunes en Chile.
 const LUNES = new Date("2026-09-28T04:00:00.000Z");
@@ -73,4 +74,36 @@ test("un correo que no sale no frena a los demás, y la corrida queda fallida", 
     r.mandados.map((m) => m.para),
     ["eva@ed.test"],
   );
+});
+
+test("todos los números cuentan la misma semana: de lunes a domingo, la anterior al lunes de Chile", async () => {
+  const pedidas: unknown[] = [];
+  const textos: string[] = [];
+  const correrEl = (hoy: Date) =>
+    mandarResumenSemanal({
+      hoy,
+      faltan: async () => 0,
+      destinatarios: async () => PERSONAS.slice(0, 1),
+      numeros: async (_rol, semana) => (pedidas.push(semana), []),
+      pagina: async (semana) => (pedidas.push(semana), null),
+      mandar: async ({ contenido }) => (textos.push(contenido.texto), "consola"),
+    });
+  // Corrido a mano el lunes 28 a las 23:30 de Chile, cuando en UTC ya es martes: sigue siendo la del 21 al 27.
+  await correrEl(new Date("2026-09-29T02:30:00.000Z"));
+  assert.deepEqual(pedidas, [
+    { desde: "2026-09-21", hasta: "2026-09-27" },
+    { desde: "2026-09-21", hasta: "2026-09-27" },
+  ]);
+  assert.match(textos[0], /semana del 21 al 27 de septiembre/);
+  // La que cruza de mes dice los dos.
+  await correrEl(new Date("2026-10-05T04:00:00.000Z"));
+  assert.deepEqual(pedidas.slice(2), [
+    { desde: "2026-09-28", hasta: "2026-10-04" },
+    { desde: "2026-09-28", hasta: "2026-10-04" },
+  ]);
+  assert.match(textos[1], /semana del 28 de septiembre al 4 de octubre/);
+});
+
+test("el resumen espera a la copia de Vercel: lee la ventana que esa copia escribe en la misma corrida", () => {
+  assert.equal(resumenSemanalDeMetricas.despuesDe, copiaDeVercel.clave);
 });
