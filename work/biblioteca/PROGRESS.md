@@ -279,3 +279,22 @@
   (el navegador embebido no da permiso de portapapeles a un clic simulado), y
   la cita aparece debajo para copiarla a mano; el camino que copia queda para
   la revisión en un navegador de verdad.
+
+- **Paso 15 — los docs.** El ADR-0016 (`0016-agregar-por-doi-y-salud-de-links.md`:
+  agregar en dos pasos, `pedirProtegido`, la salud de los links; alternativas
+  `undici`, un servicio de afuera, chequear en la revista y los 57 juntos) y
+  su fila en el índice — 0016 porque `ajustes` tomó el 0015 (DECISIONS);
+  los tres comentarios de `lib/red/` pasan a 0016. AGENTS.md §3 (`datos/biblioteca/`,
+  `admin/biblioteca/`, `features/biblioteca/contenido/`, `lib/red/`,
+  `lib/metadatos/`, las consultas y acciones nuevas, la tarea), §12 (existen
+  `materiales` y `autorias`; la regla nueva: nada del servidor pide un link de
+  una persona si no es por `pedirProtegido`) y §13 (Biblioteca hecha, dentro
+  de la fase 3). README: la tarea en el párrafo del cron, la sección
+  «Biblioteca» del admin, `lib/red/` y `lib/metadatos/` en el árbol, y
+  Novedades con «el material que abre». Spec del admin: §5 (57, y por qué no
+  63), §6 (`novedades.material_id`, la fila de `materiales`, la de `autorias`
+  y el párrafo de Materiales) y §9 (57). DESIGN.md §7: «Acción de texto» y
+  «Portada tipográfica de un material», con los contrastes medidos (§11 ya se
+  había escrito en los pasos de UI). Aceptación: `git diff --stat main --
+  docs AGENTS.md README.md DESIGN.md` → los cinco más el ADR nuevo; `pnpm lint`
+  → exit 0.

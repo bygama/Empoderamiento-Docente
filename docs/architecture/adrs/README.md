@@ -44,6 +44,7 @@ internos (refactors).
 | 0013  | [Segundo factor por correo, obligatorio para quien dirige y administra](0013-segundo-factor-por-correo.md) | Accepted (completa 0010) |
 | 0014  | [Los controles del admin en `packages/kit-admin`, y cada entidad con lo publicado en columnas y el borrador en un documento](0014-kit-admin-y-modelo-de-entidad.md) | Accepted |
 | 0015  | [Llevar a la base lo que Ajustes edita, con el plazo prometido como techo](0015-ajustes-en-la-base.md) | Accepted (enmienda 0012) |
+| 0016  | [Agregar un material por DOI, ISBN o link detrás de un pedido protegido contra SSRF, y chequear sus links cada semana](0016-agregar-por-doi-y-salud-de-links.md) | Accepted |
 
 ---
 

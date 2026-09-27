@@ -176,11 +176,12 @@ un release candidate de la 8 (ADR-0007).
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
             │   ├── roles.ts     ← el único camino para cambiar un rol (ponerRol: prende el segundo factor si lo pide)
             │   ├── sobre-cuentas.ts ← lo común de las acciones de Cuentas (queSePuede sobre la cuenta, borrar si nunca hizo nada)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad)
-            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, choque, mover-mensajes)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad, novedades, lista- y ficha-de-novedad, imagen-para-redes, sitio, rutas-del-sitio, redirecciones, indexacion, ajustes, materiales, lista- y ficha-de-material, materiales-del-admin, portadas)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion, novedades, ciclo-de-novedades, datos-del-sitio, redirecciones, privacidad, materiales, ciclo-de-materiales, buscar-datos)
+            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, editar-, publicar-novedades, editar-datos-del-sitio, editar-redirecciones, editar-plazos, editar-, publicar-materiales, choque, mover-mensajes)
+            │   ├── biblioteca/  ← buscar los datos de un material afuera (Crossref, OpenAlex, la página) y chequear su link (ADR-0016)
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
-            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google
+            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links
             ├── admin/         ← las pantallas del admin
             │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/), el número de sin leer, la cifra
             │   ├── inicio/      ← el Inicio: el saludo, los pendientes, la semana y la actividad
@@ -189,6 +190,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── mensajes/    ← las bandejas de Contacto y CV y la ficha de cada mensaje
             │   ├── novedades/   ← la primera entidad: la lista, la ficha con su formulario y su panel, «Qué cambió» (cambios.ts)
             │   ├── ajustes/     ← el índice de Ajustes y sus cinco pantallas (sitio, seo, avisos, privacidad, conexiones)
+            │   ├── biblioteca/  ← la segunda entidad: la lista con miniatura, la ficha de un material y agregar por DOI, ISBN o link
             │   ├── campos/      ← el generador de formularios de las páginas (Campo.tsx) y sus errores; los controles son del kit
             │   └── <entidad>/   ← las que siguen, como novedades/ (fase 3)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
@@ -206,10 +208,12 @@ un release candidate de la 8 (ADR-0007).
             │   │                   compositor se queda en su ruta
             │   │                   (AI_GUIDELINES §2)
             │   ├── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
-            │   └── novedades/contenido/ ← además, los dos esquemas de una novedad (novedad.ts) y lo que no
-            │                       necesita Zod (modelo.ts: categorías, topes); y imagen-para-redes/ (next/og)
+            │   ├── novedades/contenido/ ← además, los dos esquemas de una novedad (novedad.ts) y lo que no
+            │   │                   necesita Zod (modelo.ts: categorías, topes); y imagen-para-redes/ (next/og)
+            │   └── biblioteca/contenido/ ← lo mismo para un material (material.ts, campos-del-material.ts, modelo.ts), la cita APA
+            │                       (cita.ts) y lo que ve el sitio (del-sitio.ts); y portada/ (la tipográfica, next/og)
             ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO)
-            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), rss.ts (el feed): sin dominio de ED
+            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -601,8 +605,8 @@ adentro de esta app en `/admin`. Decisión y alternativas en
 > `scripts/guarda-prisma.mjs` están en el árbol y las reglas de abajo describen
 > lo que hay. La fase 2 también: `packages/kit-admin` nació con Novedades, la
 > primera entidad. De las tablas de contenido existen `paginas`,
-> `versiones_de_paginas`, `fotos` y `novedades` (spec del admin §6); las de las
-> demás entidades llegan con ellas.
+> `versiones_de_paginas`, `fotos`, `novedades`, `materiales` y `autorias`
+> (spec del admin §6); las de las demás entidades llegan con ellas.
 
 Reglas para el admin y sus datos:
 
@@ -665,6 +669,12 @@ Reglas para el admin y sus datos:
   «colecciones», «globals» ni `CollectionConfig`.
 - **Validar todos los bordes con Zod** antes de escribir o leer, incluidas las
   Server Actions del admin. Nunca confiar en input externo.
+- **El servidor no pide un link que escribió una persona si no es por
+  `pedirProtegido`** (`lib/red/pedido-protegido.ts`): solo `https`, la IP
+  chequeada antes de conectar y en cada redirección, topes de tamaño y de
+  tiempo, sin cookies ([ADR-0016](docs/architecture/adrs/0016-agregar-por-doi-y-salud-de-links.md)).
+  Un `fetch` directo a una URL que llegó de un formulario es una puerta de
+  SSRF a la red interna y a la metadata de la nube.
 - **Secretos solo server-side:** `DATABASE_URL`, el secreto de better-auth,
   `BLOB_READ_WRITE_TOKEN`, `CV_BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan `NEXT_PUBLIC_` ni
   llegan al browser. Placeholders en `apps/sitio/.env.example`.
@@ -756,6 +766,10 @@ define al implementar cada fase.
       `work/novedades-y-kit/` y el modelo en el ADR-0014.
 - [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
       aliados, páginas y ajustes.
+  - [x] **Biblioteca:** `materiales` y `autorias`, con los 57 de hoy entrados
+        por la migración y su `data.ts` borrado; el módulo, agregar por DOI,
+        ISBN o link, y la salud de los links en el cron diario. Diseño en
+        `work/biblioteca/` y el ADR-0016.
 - [ ] **Admin, fase 4 — URLs y SEO:** las 26 rutas nuevas (15 perfiles, 4 casos,
       7 landings de tipo), `sitemap.xml`, canonicals, redirecciones y JSON-LD.
       Reemplaza al «sitemap definitivo» que este §13 venía arrastrando.

@@ -3,7 +3,7 @@ import { BlockList, isIP } from "node:net";
 // Las direcciones a las que el servidor no le pide nada cuando el destino lo
 // eligió una persona (un link pegado, el link de un material): la red interna,
 // la máquina misma, la metadata de la nube y todo lo que no es internet
-// pública (SPEC §11 de `work/biblioteca/`, ADR-0015). Sin ED.
+// pública (SPEC §11 de `work/biblioteca/`, ADR-0016). Sin ED.
 
 const NO_SE_PIDEN = new BlockList();
 

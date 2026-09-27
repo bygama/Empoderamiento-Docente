@@ -173,7 +173,8 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
             ├── components/    ← UI reutilizable (brand/, layout/, ui/, …)
             ├── features/      ← secciones por dominio (home, novedades, …)
             ├── config/        ← site.ts (la marca) + nav.ts, y la forma de lo que edita Ajustes
-            └── lib/           ← hooks/, correo/ (Resend), seguridad/ (CSP) y utilidades
+            └── lib/           ← hooks/, correo/ (Resend), seguridad/ (CSP), red/ (el
+                                  pedido protegido), metadatos/ (DOI, Crossref) y utilidades
 ```
 
 El plan completo, en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md);
@@ -400,7 +401,8 @@ Ninguna pantalla consulta a Vercel ni a Google al renderizar. **Un solo cron**
 `apps/sitio/src/datos/tareas/diarias.ts`, cada una aislada: la copia de Vercel
 Analytics (a las tablas `metricas_*`), la de Search Console (a
 `busquedas_diarias`), la revisión de la indexación (a `indexacion_de_urls`,
-hasta 20 páginas por día: la API tiene cuota) y la retención de Mensajes.
+hasta 20 páginas por día: la API tiene cuota), la retención de Mensajes y la
+salud de los links de la Biblioteca (ver [Biblioteca](#biblioteca)).
 Cada corrida, bien o con su error en llano, queda en
 `corridas_de_tareas`. «Actualizar ahora», en cada pantalla, corre su tarea a
 mano, con un freno de diez minutos por tarea. Lo que necesite correr solo más
@@ -470,7 +472,7 @@ En `/admin/novedades`, con dos pestañas: **Publicadas** y **Borradores**, y un
 buscador por título. «Nueva novedad» abre la ficha vacía; el primer «Guardar
 borrador» la crea. La ficha tiene el título, la bajada, la fecha (con la
 precisión que da la fuente: año, mes o día), la categoría, la foto, si es la
-destacada, el cuerpo en secciones, la publicación de la Biblioteca que abre y
+destacada, el cuerpo en secciones, el material de la Biblioteca que abre y
 la URL, que sigue al título hasta que se publica. Al costado, cómo se ve en
 Google y al compartir el link —con la imagen para redes generada con el
 título, o una propia con «Usar otra»— y dónde se ve en el sitio.
@@ -490,6 +492,42 @@ entraron con la migración `novedades`. Los controles del formulario son de
 `packages/kit-admin`; el modelo (lo publicado en columnas, el borrador en un
 documento) es el que copian las entidades que siguen:
 [ADR-0014](docs/architecture/adrs/0014-kit-admin-y-modelo-de-entidad.md).
+
+### Biblioteca
+
+En `/admin/biblioteca`, los materiales con su portada, título, autores, tipo y
+año, un buscador y tres filtros: el tipo, el estado (publicados u ocultos) y
+la salud (link roto, sin portada, datos incompletos). Es de los tres roles, y el número de la sidebar cuenta los
+publicados con el link roto.
+
+**«Agregar material» pide una sola cosa: el DOI, el ISBN o el link.** El
+servidor busca los datos en Crossref, en OpenAlex o en la página misma (sus
+etiquetas `citation_*`, o las de redes) y llena la ficha, que dice de dónde
+salió cada dato; nada se guarda hasta «Guardar borrador». Un DOI que ya está
+en la Biblioteca lo dice, y un título parecido avisa. Lo que no se encuentre
+se escribe a mano: «Cargar a mano» abre la ficha vacía.
+
+La ficha es la de una novedad: guardar no publica, «Vista previa» muestra el
+borrador en `/biblioteca`, y «Publicar», «Ocultar», «Descartar cambios» y
+«Borrar» quedan en la actividad del Inicio. Los autores son una lista, y cada
+uno se puede enlazar al perfil de alguien del equipo. Si no hay portada ni
+cita, el sitio usa las que se generan con los datos: la portada tipográfica
+del color del tipo (`/biblioteca/portada/<id>`) y la cita APA, que la tarjeta
+del sitio copia con «Copiar cita APA». Los cuatro lugares de «Destacados» se
+eligen en la ficha.
+
+**La salud de los links:** el cron diario chequea cada link publicado una vez
+por semana, de a 15 por corrida. Un material con DOI se chequea en doi.org, y
+uno con link, pidiendo la página; solo un 404, un 410 o un sitio que ya no
+existe cuentan como roto, y ahí aparece en «Materiales con el link roto» del
+Inicio. Todo lo que el servidor le pide a un link que escribió una persona
+pasa por un pedido protegido: solo `https`, nunca a una dirección interna,
+con tope de tamaño y de tiempo. Decisión en el
+[ADR-0016](docs/architecture/adrs/0016-agregar-por-doi-y-salud-de-links.md).
+
+El sitio lee los materiales de la base en `/biblioteca`, en los destacados del
+Inicio y en la ficha de la novedad que abre uno. Los 57 que había entraron con
+la migración `biblioteca`.
 
 ### Mensajes
 

@@ -4,7 +4,7 @@ import type { LookupFunction } from "node:net";
 import { DestinoNoPermitido, lookupProtegido, resolverDelSistema, urlPermitida, type Resolver } from "./destino";
 
 // Pedirle algo a un link que eligió una persona (SPEC §11 de
-// `work/biblioteca/`, ADR-0015): solo https, a una IP pública chequeada antes
+// `work/biblioteca/`, ADR-0016): solo https, a una IP pública chequeada antes
 // de conectar, cada redirección chequeada otra vez, con tope de bytes y de
 // tiempo, y sin cookies. Sin dependencias: `node:https` con un `lookup`
 // propio. Sin ED.
