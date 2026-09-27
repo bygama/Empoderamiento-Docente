@@ -2,14 +2,11 @@
 
 ## In progress
 
-- **Estado (2026-09-26): en pausa para la revisión de cierre.** Los 14 pasos
-  hechos y la verificación en PASS (abajo); PR
-  [#185](https://github.com/bygama/Empoderamiento-Docente/pull/185) abierto
-  sobre `main` en `48ed711`. Lo que sigue: el padre abre la revisión (1 seat
-  Opus 5.5, medium, el cambio entero contra el SPEC); si hay hallazgos,
-  vuelven a esta terminal como una ronda de arreglos; con PASS y el rebase
-  final, el commit que borra `work/mensajes/` va en este mismo PR antes del
-  merge.
+- **Estado (2026-09-26): cerrada.** Revisión de cierre r1 (Opus 5.5, medium,
+  «el cambio entero contra su SPEC») en PASS sobre `dce306f`: 0 Critical,
+  0 Important, 4 Minor y dos notas fuera de su lente. Ronda de arreglos
+  hecha (abajo, «Ronda r1»); la lane se cierra en el PR #185 con el commit
+  que borra `work/mensajes/`.
 
 - 2026-09-26 — Worktree listo: `pnpm install`, `pnpm generate`, base propia
   `ed_mensajes` con las 12 migraciones de `main` aplicadas
@@ -171,6 +168,39 @@
   salía en hora universal y «Llegó el…» en la de quien mira (un contacto de
   las 21:18 del 26/9 decía que se borraba el 27/9/2028). `Momento` suma `dia`
   y la ficha lo usa.
+
+- 2026-09-26 — **Ronda r1** (lo que pidió el padre con el PASS de r1):
+  - Minor 1 (`f2e52d4`): el detalle de la retención de CV desglosa el spam
+    («Se borraron 2 CV con sus archivos (1 de spam).»); el test suma un CV
+    de spam vencido. `tsx --test src/datos/tareas/retencion-de-mensajes.test.ts`
+    → 2 pasan.
+  - Minor 2 (`4d690f1`): el ADR-0012 suma «Lo que no se hace» (exportar a
+    planilla, responder desde el admin, guardar el origen en un CV).
+  - Fuera de lente, el cuerpo sin tope (`98c816a`): `lib/formularios/cuerpo.ts`
+    (`leerConTope`, que corta al pasar el máximo y cancela la fuente; la
+    cabecera, si ya se pasa, frena antes; `comoJson`, `comoFormData`);
+    `/api/contacto` y `/api/cv` lo usan y `largoDelPedido` sale. Un cuerpo
+    chunked de más, sin `Content-Length`, recibe 413 habiendo leído menos
+    de 10 de 100 pedazos de 16 KB (Contacto) y menos de 300 de 400 (CV).
+    `tsx --test src/datos/formularios/*.test.ts src/lib/formularios/*.test.ts`
+    → 23 pasan.
+  - Fuera de lente, la cabecera de la descarga (`9b19505`): con `next start`
+    en el 3029 el proxy también pisaba la de la ruta (401 con
+    `cache-control: no-store, max-age=0`). Arreglado en la fuente: el proxy
+    pone `private, no-store, max-age=0` en todo `/admin` (DECISIONS). Con
+    `next start` después del cambio: la descarga como administra da 200,
+    `cache-control: private, no-store, max-age=0`, `application/pdf`,
+    adjunto «CV de Bruno Prueba CV.pdf», `nosniff`, 193 bytes que empiezan
+    por `%PDF-`; `/admin/entrar` sale con la misma cabecera.
+    `tsx --test src/proxy.test.ts` → 9 pasan.
+  - Quedan como están (el padre): Minor 3 (el 429 y el 500 dicen «escribinos
+    a…» igual) y «PDF · 1,2 MB».
+  - Minor 4, por qué no se probó el error con la base apagada: `ed-postgres`
+    es un solo contenedor para todas las lanes en vuelo (`ed`, `ed_mensajes`
+    y las demás); apagarlo tira los dev servers y los tests de otras
+    sesiones. El camino de error del formulario se probó con el 429 (mismo
+    `{ ok: false, error }`, misma línea en el formulario), y el 500 es la
+    misma respuesta con otro texto (`noSePudo`).
 
 ## Verification
 
