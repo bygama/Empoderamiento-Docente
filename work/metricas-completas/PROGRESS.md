@@ -20,16 +20,27 @@
   (https://github.com/bygama/Empoderamiento-Docente/pull/193) abierto sobre
   `b2bbe1e`. **En pausa, esperando la revisión de cierre del padre** (1
   revisor Opus 5.5, medium, «el cambio entero contra su SPEC»).
-- **Lo que sigue:** la ronda de arreglos que vuelva de la revisión, en esta
-  misma terminal; después, a pedido del padre, rebase sobre `main`, el gate
-  otra vez y el commit que cierra la lane (saca `work/metricas-completas/`)
-  dentro del PR, antes del merge. El dev server sigue en la pestaña «dev
-  metricas-completas» (3029) y los dos perfiles del navegador
-  (`metricas-completas`, `metricas-completas-admin`) quedan para esa ronda.
+- ~~**Lo que sigue:** la ronda de arreglos que vuelva de la revisión…~~ La
+  revisión de cierre r1 volvió FAIL (3 IMPORTANT, 4 MINOR).
+- 2026-09-27 — **Ronda de arreglos 1** (task `task_3157b0825805`, dispatch
+  `ctx_d0c350c90f41`): los siete arreglos hechos (abajo, en «Hecho») y sus
+  decisiones en DECISIONS. A pedido del padre, **rebase sobre `ddc8ca1`** (la
+  lane 9 en `main`), con la migración regenerada
+  (`20260927073235_contadores_enlaces_y_marcas`). Los hashes de «Hecho» de
+  antes de esta ronda son de antes de los rebases: se encuentran por su
+  asunto (`git log --grep`).
+- **Lo que sigue:** la revisión de los arreglos, del padre. Después, el
+  commit que cierra la lane (saca `work/metricas-completas/`) dentro del PR,
+  antes del merge.
 
 ## Verification
 
 ### 2026-09-27 — L DoD — PASS (sobre `e88b941`, `main` en `d051c6a` sin commits nuevos)
+
+> **Revocado** por la revisión de cierre r1 (FAIL): el test intermitente de
+> avisos se había arreglado aflojando la aserción, `/l/` contaba los `HEAD`
+> y la copia le pedía a Vercel 90 días con un plan que da 30. Los arreglos, en
+> la ronda 1.
 
 - Sobre el árbol final: `pnpm typecheck`, `pnpm lint`, `node scripts/verificar-react-doctor.mjs` (100/100, sin diagnósticos) y `pnpm build` → exit 0; `pnpm test` → exit 0 **tres corridas seguidas** (sitio 483: 482 pasan, 0 fallan, 1 saltado). Entre `74fe1d2` y `e88b941`: el texto de Ajustes › Avisos (`d600798`), las vistas del resumen (`74fe1d2`), dos utilidades bajo 100 líneas (`a3f2438`, `762cc77`, `2b36cb2`) y el test intermitente de avisos (`e88b941`, ver «Tried and failed» y DECISIONS). Lo de abajo se midió sobre `74fe1d2` y lo que vino después no toca pantallas ni rutas.
 - L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
@@ -100,7 +111,10 @@
   con más tests contra la base, la hizo aparecer más. Arreglado en el test
   (`e88b941`): acepta como cambios solo las cuentas que aparecieron en el
   medio, y sin ninguna sigue exigiendo cero. Después, tres corridas enteras
-  en verde.
+  en verde. **Eso no era el arreglo:** la revisión r1 lo rechazó (aflojaba la
+  aserción y la carrera seguía en el código, con una cuenta borrada en el
+  medio: `avisos_cuenta_id_fkey`). El arreglo de verdad es de la ronda 1, en
+  `datos/quien-recibe.ts` (DECISIONS).
 - 2026-09-27 — `orca screenshot` → «Screenshot timed out — the browser tab may
   not be visible or the window may not have focus», dos veces; `orca keypress`
   → `ok` sin mover el foco. La evidencia visual y de teclado es por sondas del
@@ -111,7 +125,8 @@
 - **Paso 1** — `contadores`, `enlaces` y `marcas` en
   `prisma/schema/metricas.prisma` (y los comentarios de `dimension` y `dias`
   al día), migración `20260927051631_contadores_enlaces_y_marcas` generada y
-  aplicada en `ed_metricas`. `pnpm migrate:status` → «Database schema is up to
+  aplicada en `ed_metricas` (regenerada en la ronda 1, después de las de la
+  lane 9: `20260927073235_…`, el mismo SQL). `pnpm migrate:status` → «Database schema is up to
   date!»; `sitio typecheck` → 0. `ec87ee5`.
 - **Paso 2** — `config/metricas.ts` (`PAISES_FIJOS`, `ZONA_HORARIA`,
   `NOMBRE_DE_LA_ZONA`, `EVENTOS` con `conCanal` y `publico`,
@@ -294,5 +309,12 @@
 
 ## Abierto
 
-- La lane 8a (`mateo/biblioteca`, en revisión) no está en `main`: lo que
-  depende de ella va al final del PLAN (SPEC §11).
+- ~~La lane 8a no está en `main`~~: entró en `d051c6a` y esta lane se rebasó
+  encima (DECISIONS); los pasos 17 y 18, que dependían de ella, están hechos.
+  La lane 9 entró en `ddc8ca1` y la rama está rebasada sobre ella.
+- **Para el owner:** los clics de Google del resumen semanal van casi siempre
+  «—» (Search Console llega con 2 o 3 días de atraso; DECISIONS). Sacar el
+  renglón es una línea.
+- `datos/actividad.ts` sigue por encima de 100 líneas (lo era en `main`;
+  con las lanes 9 y 11, 267): seguimiento, como lo dejaron la Biblioteca y
+  esta lane.
