@@ -664,8 +664,9 @@ Reglas para el admin y sus datos:
 - **Lo que un módulo le suma al Inicio va por registro, nunca tocando su
   pantalla:** una fila de pendientes (con su urgencia y su capacidad), un
   número de la semana o lo nuevo desde tu visita, en `datos/inicio/`; quién
-  ve un tipo de actividad, en `QUIEN_VE` (`datos/actividad.ts`), y cómo se
-  lee, en `admin/actividad/frase.ts`; su acceso rápido, en su línea de
+  ve un tipo de actividad y si va al Inicio, en `QUIEN_VE` y `VA_AL_INICIO`
+  (`datos/actividad.ts`), y cómo se lee, en `admin/actividad/frase.ts`; su
+  acceso rápido, en su línea de
   `modulos.ts`. Cada registro filtra por capacidad antes de consultar y lee
   cada entrada aislada: la que tira lo dice en su lugar y las demás siguen.
 - **Migraciones / schema:** confirmar el diseño con el humano antes de crear
