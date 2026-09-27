@@ -74,3 +74,14 @@
   `/api/[[...todo]]`. Queda en la rama local
   `respaldo/casos-aliados-fotos-pre-rebase` (no se sube) por si hace falta
   comparar.
+- 2026-09-27 — La rama de respaldo del rebase se borró después de la
+  verificación: el gate, las migraciones desde cero y `comparar-render`
+  pasaron sobre la rama rebaseada, así que ya no hace falta comparar. También
+  se sacaron la copia de `main` para comparar (`git worktree remove`), las
+  bases `ed_casos_limpia` y `ed_casos_main` y el perfil de navegador de
+  `administra`.
+- 2026-09-27 — **Arreglos que salieron de verificar, en commits aparte y no
+  en su paso:** el ancho de la ficha a 390 px (`grid-cols-1`) y la carrera de
+  mover en la tira (`updateMany`, y los tests separados por filas). El
+  primero toca solo las fichas de esta lane; la de Novedades, que tiene lo
+  mismo, queda anotada en PROGRESS para no pisar a la lane de Biblioteca.
