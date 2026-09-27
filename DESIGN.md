@@ -837,6 +837,12 @@ Una `Lista` cuyo orden es el del sitio. `apps/sitio/src/admin/armazon/ListaQueSe
   sección con su título en `text-admin-seccion` y, si hace falta, una línea
   en meta `gris-texto` que lo explica, y se mueve dentro de su grupo. Un
   grupo sin filas no está.
+- **En la base, mover es una sola pieza con su candado**
+  (`datos/acciones/lista-ordenada.ts`): en una transacción, primero el
+  candado de la lista y recién después leer el orden y renumerar. Borrar una
+  fila, y publicar donde los lugares están contados, piden el mismo. Sin él,
+  dos «Subir» a la vez leen el mismo orden viejo: uno cae por deadlock, o se
+  pierde un paso (revisión r1 de `work/equipo/`).
 - Primer consumidor: la tira de aliados (`work/casos-aliados-fotos/`); con el
   Equipo, agrupado por nivel, subió a regla el 2026-09-27 (`work/equipo/`).
 
