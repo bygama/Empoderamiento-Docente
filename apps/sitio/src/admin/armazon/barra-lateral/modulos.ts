@@ -66,11 +66,6 @@ export const CONFIGURACION: readonly Modulo[] = [
 /** Todos los módulos, en el orden de la sidebar. */
 export const MODULOS: readonly Modulo[] = [...GRUPOS.flat(), ...CONFIGURACION];
 
-/** El módulo de una clave, o `undefined`. */
-export function moduloDe(clave: string): Modulo | undefined {
-  return MODULOS.find((m) => m.clave === clave);
-}
-
 /** El segmento que decide la entrada activa: `/admin/novedades/3` → `novedades`, `/admin` → `""`. */
 export function primerSegmento(ruta: string): string {
   return ruta.split("/")[2] ?? "";
