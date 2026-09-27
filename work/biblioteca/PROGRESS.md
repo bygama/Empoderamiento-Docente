@@ -82,3 +82,20 @@
   kit 3; `pnpm build` → exit 0; `comparar-render` → «12 páginas, render
   idéntico», exit 0; `git ls-files apps/sitio/src/features/biblioteca/data` →
   vacío.
+
+- **Paso 5 — el pedido protegido.** `lib/red/` (sin ED ni `@/`): `ip.ts`
+  (`ipQueNoSePide`, con `net.BlockList`: los rangos de RFC 6890 en IPv4, y en
+  IPv6 solo la unicast global 2000::/3 menos Teredo, 6to4, documentación y el
+  IETF; una IPv4 escrita como IPv6 se juzga como IPv4), `destino.ts`
+  (`urlPermitida`: solo `https:`, puerto 443, sin credenciales, IP literal
+  chequeada; `lookupProtegido`: resuelve, rechaza si una sola dirección es
+  interna y le da a la conexión solo las chequeadas, en las dos formas de Node)
+  y `pedido-protegido.ts` (`pedirProtegido`: `node:https` con ese `lookup` y
+  `agent: false`, cada redirección chequeada otra vez hasta 5, 2 MB cortando
+  la descarga, 8 s en total, sin cookies, el cuerpo en el juego de caracteres
+  que declara). Aceptación: `pnpm exec tsx --test "src/lib/red/*.test.ts"` → 8
+  pass, 0 fail. Prueba contra la red de verdad (script de un uso, no
+  commiteado): la API de handles de doi.org → 200; `https://localhost/` → «ip»;
+  un dominio inexistente → «dns»; Redalyc → 200 con 13 KB de HTML; y el DOI de
+  RELIME por su link → «tiempo» a los 8 s (la revista tarda: por eso los DOI se
+  chequean en doi.org, paso 9).
