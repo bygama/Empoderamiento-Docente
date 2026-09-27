@@ -16,11 +16,14 @@ async function modulos() {
   return { base, ...(await import("./editar-materiales")), ...(await import("./publicar-materiales")) };
 }
 
+/** El id de Daniela Reyes en el Equipo: fijo desde la migración `equipo`, el mismo en toda base. */
+const DANIELA = "66f2382e-31e8-494f-910c-4d1bfe962dc3";
+
 const completo = (letra: string) => ({
   ...borradorVacio(),
   titulo: `Prueba material ${letra}`,
   autorias: [
-    { nombre: "Daniela Reyes-Gasperini", persona: "daniela-reyes" },
+    { nombre: "Daniela Reyes-Gasperini", persona: DANIELA },
     { nombre: "Alguien de Afuera", persona: null },
   ],
   tipo: "Artículos",
@@ -65,6 +68,9 @@ test("crear, guardar, chocar, y un DOI que ya está", sinBase, async () => {
   // Quien guarda con lo que vio antes choca con el guardado de recién.
   const tarde = await guardarMaterialEnBase(base, { id: creado.id, contenido: completo("a"), borradorEnVisto: creado.borradorEn, quien: "Beto" });
   assert.equal(!tarde.ok && tarde.choque, true);
+  // Una persona que no está en el Equipo (la borraron desde que se abrió la ficha) no se guarda.
+  const sinPersona = await guardarMaterialEnBase(base, { id: creado.id, contenido: { ...completo("a"), autorias: [{ nombre: "Nadie", persona: crypto.randomUUID() }] }, borradorEnVisto: bien.ok ? bien.borradorEn : null, quien: "Ana" });
+  assert.match(!sinPersona.ok ? sinPersona.detalle : "", /ya no está en el Equipo/);
 });
 
 test("publicar copia las autorías, suelta el lugar del destacado y borra el chequeo si cambió el link", sinBase, async () => {
@@ -75,7 +81,7 @@ test("publicar copia las autorías, suelta el lugar del destacado y borra el che
   const publicado = await publicarMaterialEnBase(base, { id: creado.id, borradorEnVisto: creado.borradorEn, quien: "Ana" });
   assert.match(publicado.ok ? publicado.detalle : publicado.detalle, /dejó su lugar entre los destacados/);
   const fila = await base.material.findUnique({ where: { id: creado.id }, include: { autorias: { orderBy: { orden: "asc" } } } });
-  assert.deepEqual(fila?.autorias.map((a) => [a.nombre, a.persona]), [["Daniela Reyes-Gasperini", "daniela-reyes"], ["Alguien de Afuera", null]]);
+  assert.deepEqual(fila?.autorias.map((a) => [a.nombre, a.personaId]), [["Daniela Reyes-Gasperini", DANIELA], ["Alguien de Afuera", null]]);
   assert.equal(fila?.destacado, 1);
   const antes = lugares.find((l) => l.destacado === 1);
   if (antes) assert.equal((await base.material.findUnique({ where: { id: antes.id } }))?.destacado, null);

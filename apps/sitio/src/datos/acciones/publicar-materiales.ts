@@ -3,7 +3,7 @@ import { publicadoDe } from "@/datos/consultas/materiales";
 import { esquemaMaterial } from "@/features/biblioteca/contenido/material";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { falloPorIndice } from "./indices-de-materiales";
-import { autoriasDe, borradorSinLugar, columnasDe, problemasDeMaterial, sinForma, tituloDe } from "./materiales-en-base";
+import { autoriasDe, borradorSinLugar, columnasDe, personaQueNoEsta, problemasDeMaterial, sinForma, tituloDe } from "./materiales-en-base";
 import { novedadesQueLoAbren, soltarElLugar } from "./vecinos-de-materiales";
 
 // Publicar y ocultar un material (SPEC §7 de `work/biblioteca/`), con el
@@ -27,6 +27,8 @@ export async function publicarMaterialEnBase(base: PrismaClient, { id, borradorE
   const valido = esquemaMaterial.safeParse(fila.borrador ?? publicadoDe(fila), sinForma);
   if (!valido.success) return problemasDeMaterial(valido.error, "publicarMaterial");
   const m = valido.data;
+  const sinPersona = await personaQueNoEsta(base, m.autorias);
+  if (sinPersona) return sinPersona;
   // Un link nuevo se chequea en la próxima corrida: el resultado del viejo ya no dice nada.
   const otroLink = fila.url !== m.url || (fila.doi ?? "") !== m.doi;
   const ahora = new Date();

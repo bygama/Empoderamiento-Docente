@@ -1,0 +1,69 @@
+// El Equipo (work/equipo/SPEC.md §4): las personas que sostienen ED, con su
+// tarjeta y, si lo tienen, su recorrido. El molde es el de Novedades
+// (ADR-0014): lo publicado en columnas, el borrador en un documento.
+
+/// Una persona del Equipo. **La fila tiene dos copias:** lo publicado, en
+/// columnas —lo que lee el sitio, y sobre lo que la base garantiza la URL
+/// única y una sola Dirección general—, y el borrador, en un documento que
+/// puede estar incompleto. Las dos se validan con los esquemas de
+/// `features/quienes-somos/contenido/persona.ts`; las listas cerradas
+/// (niveles, colores, composiciones) viven en código, no en un enum de
+/// Postgres. Las columnas del recorrido son nulas todas juntas en un perfil
+/// sin recorrido (el básico: foto, nombre, rol y país).
+///
+/// **La Dirección general es una sola**, con el índice parcial
+/// `equipo_una_sola_direccion_general`, que no está acá porque Prisma no
+/// escribe índices parciales sin un preview feature (migración `equipo`).
+model Persona {
+  id             String    @id @default(uuid())
+  /// `/quienes-somos?persona=<slug>` hoy y la ficha de la fase 4. Si cambia
+  /// al publicar, queda el 308 de `/quienes-somos/equipo/<viejo>`.
+  slug           String?   @unique
+  nombre         String?
+  rol            String?
+  pais           String?
+  /// 1 Dirección general · 2 Dirección · 3 Líderes · 4 Facilitación (modelo-del-equipo.ts).
+  nivel          Int?      @db.SmallInt
+  /// { src, alt, foco }: la foto de la tarjeta, de Fotos.
+  foto           Json?
+  /// La persona pidió no publicar su foto: la tarjeta va tipográfica.
+  sinFoto        Boolean   @default(false) @map("sin_foto")
+  /// Cuánto se acerca la foto de la tarjeta (1 a 1,5), para emparejar rostros.
+  acercamiento   Float     @default(1)
+  /// El lugar dentro de su nivel. No va al borrador: es del equipo, no de una persona.
+  orden          Int       @default(0)
+  nombreCompleto String?   @map("nombre_completo")
+  rolCompleto    String?   @map("rol_completo")
+  lugar          String?
+  origen         String?
+  titular        String?
+  intro          String?
+  /// ["Profesora de Matemática", …]
+  formacion      Json?
+  /// [{ clave, etiqueta, color }]: el índice vivo del recorrido.
+  categorias     Json?
+  /// { tipo, foto, apaisado }: marco, recorte o sin foto.
+  figura         Json?
+  /// Las etapas en orden, con sus hitos, ramas, territorios y publicaciones
+  /// (las de la Biblioteca, por el id del material: SPEC §5.1).
+  etapas         Json?
+  cierreTitulo   String?   @map("cierre_titulo")
+  cierreTexto    String?   @map("cierre_texto")
+  cierreTexto2   String?   @map("cierre_texto_2")
+  /// El sitio la muestra. Despublicar la deja en false y conserva las columnas.
+  publicado      Boolean   @default(false)
+  publicadoEn    DateTime? @map("publicado_en")
+  /// Quién, en llano. Nulo en las que entraron con la migración.
+  publicadoPor   String?   @map("publicado_por")
+  /// El documento que se edita; nulo es «el borrador es lo publicado».
+  borrador       Json?
+  borradorEn     DateTime? @map("borrador_en")
+  borradorPor    String?   @map("borrador_por")
+  creadoEn       DateTime  @default(now()) @map("creado_en")
+  creadoPor      String?   @map("creado_por")
+
+  /// Lo que firma en la Biblioteca.
+  autorias Autoria[]
+
+  @@map("equipo")
+}

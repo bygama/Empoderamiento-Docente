@@ -78,12 +78,13 @@ model Autoria {
   orden      Int      @db.SmallInt
   /// Como figura en la publicación: «Daniela Reyes-Gasperini».
   nombre     String
-  /// La clave del perfil del Equipo (`daniela-reyes`) si es de ED; nula, es de
-  /// afuera. Texto hasta que la lane 8b cree la tabla del Equipo y le ponga la
-  /// fk (DECISIONS, D).
-  persona    String?
+  /// La persona del Equipo si es de ED; nula, es de afuera. SET NULL: borrar
+  /// un perfil deja la autoría de afuera, con su nombre, y el material igual
+  /// (work/equipo/SPEC.md §4.2).
+  personaId  String?  @map("persona_id")
+  persona    Persona? @relation(fields: [personaId], references: [id], onDelete: SetNull)
 
   @@id([materialId, orden])
-  @@index([persona])
+  @@index([personaId])
   @@map("autorias")
 }

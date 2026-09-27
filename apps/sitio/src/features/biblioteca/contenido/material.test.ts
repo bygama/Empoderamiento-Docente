@@ -6,8 +6,8 @@ import { esquemaBorrador, esquemaMaterial, type Material } from "./material";
 const completo: Material = {
   titulo: "Resignificación del conocimiento matemático escolar en un espacio de desarrollo profesional docente",
   autorias: [
-    { nombre: "Daniela Reyes-Gasperini", persona: "daniela-reyes" },
-    { nombre: "Karla Gómez Osalde", persona: "karla-gomez" },
+    { nombre: "Daniela Reyes-Gasperini", persona: "66f2382e-31e8-494f-910c-4d1bfe962dc3" },
+    { nombre: "Karla Gómez Osalde", persona: "fa0f5308-40a2-47be-a191-5638e7317c1d" },
   ],
   autores: "",
   descripcion: "Analiza cómo se resignifica el conocimiento matemático escolar.",
@@ -53,7 +53,7 @@ test("un borrador vacío se guarda pero no se publica", () => {
   assert.equal(esquemaBorrador.safeParse({ ...vacio, doi: "no es un doi" }).success, false);
 });
 
-test("el DOI se guarda normalizado, y la persona tiene que ser del Equipo", () => {
+test("el DOI se guarda normalizado, y la persona es el id de un perfil del Equipo", () => {
   const conLink = esquemaMaterial.parse({ ...completo, doi: "https://doi.org/10.12802/RELIME.2025.28.E805" });
   assert.equal(conLink.doi, "10.12802/relime.2025.28.e805");
   const deAfuera = esquemaMaterial.safeParse({ ...completo, autorias: [{ nombre: "Alguien", persona: "no-existe" }] });

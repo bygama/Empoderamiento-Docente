@@ -2,7 +2,7 @@ import { tituloDe } from "@/datos/acciones/materiales-en-base";
 import { base } from "@/datos/cliente";
 import { esquemaBorrador, esquemaMaterial, type BorradorDeMaterial } from "@/features/biblioteca/contenido/material";
 import { borradorVacio, LUGARES_DE_DESTACADO } from "@/features/biblioteca/contenido/modelo";
-import { EQUIPO } from "@/features/quienes-somos/data/equipo";
+import { comoDocumento } from "@/lib/contenido/documento";
 import { publicadoDe } from "./materiales";
 
 // Lo que lee la ficha de un material en el admin (SPEC §9.2 de
@@ -66,5 +66,16 @@ export async function vecinosDeMaterial(): Promise<Vecinos> {
       return [l, quien ? { id: quien.id, titulo: tituloDe(quien) } : null];
     }),
   );
-  return { lugares, personas: EQUIPO.map((p) => ({ clave: p.key, nombre: p.nombre })) };
+  return { lugares, personas: await personasDelEquipo() };
+}
+
+/** Las personas del Equipo para vincular una autoría, en el orden del sitio: las que nunca se publicaron también, porque firmar es un hecho y no depende del perfil. */
+async function personasDelEquipo(): Promise<Vecinos["personas"]> {
+  const filas = await base.persona.findMany({ orderBy: [{ nivel: "asc" }, { orden: "asc" }, { creadoEn: "asc" }], select: { id: true, nombre: true, borrador: true } });
+  return filas.map((p) => ({ clave: p.id, nombre: p.nombre ?? nombreDelBorrador(p.borrador) }));
+}
+
+function nombreDelBorrador(borrador: unknown): string {
+  const nombre = comoDocumento(borrador).nombre;
+  return typeof nombre === "string" && nombre.trim() ? nombre.trim() : "Sin nombre";
 }

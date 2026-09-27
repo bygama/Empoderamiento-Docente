@@ -18,7 +18,7 @@ export type FilaConAutorias = Fila & { autorias: Autoria[] };
 export function publicadoDe(fila: FilaConAutorias): unknown {
   return {
     titulo: fila.titulo,
-    autorias: [...fila.autorias].sort((a, b) => a.orden - b.orden).map(({ nombre, persona }) => ({ nombre, persona })),
+    autorias: [...fila.autorias].sort((a, b) => a.orden - b.orden).map(({ nombre, personaId }) => ({ nombre, persona: personaId })),
     autores: fila.autores ?? "",
     descripcion: fila.descripcion ?? "",
     tipo: fila.tipo,

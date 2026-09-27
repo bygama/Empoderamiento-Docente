@@ -7,9 +7,9 @@ import { FORMATOS, LUGARES_DE_DESTACADO, PUBLICOS, TEMAS, TIPOS, TOPES } from ".
 // `esquemaMaterial` es lo que el sitio necesita, completo: se valida al
 // publicar y otra vez al leer. `esquemaBorrador` deja todo vacío, porque un
 // material recién empezado no tiene nada: guardar no frena por lo que falta,
-// frena por lo que está mal. Solo del servidor: la persona de una autoría se
-// valida contra el Equipo, que no viaja al navegador. Cada campo, en
-// `campos-del-material.ts`.
+// frena por lo que está mal. Que la persona de una autoría esté en el Equipo
+// lo chequea `datos/` contra la base (work/equipo/SPEC.md §4.2). Cada campo,
+// en `campos-del-material.ts`.
 
 function esquemaDe(publicar: boolean) {
   return z
