@@ -362,7 +362,8 @@ mismo día (`work/roles-y-actividad/`); las pestañas de una página, el error e
 el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
 vista previa de buscador y redes, también (`work/paginas-inicio/`); el
 número, el filtro, el buscador, «volver», confirmar lo que no se deshace y
-la casilla, ese mismo día (`work/mensajes/`). Todos los contrastes están
+la casilla, ese mismo día (`work/mensajes/`); la cifra y el Inicio, también
+(`work/inicio/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -675,8 +676,10 @@ Filas separadas por un divisor, en una caja con el mismo borde
   por hacer, las cuatro listas de Métricas › Búsquedas (sin acción: lo
   principal y sus cifras en el detalle), las versiones de una página (la más
   nueva con la insignia «En el sitio», normal, y sin acción; las demás,
-  «Restaurar como borrador») y las bandejas de Mensajes (quién lo tomó como
-  insignia normal, «Abrir» como acción).
+  «Restaurar como borrador») las bandejas de Mensajes (quién lo tomó como
+  insignia normal, «Abrir» como acción) y dos del Inicio: los pendientes y
+  la actividad reciente, de una línea, con el cuándo a la derecha en meta
+  `gris-texto` (4,83:1 · 7,08:1).
 
 ### Filtro
 
@@ -731,9 +734,10 @@ competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
   Console», en Métricas › Búsquedas (sumado el 2026-09-26,
   `work/busquedas-de-google/`).
 - Primer consumidor: los tres estados sin datos del panel de métricas. Lo
-  usan también las secciones de Búsquedas sin filas y cada estado de una
-  bandeja de Mensajes, que dice qué llega ahí o cuándo se borra: nunca una
-  lista vacía muda.
+  usan también las secciones de Búsquedas sin filas, cada estado de una
+  bandeja de Mensajes, que dice qué llega ahí o cuándo se borra, y, en el
+  Inicio, «Todo al día» y la actividad sin eventos: nunca una lista vacía
+  muda.
 
 ### Sin permiso
 
@@ -789,6 +793,60 @@ frase y no solo el cuadrito.
   `fieldset` con su `legend` en meta medium («Mandame un correo con cada»).
 - Primer consumidor: el campo opcional del editor (`admin/campos/Campo.tsx`);
   registrada con los avisos de Mi cuenta (2026-09-26, `work/mensajes/`).
+
+### Cifra
+
+Una cifra con su comparación: la etiqueta, el número y cómo le fue contra el
+período anterior. `apps/sitio/src/admin/armazon/Cifra.tsx`. No confundir con
+«El número», la pastilla con la cuenta de sin leer.
+
+- **Adentro:** la etiqueta en meta `gris-texto` (4,83:1 · 7,08:1 en el
+  oscuro); la cifra en `text-admin-titulo` Manrope 700 `azul-principal`
+  (13,63:1 · 13,59:1), con los miles de `es-AR`; abajo, la comparación en
+  meta `gris-texto`: «+12 % contra la semana anterior», «Igual que la semana
+  anterior», «Sin datos previos». Cada uso nombra su período («el período
+  anterior» si no dice otro).
+- **La comparación va sin color**, ni verde ni rojo: subir no siempre es
+  mejorar (el puesto en Google mejora cuando baja, y por eso no se compara
+  en porcentaje), y el rojo es solo para errores.
+- **Sin datos, «—»**, con «Todavía no hay datos» abajo y «Sin datos» para el
+  lector: nunca un cero inventado. Un cero es un cero solo si la fuente
+  existe y contó cero. Si la consulta falló, la nota lo dice («No se pudo
+  leer»).
+- **Caja:** `rounded-xl`, `p-4`, borde `azul-claro` decorativo, fondo
+  `white`. Sin sombra.
+- Primer consumidor: el panel de Métricas › Resumen, donde nació como su
+  tarjeta; pasó al armazón con su segundo consumidor, el Inicio. Lo usa
+  también Búsquedas.
+
+### Inicio
+
+La primera pantalla del admin: responde «¿qué tengo que hacer?» y «¿cómo va
+el sitio?» de un vistazo. `apps/sitio/src/admin/inicio/`.
+
+- **El orden de lectura:** el saludo («Hola, Daniela», el `h1`) con lo que
+  pasó desde tu última visita en el detalle, en una frase; los pendientes;
+  los números de la semana; la actividad reciente. En el celular, uno abajo
+  del otro en ese orden.
+- **Desde `lg`, dos columnas** (3 y 2 de 5): lo que hay que hacer a la
+  izquierda (los pendientes y, abajo, la actividad) y cómo va el sitio a la
+  derecha (la semana, que ocupa las dos filas). Las dos preguntas quedan
+  arriba del pliegue.
+- **Sin primario:** nada es «la» acción de esta pantalla. Las acciones de
+  los pendientes son secundarias, «Ver métricas» es terciario, y los accesos
+  rápidos («Nueva novedad», cuando exista) van como secundarios en las
+  acciones del encabezado.
+- **Lo único con peso fuerte es la cuenta de pendientes:** una insignia
+  fuerte al lado del título «Pendientes» (13,63:1 · 13,59:1). Sin
+  pendientes no está, y en su lugar va «Todo al día» con el estado vacío.
+- **Los pendientes** son una `Lista`, ordenada por urgencia: qué pasa, el
+  detalle y el link a la pantalla que lo resuelve, con el nombre de la fila
+  para el lector. **La semana**, `Cifra` de a dos; si quedan impares (quien
+  edita no ve los CV), el último toma las dos columnas. Debajo, el período
+  una sola vez. **La actividad**, una `Lista` de una línea por evento.
+- **Lo que un bloque no pudo leer lo dice en su lugar** («No se pudo revisar
+  las páginas», «No se pudo leer»): un módulo con un problema no tumba la
+  pantalla, y un pendiente que falló nunca se lee como «Todo al día».
 
 ### Pantalla de acceso
 
