@@ -1,5 +1,3 @@
-import { MIRADA } from "@/features/que-hacemos/data/areas";
-
 /**
  * Cómo se reparten los seis pasos en pilas.
  *
@@ -18,6 +16,9 @@ import { MIRADA } from "@/features/que-hacemos/data/areas";
  * suya; con una, todos se despegan juntos cuando la banda los empuja.
  */
 
+/** Cuántos pasos tiene la mirada ED: la pila y sus medidas (globals.css) están hechas para seis, y el esquema del contenido los pide exactos. */
+export const PASOS_DEL_METODO = 6;
+
 /** Cuántos paneles se apilan juntos antes de que el grupo siguiente los tape. */
 export const POR_GRUPO = 3;
 
@@ -27,6 +28,6 @@ export function lugarEnGrupo(indice: number) {
   const grupo = Math.floor(indice / POR_GRUPO);
   return {
     enGrupo: indice % POR_GRUPO,
-    porGrupo: Math.min(POR_GRUPO, MIRADA.length - grupo * POR_GRUPO),
+    porGrupo: Math.min(POR_GRUPO, PASOS_DEL_METODO - grupo * POR_GRUPO),
   };
 }

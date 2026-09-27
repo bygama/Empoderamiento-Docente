@@ -8,6 +8,10 @@ import { esquemaMision, misionInicial } from "@/features/home/contenido/mision";
 import { esquemaQuienesSomos, quienesSomosInicial } from "@/features/home/contenido/quienes-somos";
 import { seoInicial } from "@/features/home/contenido/seo";
 import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
+import {
+  comoTrabajamosInicial as comoTrabajamosDeQueHacemos,
+  esquemaComoTrabajamos as esquemaComoTrabajamosDeQueHacemos,
+} from "@/features/que-hacemos/contenido/como-trabajamos";
 import type { RegistroDePaginas } from "@/lib/contenido/documento";
 import type { Seo } from "@/lib/contenido/seo";
 
@@ -38,6 +42,7 @@ export const PAGINAS = {
     ruta: "/que-hacemos",
     nombre: "Qué hacemos",
     secciones: {
+      comoTrabajamos: { nombre: "Cómo trabajamos", esquema: esquemaComoTrabajamosDeQueHacemos, inicial: comoTrabajamosDeQueHacemos },
       areas: { nombre: "Áreas de especialización", esquema: esquemaAreasDeQueHacemos, inicial: areasDeQueHacemos },
     },
   },
