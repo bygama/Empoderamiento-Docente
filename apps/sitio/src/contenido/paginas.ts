@@ -5,6 +5,7 @@ import { destacadosInicial, esquemaDestacados } from "@/features/biblioteca/cont
 import { esquemaHeroBiblioteca, heroBibliotecaInicial } from "@/features/biblioteca/contenido/hero";
 import { aperturaInicial, esquemaApertura } from "@/features/contacto/contenido/apertura";
 import { cierreDeContactoInicial, esquemaCierreDeContacto } from "@/features/contacto/contenido/cierre";
+import { seoContactoInicial } from "@/features/contacto/contenido/seo";
 import { esquemaTitular, titularInicial } from "@/features/contacto/contenido/titular";
 import { esquemaPuente, puenteInicial } from "@/features/biblioteca/contenido/puente";
 import { seoBibliotecaInicial } from "@/features/biblioteca/contenido/seo";
@@ -134,6 +135,7 @@ export const PAGINAS = {
       apertura: { nombre: "Apertura", esquema: esquemaApertura, inicial: aperturaInicial },
       cierre: { nombre: "Cierre", esquema: esquemaCierreDeContacto, inicial: cierreDeContactoInicial },
     },
+    seo: seoContactoInicial,
   },
 } satisfies RegistroDePaginas;
 

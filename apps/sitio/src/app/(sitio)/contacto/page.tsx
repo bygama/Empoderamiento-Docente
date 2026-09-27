@@ -1,13 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { cvAbierto } from "@/config/cv";
+import { openGraphDeLaPagina } from "@/config/metadata";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { ContactoExperiencia } from "@/features/contacto/components/ContactoExperiencia";
+import { metadataDeSeo } from "@/lib/contenido/seo";
 
-export const metadata: Metadata = {
-  title: "Contacto",
-  description:
-    "Iniciá una conversación con Empoderamiento Docente: consultas profesionales, propuestas de formación, investigación y alianzas institucionales.",
-};
+// El título, la descripción y la imagen para redes salen del SEO de la página
+// (publicado, o el borrador en vista previa): se editan en su pestaña del admin.
+// Sin imagen propia, la del sitio, que se hereda del layout.
+export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Promise<Metadata> {
+  const { seo } = await contenidoDe("contacto");
+  return metadataDeSeo(seo, await openGraphDeLaPagina(padre));
+}
 
 /**
  * Contacto NO es una página de scroll: es una experiencia de UNA pantalla
