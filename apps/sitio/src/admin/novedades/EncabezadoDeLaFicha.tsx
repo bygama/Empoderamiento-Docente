@@ -1,4 +1,3 @@
-import { Boton } from "@/admin/armazon/Boton";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia, type Tono } from "@/admin/armazon/Insignia";
 import { Momento } from "@/admin/armazon/Momento";
@@ -17,8 +16,6 @@ type Props = {
   alGuardar: () => void;
   alVerBorrador?: () => void;
   alPublicar?: () => void;
-  /** Solo si está publicada y tiene cambios: vuelve a lo publicado. */
-  alDescartar?: () => void;
 };
 
 /** La insignia del estado (SPEC §5.2): lo que pide atención va fuerte, lo estable normal, lo que salió del sitio apagado. */
@@ -53,7 +50,7 @@ function Cuando({ estado, id }: { estado: EstadoDeLaFicha; id: string | null }) 
  * —Guardar borrador, Vista previa y Publicar, el único primario—. Con cambios
  * sin guardar pasa a azul, como el del editor de páginas.
  */
-export function EncabezadoDeLaFicha({ titulo, id, estado, haySinGuardar, pendiente, aviso, alGuardar, alVerBorrador, alPublicar, alDescartar }: Props) {
+export function EncabezadoDeLaFicha({ titulo, id, estado, haySinGuardar, pendiente, aviso, alGuardar, alVerBorrador, alPublicar }: Props) {
   const azul = haySinGuardar;
   const insignia = insigniaDe(estado, id);
   return (
@@ -74,11 +71,6 @@ export function EncabezadoDeLaFicha({ titulo, id, estado, haySinGuardar, pendien
             {haySinGuardar ? "Cambios sin guardar." : ""}
           </span>
           <Cuando estado={estado} id={id} />
-          {alDescartar ? (
-            <Boton variante="destructivo" sobreAzul={azul} className="-my-2.5 -ml-2" disabled={pendiente !== null} aria-busy={pendiente === "descartar" || undefined} onClick={alDescartar}>
-              {pendiente === "descartar" ? "Descartando…" : "Descartar cambios"}
-            </Boton>
-          ) : null}
         </>
       }
       acciones={<AccionesDeLaFicha pendiente={pendiente} azul={azul} alGuardar={alGuardar} alVerBorrador={alVerBorrador} alPublicar={alPublicar} />}

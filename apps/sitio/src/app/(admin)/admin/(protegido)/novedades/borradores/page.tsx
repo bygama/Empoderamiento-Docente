@@ -8,6 +8,6 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 // Las que no están en el sitio: las que nunca se publicaron y las despublicadas.
 export default async function PaginaDeBorradores({ searchParams }: Props) {
-  const { q } = await searchParams;
-  return <PantallaDeNovedades pestana="borradores" q={typeof q === "string" && q.trim() ? q.trim().slice(0, 100) : undefined} />;
+  const { q, borrada } = await searchParams;
+  return <PantallaDeNovedades pestana="borradores" q={typeof q === "string" && q.trim() ? q.trim().slice(0, 100) : undefined} borrada={borrada === "1"} />;
 }
