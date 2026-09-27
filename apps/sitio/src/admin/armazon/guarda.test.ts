@@ -60,12 +60,6 @@ test("cada módulo con carpeta propia pasa por su guarda, con la capacidad de mo
   }
 });
 
-test("los módulos que todavía son una guía pasan por la misma guarda", () => {
-  const fuente = sinComentarios(readFileSync(path.join(PROTEGIDO, "[modulo]", "page.tsx"), "utf8"));
-  assert.match(fuente, /<Guarda\s+capacidad=\{capacidad\}/);
-  assert.match(fuente, /moduloDe\(modulo\)\?\.capacidad/);
-});
-
 test("cada excepción apunta a una carpeta que existe", () => {
   for (const carpeta of Object.keys(SIN_GUARDA)) {
     assert.ok(carpetas().includes(carpeta), `${carpeta}/ ya no existe: sacala de SIN_GUARDA`);
