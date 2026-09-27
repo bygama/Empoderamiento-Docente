@@ -3,7 +3,6 @@ import type { Evento } from "@/config/metricas";
 import type { NumeroDelResumen } from "@/correos/resumen-semanal";
 import { base } from "@/datos/cliente";
 import { sumasDe, totalDe } from "@/datos/contadores";
-import { estadoDeBusquedas, totalDeBusquedas } from "@/datos/consultas/busquedas";
 import { nombresDeRutas } from "@/datos/consultas/nombres-de-rutas";
 import { cvRecibidos } from "@/datos/inicio/de-los-mensajes";
 import { sumarPorValor } from "@/lib/metricas/agregar";
@@ -14,7 +13,9 @@ import type { Dia } from "@/lib/metricas/tipos";
 // Los números del resumen semanal (SPEC de work/metricas-completas/ §8).
 // **Todos cuentan la misma semana**, de lunes a domingo —los siete días antes
 // del lunes de Chile en que sale—, cada fuente en sus días UTC como el resto
-// de Métricas, contra la semana anterior. Quien edita no recibe los CV.
+// de Métricas, contra la semana anterior. Quien edita no recibe los CV. Los
+// clics de Google no van: Search Console llega con 2 o 3 días de atraso, y el
+// lunes a la madrugada la semana cerrada casi nunca los tiene.
 
 export type Semana = { desde: Dia; hasta: Dia };
 
@@ -36,16 +37,6 @@ async function deVercel(semana: Semana): Promise<NumeroDelResumen[]> {
   return [contra("Visitantes", esta.visitantes, previa?.visitantes ?? null), contra("Vistas", esta.vistas, previa?.vistas ?? null)];
 }
 
-/** Los clics de Google de la semana, si Search Console ya llegó al domingo (los da con atraso). Sin conexión, no van. */
-async function deGoogle(semana: Semana, estadoDeGoogle: typeof estadoDeBusquedas): Promise<NumeroDelResumen[]> {
-  const estado = await estadoDeGoogle();
-  if (!estado.conectado) return [];
-  if (!estado.hastaDia || estado.hastaDia < semana.hasta) return sinNumero(["Clics desde Google"], "Google los da con 2 o 3 días de atraso: todavía no llegó el domingo");
-  const previa = anterior(semana);
-  const [esta, antes] = await Promise.all([totalDeBusquedas(semana.desde, semana.hasta), totalDeBusquedas(previa.desde, previa.hasta)]);
-  return [contra("Clics desde Google", esta?.clics ?? 0, antes ? antes.clics : null)];
-}
-
 async function deUnContador(evento: Evento, etiqueta: string, semana: Semana): Promise<NumeroDelResumen> {
   const [esta, antes] = await Promise.all([sumasDe({ eventos: [evento], ...semana }), sumasDe({ eventos: [evento], ...anterior(semana) })]);
   return contra(etiqueta, totalDe(esta, evento), totalDe(antes, evento));
@@ -60,22 +51,16 @@ async function deLosCV(semana: Semana, contar: typeof cvRecibidos): Promise<Nume
 
 /**
  * Los números para ese rol y esa semana, en el orden del correo. Cómo contar
- * los CV y el estado de Search Console se pueden pasar, para probarlos sin
- * depender de los mensajes de la base ni de las variables del entorno.
+ * los CV se puede pasar, para probarlo sin depender de los mensajes de la base.
  */
-export async function numerosDelResumen(
-  rol: unknown,
-  semana: Semana,
-  { contarCV = cvRecibidos, estadoDeGoogle = estadoDeBusquedas }: { contarCV?: typeof cvRecibidos; estadoDeGoogle?: typeof estadoDeBusquedas } = {},
-): Promise<NumeroDelResumen[]> {
-  const [vercel, google, contactos, cv, materiales] = await Promise.all([
+export async function numerosDelResumen(rol: unknown, semana: Semana, { contarCV = cvRecibidos }: { contarCV?: typeof cvRecibidos } = {}): Promise<NumeroDelResumen[]> {
+  const [vercel, contactos, cv, materiales] = await Promise.all([
     deVercel(semana),
-    deGoogle(semana, estadoDeGoogle),
     deUnContador("contacto-envio", "Contactos enviados", semana),
     puede(rol, "verCV") ? deLosCV(semana, contarCV) : Promise.resolve(null),
     deUnContador("material-consultado", "Materiales consultados", semana),
   ]);
-  return [...vercel, ...google, contactos, ...(cv ? [cv] : []), materiales];
+  return [...vercel, contactos, ...(cv ? [cv] : []), materiales];
 }
 
 /** La página más vista de la semana, con su nombre; `null` sin datos. */
