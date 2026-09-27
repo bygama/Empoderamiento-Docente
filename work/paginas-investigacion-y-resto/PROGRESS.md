@@ -5,8 +5,17 @@ Lane 4c del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- Los 18 pasos del PLAN hechos y la verificación en PASS (abajo). Próximo:
-  push, PR y `worker_done`; la revisión de cierre la lanza el padre.
+- **En pausa con el PR #188 abierto**
+  (https://github.com/bygama/Empoderamiento-Docente/pull/188): los 18 pasos
+  del PLAN hechos y la verificación en PASS (abajo); el pre-push dio «Todo en
+  verde». Falta la revisión de cierre, que lanza el padre al recibir el
+  `worker_done` (1 revisor, Opus 5.5, medium, «el cambio entero contra su
+  SPEC»). Si vuelve con hallazgos, se arreglan en esta rama y se re-verifica
+  desde el gate; si pasa, la lane cierra en este mismo PR (el commit que
+  borra `work/paginas-investigacion-y-resto/`) antes del merge, que es del
+  padre. Para retomar en frío: `REF=antes-contacto /tmp/ed4c/chequear.sh` no
+  sobrevive a la sesión; los comandos son los del gate de AGENTS.md §10 y
+  `node scripts/comparar-render.mjs <build de referencia> apps/sitio`.
 
 ## Done
 
