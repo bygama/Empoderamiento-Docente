@@ -1,10 +1,10 @@
 import gsap from "gsap";
-import { CASOS } from "@/features/investigacion/data/casos";
 import { switchSalida } from "../coreografia";
+import type { CasoInvestigacion } from "../tipos";
 import type { Maquina } from "./useLugarExpediente";
 
-/** Las acciones del archivo: abrir, cerrar (y pedir el cierre) e ir a otro caso. */
-export function useAccionesLugar(m: Maquina) {
+/** Las acciones del archivo: abrir, cerrar (y pedir el cierre) e ir a otro caso. `casos` llega por props (la base). */
+export function useAccionesLugar(m: Maquina, casos: readonly CasoInvestigacion[]) {
   // Desestructurado: el compilador de React trata a `m` como valor congelado
   // (llamar `m.x()` o escribir `m.xRef.current` sería «modificarlo»).
   const { activo, reduced, setEstado, setActivo, setAnuncio, setIntroRevelado } = m;
@@ -18,7 +18,7 @@ export function useAccionesLugar(m: Maquina) {
     entradaHechaRef.current = true;
     setIntroRevelado(true);
     setEstado("opening");
-    setAnuncio(`Expediente abierto. Caso ${CASOS[i].numero}: ${CASOS[i].pregunta}`);
+    setAnuncio(`Expediente abierto. Caso ${casos[i].numero}: ${casos[i].pregunta}`);
     // Entrada en el historial: el lugar se comporta como página nueva y el
     // botón «atrás» del navegador lo cierra (popstate → cerrar). Si se llegó
     // por link directo, la URL ya trae el hash: no se suma otra entrada.
@@ -26,7 +26,7 @@ export function useAccionesLugar(m: Maquina) {
       historialRef.current = false;
     } else {
       try {
-        window.history.pushState({ edExpediente: CASOS[i].id }, "", `#${CASOS[i].slug}`);
+        window.history.pushState({ edExpediente: casos[i].id }, "", `#${casos[i].slug}`);
         historialRef.current = true;
       } catch {
         historialRef.current = false;
@@ -88,13 +88,13 @@ export function useAccionesLugar(m: Maquina) {
     if (estadoRef.current !== "open" || j === activo) return;
     ultimaAbiertaRef.current = j;
     setEstado("switching");
-    setAnuncio(`Expediente abierto. Caso ${CASOS[j].numero}: ${CASOS[j].pregunta}`);
+    setAnuncio(`Expediente abierto. Caso ${casos[j].numero}: ${casos[j].pregunta}`);
     if (historialRef.current) {
       try {
         window.history.replaceState(
-          { edExpediente: CASOS[j].id },
+          { edExpediente: casos[j].id },
           "",
-          `#${CASOS[j].slug}`,
+          `#${casos[j].slug}`,
         );
       } catch {
         /* sin historial no hay nada que sincronizar */

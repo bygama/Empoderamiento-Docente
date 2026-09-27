@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { LaminaCaso as Lamina, TinteCarpeta } from "@/features/investigacion/data/casos";
+import type { LaminaCaso as Lamina, TinteCarpeta } from "@/features/investigacion/casos/tipos";
 import { ROTULO_MICRO, TINTES } from "./tintes";
 import { ClipPapel } from "./Garabatos";
 

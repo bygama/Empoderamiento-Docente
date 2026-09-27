@@ -52,9 +52,10 @@ function subrayada(clave: string) {
 /**
  * Un papel de la mesa: el material cambia, la pregunta no. `caso` es el slug
  * del expediente que la muestra en acción; lo pone la carpeta, por el lugar
- * de la línea en la lista.
+ * de la línea en la lista. Sin él (el sitio sin base no tiene casos) no hay
+ * adónde ir, y el papel va sin «Ver en acción».
  */
-export function Papel({ linea, caso, indice }: { linea: Linea; caso: string; indice: number }) {
+export function Papel({ linea, caso, indice }: { linea: Linea; caso?: string; indice: number }) {
   const material = MATERIALES[indice % 3];
   const numero = numeroDePapel(indice);
   // Tres tonos que se distinguen entre sí y de la carpeta (que es
@@ -99,17 +100,19 @@ export function Papel({ linea, caso, indice }: { linea: Linea; caso: string; ind
       {/* Al caso que la muestra en acción: en la misma página desliza hasta
           la pila y abre el expediente (abrir-caso.ts); el href es el link
           directo del caso, por si se abre en otra pestaña. */}
-      <Link
-        href={`#${caso}`}
-        onClick={alClicVerCaso(caso)}
-        aria-label={`Ver en acción: ${linea.nombre}`}
-        className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto mt-5 inline-flex items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
-        Ver en acción
-        <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none">
-          →
-        </span>
-      </Link>
+      {caso ? (
+        <Link
+          href={`#${caso}`}
+          onClick={alClicVerCaso(caso)}
+          aria-label={`Ver en acción: ${linea.nombre}`}
+          className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto mt-5 inline-flex items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Ver en acción
+          <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none">
+            →
+          </span>
+        </Link>
+      ) : null}
     </li>
   );
 }

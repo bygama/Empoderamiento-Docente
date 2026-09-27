@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { RevealLines } from "@/components/ui/RevealLines";
-import { CASOS } from "@/features/investigacion/data/casos";
 import { CarpetaCaso } from "./CarpetaCaso";
 import { ExpedienteCaso } from "./ExpedienteCaso";
 import { NavegacionCasos } from "./NavegacionCasos";
+import type { CasoInvestigacion } from "./tipos";
 import { useLugarExpediente } from "./maquina/useLugarExpediente";
 import { useAccionesLugar } from "./maquina/useAccionesLugar";
 import { useHistorialLugar } from "./maquina/useHistorialLugar";
@@ -32,20 +32,21 @@ import { useTransicionesExpediente } from "./maquina/useTransicionesExpediente";
  * Escape, atrás), `useEntradaIndice` y `useTransicionesExpediente`
  * (opening / switching / closing). Acá queda el JSX y el cableado.
  *
- * `titulo` es el único texto propio de la sección y llega por props; los
- * casos son una entidad (`data/casos.ts`).
+ * `titulo` es el único texto propio de la sección; los casos son una
+ * entidad (la tabla `casos`, que se edita en el admin). Los dos llegan por
+ * props.
  */
-export function CasosInvestigacion({ titulo }: { titulo: string }) {
+export function CasosInvestigacion({ titulo, casos }: { titulo: string; casos: readonly CasoInvestigacion[] }) {
   const m = useLugarExpediente();
-  const { abrir, cerrar, solicitarCierre, irA } = useAccionesLugar(m);
-  useHistorialLugar(m, { abrir, cerrar, solicitarCierre });
+  const { abrir, cerrar, solicitarCierre, irA } = useAccionesLugar(m, casos);
+  useHistorialLugar(m, { abrir, cerrar, solicitarCierre }, casos);
   const { estado, activo, anuncio, introRevelado } = m;
   const { sectionRef, introRef, itemsRef, botonesRef, lugarRef, shellRef, tituloRef } = m;
 
   // La carpeta con la anticipación desplegada: una sola a la vez.
   const [desplegada, setDesplegada] = useState<number | null>(null);
 
-  const casoActivo = activo !== null ? CASOS[activo] : null;
+  const casoActivo = activo !== null ? casos[activo] : null;
   const indiceVisible = activo === null || estado === "opening" || estado === "closing";
 
   useEntradaIndice(m);
@@ -130,12 +131,12 @@ export function CasosInvestigacion({ titulo }: { titulo: string }) {
                       // explica por qué de la pila y no de cada carpeta).
                       onPointerLeave={(e) => e.pointerType === "mouse" && setDesplegada(null)}
                     >
-                      {CASOS.map((caso, i) => (
+                      {casos.map((caso, i) => (
                         <CarpetaCaso
                           key={caso.id}
                           caso={caso}
                           indice={i}
-                          esUltima={i === CASOS.length - 1}
+                          esUltima={i === casos.length - 1}
                           interactiva={estado === "index"}
                           onAbrir={abrir}
                           desplegada={desplegada === i}
@@ -159,7 +160,7 @@ export function CasosInvestigacion({ titulo }: { titulo: string }) {
             <ExpedienteCaso
               key={casoActivo.id}
               caso={casoActivo}
-              casos={CASOS}
+              casos={casos}
               indice={activo ?? 0}
               interactiva={estado === "open"}
               telonOpaco={estado === "open" || estado === "switching"}
@@ -175,7 +176,7 @@ export function CasosInvestigacion({ titulo }: { titulo: string }) {
 
       <NavegacionCasos
         visible={activo !== null && (estado === "open" || estado === "switching")}
-        casos={CASOS}
+        casos={casos}
         indiceActivo={activo ?? 0}
         interactiva={estado === "open"}
         onVolver={solicitarCierre}

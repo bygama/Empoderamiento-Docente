@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
+import type { CasoInvestigacion } from "@/features/investigacion/casos/tipos";
 import { ROTULO_MICRO } from "../tintes";
 import type { Peso, Tinte } from "./anatomia";
 

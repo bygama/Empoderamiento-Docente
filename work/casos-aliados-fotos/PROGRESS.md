@@ -50,6 +50,25 @@
   cuatro, generados por un script que no se commitea y validados con
   `esquemaCaso`; `publicadoDeCaso` en `datos/consultas/casos.ts`.
   `migrate:deploy` → aplicada (los cuatro, 5/5/4/9 evidencias);
-  `caso.test.ts` → 3 pass, 0 fail, 0 skipped; typecheck 0.
+  `caso.test.ts` → 3 pass, 0 fail, 0 skipped; typecheck 0. Commit `19851f5`.
+- **Paso 6 — el sitio lee los casos de la base**: `casosDelSitio()` y
+  `casoParaElSitio()` en `datos/consultas/casos.ts` (vista previa por
+  borrador válido, tinte por número en `tintes.ts`, id y rótulo de cada
+  evidencia por posición); los tipos del sitio pasan a
+  `features/investigacion/casos/tipos.ts`; la página lee los casos y los
+  pasa por prop a `InvestigacionEnAccion` → `CasosInvestigacion` → los dos
+  hooks (por ref en los efectos de montaje); `CASO_DE_CADA_LINEA` pasa a ids
+  en `modelo-de-casos.ts` y las líneas reciben `{ id, slug }`; `Papel` va
+  sin «Ver en acción» si no hay slug (sitio sin base). Se borró
+  `data/casos.ts`. Aceptación: `pnpm build` acá y en un worktree de `main`
+  (`%TEMP%\ed-main-render`, base `ed_casos_main` con las migraciones de
+  `main`) y `node scripts/comparar-render.mjs <main> apps/sitio` → 12
+  páginas; **`investigacion.html` igual** (−20 084 bytes de JS: los casos ya
+  no van en el bundle); `novedades.html` y `novedades/relime-2025.html`
+  DISTINTAS en imágenes, y un diff de sus `<img>` cambiando
+  `quienes-somos/origen-03` por `fotos/origen-03` en `main` da igual: es el
+  dedupe aprobado (propuesta K). El script sale 1 por esas dos. Suite entera
+  `pnpm --filter sitio test` → 319 tests, 318 pass, 0 fail, 1 skipped (el
+  de antes); typecheck 0.
 
 ## Abierto

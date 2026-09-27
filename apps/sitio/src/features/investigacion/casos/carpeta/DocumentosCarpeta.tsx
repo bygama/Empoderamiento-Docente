@@ -1,4 +1,4 @@
-import type { CasoInvestigacion } from "@/features/investigacion/data/casos";
+import type { CasoInvestigacion } from "@/features/investigacion/casos/tipos";
 import { ROTULO_MICRO } from "../tintes";
 import { PAPELES, type Tinte } from "./anatomia";
 
