@@ -43,7 +43,7 @@ export function EspiralEstatica({ contenido }: { contenido: Ciclo }) {
           </h2>
           <ol className="mt-8 space-y-8">
             {pedagogico.map((e, i) => (
-              <li key={e.nombre}>
+              <li key={numero(i)}>
                 <Bloque {...e} numeroTexto={numero(i)} />
               </li>
             ))}
@@ -59,7 +59,7 @@ export function EspiralEstatica({ contenido }: { contenido: Ciclo }) {
           <p className="mt-5 max-w-[42ch] text-body">{contenido.remate}</p>
           <ol className="mt-8 space-y-8">
             {evidencia.map((e, i) => (
-              <li key={e.nombre}>
+              <li key={numero(i + pedagogico.length)}>
                 <Bloque {...e} numeroTexto={numero(i + pedagogico.length)} />
               </li>
             ))}

@@ -14,6 +14,7 @@ import { alClicIrA } from "@/lib/navegar";
 import { ConResaltado } from "./ConResaltado";
 import { BocaCarpeta } from "./lineas-investigacion/BocaCarpeta";
 import { crearLineas } from "./lineas-investigacion/coreografia-lineas";
+import { numeroDePapel } from "./lineas-investigacion/numero";
 import { Papel } from "./lineas-investigacion/Papel";
 import { PuntosCampo } from "./PuntosCampo";
 
@@ -146,10 +147,13 @@ export function LineasInvestigacion({ contenido }: { contenido: Lineas }) {
             </div>
 
             {/* La mesa: seis papeles en dos columnas, la pregunta como
-                protagonista. Se lee en zigzag, como una lista. */}
+                protagonista. Se lee en zigzag, como una lista. La key es el
+                número del papel y no su texto: la lista es fija y no se
+                reordena, y dos nombres iguales cargados en el admin no
+                pueden repetirla. */}
             <ol ref={listaRef} className="mt-14 grid items-start gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-2 lg:gap-y-12">
               {contenido.lineas.map((linea, i) => (
-                <Papel key={linea.nombre} linea={linea} caso={CASO_DE_CADA_LINEA[i]} indice={i} />
+                <Papel key={numeroDePapel(i)} linea={linea} caso={CASO_DE_CADA_LINEA[i]} indice={i} />
               ))}
             </ol>
 

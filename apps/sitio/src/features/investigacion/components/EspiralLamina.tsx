@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Ciclo } from "@/features/investigacion/contenido/ciclo";
 import { ConResaltado } from "./ConResaltado";
+import { numero } from "./espiral";
 import { EspiralSvg } from "./EspiralSvg";
 import { ANOTACIONES, INDICE_REMATE, posicionAnotacion, type Lado } from "./lamina-espiral";
 
@@ -139,7 +140,7 @@ export function EspiralLamina({ contenido }: { contenido: Ciclo }) {
       >
         <EspiralSvg lamina />
         {estaciones.map((e, i) => (
-          <Anotacion key={e.nombre} indice={i}>
+          <Anotacion key={numero(i)} indice={i}>
             <h3 data-anot-nombre className="font-display font-bold tracking-[-0.01em]" style={TIPO.nombre}>
               {e.nombre}
             </h3>
