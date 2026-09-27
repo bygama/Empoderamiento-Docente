@@ -6,7 +6,8 @@ import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { RevealFoco } from "../RevealFoco";
 import { ScrambleText } from "../ScrambleText";
-import { LinkNota, VERDE_SOBRE_AZUL } from "./LinkNota";
+import { LinkNota } from "./LinkNota";
+import { VERDE_SOBRE_AZUL } from "./verde-sobre-azul";
 
 /**
  * Card 1, la nota de tapa: grande, texto a la izquierda y foto a sangre a la
