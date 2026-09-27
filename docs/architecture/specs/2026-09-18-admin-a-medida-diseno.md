@@ -101,10 +101,16 @@ esto; partirlo en dos apps obligaría a una API entre las dos.
 /biblioteca/<tipo>                <-   /admin/paginas/[pagina]
 /novedades                             /admin/ajustes
 /novedades/<novedad>                   /admin/cuentas/[id]
-/contacto
-/sitemap.xml                      <-   /api/contacto · /api/cv  (reservado)
-/robots.txt                            /vista-previa · /vista-previa/salir
+/contacto                               /api/contacto · /api/cv
+/sumate-al-equipo  (apagada)           /admin/mensajes/cv/[id]/archivo
+/sitemap.xml                      <-   /vista-previa · /vista-previa/salir
+/robots.txt
 ```
+
+`/api/contacto` y `/api/cv` reciben los formularios públicos desde el
+2026-09-26 (`work/mensajes/`, [ADR-0012](../adrs/0012-mensajes-cv-privados-y-retencion.md)).
+`/sumate-al-equipo`, el formulario de CV, da 404 hasta `CV_ABIERTO=si`, y
+mientras tanto no va al sitemap.
 
 `<-` = ruta nueva. Son **26**: 15 perfiles, 4 casos, 7 landings de tipo.
 
@@ -252,8 +258,18 @@ guarda un HMAC del correo y nunca el correo, y se destraba con un reset
 completo. Lo que queda abierto, y está escrito en el ADR-0010: quien conozca un
 correo puede frenar esa cuenta hasta una hora.
 
+**Lo que llega por los formularios del sitio** (Mensajes,
+[ADR-0012](../adrs/0012-mensajes-cv-privados-y-retencion.md)): los dos
+validan con Zod en el borde, llevan un campo trampa y un tope por IP en la
+base (tabla `limites_por_ip`, la IP como HMAC): 5 contactos o 3 CV por hora.
+**El archivo de un CV no tiene URL pública**: va a un store de Blob privado,
+otro que el de las fotos, y sale solo por
+`/admin/mensajes/cv/[id]/archivo`, que pide sesión y `verCV`. Se borra solo
+a los 12 meses (Contacto a los 24, el spam a los 30 días) en el cron diario, y
+el correo que avisa de un mensaje nuevo no lleva nada de quien escribió.
+
 **Secretos solo del lado del servidor**: `DATABASE_URL`, el secreto de
-better-auth, `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan
+better-auth, `BLOB_READ_WRITE_TOKEN`, `CV_BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan
 `NEXT_PUBLIC_` ni llegan al navegador.
 
 ## 8. Migraciones

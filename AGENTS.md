@@ -159,7 +159,7 @@ un release candidate de la 8 (ADR-0007).
             ├── app/
             │   ├── (sitio)/   ← el sitio: sus páginas y su layout
             │   ├── (admin)/   ← SOLO rutas del admin
-            │   ├── api/       ← auth/ · contacto y cv llegan en la fase 4
+            │   ├── api/       ← auth/ · contacto/ y cv/ (los formularios públicos, que delegan en datos/formularios/)
             │   └── globals.css
             ├── datos/         ← la ÚNICA puerta a la base
             │   ├── cliente.ts   ← el PrismaClient de la app
@@ -168,13 +168,17 @@ un release candidate de la 8 (ADR-0007).
             │   ├── sesion.ts    ← la sesión del pedido, preguntada una vez (sesionActual)
             │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados)
             │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas)
-            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, choque)
-            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011)
+            │   ├── avisos.ts    ← quién recibe el correo de cada mensaje nuevo, y mandarlo (tabla avisos)
+            │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
+            │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos)
+            │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, choque, mover-mensajes)
+            │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes
             ├── admin/         ← las pantallas del admin
             │   ├── armazon/     ← la caja, los campos, salir, la sidebar (barra-lateral/)
             │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)
+            │   ├── mensajes/    ← las bandejas de Contacto y CV y la ficha de cada mensaje
             │   ├── campos/      ← los controles del formulario; se mudan a kit-admin en la fase 2
             │   └── <entidad>/   ← Lista, Formulario y sus límites (fase 2)
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
@@ -192,8 +196,8 @@ un release candidate de la 8 (ADR-0007).
             │   │                   compositor se queda en su ruta
             │   │                   (AI_GUIDELINES §2)
             │   └── <pagina>/contenido/ ← esquema Zod + contenido inicial de cada sección (hero.ts)
-            ├── config/        ← site.ts (datos institucionales) + nav.ts
-            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote): sin dominio de ED
+            ├── config/        ← site.ts (datos institucionales) + nav.ts · mensajes.ts (bandejas y estados) · privacidad.ts (los plazos de borrado) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO)
+            └── lib/           ← hooks/, metricas/, busquedas/ (Search Console), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -635,7 +639,7 @@ Reglas para el admin y sus datos:
 - **Validar todos los bordes con Zod** antes de escribir o leer, incluidas las
   Server Actions del admin. Nunca confiar en input externo.
 - **Secretos solo server-side:** `DATABASE_URL`, el secreto de better-auth,
-  `BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan `NEXT_PUBLIC_` ni
+  `BLOB_READ_WRITE_TOKEN`, `CV_BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan `NEXT_PUBLIC_` ni
   llegan al browser. Placeholders en `apps/sitio/.env.example`.
 - **La sesión se verifica antes de renderizar:** el proxy (`proxy.ts`) solo
   mira que la cookie exista, el layout protegido la comprueba de verdad para

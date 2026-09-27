@@ -86,6 +86,16 @@ admin sí las necesita todas, y el build completo pide al menos
 sube el admin van a Blob; sin él (local) van a `apps/sitio/.fotos/`**,
 git-ignorada, y las sirve `/api/fotos/<id>`. No hace falta cargarlo en local.
 
+Las dos de los **CV** ([ADR-0012](docs/architecture/adrs/0012-mensajes-cv-privados-y-retencion.md);
+ver «Mensajes» más abajo):
+
+- `CV_BLOB_READ_WRITE_TOKEN` — el token del **store privado** de los CV, otro
+  que el de las fotos. Sin él, en local los CV van a `apps/sitio/.cv/`
+  (git-ignorada); en Vercel, sin él el CV no se recibe.
+- `CV_ABIERTO` — **el ajuste que enciende el formulario de CV**: `si` lo
+  prende. Sin él, `/sumate-al-equipo` y `/api/cv` dan 404 y «Sumate al
+  equipo» sigue abriendo el correo.
+
 Las dos de los **correos** del admin («Elegí tu contraseña», «Tu contraseña
 cambió»; ver «Correos» más abajo):
 
@@ -230,7 +240,8 @@ Prisma antes de `next build`.
 Vive en `/admin`, construido a medida sobre **Prisma** y **better-auth**. Hoy
 tiene los cimientos —entrar, salir y elegir contraseña—, la portada con las
 métricas, **Métricas con sus búsquedas en Google** (ver «Las métricas y lo
-programado») y **la edición de Inicio** (ver «Editar las páginas»); las
+programado»), **la edición de Inicio** (ver «Editar las páginas») y
+**Mensajes**, lo que llega por los formularios del sitio (ver «Mensajes»); las
 novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
@@ -384,6 +395,30 @@ de verdad:
 cuenta de 15 minutos a 1 hora, aunque vengan de distintos lugares), se destraba
 sola al vencer el freno o al elegir una contraseña nueva desde «Olvidé mi
 contraseña».
+
+### Mensajes
+
+Lo que llega por los formularios del sitio queda en `/admin/mensajes`, en dos
+bandejas: **Contacto** (los tres roles) y **CV** (quien dirige y quien
+administra). Cada mensaje nuevo avisa por correo a quien tenga activado ese
+aviso en Mi cuenta, sin nada de lo que escribieron. Se borran solos (Contacto a
+los 24 meses, un CV a los 12 con su archivo, el spam a los 30 días) en el cron
+diario. Decisión en el
+[ADR-0012](docs/architecture/adrs/0012-mensajes-cv-privados-y-retencion.md).
+
+**El formulario de CV nace apagado.** Para encenderlo, en este orden:
+
+1. **ED confirma qué datos pide** y se ajusta la lista de
+   `apps/sitio/src/config/cv.ts` (la única que hay que tocar), y **publica la
+   política de privacidad**, con asesoría.
+2. **Crear el store privado** en Vercel (Storage → Blob, acceso **Private**, o
+   `vercel blob create-store --access private`) y conectarlo al proyecto con
+   el prefijo `CV_BLOB`: eso carga `CV_BLOB_READ_WRITE_TOKEN`. Es otro que el
+   de las fotos, que es público: el acceso de un store no se cambia después.
+3. **Cargar `CV_ABIERTO=si`** en Vercel (Production) y volver a deployar.
+
+Mientras tanto, en local se prueba con `CV_ABIERTO=si` en el `.env.local`:
+los PDF quedan en `apps/sitio/.cv/` y se bajan desde la ficha del CV.
 
 ### Comandos de base
 
