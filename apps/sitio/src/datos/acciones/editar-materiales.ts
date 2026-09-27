@@ -1,7 +1,7 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorrador } from "@/features/biblioteca/contenido/material";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
-import { doiOcupado, doiRepetido, problemasDeMaterial, tituloDe } from "./materiales-en-base";
+import { doiOcupado, doiRepetido, problemasDeMaterial, sinForma, tituloDe } from "./materiales-en-base";
 
 // Crear, guardar, descartar y borrar un material en la base (SPEC §7 de
 // `work/biblioteca/`), con el cliente inyectado para probarlo contra el
@@ -17,8 +17,8 @@ const EL_MATERIAL = "el material";
 
 /** El primer guardado de `/admin/biblioteca/nuevo`: la fila nace con su borrador. Un DOI que ya está no entra. */
 export async function crearMaterialEnBase(base: PrismaClient, { contenido, quien }: { contenido: unknown; quien: string }): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido);
-  if (!valido.success) return problemasDeMaterial(valido.error);
+  const valido = esquemaBorrador.safeParse(contenido, sinForma);
+  if (!valido.success) return problemasDeMaterial(valido.error, "crearMaterial");
   const otro = valido.data.doi ? await doiOcupado(base, valido.data.doi, null) : null;
   if (otro) return doiRepetido(otro);
   const ahora = new Date();
@@ -31,8 +31,8 @@ export async function guardarMaterialEnBase(
   base: PrismaClient,
   { id, contenido, borradorEnVisto, quien }: { id: string; contenido: unknown; borradorEnVisto: string | null; quien: string },
 ): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido);
-  if (!valido.success) return problemasDeMaterial(valido.error);
+  const valido = esquemaBorrador.safeParse(contenido, sinForma);
+  if (!valido.success) return problemasDeMaterial(valido.error, "guardarMaterial");
   const fila = await base.material.findUnique({ where: { id } });
   if (!fila) return NO_EXISTE;
   if (!vioLaFila(fila, borradorEnVisto)) return choqueCon(fila, EL_MATERIAL);

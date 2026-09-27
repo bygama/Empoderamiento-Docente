@@ -10,8 +10,29 @@ import type { Fallo } from "./choque";
 // publicar-materiales.ts): los errores en el campo, el DOI ocupado, el título
 // para la actividad y el pasaje de un material a sus columnas y sus autorías.
 
+/** Lo que dice Zod de lo que el esquema no nombra con sus palabras: un tipo que no es, algo que el formulario no manda. */
+const SIN_FORMA = "El pedido no tiene la forma esperada.";
+
+/** Para `safeParse`: los mensajes del esquema ganan; todo lo demás se marca «sin forma», en vez del inglés de Zod. */
+export const sinForma = { error: () => SIN_FORMA };
+
+/**
+ * Si el pedido no lo pudo haber armado el formulario, el mensaje en llano para
+ * la persona; el detalle técnico —el camino y el código de cada problema, sin
+ * los valores— va al log. `null` si los problemas son de los que el formulario
+ * muestra en su campo. Hay que haber parseado con `sinForma`.
+ */
+export function pedidoSinForma(error: z.ZodError, accion: string): string | null {
+  const raros = error.issues.filter((i) => i.message === SIN_FORMA);
+  if (!raros.length) return null;
+  console.warn(`${accion}: pedido sin forma:`, raros.map((i) => `${i.path.join(".") || "(raíz)"} ${i.code}`).join(", "));
+  return `${SIN_FORMA} Recargá la página y probá de nuevo.`;
+}
+
 /** Un material que no pasa su esquema: un error por campo, con el camino del formulario y las etiquetas. */
-export function problemasDeMaterial(error: z.ZodError): Fallo {
+export function problemasDeMaterial(error: z.ZodError, accion: string): Fallo {
+  const raro = pedidoSinForma(error, accion);
+  if (raro) return { ok: false, detalle: raro };
   const porCamino = new Map<string, ErrorDeCampo>();
   for (const i of error.issues) {
     const camino = i.path.map(String).join(".");
