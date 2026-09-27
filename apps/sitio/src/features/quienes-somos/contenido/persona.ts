@@ -54,8 +54,8 @@ function recorridoDe<P extends boolean>(publicar: P) {
 
 function esquemaDe<P extends boolean>(publicar: P) {
   return z
+    // En el orden del formulario: el primer error del aviso es el primero en pantalla.
     .object({
-      slug: slugDe(publicar),
       nombre: linea(TOPES.nombre, publicar, "Falta el nombre."),
       rol: linea(TOPES.rol, publicar, "Falta el rol."),
       pais: linea(TOPES.pais, publicar, "Falta el país."),
@@ -67,6 +67,7 @@ function esquemaDe<P extends boolean>(publicar: P) {
         .number({ error: "El acercamiento es un número." })
         .min(ACERCAMIENTO.minimo, `Como poco ${ACERCAMIENTO.minimo}: la foto tal cual.`)
         .max(ACERCAMIENTO.maximo, `Como mucho ${ACERCAMIENTO.maximo}.`),
+      slug: slugDe(publicar),
       // Sin recorrido, el perfil es el básico: foto, nombre, rol y país.
       recorrido: recorridoDe(publicar).nullable(),
     })

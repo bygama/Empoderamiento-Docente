@@ -73,6 +73,12 @@ test("una persona recién empezada se guarda como borrador pero no se publica", 
   assert.equal(esquemaPersona.safeParse(personaVacia()).success, false);
 });
 
+test("los errores salen en el orden del formulario: el aviso nombra primero el nombre, no la URL", () => {
+  const caminos = Object.keys(errores(esquemaPersona.safeParse(personaVacia())));
+  assert.deepEqual(caminos.slice(0, 4), ["nombre", "rol", "pais", "nivel"]);
+  assert.ok(caminos.indexOf("slug") > caminos.indexOf("nivel"));
+});
+
 test("cada etapa va en una categoría del recorrido, y la figura en marco pide su foto", () => {
   assert.match(errores(esquemaPersona.safeParse(conEtapa({ categoria: "otra" })))["recorrido.etapas.0.categoria"], /categorías del recorrido/);
   const sinFigura = { ...completa, recorrido: { ...completa.recorrido!, figura: { tipo: "marco" as const, foto: null, apaisado: false } } };
