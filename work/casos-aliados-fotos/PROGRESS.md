@@ -268,5 +268,22 @@
   47 fotos»; un borrador en el caso 01 → «4 casos · 1 con cambios sin
   publicar» y «Contenido (cambios sin publicar)» en la sidebar; descartado
   después. `pnpm --filter sitio typecheck` 0, lint 0, react-doctor 100/100.
+  Commit `3e442e4d`.
+- **Paso 19 — dos pendientes del Inicio**: `datos/inicio/de-los-aliados.ts`
+  («N aliados sin autorizar» con sus nombres, en el orden de la tira; lee
+  `listaDeAliados`) y `de-las-fotos.ts` («N fotos sin texto alternativo»;
+  lee `cuentaDeFotos`), registradas en `pendientes.ts` como
+  `aliados-sin-autorizar` (`sin-autorizar`, `autorizarAliados`, a Aliados) y
+  `fotos-sin-alt` (`a-corregir`, `editarContenido`, a
+  `/admin/contenido/fotos?filtro=sin-alt`); las entradas van en una línea
+  para que el registro quede en 100. `de-los-aliados.test.ts` y
+  `de-las-fotos.test.ts` (la frase con uno y con varios, quién ve cada fila)
+  + el resto de `datos/inicio` → 23 pass. En el navegador, con un aliado
+  nuevo sin marca y una foto con el alt vacío (en la base local, restaurado
+  después): `edita` ve «1 foto sin texto alternativo»; `administra` ve esa y
+  «1 aliado sin autorizar · Prueba Inicio». La actividad del Inicio mostró
+  «descartó los cambios de el caso 01»: se contraen «del» y «al» en
+  `frase.ts`, con su test (commit aparte, `fix(actividad)`).
+  `pnpm --filter sitio typecheck` 0, lint 0, react-doctor 100/100.
 
 ## Abierto

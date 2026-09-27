@@ -2,8 +2,10 @@ import type { Capacidad } from "@ed/auth";
 import { BANDEJAS } from "@/config/mensajes";
 import { hayVariablesDeBusquedas } from "@/lib/busquedas/entorno";
 import { materialesConLinksRotos } from "./de-la-biblioteca";
+import { fotosSinAlt } from "./de-las-fotos";
 import { novedadesEnBorradorViejas } from "./de-las-novedades";
 import { paginasSinPublicar } from "./de-las-paginas";
+import { aliadosSinAutorizar } from "./de-los-aliados";
 import { leerCvNuevos, leerCvQueSeBorran, leerMensajesSinLeer } from "./de-los-mensajes";
 
 /**
@@ -19,9 +21,9 @@ export const URGENCIAS = [
   "se-borra-pronto",
   /** Trabajo sin terminar: páginas con cambios sin publicar, y novedades en borrador hace más de 7 días. */
   "sin-publicar",
-  /** Algo se ve mal en el sitio: materiales con el link roto (lane 8) y fotos sin texto alternativo (lane 9). */
+  /** Algo se ve mal en el sitio: materiales con el link roto (lane 8) y fotos sin texto alternativo. */
   "a-corregir",
-  /** Aliados sin autorizar. Lo trae la lane 9. */
+  /** Aliados sin autorizar: su logo no se publica hasta que alguien lo marque. */
   "sin-autorizar",
   /** Un servicio sin conectar: Search Console. */
   "sin-conectar",
@@ -36,6 +38,8 @@ export const CLAVES_DE_PENDIENTES = [
   "paginas-sin-publicar",
   "novedades-en-borrador",
   "materiales-con-el-link-roto",
+  "fotos-sin-alt",
+  "aliados-sin-autorizar",
   "conectar-search-console",
 ] as const;
 export type ClaveDePendiente = (typeof CLAVES_DE_PENDIENTES)[number];
@@ -91,6 +95,8 @@ export const PENDIENTES: Record<ClaveDePendiente, Pendiente> = {
     accion: "Ver los materiales",
     leer: materialesConLinksRotos,
   },
+  "fotos-sin-alt": { urgencia: "a-corregir", capacidad: "editarContenido", que: "las fotos", href: "/admin/contenido/fotos?filtro=sin-alt", accion: "Ir a Fotos", leer: fotosSinAlt },
+  "aliados-sin-autorizar": { urgencia: "sin-autorizar", capacidad: "autorizarAliados", que: "los aliados", href: "/admin/contenido/aliados", accion: "Ir a Aliados", leer: aliadosSinAutorizar },
   "conectar-search-console": {
     urgencia: "sin-conectar",
     capacidad: "configurarConexiones",
