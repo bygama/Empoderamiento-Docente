@@ -14,3 +14,38 @@
   con datos contra los 7 anteriores; lo publicado incluye lo propio; sin
   primario; «Todo al día» con el estado vacío; base de demo propia
   `ed_inicio`, que se borra al cerrar la lane.
+
+## Durante la corrida
+
+- 2026-09-26 — **«Sin datos previos» y no «Sin datos de la semana
+  anterior»** en el Número (paso 1): la frase con el período por defecto
+  diría «de el período anterior»; una sola frase en Métricas y en el Inicio.
+  El SPEC §2.3 quedó al día.
+- 2026-09-26 — **La última visita y la actividad, aisladas también** (paso
+  6): el SPEC aísla las entradas de los registros; estas dos lecturas no son
+  de un registro, pero si tiran se llevarían el Inicio entero. `oNull` en
+  `datos/inicio/inicio.ts`: en `null`, su bloque dice que no se pudo leer.
+- 2026-09-26 — **Sin «Ver toda la actividad»** (paso 6): la 3b no está en
+  `main` (`git log HEAD..origin/main` vacío), así que lo suma ella, por la
+  regla del padre. Se vuelve a mirar al rebasear.
+- 2026-09-26 — **Lo que cambió al mirar las capturas** (`85ae2b1`,
+  `e9c9969`): la semana va apilada en el celular y en la columna de la
+  derecha (de a dos, «Materiales consultados» bajaba de línea y dejaba los
+  números a distinta altura) y de a dos solo entre `sm` y `lg`; la segunda
+  fila de la grilla es flexible (con quien edita, la semana es más alta que
+  la izquierda y el sobrante se metía entre los pendientes y la actividad);
+  «Pendientes» tiene 40 px de alto para quedar a la altura de «Esta semana»;
+  el detalle de Search Console pasa a «Para ver qué busca la gente en
+  Google.» para que su botón quede a la derecha. El boceto del SPEC §2 era
+  indicativo («la dirección visual fina se decide al implementar»); DESIGN.md
+  §11 describe lo que quedó.
+- 2026-09-26 — **El build falló dos veces con la caché de `.next`
+  inconsistente** («next/font/google queries have exactly one entry», en
+  `(sitio)/layout.tsx`, que esta lane no toca): el primer build corrió con el
+  dev server abierto sobre la misma carpeta. Con `.next` apartada a `%TEMP%`
+  (no borrada) compiló; el build final se corrió con el dev server parado.
+- 2026-09-26 — **Capturas:** la ventana de Orca estaba minimizada y
+  `orca screenshot` no podía capturar. Con el OK del padre se restauró con
+  `ShowWindow` de Win32, se sacaron las capturas y se volvió a minimizar. Una
+  vez, con la pestaña como activa global, otro worker (el 3019, `mensajes`)
+  la navegó con un `orca goto` sin `--page`: desde ahí todo va con `--page`.
