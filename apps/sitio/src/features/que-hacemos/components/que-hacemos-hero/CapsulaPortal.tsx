@@ -7,6 +7,8 @@ type CapsulaPortalProps = {
   refBoton: RefObject<HTMLButtonElement | null>;
   /** Contenido interno (parallax propio y olita de letras). */
   refInner: RefObject<HTMLSpanElement | null>;
+  /** Lo que dice la cápsula: se parte en letras para la olita. */
+  texto: string;
 };
 
 /**
@@ -16,7 +18,7 @@ type CapsulaPortalProps = {
  * flood verde + viaje a la torre. Scrollear sigue funcionando siempre —
  * atajo, no puerta. Los refs los consumen el magnetismo y el portal.
  */
-export function CapsulaPortal({ refCampo, refBoton, refInner }: CapsulaPortalProps) {
+export function CapsulaPortal({ refCampo, refBoton, refInner, texto }: CapsulaPortalProps) {
   return (
     <div data-qh-rise className="mt-10 md:mt-12">
       {/* Campo magnético: el padding invisible es el radio de sensado. */}
@@ -65,7 +67,7 @@ export function CapsulaPortal({ refCampo, refBoton, refInner }: CapsulaPortalPro
           {/* Contenido: letras sueltas para la olita + flecha que aparece
               en hover. El aria-label del botón lee por todos. */}
           <span ref={refInner} aria-hidden="true" className="relative flex items-center">
-            {"Entrá al recorrido".split("").map((ch, i) => (
+            {texto.split("").map((ch, i) => (
               <span key={i} data-qh-letra className="inline-block whitespace-pre">
                 {ch}
               </span>

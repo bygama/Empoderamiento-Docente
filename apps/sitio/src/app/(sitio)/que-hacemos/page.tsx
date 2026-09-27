@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 // preguntas del método, que repetían «Cómo trabajamos».
 export default async function QueHacemosPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { comoTrabajamos, areas } = await contenidoDe("que-hacemos");
+  const { hero, comoTrabajamos, areas } = await contenidoDe("que-hacemos");
   return (
     <main id="contenido" tabIndex={-1}>
       {/* FONDO COMPARTIDO: el hero y la escena del faro son dos cielos
@@ -63,7 +63,7 @@ export default async function QueHacemosPage() {
             "linear-gradient(180deg, color-mix(in srgb, var(--color-azul-principal) 82%, #04060c) 0, color-mix(in srgb, var(--color-azul-principal) 62%, #04060c) 52svh, color-mix(in srgb, var(--color-azul-principal) 45%, black) 100svh)",
         }}
       >
-        <QueHacemosHero areas={areas.areas} />
+        <QueHacemosHero contenido={hero} areas={areas.areas} />
         {/* Escena del faro por capas de profundidad (cámara scrubbed). Su
             CTA final («Ver las siete áreas») baja a #areas. */}
         <QueHacemosHeroFaro />
