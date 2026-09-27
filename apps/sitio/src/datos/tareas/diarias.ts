@@ -4,6 +4,7 @@ import { copiaDeSearchConsole } from "./busquedas-de-google";
 import { registrarCorrida } from "./corridas";
 import { copiaDeVercel } from "./metricas-de-vercel";
 import { podaDeActividad } from "./poda-de-actividad";
+import { podaDeLimitesPorIp, retencionDeContacto, retencionDeCV } from "./retencion-de-mensajes";
 
 /**
  * Lo que corre el cron diario (`/api/cron/diario`), una vez por día. Vercel
@@ -11,7 +12,14 @@ import { podaDeActividad } from "./poda-de-actividad";
  * algo programado (el chequeo de links, la retención, el resumen semanal)
  * suma su tarea acá, no un cron nuevo (ADR-0011).
  */
-export const TAREAS_DIARIAS = definirTareas([copiaDeVercel, copiaDeSearchConsole, podaDeActividad]);
+export const TAREAS_DIARIAS = definirTareas([
+  copiaDeVercel,
+  copiaDeSearchConsole,
+  podaDeActividad,
+  retencionDeContacto,
+  retencionDeCV,
+  podaDeLimitesPorIp,
+]);
 
 /**
  * Cada tarea tiene 50 segundos: la función tiene 60, y así una que se cuelga
