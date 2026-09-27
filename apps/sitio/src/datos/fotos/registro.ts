@@ -1,6 +1,7 @@
 import type { Prisma } from "@/../prisma/generado/client";
 import { usosEnAliados } from "./de-los-aliados";
 import { usosEnCasos } from "./de-los-casos";
+import { usosEnEquipo } from "./del-equipo";
 import { usosEnMateriales } from "./de-los-materiales";
 import { usosEnNovedades } from "./de-las-novedades";
 import { usosEnPaginas } from "./de-las-paginas";
@@ -10,10 +11,10 @@ import type { Uso, UsosDeUnModulo } from "./uso";
 // sabe nada de los módulos por dentro: cada uno declara, en su archivo, cómo
 // encontrar sus fotos y cómo cambiarles el archivo (uso.ts), y acá se anota.
 // Un uso se reconoce por la URL de la foto (`src`), que es única en la tabla
-// `fotos`. Sumar un módulo (Equipo, cuando llegue) es escribir su entrada y
-// sumarla a la lista.
+// `fotos`. Sumar un módulo es escribir su entrada y sumarla a la lista; los de
+// Contenido van en el orden de sus pestañas.
 
-export const USOS_DE_FOTOS: readonly UsosDeUnModulo[] = [usosEnPaginas, usosEnNovedades, usosEnMateriales, usosEnCasos, usosEnAliados];
+export const USOS_DE_FOTOS: readonly UsosDeUnModulo[] = [usosEnPaginas, usosEnNovedades, usosEnMateriales, usosEnCasos, usosEnEquipo, usosEnAliados];
 
 /** Los usos de cada foto, por su URL. Una foto que no aparece no se usa en ningún lado. */
 export async function usosPorFoto(base: Prisma.TransactionClient, registro: readonly UsosDeUnModulo[] = USOS_DE_FOTOS): Promise<Map<string, Uso[]>> {
