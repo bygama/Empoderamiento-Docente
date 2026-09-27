@@ -20,10 +20,13 @@
   [ADR-0006](docs/architecture/adrs/0006-packages-reutilizables.md).
 - **Stack:** Next.js 16 (App Router) + React 19 + TypeScript strict +
   Tailwind CSS v4 (theming en CSS) + GSAP + Lenis + Zod.
-- **Backend/persistencia:** **Neon** (Postgres) con **Prisma**, y un **admin a
-  medida** en `/admin` con **better-auth**; fotos en Vercel Blob, correos por
-  Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
+- **Backend/persistencia:** **Postgres** con **Prisma**, y un **admin a
+  medida** en `/admin` con **better-auth**; fotos en Blob o en disco, correos
+  por Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
   [ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md).
+- **Deploy:** el mismo código en **Vercel** o en un **VPS con Docker Compose**,
+  elegido por variables ([ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md),
+  [`docs/deploy/`](docs/deploy/vps.md)).
 - **Onboarding humano:** [`README.md`](README.md) (instalación, scripts, estructura).
 - **Lanzamiento:** **junio 2026** (estimado).
 - **Reglas duras** (no negociables):
@@ -59,7 +62,8 @@
 | Hacer **commits**                           | `docs/COMMITS.md` → §9 commit protocol                                                      |
 | Hacer **review** antes de PR                | §6 quality standards → §10 pre-PR checklist                                                 |
 | Entender la **arquitectura del repo**       | §1 purpose → §3 project structure → `docs/architecture/adrs/0001-stack-base.md`             |
-| **Backend / datos / admin** (Neon + Prisma) | §2 stack → §12 backend/datos → `docs/architecture/adrs/0005-admin-a-medida.md` → `docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md` → `docs/AI_GUIDELINES.md` §12 |
+| **Backend / datos / admin** (Postgres + Prisma) | §2 stack → §12 backend/datos → `docs/architecture/adrs/0005-admin-a-medida.md` → `docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md` → `docs/AI_GUIDELINES.md` §12 |
+| **Deploy, VPS o Vercel**                    | `docs/deploy/vps.md` o `docs/deploy/vercel.md` → `docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md` |
 | **Instalar y correr local**                 | `README.md` (getting started) → `package.json` scripts (`pnpm dev` / `build` / `start` / `lint` / `typecheck`) |
 
 > Si tu tarea no entra en la tabla, pedile al usuario que la describa y
@@ -92,12 +96,14 @@ ED a definir con el cliente).
   en `apps/sitio/src/app/globals.css`, no en un `tailwind.config.js`)
 - **GSAP 3** + **Lenis** (animaciones, smooth scroll)
 - **Zod 4** (validación de datos en bordes; se usará cuando se sumen formularios)
-- **Prisma 7** sobre **Neon** (Postgres) + **better-auth**: admin a medida en
-  `/admin`, fotos en Vercel Blob, correos por Resend (ver ADR-0005 y ADR-0007)
+- **Prisma 7** sobre **Postgres** + **better-auth**: admin a medida en
+  `/admin`, fotos en Blob o en disco, correos por Resend (ver ADR-0005 y
+  ADR-0007)
 - **pnpm 11** (pinned vía `packageManager`), **Node ≥ 22**
 
-**Backend/persistencia: Neon con Prisma, y un admin propio.** La base es
-Postgres en Neon (Docker en local); el admin se construye a medida y vive en
+**Backend/persistencia: Postgres con Prisma, y un admin propio.** La base es
+cualquier Postgres —Neon en Vercel, el del compose en un VPS, Docker en
+local—; el admin se construye a medida y vive en
 `/admin` dentro de esta app. El esquema está en `apps/sitio/prisma/schema/` y
 sus migraciones se commitean; la única puerta a la base es
 `apps/sitio/src/datos/`. Lo reutilizable vive en `packages/` y no sabe nada de
@@ -110,6 +116,15 @@ Versiones exactas → `apps/sitio/package.json`: las dependencias viven en la
 app, no en la raíz del workspace. Fijar majors, minors flotando (`^`). **Prisma
 es la excepción y va exacta, sin `^`**: el tag `latest` de npm resuelve hoy a
 un release candidate de la 8 (ADR-0007).
+
+**Deploy: Vercel o un VPS, el mismo código.** Lo que depende del host se elige
+por variables ([ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md)):
+la base es cualquier Postgres; las fotos y los CV van a Blob si hay token y a
+disco si no; las visitas se copian de Umami (VPS) o de Vercel Web Analytics; el
+cron es el de `apps/sitio/vercel.json` o el servicio `cron` del compose. En el
+VPS la entrada es `scripts/desplegar.sh`, nunca `docker compose up` a secas: el
+build lee la base y corre adentro del compose. Runbook en
+[`docs/deploy/vps.md`](docs/deploy/vps.md).
 
 ---
 
@@ -129,6 +144,7 @@ un release candidate de la 8 (ADR-0007).
 │   ├── MESSAGING.md       ← copy canónico de marca
 │   ├── AI_GUIDELINES.md   ← reglas detalladas de código IA-friendly
 │   ├── conventions/       ← CODE-STYLE.md
+│   ├── deploy/            ← vps.md (el runbook del VPS) y vercel.md
 │   └── architecture/
 │       ├── adrs/          ← decisiones arquitectónicas (ADRs)
 │       └── specs/         ← diseños largos (el admin, el monorepo)
@@ -137,7 +153,17 @@ un release candidate de la 8 (ADR-0007).
 │                            DECISIONS de cada cambio grande en curso
 ├── .githooks/             ← pre-push: el gate de §5.8 (se instala solo)
 ├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs,
-│                            guarda-prisma.mjs, comparar-render.mjs
+│                            guarda-prisma.mjs, comparar-render.mjs; y los del
+│                            VPS: desplegar.sh (la única entrada del deploy),
+│                            volver.sh y restaurar.sh
+├── Dockerfile             ← las imágenes del VPS: `fuente` y `app` (el standalone)
+├── compose.yaml           ← el VPS: proxy (Caddy), app, db, analitica (Umami),
+│                            cron, respaldo y los de una vez (migrar, construir,
+│                            herramientas); compose.prueba.yaml, el Resend falso
+│                            de la prueba local
+├── .env.example           ← las variables del compose (las de la app, en apps/sitio)
+├── deploy/                ← lo que leen los contenedores: Caddyfile, construir.sh,
+│                            db/ (las dos bases), cron/, respaldo/
 ├── package.json           ← raíz del workspace: delega en las apps + el gate
 ├── pnpm-workspace.yaml    ← packages: ["apps/*", "packages/*"] + publicHoistPattern
 ├── pnpm-lock.yaml         ← uno solo, de todo el workspace
@@ -174,6 +200,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── avisos.ts    ← quién recibe cada aviso por correo, del registro de config/avisos.ts (tabla avisos); avisar-mensaje-nuevo.ts lo manda; quien-recibe.ts, cambiar quién recibe (solo las cuentas mostradas, trabadas en una transacción)
             │   ├── privacidad.ts ← los plazos de retención de la base, con su historial (ADR-0015)
             │   ├── conexiones.ts ← el estado de cada servicio de afuera: sus variables y sus corridas
+            │   ├── fuente-de-visitas.ts ← el plan de la fuente de las visitas que rige (Umami o Vercel)
             │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
             │   ├── contadores.ts ← lo que cuenta el sitio mismo: sumas por día, sin nada de la persona (ADR-0017); recibir-evento.ts, POST /api/contar
             │   ├── enlaces.ts   ← los links cortos de Métricas; abrir-enlace.ts, lo que hace /l/<codigo> (cuenta solo el GET que le pasa el proxy); marcas.ts, las marcas a mano de la curva
@@ -204,6 +231,7 @@ un release candidate de la 8 (ADR-0007).
             │   └── <entidad>/   ← la que siga, con el molde de novedades/
             ├── contenido/     ← el registro: páginas → secciones → esquemas (paginas.ts)
             ├── proxy.ts       ← sesión · cabeceras (CSP con nonce en el admin) · rebote Strict
+            ├── instrumentation.ts ← al arrancar: avisa si los correos no van a Resend
             ├── correos/       ← las plantillas de los correos y por dónde salen (Resend o consola)
             ├── components/    ← UI reutilizable
             │   ├── brand/       ← logotipo / marca
@@ -226,8 +254,8 @@ un release candidate de la 8 (ADR-0007).
             │   └── quienes-somos/contenido/ ← además de sus secciones, una persona del Equipo (persona.ts, etapa.ts,
             │                       campos-de-persona.ts, modelo-del-equipo.ts) y lo que reciben sus componentes
             │                       (perfil-del-sitio.ts, armado por del-sitio.ts)
-            ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO) · metricas.ts (lo de ED en Métricas: países fijos, la hora de Chile, los eventos, los mínimos)
-            └── lib/           ← hooks/, metricas/ (la copia de Vercel, los canales, los robots, la mejor hora, el código de un link, si un pedido a /l/ es un clic), contadores/ (avisar un evento desde el navegador), busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed), orden.ts (mover un lugar en una lista): sin dominio de ED
+            ├── config/        ← site.ts (la marca) + nav.ts · datos-del-sitio.ts y formulario-del-sitio.ts (la forma y el esquema de los datos institucionales) · mensajes.ts (bandejas y estados) · avisos.ts (el registro de avisos) · privacidad.ts (cómo se cuentan los plazos) · conexiones.ts (los servicios de afuera) · rutas.ts (todo lo que contesta el sitio: desde ahí no se redirige) · cv.ts (los campos del CV, provisorios, y CV_ABIERTO) · metricas.ts (lo de ED en Métricas: el plan de cada fuente de visitas, países fijos, la hora de Chile, los eventos, los mínimos)
+            └── lib/           ← hooks/, metricas/ (los clientes de la copia, Umami y Vercel, y cuál se usa; qué script de analítica carga el sitio; los canales, los robots, la mejor hora, el código de un link, si un pedido a /l/ es un clic), contadores/ (avisar un evento desde el navegador), busquedas/ (Search Console: la copia y la inspección de URL), seo/ (validar una redirección, y qué rutas contesta un sitio por su cuenta), tareas/ (el corredor), contenido/ (tipos de campo, fotos, almacén en Blob o en disco, dónde hay una foto en un documento), correo/ (Resend), seguridad/ (CSP, rebote), formularios/ (campos, tope por IP, almacén privado, enviar), red/ (el pedido protegido contra SSRF), metadatos/ (DOI, Crossref, OpenAlex, etiquetas citation_*), rss.ts (el feed), orden.ts (mover un lugar en una lista): sin dominio de ED
 ```
 
 > **Nota:** el theming de Tailwind v4 vive en
@@ -608,9 +636,10 @@ Antes de pedir merge a `main`:
 
 ---
 
-## 12. Backend y datos (Neon + Prisma, admin propio)
+## 12. Backend y datos (Postgres + Prisma, admin propio)
 
-**El backend es Neon (Postgres) con Prisma, y el admin se construye a medida**,
+**El backend es Postgres (Neon en Vercel, el del compose en un VPS: ADR-0018)
+con Prisma, y el admin se construye a medida**,
 adentro de esta app en `/admin`. Decisión y alternativas en
 [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
 [ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md); diseño en
@@ -695,8 +724,10 @@ Reglas para el admin y sus datos:
   Un `fetch` directo a una URL que llegó de un formulario es una puerta de
   SSRF a la red interna y a la metadata de la nube.
 - **Secretos solo server-side:** `DATABASE_URL`, el secreto de better-auth,
-  `BLOB_READ_WRITE_TOKEN`, `CV_BLOB_READ_WRITE_TOKEN` y `RESEND_API_KEY` nunca llevan `NEXT_PUBLIC_` ni
-  llegan al browser. Placeholders en `apps/sitio/.env.example`.
+  `BLOB_READ_WRITE_TOKEN`, `CV_BLOB_READ_WRITE_TOKEN`, `RESEND_API_KEY`,
+  `CRON_SECRET`, `UMAMI_API_KEY` y `VERCEL_TOKEN` nunca llevan `NEXT_PUBLIC_`
+  ni llegan al browser. Placeholders en `apps/sitio/.env.example` (y los del
+  compose, en `.env.example` de la raíz).
 - **La sesión se verifica antes de renderizar:** el proxy (`proxy.ts`) solo
   mira que la cookie exista, el layout protegido la comprueba de verdad para
   las páginas, y **toda Server Action del admin empieza por
@@ -823,5 +854,9 @@ define al implementar cada fase.
       7 landings de tipo), canonicals y JSON-LD; el `sitemap.xml` y las
       redirecciones de las rutas de hoy ya los hizo Ajustes. Reemplaza al
       «sitemap definitivo» que este §13 venía arrastrando.
+- [x] **Deploy para los dos hosts** (ADR-0018): la imagen, el compose, Umami,
+      el cron, la IP real y los respaldos, probados en local
+      (`work/deploy-en-vps/`).
+- [ ] VPS: el servidor de verdad, con el runbook (`docs/deploy/vps.md`)
 - [ ] Vercel: Root Directory = `apps/sitio` cuando exista el proyecto
 - [ ] CI/CD
