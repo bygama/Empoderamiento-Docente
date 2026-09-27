@@ -65,8 +65,3 @@ export function motivoSinDatos(e: unknown): string {
 export function avisarDespues(mensaje: { id: string; bandeja: Bandeja }): void {
   segundoPlano(avisarMensajeNuevo(mensaje).catch((e) => console.error("avisarMensajeNuevo:", motivoSinDatos(e))));
 }
-
-/** Lo que pesa el cuerpo según quien lo manda, o 0 si no lo dice. */
-export function largoDelPedido(pedido: Request): number {
-  return Number(pedido.headers.get("content-length")) || 0;
-}

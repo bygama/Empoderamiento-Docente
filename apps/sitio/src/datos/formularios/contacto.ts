@@ -2,8 +2,9 @@ import { z } from "zod";
 import { siteConfig } from "@/config/site";
 import { TEMAS } from "@/features/contacto/components/experiencia/data";
 import { datosDe, esquemaDe, valoresDe, type CampoDeFormulario } from "@/lib/formularios/campos";
+import { comoJson, leerConTope } from "@/lib/formularios/cuerpo";
 import { base } from "@/datos/cliente";
-import { avisarDespues, dentroDelTope, demasiados, largoDelPedido, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
+import { avisarDespues, dentroDelTope, demasiados, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
 
 // `POST /api/contacto`: lo que manda el formulario de Contacto del sitio
 // (work/mensajes/SPEC.md §5.1). Llega como JSON; se valida, se cuenta contra
@@ -27,8 +28,9 @@ export const TOPE_DE_CONTACTO = 5;
 const MAXIMO_BYTES = 64 * 1024;
 
 export async function recibirContacto(pedido: Request): Promise<Response> {
-  if (largoDelPedido(pedido) > MAXIMO_BYTES) return rechazado(413, "El mensaje es demasiado largo.");
-  const cuerpo: unknown = await pedido.json().catch(() => null);
+  const bytes = await leerConTope(pedido, MAXIMO_BYTES);
+  if (!bytes) return rechazado(413, "El mensaje es demasiado largo.");
+  const cuerpo = comoJson(bytes);
   if (!cuerpo || typeof cuerpo !== "object") return rechazado(400, "No entendimos lo que llegó. Probá de nuevo.");
   const entrada = cuerpo as Record<string, unknown>;
 

@@ -81,3 +81,13 @@ test("el cuarto CV de la misma IP en una hora recibe 429", sinBase, async () => 
   for (let i = 0; i < TOPE_DE_CV; i++) assert.equal((await recibirCV(pedido({ ip }), ABIERTO)).status, 200);
   assert.equal((await recibirCV(pedido({ ip }), ABIERTO)).status, 429);
 });
+
+test("un cuerpo chunked de más recibe 413 sin leerse entero, aunque no diga su largo", async () => {
+  const { pedidoChunked } = await import("@/lib/formularios/__fixtures__/pedido-chunked");
+  const { recibirCV } = await import("./cv");
+  // 400 pedazos de 16 KB: 6,25 MB, más que el tope de 4 MB y su margen.
+  const { pedido, contador } = pedidoChunked(400, "http://localhost/api/cv", { "content-type": "multipart/form-data; boundary=x" });
+  const r = await recibirCV(pedido, ABIERTO);
+  assert.equal(r.status, 413);
+  assert.ok(contador.pedidos < 300, `leyó ${contador.pedidos} de 400 pedazos`);
+});
