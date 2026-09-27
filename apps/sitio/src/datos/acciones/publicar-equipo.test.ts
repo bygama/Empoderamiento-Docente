@@ -29,9 +29,11 @@ test("publicar copia a columnas, deja al perfil último en su nivel, y otra URL 
   if (!creado.ok) return assert.fail(creado.detalle);
   const publicado = await publicarPersonaEnBase(base, { id: creado.id, borradorEnVisto: creado.borradorEn, quien: "Ana" });
   assert.equal(publicado.ok, true);
-  const { _max } = await base.persona.aggregate({ where: { nivel: 4, id: { not: creado.id } }, _max: { orden: true } });
+  // «Último» contra los perfiles que no son de prueba: otros tests suman y borran los suyos en el nivel 4 en el medio.
+  const { _max } = await base.persona.aggregate({ where: { nivel: 4, NOT: { slug: { startsWith: "prueba-" } } }, _max: { orden: true } });
   const fila = await base.persona.findUnique({ where: { id: creado.id } });
-  assert.deepEqual([fila?.publicado, fila?.nivel, fila?.orden, fila?.titular], [true, 4, (_max.orden ?? -1) + 1, null]);
+  assert.deepEqual([fila?.publicado, fila?.nivel, fila?.titular], [true, 4, null]);
+  assert.ok((fila?.orden ?? -1) > (_max.orden ?? -1), `orden ${fila?.orden}, el último de los de verdad ${_max.orden}`);
   const otraUrl = await guardarPersonaEnBase(base, { id: creado.id, contenido: perfil("prueba-publicar-perfil-d", 4), borradorEnVisto: null, quien: "Ana" });
   if (!otraUrl.ok) return assert.fail(otraUrl.detalle);
   await publicarPersonaEnBase(base, { id: creado.id, borradorEnVisto: otraUrl.borradorEn, quien: "Ana" });
