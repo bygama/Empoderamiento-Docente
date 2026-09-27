@@ -26,7 +26,7 @@ export function fotoDe(publicar: boolean) {
       .string()
       .trim()
       .refine((s) => !publicar || s !== "", "Falta la foto.")
-      .refine((s) => s === "" || esSrcDeFoto(s), "La foto tiene que estar en /equipo/, en /fotos/, en /api/fotos/ o en el Blob del sitio."),
+      .refine((s) => s === "" || esSrcDeFoto(s), "La foto tiene que ser una foto de Fotos."),
     alt: linea(TOPES.alt, publicar, "Falta el texto alternativo: qué se ve en la foto."),
     foco: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }),
   });
