@@ -61,3 +61,25 @@
   en 123 en `main`, y es el registro donde AGENTS.md §12 manda sumar los tipos
   de cada módulo (los cinco de la Biblioteca son 15 líneas). Partirlo es un
   cambio aparte, de quien lo decida para todos los módulos.
+- 2026-09-27 — **Rebasada sobre `main` en `782aeb27` (Ajustes), a pedido del
+  padre, antes del `worker_done`.** Conciliado: en `datos/actividad.ts` y
+  `admin/actividad/frase.ts` quedan los tipos de Ajustes y después los de la
+  Biblioteca, y `QUIEN_VE` dice las dos cosas; AGENTS.md §3 y el README juntan
+  las dos lanes en el árbol y en el párrafo del cron; el índice de ADRs lleva
+  el 0015 de Ajustes y el 0016 de acá; la ficha de una novedad importa
+  `redireccionDe` de `consultas/redirecciones` (donde la mudó Ajustes).
+- 2026-09-27 — **El correo para Crossref sale de `datosDelSitio()`** (rebase):
+  Ajustes sacó los datos de contacto de `siteConfig`. `AGENTE` y `CONTACTO`
+  eran constantes; ahora `presentacion()` (`datos/biblioteca/contra-la-biblioteca.ts`)
+  arma los dos con el correo de Ajustes › Datos del sitio, y lo llaman
+  `buscarDatosDeMaterial` y la tarea `salud-de-links`. Va como *fixup* de los
+  commits que introdujeron las constantes, así cada uno compila.
+- 2026-09-27 — **`/biblioteca/portada/[id]` se declara en `config/rutas.ts`**
+  (lo pidió el padre: `rutas.test.ts` falla con una ruta sin declarar), en el
+  commit de la portada.
+- 2026-09-27 — **`admin/por-hacer/guias.ts` queda con `GUIAS = {}`**: Ajustes
+  sacó su guía y esta lane la de Biblioteca, así que no queda ningún módulo
+  por hacer y la ruta `(protegido)/[modulo]` ya no muestra nada (da 404).
+  Borrar `guias.ts`, `GuiaDelModulo.tsx` y esa ruta es un cambio aparte, para
+  quien cierre el mapa del admin: otras lanes en vuelo pueden estar tocando
+  `por-hacer/`.

@@ -307,14 +307,11 @@
   crece y parte su texto antes de empujar la acción (`flex-1 basis-64`), y la
   acción baja recién a 390 (`bfcc4629`, DESIGN.md §11 «Lista» lo dice).
 
-- **En pausa, con el PR abierto** (2026-09-27): los 15 pasos hechos y
-  verificados (abajo), la rama publicada y el
+- **En pausa, con el PR abierto y rebasado** (2026-09-27): los 15 pasos
+  hechos y verificados, la rama rebasada sobre `main` en `782aeb27` (Ajustes)
+  a pedido del padre, y el
   [PR #191](https://github.com/bygama/Empoderamiento-Docente/pull/191)
-  abierto. Falta lo que no es de esta sesión: la revisión de cierre, que
-  lanza el padre, y el rebase sobre `main`, que desde #190 (Ajustes) choca
-  en AGENTS.md, README, el índice de ADRs, `datos/actividad.ts`,
-  `admin/actividad/frase.ts`, `admin/por-hacer/guias.ts` y
-  `app/(sitio)/novedades/[slug]/page.tsx`.
+  abierto. Falta la revisión de cierre, que lanza el padre.
 
 ## Next
 
@@ -322,6 +319,11 @@
    correr el gate (`pnpm typecheck`, `pnpm lint`, `node
    scripts/verificar-react-doctor.mjs`, `pnpm test`, `pnpm build`) y pegar
    los veredictos tal cual en `## Verification`.
+2. Si `main` vuelve a moverse antes del merge: rebasar de nuevo cuando el
+   padre lo pida (DECISIONS dice cómo se concilió esta vez).
+3. Al cerrar: el commit que saca `work/biblioteca/`, dentro de este PR.
+
+## Verification`.
 2. Cuando el padre pida el rebase: `git rebase origin/main`, conciliar los
    siete archivos (en AGENTS.md y README, las dos secciones conviven; en
    `actividad.ts` y `frase.ts`, los tipos de Ajustes y los de la Biblioteca;
@@ -331,6 +333,32 @@
 3. Al cerrar: el commit que saca `work/biblioteca/`, dentro de este PR.
 
 ## Verification
+
+### 2026-09-27 — después del rebase sobre `main` (`782aeb27`) — PASS
+
+- L1: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0; `node
+  scripts/verificar-react-doctor.mjs` → exit 0, «100/100, sin diagnósticos
+  (apps/sitio/src: 931 archivos · packages/db/src: 3 · packages/auth/src: 27 ·
+  packages/kit-admin/src: 19)».
+- L2: `pnpm test` → exit 0 (kit-admin 3/3, auth 46/46, sitio 413 pass · 0
+  fail · 1 skipped, el de siempre); `pnpm build` → exit 0; `pnpm
+  migrate:deploy` aplicó las cuatro de Ajustes a `ed_biblioteca`, `pnpm
+  migrate:status` → al día y `prisma migrate diff` → «This is an empty
+  migration».
+- Render contra el `main` nuevo: `main` (`782aeb27`) buildeado contra una base
+  temporal con su esquema (`ed_biblioteca_main`, borrada después) y guardado
+  en `%LOCALAPPDATA%\Temp\ed-biblioteca-base-782`; `comparar-render` → 11
+  iguales y `biblioteca.html` distinta solo por los 8 «Copiar cita APA» (el
+  texto sin el botón, idéntico: `iguales sin el boton: True`).
+- L3: con `next start` en el 3056, «Agregar material» con el link de la RMF E
+  → la ficha llena, 9 marcas «De Crossref», sin error: `presentacion()` lee el
+  correo de Ajustes.
+- **Cada commit por separado: NO completado.** Un `tsc --noEmit` por commit
+  (regenerando Prisma en cada uno) dio verde en los tres primeros (`be0cc949`,
+  `f30f4a35`, `60af4c01`) y lo cortó el sistema por falta de memoria; no se
+  relanzó. Los cuatro commits que el rebase podía romper llevan su arreglo
+  como *fixup* (DECISIONS), pero que los 19 restantes compilen solos no está
+  probado después del rebase.
 
 ### 2026-09-27 — L DoD (lane de un XL) — PASS
 
