@@ -8,23 +8,29 @@ hace falta migrar (esta lane no toca el esquema).
 
 ## 1. Qué se quiere
 
-Que el mismo código corra en un VPS con `docker compose`, con todo lo que Vercel
-daba hecho reemplazado por piezas del propio compose, y probado **entero en
-local con Docker Desktop**: la imagen, la base, las migraciones, TLS, el cron,
-la analítica (Umami), la IP real detrás del proxy y los backups con su
-restauración. Más el runbook para levantar el servidor de verdad, que hace
-Mateo cuando tenga el SSH y el DNS.
+**Código para los dos hosts** (Mateo, 2026-09-27, al aprobar este SPEC):
+todavía no está decidido dónde se publica primero, así que el mismo código
+corre en **Vercel** y en un **VPS con `docker compose`**, y se elige por
+variables de entorno. Mudarse después es mover datos, sin tocar código.
+
+Para el VPS, todo lo que Vercel daba hecho se reemplaza por piezas del propio
+compose, probado **entero en local con Docker Desktop**: la imagen, la base, las
+migraciones, TLS, el cron, la analítica (Umami), la IP real detrás del proxy y
+los backups con su restauración. Vercel sigue como está (`vercel.json`,
+`@vercel/analytics`, Blob). Más la documentación de los dos caminos y el
+runbook para levantar el VPS de verdad, que hace Mateo cuando tenga el SSH y el
+DNS.
 
 ## 2. Lo que ya es independiente del host (relevado el 2026-09-27)
 
 | Pieza | Hoy | En el VPS |
 | --- | --- | --- |
 | Base | `@prisma/adapter-pg` (`packages/db`) | cualquier Postgres: el del compose |
-| Fotos | Blob con `BLOB_READ_WRITE_TOKEN`; sin él, `<cwd>/.fotos` servido por `/api/fotos/[id]` | disco, en un volumen montado en `.fotos` |
-| CV | Blob privado con `CV_BLOB_READ_WRITE_TOKEN`; sin él, `<cwd>/.cv`; solo en Vercel (`VERCEL`) se niega al disco | disco, en un volumen privado montado en `.cv` |
-| Cron | `crons` de `apps/sitio/vercel.json` → `GET /api/cron/diario` con `Bearer ${CRON_SECRET}` | un servicio del compose (§3.4) |
-| Build | `buildCommand` de `vercel.json`: generate → migrate:deploy → next build, con la base a mano | §3.1 |
-| Analítica | `@vercel/analytics` en el layout del sitio + copia diaria por `ClienteDeAnaliticas` (`lib/metricas/vercel.ts`) | Umami (§3.5) |
+| Fotos | Blob con `BLOB_READ_WRITE_TOKEN`; sin él, `<cwd>/.fotos` servido por `/api/fotos/[id]` | disco, en un volumen montado en `.fotos` (Blob sigue si hay token) |
+| CV | Blob privado con `CV_BLOB_READ_WRITE_TOKEN`; sin él, `<cwd>/.cv`; solo en Vercel (`VERCEL`) se niega al disco | disco, en un volumen privado montado en `.cv` (Blob sigue si hay token) |
+| Cron | `crons` de `apps/sitio/vercel.json` → `GET /api/cron/diario` con `Bearer ${CRON_SECRET}` | se queda para Vercel; en el VPS, un servicio del compose llama a la misma ruta (§3.4) |
+| Build | `buildCommand` de `vercel.json`: generate → migrate:deploy → next build, con la base a mano | se queda para Vercel; en el VPS, §3.1 |
+| Analítica | `@vercel/analytics` en el layout del sitio + copia diaria por `ClienteDeAnaliticas` (`lib/metricas/vercel.ts`) | Vercel se queda; en el VPS, Umami; se elige por variables (§3.5) |
 | IP | `x-forwarded-for` (el primero) o `x-real-ip`: `lib/formularios/limite.ts` y better-auth (`ipAddressHeaders`) | Caddy la pone (§3.6) |
 
 Las carpetas de fotos y CV no tienen variable: salen del `cwd` del servidor
@@ -116,8 +122,11 @@ se commitea un `.env` con valores** (`.gitignore` ya tiene `.env*` con
 - `output: "standalone"`; el `remotePatterns` de Blob y el `bodySizeLimit` de
   5 MB quedan (Blob sigue elegible por variable). Su comentario deja de hablar
   de «el corte de Vercel».
-- `vercel.json` **se borra**: su `buildCommand` pasa a la imagen (`generate`) y
-  a `migrar` / `construir`; su cron, al servicio `cron`.
+- **`vercel.json` se queda**: su `buildCommand` y su `crons` siguen sirviendo en
+  Vercel y en el VPS no molestan. En el VPS, lo mismo lo hacen la imagen
+  (`generate`), `migrar` / `construir` y el servicio `cron`.
+- **Fotos y CV: Blob si hay token, disco si no** —ya es así—, en los dos
+  hosts. Queda escrito en el README, el runbook y el ADR.
 
 ### 3.4 El cron diario
 
@@ -129,8 +138,9 @@ se commitea un `.env` con valores** (`.gitignore` ya tiene `.env*` con
   error— va al log del contenedor (`/proc/1/fd/1`).
 - **A mano:** `docker compose exec cron /etc/ed-cron/correr.sh`; el log, con
   `docker compose logs cron`.
-- La ruta deja de hablar del «cron de Vercel»; `maxDuration` se queda (en
-  `next start` no hace nada y en Vercel sigue valiendo).
+- La ruta habla de los dos que la llaman (el cron de `vercel.json` y el
+  servicio `cron`); `maxDuration` se queda (en `next start` no hace nada y en
+  Vercel sigue valiendo).
 
 ### 3.5 Métricas con Umami
 
@@ -188,9 +198,19 @@ historial que perder, y el nombre ya no depende de la fuente. Sus archivos
 (`datos/tareas/metricas-de-vercel.ts`, `consultas-de-vercel.ts`) se renombran
 igual.
 
-**El script.** El `<Analytics />` de `@vercel/analytics` del layout del sitio se
-reemplaza por `<script defer src="/umami/script.js" data-website-id=…>`, solo en
-producción y solo con `UMAMI_WEBSITE_ID`. Caddy sirve `/umami/script.js` y
+**El script.** El layout del sitio carga **uno solo**, en producción, según
+dónde corre, con una función pura (`scriptDeAnalitica(entorno)`) y un test de
+las combinaciones:
+
+| Entorno | Script |
+| --- | --- |
+| `VERCEL` (lo pone Vercel en el build y en el runtime) | `<Analytics />` de `@vercel/analytics`, que pega a `/_vercel/insights`, que solo existe en Vercel |
+| fuera de Vercel, con `UMAMI_WEBSITE_ID` | `<script defer src="/umami/script.js" data-website-id=…>`, que solo sirve Caddy |
+| fuera de Vercel, sin `UMAMI_WEBSITE_ID` | ninguno |
+
+Nunca los dos, y nunca uno que dé 404: el de Vercel fuera de Vercel no
+existe, y `/umami/…` en Vercel tampoco (en Vercel, `VERCEL` manda aunque haya
+variables de Umami). Caddy sirve `/umami/script.js` y
 `/umami/api/send` desde el mismo dominio (el tracker arma el endpoint desde la
 URL del script: `…/umami` + `/api/send`, verificado en `src/tracker/index.ts` de
 v3.4.0). Todo lo demás de Umami —el panel, su login, su API— **no se publica**:
@@ -198,13 +218,14 @@ se entra por un túnel SSH (`docker compose run -p 127.0.0.1:3001:3000
 analitica`, en el runbook). **La CSP no cambia**: el script y su `fetch` son del
 mismo origen (`script-src 'self'`, `connect-src 'self'`); se prueba en el
 navegador que no haya violaciones, y el comentario de `cabeceras.ts` lo dice.
-**`@vercel/analytics` se quita** (la única dependencia que se va; no entra
-ninguna: Umami va por `fetch`).
+**`@vercel/analytics` se queda**; no entra ninguna dependencia: Umami va por
+`fetch`.
 
-**Ajustes › Conexiones** muestra «Umami» (`UMAMI_API_URL`, `UMAMI_API_KEY`,
-`UMAMI_WEBSITE_ID`) en lugar de Vercel Analytics, y el cron deja de ser «de
-Vercel». Los textos del admin que dicen «se configuran en Vercel» pasan a «en
-el servidor».
+**Ajustes › Conexiones** muestra la fuente que corresponde: «Umami»
+(`UMAMI_API_URL`, `UMAMI_API_KEY`, `UMAMI_WEBSITE_ID`) si están sus variables o
+si el sitio no corre en Vercel, y «Vercel Analytics» si corre en Vercel sin
+Umami. El cron deja de ser «de Vercel». Los textos del admin que dicen «se
+configuran en Vercel» pasan a «en el servidor» (Vercel o el `.env` del VPS).
 
 **Tests.** El cliente de Umami con respuestas **grabadas de una instancia local
 de Umami v3.4.0** (las del compose), como hizo la lane de métricas con Vercel:
@@ -249,7 +270,24 @@ vista por Caddy, Umami la cuenta y «Actualizar ahora» / el cron la trae.
 - **Probado en local**: respaldar, borrar el volumen de la base y el de fotos,
   restaurar, y que las fotos y la base vuelvan.
 
-### 3.8 El runbook, `docs/deploy/vps.md`
+### 3.8 Los dos caminos y la mudanza
+
+El README y `docs/deploy/` cuentan los dos hosts:
+
+- **Vercel** (`docs/deploy/vercel.md`): el proyecto con Root Directory
+  `apps/sitio`, Neon, los dos stores de Blob (el de CV, privado), las variables
+  y el cron de `vercel.json`.
+- **VPS de Hostinger** (`docs/deploy/vps.md`): el runbook de abajo.
+- **Mudanza de uno a otro** (una sección corta en los dos): la base con
+  `pg_dump` y la restauración; los CV, que guardan la misma clave en Blob y en
+  disco, se copian archivo por archivo; las fotos cambian de URL (Blob ↔
+  `/api/fotos/<id>`) y hay que reescribir cada uso con el registro de
+  `datos/fotos/`; y las variables. **El script que copia fotos y CV entre Blob
+  y disco no entra en esta lane**: sin un token de Blob no se puede probar, y
+  código de mudanza sin probar es peor que un procedimiento escrito. Queda
+  anotado como seguimiento, con lo que tiene que hacer.
+
+### 3.9 El runbook, `docs/deploy/vps.md`
 
 De un VPS de Hostinger vacío (Ubuntu) al sitio andando: usuario sin root, SSH
 con clave (y sin contraseña ni root), firewall con `ufw` (22, 80, 443) y la
@@ -266,27 +304,28 @@ con contenido en otro lado (Neon), cómo traerla con `pg_dump` y la
 restauración. Al final, el recorrido del SPEC §11 del padre: entrar con segundo
 factor, publicar una novedad, recibir un contacto y verla en el Inicio.
 
-### 3.9 Los documentos
+### 3.10 Los documentos
 
-- **ADR-0018, «Deploy en un VPS con Docker Compose»**: qué reemplaza del
-  ADR-0005 (Neon como la base de producción, Vercel Blob como destino de las
-  fotos), del ADR-0009 (Vercel Web Analytics como la fuente; la copia diaria y
-  su interfaz quedan) y del ADR-0011 (el cron de `vercel.json`; un solo cron que
-  corre todas las tareas queda). Por qué el build necesita la base y por qué A
+- **ADR-0018, «Deploy en Vercel o en un VPS: el código no depende del host»**:
+  qué cambia del ADR-0005 (Neon y Vercel Blob dejan de ser los únicos: la base
+  es cualquier Postgres y el disco es un destino de producción), del ADR-0009
+  (Vercel Web Analytics deja de ser la única fuente: la copia elige su cliente)
+  y del ADR-0011 (el cron de `vercel.json` sigue en Vercel; en el VPS lo llama
+  un servicio; un solo cron que corre todas las tareas queda). Por qué el build necesita la base y por qué A
   frente a B, C y D; por qué Umami; por qué la app confía en la IP de Caddy.
 - **AGENTS.md** §2 y §12, y los lugares que nombran Vercel Blob, Neon o Vercel
   como el host (§1 Quickstart, §3 el árbol —los archivos nuevos de la raíz,
   `deploy/` y los `scripts/` nuevos—, §5.8 si nombra el build, §13 las dos
   casillas de Vercel/CI). Mateo los revisa en el PR.
-- **README**: getting started y deploy; la línea «cuando llegue la fase 1…» se
-  va.
-- **`apps/sitio/.env.example`**: las de Umami, y las de Vercel marcadas como la
-  alternativa.
+- **README**: getting started y deploy, con las dos secciones y la mudanza; la
+  línea «cuando llegue la fase 1…» se va.
+- **`apps/sitio/.env.example`**: las de Umami al lado de las de Vercel, cada una
+  con el host en que se usa.
 
 ## 4. Tablas, dependencias, imágenes
 
 - **Tablas:** ninguna. La lane no toca el esquema ni genera migraciones.
-- **Dependencias:** se quita `@vercel/analytics`. No entra ninguna.
+- **Dependencias:** ninguna entra ni sale.
 - **Imágenes Docker** (no son dependencias del lockfile, pero se fijan por
   versión): `node:24-alpine`, `postgres:17-alpine` (la misma mayor que el
   `ed-postgres` de desarrollo), `caddy:2-alpine`, Umami v3.4.0, `alpine`.
@@ -297,8 +336,9 @@ factor, publicar una novedad, recibir un contacto y verla en el Inicio.
   con el runbook.
 - Los campos del CV y el texto de privacidad (ED); el CV sigue cerrado con
   `CV_ABIERTO` salvo en la prueba local.
-- Sacar el soporte de Vercel Blob o el cliente de Vercel Analytics: quedan,
-  elegidos por variable.
+- Sacar nada de Vercel: `vercel.json`, `@vercel/analytics`, Blob y el cliente
+  de Vercel Analytics quedan, elegidos por variable.
+- El script que copia fotos y CV entre Blob y disco (§3.8): seguimiento.
 - Mostrar provincias o ciudades, o cualquier dimensión nueva de Umami.
 - CI/CD (sigue en §13 de AGENTS.md) y los `scrub: true` del sitio.
 
@@ -322,6 +362,8 @@ factor, publicar una novedad, recibir un contacto y verla en el Inicio.
   - ningún secreto en `.compilado/` ni en la imagen;
   - los segundos de corte de un segundo `desplegar.sh`, y `volver.sh` a la
     imagen anterior.
+- **El test de `scriptDeAnalitica`**: Umami, Vercel, ninguno, y los dos
+  configurados (gana Vercel en Vercel).
 - **`scripts/comparar-render.mjs` contra `main`**: la única diferencia es el
-  script de analítica (el de Vercel sale, el de Umami entra solo con
-  `UMAMI_WEBSITE_ID`), explicada en PROGRESS.
+  script de analítica (fuera de Vercel y sin `UMAMI_WEBSITE_ID`, ninguno, donde
+  `main` ponía el de Vercel), explicada en PROGRESS.

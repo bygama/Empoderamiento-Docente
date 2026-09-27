@@ -31,6 +31,23 @@
     salida en PROGRESS; `.compilado` en `.gitignore` y en el `.dockerignore` de
     la imagen fuente. (4) Los segundos de corte de un deploy, medidos en local,
     en PROGRESS. (5) Esto, en este archivo y en el ADR nuevo.
+- 2026-09-27 — **«Código para los dos».** El padre aprobó el SPEC con un cambio
+  de alcance que decidió Mateo: «el código queda listo para los dos hosts,
+  Vercel y el VPS, y se elige por variables de entorno. Todavía no está
+  decidido dónde se publica primero, y mudarse después tiene que ser solo mover
+  datos, sin tocar código.» Por eso `vercel.json` y `@vercel/analytics` se
+  quedan; el layout carga un solo script de analítica (Vercel en Vercel, Umami
+  fuera de Vercel con su variable, ninguno si no), con un test de las
+  combinaciones; la copia elige su cliente por variables; fotos y CV siguen
+  «Blob si hay token, disco si no»; el ADR pasa a llamarse «Deploy en Vercel o
+  en un VPS: el código no depende del host»; README y runbook cuentan los dos
+  caminos y la mudanza. El filtro de tipo propio, aprobado.
+- 2026-09-27 — **El script de mudanza de archivos queda afuera.** Copiar fotos
+  entre Blob y disco cambia su URL (hay que reescribir cada uso con el registro
+  de `datos/fotos/`) y los CV se copian con la misma clave. No hay token de
+  Blob en este worktree, así que no se puede probar: se escribe el
+  procedimiento y se anota el script como seguimiento (el padre lo dejó a
+  criterio: «si no entra en la lane, anotalo»).
 - 2026-09-27 — **N = 5 imágenes de `app` guardadas.** Una imagen standalone pesa
   del orden de 200-300 MB; cinco entran holgadas en el disco de un VPS chico y
   cubren una semana de deploys diarios.
