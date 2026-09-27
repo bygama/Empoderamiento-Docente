@@ -24,6 +24,8 @@ type Props = {
   children: ReactNode;
   /** Tag a renderizar (h1, h2, p, div...). Default: div. */
   as?: ElementType;
+  /** Para nombrar una región con este texto (`aria-labelledby`). */
+  id?: string;
   className?: string;
   style?: CSSProperties;
   /** start de ScrollTrigger. Default: "top 85%". */
@@ -49,6 +51,7 @@ type Props = {
 export function RevealLines({
   children,
   as = "div",
+  id,
   className,
   style,
   start = "top 85%",
@@ -102,7 +105,7 @@ export function RevealLines({
 
   const Tag = as;
   return (
-    <Tag ref={ref as Ref<HTMLElement>} className={className} style={style}>
+    <Tag ref={ref as Ref<HTMLElement>} id={id} className={className} style={style}>
       {children}
     </Tag>
   );

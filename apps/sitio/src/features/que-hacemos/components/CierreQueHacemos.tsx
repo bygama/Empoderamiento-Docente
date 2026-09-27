@@ -8,6 +8,7 @@ import { RevealLines } from "@/components/ui/RevealLines";
 import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { ArrowUpRight } from "@/components/ui/icons";
+import type { CierreDeQueHacemos } from "@/features/que-hacemos/contenido/cierre";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -24,7 +25,7 @@ if (typeof window !== "undefined") {
  * Marca la página con data-footer-dock-tint="gris" para que la muesca del
  * footer tome el gris y el encuentro no muestre triángulos blancos.
  */
-export function CierreQueHacemos() {
+export function CierreQueHacemos({ contenido }: { contenido: CierreDeQueHacemos }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -79,7 +80,7 @@ export function CierreQueHacemos() {
         ref={rootRef}
         id="hablemos"
         className="bg-azul-principal relative isolate mx-auto w-full max-w-screen-xl overflow-hidden rounded-[1.5rem] text-white shadow-[0_32px_80px_-42px_rgb(15_23_42/0.5)] md:rounded-[2.5rem]"
-        aria-label="Cierre"
+        aria-labelledby="cierre-titulo"
       >
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <span
@@ -101,30 +102,30 @@ export function CierreQueHacemos() {
         <div className="relative z-10 flex min-h-[58svh] flex-col items-center justify-center px-5 py-24 text-center md:px-10 md:py-28">
           <RevealLines
             as="h2"
+            id="cierre-titulo"
             className="font-display max-w-[18ch] font-extrabold tracking-[-0.025em]"
             style={{ fontSize: "clamp(2.4rem, 1rem + 4.6vw, 5rem)", lineHeight: 1.02 }}
           >
-            Cada contexto merece su propia solución.
+            {contenido.titulo}
           </RevealLines>
 
           <p
             data-qhc-foot
             className="text-azul-claro mt-7 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed md:text-[1.2rem]"
           >
-            Contanos dónde estás y qué necesitás: pensamos juntas el camino.
-            Nada de lo que hacemos viene enlatado.
+            {contenido.texto}
           </p>
 
           <div
             data-qhc-foot
             className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
           >
-            <ButtonPrimary href="/contacto?tema=formacion">Hablemos de tu contexto</ButtonPrimary>
+            <ButtonPrimary href="/contacto?tema=formacion">{contenido.boton}</ButtonPrimary>
             <Link
               href="/investigacion"
               className="group text-azul-claro hover:text-white inline-flex items-center gap-2 font-sans text-[0.95rem] font-medium transition-colors"
             >
-              Conocé la investigación detrás
+              {contenido.link}
               <ArrowUpRight
                 size={16}
                 className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
