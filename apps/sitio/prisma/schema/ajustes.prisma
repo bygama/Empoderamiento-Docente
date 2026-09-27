@@ -33,7 +33,7 @@ model DatosDelSitio {
 }
 
 /// Cada plazo de retención, con desde cuándo rige: una fila por cambio, y
-/// nunca se edita una (work/ajustes/SPEC.md §4, ADR-0014). El historial es lo
+/// nunca se edita una (work/ajustes/SPEC.md §4, ADR-0015). El historial es lo
 /// que cumple la promesa: a lo que llegó se le aplica el menor entre el plazo
 /// que regía al llegar y cualquiera posterior, así alargar no toca lo ya
 /// recibido y acortar vale para todo (`config/privacidad.ts`). La migración
