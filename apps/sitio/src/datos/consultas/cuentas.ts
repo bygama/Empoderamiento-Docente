@@ -9,6 +9,10 @@ export type CuentaEnLista = {
   correo: string;
   rol: Rol | null;
   estado: EstadoDeCuenta;
+  /** ISO; solo mientras está pendiente, y `null` si nunca se la invitó. */
+  invitacionVence: string | null;
+  /** Si esa invitación ya venció: pide reenviarla. */
+  invitacionVencida: boolean;
   /** ISO; `null` si nunca entró. */
   ultimoAcceso: string | null;
 };
@@ -16,8 +20,6 @@ export type CuentaEnLista = {
 /** Una cuenta, con lo que muestra su pantalla. */
 export type FichaDeCuenta = CuentaEnLista & {
   segundoFactor: boolean;
-  /** ISO; solo mientras está pendiente, y `null` si nunca se la invitó. */
-  invitacionVence: string | null;
   /** Si hizo algo en el admin: entonces no se borra, se suspende. */
   tieneActividad: boolean;
   sesiones: SesionAbierta[];
@@ -29,11 +31,12 @@ const SELECCION = {
   email: true,
   rol: true,
   suspendida: true,
+  invitacionVence: true,
   // «Pendiente» es no haber elegido nunca una contraseña: sin credencial con contraseña.
   accounts: { where: { providerId: "credential", password: { not: null } }, select: { id: true }, take: 1 },
 } as const;
 
-type Fila = { id: string; name: string; email: string; rol: string; suspendida: boolean; accounts: { id: string }[] };
+type Fila = { id: string; name: string; email: string; rol: string; suspendida: boolean; invitacionVence: Date | null; accounts: { id: string }[] };
 
 function estadoDe(fila: Fila): EstadoDeCuenta {
   if (fila.suspendida) return "suspendida";
@@ -64,7 +67,17 @@ async function ultimosAccesos(ids?: string[]): Promise<Map<string, Date>> {
 export type DatosDeCuenta = Omit<CuentaEnLista, "ultimoAcceso">;
 
 function datosDe(fila: Fila): DatosDeCuenta {
-  return { id: fila.id, nombre: fila.name, correo: fila.email, rol: esRol(fila.rol) ? fila.rol : null, estado: estadoDe(fila) };
+  const estado = estadoDe(fila);
+  const vence = estado === "pendiente" ? fila.invitacionVence : null;
+  return {
+    id: fila.id,
+    nombre: fila.name,
+    correo: fila.email,
+    rol: esRol(fila.rol) ? fila.rol : null,
+    estado,
+    invitacionVence: vence?.toISOString() ?? null,
+    invitacionVencida: vence !== null && vence < new Date(),
+  };
 }
 
 function enLista(fila: Fila, accesos: Map<string, Date>): CuentaEnLista {
@@ -86,18 +99,16 @@ export async function cuentaParaActuar(id: string): Promise<DatosDeCuenta | null
 
 /** Una cuenta con su pantalla entera, o `null` si no existe. */
 export async function unaCuenta(id: string): Promise<FichaDeCuenta | null> {
-  const fila = await base.user.findUnique({ where: { id }, select: { ...SELECCION, twoFactorEnabled: true, invitacionVence: true } });
+  const fila = await base.user.findUnique({ where: { id }, select: { ...SELECCION, twoFactorEnabled: true } });
   if (!fila) return null;
   const [accesos, actividad, sesiones] = await Promise.all([
     ultimosAccesos([id]),
     base.actividad.findFirst({ where: { cuentaId: id }, select: { id: true } }),
     sesionesAbiertas(id),
   ]);
-  const cuenta = enLista(fila, accesos);
   return {
-    ...cuenta,
+    ...enLista(fila, accesos),
     segundoFactor: fila.twoFactorEnabled,
-    invitacionVence: cuenta.estado === "pendiente" ? (fila.invitacionVence?.toISOString() ?? null) : null,
     tieneActividad: actividad !== null,
     sesiones,
   };

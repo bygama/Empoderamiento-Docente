@@ -732,6 +732,27 @@ Las páginas de una lista paginada en el servidor.
   dibuja.
 - Primer consumidor: Cuentas › Actividad, de a 50.
 
+### Tabla
+
+Para lo que se lee cruzando filas y columnas; una lista de cosas es una
+`Lista`, no una tabla. Hoy hay una sola, la de permisos, y la pieza vive con
+ella (`apps/sitio/src/admin/cuentas/TablaDePermisos.tsx`) hasta que haya una
+segunda.
+
+- **La caja de la `Lista`:** borde `azul-claro/60`, `rounded-xl`, filas
+  separadas por el mismo divisor, `px-4 py-3`, todo en meta. Encabezados de
+  columna y de fila de verdad (`th` con `scope`) y un `caption` para el
+  lector.
+- **Encabezados en meta medium** `azul-principal`; las celdas, en regular.
+- **Un sí o un no se dibujan y se dicen:** el ✓ (`Check`, 16 px,
+  `azul-principal`) se lee «Sí»; la raya, en `gris-texto` (4,83:1 · 7,08:1),
+  se lee «No». El dibujo va con `aria-hidden` y la palabra, solo para el
+  lector.
+- En el celular la caja scrollea de costado (`overflow-x-auto`) y la tabla
+  no baja de `min-w-lg`.
+- Primer consumidor: «Qué puede cada rol», en Cuentas, plegada en un
+  desplegable debajo de la frase de cada rol. Se arma desde `permisos.ts`.
+
 ### Estado vacío
 
 Donde todavía no hay nada: qué pasa, en el título (cuerpo medium), y qué

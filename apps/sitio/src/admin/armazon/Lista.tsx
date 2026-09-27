@@ -43,14 +43,28 @@ export function Fila({ principal, detalle, insignias, accion, atenuada, desplega
         </div>
       </div>
       {desplegable ? (
-        <details className="group/fila mt-2">
-          <summary className="-ml-1 inline-flex min-h-8 cursor-pointer list-none items-center gap-1 rounded-sm pr-1 text-admin-meta font-medium text-azul-medio focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio [&::-webkit-details-marker]:hidden">
-            <ChevronDown size={16} className="shrink-0 -rotate-90 motion-safe:transition-transform group-open/fila:rotate-0" />
-            {desplegable.resumen}
-          </summary>
+        <Desplegable resumen={desplegable.resumen} className="mt-2">
           <div className="pt-1 pl-4">{desplegable.contenido}</div>
-        </details>
+        </Desplegable>
       ) : null}
     </li>
+  );
+}
+
+/**
+ * Lo que se despliega debajo de algo (DESIGN.md §11, «Lista», desplegable):
+ * un `details`, sin JavaScript y anunciado como botón. El resumen en meta
+ * medium `azul-medio` con un chevron que gira. Lo usa la fila de una `Lista`
+ * y cualquier bloque que tenga un detalle que no hace falta ver siempre.
+ */
+export function Desplegable({ resumen, className, children }: { resumen: string; className?: string; children: React.ReactNode }) {
+  return (
+    <details className={`group/desplegable ${className ?? ""}`}>
+      <summary className="-ml-1 inline-flex min-h-8 cursor-pointer list-none items-center gap-1 rounded-sm pr-1 text-admin-meta font-medium text-azul-medio focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio [&::-webkit-details-marker]:hidden">
+        <ChevronDown size={16} className="shrink-0 -rotate-90 motion-safe:transition-transform group-open/desplegable:rotate-0" />
+        {resumen}
+      </summary>
+      {children}
+    </details>
   );
 }

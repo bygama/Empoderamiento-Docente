@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // Cada entrada del menú cuyo módulo todavía no existe cae acá y muestra su
 // guía. Las rutas que ya existen (`contenido`) son carpetas propias y ganan
 // sobre este segmento dinámico. La guía pasa por la misma guarda que va a
-// tener el módulo: quien edita y escribe /admin/cuentas ve «Sin permiso».
+// tener el módulo: quien edita y escribe /admin/ajustes ve «Sin permiso».
 export default async function ModuloPorHacer({ params }: Props) {
   const { modulo } = await params;
   const guia = guiaDe(modulo);
