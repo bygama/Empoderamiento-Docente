@@ -4,11 +4,11 @@ import { FlechaIzquierda } from "./iconos";
 export type DestinoDeVolver = { href: string; etiqueta: string };
 
 /**
- * «← Mensajes»: la vuelta de un detalle a su lista (DESIGN.md §11,
+ * «← Productos»: la vuelta de un detalle a su lista (DESIGN.md §11,
  * «Volver»). Va arriba del título, adentro del encabezado, donde el editor
  * lleva sus migas: un detalle tiene dos niveles y no necesita más. Meta
  * medium `azul-medio` (5,11:1 · 7,14:1), o `azul-claro` sobre el encabezado
- * navy (7,68:1). La flecha es decorativa: el link se lee «Mensajes». No sabe
+ * navy (7,68:1). La flecha es decorativa: el link se lee «Productos». No sabe
  * de ED.
  */
 export function Volver({ href, etiqueta, resaltado = false }: DestinoDeVolver & { resaltado?: boolean }) {

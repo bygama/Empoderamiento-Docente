@@ -4,7 +4,7 @@ import { useId } from "react";
 import { Boton } from "./Boton";
 
 type Props = {
-  /** Qué se va a hacer y que no vuelve: «¿Borrar el mensaje para siempre?». */
+  /** Qué se va a hacer y que no vuelve: «¿Borrar el producto para siempre?». */
   pregunta: string;
   /** El botón que lo hace: «Sí, borrar». */
   confirmar: string;

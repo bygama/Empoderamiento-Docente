@@ -5,8 +5,8 @@ export type Cuenta = { cuantos: number; que: string };
  * El número de una entrada de la sidebar o de una pestaña (DESIGN.md §11,
  * «El número»): una pastilla en el tono fuerte de las insignias, porque pide
  * atención. Se ve el número y se anuncia la frase entera («(3 sin leer)»),
- * como el punto de Contenido. Con 0 no hay nada que decir y no se dibuja; de
- * 100 para arriba, «99+». No sabe de ED.
+ * como el punto que marca una entrada de la sidebar. Con 0 no hay nada que
+ * decir y no se dibuja; de 100 para arriba, «99+». No sabe de ED.
  */
 export function Numero({ cuantos, que }: Cuenta) {
   if (cuantos <= 0) return null;

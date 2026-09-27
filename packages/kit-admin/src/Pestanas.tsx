@@ -29,7 +29,7 @@ const INACTIVA_SOBRE_AZUL = "text-azul-claro hover:text-white focus-visible:outl
  * activa anunciada por `aria-current`. La activa sale de la ruta —la más
  * específica de las que la contienen (`pestanaActiva`)—, así un layout puede
  * ponerlas sin que cada página diga cuál es, y las de una página del editor
- * (`/inicio` y `/inicio/seo`) no se encienden de a dos. Cliente solo por
+ * (`/productos/3` y `/productos/3/seo`) no se encienden de a dos. Cliente solo por
  * `usePathname`.
  */
 export function Pestanas({ etiqueta, pestanas, sobreAzul = false }: { etiqueta: string; pestanas: readonly Pestana[]; sobreAzul?: boolean }) {
