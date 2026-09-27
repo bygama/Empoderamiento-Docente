@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { contenidoDe } from "@/datos/consultas/paginas";
 import { InvestigacionHero } from "@/features/investigacion/components/InvestigacionHero";
 import { LineasInvestigacion } from "@/features/investigacion/components/LineasInvestigacion";
 import { EspiralInvestigacion } from "@/features/investigacion/components/EspiralInvestigacion";
@@ -38,10 +39,12 @@ export const metadata: Metadata = {
  * 2026-09-15 también su versión de Biblioteca; la invitación a la
  * Biblioteca sigue en el cierre, del lado izquierdo (decisión de Gastón).
  */
-export default function InvestigacionPage() {
+export default async function InvestigacionPage() {
+  // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
+  const { hero } = await contenidoDe("investigacion");
   return (
     <main id="contenido" tabIndex={-1}>
-      <InvestigacionHero />
+      <InvestigacionHero contenido={hero} />
       <LineasInvestigacion />
       <EspiralInvestigacion />
       <InvestigacionEnAccion />

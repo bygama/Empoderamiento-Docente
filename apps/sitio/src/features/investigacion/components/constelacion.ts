@@ -45,16 +45,13 @@ export const DISPERSION: ReadonlyArray<readonly [number, number]> = [
   [200, 208],
 ];
 
+/**
+ * Una figura de la constelación: solo geometría. El verbo y la frase de cada
+ * paso de la historia son contenido y llegan por props desde
+ * `features/investigacion/contenido/hero.ts`, en el mismo orden que FIGURAS.
+ */
 export type Figura = {
   id: string;
-  /** Rótulo mono que acompaña la figura en el loop. */
-  etiqueta: string;
-  /**
-   * Frase del beat en la historia scrolleada del hero. Copy destilado de la
-   * bajada del doc maestro (arquitectura-investigacion.md §3) + la idea
-   * central de §4; aprobado por el cliente el 31-08-2026.
-   */
-  frase: string;
   puntos: ReadonlyArray<readonly [number, number]>;
   /** Aristas como pares de índices de puntos. */
   aristas: ReadonlyArray<readonly [number, number]>;
@@ -63,8 +60,6 @@ export type Figura = {
 /** Signo de pregunta de puntos conectados (lámina «Abrir nuevas preguntas»). */
 const PREGUNTA: Figura = {
   id: "pregunta",
-  etiqueta: "Preguntar",
-  frase: "Todo empieza con un problema real del aula, convertido en pregunta.",
   puntos: [
     [140, 150],
     [154, 110],
@@ -98,8 +93,6 @@ const PREGUNTA: Figura = {
 /** Lupa sobre el hallazgo (lámina «Investigación e Intervención»). */
 const LUPA: Figura = {
   id: "lupa",
-  etiqueta: "Mirar de cerca",
-  frase: "Lo estudiamos con rigor: qué ocurre, por qué ocurre y qué significa.",
   puntos: [
     [294, 186],
     [269, 255],
@@ -134,8 +127,6 @@ const LUPA: Figura = {
 /** Red con nodo central (lámina «Las transformaciones se construyen en sistema»). */
 const RED: Figura = {
   id: "red",
-  etiqueta: "Relacionar",
-  frase: "No investigamos desde afuera: construimos con quienes habitan los contextos educativos.",
   puntos: [
     [200, 108],
     [315, 174],
@@ -170,8 +161,6 @@ const RED: Figura = {
 /** Espiral que se abre (lámina «Transformar es articular dimensiones»). */
 const ESPIRAL: Figura = {
   id: "espiral",
-  etiqueta: "Transformar",
-  frase: "El conocimiento vuelve al aula, la transforma… y abre la próxima pregunta.",
   puntos: [
     [216, 240],
     [215, 266],
