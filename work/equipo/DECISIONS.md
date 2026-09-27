@@ -26,6 +26,35 @@
     del HTML van a «Abierto» para la fase 4 (cargar el perfil al abrirlo).
   - **Orden:** la lane 9 se mergea primero; fotos y la lista que se ordena la
     esperan, y si no llegó, se anota y se sigue con otro paso.
+- 2026-09-27 — **Los datos de los 5 materiales nuevos** (paso 2), bajados de
+  Crossref una vez al escribir la migración: la tortilla va con el tema
+  **Pensamiento variacional** y no «Ciudadanía y justicia social» (su
+  resumen dice «en el marco del pensamiento variacional»; el SPEC §5.3 lo
+  dejaba «a confirmar con el resumen») y con el año **2024** (el del DOI y el
+  del perfil; Crossref da 2025-11 como fecha de publicación del número); la
+  *Secuencia de aprendizaje lúdica* queda para «Docentes», como proponía el
+  SPEC (Crossref no trae resumen). Los nombres de ED, como en las demás
+  autorías («Gabriela Buendía Abalos», «Luis Alberto López Acosta»).
+- 2026-09-27 — **El título de Viète y Descartes es el de su fuente** (paso 2,
+  la regla de H): Crossref da «Emergencia de las ecuaciones paramétricas en
+  Viète y Descartes: elementos para repensar la actividad analítica-algebraica»
+  y el perfil decía hasta «Descartes». El material entra con el entero, así
+  que la tarjeta de Luis López suma una diferencia a las de §8.2 (16 títulos,
+  no 15).
+- 2026-09-27 — **Los dos títulos cortos se corrigen** (paso 2, precisión H):
+  Crossref da el entero en los dos (Iván Pérez, `10.61174/recacym.v21i2.235`;
+  Andrea Vergara, `10.21703/rexe.v24i56.3302`). La migración corrige el título
+  y la cita. Su **portada estática** (`/biblioteca/portadas/44-…` y `57-…`)
+  tenía el título corto dibujado: queda nula y el sitio muestra la tipográfica
+  generada, igual a las demás (propuesta G de la 8a); los dos `.webp` quedan
+  sin uso en el repo. Consecuencia en el admin: esos dos y los 5 nuevos llevan
+  la insignia «Sin portada» (es lo que la insignia dice: sin una propia), y
+  los 5 nuevos, «Datos incompletos» hasta que ED escriba su descripción.
+- 2026-09-27 — **Visto al pasar, sin tocar:** *Producción de fórmulas* (Luis
+  López) es un capítulo del Tomo I de *Matemática en Red*, que tiene su PDF
+  público en la página de la colección. El SPEC aprobado lo deja «sin link»
+  (el perfil de hoy no lo tiene): sumarle el link, y pasarlo a la
+  Biblioteca, es de ED.
 - 2026-09-27 — **La actividad de mover se llama `movio-un-perfil`** (consecuencia
   de J): con un paso por clic, lo que se anota es a quién se movió («Ana movió
   a Iván Pérez en el orden del equipo»), no el nivel entero. Va al Inicio,
