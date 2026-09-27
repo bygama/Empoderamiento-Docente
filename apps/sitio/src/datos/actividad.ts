@@ -52,6 +52,13 @@ export const TIPOS_DE_ACTIVIDAD = [
   "despublico-una-novedad",
   "descarto-cambios-de-una-novedad",
   "borro-una-novedad",
+  // Ajustes (work/ajustes/): una redirección con «/viejo → /nuevo» en `sobre`;
+  // un aviso, con su nombre («CV»); los plazos, con lo que cambió.
+  "cambio-los-datos-del-sitio",
+  "agrego-una-redireccion",
+  "borro-una-redireccion",
+  "cambio-quien-recibe-un-aviso",
+  "cambio-los-plazos-de-guarda",
 ] as const;
 export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
 
@@ -62,7 +69,8 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * cuentas: lo ve quien usa Cuentas. Lo que se hace con una página lo ve quien
  * edita el contenido; con un mensaje de Contacto, quien ve Contacto; que se
  * borró un CV, solo quien ve los CV; lo que se le hace a otra cuenta, quien
- * usa Cuentas; y lo que se hace con una novedad, quien edita las novedades.
+ * usa Cuentas; lo que se hace con una novedad, quien edita las novedades; y lo
+ * que se cambia en Ajustes, quien usa Ajustes.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -93,6 +101,11 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "despublico-una-novedad": "editarNovedades",
   "descarto-cambios-de-una-novedad": "editarNovedades",
   "borro-una-novedad": "editarNovedades",
+  "cambio-los-datos-del-sitio": "usarAjustes",
+  "agrego-una-redireccion": "usarAjustes",
+  "borro-una-redireccion": "usarAjustes",
+  "cambio-quien-recibe-un-aviso": "usarAjustes",
+  "cambio-los-plazos-de-guarda": "usarAjustes",
 };
 
 /**
@@ -131,6 +144,11 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "despublico-una-novedad": true,
   "descarto-cambios-de-una-novedad": true,
   "borro-una-novedad": true,
+  "cambio-los-datos-del-sitio": true,
+  "agrego-una-redireccion": true,
+  "borro-una-redireccion": true,
+  "cambio-quien-recibe-un-aviso": true,
+  "cambio-los-plazos-de-guarda": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */

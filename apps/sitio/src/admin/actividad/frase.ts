@@ -51,6 +51,12 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "despublico-una-novedad": ({ quien, sobre }) => `${quien} despublicó la novedad ${novedad(sobre)}`,
   "descarto-cambios-de-una-novedad": ({ quien, sobre }) => `${quien} descartó los cambios de la novedad ${novedad(sobre)}`,
   "borro-una-novedad": ({ quien, sobre }) => `${quien} borró la novedad ${novedad(sobre)}`,
+  // Ajustes: `sobre` dice qué, cuando hace falta.
+  "cambio-los-datos-del-sitio": ({ quien }) => `${quien} cambió los datos del sitio`,
+  "agrego-una-redireccion": ({ quien, sobre }) => `${quien} agregó ${sobre ? `la redirección ${sobre}` : "una redirección"}`,
+  "borro-una-redireccion": ({ quien, sobre }) => `${quien} borró ${sobre ? `la redirección ${sobre}` : "una redirección"}`,
+  "cambio-quien-recibe-un-aviso": ({ quien, sobre }) => `${quien} cambió quién recibe los avisos${sobre ? ` de ${sobre}` : ""}`,
+  "cambio-los-plazos-de-guarda": ({ quien, sobre }) => `${quien} cambió los plazos de privacidad${sobre ? `: ${sobre}` : ""}`,
 };
 
 /**

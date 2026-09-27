@@ -26,3 +26,11 @@ test("cada rol ve la actividad de lo que usa: quien edita, la de páginas, Conta
     "borro-una-novedad",
   ]);
 });
+
+test("lo que se cambia en Ajustes se lee con qué cambió, y solo lo ve quien usa Ajustes", () => {
+  assert.equal(fraseDe({ tipo: "agrego-una-redireccion", quien: "Ana", sobre: "/taller → /contacto" }), "Ana agregó la redirección /taller → /contacto");
+  assert.equal(fraseDe({ tipo: "cambio-quien-recibe-un-aviso", quien: "Ana", sobre: "CV" }), "Ana cambió quién recibe los avisos de CV");
+  assert.equal(fraseDe({ tipo: "cambio-los-plazos-de-guarda", quien: "Ana", sobre: "CV, de 12 meses a 6 meses" }), "Ana cambió los plazos de privacidad: CV, de 12 meses a 6 meses");
+  assert.ok(!tiposQueVe("edita").includes("cambio-los-datos-del-sitio"));
+  assert.ok(tiposQueVe("dirige").includes("cambio-los-datos-del-sitio"));
+});
