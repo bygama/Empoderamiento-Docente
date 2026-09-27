@@ -8,8 +8,6 @@ import { auth } from "@/datos/auth";
 import { base } from "@/datos/cliente";
 import { publicadoDe } from "@/datos/consultas/novedades";
 import { encenderVistaPrevia } from "@/datos/vista-previa";
-import { esquemaCaso } from "@/features/investigacion/contenido/caso";
-import { IDS_DE_CASOS } from "@/features/investigacion/contenido/modelo-de-casos";
 import { comoDocumento } from "@/lib/contenido/documento";
 
 // La vista previa (SPEC §6) es el Draft Mode de Next: con la cookie puesta,
@@ -33,29 +31,6 @@ export async function abrirVistaPrevia(slug: string): Promise<{ ok: true; url: s
     return { ok: true, url: PAGINAS[valido.data].ruta };
   } catch (e) {
     console.error("abrirVistaPrevia:", e);
-    return { ok: false, detalle: "No se pudo abrir la vista previa; probá de nuevo en un rato." };
-  }
-}
-
-/**
- * Enciende la vista previa de un caso y dice adónde ir: `/investigacion` con
- * su expediente abierto (`#slug`), como quedaría al publicarlo. Si el
- * borrador todavía no se puede publicar, el sitio muestra lo publicado, y el
- * ancla es la de lo publicado. Muestra lo guardado: la ficha guarda antes.
- */
-export async function abrirVistaPreviaDeCaso(id: string): Promise<{ ok: true; url: string } | { ok: false; detalle: string }> {
-  try {
-    const sesion = await auth.api.getSession({ headers: await headers() });
-    if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para ver la vista previa." };
-    if (!puede(sesion.user.rol, "editarContenido")) return { ok: false, detalle: SIN_PERMISO };
-    const valido = z.enum(IDS_DE_CASOS).safeParse(id);
-    const fila = valido.success ? await base.caso.findUnique({ where: { id: valido.data } }) : null;
-    if (!fila) return { ok: false, detalle: "Ese caso no existe." };
-    const borrador = fila.borrador === null ? null : esquemaCaso.safeParse(fila.borrador);
-    await encenderVistaPrevia();
-    return { ok: true, url: `/investigacion#${borrador?.success ? borrador.data.slug : fila.slug}` };
-  } catch (e) {
-    console.error("abrirVistaPreviaDeCaso:", e);
     return { ok: false, detalle: "No se pudo abrir la vista previa; probá de nuevo en un rato." };
   }
 }

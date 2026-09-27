@@ -2,7 +2,7 @@ import { createElement, useState } from "react";
 import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
 import { VistaPreviaFrenada } from "@/admin/armazon/VistaPreviaFrenada";
 import { descartarCambiosDeCaso, guardarCaso, publicarCaso } from "@/datos/acciones/casos";
-import { abrirVistaPreviaDeCaso } from "@/datos/acciones/vista-previa";
+import { abrirVistaPreviaDeCaso } from "@/datos/acciones/vista-previa-de-contenido";
 import type { EstadoDelCaso } from "@/datos/consultas/casos-del-admin";
 import type { BorradorDeCaso } from "@/features/investigacion/contenido/caso";
 import type { IdDeCaso } from "@/features/investigacion/contenido/modelo-de-casos";
