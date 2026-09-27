@@ -128,8 +128,10 @@ métricas y lo programado», más abajo:
 - `SEARCH_CONSOLE_SITE_URL` — la propiedad: `sc-domain:empoderamientodocente.org`
   si es de dominio, o `https://empoderamientodocente.org/` si es de prefijo.
 
-Sin las tres, Búsquedas dice que no está conectado y la copia no toca la API;
-en local no hace falta cargarlas.
+Con las mismas tres, una tarea del cron revisa si cada página del sitemap está
+en Google (la API de inspección de URL; Ajustes › SEO). Sin las tres,
+Búsquedas dice que no está conectado y ni la copia ni la revisión tocan la
+API; en local no hace falta cargarlas.
 
 Todas menos `NEXT_PUBLIC_SITE_URL` son secretas y **solo server-side**. Los
 placeholders viven en
@@ -170,7 +172,7 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
             ├── correos/       ← las plantillas de los correos y por dónde salen
             ├── components/    ← UI reutilizable (brand/, layout/, ui/, …)
             ├── features/      ← secciones por dominio (home, novedades, …)
-            ├── config/        ← site.ts (datos institucionales) + nav.ts
+            ├── config/        ← site.ts (la marca) + nav.ts, y la forma de lo que edita Ajustes
             └── lib/           ← hooks/, correo/ (Resend), seguridad/ (CSP) y utilidades
 ```
 
@@ -187,7 +189,9 @@ delega en la app. El porqué está en el
 
 El theming de Tailwind v4 vive en `apps/sitio/src/app/globals.css` (bloque
 `@theme`), no en `tailwind.config.js`. Los datos institucionales (mail,
-dirección, redes) están centralizados en `apps/sitio/src/config/site.ts`.
+WhatsApp, dirección, países, redes) se editan en Ajustes › Datos del sitio y
+viven en la base (ver «Ajustes»); `apps/sitio/src/config/site.ts` guarda lo de
+la marca.
 
 ---
 
@@ -245,8 +249,9 @@ actividad reciente, **Cuentas** (invitar, cambiar roles, suspender y la
 actividad; ver «Las cuentas»), **Métricas con sus búsquedas en Google** (ver
 «Las métricas y lo programado»), **la edición de las páginas** (ver «Editar
 las páginas»), **Mensajes**, lo que llega por los formularios del sitio (ver
-«Mensajes»), y **Novedades**, la primera entidad (ver «Novedades»); la
-biblioteca, los casos y el equipo llegan en la fase siguiente.
+«Mensajes»), **Novedades**, la primera entidad (ver «Novedades»), y
+**Ajustes**, lo que se configura una vez (ver «Ajustes»); la biblioteca, los
+casos y el equipo llegan en la fase siguiente.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
 y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
@@ -393,8 +398,10 @@ compartir todavía muestran lo que van a tener.
 Ninguna pantalla consulta a Vercel ni a Google al renderizar. **Un solo cron**
 (`/api/cron/diario`, a las 4 UTC) corre cada día las tareas registradas en
 `apps/sitio/src/datos/tareas/diarias.ts`, cada una aislada: la copia de Vercel
-Analytics (a las tablas `metricas_*`) y la de Search Console (a
-`busquedas_diarias`). Cada corrida, bien o con su error en llano, queda en
+Analytics (a las tablas `metricas_*`), la de Search Console (a
+`busquedas_diarias`), la revisión de la indexación (a `indexacion_de_urls`,
+hasta 20 páginas por día: la API tiene cuota) y la retención de Mensajes.
+Cada corrida, bien o con su error en llano, queda en
 `corridas_de_tareas`. «Actualizar ahora», en cada pantalla, corre su tarea a
 mano, con un freno de diez minutos por tarea. Lo que necesite correr solo más
 adelante se suma como una tarea en esa lista, no como un cron nuevo
@@ -489,10 +496,12 @@ documento) es el que copian las entidades que siguen:
 Lo que llega por los formularios del sitio queda en `/admin/mensajes`, en dos
 bandejas: **Contacto** (los tres roles) y **CV** (quien dirige y quien
 administra). Cada mensaje nuevo avisa por correo a quien tenga activado ese
-aviso en Mi cuenta, sin nada de lo que escribieron. Se borran solos (Contacto a
-los 24 meses, un CV a los 12 con su archivo, el spam a los 30 días) en el cron
-diario. Decisión en el
-[ADR-0012](docs/architecture/adrs/0012-mensajes-cv-privados-y-retencion.md).
+aviso en Mi cuenta o en Ajustes › Avisos, sin nada de lo que escribieron. Se
+borran solos en el cron diario, a los plazos de Ajustes › Privacidad (de
+fábrica, Contacto a los 24 meses, un CV a los 12 con su archivo, el spam a los
+30 días). Decisión en el
+[ADR-0012](docs/architecture/adrs/0012-mensajes-cv-privados-y-retencion.md) y,
+los plazos editables, en el [ADR-0014](docs/architecture/adrs/0014-ajustes-en-la-base.md).
 
 **El formulario de CV nace apagado.** Para encenderlo, en este orden:
 
@@ -507,6 +516,28 @@ diario. Decisión en el
 
 Mientras tanto, en local se prueba con `CV_ABIERTO=si` en el `.env.local`:
 los PDF quedan en `apps/sitio/.cv/` y se bajan desde la ficha del CV.
+
+### Ajustes
+
+`/admin/ajustes`, solo para quien dirige y quien administra, reúne lo que se
+configura una vez, en cinco pantallas:
+
+- **Datos del sitio:** el correo, el WhatsApp, la dirección, los países y las
+  redes. Viven en la tabla `datos_del_sitio` y **guardar es publicar**: el pie,
+  el menú del celular, Contacto y los formularios cambian sin un deploy. Ya no
+  se tocan en el código.
+- **SEO:** las redirecciones (las que el sitio escribe solo al cambiar un slug
+  y las que se agregan a mano; la ruta vieja contesta un 308), si cada página
+  está en Google según Search Console, y el `sitemap.xml`, que arma el sitio
+  solo con las rutas que existen.
+- **Avisos:** quién recibe un correo con cada mensaje de Contacto y con cada
+  CV (la misma preferencia que Mi cuenta › Avisos).
+- **Privacidad:** los plazos de retención, con sus topes. Alargar vale para lo
+  que llegue desde ahora; acortar vale para todo y, si borra algo, pregunta
+  antes ([ADR-0014](docs/architecture/adrs/0014-ajustes-en-la-base.md)).
+- **Conexiones:** Vercel Analytics, Search Console, Resend, los dos Blob y el
+  cron: si tienen sus variables (por el nombre, nunca el valor) y cómo corrió
+  cada tarea. Es el primer lugar donde mirar si algo dejó de actualizarse.
 
 ### Comandos de base
 
