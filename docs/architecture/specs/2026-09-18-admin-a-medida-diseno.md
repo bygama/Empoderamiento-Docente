@@ -208,8 +208,30 @@ Resend, en segundo plano, y elegir una contraseña nueva avisa con otro («Tu
 contraseña cambió»); sin `RESEND_API_KEY`, en local salen por la consola y en
 producción no salen, sin loguear nunca el enlace.
 
+**Las cuentas se manejan desde Cuentas**, que usan dirige y administra
+(`work/cuentas/`): se invita con correo, nombre y rol (administra o edita;
+dirige no se invita, se pasa), y llega «Elegí tu contraseña» con un enlace
+que vence a las 72 h. Una cuenta se **suspende en vez de borrarse**: ya no
+abre sesión (lo mira `@ed/auth` donde nace toda sesión) y su nombre queda en
+la historia; se borra solo si nunca hizo nada, y eso lo decide la clave
+foránea de `actividad`. Qué puede hacer cada rol sobre cada cuenta vive en un
+solo lugar, `packages/auth/src/cuentas.ts` (`queSePuede`): la cuenta de quien
+dirige no la suspende, borra ni degrada nadie, quien administra no la toca, y
+sobre la propia solo se cambia el correo. Pasar la dirección pide otra vez la
+contraseña, que cuenta en el bloqueo por cuenta.
+
+**El segundo factor es un código de 6 dígitos por correo**, obligatorio para
+dirige y administra y opcional para edita (Mi cuenta › Seguridad). Lo
+garantiza la base (el CHECK `user_segundo_factor_obligatorio`); quien pasa a
+uno de esos roles sin él lo recibe prendido y pierde sus sesiones, que se
+abrieron sin código. El código vence a los 10 minutos, se guarda hasheado y
+admite 5 intentos; «Recordar este dispositivo» dura 30 días. Si el correo no
+sale, la pantalla del código lo dice en vez de fingir: desde esta fase, entrar
+con esos roles depende de Resend.
+
 Todo lo de esta sección que cambió el 2026-09-26 está decidido en el
-[ADR-0010](../adrs/0010-seguridad-del-acceso.md).
+[ADR-0010](../adrs/0010-seguridad-del-acceso.md) y, el segundo factor, en el
+[ADR-0012](../adrs/0012-segundo-factor-por-correo.md).
 
 Lo que cierra respecto del estado anterior:
 
