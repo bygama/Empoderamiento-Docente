@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
 import { CATEGORIAS, etiquetaDeCategoria, type Categoria } from "@/features/novedades/contenido/modelo";
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
+import type { UltimasDeNovedades } from "@/features/novedades/contenido/ultimas";
 import { NovedadCard } from "./NovedadCard";
 import { PaginacionNovedades } from "./PaginacionNovedades";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -35,7 +36,7 @@ const filtrarLista = (novedades: readonly NovedadDelSitio[], f: Filtro) =>
  * links compartibles y estado que sobrevive al refresh, sin useSearchParams
  * (evita el bailout a CSR de Next). Sin motion: todo funciona, sin animar.
  */
-export function FiltrosNovedades({ novedades }: { novedades: readonly NovedadDelSitio[] }) {
+export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasDeNovedades; novedades: readonly NovedadDelSitio[] }) {
   const [activa, setActiva] = useState<Filtro>("todas");
   const [pagina, setPagina] = useState(1);
   const gridRef = useRef<HTMLDivElement | null>(null);
@@ -165,7 +166,7 @@ export function FiltrosNovedades({ novedades }: { novedades: readonly NovedadDel
             className="font-display text-azul-principal font-bold tracking-[-0.02em]"
             style={{ fontSize: "clamp(1.8rem, 1rem + 2.6vw, 3.2rem)", lineHeight: 1.08 }}
           >
-            Lo que viene pasando.
+            {contenido.titulo}
           </RevealLines>
         </div>
 
@@ -206,18 +207,14 @@ export function FiltrosNovedades({ novedades }: { novedades: readonly NovedadDel
           <div className="px-5 py-6 md:px-8 md:py-8">
             {filtradas.length === 0 && (
               <div className="py-14 text-center">
-                <p className="text-azul-principal font-display text-lg font-bold">
-                  Todavía no hay novedades en esta categoría.
-                </p>
-                <p className="text-gris-texto mt-2 font-sans text-[0.95rem]">
-                  Pronto vamos a compartir nuevas acá.
-                </p>
+                <p className="text-azul-principal font-display text-lg font-bold">{contenido.vacio.titulo}</p>
+                <p className="text-gris-texto mt-2 font-sans text-[0.95rem]">{contenido.vacio.texto}</p>
                 <button
                   type="button"
                   onClick={() => aplicar("todas", 1)}
                   className="border-azul-principal/15 text-azul-principal hover:border-verde-concepto/50 mt-6 rounded-full border px-5 py-2 font-mono text-[0.72rem] tracking-[0.1em] uppercase transition-colors"
                 >
-                  Ver todas
+                  {contenido.vacio.boton}
                 </button>
               </div>
             )}

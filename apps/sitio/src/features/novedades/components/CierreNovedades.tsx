@@ -8,6 +8,7 @@ import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 import { Instagram, Linkedin, Facebook } from "@/components/ui/icons";
 import { siteConfig } from "@/config/site";
+import type { CierreDeNovedades } from "@/features/novedades/contenido/cierre";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -34,7 +35,7 @@ const REDES = [
  * data-footer-dock-tint="gris" para que la muesca del footer tome ese mismo
  * gris (regla en globals.css) y el encuentro no muestre triángulos blancos.
  */
-export function CierreNovedades() {
+export function CierreNovedades({ contenido }: { contenido: CierreDeNovedades }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -124,23 +125,21 @@ export function CierreNovedades() {
             className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em]"
             style={{ fontSize: "clamp(2.4rem, 1rem + 4.6vw, 5rem)", lineHeight: 1.02 }}
           >
-            No te pierdas nada.
+            {contenido.titulo}
           </RevealLines>
 
           <p
             data-cierre-foot
             className="text-azul-claro mt-7 max-w-[52ch] font-sans text-[1.05rem] leading-relaxed md:text-[1.2rem]"
           >
-            {REDES.some(({ key }) => siteConfig.redes[key])
-              ? "Escribinos y contamos lo que estamos haciendo, o seguinos en redes para enterarte de cada novedad apenas sale."
-              : "Escribinos y te contamos lo que estamos haciendo."}
+            {REDES.some(({ key }) => siteConfig.redes[key]) ? contenido.conRedes : contenido.sinRedes}
           </p>
 
           <div
             data-cierre-foot
             className="mt-10 flex flex-col items-center gap-7"
           >
-            <ButtonPrimary href="/contacto">Hablemos</ButtonPrimary>
+            <ButtonPrimary href="/contacto">{contenido.boton}</ButtonPrimary>
             {/* Solo las redes con URL confirmada: un ícono a «#» es un link muerto. */}
             {REDES.some(({ key }) => siteConfig.redes[key]) && (
               <ul className="flex items-center gap-5">

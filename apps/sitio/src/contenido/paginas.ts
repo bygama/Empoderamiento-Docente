@@ -23,6 +23,13 @@ import { enAccionInicial, esquemaEnAccion } from "@/features/investigacion/conte
 import { esquemaHeroInvestigacion, heroInvestigacionInicial } from "@/features/investigacion/contenido/hero";
 import { esquemaLineas, lineasInicial } from "@/features/investigacion/contenido/lineas";
 import { seoInvestigacionInicial } from "@/features/investigacion/contenido/seo";
+import { cierreDeNovedadesInicial, esquemaCierreDeNovedades } from "@/features/novedades/contenido/cierre";
+import { destacadasDeNovedadesInicial, esquemaDestacadasDeNovedades } from "@/features/novedades/contenido/destacadas";
+import { esquemaHeroDeNovedades, heroDeNovedadesInicial } from "@/features/novedades/contenido/hero";
+import { esquemaLanzamientosDeNovedades, lanzamientosDeNovedadesInicial } from "@/features/novedades/contenido/lanzamientos";
+import { esquemaMovimientoDeNovedades, movimientoDeNovedadesInicial } from "@/features/novedades/contenido/movimiento";
+import { seoDeNovedadesInicial } from "@/features/novedades/contenido/seo";
+import { esquemaUltimasDeNovedades, ultimasDeNovedadesInicial } from "@/features/novedades/contenido/ultimas";
 import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import { cierreInicial as cierreDeQueHacemos, esquemaCierre as esquemaCierreDeQueHacemos } from "@/features/que-hacemos/contenido/cierre";
 import { esquemaFaro, faroInicial } from "@/features/que-hacemos/contenido/faro";
@@ -126,7 +133,20 @@ export const PAGINAS = {
     },
     seo: seoBibliotecaInicial,
   },
-  novedades: { ruta: "/novedades", nombre: "Novedades", secciones: {} },
+  novedades: {
+    ruta: "/novedades",
+    nombre: "Novedades",
+    // Los textos propios de la página (work/novedades-y-kit/SPEC.md §8); las novedades mismas son una tabla, con su módulo.
+    secciones: {
+      hero: { nombre: "Hero", esquema: esquemaHeroDeNovedades, inicial: heroDeNovedadesInicial },
+      destacadas: { nombre: "Destacadas", esquema: esquemaDestacadasDeNovedades, inicial: destacadasDeNovedadesInicial },
+      ultimas: { nombre: "Lo último", esquema: esquemaUltimasDeNovedades, inicial: ultimasDeNovedadesInicial },
+      movimiento: { nombre: "ED en movimiento", esquema: esquemaMovimientoDeNovedades, inicial: movimientoDeNovedadesInicial },
+      lanzamientos: { nombre: "Recién salido", esquema: esquemaLanzamientosDeNovedades, inicial: lanzamientosDeNovedadesInicial },
+      cierre: { nombre: "Cierre", esquema: esquemaCierreDeNovedades, inicial: cierreDeNovedadesInicial },
+    },
+    seo: seoDeNovedadesInicial,
+  },
   contacto: {
     ruta: "/contacto",
     nombre: "Contacto",

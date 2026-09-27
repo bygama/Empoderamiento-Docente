@@ -12,7 +12,7 @@ import { VERDE_SOBRE_AZUL } from "./verde-sobre-azul";
  * la esquina de la tapa. Composición invertida (foto a la izquierda) y titular
  * con line-clamp-2: es «la que sigue», deliberadamente no compite.
  */
-export function SegundaDestacada({ n }: { n: NovedadDelSitio }) {
+export function SegundaDestacada({ n, boton }: { n: NovedadDelSitio; boton: string }) {
   return (
     <article
       data-nd-card
@@ -44,7 +44,7 @@ export function SegundaDestacada({ n }: { n: NovedadDelSitio }) {
         <h3 className="font-display mt-2.5 line-clamp-2 text-[1.1rem] leading-snug font-bold text-white md:text-[1.35rem]">{n.titulo}</h3>
 
         <LinkNota n={n} className="text-azul-claro mt-4 inline-flex w-fit items-center gap-2.5 font-sans text-[0.88rem] font-medium">
-          Leer la nota
+          {boton}
           <span className="group-hover:border-naranja-accion group-hover:bg-naranja-accion group-hover:text-white flex h-7 w-7 items-center justify-center rounded-full border border-white/25 transition-colors duration-300">
             <ArrowUpRight size={13} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </span>
