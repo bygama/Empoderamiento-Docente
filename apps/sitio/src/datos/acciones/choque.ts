@@ -19,10 +19,14 @@ export function vioLaFila(fila: FilaVista, borradorEnVisto: string | null): bool
   return (fila?.borradorEn?.toISOString() ?? null) === borradorEnVisto;
 }
 
-/** El choque en llano, con la fila como está ahora: quién guardó y cuándo, o que ya no hay borrador. */
-export function choqueCon(fila: FilaVista): Fallo {
+/**
+ * El choque en llano, con la fila como está ahora: quién guardó y cuándo, o
+ * que ya no hay borrador. `abriste` es lo que se abrió: «la página», «la
+ * novedad».
+ */
+export function choqueCon(fila: FilaVista, abriste = "la página"): Fallo {
   const detalle = fila?.borradorEn
     ? `${fila.borradorPor ?? "Alguien"} guardó este borrador ${haceCuanto(fila.borradorEn)}. Recargá para ver sus cambios antes de seguir.`
-    : "Este borrador se publicó o se descartó desde que abriste la página. Recargá para seguir.";
+    : `Este borrador se publicó o se descartó desde que abriste ${abriste}. Recargá para seguir.`;
   return { ok: false, detalle, choque: true };
 }
