@@ -49,7 +49,8 @@ export async function guardarAviso(cuentaId: string, bandeja: Bandeja, activo: b
  */
 export async function avisarMensajeNuevo(
   { id, bandeja }: { id: string; bandeja: Bandeja },
-  { mandar = mandarCorreo }: { mandar?: typeof mandarCorreo } = {},
+  // Lo único que usa de `mandarCorreo` es que mande: su respuesta no le importa.
+  { mandar = mandarCorreo }: { mandar?: (correo: Parameters<typeof mandarCorreo>[0]) => Promise<unknown> } = {},
 ): Promise<void> {
   const enlace = `${urlDelSitio()}${BANDEJAS[bandeja].href}/${id}`;
   const destinatarios = await destinatariosDe(bandeja);
