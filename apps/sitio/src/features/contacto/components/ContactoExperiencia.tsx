@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import gsap from "gsap";
 import { MathField } from "@/components/ui/MathField";
+import type { Titular } from "@/features/contacto/contenido/titular";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { TEMAS, type TemaKey, type Vista } from "./experiencia/data";
@@ -61,14 +62,15 @@ import { PanelCierre } from "./experiencia/PanelCierre";
  * Reduced-motion: se entra directo al selector, sin intro ni vuelos. El fondo
  * de nodos (MathField) queda vivo detrás siempre.
  *
- * Piezas (`experiencia/`): contenido en `data.ts`, clases en `estilos.ts`, el
- * contexto que reciben las coreografías en `contexto.ts`, la intro en
- * `coreografia-intro.ts` (+ `ghost-titulo.ts`, `useSaltoIntro.ts`), apertura ⇄
- * formulario en `coreografia-paneles.ts`, envío y vuelta en
+ * Piezas (`experiencia/`): los temas y el equipo en `data.ts`, clases en
+ * `estilos.ts`, el contexto que reciben las coreografías en `contexto.ts`, la
+ * intro en `coreografia-intro.ts` (+ `ghost-titulo.ts`, `useSaltoIntro.ts`),
+ * apertura ⇄ formulario en `coreografia-paneles.ts`, envío y vuelta en
  * `coreografia-envio.ts`; markup en PanelHero, ColumnaIdentidad, IndiceTemas,
- * PanelFormulario (RailTema + CamposContacto) y PanelCierre.
+ * PanelFormulario (RailTema + CamposContacto) y PanelCierre. Los textos que se
+ * editan desde el admin llegan por props (`features/contacto/contenido/`).
  */
-export function ContactoExperiencia({ cvAbierto }: { cvAbierto: boolean }) {
+export function ContactoExperiencia({ cvAbierto, titular }: { cvAbierto: boolean; titular: Titular }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
   const [vista, setVista] = useState<Vista>("hero");
@@ -142,7 +144,7 @@ export function ContactoExperiencia({ cvAbierto }: { cvAbierto: boolean }) {
       {/* ── Escenario: los cuatro estados apilados ────────────────────────── */}
       <div className="relative z-10 mx-auto h-full w-full max-w-screen-xl px-5 md:px-10">
         {/* 0 · HERO */}
-        <PanelHero activo={vista === "hero"} />
+        <PanelHero activo={vista === "hero"} titulo={titular.titulo} />
 
         {/* 1 · APERTURA */}
         {/* my-auto (y no justify-center en el padre): con 5 tarjetas apiladas
@@ -169,7 +171,7 @@ export function ContactoExperiencia({ cvAbierto }: { cvAbierto: boolean }) {
               identidad a la izquierda (titular + equipo real) y el ÍNDICE de
               temas a la derecha — renglones numerados, no un grid de fichas. */}
           <div className="my-auto w-full lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-stretch lg:gap-x-16 xl:gap-x-24">
-            <ColumnaIdentidad />
+            <ColumnaIdentidad titulo={titular.titulo} />
             <IndiceTemas onElegir={(key, el) => elegirTema(contexto(), key, el)} />
           </div>
         </div>

@@ -1,14 +1,13 @@
-import { TITULO } from "./data";
-
 /**
- * El ghost del titular que VIAJA del hero al selector: un clon fixed de
- * "Hablemos." en <body>, con la tipografía exacta del destino, listo para
- * animarse por SCALE desde el tamaño del hero (no por font-size, que es
- * layout). Vive fuera del ctx de GSAP: quien lo crea lo tiene que sacar.
+ * El ghost del titular que VIAJA del hero al selector: un clon fixed del
+ * titular («Hablemos.») en <body>, con el texto y la tipografía exacta del
+ * destino, listo para animarse por SCALE desde el tamaño del hero (no por
+ * font-size, que es layout). Vive fuera del ctx de GSAP: quien lo crea lo
+ * tiene que sacar.
  */
-export function crearGhostTitulo(d: DOMRect, cs: CSSStyleDeclaration, fsDst: number) {
+export function crearGhostTitulo(texto: string, d: DOMRect, cs: CSSStyleDeclaration, fsDst: number) {
   const gt = document.createElement("div");
-  gt.textContent = TITULO;
+  gt.textContent = texto;
   gt.setAttribute("aria-hidden", "true");
   Object.assign(gt.style, {
     position: "fixed",
