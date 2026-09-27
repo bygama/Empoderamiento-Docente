@@ -2,7 +2,7 @@
 
 ## In progress
 
-- Paso 12 del PLAN.
+- work-verify.
 
 ## Done
 
@@ -140,3 +140,41 @@
   `cmp` idéntico), la fila de la foto, el CV (fila y archivo), las 9 novedades,
   las 2 cuentas, Umami (1 sitio, 5 eventos) y hasta la sesión de antes (`GET
   /admin` 200 con la misma cookie).
+- 2026-09-27 — **Mediciones para el runbook** (padre, «se usa todo lo del
+  VPS»). Memoria, con `docker stats` cada ~2 s: `construir` con las 32 CPUs de
+  esta máquina, pico 5,25 GiB; con `cpuset: "0,1"` (2 CPUs, como un KVM 2),
+  pico 5,05 GiB en 59 s (lo pesado es Turbopack, no los workers); con 2 CPUs y
+  `mem_limit: 3g`, **exit 137** (OOM). El compose en marcha: app 115 MiB, Umami
+  145, Postgres 53, Caddy 12, el resto <1 (≈350 MiB). → KVM 2 (8 GB) alcanza;
+  KVM 1 (4 GB) con 4 GB de swap. Un reintento falló por red: `next/font/google`
+  baja las fuentes en el build (Turbopack lo dice como «Can't resolve
+  '@vercel/turbopack-next/internal/font/google/font'»): el build necesita
+  internet. Disco: `ed` 9,7 MB, `umami` 9,4 MB, un respaldo 197 KB; imágenes
+  `ed-fuente` 1,51 GB, `ed-sitio` 384 MB, Umami 1,47 GB, `postgres:17-alpine`
+  424 MB; caché de build 2,4 GB. Hostinger (verificado en su ayuda, actualizada
+  el 2026-09-15, y en la página de planes): backup semanal gratis en todos los
+  KVM, dos semanales guardados fuera del servidor, diario pago; un snapshot
+  manual que vence al día; restaurar pisa el VPS entero. KVM 1: 1 vCPU, 4 GB,
+  50 GB; KVM 2: 2 vCPU, 8 GB, 100 GB.
+- 2026-09-27 — **Corte de un deploy** (condición 4 del padre): `desplegar.sh`
+  completo con `curl` a `https://localhost/` cada ~0,6 s: 87 sondeos, 2 sin 200
+  (un `000` por el tope de 2 s y un `502`); entre la última respuesta buena y la
+  siguiente, **5,3 s**. `volver.sh 2daf9e898a3e` y de vuelta `62868041a6a0`: el
+  contenedor corre exactamente la imagen pedida (`sha256:5829759b3540…` y
+  `sha256:f3a8caa77cbf…`), el sitio 200; con una versión que no existe, exit 1 y
+  la lista (`2e380801` saca `actual` de la lista). El panel de Umami del
+  runbook (`docker compose run --rm -d --name ed-panel-umami -p
+  127.0.0.1:3001:3000 analitica`): `/api/heartbeat` 200 y `/login` 200 en
+  `127.0.0.1:3001`; `docker stop` lo borra.
+- 2026-09-27 — **Paso 12** (`7c41bb6c`, `62868041`): ADR-0018 («Deploy en
+  Vercel o en un VPS: el código no depende del host»), en el índice, y el 0005,
+  el 0009 y el 0011 marcados como ampliados por él.
+- 2026-09-27 — **Paso 13** (`d7924a59`): `docs/deploy/vps.md` y
+  `docs/deploy/vercel.md`, y el índice de `docs/README.md`. Cada script y
+  servicio que nombran existe (chequeo con `[ -f ]` y `grep "^  <servicio>:"`
+  sobre `compose.yaml`: los diez archivos y los nueve servicios).
+- 2026-09-27 — **Paso 14** (`7e76530f`, `6a5ce63a`): README (lo de arriba,
+  variables, Deploy con los dos caminos, Métricas, el cron, los CV y
+  Conexiones), `apps/sitio/.env.example` (Umami al lado de Vercel) y AGENTS.md
+  §1, §2, §3, §12 y §13. `git grep "cuando llegue la fase 1"` vacío; `pnpm lint`
+  → 0.
