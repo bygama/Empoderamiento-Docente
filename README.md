@@ -395,7 +395,8 @@ El admin manda **«Elegí tu contraseña»** (el enlace de «Olvidé mi
 contraseña», que vence en una hora, y la invitación de Cuentas, que vence a las
 72 h), **«Tu contraseña cambió»** (cada vez que alguien elige una, con las demás
 sesiones ya cerradas), **«Tu código para entrar»** (el segundo factor) y **«El
-correo de tu cuenta del admin cambió»** (a la dirección vieja y a la nueva).
+correo de tu cuenta del admin cambió»** (a la dirección vieja y a la nueva); el
+aviso de cada mensaje nuevo está en «Mensajes».
 Salen por la API de Resend desde `CORREO_REMITENTE`; el del código se espera,
 y si no salió la pantalla lo dice. Decisión y detalles en el
 [ADR-0010](docs/architecture/adrs/0010-seguridad-del-acceso.md) y el
