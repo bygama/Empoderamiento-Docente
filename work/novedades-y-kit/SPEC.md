@@ -1,7 +1,9 @@
 # SPEC — Novedades y el kit del admin
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-26, con las seis propuestas de
+  §14 y dos condiciones (el comentario en cada re-export de A y la licencia
+  al lado de la fuente de F); ver DECISIONS
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación, tablas y dependencias incluidas: DECISIONS del padre,
   2026-09-26)
