@@ -49,9 +49,12 @@ export async function guardarQuienRecibe(pedido: { aviso: string; cuentas: strin
     const valido = esquemaDeQuienRecibe.safeParse(pedido);
     if (!valido.success || !esAviso(valido.data.aviso)) return { ok: false, detalle: "Ese aviso no existe." };
     const { aviso, cuentas } = valido.data;
-    const reciben = await ponerQuienRecibe(aviso, cuentas);
-    revalidatePath("/admin/ajustes", "layout");
-    await registrarActividad({ tipo: "cambio-quien-recibe-un-aviso", quien: sesion.user.id, sobre: AVISOS[aviso].nombre });
+    const { reciben, cambiaron } = await ponerQuienRecibe(aviso, cuentas);
+    // Guardar sin tocar nada no es un cambio: no va a la actividad.
+    if (cambiaron) {
+      revalidatePath("/admin/ajustes", "layout");
+      await registrarActividad({ tipo: "cambio-quien-recibe-un-aviso", quien: sesion.user.id, sobre: AVISOS[aviso].nombre });
+    }
     const { cada } = AVISOS[aviso];
     if (!reciben) return { ok: true, detalle: `Nadie va a recibir un correo con cada ${cada}: se va a ver solo al entrar al admin.` };
     return { ok: true, detalle: `Listo: ${reciben === 1 ? "1 persona recibe" : `${reciben} personas reciben`} un correo con cada ${cada}.` };

@@ -87,16 +87,20 @@ test("Ajustes ve cada aviso con las cuentas activas que lo pueden recibir; sin u
   assert.ok(!cv.cuentas.some((c) => c.id === SUSPENDIDA), "una cuenta suspendida no aparece");
 });
 
-test("poner quién recibe prende las elegidas y apaga las demás que pueden; un id que no puede, no cuenta", sinBase, async () => {
+test("poner quién recibe prende las elegidas y apaga las demás que pueden; un id que no puede, no cuenta, y repetirlo no cambia nada", sinBase, async () => {
   const { avisosDe, ponerQuienRecibe } = await import("./avisos");
   // Solo nuestras cuentas: las demás de la base quedan apagadas en esta prueba y se vuelven a prender abajo.
   const { base } = await import("@/datos/cliente");
   const antes = await base.aviso.findMany({ where: { aviso: "cv", cuentaId: { notIn: CUENTAS.map((c) => c.id) } } });
   try {
-    assert.equal(await ponerQuienRecibe("cv", [CALLADA, EDITA]), 1);
+    const primera = await ponerQuienRecibe("cv", [CALLADA, EDITA]);
+    assert.equal(primera.reciben, 1);
+    assert.ok(primera.cambiaron >= 2, "prende la callada y apaga la que administra (y las de la base que lo tenían)");
     assert.equal((await avisosDe(CALLADA, "administra"))[1]?.activo, true);
     assert.equal((await avisosDe(ADMINISTRA, "administra"))[1]?.activo, false);
     assert.deepEqual(await avisosDe(EDITA, "edita"), [{ aviso: "contacto", activo: true }]);
+    // Guardar lo mismo otra vez no cambia nada, y la acción no lo anota en la actividad.
+    assert.deepEqual(await ponerQuienRecibe("cv", [CALLADA, EDITA]), { reciben: 1, cambiaron: 0 });
   } finally {
     await base.aviso.deleteMany({ where: { aviso: "cv", cuentaId: { notIn: CUENTAS.map((c) => c.id) } } });
     if (antes.length) await base.aviso.createMany({ data: antes });
