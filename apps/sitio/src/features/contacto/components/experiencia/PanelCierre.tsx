@@ -1,14 +1,17 @@
+import type { CierreDeContacto } from "@/features/contacto/contenido/cierre";
 import { CanalDirecto } from "../CanalDirecto";
 
 type Props = {
   activo: boolean;
   /** Título del tema elegido (eco de qué conversación empezó). */
   titulo: string;
+  /** Los textos del cierre, de `features/contacto/contenido/cierre.ts` o de la base. */
+  contenido: CierreDeContacto;
   onOtra: () => void;
 };
 
 /** 3 · CIERRE — al enviar: «Cada propuesta empieza con una conversación.» */
-export function PanelCierre({ activo, titulo, onOtra }: Props) {
+export function PanelCierre({ activo, titulo, contenido, onOtra }: Props) {
   return (
     <div
       data-panel="cierre"
@@ -33,11 +36,10 @@ export function PanelCierre({ activo, titulo, onOtra }: Props) {
         className="font-display text-azul-principal mt-4 max-w-[20ch] font-bold tracking-[-0.02em]"
         style={{ fontSize: "clamp(1.9rem, 1rem + 3vw, 3.2rem)", lineHeight: 1.12 }}
       >
-        Cada propuesta empieza con una conversación.
+        {contenido.titulo}
       </p>
       <p data-fin-bit className="text-gris-texto mt-6 max-w-[52ch] font-sans text-[0.98rem] leading-relaxed">
-        Recibimos tu mensaje: te vamos a responder por correo. Si preferís,
-        también podés escribirnos directo.
+        {contenido.texto}
       </p>
       <div data-fin-bit className="mt-5">
         <CanalDirecto />
@@ -48,7 +50,7 @@ export function PanelCierre({ activo, titulo, onOtra }: Props) {
         onClick={onOtra}
         className="border-azul-principal/25 text-azul-principal hover:border-verde-concepto hover:text-verde-concepto mt-9 inline-flex items-center gap-2 rounded-lg border px-6 py-3 font-sans text-[0.95rem] font-medium transition-colors"
       >
-        Hacer otra consulta
+        {contenido.boton}
       </button>
     </div>
   );
