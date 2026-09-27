@@ -46,7 +46,45 @@ test("si registrar falla, la corrida lo dice y las demás se registran igual", a
   assert.deepEqual(registradas, ["b"]);
 });
 
-test("dos tareas con la misma clave no se pueden definir", () => {
+test("dos tareas con la misma clave no se pueden definir, ni una que espera a otra que no va antes", () => {
   assert.throws(() => definirTareas([bien("a"), bien("a")]), /dos tareas con la clave «a»/);
   assert.equal(definirTareas([bien("a"), bien("b")]).length, 2);
+  assert.throws(() => definirTareas([{ ...bien("b"), despuesDe: "a" }, bien("a")]), /«b» espera a «a», que tiene que ir antes/);
+  assert.equal(definirTareas([bien("a"), { ...bien("b"), despuesDe: "a" }]).length, 2);
+});
+
+const esperar = (ms: number) => new Promise((resolver) => setTimeout(resolver, ms));
+
+test("la que espera a otra empieza cuando esa terminó, aunque haya fallado; las demás no esperan", async () => {
+  const orden: string[] = [];
+  const copia: Tarea = {
+    clave: "copia",
+    nombre: "Copia",
+    correr: async () => {
+      await esperar(30);
+      orden.push("copia");
+      throw new Error("Vercel respondió 500.");
+    },
+  };
+  const lee: Tarea = { clave: "lee", nombre: "Lee", despuesDe: "copia", correr: async () => (orden.push("lee"), { ok: true, detalle: "leyó" }) };
+  const suelta: Tarea = { clave: "suelta", nombre: "Suelta", correr: async () => (orden.push("suelta"), { ok: true, detalle: "listo" }) };
+  const corridas = await correrTareas([copia, lee, suelta], { registrar: async () => {}, limiteMs: 1000 });
+  assert.deepEqual(orden, ["suelta", "copia", "lee"]);
+  assert.deepEqual(
+    corridas.map((c) => [c.clave, c.ok]),
+    [
+      ["copia", false],
+      ["lee", true],
+      ["suelta", true],
+    ],
+  );
+});
+
+test("la espera cuenta en su tiempo: si la otra se cuelga, la corrida entera sigue cabiendo en el límite", async () => {
+  // Si el reloj arrancara recién al terminar la espera, «lee» empezaría a los 50 ms y terminaría bien a los 90.
+  const colgada: Tarea = { clave: "copia", nombre: "Copia", correr: () => new Promise(() => {}) };
+  const lee: Tarea = { clave: "lee", nombre: "Lee", despuesDe: "copia", correr: async () => (await esperar(40), { ok: true, detalle: "leyó" }) };
+  const [, esperando] = await correrTareas([colgada, lee], { registrar: async () => {}, limiteMs: 50 });
+  assert.equal(esperando.ok, false);
+  assert.match(esperando.detalle, /^No terminó en \d+ segundos\.$/);
 });
