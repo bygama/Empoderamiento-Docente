@@ -13,6 +13,8 @@ export const SIN_RED = "No hubo respuesta del servidor. Fijate la conexión y pr
 type Opciones = {
   idInicial: string | null;
   estadoInicial: EstadoDeLaFicha;
+  /** El aviso con que abre la ficha, si trae uno. */
+  avisoInicial?: AvisoDelEditor;
   /** Marca cada campo que no pasa y lleva el foco al primero. */
   mostrarErrores: (errores: ErrorDeCampo[]) => void;
 };
@@ -24,10 +26,10 @@ type Opciones = {
  * `/admin/biblioteca/[id]` sin recargar, con lo escrito en pantalla. Cada
  * guardado lleva el `borradorEn` que vio (el aviso de choque).
  */
-export function useGuardarMaterial({ idInicial, estadoInicial, mostrarErrores }: Opciones) {
+export function useGuardarMaterial({ idInicial, estadoInicial, avisoInicial, mostrarErrores }: Opciones) {
   const [id, setId] = useState(idInicial);
   const [estado, setEstado] = useState(() => estadoInicial); // Perezoso: no es una copia del prop (no-derived-useState).
-  const [aviso, setAviso] = useState<AvisoDelEditor | null>(null);
+  const [aviso, setAviso] = useState<AvisoDelEditor | null>(() => avisoInicial ?? null);
   const [pendiente, setPendiente] = useState<Pendiente>(null);
 
   /** Guarda el documento. Da el id y el `borradorEn` que quedaron, o `false` si no se pudo (y ya avisó). */
