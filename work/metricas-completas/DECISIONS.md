@@ -27,3 +27,12 @@
 - 2026-09-27 — **El ADR de esta lane es el 0017**, aprobado por el padre: el
   0016 lo toma la Biblioteca (lane 8a) en su PR. Si al rebasear el número
   choca, se concilia ahí.
+- 2026-09-27 — **La 8a entró a `main` (`d051c6a`)**, avisó el padre por el
+  buzón: «consultado N veces este mes» ya se puede hacer. Rebasé enseguida,
+  después del paso 11 y antes del 12, en vez de esperar al 17: conciliar
+  temprano es más barato. Conflictos resueltos juntando las dos partes en
+  `datos/actividad.ts`, `admin/actividad/frase.ts` (y su test),
+  `config/rutas.ts` y DESIGN.md §11 («Filtro»). Las migraciones de la 8a
+  (`…030549_biblioteca`, `…031500_material_de_las_novedades`) son anteriores a
+  la mía (`…051631`), así que la mía no se regenera. Después del rebase:
+  typecheck, lint y test (470: 469 pasan, 1 saltado) en verde.
