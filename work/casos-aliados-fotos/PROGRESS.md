@@ -371,7 +371,7 @@ factor por el log):
 - Casos: la vista previa de un borrador del caso 02 con «Estás viendo un
   borrador»; el payload de la escena trae la pregunta del borrador y no la
   publicada, y `/investigacion` sin la cookie no la tiene; «Volver al sitio
-  publicado» y descartar. (Editar y publicar, en el paso 16; el cambio de URL
+  publicado» y descartar. (Editar y publicar, en el paso 15; el cambio de URL
   con su 308, en `editar-casos.test.ts`.)
 - Inicio: las dos filas nuevas con quién ve cada una (paso 19); índice de
   Contenido y el punto de la sidebar (paso 18).
@@ -434,9 +434,96 @@ tenía 104 (el tope de §6 es 100); no se reformateó lo de Biblioteca.
   las fichas de una novedad y de un material, y queda escrita en DESIGN.md
   §11, «Ficha de una entidad»; a 390 px las dos sin desborde.
 
-**Revisión de cierre:** no se corrió desde acá. La corre el padre después del
-`worker_done` (orchestrate); los arreglos que pida vuelven como tarea a esta
-terminal.
+**Revisión de cierre:** la corre el padre después del `worker_done`
+(orchestrate). r1 (Opus 5.5, medium) dio **FAIL** por un Critical: la marca
+«Autorizado» no estaba atada al logo ni al nombre autorizados. Lo arregla la
+ronda 1, abajo; vuelve a mirarlo el mismo revisor.
+
+### Ronda de arreglos 1
+
+Sobre `fff0a717` (commits `6a788882`, `5fd5dfc5`, `56dff890`, `fff0a717`), con
+`main` en `d051c6a0`.
+
+- **Critical — la marca atada a lo que se autorizó** (`6a788882`, decisión del
+  padre en DECISIONS): `autorizado_logo` y `autorizado_nombre` en `aliados`;
+  autorizar guarda los del borrador si se puede publicar (si no, los
+  publicados) y exige que quien autoriza haya visto esos (`visto`); publicar
+  se niega a todos si difieren; `aliadosVisibles` los compara también en la
+  vista previa; la lista, la tarjeta de Contenido y la fila del Inicio cuentan
+  como sin autorizar al que cambió; la ficha muestra «Se autorizó» y «Se va a
+  autorizar» con el logo como en la tira. La migración `aliados` se regeneró
+  (`20260927060913_aliados`, el CREATE de `prisma migrate dev --create-only` y
+  la carga a mano con su comentario) y `ed_casos` se reseteó y se aplicó desde
+  cero: 25 migraciones, los cinco con su logo y su nombre como autorizados.
+  Como su fecha es posterior a todas las de `main`, el orden desde cero y el
+  de producción son el mismo.
+- **Reemplazar el logo autorizado se niega** (`5fd5dfc5`): antes de subir y
+  adentro de la transacción; la ficha de la foto lo explica en lugar del
+  control.
+- **Borrar una foto, en una transacción con `FOR UPDATE`** (`56dff890`,
+  Minor 5; la ventana que queda, en DECISIONS).
+- **Tests, uno por hueco** (`autorizacion-de-aliados.test.ts`,
+  `consultas/aliados.test.ts`, `editar-fotos.test.ts`): el escenario del
+  revisor sobre UNESCO (publicar se niega; la vista previa no lo muestra, lo
+  publicado sí); columnas publicadas con otro logo escritas directo en la
+  base (el sitio no lo muestra; con el logo autorizado, sí); autorizar guarda
+  el logo y el nombre del borrador y no autoriza lo que no se vio; quitar la
+  marca vacía las dos columnas; reemplazar el logo autorizado se niega sin
+  dejar archivo; cambiar solo la URL o el tamaño sigue publicándose.
+- **Minor 2:** «Editar y publicar, en el paso 15» (decía 16).
+
+| Comando | Resultado |
+| --- | --- |
+| `pnpm typecheck`, sin `.next`, `next-env.d.ts` ni `tsconfig.tsbuildinfo`, antes del build | exit 0 |
+| `pnpm build` | exit 0 |
+| `pnpm lint` | exit 0 |
+| `node scripts/verificar-react-doctor.mjs` | exit 0 · `react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 1041 archivos · …)` (antes, dos diagnósticos de complejidad: se partieron `AutorizacionDelAliado` y `SalidaDeLaFoto`) |
+| `pnpm test`, tres vueltas | exit 0 las tres · sitio 469 tests, 468 pass, 0 fail, 1 skip (el de Vercel) |
+
+La primera tanda de vueltas falló en `editar-aliados.test.ts`: suponía que el
+vecino del aliado de prueba era Science Up, y un aliado de una prueba a mano
+quedó al final de la tabla. `fff0a717` lo mide contra su lugar de antes.
+
+**En el navegador de Orca** (dev server en 3027; `edita` y `administra`, esta
+con segundo factor por el log):
+
+- El escenario del revisor, como `edita`: en UNESCO, nombre «Ministerio de
+  Educación» y el logo de Bloom, guardar → «Publicar» contesta «Cambió el logo
+  o el nombre desde que se autorizó: lo vuelve a autorizar quien dirige o
+  administra, mirando el nuevo.»; la lista lo muestra «Sin autorizar»; con la
+  vista previa, el pie tiene Techint, Bloom, UCSH y Science Up, sin UNESCO y
+  sin «Ministerio de Educación» en la página; se descartó el borrador y `/`
+  volvió a tener UNESCO.
+- Como `administra`, la misma ficha: el aviso, «Se autorizó» (el logo de
+  UNESCO, «UNESCO») y «Se va a autorizar» (el de Bloom, «Ministerio de
+  Educación») antes de «Autorizar este logo»; no se tocó.
+- La ficha de la foto `/aliados/unesco.png`: «Es el logo autorizado de UNESCO:
+  subí el nuevo y cambialo desde su ficha, que pide volver a autorizarlo.» y
+  sin el control de reemplazo.
+- El camino bueno, como `administra`: un aliado nuevo con el logo de Bloom →
+  «Se va a autorizar» → nota → «Autorizar este logo» → en la base
+  `/aliados/bloom.png` y el nombre → publicar → cambiar solo la URL, guardar y
+  publicar de nuevo → el link en el pie; se borró.
+- **Minor 3 — la URL de un caso:** el caso 02 pasó de
+  `resignificacion-escuelas-tecnicas` a `escuelas-tecnicas-prueba` desde su
+  ficha: «Publicado: el sitio ya lo muestra, y
+  /investigacion/casos/resignificacion-escuelas-tecnicas pasa a llevar a la URL
+  nueva.»; `/investigacion` con el ancla nueva y la vieja → **308** a la nueva.
+  Vuelto al original: una sola fila en `redirecciones` (la de prueba → la
+  original, 308), sin cadena; la original ya no redirige.
+- **Minor 4 — la fuga con `next start`:** el build de arriba en el puerto
+  3028, con un aliado sin autorizar cargado. Con la sesión de `edita`, 9
+  pantallas (Inicio, Contenido, Casos y la ficha del 01, Aliados y las fichas
+  de UNESCO y del sin autorizar, Fotos y la ficha del logo de UNESCO), cada
+  una pedida como HTML (con su payload inline) y como RSC (`text/x-component`):
+  **18 pedidos, 11 marcadores** («aliado sin autorizar», «aliados sin
+  autorizar», `aliados-sin-autorizar`, `autorizarAliados`, «Ir a Aliados»,
+  «Autorizar este logo», «Guardar la nota», «Quitar la autorización», «Dónde
+  consta la autorización» y `"puedeAutorizar":true` en sus dos escrituras):
+  **0 apariciones**. El control con la sesión de `administra`, mismos pedidos:
+  13 apariciones (la fila del Inicio en HTML y RSC, y los controles de la
+  marca en las dos fichas). El código de los componentes de cliente viaja en
+  los chunks de JS igual para todos; lo medido es lo que se renderiza.
 
 ## Abierto
 
