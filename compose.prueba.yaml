@@ -29,7 +29,7 @@ services:
           pedido.on("data", (parte) => (cuerpo += parte));
           pedido.on("end", () => {
             const c = JSON.parse(cuerpo || "{}");
-            console.log(`\n--- Para ${c.to} — ${c.subject}\n${c.text}\n`);
+            console.log("\n--- Para " + c.to + ": " + c.subject + "\n" + c.text + "\n");
             respuesta.setHeader("content-type", "application/json");
             respuesta.end(JSON.stringify({ id: "prueba-local" }));
           });
