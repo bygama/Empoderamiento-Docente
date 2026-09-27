@@ -14,7 +14,7 @@ import { VERDE_SOBRE_AZUL } from "./verde-sobre-azul";
  * derecha. Es la protagonista; su titular es el único con jerarquía de H2 en
  * la sección.
  */
-export function TapaDestacada({ n }: { n: NovedadDelSitio }) {
+export function TapaDestacada({ n, boton }: { n: NovedadDelSitio; boton: string }) {
   return (
     <article
       data-nd-card
@@ -45,7 +45,7 @@ export function TapaDestacada({ n }: { n: NovedadDelSitio }) {
             «Leer la nota» abre la ficha; si la nota no tiene cuerpo, baja
             al listado (Gastón, 2026-09-11). */}
         <LinkNota n={n} className="mt-7 inline-flex w-fit items-center gap-3 font-sans text-[0.95rem] font-medium text-white">
-          Leer la nota
+          {boton}
           <span className="group-hover:border-naranja-accion group-hover:bg-naranja-accion flex h-8 w-8 items-center justify-center rounded-full border border-white/25 transition-colors duration-300">
             <ArrowUpRight size={15} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </span>

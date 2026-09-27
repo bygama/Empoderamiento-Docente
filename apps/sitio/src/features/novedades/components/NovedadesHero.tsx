@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
+import type { HeroDeNovedades } from "@/features/novedades/contenido/hero";
 import { RotadorPalabras } from "./RotadorPalabras";
 import { SplitFlap } from "./SplitFlap";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
@@ -33,8 +34,9 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 // La fecha del tablero es la de la novedad más nueva, con la precisión que
 // trae (día·mes·año, mes·año o solo año): antes era un string fijo y quedó
 // mostrando la fecha de una nota inventada (Gastón, 2026-09-11). Sin
-// novedades (sin base), el tablero no se muestra.
-export function NovedadesHero({ fechaDeLaUltima }: { fechaDeLaUltima: string | null }) {
+// novedades (sin base), el tablero no se muestra. Los textos llegan por props
+// (de `features/novedades/contenido/hero.ts` o de la base).
+export function NovedadesHero({ contenido, fechaDeLaUltima }: { contenido: HeroDeNovedades; fechaDeLaUltima: string | null }) {
   const ultima = fechaDeLaUltima?.split("-").reverse().join("·");
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -94,22 +96,16 @@ export function NovedadesHero({ fechaDeLaUltima }: { fechaDeLaUltima: string | n
         >
           {/* El texto accesible es ESTABLE (sr-only): el rotador visual es
               aria-hidden y no anuncia cada giro al lector de pantalla. */}
-          <span className="sr-only">Siempre hay novedades.</span>
+          <span className="sr-only">{`${contenido.titulo} ${contenido.palabras[0]}`}</span>
           <span aria-hidden="true" className="block overflow-hidden pb-[0.06em]">
             <span data-nh-word className="block">
-              Siempre hay
+              {contenido.titulo}
             </span>
           </span>
           {/* Sin máscara de subida: esta línea ENTRA girando como tablero y
               frena cuando el haz del faro cruza el centro (~0.95s). */}
           <RotadorPalabras
-            words={[
-              "novedades.",
-              "publicaciones.",
-              "encuentros.",
-              "convocatorias.",
-              "prensa.",
-            ]}
+            words={contenido.palabras}
             settleDelay={0.95}
             className="text-verde-concepto block"
           />
@@ -119,7 +115,7 @@ export function NovedadesHero({ fechaDeLaUltima }: { fechaDeLaUltima: string | n
           data-nh-rise
           className="mt-7 max-w-[54ch] font-sans text-[1.05rem] leading-relaxed text-white/85 md:text-[1.2rem]"
         >
-          Seguí de cerca lo que investigamos, diseñamos y llevamos al aula.
+          {contenido.bajada}
         </p>
 
         {/* Tablero "en vivo": punto verde latiendo + última fecha que gira.
@@ -135,7 +131,7 @@ export function NovedadesHero({ fechaDeLaUltima }: { fechaDeLaUltima: string | n
                 la frase queda centrada en sí misma, como la fecha de abajo. */}
             <span className="relative whitespace-nowrap">
               <span className="bg-verde-concepto absolute top-1/2 -left-5 h-2 w-2 -translate-y-1/2 animate-pulse rounded-full" />
-              Última actualización
+              {contenido.etiquetaDeLaFecha}
             </span>
             <SplitFlap text={ultima} charset="digits" trigger="mount" className="text-white" />
           </div>

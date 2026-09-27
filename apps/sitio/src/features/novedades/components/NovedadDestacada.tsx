@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
+import type { DestacadasDeNovedades } from "@/features/novedades/contenido/destacadas";
 import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -49,9 +50,10 @@ if (typeof window !== "undefined") {
  * color-mix sobre el azul para pasar AA en texto chico. Profundidad con borde
  * azul-claro sutil + una sola sombra para el lift de la card montada.
  *
- * Sin novedades (sin base), no se dibuja.
+ * Sin novedades (sin base), no se dibuja. Los textos de la sección llegan por
+ * props (de `features/novedades/contenido/destacadas.ts` o de la base).
  */
-export function NovedadDestacada({ novedades }: { novedades: readonly NovedadDelSitio[] }) {
+export function NovedadDestacada({ contenido, novedades }: { contenido: DestacadasDeNovedades; novedades: readonly NovedadDelSitio[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -109,11 +111,11 @@ export function NovedadDestacada({ novedades }: { novedades: readonly NovedadDel
               señal del faro del hero. */}
           <div className="text-azul-claro/90 mb-8 flex items-center gap-3 font-mono text-[0.74rem] tracking-[0.2em] uppercase md:mb-10">
             <span className="bg-verde-concepto h-2 w-2 animate-pulse rounded-full" />
-            <ScrambleText text="Novedades destacadas" duration={1000} />
+            <ScrambleText text={contenido.titulo} duration={1000} />
           </div>
 
-          <TapaDestacada n={principal} />
-          {segunda && <SegundaDestacada n={segunda} />}
+          <TapaDestacada n={principal} boton={contenido.boton} />
+          {segunda && <SegundaDestacada n={segunda} boton={contenido.boton} />}
         </div>
       </div>
     </section>
