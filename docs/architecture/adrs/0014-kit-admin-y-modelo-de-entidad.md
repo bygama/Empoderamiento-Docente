@@ -65,6 +65,10 @@ carga el kit y no hay dos definiciones.
   `armazon/Boton.tsx`, `armazon/clases.ts` y el `Aviso` de `armazon/Campos.tsx`
   re-exportan del kit con un comentario de una línea que dice que se van con
   esa mudanza.
+  **Hecha el 2026-09-27**, al cerrar el mapa del admin: lo del armazón que no
+  sabe de ED pasó al kit, los tres puentes se borraron, y en la app quedó lo
+  que sí (la sidebar, la guarda, el tema, la pantalla de acceso y lo que
+  depende de `lib/contenido/`).
 - **Sin dependencias nuevas:** `react`, `react-dom` y `next` son
   `peerDependencies`; las herramientas, las del lockfile. El kit está en las
   dos listas del gate (AGENTS.md §5.8) y da 100/100 como los demás.

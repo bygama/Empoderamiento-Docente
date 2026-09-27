@@ -398,9 +398,11 @@ Hasta tenerlos en el repo, usar placeholder textual o el favicon de Next.js.
 El admin (`/admin`) es una herramienta de trabajo, no una pieza de marca: lo
 usa el equipo de ED unas pocas veces por mes, y pesa más la claridad que la
 velocidad. Usa la paleta y las fuentes de la marca con estas reglas propias.
-Las piezas viven en `apps/sitio/src/admin/armazon/` y no saben nada de ED;
-los controles de un formulario, en `packages/kit-admin/`, que tampoco, y
-cuyo README dice qué tokens espera de la app que lo usa.
+Las piezas que no saben nada de ED —los controles de un formulario y las de
+una pantalla— viven en `packages/kit-admin/`, cuyo README dice qué tokens
+espera de la app que lo usa; lo que sabe de ED (la sidebar, la guarda, «Sin
+permiso», la pantalla de acceso, el tema, «Qué cambió» y «Cómo se ve») se
+queda en `apps/sitio/src/admin/armazon/`.
 Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
 sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
 índice de tarjetas, la lista, el estado vacío y la pantalla de acceso nueva,
@@ -460,7 +462,7 @@ valores del claro, así que donde abajo dice «claro» vale para los dos.
 ### El número
 
 Cuántos de algo esperan, en una entrada de la sidebar o en una pestaña.
-`apps/sitio/src/admin/armazon/Numero.tsx`.
+`packages/kit-admin/src/Numero.tsx`.
 
 - **Una pastilla** `rounded-full`, 20 px de alto y de ancho mínimo, `px-1.5`,
   en meta medium con cifras tabulares: relleno `azul-principal` y el número
@@ -612,7 +614,7 @@ Fondo blanco con un divisor inferior; si es fijo, queda `sticky` arriba.
 ### Volver
 
 La vuelta de un detalle a su lista: «← Contacto».
-`apps/sitio/src/admin/armazon/Volver.tsx`, en el slot `volver` del
+`packages/kit-admin/src/Volver.tsx`, en el slot `volver` del
 encabezado.
 
 - **Arriba del título, adentro del encabezado**, donde el editor lleva sus
@@ -632,7 +634,7 @@ encabezado.
 
 Borrar algo para siempre («Borrar ahora») pide confirmación, **en el lugar
 del botón** y no en un diálogo del navegador, que no se puede estilar y
-frena todo. `apps/sitio/src/admin/armazon/Confirmacion.tsx`.
+frena todo. `packages/kit-admin/src/Confirmacion.tsx`.
 
 - **Un grupo con la pregunta** en meta medium `rojo-error` (6,57:1) y un
   borde izquierdo del mismo color, «Sí, borrar» destructivo y «Cancelar»
@@ -660,7 +662,7 @@ suya: «SEO · Inicio · Páginas · Admin ED».
 ### Pestañas
 
 Las pantallas de un módulo, cuando tiene más de una (el tercer nivel del
-menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
+menú). `packages/kit-admin/src/Pestanas.tsx`.
 
 - **Son links, no el patrón ARIA de tabs:** navegan. Un `nav` con el nombre
   del módulo como `aria-label`, una lista, y la activa con
@@ -702,7 +704,7 @@ menú). `apps/sitio/src/admin/armazon/Pestanas.tsx`.
 
 La puerta de un módulo con varias pantallas: una grilla de tarjetas (una
 columna, dos desde `sm`, tres desde `lg`).
-`apps/sitio/src/admin/armazon/IndiceDeTarjetas.tsx`.
+`packages/kit-admin/src/IndiceDeTarjetas.tsx`.
 
 - **Cada tarjeta entera es el link.** El link es el nombre, y su `::after` se
   estira sobre la tarjeta: se toca en cualquier lado, pero el lector de
@@ -782,7 +784,7 @@ oscuro. Sobre blanco, un logo blanco desaparecería.
 ### Lista
 
 Filas separadas por un divisor, en una caja con el mismo borde
-(`azul-claro/60`, `rounded-xl`). `apps/sitio/src/admin/armazon/Lista.tsx`.
+(`azul-claro/60`, `rounded-xl`). `packages/kit-admin/src/Lista.tsx`.
 
 - **Cada fila:** a la izquierda lo principal (cuerpo medium
   `azul-principal`, con lo que haga falta al lado en meta `gris-texto`) y una
@@ -819,7 +821,7 @@ Filas separadas por un divisor, en una caja con el mismo borde
 
 ### Lista que se ordena
 
-Una `Lista` cuyo orden es el del sitio. `apps/sitio/src/admin/armazon/ListaQueSeOrdena.tsx`
+Una `Lista` cuyo orden es el del sitio. `packages/kit-admin/src/ListaQueSeOrdena.tsx`
 (los botones y el anuncio) y `useMoverEnOrden.ts` (el movimiento).
 
 - **Se mueve con «Subir» y «Bajar»**, terciarios, en cada fila y antes de la
@@ -851,7 +853,7 @@ Una `Lista` cuyo orden es el del sitio. `apps/sitio/src/admin/armazon/ListaQueSe
 La misma lista recortada por un valor que va en la URL (los estados de una
 bandeja: `?estado=en-curso`). No son pantallas del módulo, así que no son
 pestañas: van debajo del encabezado, a la izquierda del buscador.
-`apps/sitio/src/admin/armazon/Filtro.tsx`.
+`packages/kit-admin/src/Filtro.tsx`.
 
 - **Píldoras que son links**, en un `nav` con su `aria-label` («Estado de
   los mensajes») y la activa con `aria-current="page"`. La activa la dice
@@ -874,7 +876,7 @@ pestañas: van debajo del encabezado, a la izquierda del buscador.
 ### Buscador
 
 Una caja en las listas largas, a la derecha del filtro.
-`apps/sitio/src/admin/armazon/Buscador.tsx`.
+`packages/kit-admin/src/Buscador.tsx`.
 
 - **Un formulario GET con `role="search"`**, sin JavaScript: lo buscado
   queda en la URL (`?q=`) y conserva lo demás (el estado). Su nombre
@@ -892,7 +894,7 @@ Una caja en las listas largas, a la derecha del filtro.
 ### Paginado
 
 Las páginas de una lista paginada en el servidor.
-`apps/sitio/src/admin/armazon/Paginado.tsx`.
+`packages/kit-admin/src/Paginado.tsx`.
 
 - **«Más nuevas» · «Página 2 de 7» · «Más viejas»**: las listas largas del
   admin van de la más nueva a la más vieja, y así se dice. Los dos son links
@@ -905,7 +907,7 @@ Las páginas de una lista paginada en el servidor.
 ### Tabla
 
 Para lo que se lee cruzando filas y columnas; una lista de cosas es una
-`Lista`, no una tabla. `apps/sitio/src/admin/armazon/Tabla.tsx`: nació con
+`Lista`, no una tabla. `packages/kit-admin/src/Tabla.tsx`: nació con
 la de permisos y subió al armazón con su segunda, las de Ajustes › SEO.
 
 - **La caja de la `Lista`:** borde `azul-claro/60`, `rounded-xl`, filas
@@ -932,7 +934,7 @@ la de permisos y subió al armazón con su segunda, las de Ajustes › SEO.
 Donde todavía no hay nada: qué pasa, en el título (cuerpo medium), y qué
 hacer, en una frase en meta `gris-texto` (4,83:1 · 7,08:1). Borde punteado
 `azul-claro`, decorativo, `rounded-xl`, `p-6`: dice «acá va a haber algo» sin
-competir con el contenido. `apps/sitio/src/admin/armazon/EstadoVacio.tsx`.
+competir con el contenido. `packages/kit-admin/src/EstadoVacio.tsx`.
 
 - **Con una acción**, cuando la pantalla vacía tiene algo para hacer: debajo
   de la frase, y es el primario de la pantalla, así que el encabezado no lo
@@ -983,7 +985,7 @@ no se la muestra, así que llega por un link viejo o tipeando.
 
 Una pantalla de ajustes partida en apartados: a la izquierda qué es y **qué
 pasa si se toca**; a la derecha, lo que se toca.
-`apps/sitio/src/admin/armazon/Apartado.tsx`.
+`packages/kit-admin/src/Apartado.tsx`.
 
 - **Desde `lg`, dos columnas**: un tercio con el título en
   `text-admin-seccion` y una frase en meta `gris-texto` (4,83:1 · 7,08:1),
@@ -1125,7 +1127,7 @@ subir otra. `packages/kit-admin/src/CampoFoto.tsx` y sus piezas en
 ### Cifra
 
 Una cifra con su comparación: la etiqueta, el número y cómo le fue contra el
-período anterior. `apps/sitio/src/admin/armazon/Cifra.tsx`. No confundir con
+período anterior. `packages/kit-admin/src/Cifra.tsx`. No confundir con
 «El número», la pastilla con la cuenta de sin leer.
 
 - **Adentro:** la etiqueta en meta `gris-texto` (4,83:1 · 7,08:1 en el
@@ -1155,7 +1157,7 @@ el admin muestra un gráfico solo donde una lista no alcanza. Sin
 dependencias: SVG y HTML dibujados en el servidor. Sin verde ni naranja: una
 sola serie, en la familia azul.
 
-- **La curva** (`apps/sitio/src/admin/armazon/Curva.tsx`): una serie por
+- **La curva** (`packages/kit-admin/src/Curva.tsx`): una serie por
   día. La línea de 2 px en `azul-medio` (5,11:1 · 7,14:1 en el oscuro: más
   de 3:1, como pide un objeto gráfico), el área debajo en `azul-claro/30` y
   la grilla (el piso, la mitad y el tope) en `azul-claro/60`, las dos
@@ -1393,7 +1395,7 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
 - Primer consumidor: Novedades. Las entidades que siguen (materiales, casos,
   equipo) la repiten con sus campos.
 - **Segundo consumidor: un material** (2026-09-27, `work/biblioteca/`), con
-  las acciones de la ficha compartidas (`admin/armazon/AccionesDeLaFicha.tsx`)
+  las acciones de la ficha compartidas (`packages/kit-admin/src/AccionesDeLaFicha.tsx`)
   y tres piezas que suma:
   - **La imagen generada con «Usar otra»** vale también para la portada: sin
     una propia, la ficha muestra la tipográfica generada en vivo (240 px,
