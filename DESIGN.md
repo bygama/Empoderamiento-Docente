@@ -817,6 +817,29 @@ Filas separadas por un divisor, en una caja con el mismo borde
   aparte, y «Borrar», destructivo, que confirma en el lugar
   (`work/metricas-completas/`).
 
+### Lista que se ordena
+
+Una `Lista` cuyo orden es el del sitio. `apps/sitio/src/admin/armazon/ListaQueSeOrdena.tsx`
+(los botones y el anuncio) y `useMoverEnOrden.ts` (el movimiento).
+
+- **Se mueve con «Subir» y «Bajar»**, terciarios, en cada fila y antes de la
+  acción que navega, con el nombre y dónde para el lector («Subir Iván Pérez
+  en su nivel»). No se arrastra: el teclado, el lector y la pantalla táctil
+  llegan igual. En una punta, el botón que no va no está.
+- **Un paso por clic, aplicado en el momento**: el orden no va al borrador,
+  porque es de la lista y no de una fila, y cambia el sitio al toque. Mientras
+  se mueve, todos los botones de mover quedan deshabilitados.
+- **El foco sigue a la fila** a su lugar nuevo: al mismo botón, o al otro si
+  quedó en una punta. Un `status` lo anuncia («Judith Hernández pasó al
+  lugar 1 de Líderes de área y proyecto.»); si no salió, un aviso de error
+  arriba de la lista.
+- **Agrupada**, cuando el orden es dentro de un grupo: cada grupo es una
+  sección con su título en `text-admin-seccion` y, si hace falta, una línea
+  en meta `gris-texto` que lo explica, y se mueve dentro de su grupo. Un
+  grupo sin filas no está.
+- Primer consumidor: la tira de aliados (`work/casos-aliados-fotos/`); con el
+  Equipo, agrupado por nivel, subió a regla el 2026-09-27 (`work/equipo/`).
+
 ### Filtro
 
 La misma lista recortada por un valor que va en la URL (los estados de una
@@ -1393,8 +1416,7 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
 - **Los aliados** (`admin/aliados/`) la repiten entera, con dos insignias en
   el encabezado (la autorización y la publicación) y la autorización aparte
   («Logo de aliado»). Su lista no tiene pestañas ni buscador: son pocos y el
-  orden es el de la tira, con «Subir» y «Bajar» terciarios en cada fila; al
-  mover, el foco sigue al aliado y un `status` lo anuncia.
+  orden es el de la tira: una «Lista que se ordena».
 - **Los perfiles del Equipo** (`admin/equipo/`, `work/equipo/`) la repiten
   entera. Su encabezado y el de un material eran el mismo árbol (lo marcó
   react-doctor), así que viven en el armazón como `EncabezadoDeFicha`: el
@@ -1404,7 +1426,9 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
   casilla del bloque anterior («Tiene recorrido»): sin ella no está, y sacarla
   no borra nada hasta guardar. «En la Biblioteca» es una `Lista` de solo
   lectura con «Abrir» en cada fila y «Agregar en Biblioteca», secundario,
-  debajo.
+  debajo. Su lista es una «Lista que se ordena» agrupada por nivel, con
+  miniatura (la foto de la tarjeta; sin foto, el ícono de persona) y la
+  insignia solo si pide atención, como en la Biblioteca.
 
 ### Agregar con datos de afuera
 
