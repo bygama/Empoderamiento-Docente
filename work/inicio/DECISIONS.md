@@ -28,8 +28,8 @@
 - 2026-09-26 — **Sin «Ver toda la actividad»** (paso 6): la 3b no está en
   `main` (`git log HEAD..origin/main` vacío), así que lo suma ella, por la
   regla del padre. Se vuelve a mirar al rebasear.
-- 2026-09-26 — **Lo que cambió al mirar las capturas** (`85ae2b1`,
-  `e9c9969`): la semana va apilada en el celular y en la columna de la
+- 2026-09-26 — **Lo que cambió al mirar las capturas** (`c7243fc`,
+  `10a365a`): la semana va apilada en el celular y en la columna de la
   derecha (de a dos, «Materiales consultados» bajaba de línea y dejaba los
   números a distinta altura) y de a dos solo entre `sm` y `lg`; la segunda
   fila de la grilla es flexible (con quien edita, la semana es más alta que
@@ -49,3 +49,12 @@
   `ShowWindow` de Win32, se sacaron las capturas y se volvió a minimizar. Una
   vez, con la pestaña como activa global, otro worker (el 3019, `mensajes`)
   la navegó con un `orca goto` sin `--page`: desde ahí todo va con `--page`.
+- 2026-09-26 — **Rebase antes del PR, sobre la 4a mergeada** (`48ed711`):
+  por la regla del padre, lo concilia el que se mergea segundo. Sus tres
+  tipos (`publico-una-pagina`, `descarto-un-borrador`,
+  `restauro-una-version`) van con `editarContenido` en `QUIEN_VE` —son
+  contenido, y el SPEC padre §3 le da a quien edita el Inicio «sin filas de
+  CV ni de ajustes», no sin contenido— y se leen «Raquel Ayala publicó
+  Inicio», «… descartó el borrador de Inicio», «… restauró una versión de
+  Inicio». «Lo nuevo desde tu visita» sigue leyendo `paginas.publicadoEn`
+  (sigue siendo verdad y no depende de que cada acción anote).
