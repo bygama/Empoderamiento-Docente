@@ -8,6 +8,7 @@ import { ComoTrabajamos } from "@/features/home/components/ComoTrabajamos";
 import { LineasAccion } from "@/features/home/components/LineasAccion";
 import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNovedades";
 import { areasDeInicio, ideasDelMetodo } from "@/features/home/contenido/compartido";
+import { NOVEDADES_EN_EL_INICIO } from "@/features/novedades/contenido/modelo";
 import { metadataDeSeo } from "@/lib/contenido/seo";
 
 // El título, la descripción y la imagen para redes salen del SEO de la página
@@ -44,7 +45,7 @@ export default async function Home() {
           original, después de «Cómo trabajamos» (2026-09-09). */}
       <LineasAccion contenido={areas} areas={areasDeInicio(queHacemos.areas)} />
       {/* Las cuatro novedades más nuevas: la lista ya viene en orden. */}
-      <BibliotecaNovedades contenido={bibliotecaYNovedades} ultimasNovedades={novedades.slice(0, 4)} />
+      <BibliotecaNovedades contenido={bibliotecaYNovedades} ultimasNovedades={novedades.slice(0, NOVEDADES_EN_EL_INICIO)} />
     </main>
   );
 }

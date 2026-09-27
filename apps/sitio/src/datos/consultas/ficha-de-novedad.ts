@@ -26,8 +26,8 @@ export type FichaDeNovedad = {
   estado: EstadoDeLaFicha;
 };
 
-/** Lo que la ficha necesita de las demás: cuál es la destacada, y las fechas de las publicadas para «Se ve en». */
-export type Vecinas = { destacada: { id: string; titulo: string } | null; publicadas: Array<{ id: string; fecha: string }> };
+/** Lo que la ficha necesita de las demás: cuál es la destacada, y la fecha y el slug de las publicadas para «Se ve en» (el orden del sitio). */
+export type Vecinas = { destacada: { id: string; titulo: string } | null; publicadas: Array<{ id: string; fecha: string; slug: string }> };
 
 // `en-CA` porque da AAAA-MM-DD; la zona es la de ED (la del sitio, en español rioplatense).
 const DIA_EN_ARGENTINA = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
@@ -58,10 +58,10 @@ export async function fichaDeNovedad(id: string): Promise<FichaDeNovedad | null>
 }
 
 export async function vecinasDe(): Promise<Vecinas> {
-  const publicadas = await base.novedad.findMany({ where: { publicada: true }, select: { id: true, fecha: true, destacada: true, titulo: true, borrador: true } });
+  const publicadas = await base.novedad.findMany({ where: { publicada: true }, select: { id: true, fecha: true, slug: true, destacada: true, titulo: true, borrador: true } });
   const destacada = publicadas.find((n) => n.destacada);
   return {
     destacada: destacada ? { id: destacada.id, titulo: tituloDe(destacada) } : null,
-    publicadas: publicadas.map((n) => ({ id: n.id, fecha: n.fecha ?? "" })),
+    publicadas: publicadas.map((n) => ({ id: n.id, fecha: n.fecha ?? "", slug: n.slug ?? "" })),
   };
 }
