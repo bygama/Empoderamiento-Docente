@@ -1,6 +1,7 @@
 import { estadoDeBusquedas, totalDeBusquedas, type EstadoDeBusquedas } from "@/datos/consultas/busquedas";
 import { estadoDeMetricas, tarjetaDe, type EstadoDeMetricas, type Tarjeta } from "@/datos/consultas/metricas";
 import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
+import { cvRecibidos } from "./de-los-mensajes";
 import type { Agregado } from "@/lib/busquedas/lecturas";
 import { sumarDias, variacion } from "@/lib/metricas/periodos";
 
@@ -49,6 +50,17 @@ export async function clicsSegun(
   const [actual, anterior] = await Promise.all([total(desde, estado.hastaDia), total(sumarDias(hastaAnterior, -(DIAS - 1)), hastaAnterior)]);
   const clics = actual?.clics ?? 0;
   return { valor: clics, variacion: variacion(clics, anterior ? anterior.clics : null) };
+}
+
+/**
+ * Los CV que llegaron en los últimos 7 días contra los 7 anteriores. Mensajes
+ * cuenta en el momento: acá la semana termina ahora, y un cero es un cero.
+ */
+export async function cvDeLaSemana(hoy: Date = new Date()): Promise<LecturaDeLaSemana> {
+  const semana = DIAS * 86_400_000;
+  const desde = new Date(hoy.getTime() - semana);
+  const [actual, anterior] = await Promise.all([cvRecibidos(desde, hoy), cvRecibidos(new Date(desde.getTime() - semana), desde)]);
+  return { valor: actual, variacion: variacion(actual, anterior) };
 }
 
 export async function visitantes(): Promise<LecturaDeLaSemana> {

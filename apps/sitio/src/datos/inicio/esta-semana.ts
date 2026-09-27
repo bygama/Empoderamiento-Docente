@@ -1,5 +1,5 @@
 import type { Capacidad } from "@ed/auth";
-import { clicsDeGoogle, visitantes, type LecturaDeLaSemana } from "./lecturas-de-la-semana";
+import { clicsDeGoogle, cvDeLaSemana, visitantes, type LecturaDeLaSemana } from "./lecturas-de-la-semana";
 import { enOrden, leerAisladas, visiblesPara } from "./registro";
 
 // «Esta semana» en el Inicio: cada número, los últimos 7 días con datos de su
@@ -18,8 +18,7 @@ const todaviaNo = async (): Promise<LecturaDeLaSemana> => null;
 const NUMEROS: Record<ClaveDeNumero, DefinicionDeNumero> = {
   visitantes: { etiqueta: "Visitantes", capacidad: "verMetricas", leer: visitantes },
   "clics-de-google": { etiqueta: "Clics desde Google", capacidad: "verMetricas", leer: clicsDeGoogle },
-  // Lo conecta la lane 7, mensajes, con los CV que lleguen por el formulario.
-  "cv-recibidos": { etiqueta: "CV recibidos", capacidad: "verCV", leer: todaviaNo },
+  "cv-recibidos": { etiqueta: "CV recibidos", capacidad: "verCV", leer: () => cvDeLaSemana() },
   // Lo conecta la lane 11, metricas-completas, con los contadores de Acciones.
   "materiales-consultados": { etiqueta: "Materiales consultados", capacidad: "verMetricas", leer: todaviaNo },
 };

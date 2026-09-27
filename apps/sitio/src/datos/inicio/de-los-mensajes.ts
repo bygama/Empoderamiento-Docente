@@ -29,6 +29,11 @@ export function cvQueSeBorranPronto(hoy: Date = new Date()): Promise<number> {
   });
 }
 
+/** Los CV que llegaron en `[desde, hasta)`, en cualquier estado: lo que llegó, llegó. */
+export function cvRecibidos(desde: Date, hasta: Date): Promise<number> {
+  return base.mensaje.count({ where: { bandeja: "cv", recibidoEn: { gte: desde, lt: hasta } } });
+}
+
 const nadie = (n: number) => (n === 1 ? "Nadie lo tomó todavía." : "Nadie los tomó todavía.");
 
 /** «3 CV nuevos», o `null` si no hay ninguno. */
