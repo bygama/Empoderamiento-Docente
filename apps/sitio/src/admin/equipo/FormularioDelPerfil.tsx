@@ -14,6 +14,8 @@ type Props = PropsDeBloque & {
   /** `null` mientras el perfil no se guardó nunca: todavía no firma nada. */
   id: string | null;
   vecinos: VecinosDePersona;
+  /** El slug que está en el sitio, o `null` si nunca se publicó: cambia la ayuda de la URL. */
+  slugPublicado: string | null;
 };
 
 /**
@@ -23,13 +25,13 @@ type Props = PropsDeBloque & {
  * errores del guardado caen en su lugar. Sin recorrido, los bloques que
  * cuelgan de él no están.
  */
-export function FormularioDelPerfil({ id, vecinos, ...bloque }: Props) {
+export function FormularioDelPerfil({ id, vecinos, slugPublicado, ...bloque }: Props) {
   const { form, cambiar, errores } = bloque;
   const cambiarRecorrido: CambiarRecorrido = (campo, cambio) => cambiar("recorrido", (r) => (r ? { ...r, [campo]: resolverCambio(cambio, r[campo]) } : r));
   const delRecorrido = form.recorrido ? { recorrido: form.recorrido, cambiar: cambiarRecorrido, errores } : null;
   return (
     <div className="space-y-10">
-      <BloqueDeLaTarjeta {...bloque} porNivel={vecinos.porNivel} />
+      <BloqueDeLaTarjeta {...bloque} porNivel={vecinos.porNivel} slugPublicado={slugPublicado} />
       <BloqueDelRecorrido {...bloque} cambiarRecorrido={cambiarRecorrido} />
       {delRecorrido ? (
         <>

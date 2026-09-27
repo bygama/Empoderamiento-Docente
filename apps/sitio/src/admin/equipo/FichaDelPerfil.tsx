@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { desdeTexto } from "@ed/db/slug";
 import { resolverCambio } from "@ed/kit-admin";
 import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
@@ -36,6 +37,8 @@ export function FichaDelPerfil({ ficha, vecinos }: Props) {
   const [form, setForm] = useState(() => aFormulario(ficha.documento));
   const [guardado, setGuardado] = useState(() => (ficha.id ? ficha.documento : personaVacia()));
   const [publicado, setPublicado] = useState<BorradorDePersona | null>(() => ficha.publicado);
+  // La URL sigue al nombre hasta que alguien la escribe, o hasta que se publica (como la de una novedad).
+  const [urlAMano, setUrlAMano] = useState(() => ficha.publicado !== null || (ficha.documento.slug !== "" && ficha.documento.slug !== desdeTexto(ficha.documento.nombre)));
   const documento = aDocumento(form);
   const haySinGuardar = !mismoDocumento(documento, guardado);
   const soltarSalida = useFrenarSalida(haySinGuardar);
@@ -45,7 +48,12 @@ export function FichaDelPerfil({ ficha, vecinos }: Props) {
 
   const cambiar: CambiarPerfil = (campo, cambio) => {
     errores.contexto.limpiar(String(campo));
-    setForm((actual) => ({ ...actual, [campo]: resolverCambio(cambio, actual[campo]) }));
+    if (campo === "slug") setUrlAMano(true);
+    setForm((actual) => {
+      const nuevo = { ...actual, [campo]: resolverCambio(cambio, actual[campo]) };
+      if (campo === "nombre" && !urlAMano) nuevo.slug = desdeTexto(nuevo.nombre);
+      return nuevo;
+    });
   };
 
   /** Guarda lo que hay en pantalla. Da el id y el `borradorEn`, o `false`. */
@@ -78,7 +86,10 @@ export function FichaDelPerfil({ ficha, vecinos }: Props) {
     mostrarErrores: errores.mostrar,
     preparar,
     nadaParaPublicar: Boolean(id && estado.publicado && !estado.borradorEn && !haySinGuardar),
-    alPublicarse: () => setPublicado(documento),
+    alPublicarse: () => {
+      setPublicado(documento);
+      setUrlAMano(true);
+    },
   });
   const salida = useSalidaDelPerfil({
     estado,
@@ -116,7 +127,7 @@ export function FichaDelPerfil({ ficha, vecinos }: Props) {
       />
       {/* Desde `xl`, el panel ocupa las dos filas de la derecha; la segunda fila se lleva el sobrante, así «Qué cambió» no se despega del formulario. */}
       <div className="grid items-start gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,48rem)_22rem] xl:grid-rows-[auto_1fr]">
-        <FormularioDelPerfil form={form} cambiar={cambiar} errores={errores.contexto.errores} id={id} vecinos={vecinos} />
+        <FormularioDelPerfil form={form} cambiar={cambiar} errores={errores.contexto.errores} id={id} vecinos={vecinos} slugPublicado={publicado?.slug ?? null} />
         <div className="xl:col-start-2 xl:row-span-2 xl:row-start-1">
           <PanelDelPerfil nivel={form.nivel} conRecorrido={form.recorrido !== null} slugPublicado={estado.publicado && publicado ? publicado.slug : null} />
         </div>
