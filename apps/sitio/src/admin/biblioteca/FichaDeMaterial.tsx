@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { resolverCambio } from "@ed/kit-admin";
-import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
+import { AvisoDeLaAccion, type AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
 import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { materialesParecidos } from "@/datos/acciones/buscar-datos";
@@ -32,6 +32,8 @@ type Props = {
   origenInicial?: Origen;
   /** Los materiales con un título parecido que encontró «Buscar datos». */
   parecidosIniciales?: readonly Vecino[];
+  /** Lo que la ficha dice al abrirse: que la persona del Equipo que llegó no está entre los autores. */
+  avisoInicial?: AvisoDelEditor;
 };
 
 /**
@@ -42,7 +44,7 @@ type Props = {
  * «Cambios sin guardar» es el documento en pantalla contra el último
  * guardado, y frena la salida.
  */
-export function FichaDeMaterial({ ficha, vecinos, origenInicial = {}, parecidosIniciales = [] }: Props) {
+export function FichaDeMaterial({ ficha, vecinos, origenInicial = {}, parecidosIniciales = [], avisoInicial }: Props) {
   const [form, setForm] = useState(() => aFormulario(ficha.documento));
   // Lo último guardado: en `/nuevo`, nada, así lo que vino de «Buscar datos» ya cuenta como sin guardar.
   const [guardado, setGuardado] = useState(() => (ficha.id ? ficha.documento : borradorVacio()));
@@ -54,7 +56,7 @@ export function FichaDeMaterial({ ficha, vecinos, origenInicial = {}, parecidosI
   const soltarSalida = useFrenarSalida(haySinGuardar);
   const errores = useErroresDelEditor();
   const portadaGenerada = usePortadaGenerada(form);
-  const g = useGuardarMaterial({ idInicial: ficha.id, estadoInicial: ficha.estado, mostrarErrores: errores.mostrar });
+  const g = useGuardarMaterial({ idInicial: ficha.id, estadoInicial: ficha.estado, avisoInicial, mostrarErrores: errores.mostrar });
   const { id, estado, setAviso, pendiente, setPendiente } = g;
   const opciones = opcionesDeLaFicha(vecinos, id, form.destacado);
 

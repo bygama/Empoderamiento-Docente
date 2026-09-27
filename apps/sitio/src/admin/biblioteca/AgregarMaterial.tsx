@@ -3,19 +3,35 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Aviso, Boton, TextoCorto } from "@ed/kit-admin";
+import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { buscarDatosDeMaterial } from "@/datos/acciones/buscar-datos";
 import type { Vecino } from "@/datos/biblioteca/contra-la-biblioteca";
+import type { PersonaParaAutoria } from "@/datos/consultas/equipo-del-admin";
 import type { Vecinos } from "@/datos/consultas/ficha-de-material";
 import type { BorradorDeMaterial } from "@/features/biblioteca/contenido/material";
 import { borradorVacio } from "@/features/biblioteca/contenido/modelo";
 import { FichaDeMaterial } from "./FichaDeMaterial";
 import type { Origen } from "./formulario";
+import { vincularPersona } from "./vincular-persona";
 
 const ESTADO_NUEVO = { publicado: false, publicadoEn: null, publicadoPor: null, borradorEn: null, borradorPor: null };
 
-type Encontrado = { documento: BorradorDeMaterial; origen: Origen; parecidos: readonly Vecino[] };
+type Encontrado = { documento: BorradorDeMaterial; origen: Origen; parecidos: readonly Vecino[]; aviso?: AvisoDelEditor };
 type Problema = { tipo: "error"; texto: string } | { tipo: "repetido"; material: Vecino };
+
+/**
+ * Lo que la ficha abre con la persona que llegó de su perfil: a mano, como
+ * primera autora; con datos de afuera, vinculada al autor que la nombra, o un
+ * aviso si ninguno la nombra (work/equipo/SPEC.md §7.3).
+ */
+function conLaPersona(documento: BorradorDeMaterial, persona: PersonaParaAutoria | null, aMano: boolean): Pick<Encontrado, "documento" | "aviso"> {
+  if (!persona) return { documento };
+  if (aMano) return { documento: { ...documento, autorias: [{ nombre: persona.nombreCompleto, persona: persona.id }] } };
+  const { autorias, vinculada } = vincularPersona(documento.autorias, persona);
+  if (vinculada) return { documento: { ...documento, autorias } };
+  return { documento, aviso: { ok: false, detalle: `Ningún autor de este material es ${persona.nombre}: vinculala a mano en Autores, o revisá el DOI.` } };
+}
 
 /**
  * «Agregar material» en dos pasos (SPEC §8.1 de `work/biblioteca/`): se pega
@@ -25,7 +41,7 @@ type Problema = { tipo: "error"; texto: string } | { tipo: "repetido"; material:
  * material nace recién cuando alguien toca Guardar o Publicar. Un DOI que ya
  * está no pasa al segundo paso: se ofrece abrir el que existe.
  */
-export function AgregarMaterial({ vecinos }: { vecinos: Vecinos }) {
+export function AgregarMaterial({ vecinos, persona = null }: { vecinos: Vecinos; persona?: PersonaParaAutoria | null }) {
   const [entrada, setEntrada] = useState("");
   const [buscando, setBuscando] = useState(false);
   const [aviso, setAviso] = useState<Problema | null>(null);
@@ -38,6 +54,7 @@ export function AgregarMaterial({ vecinos }: { vecinos: Vecinos }) {
         vecinos={vecinos}
         origenInicial={encontrado.origen}
         parecidosIniciales={encontrado.parecidos}
+        avisoInicial={encontrado.aviso}
       />
     );
   }
@@ -50,7 +67,7 @@ export function AgregarMaterial({ vecinos }: { vecinos: Vecinos }) {
       const r = await buscarDatosDeMaterial({ entrada });
       if (!r.ok) return setAviso({ tipo: "error", texto: r.detalle });
       if (r.repetido) return setAviso({ tipo: "repetido", material: r.repetido });
-      setEncontrado({ documento: { ...borradorVacio(), ...r.datos }, origen: r.origen, parecidos: r.parecidos });
+      setEncontrado({ ...conLaPersona({ ...borradorVacio(), ...r.datos }, persona, false), origen: r.origen, parecidos: r.parecidos });
     } catch {
       setAviso({ tipo: "error", texto: "No hubo respuesta del servidor. Fijate la conexión y probá de nuevo, o cargalo a mano." });
     } finally {
@@ -83,7 +100,7 @@ export function AgregarMaterial({ vecinos }: { vecinos: Vecinos }) {
           <Boton variante="primario" type="submit" disabled={buscando} aria-busy={buscando || undefined}>
             {buscando ? "Buscando…" : "Buscar datos"}
           </Boton>
-          <Boton variante="terciario" type="button" disabled={buscando} onClick={() => setEncontrado({ documento: borradorVacio(), origen: {}, parecidos: [] })}>
+          <Boton variante="terciario" type="button" disabled={buscando} onClick={() => setEncontrado({ ...conLaPersona(borradorVacio(), persona, true), origen: {}, parecidos: [] })}>
             Cargar a mano
           </Boton>
         </div>
