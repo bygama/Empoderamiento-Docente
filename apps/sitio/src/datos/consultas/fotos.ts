@@ -83,8 +83,8 @@ export async function paraElegir(): Promise<FotoParaElegir[]> {
   return filas.sort(masNuevaPrimero).map((f) => ({ src: f.url, alt: f.alt, ancho: f.ancho, alto: f.alto }));
 }
 
-/** Cuántas hay y cuántas sin texto alternativo: la tarjeta de Contenido y la fila del Inicio. */
-export async function resumenDeFotos(): Promise<{ total: number; sinAlt: number }> {
-  const [total, sinAltTexto] = await Promise.all([base.foto.count(), base.foto.count({ where: { alt: { equals: "" } } })]);
-  return { total, sinAlt: sinAltTexto };
+/** Cuántas hay y cuántas sin texto alternativo, con la misma vara que el filtro: la tarjeta de Contenido y la fila del Inicio. */
+export async function cuentaDeFotos(): Promise<{ total: number; sinAlt: number }> {
+  const filas = await base.foto.findMany({ select: { alt: true } });
+  return { total: filas.length, sinAlt: filas.filter(sinAlt).length };
 }

@@ -1,4 +1,6 @@
 import { puede } from "@ed/auth";
+import { listaDeAliados } from "@/datos/consultas/aliados-del-admin";
+import { listaDeCasos } from "@/datos/consultas/casos-del-admin";
 import { listaDePaginas } from "@/datos/consultas/editor-de-paginas";
 import { cuantosLinksRotos } from "@/datos/consultas/materiales-del-admin";
 import { nuevosPorBandeja } from "@/datos/consultas/mensajes";
@@ -9,13 +11,14 @@ import type { Cuenta } from "./Numero";
 import type { Tema } from "./tema";
 
 /**
- * Si alguna página tiene cambios sin publicar. Si la base no contestó, `false`:
- * la sidebar nunca voltea el admin, se dibuja igual sin el punto, y el error
- * queda en el log.
+ * Si algo de Contenido (una página, un caso, un aliado) tiene cambios sin
+ * publicar. Si la base no contestó, `false`: la sidebar nunca voltea el admin,
+ * se dibuja igual sin el punto, y el error queda en el log.
  */
-async function hayPaginasSinPublicar(): Promise<boolean> {
+async function hayContenidoSinPublicar(): Promise<boolean> {
   try {
-    return (await listaDePaginas()).some((f) => f.estado.borradorEn);
+    const listas = await Promise.all([listaDePaginas(), listaDeCasos(), listaDeAliados()]);
+    return listas.some((filas) => filas.some((f) => f.estado.borradorEn));
   } catch (e) {
     console.error("BarraLateral: sin el punto de «sin publicar»:", e);
     return false;
@@ -57,7 +60,7 @@ async function numerosDe(rol: unknown): Promise<Record<string, Cuenta>> {
  */
 export async function BarraLateral({ usuario, tema }: { usuario: Usuario; tema: Tema }) {
   const visibles = MODULOS.filter((m) => !m.capacidad || puede(usuario.rol, m.capacidad)).map((m) => m.clave);
-  const [sinPublicar, numeros] = await Promise.all([hayPaginasSinPublicar(), numerosDe(usuario.rol)]);
+  const [sinPublicar, numeros] = await Promise.all([hayContenidoSinPublicar(), numerosDe(usuario.rol)]);
   const conPunto = sinPublicar ? ["contenido"] : [];
   const contenido = <ContenidoDeLaBarra usuario={usuario} tema={tema} visibles={visibles} conPunto={conPunto} numeros={numeros} />;
   return (
