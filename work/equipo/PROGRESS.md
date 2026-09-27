@@ -107,6 +107,46 @@
   `/admin/contenido`), `revalidar-equipo.ts` y `abrirVistaPreviaDePersona`
   (`/quienes-somos?persona=<slug>`). `pnpm --filter sitio exec tsx --test src/datos/acciones/acciones-con-sesion.test.ts src/datos/actividad.test.ts src/admin/actividad/frase.test.ts`
   → 22 pass, 0 fail; typecheck 0; eslint 0; react-doctor 100/100.
+- **Paso 7 — la ficha: la tarjeta** (`04b733a3`): `/admin/contenido/equipo/nuevo`
+  y `/[id]` (cada una chequea `editarContenido` antes de leer),
+  `datos/consultas/ficha-de-persona.ts` (la ficha, lo que firma, quiénes
+  ocupan cada nivel), `admin/equipo/` con `FichaDelPerfil` (el molde de un
+  material), `formulario.ts` (claves estables, listas de texto en renglones,
+  la foto siempre un valor del campo), los hooks de guardar, publicar y
+  salida, `BloqueDeLaTarjeta` (nombre, rol, país, nivel con sus lugares,
+  «Sin foto», la foto, el acercamiento, la URL), `PanelDelPerfil` («Se ve
+  en»), `SalidaDelPerfil` y «Qué cambió» (`cambios.ts`, campo por campo y
+  etapa por etapa, con `cambios.test.ts` → 2 pass).
+- **Paso 8 — la ficha: el recorrido** (`bb06c883`): `BloqueDelRecorrido`
+  («Tiene recorrido», que no borra nada hasta guardar; quién es, titular,
+  bajada, formación en renglones), `CategoriasDelRecorrido`,
+  `BloqueDeLaFigura` (marco, recorte o sin foto; la foto y «apaisada») y
+  `BloqueDelCierre`.
+- **Paso 9 — la ficha: las etapas y sus publicaciones** (`e4bf7b68`,
+  `7dfe6014`): `EtapasDelRecorrido` y `EtapaDelRecorrido` (lo común y lo que
+  usa cada composición, en `etapa-del-recorrido/composiciones.ts`), con
+  `HitosDeLaEtapa`, `RamasDeLaEtapa`, `PublicacionesDeLaEtapa` y
+  `PublicacionDeLaEtapa` (de la Biblioteca —lo que firma— o sin link), y
+  `EnLaBiblioteca` (una `Lista` de lo que firma, dónde está en el recorrido,
+  «Abrir» y «Agregar en Biblioteca»). react-doctor marcó el encabezado
+  duplicado con el de un material y dos exports que no eran componentes: el
+  encabezado subió al armazón (`EncabezadoDeFicha`, el refactor aparte) y
+  los colores a `colores.ts`; queda en 100/100.
+- **Paso 10 — «Agregar en Biblioteca» con la persona elegida** (`95c5a0cc`):
+  `/admin/biblioteca/nuevo?persona=<id>` (la persona que no existe se
+  ignora), `personaParaAutoria`, `AgregarMaterial` (a mano: primera autora;
+  con datos de afuera: `vincularPersona`, palabra por palabra sin tildes ni
+  mayúsculas, o el aviso «Ningún autor de este material es…») y el aviso
+  inicial de la ficha de un material. `vincular-persona.test.ts` → 2 pass.
+- **Paso 13, en parte** (`7600dc32`, `20c58d2c`): AGENTS.md §3 y §13, el
+  README (Equipo), el spec del admin §6 y DESIGN.md §11 (el encabezado de la
+  ficha en el armazón y la lista variable anidada). Falta «Lista que se
+  ordena», que es del paso 11.
+- **El navegador de Orca, trabado** (pasos 7 a 10 sin su prueba de punta a
+  punta todavía): las pestañas del perfil aislado `equipo` se cierran solas
+  o el runtime corta la conexión en el primer `snapshot`/`eval`; con el
+  perfil `default` un `eval` anduvo una vez y la pestaña se cerró en el
+  siguiente comando. Consultado al padre (abajo).
 
 ## Abierto
 
