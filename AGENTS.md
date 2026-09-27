@@ -717,6 +717,11 @@ define al implementar cada fase.
       «Restaurar como borrador»), «Qué cambió», el aviso de choque en toda
       escritura del borrador, el error en el campo y la pestaña SEO por
       página. Las otras seis páginas la usan tal cual (spec del admin §6).
+- [x] **Páginas, fase C — Qué hacemos, Quiénes somos y lo compartido:** sus
+      once secciones y su SEO, y lo que estaba dos veces en una sola fuente:
+      las siete áreas y las frases del método viven en Qué hacemos, Inicio las
+      lee con `usa` en el registro, el editor lo avisa en las dos puntas y
+      publicar regenera todas las rutas que lo muestran.
 - [ ] **Admin, fase 2 — el kit y una entidad entera:** `packages/kit-admin` y
       novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`.
 - [ ] **Admin, fase 3 — el resto del contenido:** materiales, casos, equipo,
