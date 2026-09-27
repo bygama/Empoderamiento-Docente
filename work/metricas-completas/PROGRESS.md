@@ -16,6 +16,83 @@
 - 2026-09-27 — SPEC.md escrito (`37d2272`) y aprobado por el padre con las
   siete recomendaciones de §12 (DECISIONS). PLAN.md escrito: 19 pasos, los dos
   de la 8a al final.
+- 2026-09-27 — Los 19 pasos hechos y verificados (abajo). Lista para la
+  revisión de cierre del padre: el PR y `worker_done` salen ahora.
+
+## Verification
+
+### 2026-09-27 — L DoD — PASS (sobre `74fe1d2`, `main` en `d051c6a` sin commits nuevos)
+
+- L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
+  `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor: 100/100,
+  sin diagnósticos», apps/sitio/src: 1000 archivos · packages/db/src: 3 ·
+  packages/auth/src: 27 · packages/kit-admin/src: 19).
+- L2 behavioral: `pnpm test` → exit 0 (kit-admin 3/3, auth 46/46, sitio 483:
+  482 pasan, 0 fallan, 1 saltado —el de las respuestas grabadas de Vercel, que
+  espera a A1, como en `main`—); `pnpm build` → exit 0 («✓ Compiled
+  successfully»; `/admin/metricas{,/acciones,/busquedas,/enlaces,/origen}`,
+  `/api/contar` y `/l/[codigo]` dinámicas). Arranca: `next start -p 3129`
+  (terminal de Orca, ya cerrada) → `/l/taller-en-monterrey` con un
+  `User-Agent` de iPhone da `307`, `location:
+  /novedades/taller-en-monterrey?utm_source=linkedin&utm_medium=link&utm_campaign=taller-en-monterrey`
+  y `Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate`;
+  `/l/no-existe` → 404; `POST /api/contar` → `204` con `cache-control:
+  no-store`; sin sesión, Resumen, Origen, Qué hace la gente y Links → `307` a
+  `/admin/entrar?volver=…` y su HTML no tiene ni un link, ni una marca, ni la
+  curva (`grep -c` → 0 en las cuatro). Los permisos por rol no se prueban con
+  un rol sin permiso porque no lo hay: `verMetricas` es de los tres; cada
+  página envuelve lo que lee en `<Guarda capacidad="verMetricas">` y cada
+  acción la chequea (`acciones-con-sesion.test.ts`).
+- L3 end-to-end (navegador de Orca, dev en el 3029, `ed_metricas` sembrada con
+  poco y con mucho tráfico; dos perfiles aislados: `edita@ed.test` y
+  `admin@ed.test` con su segundo factor):
+  - Resumen, Origen, Qué hace la gente y Links: cada bloque con datos, con
+    poco dato («Todavía no hay datos suficientes» y cuánto falta) y sin copia;
+    marcas y links creados y borrados desde la pantalla, con su actividad; a
+    390 de ancho, ningún desborde en las cuatro ni en Mi cuenta.
+  - Temas: con la cookie `tema-del-admin` en oscuro, la línea de la curva es
+    `rgb(143, 176, 224)` (#8FB0E0, 7,14:1 sobre #172239), las marcas
+    `rgb(163, 174, 192)` y la pastilla `rgb(232, 238, 247)` sobre la
+    superficie; en claro y mixto, `rgb(74, 111, 165)` y `rgb(107, 114, 128)`
+    sobre blanco.
+  - Teclado: `orca keypress --key Tab` contesta `ok` y no mueve el foco (la
+    ventana de Orca no tiene foco, como `orca screenshot`), así que se auditó
+    por el DOM: los 41 controles de las cuatro pantallas son nativos (link,
+    botón, `summary`, `input`, `select`), ninguno con `tabindex=-1`, y todos
+    con su estilo de foco (`focus-visible:outline-*` del armazón, o
+    `focus:ring` de la `ENTRADA` del kit).
+  - Como quien administra: Ajustes › Avisos muestra Contacto · CV · Resumen
+    semanal; el índice dice «Resumen semanal: 0 personas» sin la alerta
+    «Nadie recibe…»; Cuentas › Actividad filtrada por «Métricas» lista
+    crear/borrar un link y agregar/borrar una marca con su frase.
+  - El resumen semanal: prendido desde Mi cuenta (queda la fila
+    `edita@ed.test|resumen-semanal|t`), la tarea corrida contra `ed_metricas`
+    con `hoy` = lunes 28/9 a las 4 UTC y un `mandar` que imprime → «Salió a 1
+    de 1 persona.», con la semana del 21 al 27, los contactos, los
+    materiales, la página más vista y la clave
+    `resumen-semanal:2026-09-28:<cuenta>`; el domingo → «Hoy no es lunes».
+    Esto encontró dos cosas, arregladas: las vistas desaparecían sin decir
+    por qué cuando faltan las variables (`74fe1d2`) y Ajustes › Avisos
+    decía del resumen «El correo no trae lo que escribieron» (`d600798`).
+- Close review: **la corre el padre** (supervised child, work-verify §4): 1
+  revisor Opus 5.5, effort medium, lente «el cambio entero contra su SPEC»,
+  al recibir `worker_done`. Marcas `high` del PLAN: pasos 1, 3, 6, 7, 11, 12,
+  14, 15 y 16.
+
+## Tried and failed
+
+- 2026-09-27 — La primera `pnpm test` de la verificación dio 1 fallo en
+  `datos/avisos.test.ts` («poner quién recibe…»: `cambiaron: 1` donde se
+  esperaba `0` en la segunda llamada). La segunda corrida pasó entera, y la
+  última también. Es una carrera entre archivos de test que corren en
+  paralelo sobre la misma base: otro archivo crea una cuenta que administra
+  (sin fila en `avisos`, así que recibe el CV de fábrica) entre las dos
+  llamadas del test. La lógica de «sin fila, lo de fábrica» es la de antes
+  para el CV, así que la carrera ya existía; queda como seguimiento.
+- 2026-09-27 — `orca screenshot` → «Screenshot timed out — the browser tab may
+  not be visible or the window may not have focus», dos veces; `orca keypress`
+  → `ok` sin mover el foco. La evidencia visual y de teclado es por sondas del
+  DOM (arriba).
 
 ## Hecho
 
