@@ -41,7 +41,10 @@ tener uno por una métrica.
    página, dónde se comparte y un nombre; el link cuenta el clic en el
    servidor y redirige con un **307** a la página con
    `utm_source=<canal>&utm_medium=link&utm_campaign=<codigo>`, así la
-   analítica de Vercel cuenta las visitas que trajo sin nada propio.
+   analítica de Vercel cuenta las visitas que trajo sin nada propio. Cuenta
+   solo un `GET`: `/l/` es una página (así su 404 es el del sitio) y no ve
+   el método, y el proxy le pasa el real en `x-ed-metodo`, pisando el que
+   venga de afuera; sin esa cabecera no cuenta nada.
 
 **Lo que no se guarda nunca**, y por qué alcanza igual:
 
@@ -96,7 +99,8 @@ persona y por lunes.
 - **La atribución de un CV a un link es corta** (arriba): la pantalla y el
   README lo dicen.
 - **Las visitas de un link dependen de Vercel** (`utm_campaign`): sin la
-  copia diaria, la pantalla las muestra «—».
+  copia diaria, o con un plan que no cuenta por UTM (Hobby, hoy), la pantalla
+  las muestra «—».
 - **Un script puede inflar los contadores** hasta el tope por IP. Es un costo
   aceptado: no hay nada que robar y el tope lo acota.
 
