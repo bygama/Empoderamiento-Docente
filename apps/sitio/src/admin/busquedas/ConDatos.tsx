@@ -2,7 +2,7 @@ import type { FilaDeBusquedas, ResumenDeBusquedas } from "@/datos/consultas/busq
 import { nombreDelPais } from "@/lib/busquedas/paises";
 import { Cifra } from "@/admin/armazon/Cifra";
 import { cifras, motivo, rutaDe } from "./formato";
-import { Seccion, type FilaDeSeccion } from "./Seccion";
+import { Seccion, type FilaDeSeccion } from "@/admin/metricas/Seccion";
 
 const filasDe = (filas: readonly FilaDeBusquedas[], nombre: (valor: string) => string): FilaDeSeccion[] =>
   filas.map((f) => ({ clave: f.valor, principal: nombre(f.valor), detalle: cifras(f) }));
