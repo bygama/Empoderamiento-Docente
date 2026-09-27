@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { cvAbierto } from "@/config/cv";
+import { camposDelCV, cvAbierto } from "@/config/cv";
+import { datosDelSitio } from "@/datos/consultas/sitio";
 import { SumateAlEquipo } from "@/features/cv/components/SumateAlEquipo";
 
 export const metadata: Metadata = {
@@ -12,13 +13,14 @@ export const metadata: Metadata = {
  * La entrada pública del CV. **Apagada hasta `CV_ABIERTO=si`**: ED todavía
  * tiene que confirmar qué datos pide y publicar la política de privacidad
  * (work/mensajes/SPEC.md §5.2). Apagada da 404 y ningún link del sitio lleva
- * acá.
+ * acá. El país se elige entre los de Ajustes › Datos del sitio.
  */
-export default function SumateAlEquipoPage() {
+export default async function SumateAlEquipoPage() {
   if (!cvAbierto()) notFound();
+  const sitio = await datosDelSitio();
   return (
     <main id="contenido" tabIndex={-1}>
-      <SumateAlEquipo />
+      <SumateAlEquipo campos={camposDelCV(sitio.paises)} />
     </main>
   );
 }

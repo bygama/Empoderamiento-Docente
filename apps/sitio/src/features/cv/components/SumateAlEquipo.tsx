@@ -1,4 +1,5 @@
 import { MathField } from "@/components/ui/MathField";
+import type { CampoDeFormulario } from "@/lib/formularios/campos";
 import { TITULO_TIPO } from "@/features/contacto/components/experiencia/estilos";
 import { FormularioCV } from "./FormularioCV";
 
@@ -8,7 +9,7 @@ import { FormularioCV } from "./FormularioCV";
  * la grilla 2/3 del formulario, con el texto a la izquierda y el panel de
  * campos a la derecha. Es del sitio: sale de DESIGN.md §1 a §10, no del admin.
  */
-export function SumateAlEquipo() {
+export function SumateAlEquipo({ campos }: { campos: readonly CampoDeFormulario[] }) {
   return (
     <section
       aria-labelledby="sumate-titulo"
@@ -27,7 +28,7 @@ export function SumateAlEquipo() {
             nosotros. Contanos quién sos y dejanos tu CV.
           </p>
         </header>
-        <FormularioCV />
+        <FormularioCV campos={campos} />
       </div>
     </section>
   );

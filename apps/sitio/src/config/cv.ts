@@ -1,5 +1,4 @@
 import type { CampoDeFormulario } from "@/lib/formularios/campos";
-import { siteConfig } from "./site";
 
 // El formulario de CV del sitio (/sumate-al-equipo) y lo que recibe /api/cv
 // (work/mensajes/SPEC.md §5.2). De esta lista salen los controles, el
@@ -17,21 +16,28 @@ import { siteConfig } from "./site";
  * `nombre` y `correo` no se sacan: sin ellos no hay a quién responder, y un
  * test lo exige. `nombre`, `correo`, `pais` y `mensaje` van a sus columnas;
  * los demás, en el orden de acá, a `datos`.
+ *
+ * El país se elige entre los de ED, que se editan en Ajustes › Datos del
+ * sitio (`datosDelSitio().paises`), más «Otro»: por eso es una función. La
+ * página y `/api/cv` le pasan la misma lista, así lo que se ofrece es lo que
+ * se acepta.
  */
-export const CAMPOS_DEL_CV = [
-  { clave: "nombre", etiqueta: "Nombre y apellido", tipo: "texto", obligatorio: true, largo: 120, autocompletar: "name" },
-  { clave: "correo", etiqueta: "Correo", tipo: "correo", obligatorio: true, autocompletar: "email" },
-  { clave: "pais", etiqueta: "País", tipo: "opcion", obligatorio: true, opciones: [...siteConfig.paises, "Otro"] },
-  {
-    clave: "nivel",
-    etiqueta: "Nivel en que enseñás",
-    tipo: "opcion",
-    obligatorio: true,
-    opciones: ["Inicial", "Primaria o básica", "Secundaria o media", "Superior o universitaria", "Formación docente", "Otro"],
-  },
-  { clave: "area", etiqueta: "Área en que enseñás", tipo: "texto", obligatorio: true, largo: 120 },
-  { clave: "mensaje", etiqueta: "Contanos algo más", tipo: "parrafo", obligatorio: false, largo: 2000 },
-] as const satisfies readonly CampoDeFormulario[];
+export function camposDelCV(paises: readonly string[]) {
+  return [
+    { clave: "nombre", etiqueta: "Nombre y apellido", tipo: "texto", obligatorio: true, largo: 120, autocompletar: "name" },
+    { clave: "correo", etiqueta: "Correo", tipo: "correo", obligatorio: true, autocompletar: "email" },
+    { clave: "pais", etiqueta: "País", tipo: "opcion", obligatorio: true, opciones: [...paises, "Otro"] },
+    {
+      clave: "nivel",
+      etiqueta: "Nivel en que enseñás",
+      tipo: "opcion",
+      obligatorio: true,
+      opciones: ["Inicial", "Primaria o básica", "Secundaria o media", "Superior o universitaria", "Formación docente", "Otro"],
+    },
+    { clave: "area", etiqueta: "Área en que enseñás", tipo: "texto", obligatorio: true, largo: 120 },
+    { clave: "mensaje", etiqueta: "Contanos algo más", tipo: "parrafo", obligatorio: false, largo: 2000 },
+  ] as const satisfies readonly CampoDeFormulario[];
+}
 
 /** Los campos que van a su propia columna de `mensajes`, y no a `datos`. */
 export const COLUMNAS_DEL_CV = ["nombre", "correo", "pais", "mensaje"] as const;

@@ -65,6 +65,16 @@ test("lo inválido vuelve con el primer problema, en llano", sinBase, async () =
   assert.equal(roto.status, 400);
 });
 
+test("el país es uno de los de Ajustes › Datos del sitio, u «Otro»", sinBase, async () => {
+  const { recibirContacto } = await import("./contacto");
+  const { datosDelSitio } = await import("@/datos/consultas/sitio");
+  const [primero] = (await datosDelSitio()).paises;
+  const inventado = await recibirContacto(pedido({ ...BIEN, pais: "Atlántida" }));
+  assert.deepEqual(await inventado.json(), { ok: false, error: "Elegí una opción de «País»." });
+  assert.equal((await recibirContacto(pedido({ ...BIEN, pais: primero }))).status, 200);
+  assert.equal((await recibirContacto(pedido({ ...BIEN, pais: "Otro" }))).status, 200);
+});
+
 test("el sexto de la misma IP en una hora recibe 429, con cuándo volver", sinBase, async () => {
   const { recibirContacto, TOPE_DE_CONTACTO } = await import("./contacto");
   const ip = `prueba-${randomUUID()}`;

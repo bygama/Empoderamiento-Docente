@@ -1,9 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { COLUMNAS_DEL_CV, CAMPOS_DEL_CV, cvAbierto } from "./cv";
+import { COLUMNAS_DEL_CV, camposDelCV, cvAbierto } from "./cv";
 
 // La lista del CV es provisoria y va a cambiar cuando ED la confirme. Lo que
 // no puede cambiar es que haya a quién responder.
+
+const CAMPOS_DEL_CV = camposDelCV(["Chile", "Perú"]);
 
 test("la lista del CV tiene nombre y correo, obligatorios", () => {
   const campo = (clave: string) => CAMPOS_DEL_CV.find((c) => c.clave === clave);
@@ -22,4 +24,8 @@ test("la entrada pública está apagada salvo CV_ABIERTO=si", () => {
   assert.equal(cvAbierto({}), false);
   assert.equal(cvAbierto({ CV_ABIERTO: "true" }), false);
   assert.equal(cvAbierto({ CV_ABIERTO: "si" }), true);
+});
+
+test("el país ofrece los países que recibe, en su orden, y «Otro»", () => {
+  assert.deepEqual(CAMPOS_DEL_CV.find((c) => c.clave === "pais")?.opciones, ["Chile", "Perú", "Otro"]);
 });

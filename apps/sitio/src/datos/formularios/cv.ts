@@ -1,12 +1,13 @@
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import { CAMPOS_DEL_CV, COLUMNAS_DEL_CV, CV_PESA_DE_MAS, MAXIMO_DEL_CV, cvAbierto } from "@/config/cv";
+import { COLUMNAS_DEL_CV, CV_PESA_DE_MAS, MAXIMO_DEL_CV, camposDelCV, cvAbierto } from "@/config/cv";
 import { almacenPrivado, type AlmacenPrivado } from "@/lib/formularios/almacen-privado";
 import { datosDe, esquemaDe, valoresDe } from "@/lib/formularios/campos";
 import { comoFormData, leerConTope } from "@/lib/formularios/cuerpo";
 import { esPdf } from "@/lib/formularios/pdf";
 import { base } from "@/datos/cliente";
-import { ESCRIBINOS, avisarDespues, dentroDelTope, demasiados, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
+import { datosDelSitio } from "@/datos/consultas/sitio";
+import { avisarDespues, dentroDelTope, demasiados, escribinosA, motivoSinDatos, noSePudo, rechazado, recibido } from "./recibir";
 
 // `POST /api/cv`: el formulario de /sumate-al-equipo (work/mensajes/SPEC.md
 // §5.2). Llega como multipart con el PDF. El archivo va al almacén privado
@@ -51,7 +52,10 @@ export async function recibirCV(pedido: Request, entorno: Entorno = process.env)
   // El campo trampa, como en Contacto: se contesta que salió bien y no se guarda nada.
   if (datos.get("web")) return recibido();
 
-  const valores = esquemaDe(CAMPOS_DEL_CV).safeParse(valoresDe(CAMPOS_DEL_CV, datos));
+  // Sin base o si la consulta tira, los datos iniciales: el formulario no se cae por esto.
+  const sitio = await datosDelSitio();
+  const campos = camposDelCV(sitio.paises);
+  const valores = esquemaDe(campos).safeParse(valoresDe(campos, datos));
   if (!valores.success) return rechazado(400, valores.error.issues[0]?.message ?? "Revisá los datos del formulario.");
   const pdf = await pdfDe(datos.get("archivo"));
   if (typeof pdf === "string") return rechazado(400, pdf);
@@ -61,11 +65,11 @@ export async function recibirCV(pedido: Request, entorno: Entorno = process.env)
     almacen = almacenDeCV(entorno);
   } catch {
     console.error("recibirCV: no hay dónde guardar los CV (falta CV_BLOB_READ_WRITE_TOKEN).");
-    return rechazado(503, `Por ahora no podemos recibir CV por acá: ${ESCRIBINOS}.`);
+    return rechazado(503, `Por ahora no podemos recibir CV por acá: ${escribinosA(sitio.correo)}.`);
   }
 
   try {
-    if (!(await dentroDelTope("cv", pedido, TOPE_DE_CV))) return demasiados();
+    if (!(await dentroDelTope("cv", pedido, TOPE_DE_CV))) return demasiados(sitio.correo);
     const id = randomUUID();
     const archivo = `cv/${id}.pdf`;
     const { nombre, correo, pais, mensaje } = valores.data;
@@ -81,7 +85,7 @@ export async function recibirCV(pedido: Request, entorno: Entorno = process.env)
           correo,
           pais: pais || null,
           mensaje: mensaje || null,
-          datos: datosDe(CAMPOS_DEL_CV, valores.data, COLUMNAS_DEL_CV),
+          datos: datosDe(campos, valores.data, COLUMNAS_DEL_CV),
           archivo,
           archivoBytes: pdf.byteLength,
         },
@@ -94,6 +98,6 @@ export async function recibirCV(pedido: Request, entorno: Entorno = process.env)
     return recibido();
   } catch (e) {
     console.error("recibirCV: no se guardó:", motivoSinDatos(e));
-    return noSePudo();
+    return noSePudo(sitio.correo);
   }
 }
