@@ -120,9 +120,9 @@ de límites de Web Analytics de Vercel, actualizada el 2026-08-25): Hobby,
   día por día, así que visitantes va «—» y la nota dice por qué. La
   comparación es solo contra un período anterior **entero**; si no, «sin
   datos previos».
-- **Sin UTM**, la consulta `campana` no se hace y las visitas de un link van
-  «—» (§6.4). Si el plan cambia, se cambia `PLAN_DE_VERCEL` y lo demás lo
-  sigue.
+- **Sin UTM**, la consulta `campana` no se hace y las visitas de un link no
+  se miden (§6.4). `PLAN_DE_VERCEL` es el único lugar para prenderlas si ED
+  cambia de plan: la copia y Links lo siguen.
 
 Los países fijos (Chile, México, Argentina) viven en `config/metricas.ts`; el
 cliente (`lib/metricas/vercel.ts`) solo aprende a pasar un `filter` y las
@@ -366,9 +366,18 @@ página lleva, quién lo creó y cuándo; las cifras de todo el tiempo —**clic
 (los de `/l/`), **visitas** (las de Vercel con ese `utm_campaign`) y **CV** (los
 `cv-envio` con ese link)—; y a la derecha **«Copiar»** (secundario, con aviso
 «Copiado» para el lector) y **«Borrar»** (destructivo, con `Confirmacion`: «¿Borrar el
-link? Si ya lo compartiste, deja de andar.»), que anota `borro-un-enlace`. Sin
-datos de Vercel, o sin UTM en el plan (§4.1), las visitas van «—», y la
-explicación del bloque lo dice. Vacía: «Todavía no hay links» y qué son.
+link? Si ya lo compartiste, deja de andar.»), que anota `borro-un-enlace`.
+Vacía: «Todavía no hay links» y qué son.
+
+**Sin visitas, se dice una vez** (ronda de cierre, aprobado por el padre): en
+Hobby, Vercel no da «UTM Parameters» (§4.1), así que las visitas de un link no
+se pueden medir; los clics (del servidor) y los CV (con el código en la URL)
+sí. Cuando las visitas no se miden, cada fila dice solo «N clics · N CV» y la
+explicación de la lista lo dice en llano, una vez: «Vercel no da de dónde
+vienen las visitas en el plan gratuito: acá se ven los clics y los CV.» (sin
+las variables de Vercel, lo mismo con su motivo). Lo decide
+`sinVisitasPorque()` en `datos/consultas/enlaces.ts`, que lee
+`PLAN_DE_VERCEL`.
 Debajo de la lista, la línea de §5.3: cuándo un CV cuenta para un link.
 
 **`/l/[codigo]`** (`app/(sitio)/l/[codigo]/page.tsx`, declarada en
@@ -430,18 +439,20 @@ contrastes en los tres temas.
   hay un mes de datos: hay 12 días») y en Mi cuenta › Avisos, debajo de la
   casilla («Empieza cuando haya un mes de datos: faltan 16 días.»).
 - **Qué trae**, la semana de lunes a domingo contra la anterior, **según el
-  rol de quien lo recibe**: visitantes, vistas, clics desde Google (si Search
-  Console está conectado), contactos enviados, CV recibidos (solo con
-  `verCV`, como el Inicio) y materiales consultados (cuando cuenten); la
-  página más vista; y «Ver las métricas». Sin nada de ninguna persona.
+  rol de quien lo recibe**: visitantes, vistas, contactos enviados, CV
+  recibidos (solo con `verCV`, como el Inicio) y materiales consultados
+  (cuando cuenten); la página más vista; y «Ver las métricas». Sin nada de
+  ninguna persona. **Sin clics de Google** (ronda de cierre): Search Console
+  llega con 2 o 3 días de atraso y la semana cerrada casi nunca los tiene;
+  un número que casi nunca está es ruido en el correo.
 - **Una sola semana para todo** (ronda de arreglos 1): la de los siete días
   antes del lunes de Chile en que sale (`semanaAntesDe`), y cada número la
   cuenta en días UTC, como se guardan las sumas: visitantes y vistas, de la
   ventana de 7 días que termina el domingo; contactos, materiales y la página
   más vista, de lunes a domingo; los CV, del lunes a las 0 al lunes siguiente
-  a las 0 (UTC). Los clics de Google, solo si Search Console ya llegó al
-  domingo; si no, «—» con el porqué (Google los da con 2 o 3 días de atraso,
-  así que el lunes a la madrugada casi siempre falta). La tarea espera a la
+  a las 0 (UTC). Contar en días UTC y no en horas de Chile es un desvío
+  aceptado por el padre: las sumas se guardan por día UTC y un número no
+  puede mezclar los dos; el desfase es de 3 horas. La tarea espera a la
   copia de Vercel de la misma corrida (`despuesDe`), que es la que escribe
   la ventana del domingo.
 - **Sale por Resend** con `mandarCorreo`, que gana un `idempotencia` opcional:

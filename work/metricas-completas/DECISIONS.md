@@ -139,3 +139,30 @@
   las migraciones de `main` (`migrate dev --create-only`): pasó de
   `20260927051631_…` a `20260927073235_contadores_enlaces_y_marcas`, con el
   SQL idéntico (`diff` vacío), y entró en su commit original.
+- 2026-09-27 — **Ronda de cierre** (revisión r2: PASS sobre `7ec4363`, con
+  tres arreglos antes del merge y una ratificación). Lo decidido:
+- 2026-09-27 — **Cada test borra solo sus filas.** El `after` de
+  `metricas-de-vercel.test.ts` borraba `metricas_diarias` y
+  `metricas_ventanas` hasta el 2001-12-31, y 1997 —donde siembra
+  `numeros-del-resumen.test.ts`, en otro proceso y a la vez— caía adentro: una
+  carrera latente entre archivos. Ahora borra los días que sus tests escriben
+  y los fines de sus ventanas, listados. Se prefirió a mudar la siembra a
+  otro año porque es la regla de filas propias: un borrado por rango vuelve a
+  pisar al próximo que siembre cerca.
+- 2026-09-27 — **Links sin visitas en Hobby, aprobado por el padre** sabiendo
+  lo que implica: en el plan gratuito las visitas de un link no se pueden
+  medir; los clics (contados en el servidor) y los CV (con el código en la
+  URL) sí. La condición: donde iba «—» en cada fila, la pantalla lo dice en
+  llano **una vez** —«Vercel no da de dónde vienen las visitas en el plan
+  gratuito: acá se ven los clics y los CV.»— y las filas dicen solo clics y
+  CV. `PLAN_DE_VERCEL` queda como el único lugar para prenderlas si ED cambia
+  de plan; `sinVisitasPorque()` lo lee y la copia también.
+- 2026-09-27 — **El resumen semanal no trae clics de Google.** Search
+  Console llega con 2 o 3 días de atraso, y el lunes a la madrugada la
+  semana cerrada casi nunca tiene sus datos: un número que casi nunca está es
+  ruido en un correo de seis. Lo decidió el padre; reemplaza al «Para el
+  owner» de la ronda 1.
+- 2026-09-27 — **Ratificado: la semana del resumen se cuenta en días UTC**,
+  como se guardan las sumas. Es un desvío de lo que pidió la revisión r1
+  (America/Santiago), aceptado por el padre: un número no puede mezclar días
+  de Chile con sumas por día UTC, y el desfase es de 3 horas.
