@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { desdeTexto } from "@ed/db/slug";
-import { resolverCambio, type Cambio, type Opcion } from "@ed/kit-admin";
-import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
+import { AvisoDeLaAccion, type Cambio, type Opcion, resolverCambio, useFrenarSalida } from "@ed/kit-admin";
 import { errorDe } from "@/admin/campos/errores";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
-import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import type { FichaDeNovedad as Ficha, Vecinas } from "@/datos/consultas/ficha-de-novedad";
 import type { BorradorDeNovedad } from "@/features/novedades/contenido/novedad";
 import { EncabezadoDeLaFicha } from "./EncabezadoDeLaFicha";

@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Casilla, Parrafo, TextoCorto } from "@ed/kit-admin";
-import { Bloque } from "@/admin/armazon/Bloque";
+import { Bloque, Casilla, Parrafo, TextoCorto } from "@ed/kit-admin";
 import { errorDe } from "@/admin/campos/errores";
 import { TOPES } from "@/features/quienes-somos/contenido/modelo-del-equipo";
 import type { CambiarRecorrido, PropsDeBloque } from "./bloques";

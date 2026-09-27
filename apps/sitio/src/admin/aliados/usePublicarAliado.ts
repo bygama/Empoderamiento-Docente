@@ -1,6 +1,5 @@
 import { createElement } from "react";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
-import { VistaPreviaFrenada } from "@/admin/armazon/VistaPreviaFrenada";
+import { type AvisoDelEditor, VistaPreviaFrenada } from "@ed/kit-admin";
 import { publicarAliado } from "@/datos/acciones/ciclo-de-aliados";
 import { abrirVistaPreviaDeAliado } from "@/datos/acciones/vista-previa-de-contenido";
 import type { EstadoDelAliado } from "@/datos/consultas/aliados-del-admin";

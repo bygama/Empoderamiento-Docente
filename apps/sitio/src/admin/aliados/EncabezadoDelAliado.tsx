@@ -1,6 +1,4 @@
-import { AccionesDeLaFicha } from "@/admin/armazon/AccionesDeLaFicha";
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { AccionesDeLaFicha, Encabezado, Insignia } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import type { EstadoDelAliado } from "@/datos/consultas/aliados-del-admin";
 import { insigniaDeLaPublicacion } from "./estado";

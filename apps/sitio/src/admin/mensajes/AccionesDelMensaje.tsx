@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Aviso, Boton, claseDeBoton } from "@ed/kit-admin";
-import { Confirmacion } from "@/admin/armazon/Confirmacion";
+import { Aviso, Boton, claseDeBoton, Confirmacion } from "@ed/kit-admin";
 import { BANDEJAS, type Bandeja, type EstadoDeMensaje } from "@/config/mensajes";
 import { borrarMensaje, cerrarMensaje, marcarComoSpam, tomarMensaje } from "@/datos/acciones/mensajes";
 

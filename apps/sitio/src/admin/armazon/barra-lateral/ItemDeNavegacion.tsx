@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ComponentType } from "react";
+import { type Cuenta, Numero } from "@ed/kit-admin";
 import type { IconProps } from "@/components/ui/icons";
-import { Numero, type Cuenta } from "../Numero";
 
 // Sobre gris-fondo: el texto en azul-principal al 80 % da 6,78:1 y el activo,
 // azul-principal sobre la pastilla blanca, 13,63:1. Ni naranja ni verde en la

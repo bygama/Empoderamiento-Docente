@@ -1,4 +1,4 @@
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { EstadoVacio } from "@ed/kit-admin";
 import { DIAS_DEL_PERIODO, type EstadoDeBusquedas, type ResumenDeBusquedas } from "@/datos/consultas/busquedas";
 import { ConDatos } from "./ConDatos";
 

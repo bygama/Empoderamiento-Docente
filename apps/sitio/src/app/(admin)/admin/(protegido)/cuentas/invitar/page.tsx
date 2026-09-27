@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { puede } from "@ed/auth";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Encabezado } from "@ed/kit-admin";
 import { SinPermiso } from "@/admin/armazon/SinPermiso";
 import { FormularioDeInvitacion } from "@/admin/cuentas/FormularioDeInvitacion";
 import { VOLVER_A_CUENTAS } from "@/admin/cuentas/pantallas";

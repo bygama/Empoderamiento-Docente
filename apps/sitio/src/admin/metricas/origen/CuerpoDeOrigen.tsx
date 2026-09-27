@@ -1,4 +1,4 @@
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { EstadoVacio } from "@ed/kit-admin";
 import { MENOS_DE, MINIMOS, NOMBRE_DE_LA_ZONA } from "@/config/metricas";
 import type { OrigenDelPeriodo } from "@/datos/consultas/origen";
 import { NOMBRE_DEL_CANAL } from "@/lib/metricas/canales";

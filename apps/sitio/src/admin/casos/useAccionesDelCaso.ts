@@ -1,6 +1,5 @@
 import { createElement, useState } from "react";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
-import { VistaPreviaFrenada } from "@/admin/armazon/VistaPreviaFrenada";
+import { type AvisoDelEditor, VistaPreviaFrenada } from "@ed/kit-admin";
 import { descartarCambiosDeCaso, guardarCaso, publicarCaso } from "@/datos/acciones/casos";
 import { abrirVistaPreviaDeCaso } from "@/datos/acciones/vista-previa-de-contenido";
 import type { EstadoDelCaso } from "@/datos/consultas/casos-del-admin";

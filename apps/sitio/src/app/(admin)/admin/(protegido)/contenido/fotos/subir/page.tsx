@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Encabezado } from "@ed/kit-admin";
 import { SubirALaBiblioteca } from "@/admin/fotos/SubirALaBiblioteca";
 
 export const metadata: Metadata = { title: "Subir una foto" };

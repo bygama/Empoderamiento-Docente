@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Aviso, Boton, TextoCorto } from "@ed/kit-admin";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Aviso, type AvisoDelEditor, Boton, Encabezado, TextoCorto } from "@ed/kit-admin";
 import { buscarDatosDeMaterial } from "@/datos/acciones/buscar-datos";
 import type { Vecino } from "@/datos/biblioteca/contra-la-biblioteca";
 import type { PersonaParaAutoria } from "@/datos/consultas/equipo-del-admin";

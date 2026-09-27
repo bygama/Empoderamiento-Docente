@@ -1,5 +1,4 @@
-import { Apartado } from "@/admin/armazon/Apartado";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Apartado, Encabezado } from "@ed/kit-admin";
 import type { Plazo } from "@/config/privacidad";
 import type { PlazoParaEditar } from "@/datos/privacidad";
 import { VOLVER_A_AJUSTES } from "../pantallas";

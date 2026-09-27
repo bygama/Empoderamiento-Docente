@@ -2,8 +2,7 @@
 
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Campo } from "@/admin/armazon/Campos";
+import { Aviso, Boton, CampoSimple } from "@ed/kit-admin";
 import { cambiarElCorreo } from "@/datos/acciones/cuentas";
 
 /**
@@ -30,7 +29,7 @@ export function FormularioDelCorreo({ idDeCuenta, correo }: { idDeCuenta: string
   const rechazado = resultado !== null && !resultado.ok;
   return (
     <form onSubmit={cambiar} className="max-w-md space-y-3">
-      <Campo
+      <CampoSimple
         key={correo}
         etiqueta="Correo"
         name="correo"

@@ -1,12 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { resolverCambio, type Cambio } from "@ed/kit-admin";
+import { AvisoDeLaAccion, type Cambio, type Pestana, resolverCambio, useFrenarSalida } from "@ed/kit-admin";
 import { ContextoDeErrores } from "@/admin/campos/errores";
-import { AvisoDeLaAccion } from "@/admin/armazon/AvisoDelEditor";
-import type { Pestana } from "@/admin/armazon/Pestanas";
 import { useErroresDelEditor } from "@/admin/armazon/useErroresDelEditor";
-import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { guardarBorrador } from "@/datos/acciones/paginas";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 import { resumenDeErrores, type ErrorDeCampo } from "@/lib/contenido/errores";

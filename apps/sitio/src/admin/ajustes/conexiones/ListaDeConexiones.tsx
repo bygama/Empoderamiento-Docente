@@ -1,6 +1,4 @@
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Insignia, type Tono } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { Encabezado, Fila, Insignia, Lista, type Tono } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import type { EstadoDeConexion, EstadoDeTarea } from "@/datos/conexiones";
 import { VOLVER_A_AJUSTES } from "../pantallas";

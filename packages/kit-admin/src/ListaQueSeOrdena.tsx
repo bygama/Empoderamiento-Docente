@@ -1,4 +1,5 @@
-import { Aviso, Boton } from "@ed/kit-admin";
+import { Aviso } from "./Aviso";
+import { Boton } from "./Boton";
 import type { Hacia } from "./useMoverEnOrden";
 
 // Las dos piezas de una lista que se ordena (DESIGN.md §11, «Lista que se

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import type { Cuenta } from "../Numero";
+import type { Cuenta } from "@ed/kit-admin";
 import { ItemDeNavegacion } from "./ItemDeNavegacion";
 import { CONFIGURACION, GRUPOS, primerSegmento, type Modulo } from "./modulos";
 

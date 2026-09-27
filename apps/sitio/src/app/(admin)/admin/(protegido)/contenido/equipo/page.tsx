@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { puede } from "@ed/auth";
-import { Aviso, BotonEnlace } from "@ed/kit-admin";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { Aviso, BotonEnlace, EstadoVacio } from "@ed/kit-admin";
 import { SinPermiso } from "@/admin/armazon/SinPermiso";
 import { EncabezadoDeContenido } from "@/admin/contenido/EncabezadoDeContenido";
 import { ListaDelEquipo } from "@/admin/equipo/ListaDelEquipo";

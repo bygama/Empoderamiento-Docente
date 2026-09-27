@@ -1,7 +1,6 @@
 "use client";
 
-import { Casilla, ListaVariable, Seleccion, TextoCorto } from "@ed/kit-admin";
-import { Bloque } from "@/admin/armazon/Bloque";
+import { Bloque, Casilla, ListaVariable, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { RUTAS_INTERNAS } from "@/config/nav";
 import { TOPES } from "@/features/investigacion/contenido/modelo-de-casos";
 import { evidenciaVacia, produccionVacia, type EvidenciaEnElFormulario, type ProduccionEnElFormulario } from "../formulario";

@@ -1,7 +1,4 @@
-import { BotonEnlace } from "@ed/kit-admin";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { BotonEnlace, EstadoVacio, Fila, Insignia, Lista } from "@ed/kit-admin";
 import type { FilaDePendiente } from "@/datos/inicio/filas-de-pendientes";
 
 /**

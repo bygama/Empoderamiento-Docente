@@ -1,6 +1,4 @@
-import { claseDeBoton } from "@ed/kit-admin";
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Insignia, type Tono } from "@/admin/armazon/Insignia";
+import { claseDeBoton, Encabezado, Insignia, type Tono } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import { BANDEJAS, ETIQUETA_DEL_ESTADO, type EstadoDeMensaje } from "@/config/mensajes";
 import type { FichaDeMensaje } from "@/datos/consultas/ficha-de-mensaje";

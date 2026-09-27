@@ -4,9 +4,8 @@ import { useId, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CODIGO_NO_SALIO, CUENTA_SUSPENDIDA, quienPuede } from "@ed/auth";
-import { Aviso, Boton as BotonDelAdmin } from "@ed/kit-admin";
+import { Aviso, Boton, BotonDeAcceso, CampoSimple, ENLACE_DE_ACCESO } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 import { destinoSeguro } from "../destino";
 
 /**
@@ -105,9 +104,9 @@ export function FormularioCodigo({ minutosDeVigencia }: { minutosDeVigencia: num
           No pudimos mandarte el código, y sin él no se puede entrar con este rol. Avisale a quien se ocupa del sitio: el envío de correos no
           está andando.
         </Aviso>
-        <Boton type="button" onClick={mandarOtro} disabled={mandando} aria-busy={mandando || undefined}>
+        <BotonDeAcceso type="button" onClick={mandarOtro} disabled={mandando} aria-busy={mandando || undefined}>
           {mandando ? "Mandando…" : "Probar de nuevo"}
-        </Boton>
+        </BotonDeAcceso>
         <p className="text-center text-admin-meta">{volver}</p>
       </div>
     );
@@ -133,7 +132,7 @@ export function FormularioCodigo({ minutosDeVigencia }: { minutosDeVigencia: num
           PEDISTE_MUCHOS
         )}
       </p>
-      <Campo
+      <CampoSimple
         etiqueta="Código"
         name="codigo"
         required
@@ -159,13 +158,13 @@ export function FormularioCodigo({ minutosDeVigencia }: { minutosDeVigencia: num
         </Aviso>
       ) : null}
       {otroListo ? <Aviso tono="bien">Te mandamos otro código.</Aviso> : null}
-      <Boton type="submit" disabled={entrando} aria-busy={entrando || undefined}>
+      <BotonDeAcceso type="submit" disabled={entrando} aria-busy={entrando || undefined}>
         {entrando ? "Entrando…" : "Entrar"}
-      </Boton>
+      </BotonDeAcceso>
       <div className="flex flex-wrap items-center justify-between gap-3 text-admin-meta">
-        <BotonDelAdmin variante="terciario" onClick={mandarOtro} disabled={mandando} aria-busy={mandando || undefined} className="-ml-4">
+        <Boton variante="terciario" onClick={mandarOtro} disabled={mandando} aria-busy={mandando || undefined} className="-ml-4">
           {mandando ? "Mandando…" : "Mandar otro"}
-        </BotonDelAdmin>
+        </Boton>
         {volver}
       </div>
     </form>

@@ -1,5 +1,4 @@
-import { Encabezado } from "./Encabezado";
-import { Insignia, type Tono } from "./Insignia";
+import { Encabezado, Insignia, type Tono } from "@ed/kit-admin";
 import { Momento } from "./Momento";
 
 /** Lo que el encabezado cuenta de la cosa: quién y cuándo la guardó o la publicó, en ISO. */

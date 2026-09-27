@@ -1,5 +1,4 @@
-import { Apartado } from "@/admin/armazon/Apartado";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Apartado, Encabezado } from "@ed/kit-admin";
 import { RUTAS_DE_LA_APP } from "@/config/rutas";
 import type { Indexacion as LaIndexacion } from "@/datos/consultas/indexacion";
 import type { FilaDeRedireccion } from "@/datos/consultas/redirecciones";

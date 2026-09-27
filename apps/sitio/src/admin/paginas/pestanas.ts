@@ -1,4 +1,4 @@
-import type { Pestana } from "@/admin/armazon/Pestanas";
+import type { Pestana } from "@ed/kit-admin";
 
 // Las pantallas de una página en el editor (SPEC §7 de `work/paginas-inicio/`):
 // pestañas que son rutas, debajo de su encabezado. Sin datos de la base: las

@@ -1,7 +1,5 @@
 import Image from "next/image";
-import { BotonEnlace } from "@ed/kit-admin";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { BotonEnlace, Fila, Insignia, Lista } from "@ed/kit-admin";
 import { BookOpen } from "@/components/ui/icons";
 import type { EstadoDeMaterial, FilaDeMaterial } from "@/datos/consultas/lista-de-materiales";
 import { SALUDES } from "./filtros";

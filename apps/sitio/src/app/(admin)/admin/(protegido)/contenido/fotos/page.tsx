@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { Aviso, BotonEnlace } from "@ed/kit-admin";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Filtro } from "@/admin/armazon/Filtro";
+import { Aviso, BotonEnlace, EstadoVacio, Filtro } from "@ed/kit-admin";
 import { EncabezadoDeContenido } from "@/admin/contenido/EncabezadoDeContenido";
 import { GrillaDeFotos } from "@/admin/fotos/GrillaDeFotos";
 import { FILTROS_DE_FOTOS, grillaDeFotos, type FiltroDeFotos } from "@/datos/consultas/fotos";

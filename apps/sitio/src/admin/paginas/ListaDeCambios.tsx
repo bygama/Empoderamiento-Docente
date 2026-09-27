@@ -1,4 +1,4 @@
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { EstadoVacio } from "@ed/kit-admin";
 import { ListaDeDiferencias } from "@/admin/armazon/ListaDeDiferencias";
 import type { CambiosDeUnaParte } from "@/datos/consultas/historial-de-paginas";
 

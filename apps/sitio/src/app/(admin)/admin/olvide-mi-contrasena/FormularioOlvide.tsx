@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Aviso } from "@ed/kit-admin";
+import { Aviso, BotonDeAcceso, CampoSimple, ENLACE_DE_ACCESO } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { Boton, Campo, ENLACE_DE_ACCESO } from "@/admin/armazon/Campos";
 
 export function FormularioOlvide() {
   const [listo, setListo] = useState(false);
@@ -39,11 +38,11 @@ export function FormularioOlvide() {
 
   return (
     <form action={pedir} className="space-y-4">
-      <Campo etiqueta="Correo" name="email" type="email" required autoComplete="email" autoFocus />
+      <CampoSimple etiqueta="Correo" name="email" type="email" required autoComplete="email" autoFocus />
       {error ? <Aviso tono="error">{error}</Aviso> : null}
-      <Boton type="submit" disabled={enviando}>
+      <BotonDeAcceso type="submit" disabled={enviando}>
         {enviando ? "Mandando…" : "Mandarme el enlace"}
-      </Boton>
+      </BotonDeAcceso>
       <p className="text-center text-sm">
         <Link className={ENLACE_DE_ACCESO} href="/admin/entrar">
           Volver

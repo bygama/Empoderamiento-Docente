@@ -1,5 +1,5 @@
-import { Boton } from "@ed/kit-admin";
-import { ArrowUpRight } from "@/components/ui/icons";
+import { Boton } from "./Boton";
+import { FlechaAfuera } from "./iconos";
 
 type Props = {
   /** Lo que corre en la ficha, o nada: «guardar», «vista-previa» o «publicar» se dicen en su botón; lo demás solo los deja esperando. */
@@ -36,7 +36,7 @@ export function AccionesDeLaFicha({ pendiente, azul, alGuardar, alVerBorrador, a
       {alVerBorrador ? (
         <Boton variante="secundario" sobreAzul={azul} disabled={corriendo} aria-busy={pendiente === "vista-previa" || undefined} onClick={alVerBorrador}>
           {pendiente === "vista-previa" ? "Abriendo…" : "Vista previa"}
-          <ArrowUpRight size={16} />
+          <FlechaAfuera size={16} />
           <span className="sr-only">(se abre en otra pestaña)</span>
         </Boton>
       ) : null}

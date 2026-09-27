@@ -1,5 +1,5 @@
 import { QUE_PUEDE, ROLES } from "@ed/auth";
-import { Desplegable } from "@/admin/armazon/Lista";
+import { Desplegable } from "@ed/kit-admin";
 import { TablaDePermisos } from "./TablaDePermisos";
 
 /**

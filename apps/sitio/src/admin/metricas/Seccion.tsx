@@ -1,5 +1,4 @@
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { EstadoVacio, Fila, Lista } from "@ed/kit-admin";
 
 export type FilaDeSeccion = { clave: string; principal: string; detalle: string };
 

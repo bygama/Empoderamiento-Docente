@@ -79,3 +79,42 @@ export function Subir({ size = 24, ...rest }: Props) {
     </svg>
   );
 }
+
+export function FlechaIzquierda({ size = 24, ...rest }: Props) {
+  return (
+    <svg width={size} height={size} {...BASE} {...rest}>
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 5 5 12 12 19" />
+    </svg>
+  );
+}
+
+/** Sale hacia arriba a la derecha: lo que se abre en otra pestaña. */
+export function FlechaAfuera({ size = 24, ...rest }: Props) {
+  return (
+    <svg width={size} height={size} {...BASE} {...rest}>
+      <path d="M7 17 17 7" />
+      <path d="M7 7h10v10" />
+    </svg>
+  );
+}
+
+export function Ojo({ size = 24, ...rest }: Props) {
+  return (
+    <svg width={size} height={size} {...BASE} {...rest}>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+export function OjoTachado({ size = 24, ...rest }: Props) {
+  return (
+    <svg width={size} height={size} {...BASE} {...rest}>
+      <path d="M10.6 5.1A9.8 9.8 0 0 1 12 5c6.5 0 10 7 10 7a17.4 17.4 0 0 1-2.9 3.9" />
+      <path d="M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7a9.6 9.6 0 0 0 5.4-1.6" />
+      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+      <line x1="3" y1="3" x2="21" y2="21" />
+    </svg>
+  );
+}

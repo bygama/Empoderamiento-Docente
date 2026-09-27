@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { EstadoVacio, Insignia, Tabla } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
-import { Tabla } from "@/admin/armazon/Tabla";
 import type { Indexacion as LaIndexacion } from "@/datos/consultas/indexacion";
 import { coberturaEnCastellano, insigniaDeIndexacion } from "./cobertura";
 

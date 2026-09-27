@@ -1,9 +1,4 @@
-import { Aviso, BotonEnlace } from "@ed/kit-admin";
-import { Buscador } from "@/admin/armazon/Buscador";
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Filtro } from "@/admin/armazon/Filtro";
-import { Paginado } from "@/admin/armazon/Paginado";
+import { Aviso, BotonEnlace, Buscador, Encabezado, EstadoVacio, Filtro, Paginado } from "@ed/kit-admin";
 import { listaDeMateriales } from "@/datos/consultas/lista-de-materiales";
 import { consultasDelMes } from "@/datos/consultas/materiales-consultados";
 import { TIPOS } from "@/features/biblioteca/contenido/modelo";

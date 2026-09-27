@@ -1,6 +1,6 @@
 "use client";
 
-import type { Pestana } from "@/admin/armazon/Pestanas";
+import type { Pestana } from "@ed/kit-admin";
 import type { PaginaEnRevision, VersionEnLista } from "@/datos/consultas/historial-de-paginas";
 import { ListaDeVersiones } from "./ListaDeVersiones";
 import { PantallaDeRevision } from "./PantallaDeRevision";

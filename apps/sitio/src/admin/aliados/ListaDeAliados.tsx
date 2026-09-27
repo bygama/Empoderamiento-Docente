@@ -1,10 +1,6 @@
 "use client";
 
-import { BotonEnlace } from "@ed/kit-admin";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
-import { AvisosDelOrden, BotonesDeOrden } from "@/admin/armazon/ListaQueSeOrdena";
-import { useMoverEnOrden } from "@/admin/armazon/useMoverEnOrden";
+import { AvisosDelOrden, BotonEnlace, BotonesDeOrden, Fila, Insignia, Lista, useMoverEnOrden } from "@ed/kit-admin";
 import { moverAliado } from "@/datos/acciones/aliados";
 import type { FilaDeAliado } from "@/datos/consultas/aliados-del-admin";
 import { altoDe } from "@/features/aliados/contenido/modelo";

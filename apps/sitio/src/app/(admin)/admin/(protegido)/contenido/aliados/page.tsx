@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Aviso, BotonEnlace } from "@ed/kit-admin";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
+import { Aviso, BotonEnlace, EstadoVacio } from "@ed/kit-admin";
 import { ListaDeAliados } from "@/admin/aliados/ListaDeAliados";
 import { EncabezadoDeContenido } from "@/admin/contenido/EncabezadoDeContenido";
 import { listaDeAliados } from "@/datos/consultas/aliados-del-admin";

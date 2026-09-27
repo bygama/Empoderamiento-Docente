@@ -1,5 +1,4 @@
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { IndiceDeTarjetas } from "@/admin/armazon/IndiceDeTarjetas";
+import { Encabezado, IndiceDeTarjetas } from "@ed/kit-admin";
 import { resumenDePaginas } from "@/admin/paginas/resumen";
 import type { FilaDeAliado } from "@/datos/consultas/aliados-del-admin";
 import type { FilaDeCaso } from "@/datos/consultas/casos-del-admin";

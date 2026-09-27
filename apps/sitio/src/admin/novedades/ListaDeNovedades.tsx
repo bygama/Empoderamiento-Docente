@@ -1,6 +1,4 @@
-import { BotonEnlace } from "@ed/kit-admin";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { BotonEnlace, Fila, Insignia, Lista } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import type { EstadoDeNovedad, FilaDeLaLista } from "@/datos/consultas/lista-de-novedades";
 import { fechaCorta } from "@/features/novedades/contenido/fechas";

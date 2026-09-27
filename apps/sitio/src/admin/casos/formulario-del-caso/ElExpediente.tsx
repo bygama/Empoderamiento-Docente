@@ -1,7 +1,6 @@
 "use client";
 
-import { CampoFoto, Parrafo, resolverCambio, Seleccion, TextoCorto } from "@ed/kit-admin";
-import { Bloque } from "@/admin/armazon/Bloque";
+import { Bloque, CampoFoto, Parrafo, resolverCambio, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import { SUJECIONES, TOPES } from "@/features/investigacion/contenido/modelo-de-casos";
 import { MAXIMO_BYTES } from "@/lib/contenido/fotos";

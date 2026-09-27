@@ -3,9 +3,8 @@
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LARGO_MINIMO_CONTRASENA } from "@ed/auth";
-import { Aviso, Boton } from "@ed/kit-admin";
+import { Aviso, Boton, CampoContrasena } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
 
 type Rechazado = "actual" | "nueva" | null;
 type Resultado = { tono: "bien" | "error"; texto: string; rechazado: Rechazado };

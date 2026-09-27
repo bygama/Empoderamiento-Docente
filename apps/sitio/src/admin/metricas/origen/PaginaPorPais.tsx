@@ -1,5 +1,4 @@
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Tabla } from "@/admin/armazon/Tabla";
+import { EstadoVacio, Tabla } from "@ed/kit-admin";
 import { MENOS_DE, MINIMOS } from "@/config/metricas";
 import type { OrigenDelPeriodo } from "@/datos/consultas/origen";
 import type { Periodo } from "@/lib/metricas/periodos";

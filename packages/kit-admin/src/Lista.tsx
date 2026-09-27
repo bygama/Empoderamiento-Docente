@@ -1,4 +1,4 @@
-import { ChevronDown } from "@/components/ui/icons";
+import { ChevronAbajo } from "./iconos";
 
 /**
  * Una lista del admin (DESIGN.md §11): filas separadas por un divisor, en una
@@ -78,7 +78,7 @@ export function Desplegable({ resumen, className, children }: { resumen: string;
   return (
     <details className={`group/desplegable ${className ?? ""}`}>
       <summary className="-ml-1 inline-flex min-h-8 cursor-pointer list-none items-center gap-1 rounded-sm pr-1 text-admin-meta font-medium text-azul-medio focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio [&::-webkit-details-marker]:hidden">
-        <ChevronDown size={16} className="shrink-0 -rotate-90 motion-safe:transition-transform group-open/desplegable:rotate-0" />
+        <ChevronAbajo size={16} className="shrink-0 -rotate-90 motion-safe:transition-transform group-open/desplegable:rotate-0" />
         {resumen}
       </summary>
       {children}

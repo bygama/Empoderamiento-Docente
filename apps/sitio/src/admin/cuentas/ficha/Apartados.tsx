@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { QUE_PUEDE, ROL_AL_DEJAR_LA_DIRECCION, segundoFactorObligatorio, type LoQueSePuede, type Rol } from "@ed/auth";
-import { Apartado } from "@/admin/armazon/Apartado";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { Apartado, Insignia } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import { ListaDeSesiones } from "@/admin/mi-cuenta/Sesiones";
 import { cerrarSusSesiones } from "@/datos/acciones/cuentas";

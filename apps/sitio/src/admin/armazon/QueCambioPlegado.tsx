@@ -1,6 +1,6 @@
+import { EstadoVacio } from "@ed/kit-admin";
 import { ChevronDown } from "@/components/ui/icons";
 import type { Diferencia } from "@/lib/contenido/comparar";
-import { EstadoVacio } from "./EstadoVacio";
 import { ListaDeDiferencias } from "./ListaDeDiferencias";
 
 /**

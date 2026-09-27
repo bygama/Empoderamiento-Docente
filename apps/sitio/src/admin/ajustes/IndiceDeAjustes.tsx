@@ -1,6 +1,4 @@
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { IndiceDeTarjetas } from "@/admin/armazon/IndiceDeTarjetas";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { Encabezado, IndiceDeTarjetas, Insignia } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import { enPalabras } from "@/config/privacidad";
 import type { Leido, ResumenDeAjustes } from "@/datos/consultas/ajustes";

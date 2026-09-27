@@ -1,7 +1,4 @@
-import { Boton } from "@ed/kit-admin";
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Pestanas, type Pestana } from "@/admin/armazon/Pestanas";
+import { Boton, Encabezado, Insignia, type Pestana, Pestanas } from "@ed/kit-admin";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { PaginaParaEditar } from "@/datos/consultas/editor-de-paginas";
 import { Cuando } from "./Cuando";

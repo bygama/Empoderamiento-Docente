@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { Boton } from "@ed/kit-admin";
+import { Boton } from "./Boton";
 
 type Props = {
   /** Qué se va a hacer y que no vuelve: «¿Borrar el mensaje para siempre?». */

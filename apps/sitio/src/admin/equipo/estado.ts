@@ -1,4 +1,4 @@
-import type { Tono } from "@/admin/armazon/Insignia";
+import type { Tono } from "@ed/kit-admin";
 
 // El estado de un perfil del Equipo en una insignia (DESIGN.md §11,
 // «Insignias de estado»): lo que pide atención va fuerte, lo estable normal,

@@ -1,10 +1,8 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import { Aviso, Boton } from "@ed/kit-admin";
-import { Encabezado } from "@/admin/armazon/Encabezado";
+import { Aviso, Boton, Encabezado, useFrenarSalida } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
-import { useFrenarSalida } from "@/admin/armazon/useFrenarSalida";
 import { CAMPOS_DEL_SITIO, type CampoDelSitio, type ValoresDelSitio } from "@/config/formulario-del-sitio";
 import { guardarDatosDelSitio } from "@/datos/acciones/datos-del-sitio";
 import { VOLVER_A_AJUSTES } from "../pantallas";

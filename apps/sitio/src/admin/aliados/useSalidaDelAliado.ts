@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import type { AvisoDelEditor } from "@ed/kit-admin";
 import { borrarAliado } from "@/datos/acciones/aliados";
 import { descartarCambiosDeAliado, despublicarAliado } from "@/datos/acciones/ciclo-de-aliados";
 import type { EstadoDelAliado } from "@/datos/consultas/aliados-del-admin";

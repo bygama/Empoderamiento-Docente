@@ -1,4 +1,4 @@
-import type { Tono } from "@/admin/armazon/Insignia";
+import type { Tono } from "@ed/kit-admin";
 import type { EstadoDePagina } from "@/datos/consultas/editor-de-paginas";
 
 /**

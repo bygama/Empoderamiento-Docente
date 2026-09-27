@@ -1,5 +1,5 @@
 import { PUEDE, QUE_PERMITE, ROLES, puede, type Capacidad } from "@ed/auth";
-import { SiONo, Tabla } from "@/admin/armazon/Tabla";
+import { SiONo, Tabla } from "@ed/kit-admin";
 
 const CAPACIDADES = Object.keys(PUEDE) as Capacidad[];
 

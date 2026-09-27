@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import type { AvisoDelEditor } from "@ed/kit-admin";
 import { descartarCambiosDePersona, despublicarPersona } from "@/datos/acciones/ciclo-de-equipo";
 import { borrarPersona } from "@/datos/acciones/equipo";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-persona";

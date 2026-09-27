@@ -1,8 +1,4 @@
-import { Aviso, BotonEnlace } from "@ed/kit-admin";
-import { Buscador } from "@/admin/armazon/Buscador";
-import { Encabezado } from "@/admin/armazon/Encabezado";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Pestanas } from "@/admin/armazon/Pestanas";
+import { Aviso, BotonEnlace, Buscador, Encabezado, EstadoVacio, Pestanas } from "@ed/kit-admin";
 import { listaDeNovedades, type PestanaDeNovedades } from "@/datos/consultas/lista-de-novedades";
 import { ListaDeNovedades } from "./ListaDeNovedades";
 

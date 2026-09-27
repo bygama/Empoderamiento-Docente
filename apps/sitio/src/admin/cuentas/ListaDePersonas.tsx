@@ -1,5 +1,4 @@
-import { BotonEnlace } from "@ed/kit-admin";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { BotonEnlace, Fila, Lista } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import type { CuentaEnLista } from "@/datos/consultas/cuentas";
 import { EstadoDeLaCuenta } from "./EstadoDeLaCuenta";

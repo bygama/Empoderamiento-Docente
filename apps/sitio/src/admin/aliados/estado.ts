@@ -1,4 +1,4 @@
-import type { Tono } from "@/admin/armazon/Insignia";
+import type { Tono } from "@ed/kit-admin";
 import type { EstadoDelAliado } from "@/datos/consultas/aliados-del-admin";
 
 /**

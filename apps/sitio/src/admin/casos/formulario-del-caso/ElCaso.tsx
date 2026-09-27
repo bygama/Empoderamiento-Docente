@@ -1,8 +1,7 @@
 "use client";
 
-import { Casilla, Parrafo, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { LARGO_MAXIMO } from "@ed/db/slug";
-import { Bloque } from "@/admin/armazon/Bloque";
+import { Bloque, Casilla, Parrafo, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { ESTADOS, TOPES } from "@/features/investigacion/contenido/modelo-de-casos";
 import type { PropsDeBloque } from "./tipos";
 

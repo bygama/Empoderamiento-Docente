@@ -1,6 +1,6 @@
+import { Cifra } from "@ed/kit-admin";
 import type { FilaDeBusquedas, ResumenDeBusquedas } from "@/datos/consultas/busquedas";
 import { nombreDelPais } from "@/lib/busquedas/paises";
-import { Cifra } from "@/admin/armazon/Cifra";
 import { cifras, motivo, rutaDe } from "./formato";
 import { Seccion, type FilaDeSeccion } from "@/admin/metricas/Seccion";
 

@@ -2,9 +2,8 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Aviso, Boton } from "@ed/kit-admin";
+import { Aviso, Boton, CampoContrasena } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
 
 type Resultado = { tono: "bien" | "error"; texto: string; contrasenaMala: boolean };
 

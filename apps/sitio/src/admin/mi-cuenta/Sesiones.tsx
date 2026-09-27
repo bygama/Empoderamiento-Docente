@@ -1,5 +1,4 @@
-import { Insignia } from "@/admin/armazon/Insignia";
-import { Fila, Lista } from "@/admin/armazon/Lista";
+import { Fila, Insignia, Lista } from "@ed/kit-admin";
 import { Momento } from "@/admin/armazon/Momento";
 import type { SesionAbierta } from "@/datos/consultas/mi-cuenta";
 import { dispositivoDe, lugarDe } from "@/lib/sesiones";

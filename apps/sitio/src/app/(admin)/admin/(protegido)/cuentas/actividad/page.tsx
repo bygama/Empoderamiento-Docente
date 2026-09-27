@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { puede } from "@ed/auth";
-import { Buscador } from "@/admin/armazon/Buscador";
-import { EstadoVacio } from "@/admin/armazon/EstadoVacio";
-import { Filtro } from "@/admin/armazon/Filtro";
-import { Paginado } from "@/admin/armazon/Paginado";
+import { Buscador, EstadoVacio, Filtro, Paginado } from "@ed/kit-admin";
 import { SinPermiso } from "@/admin/armazon/SinPermiso";
 import { EncabezadoDeCuentas } from "@/admin/cuentas/EncabezadoDeCuentas";
 import { CUANDO, conservados, hayFiltros, leerFiltros, urlDeActividad, type Filtros } from "@/admin/cuentas/actividad/filtros";

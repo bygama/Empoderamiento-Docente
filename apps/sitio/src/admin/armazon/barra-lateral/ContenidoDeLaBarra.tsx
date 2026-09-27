@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Cuenta } from "@ed/kit-admin";
 import { MenuDeLaCuenta, type Usuario } from "./MenuDeLaCuenta";
 import { MenuDelAdmin } from "./MenuDelAdmin";
-import type { Cuenta } from "../Numero";
 import type { Tema } from "../tema";
 
 export type { Usuario };

@@ -1,6 +1,5 @@
-import { BotonEnlace } from "@ed/kit-admin";
+import { BotonEnlace, Fila, Lista } from "@ed/kit-admin";
 import { fraseDe } from "@/admin/actividad/frase";
-import { Fila, Lista } from "@/admin/armazon/Lista";
 import { Momento } from "@/admin/armazon/Momento";
 import type { FilaDeActividad } from "@/datos/consultas/actividad";
 import { MODULOS_DE_ACTIVIDAD, moduloDe, pantallaDe } from "./modulos";

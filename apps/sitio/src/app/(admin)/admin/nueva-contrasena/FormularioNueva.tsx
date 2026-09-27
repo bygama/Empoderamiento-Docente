@@ -3,10 +3,8 @@
 import { useId, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LARGO_MINIMO_CONTRASENA } from "@ed/auth";
-import { Aviso } from "@ed/kit-admin";
+import { Aviso, BotonDeAcceso, CampoContrasena } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
-import { CampoContrasena } from "@/admin/armazon/CampoContrasena";
-import { Boton } from "@/admin/armazon/Campos";
 
 /** Qué campo rechazó el formulario, para marcarlo con `aria-invalid`. */
 type Rechazado = "contrasena" | "repetida" | null;
@@ -81,9 +79,9 @@ export function FormularioNueva() {
           {error}
         </Aviso>
       ) : null}
-      <Boton type="submit" disabled={enviando}>
+      <BotonDeAcceso type="submit" disabled={enviando}>
         {enviando ? "Guardando…" : "Guardar"}
-      </Boton>
+      </BotonDeAcceso>
     </form>
   );
 }

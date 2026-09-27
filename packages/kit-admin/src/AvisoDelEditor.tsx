@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Aviso } from "@ed/kit-admin";
+import { Aviso } from "./Aviso";
 
 /** El aviso de la última acción. `choque`: otra persona guardó mientras tanto, y el aviso ofrece recargar. */
 export type AvisoDelEditor = { ok: boolean; detalle: ReactNode; choque?: true };

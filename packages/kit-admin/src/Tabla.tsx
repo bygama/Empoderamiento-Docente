@@ -1,4 +1,4 @@
-import { Check } from "@/components/ui/icons";
+import { Check } from "./iconos";
 
 export type ColumnaDeTabla = {
   etiqueta: string;

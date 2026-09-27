@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import type { AvisoDelEditor } from "@/admin/armazon/AvisoDelEditor";
+import type { AvisoDelEditor } from "@ed/kit-admin";
 import { descartarCambiosDeNovedad, despublicarNovedad } from "@/datos/acciones/ciclo-de-novedades";
 import { borrarNovedad } from "@/datos/acciones/novedades";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-novedad";

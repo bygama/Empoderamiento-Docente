@@ -1,7 +1,6 @@
 "use client";
 
-import { Aviso } from "@ed/kit-admin";
-import { Bloque } from "@/admin/armazon/Bloque";
+import { Aviso, Bloque } from "@ed/kit-admin";
 import type { Autorizacion } from "@/datos/consultas/aliados-del-admin";
 import type { Aliado } from "@/features/aliados/contenido/aliado";
 import { CAMBIO_DESDE_LA_AUTORIZACION } from "@/features/aliados/contenido/autorizacion";

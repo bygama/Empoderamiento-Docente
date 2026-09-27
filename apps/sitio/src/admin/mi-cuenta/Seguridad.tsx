@@ -1,5 +1,5 @@
 import { segundoFactorObligatorio } from "@ed/auth";
-import { Insignia } from "@/admin/armazon/Insignia";
+import { Insignia } from "@ed/kit-admin";
 import { FormularioDelSegundoFactor } from "./FormularioDelSegundoFactor";
 
 /**

@@ -1,7 +1,6 @@
 "use client";
 
-import { CampoFoto, resolverCambio, Seleccion, TextoCorto, type Cambio } from "@ed/kit-admin";
-import { Bloque } from "@/admin/armazon/Bloque";
+import { Bloque, type Cambio, CampoFoto, resolverCambio, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { fotosParaElegir, subirFoto } from "@/datos/acciones/fotos";
 import type { BorradorDeAliado } from "@/features/aliados/contenido/aliado";
 import { TAMANOS, TOPES } from "@/features/aliados/contenido/modelo";
