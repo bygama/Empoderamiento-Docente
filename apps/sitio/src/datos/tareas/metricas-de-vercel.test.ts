@@ -1,8 +1,8 @@
 import { after, test } from "node:test";
 import assert from "node:assert/strict";
 import { config as cargarEntorno } from "dotenv";
-import { fechaUTC } from "@/lib/metricas/periodos";
-import type { ClienteDeAnaliticas } from "@/lib/metricas/vercel";
+import { diaISO, fechaUTC } from "@/lib/metricas/periodos";
+import { crearClienteDeAnaliticas, type ClienteDeAnaliticas } from "@/lib/metricas/vercel";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const hayBase = Boolean(process.env.DATABASE_URL);
@@ -39,12 +39,19 @@ test("correr dos veces deja las mismas filas y dice qué días copió", { skip: 
   const r2 = await sincronizarMetricas({ cliente: clienteFalso, base, hoy: HOY, minimoDias: 3 });
   assert.equal(r1.ok, true);
   assert.equal(r2.ok, true);
-  assert.equal(r2.detalle, "Del 2001-01-08 al 2001-01-10: 3 días, 1 filas, 6 ventanas.");
+  assert.equal(r2.detalle, "Del 2001-01-08 al 2001-01-10: 3 días, 1 filas, 3 ventanas.");
   const filas = await base.metricaDiaria.count({ where: { fecha: { gte: fechaUTC("2000-12-01"), lte: fechaUTC("2001-01-10") } } });
   assert.equal(filas, 1);
-  // La anterior de 90 días termina el 2000-10-12.
-  const ventanas = await base.metricaVentana.count({ where: { fechaFin: { gte: fechaUTC("2000-10-01"), lte: fechaUTC("2001-01-10") } } });
-  assert.equal(ventanas, 6);
+  // Solo las que entran en el mes del plan: la de 7, la de 7 anterior y la de 30.
+  const ventanas = await base.metricaVentana.findMany({ where: { fechaFin: { gte: fechaUTC("2000-10-01"), lte: fechaUTC("2001-01-10") } }, orderBy: [{ fechaFin: "asc" }, { dias: "asc" }] });
+  assert.deepEqual(
+    ventanas.map((v) => [diaISO(v.fechaFin), v.dias]),
+    [
+      ["2001-01-03", 7],
+      ["2001-01-10", 7],
+      ["2001-01-10", 30],
+    ],
+  );
 });
 
 test("la hora y el cruce por país se guardan con su propia dimensión", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
@@ -91,6 +98,39 @@ test("si la API falla, la corrida sale fallida y no se copia nada", { skip: !hay
   assert.equal(filas, 0);
   const ventanas = await base.metricaVentana.count({ where: { fechaFin: { gte: fechaUTC("2001-01-11"), lte: fechaUTC("2001-02-10") } } });
   assert.equal(ventanas, 0);
+});
+
+test("una ventana que Vercel rechaza (400) no voltea la copia: va al detalle y la marca avanza igual", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { sincronizarMetricas } = await import("./metricas-de-vercel");
+  const hoy = new Date("2001-11-11T12:00:00.000Z");
+  const pedidas: string[] = [];
+  // Respuestas grabadas con la forma de la API: el total del día, y un 400 para la ventana de 30 días.
+  const cliente = crearClienteDeAnaliticas({
+    token: "x",
+    proyecto: "prj_x",
+    fetchImpl: async (entrada) => {
+      const url = new URL(String(entrada));
+      const since = url.searchParams.get("since") ?? "";
+      if (url.pathname.endsWith("/visits/count")) {
+        pedidas.push(since);
+        if (since === "2001-10-12") return new Response("rango fuera de la ventana de reporte", { status: 400 });
+        return Response.json({ data: { pageviews: 9, visitors: 5 } });
+      }
+      const soloDia = url.searchParams.getAll("by").join(",") === "day";
+      return Response.json({ data: soloDia ? [{ timestamp: "2001-11-10T00:00:00.000Z", pageviews: 9, visitors: 5 }] : [] });
+    },
+  });
+  // La marca de agua es la del test, no la que haya dejado la base: con ella en el 9, se copia solo el 10
+  // (una marca más nueva, de otro test o de datos reales, da lo mismo por `minimoDias`).
+  const marca = { fecha: fechaUTC("2001-11-09"), dimension: "total", valor: "", agrupado: false };
+  await base.metricaDiaria.upsert({ where: { fecha_dimension_valor_agrupado: marca }, create: { ...marca, vistas: 1, visitantes: 1 }, update: {} });
+  const r = await sincronizarMetricas({ cliente, base, hoy, minimoDias: 1 });
+  assert.equal(r.ok, true);
+  assert.equal(r.detalle, "Del 2001-11-10 al 2001-11-10: 1 días, 1 filas, 2 ventanas. No se pudo: la de 30 días hasta el 2001-11-10 (Vercel respondió 400.).");
+  // Nunca pidió más atrás que el mes del plan.
+  assert.deepEqual(pedidas.sort(), ["2001-10-12", "2001-10-28", "2001-11-04"]);
+  assert.equal(await base.metricaDiaria.count({ where: { fecha: fechaUTC("2001-11-10"), dimension: "total" } }), 1);
 });
 
 after(async () => {

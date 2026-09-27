@@ -3,6 +3,17 @@
 // que cuenta el sitio, dónde se comparte un link y cuánto dato hace falta
 // para dibujar cada bloque. Lo que no sabe de ED vive en `lib/metricas/`.
 
+/**
+ * Lo que da el plan de Vercel de ED, que es Hobby (ADR-0009), verificado el
+ * 2026-09-27 en https://vercel.com/docs/analytics/limits-and-pricing
+ * (actualizada el 2026-08-25): «Reporting Window: 1 Month» y «UTM Parameters:
+ * -». La copia diaria nunca le pide a Vercel nada más viejo que la ventana ni
+ * lo que el plan no tiene: si lo pidiera, la API lo rechaza o lo recorta, y
+ * la copia fallaría todos los días o daría cifras falsas. Si ED cambia de
+ * plan, se cambia acá (Pro: 12 meses, UTM solo con Web Analytics Plus).
+ */
+export const PLAN_DE_VERCEL = { ventanaDeReporteDias: 30, utm: false } as const;
+
 /** Los países que van siempre arriba en Origen, en este orden: ISO alfa-2, como los da Vercel. */
 export const PAISES_FIJOS = ["CL", "MX", "AR"] as const;
 export type PaisFijo = (typeof PAISES_FIJOS)[number];

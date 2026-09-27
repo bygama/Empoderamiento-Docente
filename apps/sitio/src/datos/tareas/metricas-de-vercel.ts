@@ -1,11 +1,11 @@
 import type { PrismaClient } from "@/../prisma/generado/client";
 import { base as baseDeLaApp } from "@/datos/cliente";
 import { clienteDesdeEntorno } from "@/lib/metricas/entorno";
-import { ayerUTC, diaISO, fechaUTC, MAXIMO_DIAS_POR_CORRIDA, rangoFaltante, sumarDias, ventanasDe } from "@/lib/metricas/periodos";
+import { ayerUTC, diaISO, fechaUTC, rangoFaltante, sumarDias } from "@/lib/metricas/periodos";
 import type { FilaDiaria } from "@/lib/metricas/tipos";
 import type { ClienteDeAnaliticas } from "@/lib/metricas/vercel";
 import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
-import { CONSULTAS } from "./consultas-de-vercel";
+import { CONSULTAS, DIAS_POR_CORRIDA, ventanasQueSePiden } from "./consultas-de-vercel";
 
 // Copia a nuestra base lo que la API de Web Analytics tiene y todavía no
 // guardamos. Idempotente: correr dos veces deja lo mismo. Es una tarea del
@@ -35,10 +35,10 @@ export async function sincronizarMetricas({
 }): Promise<ResultadoDeTarea> {
   const ultimo = await base.metricaDiaria.findFirst({ where: { dimension: "total" }, orderBy: { fecha: "desc" } });
   const ayer = ayerUTC(hoy);
-  let rango = rangoFaltante({ ultimoGuardado: ultimo ? diaISO(ultimo.fecha) : null, hoy });
-  // Una función de Vercel tiene un tiempo máximo: minimoDias nunca pide más
-  // días de los que ya acepta una corrida.
-  const minimo = Math.min(minimoDias, MAXIMO_DIAS_POR_CORRIDA);
+  let rango = rangoFaltante({ ultimoGuardado: ultimo ? diaISO(ultimo.fecha) : null, hoy, maximo: DIAS_POR_CORRIDA });
+  // Ni el tiempo de una función ni la ventana del plan dejan pedir más:
+  // minimoDias nunca pide más días de los que ya acepta una corrida.
+  const minimo = Math.min(minimoDias, DIAS_POR_CORRIDA);
   if (minimo > 0) {
     const desdeMinimo = sumarDias(ayer, -(minimo - 1));
     rango = { desde: rango && rango.desde < desdeMinimo ? rango.desde : desdeMinimo, hasta: ayer };
@@ -56,24 +56,32 @@ export async function sincronizarMetricas({
       filas += filasDia.length;
       await pausa();
     }
+    // Cada ventana es independiente: una que falla va al detalle y no voltea
+    // la copia, porque la marca de agua depende solo de las filas diarias.
     let ventanas = 0;
-    for (const v of ventanasDe(rango.hasta)) {
-      const medida = await cliente.ventana({ desde: v.desde, hasta: v.fechaFin });
-      const clave = { fechaFin: fechaUTC(v.fechaFin), dias: v.dias };
-      await base.metricaVentana.upsert({ where: { fechaFin_dias: clave }, create: { ...clave, ...medida }, update: medida });
-      ventanas++;
+    const fallidas: string[] = [];
+    for (const v of ventanasQueSePiden(rango.hasta, hoy)) {
+      try {
+        const medida = await cliente.ventana({ desde: v.desde, hasta: v.fechaFin });
+        const clave = { fechaFin: fechaUTC(v.fechaFin), dias: v.dias };
+        await base.metricaVentana.upsert({ where: { fechaFin_dias: clave }, create: { ...clave, ...medida }, update: medida });
+        ventanas++;
+      } catch (e) {
+        fallidas.push(`la de ${v.dias} días hasta el ${v.fechaFin} (${e instanceof Error ? e.message : String(e)})`);
+      }
       await pausa();
     }
     // `total` es la marca de agua: la próxima corrida decide desde dónde seguir
     // mirando la fila `total` más nueva. Si se guardara antes de que termine el
-    // resto (una consulta o una ventana con un 429, por ejemplo) la marca
+    // resto (una consulta con un 429, por ejemplo) la marca
     // avanzaría sin que el rango haya entrado entero. Por eso cierra la
     // corrida, con el mismo patrón de upserts independientes que el resto.
     const filasTotal = await cliente.porDia(rango, "total");
     await Promise.all(filasTotal.map((fila) => guardarFila(base, fila)));
     filas += filasTotal.length;
     const dias = Math.round((fechaUTC(rango.hasta).getTime() - fechaUTC(rango.desde).getTime()) / 86_400_000) + 1;
-    return { ok: true, detalle: `Del ${rango.desde} al ${rango.hasta}: ${dias} días, ${filas} filas, ${ventanas} ventanas.` };
+    const sinVentana = fallidas.length ? ` No se pudo: ${fallidas.join("; ")}.` : "";
+    return { ok: true, detalle: `Del ${rango.desde} al ${rango.hasta}: ${dias} días, ${filas} filas, ${ventanas} ventanas.${sinVentana}` };
   } catch (e) {
     return { ok: false, detalle: e instanceof Error ? e.message : String(e) };
   }

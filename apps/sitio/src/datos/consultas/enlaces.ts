@@ -1,3 +1,4 @@
+import { PLAN_DE_VERCEL } from "@/config/metricas";
 import { base } from "@/datos/cliente";
 import { hayVariablesDeMetricas } from "@/lib/metricas/entorno";
 import { urlDelSitio } from "@/lib/url-del-sitio";
@@ -21,7 +22,7 @@ export type EnlaceConCifras = {
   creadoPor: string;
   /** Los de `/l/`, contados en el servidor. */
   clics: number;
-  /** Las visitas que Vercel contó con su `utm_campaign`; `null` sin la copia de Vercel. */
+  /** Las visitas que Vercel contó con su `utm_campaign`; `null` sin la copia de Vercel o sin UTM en el plan. */
   visitas: number | null;
   /** Los CV que se mandaron en la carga en que se llegó por el link. */
   cv: number;
@@ -41,7 +42,8 @@ export async function enlacesConCifras(): Promise<EnlaceConCifras[]> {
   ]);
   const de = <T extends { _sum: Record<string, number | null> }>(filas: T[], clave: (f: T) => string, id: string, campo: string) =>
     filas.find((f) => clave(f) === id)?._sum[campo] ?? 0;
-  const conVercel = hayVariablesDeMetricas();
+  // Sin UTM en el plan (Hobby), Vercel no cuenta las visitas por campaña: no hay número.
+  const conVercel = hayVariablesDeMetricas() && PLAN_DE_VERCEL.utm;
   return enlaces.map((e) => ({
     id: e.id,
     codigo: e.codigo,
