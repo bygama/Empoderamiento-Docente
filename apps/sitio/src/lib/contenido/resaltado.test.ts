@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { fragmentos, parrafos, resaltadoValido } from "./resaltado";
+import { fragmentos, parrafos, partirResaltado, resaltadoValido, sinMarcas } from "./resaltado";
 
 test("fragmentos separa lo resaltado y conserva los espacios de afuera", () => {
   assert.deepEqual(fragmentos("Somos **una idea** hecha acción"), [
@@ -35,4 +35,15 @@ test("resaltadoValido con exactamente cuenta las partes resaltadas", () => {
 
 test("parrafos corta en cada renglón y saltea los vacíos", () => {
   assert.deepEqual(parrafos("Primero.\n\n  Segundo.  \r\nTercero.\n"), ["Primero.", "Segundo.", "Tercero."]);
+});
+
+test("sinMarcas deja el texto como se lee", () => {
+  assert.equal(sinMarcas("Áreas de **especialización**"), "Áreas de especialización");
+  assert.equal(sinMarcas("Sin marcas."), "Sin marcas.");
+});
+
+test("partirResaltado separa la primera parte resaltada con lo de antes y lo de después", () => {
+  assert.deepEqual(partirResaltado("Es poder para **transformar**."), { antes: "Es poder para ", clave: "transformar", despues: "." });
+  assert.deepEqual(partirResaltado("**Todo**"), { antes: "", clave: "Todo", despues: "" });
+  assert.deepEqual(partirResaltado("Sin marca"), { antes: "Sin marca", clave: null, despues: "" });
 });

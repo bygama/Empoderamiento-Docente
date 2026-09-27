@@ -8,24 +8,11 @@ import {
   Users,
 } from "@/components/ui/icons";
 import type { Areas } from "@/features/home/contenido/areas";
-import { fragmentos } from "@/lib/contenido/resaltado";
+import { partirResaltado } from "@/lib/contenido/resaltado";
 
 // Un ícono de marca por área, en el orden de la lista: la identidad de cada
 // carta es estructura, no copy.
 const ICONOS = [Users, Lightbulb, Compass, TrendingUp, BookOpen, School, Target];
-
-/**
- * El detalle se escribe con su idea en negrita entre dobles asteriscos (el
- * esquema pide exactamente una) y se dibuja como antes: lo de antes, la idea en
- * `strong`, lo de después. Sin marca, va todo como texto.
- */
-function partirDetalle(detalle: string): { antes: string; clave: string | null; despues: string } {
-  const partes = fragmentos(detalle);
-  const i = partes.findIndex((f) => f.resaltado);
-  if (i === -1) return { antes: detalle, clave: null, despues: "" };
-  const unir = (lista: typeof partes) => lista.map((f) => f.texto).join("");
-  return { antes: unir(partes.slice(0, i)), clave: partes[i].texto, despues: unir(partes.slice(i + 1)) };
-}
 
 /**
  * Una carta del abanico de Áreas, en tres capas para que ningún transform
@@ -49,7 +36,9 @@ export function CartaArea({
 }) {
   const n = String(indice + 1).padStart(2, "0");
   const Icon = ICONOS[indice % ICONOS.length];
-  const detalle = partirDetalle(texto);
+  // El detalle lleva su idea en negrita entre dobles asteriscos (el esquema pide
+  // exactamente una): lo de antes, la idea en `strong`, lo de después.
+  const detalle = partirResaltado(texto);
   return (
     <div data-deck-mano className="relative h-full">
       {/* Sombra larga de la carta elegida: se enciende por opacidad. */}

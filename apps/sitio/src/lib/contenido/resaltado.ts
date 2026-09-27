@@ -32,6 +32,26 @@ export function fragmentos(texto: string): Fragmento[] {
   return partes.map((parte, i) => ({ texto: parte, resaltado: i % 2 === 1 })).filter((f) => f.texto !== "");
 }
 
+/** El texto como se lee, sin las marcas: «Somos **una idea**» → «Somos una idea». */
+export function sinMarcas(texto: string): string {
+  return fragmentos(texto)
+    .map((f) => f.texto)
+    .join("");
+}
+
+/**
+ * Lo de antes, la primera parte resaltada y lo de después: para las secciones
+ * que resaltan una sola parte (el esquema pide exactamente una) y la dibujan
+ * en su propio elemento. Sin marca, todo va en `antes`.
+ */
+export function partirResaltado(texto: string): { antes: string; clave: string | null; despues: string } {
+  const partes = fragmentos(texto);
+  const i = partes.findIndex((f) => f.resaltado);
+  if (i === -1) return { antes: texto, clave: null, despues: "" };
+  const unir = (lista: Fragmento[]) => lista.map((f) => f.texto).join("");
+  return { antes: unir(partes.slice(0, i)), clave: partes[i].texto, despues: unir(partes.slice(i + 1)) };
+}
+
 /** Cuántas partes resaltadas hay, o `null` si alguna marca quedó sin cerrar o vacía (`****`). */
 function cuantosResaltados(texto: string): number | null {
   const partes = texto.split(MARCA);

@@ -7,6 +7,7 @@ import { esquemaHero, heroInicial } from "@/features/home/contenido/hero";
 import { esquemaMision, misionInicial } from "@/features/home/contenido/mision";
 import { esquemaQuienesSomos, quienesSomosInicial } from "@/features/home/contenido/quienes-somos";
 import { seoInicial } from "@/features/home/contenido/seo";
+import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import type { RegistroDePaginas } from "@/lib/contenido/documento";
 import type { Seo } from "@/lib/contenido/seo";
 
@@ -33,7 +34,13 @@ export const PAGINAS = {
     // El SEO de hoy (SPEC §6 de work/paginas-inicio/): con esto la página tiene pestaña SEO.
     seo: seoInicial,
   },
-  "que-hacemos": { ruta: "/que-hacemos", nombre: "Qué hacemos", secciones: {} },
+  "que-hacemos": {
+    ruta: "/que-hacemos",
+    nombre: "Qué hacemos",
+    secciones: {
+      areas: { nombre: "Áreas de especialización", esquema: esquemaAreasDeQueHacemos, inicial: areasDeQueHacemos },
+    },
+  },
   "quienes-somos": { ruta: "/quienes-somos", nombre: "Quiénes somos", secciones: {} },
   investigacion: { ruta: "/investigacion", nombre: "Investigación", secciones: {} },
   biblioteca: { ruta: "/biblioteca", nombre: "Biblioteca", secciones: {} },

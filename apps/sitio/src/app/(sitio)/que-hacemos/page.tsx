@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { contenidoDe } from "@/datos/consultas/paginas";
 import { QueHacemosHero } from "@/features/que-hacemos/components/QueHacemosHero";
 import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemosHeroFaro";
 import { AreasQueHacemos } from "@/features/que-hacemos/components/AreasQueHacemos";
@@ -37,7 +38,9 @@ export const metadata: Metadata = {
 // sitemap pone después del hero: cuatro frases de por qué esto no es una
 // capacitación tradicional (palabras de Dani), en lugar de las cinco
 // preguntas del método, que repetían «Cómo trabajamos».
-export default function QueHacemosPage() {
+export default async function QueHacemosPage() {
+  // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
+  const { areas } = await contenidoDe("que-hacemos");
   return (
     <main id="contenido" tabIndex={-1}>
       {/* FONDO COMPARTIDO: el hero y la escena del faro son dos cielos
@@ -60,13 +63,13 @@ export default function QueHacemosPage() {
             "linear-gradient(180deg, color-mix(in srgb, var(--color-azul-principal) 82%, #04060c) 0, color-mix(in srgb, var(--color-azul-principal) 62%, #04060c) 52svh, color-mix(in srgb, var(--color-azul-principal) 45%, black) 100svh)",
         }}
       >
-        <QueHacemosHero />
+        <QueHacemosHero areas={areas.areas} />
         {/* Escena del faro por capas de profundidad (cámara scrubbed). Su
             CTA final («Ver las siete áreas») baja a #areas. */}
         <QueHacemosHeroFaro />
       </div>
       <MiradaPasos />
-      <AreasQueHacemos />
+      <AreasQueHacemos contenido={areas} />
       {/* La víbora: una sola, en una capa fija por debajo de Niveles y
           Proyectos, que van transparentes en vivo. */}
       <ViboraQueHacemos />

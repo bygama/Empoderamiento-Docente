@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { AREAS } from "@/features/que-hacemos/data/areas";
+import type { AreaDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useMouseParallax } from "@/lib/hooks/useMouseParallax";
@@ -12,6 +12,7 @@ import { crearPortal } from "./que-hacemos-hero/portal-viaje";
 import { CieloPolvo } from "./que-hacemos-hero/CieloPolvo";
 import { TitularQH } from "./que-hacemos-hero/TitularQH";
 import { CapsulaPortal } from "./que-hacemos-hero/CapsulaPortal";
+import { idDeArea } from "./areas/anclas";
 
 /**
  * Hero de Qué hacemos — pantalla completa (100svh) a sangre, sin bordes
@@ -26,7 +27,7 @@ import { CapsulaPortal } from "./que-hacemos-hero/CapsulaPortal";
  * zona del cielo que toca respira un poco más de luz. Titular: "Generamos y /
  * transformamos." (antes "No formamos. / Transformamos."; se cambió a
  * pedido de Gastón el 2026-09-01). PENDIENTE validar titular exacto con ED.
- * Debajo de la bajada van las SEIS ÁREAS del cartel oficial como chips que
+ * Debajo de la bajada van las SIETE ÁREAS (su nombre corto) como chips que
  * bajan a su bloque en #areas (2026-09-08): es lo único que el hero suma
  * para decir qué hace ED; la frase del cartel va en la escena del faro.
  *
@@ -72,7 +73,7 @@ import { CapsulaPortal } from "./que-hacemos-hero/CapsulaPortal";
  * magnetismo en `capsula-magnetismo.ts`, portal y viaje en `portal-viaje.ts`;
  * markup en `CieloPolvo`, `TitularQH` y `CapsulaPortal`.
  */
-export function QueHacemosHero() {
+export function QueHacemosHero({ areas }: { areas: readonly AreaDeQueHacemos[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const holdRef = useRef<HTMLButtonElement | null>(null);
   const campoRef = useRef<HTMLDivElement | null>(null);
@@ -167,17 +168,17 @@ export function QueHacemosHero() {
           aria-label="Áreas de trabajo"
           className="mt-7 flex max-w-[64ch] flex-wrap justify-center gap-2"
         >
-          {AREAS.map((a) => (
-            <li key={a.id}>
+          {areas.map((a, i) => (
+            <li key={idDeArea(i)}>
               <a
-                href={`#area-${a.id}`}
+                href={`#${idDeArea(i)}`}
                 className="focus-visible:outline-verde-concepto inline-flex min-h-9 items-center rounded-full border border-white/25 px-3.5 font-sans text-[0.85rem] text-white/85 transition-colors hover:border-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 {/* Nombre corto: son siete chips en un hero a pantalla
                     completa, y con los nombres largos la fila se come el aire
                     entre la bajada y la capsula. El area completa se lee en su
                     bloque. */}
-                {a.nombreCorto ?? a.nombre}
+                {a.nombreCorto}
               </a>
             </li>
           ))}
