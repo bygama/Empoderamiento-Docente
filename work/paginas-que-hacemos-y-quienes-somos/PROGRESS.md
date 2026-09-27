@@ -6,7 +6,7 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- Paso 15 del PLAN (las siete áreas, una sola fuente).
+- Paso 17 del PLAN (el aviso de sección compartida).
 
 ## Abierto
 
@@ -16,6 +16,37 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
   archivo; el padre lo anota en su lane.
 
 ## Hecho
+
+- **Paso 16 — Las frases del método, una sola fuente** (`3112758`). Los
+  pasos de Inicio pierden `frase` (esquema e inicial) y su sección anota
+  `usa: { pagina: "que-hacemos", seccion: "comoTrabajamos", que: "Las frases
+  en verde de los pasos" }`; `ideasDelMetodo(comoTrabajamos, cuantas)` (+1
+  test: las cinco ideas de hoy, en orden) y `ComoTrabajamos` las recibe como
+  `frases` y se las pone a cada paso. La ayuda de la idea en Qué hacemos
+  nombra a Inicio; la de los pasos de Inicio dice que Qué hacemos tiene su
+  propia versión, con otros textos. typecheck 0 · lint 0 · test 0 (186 ok) ·
+  build 0 · react-doctor 100/100 · comparar-render contra el paso anterior
+  **0**.
+
+- **Paso 15 — Las siete áreas, una sola fuente** (`ce0a9e6`).
+  `lib/contenido/compartido.ts` (sin ED): `Compartido = { pagina, seccion,
+  que }`, `rutasQueMuestran`, `quienesUsan`, `problemasDeCompartidos` (+3
+  tests); `SeccionRegistrada.usa?`. La sección `areas` de Inicio pierde la
+  lista (se queda con título, bajada y enlace) y anota `usa: { pagina:
+  "que-hacemos", seccion: "areas", que: "Las siete áreas" }`; el test del
+  registro exige `problemasDeCompartidos(PAGINAS)` vacío.
+  `features/home/contenido/compartido.ts`: `areasDeInicio` (+1 test: solo
+  título, frase y detalle, en orden; solo tipos de Qué hacemos). `/` pide
+  Inicio y Qué hacemos con `Promise.all` (react-doctor frenó el `await`
+  secuencial: `server-sequential-independent-await`, arreglado por código) y
+  `LineasAccion` recibe las áreas. `publicarEnBase` devuelve `rutas` (de
+  `rutasQueMuestran`) y la acción `publicar` revalida cada una; el test de
+  integración nuevo publica la dueña de un registro de prueba y recibe las
+  dos rutas, y el viejo de `editar-paginas.test.ts` pasa a `rutas`. Las
+  ayudas de las áreas de Qué hacemos ahora nombran a Inicio. typecheck 0 ·
+  lint 0 · test 0 (sitio: 186, 185 ok, 1 omitido) · build 0 (`/` sigue ○) ·
+  react-doctor 100/100 · comparar-render contra el paso anterior **0**
+  (`index.html` igual, −8 bytes de activos: Zod no viaja al navegador).
 
 - **Paso 14 — SEO de Quiénes somos** (`49ef7aa`).
   `features/quienes-somos/contenido/seo.ts` («Quiénes somos | Empoderamiento
