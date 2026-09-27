@@ -115,8 +115,15 @@ esto; partirlo en dos apps obligaría a una API entre las dos.
 /contacto                               /api/contacto · /api/cv
 /sumate-al-equipo  (apagada)           /admin/mensajes/cv/[id]/archivo
 /sitemap.xml                      <-   /vista-previa · /vista-previa/salir
-/robots.txt
+/robots.txt                            /api/contar
+/l/<codigo>        (link corto)        /admin/metricas/{busquedas,origen,acciones,enlaces}
 ```
+
+`/l/<codigo>` y `/api/contar` son de Métricas desde el 2026-09-27
+(`work/metricas-completas/`, [ADR-0017](../adrs/0017-contadores-propios-y-links-cortos.md)):
+el link corto cuenta el clic y redirige con un 307 a su página con los UTM
+(no se indexa ni se cachea; uno borrado da el 404), y `/api/contar` suma un
+evento raro del sitio y contesta siempre 204.
 
 `/api/contacto` y `/api/cv` reciben los formularios públicos desde el
 2026-09-26 (`work/mensajes/`, [ADR-0012](../adrs/0012-mensajes-cv-privados-y-retencion.md)).
@@ -229,6 +236,18 @@ autorías; sin `cita`, la cita APA se arma con los datos de hoy; sin
 `portada`, el sitio muestra la tipográfica generada. El DOI es único y cada
 uno de los cuatro lugares de destacado también. `chequeo_en`, `chequeo` y
 `chequeo_detalle` los escribe la tarea `salud-de-links` del cron diario.
+
+**Métricas** (2026-09-27, `work/metricas-completas/`,
+[ADR-0017](../adrs/0017-contadores-propios-y-links-cortos.md)) no es
+contenido, pero sus tablas viven en la misma base. `metricas_diarias` y
+`metricas_ventanas` son la copia diaria de Vercel (ADR-0009); la copia suma
+sistema, navegador, campaña, hora y el cruce página × país **como valores de
+`dimension`, sin migración**, y la ventana de 90 días. `contadores` guarda lo
+que cuenta el sitio mismo —una suma por día, evento, canal y clave (el id de
+un material o de un link), sin IP, navegador ni hora—. `enlaces` son los
+links cortos (código único, nombre, destino, dónde se comparte, quién) y
+`marcas`, las que se agregan a mano en la curva; las de publicar salen de
+`actividad`.
 
 ## 7. Acceso y seguridad
 
