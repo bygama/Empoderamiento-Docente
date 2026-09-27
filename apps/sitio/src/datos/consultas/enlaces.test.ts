@@ -1,12 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { PLAN_DE_VERCEL } from "@/config/metricas";
+import { SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 import { sinVisitasPorque } from "./enlaces";
 
-test("en el plan de hoy, sin UTM, Links dice una vez por qué no hay visitas, aunque estén las variables de Vercel", () => {
-  // Si ED cambia de plan, se prende PLAN_DE_VERCEL.utm y este test se reescribe con él.
-  assert.equal(PLAN_DE_VERCEL.utm, false);
-  process.env.VERCEL_TOKEN = "de-prueba";
-  process.env.VERCEL_ANALYTICS_PROJECT_ID = "de-prueba";
-  assert.equal(sinVisitasPorque(), "Vercel no da de dónde vienen las visitas en el plan gratuito: acá se ven los clics y los CV.");
+test("con Vercel en su plan gratuito, sin UTM, Links dice una vez por qué no hay visitas, aunque estén sus variables", () => {
+  const vercel = { VERCEL: "1", VERCEL_TOKEN: "de-prueba", VERCEL_ANALYTICS_PROJECT_ID: "de-prueba" };
+  assert.equal(sinVisitasPorque(vercel), "Vercel no da de dónde vienen las visitas en el plan gratuito: acá se ven los clics y los CV.");
+});
+
+test("con Umami las visitas por link se cuentan; sin sus variables, se dice qué falta", () => {
+  assert.equal(sinVisitasPorque({ UMAMI_API_URL: "http://analitica:3000", UMAMI_API_KEY: "k", UMAMI_WEBSITE_ID: "s" }), null);
+  assert.equal(sinVisitasPorque({}), `${SIN_VARIABLES_DE_METRICAS}: por ahora, acá se ven los clics y los CV.`);
 });

@@ -36,8 +36,8 @@ export function CuerpoDeOrigen({ origen, periodo }: { origen: OrigenDelPeriodo; 
       />
       <Bloque id="regiones" titulo="Regiones">
         <EstadoVacio
-          titulo="Vercel no da provincias, estados ni ciudades"
-          texto="Su analítica dice el país y nada más fino. Por eso acá no hay regiones: no se inventan."
+          titulo="Sin provincias, estados ni ciudades"
+          texto="Alcanza con el país: una provincia o una ciudad con pocas visitas puede señalar a alguien. Por eso acá no hay regiones."
         />
       </Bloque>
       <Seccion

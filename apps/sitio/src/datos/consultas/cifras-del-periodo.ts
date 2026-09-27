@@ -1,5 +1,5 @@
-import { PLAN_DE_VERCEL } from "@/config/metricas";
 import { base } from "@/datos/cliente";
+import { planDeLaFuente } from "@/datos/fuente-de-visitas";
 import { diaISO, fechaUTC, sumarDias, variacion, type Periodo } from "@/lib/metricas/periodos";
 import type { Dia } from "@/lib/metricas/tipos";
 import { tarjetaDe } from "./metricas";
@@ -17,21 +17,21 @@ async function vistasEntre(desde: Dia, hasta: Dia): Promise<number> {
 }
 
 /**
- * Hasta la ventana del plan, las dos salen de la ventana que Vercel mide
- * entera (personas distintas de todo el rango). Más largo, **lo que no se
+ * Hasta la ventana del plan (o siempre, si la fuente no tiene ventana, como
+ * Umami), las dos salen de la ventana que la fuente mide entera (personas distintas de todo el rango). Más largo, **lo que no se
  * puede medir se dice**: las vistas sí se suman día por día, si la copia
  * tiene el período entero, y se comparan solo con el anterior entero; las
  * personas distintas no se suman, así que no hay número y la nota dice por qué.
  */
 export async function cifrasDelPeriodo(periodo: Periodo, desde: Dia, hasta: Dia): Promise<CifrasDelPeriodo> {
-  const dias = PLAN_DE_VERCEL.ventanaDeReporteDias;
-  if (periodo <= dias) {
+  const { nombre, ventanaDeReporteDias: dias } = planDeLaFuente();
+  if (dias === null || periodo <= dias) {
     const t = await tarjetaDe(periodo);
     if (!t) return { visitantes: { valor: null }, vistas: { valor: null } };
     return { visitantes: { valor: t.visitantes, variacion: t.variacionVisitantes }, vistas: { valor: t.vistas, variacion: t.variacionVistas } };
   }
   const primera = await base.metricaDiaria.findFirst({ where: { dimension: "total" }, orderBy: { fecha: "asc" }, select: { fecha: true } });
-  return cifrasMasLargasQueElPlan({ periodo, desde, hasta, desdeLaCopia: primera ? diaISO(primera.fecha) : null, sumarVistas: vistasEntre });
+  return cifrasMasLargasQueElPlan({ periodo, desde, hasta, desdeLaCopia: primera ? diaISO(primera.fecha) : null, sumarVistas: vistasEntre, plan: { nombre, dias } });
 }
 
 /** Las cifras de un período más largo que la ventana del plan. Recibe cómo sumar las vistas, para probarla sin base. */
@@ -41,6 +41,7 @@ export async function cifrasMasLargasQueElPlan({
   hasta,
   desdeLaCopia,
   sumarVistas,
+  plan,
 }: {
   periodo: Periodo;
   desde: Dia;
@@ -48,8 +49,10 @@ export async function cifrasMasLargasQueElPlan({
   /** El primer día copiado; `null` sin copia. */
   desdeLaCopia: Dia | null;
   sumarVistas: (desde: Dia, hasta: Dia) => Promise<number>;
+  /** La fuente y su ventana, que es más corta que el período. */
+  plan: { nombre: string; dias: number };
 }): Promise<CifrasDelPeriodo> {
-  const visitantes = { valor: null, nota: `No se puede medir: Vercel da personas distintas de hasta ${PLAN_DE_VERCEL.ventanaDeReporteDias} días, y día por día no se suman` };
+  const visitantes = { valor: null, nota: `No se puede medir: ${plan.nombre} da personas distintas de hasta ${plan.dias} días, y día por día no se suman` };
   if (!desdeLaCopia || desdeLaCopia > desde) return { visitantes, vistas: { valor: null, nota: `La copia todavía no tiene los ${periodo} días enteros` } };
   const desdeAnterior = sumarDias(desde, -periodo);
   // El período y el anterior no dependen uno del otro: van juntos.

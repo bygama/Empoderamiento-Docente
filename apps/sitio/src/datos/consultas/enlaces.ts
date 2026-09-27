@@ -1,5 +1,5 @@
-import { PLAN_DE_VERCEL } from "@/config/metricas";
 import { base } from "@/datos/cliente";
+import { planDeLaFuente } from "@/datos/fuente-de-visitas";
 import { hayVariablesDeMetricas, SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 import { urlDelSitio } from "@/lib/url-del-sitio";
 import { nombresDeRutas } from "./nombres-de-rutas";
@@ -22,7 +22,7 @@ export type EnlaceConCifras = {
   creadoPor: string;
   /** Los de `/l/`, contados en el servidor. */
   clics: number;
-  /** Las visitas que Vercel contó con su `utm_campaign`; `null` cuando no se miden (`sinVisitasPorque`). */
+  /** Las visitas que la analítica contó con su `utm_campaign`; `null` cuando no se miden (`sinVisitasPorque`). */
   visitas: number | null;
   /** Los CV que se mandaron en la carga en que se llegó por el link. */
   cv: number;
@@ -42,7 +42,7 @@ export async function enlacesConCifras(): Promise<EnlaceConCifras[]> {
   ]);
   const de = <T extends { _sum: Record<string, number | null> }>(filas: T[], clave: (f: T) => string, id: string, campo: string) =>
     filas.find((f) => clave(f) === id)?._sum[campo] ?? 0;
-  const conVercel = sinVisitasPorque() === null;
+  const conVisitas = sinVisitasPorque() === null;
   return enlaces.map((e) => ({
     id: e.id,
     codigo: e.codigo,
@@ -54,19 +54,20 @@ export async function enlacesConCifras(): Promise<EnlaceConCifras[]> {
     creadoEn: e.creadoEn.toISOString(),
     creadoPor: e.creadoPor,
     clics: de(clics, (f) => f.clave, e.id, "cuenta"),
-    visitas: conVercel ? de(visitas, (f) => f.valor, e.codigo, "visitantes") : null,
+    visitas: conVisitas ? de(visitas, (f) => f.valor, e.codigo, "visitantes") : null,
     cv: de(cv, (f) => f.clave, e.id, "cuenta"),
   }));
 }
 
 /**
  * Por qué los links no traen visitas, o `null` si las traen. La pantalla lo
- * dice una vez, arriba de la lista, y no en cada fila. En Hobby, Vercel no
- * cuenta por UTM: prenderlas es cambiar `PLAN_DE_VERCEL` si ED cambia de plan.
+ * dice una vez, arriba de la lista, y no en cada fila. Umami cuenta por UTM;
+ * Vercel, en Hobby, no (`PLANES_DE_LA_FUENTE`).
  */
-export function sinVisitasPorque(): string | null {
-  if (!PLAN_DE_VERCEL.utm) return "Vercel no da de dónde vienen las visitas en el plan gratuito: acá se ven los clics y los CV.";
-  if (!hayVariablesDeMetricas()) return `${SIN_VARIABLES_DE_METRICAS}: por ahora, acá se ven los clics y los CV.`;
+export function sinVisitasPorque(entorno: Record<string, string | undefined> = process.env): string | null {
+  const plan = planDeLaFuente(entorno);
+  if (!plan.utm) return `${plan.nombre} no da de dónde vienen las visitas en el plan gratuito: acá se ven los clics y los CV.`;
+  if (!hayVariablesDeMetricas(entorno)) return `${SIN_VARIABLES_DE_METRICAS}: por ahora, acá se ven los clics y los CV.`;
   return null;
 }
 

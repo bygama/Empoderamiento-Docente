@@ -39,7 +39,16 @@ test("con error si está configurada y su última corrida falló, con la última
   assert.deepEqual(vercel.tareasDeLaConexion.map((t) => [t.nombre, t.ultima?.ok, t.ultimaCorrecta]), [["Copia de las visitas", false, AYER]]);
   // Sin configurar no es un error: es lo que falta hacer.
   const sinConfigurar = await estadoDeLasConexiones("dirige", { entorno: {}, leer });
-  assert.equal(sinConfigurar.find((c) => c.clave === "vercel-analytics")!.conError, false);
+  assert.equal(sinConfigurar.find((c) => c.clave === "umami")!.conError, false);
+});
+
+test("de las visitas se muestra una sola fuente: la configurada, o la del host", async () => {
+  const claves = async (entorno: Record<string, string>) => (await estadoDeLasConexiones("dirige", { entorno, leer })).map((c) => c.clave);
+  const umami = { UMAMI_API_URL: "http://analitica:3000", UMAMI_API_KEY: "k", UMAMI_WEBSITE_ID: "s" };
+  assert.ok((await claves(umami)).includes("umami") && !(await claves(umami)).includes("vercel-analytics"));
+  // En Vercel, sin ninguna configurada, la que falta es la de Vercel; en un VPS, la de Umami.
+  assert.ok((await claves({ VERCEL: "1" })).includes("vercel-analytics") && !(await claves({ VERCEL: "1" })).includes("umami"));
+  assert.ok((await claves({})).includes("umami") && !(await claves({})).includes("vercel-analytics"));
 });
 
 test("el cron mira la última corrida de cualquier tarea", async () => {

@@ -6,7 +6,7 @@ import { SIN_PERMISO, puede } from "@ed/auth";
 import { auth } from "@/datos/auth";
 import { correrAMano } from "@/datos/tareas/a-mano";
 import { copiaDeVisitas, copiarMetricas } from "@/datos/tareas/copia-de-visitas";
-import { hayVariablesDeMetricas } from "@/lib/metricas/entorno";
+import { hayVariablesDeMetricas, SIN_VARIABLES_DE_METRICAS } from "@/lib/metricas/entorno";
 
 // Una Server Action corre antes de que se renderice el layout protegido, así
 // que el layout no la cubre y el proxy solo mira que la cookie exista:
@@ -19,7 +19,7 @@ export async function actualizarMetricasAhora(): Promise<{ ok: boolean; detalle:
     if (!puede(sesion.user.rol, "verMetricas")) return { ok: false, detalle: SIN_PERMISO };
     // Sin variables no hay nada que copiar, y esa corrida no se registra: no
     // tocó la API, así que no tiene por qué frenar al botón.
-    if (!hayVariablesDeMetricas()) return { ok: false, detalle: "Faltan las variables de Vercel: ver el README." };
+    if (!hayVariablesDeMetricas()) return { ok: false, detalle: `${SIN_VARIABLES_DE_METRICAS}: ver el README.` };
 
     const resultado = await correrAMano(copiaDeVisitas.clave, () => copiarMetricas({ minimoDias: 3 }));
     revalidatePath("/admin");

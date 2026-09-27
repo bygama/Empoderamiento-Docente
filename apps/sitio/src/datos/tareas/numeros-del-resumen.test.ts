@@ -6,7 +6,7 @@ import { semanaAntesDe } from "./numeros-del-resumen";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const hayBase = Boolean(process.env.DATABASE_URL);
-// Los números leen la copia solo con las variables de Vercel; acá no se llama a la API.
+// Los números leen la copia solo con las variables de la analítica; acá no se llama a la API.
 process.env.VERCEL_TOKEN ||= "de-prueba";
 process.env.VERCEL_ANALYTICS_PROJECT_ID ||= "de-prueba";
 

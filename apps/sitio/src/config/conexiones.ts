@@ -1,4 +1,5 @@
 import { urlDesviada } from "@/lib/correo/resend";
+import { fuenteEsperada, VARIABLES_DE_LA_FUENTE } from "@/lib/metricas/entorno";
 
 // Los servicios de afuera de los que depende el sitio (Ajustes › Conexiones,
 // work/ajustes/SPEC.md §2.6): cómo se configura cada uno —por los nombres de
@@ -16,18 +17,30 @@ export type Conexion = {
   tareas: readonly string[] | "todas";
   /** Qué pasa mientras no está configurada. */
   sinConfigurar: string;
+  /** Si se muestra en este entorno; sin esto, siempre. Las dos fuentes de visitas se excluyen. */
+  mostrar?: (entorno: Record<string, string | undefined>) => boolean;
   /** Algo raro de la configuración que hay que ver, aunque tenga sus variables; `null` si nada. */
   avisar?: (entorno: Record<string, string | undefined>) => string | null;
 };
 
 export const CONEXIONES: readonly Conexion[] = [
   {
+    clave: "umami",
+    nombre: "Umami",
+    para: "Las visitas de Métricas, copiadas una vez por día desde la analítica del VPS.",
+    variables: VARIABLES_DE_LA_FUENTE.umami,
+    tareas: ["copia-de-visitas"],
+    sinConfigurar: "Métricas no se actualiza.",
+    mostrar: (entorno) => fuenteEsperada(entorno) === "umami",
+  },
+  {
     clave: "vercel-analytics",
     nombre: "Vercel Analytics",
     para: "Las visitas de Métricas, copiadas una vez por día.",
-    variables: ["VERCEL_TOKEN", "VERCEL_ANALYTICS_PROJECT_ID"],
+    variables: VARIABLES_DE_LA_FUENTE.vercel,
     tareas: ["copia-de-visitas"],
     sinConfigurar: "Métricas no se actualiza.",
+    mostrar: (entorno) => fuenteEsperada(entorno) === "vercel",
   },
   {
     clave: "search-console",
@@ -55,7 +68,7 @@ export const CONEXIONES: readonly Conexion[] = [
     para: "Las fotos que se suben desde el admin.",
     variables: ["BLOB_READ_WRITE_TOKEN"],
     tareas: [],
-    sinConfigurar: "Las fotos van al disco del servidor: sirve en local, no en Vercel.",
+    sinConfigurar: "Las fotos van al disco del servidor: en el VPS, a su volumen. En Vercel hace falta, porque su disco no dura.",
   },
   {
     clave: "blob-de-cv",
@@ -63,12 +76,12 @@ export const CONEXIONES: readonly Conexion[] = [
     para: "Los archivos de los CV, guardados sin URL pública.",
     variables: ["CV_BLOB_READ_WRITE_TOKEN"],
     tareas: ["retencion-de-cv"],
-    sinConfigurar: "En Vercel no se reciben CV.",
+    sinConfigurar: "Los CV van al disco privado del servidor: en el VPS, a su volumen. En Vercel no se reciben.",
   },
   {
     clave: "cron",
-    nombre: "Cron diario de Vercel",
-    para: "Corre una vez por día todo lo programado: las copias, la indexación y la retención.",
+    nombre: "Cron diario",
+    para: "Corre una vez por día todo lo programado: las copias, la indexación y la retención. Lo llama el cron de Vercel o el servicio `cron` del VPS.",
     variables: ["CRON_SECRET"],
     tareas: "todas",
     sinConfigurar: "Nada programado corre: el cron contesta 401.",

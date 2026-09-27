@@ -41,7 +41,7 @@ function LineaDeTarea({ tarea }: { tarea: EstadoDeTarea }) {
 
 /**
  * Ajustes › Conexiones (work/ajustes/SPEC.md §2.6): una `Lista` sin acciones,
- * porque se configuran en Vercel y no acá. Cada una dice para qué está, si
+ * porque se configuran en el servidor y no acá. Cada una dice para qué está, si
  * tiene sus variables (los nombres, nunca el valor) y cómo corrieron sus
  * tareas: así se ve por qué algo dejó de actualizarse sin llamar a quien
  * desarrolla.
@@ -52,7 +52,7 @@ export function ListaDeConexiones({ conexiones }: { conexiones: readonly EstadoD
       <Encabezado
         volver={VOLVER_A_AJUSTES}
         titulo="Conexiones"
-        detalle="Los servicios de afuera de los que depende el sitio. Se configuran en Vercel, con sus variables; acá se ve si están y cómo anduvieron."
+        detalle="Los servicios de afuera de los que depende el sitio. Se configuran en el servidor, con sus variables; acá se ve si están y cómo anduvieron."
       />
       <Lista>
         {conexiones.map((c) => {

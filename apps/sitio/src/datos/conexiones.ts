@@ -46,7 +46,7 @@ export async function estadoDeLasConexiones(
 ): Promise<EstadoDeConexion[]> {
   if (!puede(rol, "usarAjustes")) return [];
   return Promise.all(
-    CONEXIONES.map(async (conexion) => {
+    CONEXIONES.filter((conexion) => conexion.mostrar?.(entorno) ?? true).map(async (conexion) => {
       const faltan = conexion.variables.filter((v) => !entorno[v]);
       const tareasDeLaConexion =
         conexion.tareas === "todas"

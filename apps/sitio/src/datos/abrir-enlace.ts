@@ -7,7 +7,7 @@ import { sumarEnvio } from "./limites-por-ip";
 
 // `/l/<codigo>`, el link corto (SPEC de work/metricas-completas/ §6.4): cuenta
 // el clic en el servidor —sin cookies, aunque la persona bloquee la
-// analítica— y lleva a la página con los UTM, así Vercel cuenta las visitas
+// analítica— y lleva a la página con los UTM, así la analítica cuenta las visitas
 // que trajo. La página solo delega acá.
 
 const HORA_MS = 60 * 60 * 1000;

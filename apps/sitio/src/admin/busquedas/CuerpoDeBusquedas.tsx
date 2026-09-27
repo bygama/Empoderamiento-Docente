@@ -8,7 +8,7 @@ const PASOS = [
   "Verificá el dominio en Search Console con la cuenta de Google de ED: se hace una vez, con un registro TXT en el DNS.",
   "Pedile a quien desarrolla el sitio una cuenta de servicio de Google Cloud con la API de Search Console: te va a pasar un correo que termina en .iam.gserviceaccount.com.",
   "En Search Console › Configuración › Usuarios y permisos, agregá ese correo con el permiso «Restringido»: solo puede leer.",
-  "Quien desarrolla carga las tres variables en Vercel. La primera copia llega esa noche, o antes con «Actualizar ahora».",
+  "Quien desarrolla carga las tres variables en el servidor. La primera copia llega esa noche, o antes con «Actualizar ahora».",
 ];
 
 function SinConectar({ puedeConectar }: { puedeConectar: boolean }) {
