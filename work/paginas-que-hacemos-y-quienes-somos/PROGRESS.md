@@ -6,9 +6,80 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- Paso 9 del PLAN (SEO de Qué hacemos).
+- Paso 12 del PLAN (Nuestra mirada).
+
+## Abierto
+
+- **La copia de `origen-03-pregunta.webp`** (paso 11): está en
+  `public/fotos/` (la usa el origen) y en `public/quienes-somos/` (la usa
+  Novedades). Se deduplica cuando Fotos (lane 9) consolide dónde vive cada
+  archivo; el padre lo anota en su lane.
 
 ## Hecho
+
+- **Paso 11 — Origen, sentido y evolución** (`457ddf9`).
+  `features/quienes-somos/contenido/origen.ts` (origen: título y texto;
+  sentido: la cita en tres renglones y quién la dijo; evolución: pregunta y
+  respuesta; qué es ED: volanta, título con un resaltado y cinco hitos; el
+  remate: frase con resaltado y texto; tres fotos). `origen/data.ts` se queda
+  con `NODOS`, `PATH_D` y `PILARES` (de ahí salen el 5 de los hitos y el 3 de
+  las fotos); `OrigenEd`, `PilaresOrigen`, `BeatRemate` (parte la frase en
+  palabras, verde la que cae en un resaltado), las dos trayectorias y
+  `PanelFotos` por props. El `aria-label` de la región queda fijo (no tiene
+  título propio, DECISIONS). **Las fotos:** el campo de foto solo acepta
+  `/fotos/`; `origen-02-inflexion.webp` se movió y `origen-03-pregunta.webp` se
+  copió a `public/fotos/` (ruling del padre, DECISIONS). typecheck 0 · lint 0
+  · test 0 (179; en el primer intento el test del registro frenó la foto de
+  `/quienes-somos/`, que es lo que llevó al ruling) · build 0 · react-doctor
+  100/100 · comparar-render contra el paso anterior **1, solo `imagenes` de
+  `/quienes-somos`** (la cuarta diferencia, aprobada):
+
+  ```
+  antes: src="/_next/image?url=%2Fquienes-somos%2Forigen-02-inflexion.webp&amp;w=3840&amp;q=75"
+  ahora: src="/_next/image?url=%2Ffotos%2Forigen-02-inflexion.webp&amp;w=3840&amp;q=75"
+  antes: src="/_next/image?url=%2Fquienes-somos%2Forigen-03-pregunta.webp&amp;w=3840&amp;q=75"
+  ahora: src="/_next/image?url=%2Ffotos%2Forigen-03-pregunta.webp&amp;w=3840&amp;q=75"
+  ```
+
+  (el `srcset` igual; el `alt`, sin cambios). En el navegador, bajando el
+  origen en 21 muestras: la cita entra al 25 %, la pregunta se escribe de a
+  una letra hasta las 23 entre el 35 % y el 45 %, el remate llega en cuatro
+  palabras («Vivir» y «vivir.» en verde) desde el 85 %, y las tres fotos
+  cargan (`naturalWidth` 559).
+
+- **Paso 10 — Hero de Quiénes somos** (`94523ac`).
+  `features/quienes-somos/contenido/hero.ts` (dos renglones, bajada, botón);
+  la página pasa a `async` con `contenidoDe("quienes-somos")`;
+  `QuienesSomosHero` por props, su `h1` sr-only armado con los dos renglones.
+  **Nombre accesible**: antes `aria-label` «Quiénes somos — Empoderamiento
+  Docente»; ahora `aria-labelledby="quienes-somos-titulo"` → «No
+  capacitamos. Transformamos.». typecheck 0 · lint 0 · test 0 (179) · build
+  0 · react-doctor 100/100 · comparar-render contra el paso anterior **0**.
+
+- **Paso 9 — SEO de Qué hacemos** (`301c502`). `features/que-hacemos/contenido/seo.ts`
+  (`seoQueHacemosInicial`: «Qué hacemos | Empoderamiento Docente», la
+  descripción de hoy, sin imagen propia), su línea `seo` en el registro, y
+  `generateMetadata(_, padre)` con `metadataDeSeo(seo, await
+  openGraphDeLaPagina(padre))`. `openGraphDeLaPagina` va en
+  `config/metadata.ts` con la misma firma y el mismo cuerpo que en la 4c
+  (DECISIONS; la 4c todavía no está en `main`). typecheck 0 · lint 0 · test 0
+  (179) · build 0 (`/que-hacemos` sigue ○) · react-doctor 100/100 ·
+  comparar-render contra el paso anterior **1, solo `head` de
+  `/que-hacemos`** (la excepción 2 del SPEC §7). Las etiquetas (`diff-head.mjs`):
+
+  ```
+  - og:title            «Empoderamiento Docente — Transformamos el aprendizaje de las matemáticas»
+  - og:description      «Consultora especializada … en Chile, México, Argentina, Colombia y Brasil.»
+  - twitter:title       (= og:title de Inicio)
+  - twitter:description (= og:description de Inicio)
+  + og:title            «Qué hacemos | Empoderamiento Docente»
+  + og:description      «Consultora especializada en la transformación del aprendizaje matemático: investigación, diseño de materiales didácticos, desarrollo profesional docente, acompañamiento, currículo y evaluación.»
+  + twitter:title       (= og:title nuevo)
+  + twitter:description (= og:description nueva)
+  ```
+
+  `<title>`, `description`, `og:image` (con medidas y alt) y `twitter:image`
+  quedan iguales.
 
 - **Paso 8 — Cierre de Qué hacemos** (`4170167`). `contenido/cierre.ts`
   (título, texto, texto del botón, texto del link; los destinos quedan en

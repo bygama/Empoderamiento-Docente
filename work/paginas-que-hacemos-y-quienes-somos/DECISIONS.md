@@ -68,3 +68,17 @@ Append-only: fecha — decisión — por qué.
   archivo nuevo. comparar-render tiene que mostrar `og:image` y
   `twitter:image` sin cambios: cambian solo `og:title`, `og:description`,
   `twitter:title` y `twitter:description`.
+- 2026-09-26 — **Las fotos del origen pasan a `public/fotos/`** (ruling del
+  padre, opción A, por orca ask). El campo `foto()` de la 4a solo acepta
+  `/fotos/`, `/api/fotos/<uuid>` o el Blob (defensa de path traversal en
+  `lib/contenido/fotos.ts`), y dos de las tres fotos del panel del origen
+  vivían en `public/quienes-somos/`. `origen-02-inflexion.webp` se mueve
+  (`git mv`, solo la usaba el origen) y `origen-03-pregunta.webp` se **copia**
+  con el mismo nombre: la de `public/quienes-somos/` queda para Novedades
+  (lane 6, que la está pasando a la base). La copia se deduplica cuando Fotos
+  (lane 9) consolide dónde vive cada archivo. **Descartadas:** ampliar
+  `esSrcDeFoto` a `/quienes-somos/` (mete una carpeta de ED en un `lib/` sin
+  dominio y afloja una validación de seguridad) y dejar esas fotos en código
+  (no cumple el brief). **La cuarta diferencia de render, aprobada:** el
+  `src`/`srcset` de esas dos imágenes de `/quienes-somos` pasa de
+  `%2Fquienes-somos%2F` a `%2Ffotos%2F`; mismo archivo, se ve igual.
