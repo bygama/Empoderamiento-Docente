@@ -416,8 +416,10 @@ vacío con su acción, la fecha, la selección, la lista variable y la ficha de
 una entidad, también (`work/novedades-y-kit/`); Ajustes, que no suma
 patrones: usa los de acá y sube la tabla al armazón (`work/ajustes/`); la
 grilla de fotos, elegir una foto y el logo de aliado, el 2026-09-27
-(`work/casos-aliados-fotos/`); y los gráficos y el estado de poco dato, el
-2026-09-27 (`work/metricas-completas/`). Todos los contrastes están
+(`work/casos-aliados-fotos/`); el Equipo, que sube el encabezado de la ficha al
+armazón y anida la lista variable, ese mismo día (`work/equipo/`); y los
+gráficos y el estado de poco dato, también (`work/metricas-completas/`). Todos
+los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -1081,7 +1083,15 @@ subir otra. `packages/kit-admin/src/CampoFoto.tsx` y sus piezas en
 - **«Agregar sección»** es secundario, con el ícono `Mas`. En el tope deja su
   lugar a la explicación: «Llegaste al tope de 10: para agregar, primero hay
   que quitar». No se deshabilita.
-- Primer consumidor: el cuerpo de una novedad.
+- **Anidada**: una lista variable puede ir adentro del ítem de otra, sin
+  cambios en la pieza; su `nombre` es el camino entero en el esquema
+  (`recorrido.etapas.2.hitos`), así cada botón tiene su id y el error del
+  guardado cae en su lugar. Una lista de textos cortos (la formación, los
+  territorios, los conceptos) no es una lista variable: va en un `Parrafo`,
+  un ítem por renglón, como los párrafos de una novedad.
+- Primer consumidor: el cuerpo de una novedad. Anidada: las etapas de un
+  perfil del Equipo, con sus hitos, sus estancias y sus publicaciones
+  (2026-09-27, `work/equipo/`).
 
 ### Cifra
 
@@ -1385,6 +1395,16 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
   («Logo de aliado»). Su lista no tiene pestañas ni buscador: son pocos y el
   orden es el de la tira, con «Subir» y «Bajar» terciarios en cada fila; al
   mover, el foco sigue al aliado y un `status` lo anuncia.
+- **Los perfiles del Equipo** (`admin/equipo/`, `work/equipo/`) la repiten
+  entera. Su encabezado y el de un material eran el mismo árbol (lo marcó
+  react-doctor), así que viven en el armazón como `EncabezadoDeFicha`: el
+  título, la insignia, «Cambios sin guardar» anunciado, cuándo y quién (en
+  masculino, «Guardado», «Publicado») y las acciones que le pasa cada ficha.
+  Un bloque («La tarjeta», «El recorrido», «Las etapas») puede depender de una
+  casilla del bloque anterior («Tiene recorrido»): sin ella no está, y sacarla
+  no borra nada hasta guardar. «En la Biblioteca» es una `Lista` de solo
+  lectura con «Abrir» en cada fila y «Agregar en Biblioteca», secundario,
+  debajo.
 
 ### Agregar con datos de afuera
 
