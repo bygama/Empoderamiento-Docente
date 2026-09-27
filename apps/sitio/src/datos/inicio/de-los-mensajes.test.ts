@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { config as cargarEntorno } from "dotenv";
 import { seBorraEl } from "@/config/privacidad";
-import { cvQueSeBorranPronto, filaDeCvNuevos, filaDeCvQueSeBorran, filaDeMensajesSinLeer } from "./de-los-mensajes";
+import { cvQueSeBorranPronto, filaDeCvNuevos, filaDeCvQueSeBorran, filaDeMensajesSinLeer, fraseDeLlegados } from "./de-los-mensajes";
+import { LO_NUEVO } from "./desde-tu-visita";
 import { PENDIENTES } from "./pendientes";
 import { enOrden, visiblesPara } from "./registro";
 
@@ -30,6 +31,15 @@ test("quien edita ve los mensajes de contacto sin leer, pero ninguna fila de CV"
   for (const rol of ["dirige", "administra"]) {
     assert.ok(claves(rol).includes("cv-nuevos") && claves(rol).includes("cv-que-se-borran"), rol);
   }
+});
+
+test("desde tu última visita: lo que llegó se dice cuando llegó algo, y los CV solo a quien los ve", () => {
+  assert.equal(fraseDeLlegados("cv", 0), null);
+  assert.equal(fraseDeLlegados("cv", 1), "llegó 1 CV");
+  assert.equal(fraseDeLlegados("contacto", 3), "llegaron 3 mensajes de contacto");
+  const claves = (rol: string) => visiblesPara(enOrden(LO_NUEVO), rol).map((e) => e.clave);
+  assert.deepEqual(claves("edita"), ["mensajes-que-llegaron", "paginas-publicadas"]);
+  assert.deepEqual(claves("dirige"), ["cv-que-llegaron", "mensajes-que-llegaron", "paginas-publicadas"]);
 });
 
 test("los CV que se borran en 7 días son los de seBorraEl, también el spam", sinBase, async () => {

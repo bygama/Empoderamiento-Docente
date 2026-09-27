@@ -1,6 +1,7 @@
 import type { Capacidad } from "@ed/auth";
 import { base } from "@/datos/cliente";
 import { paginasPublicadasDesde } from "./de-las-paginas";
+import { fraseDeLlegados, llegaronDesde } from "./de-los-mensajes";
 import { enOrden, leerAisladas, visiblesPara } from "./registro";
 
 /**
@@ -19,8 +20,8 @@ export async function ultimaVisita(cuentaId: string, comienzoDeEstaSesion: Date)
   return fila?.en ?? null;
 }
 
-/** Lo que el Inicio cuenta que pasó desde tu última visita. Mensajes (lane 7) suma los CV y los mensajes que llegaron. */
-export const CLAVES_DE_LO_NUEVO = ["paginas-publicadas"] as const;
+/** Lo que el Inicio cuenta que pasó desde tu última visita, en este orden: lo que llegó y lo que se publicó. */
+export const CLAVES_DE_LO_NUEVO = ["cv-que-llegaron", "mensajes-que-llegaron", "paginas-publicadas"] as const;
 export type ClaveDeLoNuevo = (typeof CLAVES_DE_LO_NUEVO)[number];
 
 type DefinicionDeLoNuevo = {
@@ -31,7 +32,13 @@ type DefinicionDeLoNuevo = {
   leer: (desde: Date) => Promise<string | null>;
 };
 
-const LO_NUEVO: Record<ClaveDeLoNuevo, DefinicionDeLoNuevo> = {
+export const LO_NUEVO: Record<ClaveDeLoNuevo, DefinicionDeLoNuevo> = {
+  "cv-que-llegaron": { capacidad: "verCV", que: "los CV", leer: async (desde) => fraseDeLlegados("cv", await llegaronDesde("cv", desde)) },
+  "mensajes-que-llegaron": {
+    capacidad: "verContacto",
+    que: "los mensajes de contacto",
+    leer: async (desde) => fraseDeLlegados("contacto", await llegaronDesde("contacto", desde)),
+  },
   "paginas-publicadas": { capacidad: "editarContenido", que: "las páginas", leer: paginasPublicadasDesde },
 };
 
