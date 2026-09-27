@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "@/config/site";
 import { esUnPreviewDeVercel } from "@/lib/dominio";
 
 // El admin y su API no se indexan; el sitio, todo. Las tres rutas siguen
@@ -9,11 +10,15 @@ import { esUnPreviewDeVercel } from "@/lib/dominio";
 // Los previews de Vercel se cierran enteros: son URLs públicas con los
 // mismos canonicals que apuntan al dominio real, y Google los indexaría con
 // canonicals ajenos. Producción no cambia (work/primer-deploy).
+//
+// Fuera de un preview, la línea `Sitemap:` dice dónde está el de las rutas
+// públicas (`app/sitemap.ts`), en el dominio real.
 export default function robots(): MetadataRoute.Robots {
   if (esUnPreviewDeVercel(process.env.VERCEL_ENV)) {
     return { rules: [{ userAgent: "*", disallow: "/" }] };
   }
   return {
     rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/vista-previa"] }],
+    sitemap: new URL("/sitemap.xml", siteConfig.url).toString(),
   };
 }
