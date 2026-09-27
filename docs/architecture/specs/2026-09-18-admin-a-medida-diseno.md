@@ -142,7 +142,10 @@ mientras tanto no va al sitemap.
 - **El slug es una columna, no se deriva del título.** Corregir un título no
   mueve una URL.
 - **Tabla de redirecciones.** Si un slug cambia, el admin escribe el 308 del
-  viejo al nuevo. Sin eso, cada cambio es un link muerto.
+  viejo al nuevo. Sin eso, cada cambio es un link muerto. Ajustes › SEO suma
+  las que se agregan a mano (`a_mano`), validadas: «hacia» es una ruta del
+  sitemap y «desde» no, así no hay cadenas ni ciclos. El sitio las sigue en la
+  ruta atrapa-todo, antes del 404 (`work/ajustes/`).
 
 ## 6. Modelo de contenido
 
@@ -159,7 +162,17 @@ Siete entidades, más las páginas y los ajustes:
 | `cuentas` | mail, nombre, rol | no existe |
 | `paginas` | una fila por página, con su pestaña de SEO | los componentes y sus `data.ts` |
 | `versiones_de_paginas` | cada publicación de una página: el documento, quién y cuándo; las últimas 10 | no existe |
-| `ajustes` | contacto, dirección, países, redes, personas de referencia | `config/site.ts` |
+| `datos_del_sitio` | una fila: correo, WhatsApp, dirección, países, redes | `config/site.ts` (la migración la cargó con lo de ahí) |
+| `plazos_de_retencion` | cada plazo de retención con desde cuándo rige: una fila por cambio | `config/privacidad.ts` |
+| `indexacion_de_urls` | si cada ruta del sitemap está en Google, según Search Console | no existe |
+
+**Ajustes** (`work/ajustes/`, [ADR-0014](../adrs/0014-ajustes-en-la-base.md))
+no es una tabla genérica de claves: cada cosa que se configura tiene la suya,
+con sus columnas. Los plazos guardan historial porque son una promesa: a lo
+que llegó se le aplica **el menor entre el plazo de cuando llegó y cualquiera
+posterior** —alargar no toca lo ya recibido, acortar vale para todo—. Las
+**personas de referencia** (la fundadora y la referente) no se mudaron: nada
+del sitio las leía. Vuelven con la fase 4, en el JSON-LD de la organización.
 
 **Estructura fija, en el modelo.** Las listas coreografiadas llevan cantidad
 exacta; los textos, `maxLength` con contador y un aviso que explica el límite
@@ -336,7 +349,7 @@ producción como «la tabla no existe».
 | **1** | **Cimientos.** `packages/db` + `packages/auth`, middleware (cabeceras, rate limit), login en `/admin`. Sin contenido. | sí |
 | **2** | **El kit y una entidad entera.** `packages/kit-admin` + novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`. **Hecha** (2026-09-26). | sí |
 | **3** | **El resto del contenido.** Materiales, casos, equipo, aliados, páginas, ajustes. | por entidad |
-| **4** | **Las URLs y el SEO.** Las 26 rutas nuevas, `sitemap.xml`, canonicals, redirecciones, JSON-LD. | sí |
+| **4** | **Las URLs y el SEO.** Las 26 rutas nuevas, canonicals y JSON-LD (con las personas de referencia de la organización). El `sitemap.xml` de las rutas de hoy y las redirecciones ya los hizo Ajustes (`work/ajustes/`): las rutas nuevas se suman a `rutasDelSitio()`. | sí |
 
 **Sección por sección:** cada sección cambia su lectura a `datos/consultas/` en
 su propio PR, y en ese mismo PR se borra su `data.ts`. Nunca hay dos fuentes de
