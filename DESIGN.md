@@ -796,9 +796,11 @@ no se la muestra, así que llega por un link viejo o tipeando.
 - **Sin primario**: acá no hay nada que hacer. Sin ícono de candado ni tono
   de error: no es una falla, es un lugar que no es tuyo.
 - No se esconde qué sección es: la URL ya lo dijo. Se explica de quién es.
-- Primer consumidor: la guarda de cada módulo (hoy Contenido, Métricas y
-  Mensajes, con la bandeja de CV aparte, y Cuentas y Ajustes mientras son
-  una guía).
+- Lo dibujan dos guardas. La del layout de cada módulo **solo oculta la
+  interfaz**: Next manda la página en el payload aunque el layout diga «Sin
+  permiso». La que protege los datos es la de cada página de un módulo que
+  deja afuera a algún rol (hoy Cuentas y la bandeja de CV; Ajustes, mientras
+  es una guía), que lo chequea antes de leer nada (AGENTS.md §12).
 
 ### Apartado
 
