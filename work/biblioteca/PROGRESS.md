@@ -13,3 +13,15 @@
   `work/mapa-del-admin/`), con catorce propuestas (§16).
 - 2026-09-26 — **SPEC aprobado por el padre** con dos precisiones, C e I
   (DECISIONS). PLAN.md escrito: 15 pasos.
+
+- **Paso 1 — el modelo de un material** (`a613d95`).
+  `features/biblioteca/contenido/`: `modelo.ts` (listas cerradas, topes,
+  `fechaDelSitio`, `anioDe`, `firmaDe` con `Intl.ListFormat`, `accionDe`,
+  `borradorVacio`), `material.ts` (`esquemaMaterial` y `esquemaBorrador`; la
+  persona se valida contra las 15 claves de `equipo.ts`; el DOI se normaliza;
+  la fecha sin día), `cita.ts` (`citaApa`, `partirNombre`, `iniciales`) y
+  `parecidos.ts` (`sonParecidos`, umbral 0,75: con 0,8 un título con dos
+  palabras de menos no se parecía). `lib/metadatos/doi.ts` (`normalizarDoi`,
+  `linkDelDoi`), y `biblioteca/portadas` entre las carpetas de fotos
+  (DECISIONS). Aceptación: `pnpm exec tsx --test "src/features/biblioteca/contenido/*.test.ts" "src/lib/metadatos/*.test.ts" "src/lib/contenido/*.test.ts"`
+  → 66 pass, 0 fail; `pnpm typecheck` → exit 0.
