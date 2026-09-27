@@ -9,6 +9,12 @@
 # por la red interna, y por eso la app puede confiar en la IP que le pasa Caddy.
 #
 # Las variables salen del `.env` de al lado (ver `.env.example`).
+#
+# El proyecto se llama `ed`, salvo que `COMPOSE_PROJECT_NAME` diga otro (en el
+# `.env`, para una segunda copia en el mismo servidor). De ese nombre salen los
+# volúmenes, la red y las dos imágenes, `<proyecto>-fuente` y
+# `<proyecto>-sitio`: los scripts de `scripts/` lo leen de acá y solo tocan
+# las imágenes del suyo.
 
 name: ed
 
@@ -56,7 +62,7 @@ services:
       retries: 10
 
   migrar:
-    image: ed-fuente:actual
+    image: ${COMPOSE_PROJECT_NAME}-fuente:actual
     build:
       context: .
       target: fuente
@@ -67,7 +73,7 @@ services:
         condition: service_healthy
 
   construir:
-    image: ed-fuente:actual
+    image: ${COMPOSE_PROJECT_NAME}-fuente:actual
     profiles: ["construir"]
     # Saca un tar por stdout: el contexto de la imagen `app`.
     command: ["sh", "deploy/construir.sh"]
@@ -79,7 +85,7 @@ services:
   herramientas:
     # Los comandos de apps/sitio/scripts/ con el entorno de la app, a mano:
     #   docker compose run --rm herramientas pnpm --filter sitio nombrar-direccion <correo>
-    image: ed-fuente:actual
+    image: ${COMPOSE_PROJECT_NAME}-fuente:actual
     profiles: ["herramientas"]
     environment: *entorno-de-la-app
     depends_on:
@@ -88,8 +94,9 @@ services:
 
   app:
     # La arma scripts/desplegar.sh con el commit como etiqueta; `actual` es la
-    # que corre (scripts/volver.sh la cambia).
-    image: ed-sitio:actual
+    # que corre (scripts/volver.sh la cambia). El nombre, como el de la imagen
+    # fuente, sale del proyecto (arriba).
+    image: ${COMPOSE_PROJECT_NAME}-sitio:actual
     pull_policy: never
     restart: unless-stopped
     environment: *entorno-de-la-app

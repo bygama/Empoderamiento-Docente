@@ -31,6 +31,11 @@ fi
 
 paso() { printf '\n== %s\n' "$*"; }
 
+# Las imágenes llevan el nombre del proyecto (`ed`, o el COMPOSE_PROJECT_NAME
+# del .env: compose.yaml), y la poda de abajo solo toca las de este.
+proyecto=$(docker compose config --no-interpolate | sed -n 's/^name: //p')
+sitio="$proyecto-sitio"
+
 paso "1/5 La imagen fuente (dependencias y Prisma)"
 docker compose build migrar
 
@@ -42,8 +47,8 @@ docker compose run --rm migrar
 
 paso "4/5 El build del sitio con la base, y la imagen app $version"
 # -T: sin terminal, para que por stdout salga solo el tar.
-docker compose run --rm -T --no-deps construir | docker build --target app -t "ed-sitio:$version" -
-docker tag "ed-sitio:$version" ed-sitio:actual
+docker compose run --rm -T --no-deps construir | docker build --target app -t "$sitio:$version" -
+docker tag "$sitio:$version" "$sitio:actual"
 
 paso "5/5 Levantar todo con la versión nueva"
 docker compose up -d --wait --remove-orphans
@@ -52,9 +57,9 @@ docker compose up -d --wait --remove-orphans
 docker compose exec -T proxy caddy reload --config /etc/caddy/Caddyfile
 
 paso "Quedan las últimas $GUARDAR imágenes de app"
-docker images ed-sitio --format '{{.CreatedAt}}|{{.Tag}}' \
+docker images "$sitio" --format '{{.CreatedAt}}|{{.Tag}}' \
   | grep -v '|actual$' | sort -r | tail -n +$((GUARDAR + 1)) | cut -d'|' -f2 \
-  | while read -r vieja; do docker rmi "ed-sitio:$vieja" >/dev/null && echo "borrada ed-sitio:$vieja"; done
-docker images ed-sitio --format '  {{.Tag}}  {{.CreatedAt}}'
+  | while read -r vieja; do docker rmi "$sitio:$vieja" >/dev/null && echo "borrada $sitio:$vieja"; done
+docker images "$sitio" --format '  {{.Tag}}  {{.CreatedAt}}'
 
 printf '\nListo: https://%s corre %s.\n' "$(grep -E '^DOMINIO=' .env | cut -d= -f2)" "$version"
