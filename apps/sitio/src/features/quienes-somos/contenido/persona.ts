@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { SIN_SALTOS, deLaLista, linea, opcional } from "@/features/biblioteca/contenido/campos-del-material";
-import { clave, fotoDe, renglones, sinRepetir, slugDe } from "./campos-de-persona";
+import { SIN_SALTOS, linea, opcional } from "@/features/biblioteca/contenido/campos-del-material";
+import { clave, deLista, exigido, fotoDe, renglones, sinRepetir, slugDe } from "./campos-de-persona";
 import { etapaDe } from "./etapa";
 import { ACERCAMIENTO, COLORES, FIGURAS, NUMEROS_DE_NIVEL, TOPES } from "./modelo-del-equipo";
 
@@ -13,7 +13,7 @@ import { ACERCAMIENTO, COLORES, FIGURAS, NUMEROS_DE_NIVEL, TOPES } from "./model
 
 const requerido = (maximo: number, publicar: boolean, falta: string) => opcional(maximo).refine((t) => !publicar || t !== "", falta);
 
-function recorridoDe(publicar: boolean) {
+function recorridoDe<P extends boolean>(publicar: P) {
   return z
     .object({
       nombreCompleto: linea(TOPES.nombreCompleto, publicar, "Falta el nombre completo."),
@@ -24,7 +24,7 @@ function recorridoDe(publicar: boolean) {
       intro: requerido(TOPES.intro, publicar, "Falta la bajada del recorrido."),
       formacion: renglones(TOPES.unaFormacion, TOPES.formacion, publicar, "la formación"),
       categorias: z
-        .array(z.object({ clave, etiqueta: linea(TOPES.categoria, publicar, "Falta el nombre de la categoría."), color: deLaLista(COLORES, publicar, "Elegí el color de la categoría.") }))
+        .array(z.object({ clave, etiqueta: linea(TOPES.categoria, publicar, "Falta el nombre de la categoría."), color: deLista(COLORES, publicar, "Elegí el color de la categoría.") }))
         .max(TOPES.categorias, `Como mucho ${TOPES.categorias} categorías.`)
         .refine((c) => !publicar || c.length > 0, "Falta al menos una categoría: cada etapa se ordena en una.")
         .refine((c) => sinRepetir(c, (x) => x.clave), "Dos categorías tienen la misma clave."),
@@ -52,15 +52,14 @@ function recorridoDe(publicar: boolean) {
     });
 }
 
-function esquemaDe(publicar: boolean) {
-  const nivel = z.literal(NUMEROS_DE_NIVEL, { error: "Elegí el nivel." });
+function esquemaDe<P extends boolean>(publicar: P) {
   return z
     .object({
       slug: slugDe(publicar),
       nombre: linea(TOPES.nombre, publicar, "Falta el nombre."),
       rol: linea(TOPES.rol, publicar, "Falta el rol."),
       pais: linea(TOPES.pais, publicar, "Falta el país."),
-      nivel: publicar ? nivel : nivel.nullable(),
+      nivel: exigido(z.literal(NUMEROS_DE_NIVEL, { error: "Elegí el nivel." }), publicar),
       foto: fotoDe(publicar).nullable(),
       // La persona pidió no publicar su foto: la tarjeta va tipográfica.
       sinFoto: z.boolean(),
