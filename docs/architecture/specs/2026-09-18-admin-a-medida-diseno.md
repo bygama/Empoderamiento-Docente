@@ -55,7 +55,7 @@ Un solo deployable, y `packages/` desde ahora (ADR-0006):
 packages/                     LO REUSABLE — cero dominio de ED adentro
 ├── db/                       cliente Prisma + Neon, slugs, redirecciones
 ├── auth/                     better-auth configurado, permisos, guarda
-└── kit-admin/                tabla, formulario, controles, imágenes, avisos
+└── kit-admin/                los controles de un formulario, el botón, el aviso
 
 apps/sitio/
 ├── prisma/schema/            base · auth · contenido · sitio
@@ -80,6 +80,16 @@ apps/sitio/
 4. **`features/` no se entera.** Los componentes reciben props; cambia quién se
    las pasa, nunca su contrato. Por eso los `data.ts` se borran de a uno,
    cuando le toca a su sección, y nunca hay dos fuentes de verdad.
+
+**El kit, tal como quedó** (2026-09-26, `work/novedades-y-kit/`,
+[ADR-0014](../adrs/0014-kit-admin-y-modelo-de-entidad.md)): los controles
+que eran de `admin/campos/` —`TextoCorto`, `Parrafo`, `Seleccion`,
+`CampoFoto`, `ListaFija`— más `Casilla`, `Fecha` y `ListaVariable`, que
+nacieron con Novedades, y `Boton`, `claseDeBoton` y `Aviso`, porque
+`CampoFoto` los usa. Los tokens son de la app: su `README.md` dice cuáles
+espera. El generador de formularios de las páginas (`admin/campos/Campo.tsx`)
+y `admin/armazon/` se quedan en la app; el armazón se muda al kit en un
+cambio mecánico aparte, y la tabla llega cuando una lista la necesite.
 
 ## 4. Cómo lee el sitio
 
@@ -140,7 +150,7 @@ Siete entidades, más las páginas y los ajustes:
 | Tabla | Qué guarda | Origen hoy |
 | --- | --- | --- |
 | `fotos` | imagen, alt obligatorio, punto focal | `public/**` |
-| `novedades` | fecha, categoría, título, bajada, imagen, destacada, cuerpo | `features/novedades/data/novedades.ts` |
+| `novedades` | slug, fecha, categoría, título, bajada, imagen, destacada, cuerpo, publicación, imagen para redes | la migración `novedades` (era `features/novedades/data/novedades.ts`, borrado) |
 | `materiales` | título, autores, tipo, tema, público, año, formato, portada, URL | `features/biblioteca/data/materiales.ts` |
 | `casos` | número, pregunta, eje, indicio, ficha, contexto, evidencias, análisis | `features/investigacion/data/casos.ts` |
 | `equipo` | perfil: nombre, rol, lugar, etapas con hitos y publicaciones | `features/quienes-somos/data/equipo.ts` |
@@ -178,6 +188,20 @@ campo por campo. El SEO de cada página vive en el mismo documento, bajo la
 clave `seo`, así tiene borrador, versiones y «qué cambió» como las secciones.
 Toda escritura del borrador trae lo que vio la pantalla y, si otra persona
 guardó mientras tanto, no pisa: avisa y ofrece recargar.
+
+**Las entidades: lo publicado en columnas, el borrador en un documento**
+(2026-09-26, `work/novedades-y-kit/`,
+[ADR-0014](../adrs/0014-kit-admin-y-modelo-de-entidad.md)). Cada fila tiene
+lo publicado en sus columnas —lo que lee el sitio, y sobre lo que la base
+garantiza la URL única y, en `novedades`, la destacada única con un índice
+parcial— y el borrador en un `jsonb` que puede estar incompleto. Dos esquemas
+Zod con los mismos campos: uno para publicar (completo, y otra vez al leer) y
+uno para guardar (todo puede estar vacío). Las acciones son seis: crear (el
+primer guardado), guardar borrador, publicar, despublicar (conserva las
+columnas), descartar cambios y borrar. Publicar con otra URL deja el 308 de
+la vieja en `redirecciones`, sin cadenas, y el sitio lo lee antes del 404.
+Novedades es la primera; materiales, casos, equipo y aliados copian el molde
+con sus columnas.
 
 ## 7. Acceso y seguridad
 
@@ -309,7 +333,7 @@ producción como «la tabla no existe».
 | --- | --- | --- |
 | **0** | **Escisión.** Payload afuera, repo en verde, sitio idéntico, ADRs y docs al día. | sí, y es reversible |
 | **1** | **Cimientos.** `packages/db` + `packages/auth`, middleware (cabeceras, rate limit), login en `/admin`. Sin contenido. | sí |
-| **2** | **El kit y una entidad entera.** `packages/kit-admin` + novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`. | sí |
+| **2** | **El kit y una entidad entera.** `packages/kit-admin` + novedades de punta a punta, con el sitio leyéndola por `datos/consultas/`. **Hecha** (2026-09-26). | sí |
 | **3** | **El resto del contenido.** Materiales, casos, equipo, aliados, páginas, ajustes. | por entidad |
 | **4** | **Las URLs y el SEO.** Las 26 rutas nuevas, `sitemap.xml`, canonicals, redirecciones, JSON-LD. | sí |
 
@@ -323,6 +347,13 @@ controles en `apps/sitio/src/admin/campos/`. Esos controles reciben
 props planas y no conocen el generador de formularios de las páginas
 (`Campo.tsx`), así que en la fase 2 se mudan a `packages/kit-admin` y el
 generador se queda en la app.
+
+**La fase 2, hecha** (2026-09-26, `work/novedades-y-kit/`): el kit (§3) y
+Novedades de punta a punta —la tabla con las nueve de hoy cargadas por la
+migración, el módulo en `/admin/novedades` con su lista, su ficha y la vista
+previa, y el sitio leyendo de la base en `/novedades`, cada ficha, el Inicio
+y `/novedades/rss.xml`—. Los textos de la página Novedades pasaron a sus
+secciones, con su pestaña SEO, como las demás páginas.
 
 ## 10. Calidad
 
