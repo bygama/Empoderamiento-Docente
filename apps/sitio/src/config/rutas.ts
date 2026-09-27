@@ -20,6 +20,8 @@ export const RUTAS_DE_LA_APP: readonly RutaDeclarada[] = [
   { ruta: "/novedades/rss.xml", contesta: "sola" },
   // La portada tipográfica de un material sin portada propia; lo que no es un publicado, 404.
   { ruta: "/biblioteca/portada/[id]", contesta: "sola" },
+  // Los links cortos de Métricas: un código que no existe da el 404, sin buscar redirección.
+  { ruta: "/l/[codigo]", contesta: "sola" },
   // Los que Next arma desde los archivos de app/.
   { ruta: "/sitemap.xml", contesta: "sola" },
   { ruta: "/robots.txt", contesta: "sola" },
