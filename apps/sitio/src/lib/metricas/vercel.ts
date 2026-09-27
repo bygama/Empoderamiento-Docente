@@ -1,20 +1,11 @@
+import { ErrorDeAnaliticas, paisesDelFiltro, type ClienteDeAnaliticas } from "./cliente";
 import { mapearPorDia, mapearVentana, PEDIDO_POR_DIMENSION } from "./mapear";
-import type { Dimension, FilaDiaria, Rango } from "./tipos";
+import type { FiltroDePais } from "./tipos";
 
 // Cliente de la API pública de Web Analytics de Vercel. No sabe nada de ED:
 // recibe proyecto, token y fechas, devuelve filas. Cómo se mapea cada
 // respuesta vive en `mapear.ts`.
 const BASE = "https://api.vercel.com/v1/query/web-analytics";
-
-export class ErrorDeAnaliticas extends Error {
-  constructor(
-    readonly estado: number,
-    mensaje: string,
-  ) {
-    super(mensaje);
-    this.name = "ErrorDeAnaliticas";
-  }
-}
 
 function explicar(estado: number): string {
   if (estado === 401) return "Vercel respondió 401: el token no sirve o venció.";
@@ -23,28 +14,11 @@ function explicar(estado: number): string {
   return `Vercel respondió ${estado}.`;
 }
 
-const CODIGO_DE_PAIS = /^[A-Z]{2}$/;
-
-function codigos(paises: readonly string[]): string[] {
-  for (const p of paises) if (!CODIGO_DE_PAIS.test(p)) throw new Error(`«${p}» no es un código de país ISO de dos letras.`);
-  return paises.map((p) => `'${p}'`);
+/** El filtro en OData: `country eq 'CL'`, o `not (country in ('CL','MX'))` para el resto. */
+export function filtroOData(filtro: FiltroDePais): string {
+  const codigos = paisesDelFiltro(filtro).map((p) => `'${p}'`);
+  return "pais" in filtro ? `country eq ${codigos[0]}` : `not (country in (${codigos.join(",")}))`;
 }
-
-/** El filtro OData de un país: `country eq 'CL'`. */
-export function soloPais(pais: string): string {
-  return `country eq ${codigos([pais])[0]}`;
-}
-
-/** El filtro OData del resto: `not (country in ('CL','MX'))`. */
-export function fueraDePaises(paises: readonly string[]): string {
-  return `not (country in (${codigos(paises).join(",")}))`;
-}
-
-export type ClienteDeAnaliticas = {
-  /** Por día (o por hora, en `hora`), con un `filtro` OData opcional. */
-  porDia(rango: Rango, dimension: Dimension, filtro?: string): Promise<FilaDiaria[]>;
-  ventana(rango: Rango): Promise<{ vistas: number; visitantes: number }>;
-};
 
 export function crearClienteDeAnaliticas({
   token,
@@ -74,7 +48,7 @@ export function crearClienteDeAnaliticas({
   return {
     async porDia(rango, dimension, filtro) {
       const params: Record<string, string> = { since: rango.desde, until: rango.hasta };
-      if (filtro) params.filter = filtro;
+      if (filtro) params.filter = filtroOData(filtro);
       const by = ["day"];
       if (dimension !== "total") {
         const pedido = PEDIDO_POR_DIMENSION[dimension];

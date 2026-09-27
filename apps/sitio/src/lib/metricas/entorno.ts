@@ -1,4 +1,5 @@
-import { crearClienteDeAnaliticas, type ClienteDeAnaliticas } from "./vercel";
+import type { ClienteDeAnaliticas } from "./cliente";
+import { crearClienteDeAnaliticas } from "./vercel";
 
 // El token abre toda la cuenta de Vercel, no solo la analítica (ADR-0009):
 // por eso solo va en Production y en el .env.local de quien lo necesite.

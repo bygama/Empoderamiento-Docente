@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { mapearPorDia, mapearVentana } from "./mapear";
-import { ErrorDeAnaliticas, crearClienteDeAnaliticas, fueraDePaises, soloPais } from "./vercel";
+import { ErrorDeAnaliticas } from "./cliente";
+import { crearClienteDeAnaliticas, filtroOData } from "./vercel";
 
 test("el total por día se mapea con valor vacío", () => {
   const filas = mapearPorDia({ data: [{ timestamp: "2026-09-20T00:00:00.000Z", pageviews: 5, visitors: 4 }] }, "total");
@@ -100,9 +101,9 @@ test("sistema, navegador y campaña toman su clave de la API", () => {
 });
 
 test("los filtros por país se arman en OData y no aceptan otra cosa que un código", () => {
-  assert.equal(soloPais("CL"), "country eq 'CL'");
-  assert.equal(fueraDePaises(["CL", "MX", "AR"]), "not (country in ('CL','MX','AR'))");
-  assert.throws(() => soloPais("CL' or 1 eq 1"));
+  assert.equal(filtroOData({ pais: "CL" }), "country eq 'CL'");
+  assert.equal(filtroOData({ fueraDe: ["CL", "MX", "AR"] }), "not (country in ('CL','MX','AR'))");
+  assert.throws(() => filtroOData({ pais: "CL' or 1 eq 1" }));
 });
 
 test("la hora se pide sola, sin día, y un filtro viaja entero", async () => {
@@ -116,7 +117,7 @@ test("la hora se pide sola, sin día, y un filtro viaja entero", async () => {
     },
   });
   await cliente.porDia({ desde: "2026-09-01", hasta: "2026-09-07" }, "hora");
-  await cliente.porDia({ desde: "2026-09-01", hasta: "2026-09-07" }, "pagina", soloPais("MX"));
+  await cliente.porDia({ desde: "2026-09-01", hasta: "2026-09-07" }, "pagina", { pais: "MX" });
   assert.deepEqual(urls[0].searchParams.getAll("by"), ["hour"]);
   assert.equal(urls[0].searchParams.get("limit"), null);
   assert.deepEqual(urls[1].searchParams.getAll("by"), ["day", "requestPath"]);

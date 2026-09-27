@@ -3,7 +3,7 @@ import { base as baseDeLaApp } from "@/datos/cliente";
 import { clienteDesdeEntorno } from "@/lib/metricas/entorno";
 import { ayerUTC, diaISO, fechaUTC, rangoFaltante, sumarDias } from "@/lib/metricas/periodos";
 import type { FilaDiaria } from "@/lib/metricas/tipos";
-import type { ClienteDeAnaliticas } from "@/lib/metricas/vercel";
+import type { ClienteDeAnaliticas } from "@/lib/metricas/cliente";
 import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 import { CONSULTAS, DIAS_POR_CORRIDA, ventanasQueSePiden } from "./consultas-de-vercel";
 

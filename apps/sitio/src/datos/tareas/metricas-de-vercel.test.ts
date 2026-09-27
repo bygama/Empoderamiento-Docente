@@ -2,7 +2,9 @@ import { after, test } from "node:test";
 import assert from "node:assert/strict";
 import { config as cargarEntorno } from "dotenv";
 import { diaISO, fechaUTC } from "@/lib/metricas/periodos";
-import { crearClienteDeAnaliticas, type ClienteDeAnaliticas } from "@/lib/metricas/vercel";
+import type { ClienteDeAnaliticas } from "@/lib/metricas/cliente";
+import type { FiltroDePais } from "@/lib/metricas/tipos";
+import { crearClienteDeAnaliticas } from "@/lib/metricas/vercel";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const hayBase = Boolean(process.env.DATABASE_URL);
@@ -64,13 +66,13 @@ test("correr dos veces deja las mismas filas y dice qué días copió", { skip: 
 test("la hora y el cruce por país se guardan con su propia dimensión", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
   const { base } = await import("@/datos/cliente");
   const { sincronizarMetricas } = await import("./metricas-de-vercel");
-  const filtros: string[] = [];
+  const filtros: FiltroDePais[] = [];
   const cliente: ClienteDeAnaliticas = {
     async porDia(rango, dimension, filtro) {
       if (filtro) filtros.push(filtro);
       const fila = { fecha: rango.hasta, dimension, agrupado: false, vistas: 2, visitantes: 2 };
       if (dimension === "hora") return [{ ...fila, valor: "13" }];
-      if (dimension === "pagina" && filtro === "country eq 'MX'") return [{ ...fila, valor: "/que-hacemos" }];
+      if (dimension === "pagina" && filtro && "pais" in filtro && filtro.pais === "MX") return [{ ...fila, valor: "/que-hacemos" }];
       if (dimension === "total") return [{ ...fila, valor: "" }];
       return [];
     },
@@ -89,7 +91,7 @@ test("la hora y el cruce por país se guardan con su propia dimensión", { skip:
       ["total", ""],
     ],
   );
-  assert.deepEqual(filtros, ["country eq 'CL'", "country eq 'MX'", "country eq 'AR'", "not (country in ('CL','MX','AR'))"]);
+  assert.deepEqual(filtros, [{ pais: "CL" }, { pais: "MX" }, { pais: "AR" }, { fueraDe: ["CL", "MX", "AR"] }]);
 });
 
 test("si la API falla, la corrida sale fallida y no se copia nada", { skip: !hayBase && "sin DATABASE_URL" }, async () => {
