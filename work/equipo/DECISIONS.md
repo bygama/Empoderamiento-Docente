@@ -79,6 +79,28 @@
   completo) en vez de `fullName`, así el alt que se edita en la ficha es el
   que se ve. La migración lo cargó con el nombre completo: el HTML del perfil
   es el mismo.
+- 2026-09-27 — **El encabezado de la ficha sube al armazón** (paso 9, lo pidió
+  react-doctor: `duplicate-jsx-subtree` entre el de un material y el de un
+  perfil). `admin/armazon/EncabezadoDeFicha.tsx` lleva el título, la
+  insignia, «Cambios sin guardar» y cuándo y quién; cada ficha le pasa su
+  insignia y sus acciones. La del material queda igual (el mismo JSX, ahora
+  en una pieza). Es la generalización que la 8a hizo con
+  `QueCambioPlegado`; la de Novedades, en femenino, no se tocó.
+- 2026-09-27 — **La ficha de un material acepta un aviso inicial** (paso 10):
+  `avisoInicial` en `FichaDeMaterial` y `useGuardarMaterial`, para decir al
+  abrir que la persona que llegó del perfil no está entre los autores que
+  trajo el DOI. Va con el tono de error: es algo para resolver.
+- 2026-09-27 — **Las listas de textos cortos van en renglones** (paso 7): la
+  formación, los territorios y los conceptos son un `Parrafo`, un ítem por
+  renglón, como los párrafos de una novedad, y no una lista variable
+  anidada más; los hitos, las estancias y las publicaciones, que tienen
+  varios campos, sí son listas variables (DESIGN.md §11).
+- 2026-09-27 — **Visto al pasar, sin tocar:** `docs/AI_GUIDELINES.md` §2
+  («Dónde va un archivo de datos») da de ejemplo `quienes-somos/data/equipo.ts`,
+  que esta lane borra; el único `data/` de contenido que queda es
+  `investigacion/data/casos.ts`, y la lane 9 también lo borra. La regla
+  quedó sin ejemplo porque el contenido pasó a la base: reescribirla es
+  de quien cierre el mapa del admin.
 - 2026-09-27 — **La actividad de mover se llama `movio-un-perfil`** (consecuencia
   de J): con un paso por clic, lo que se anota es a quién se movió («Ana movió
   a Iván Pérez en el orden del equipo»), no el nivel entero. Va al Inicio,
