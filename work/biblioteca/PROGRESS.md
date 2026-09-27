@@ -158,3 +158,21 @@
   Crossref; SciELO sin DOI → todo «de la página», con 21 páginas y la cita con
   volumen y número; la RMF E → su `citation_doi` llevó a Crossref; el ISBN de
   Gedisa → «No encontramos datos» (Crossref no lo tiene).
+
+- **Paso 9 — la salud de los links.** `datos/biblioteca/chequear-link.ts`
+  (`chequearLink`: el DOI en la API de handles de doi.org —registrado es
+  `bien`, sin registrar `roto`—; una ruta propia es `bien`; `http:` es
+  `sin-chequear`; `https:` con `HEAD` y, si no sirve, `GET` sin leer el
+  cuerpo: menos de 400 `bien`, 404 y 410 `roto`, un dominio que ya no existe
+  `roto`, lo demás `sin-respuesta`) y `datos/tareas/salud-de-links.ts`
+  (`chequearLinks`: los publicados con el chequeo vencido hace 7 días o sin
+  chequear, los más viejos primero, 15 por corrida, de a 5, sin empezar otra
+  tanda pasados 35 s; el resultado en el material y el resumen de la corrida;
+  la tarea `salud-de-links`, sumada a `TAREAS_DIARIAS`). Aceptación: `pnpm
+  exec tsx --test src/datos/tareas/salud-de-links.test.ts
+  src/lib/tareas/corredor.test.ts` → 8 pass (la corrida contra
+  `ed_biblioteca` devuelve cada chequeo a como estaba); `tsc --noEmit` → exit
+  0. Contra la red de verdad, cuatro corridas seguidas (script de un uso):
+  3,6 s, 7,1 s, 18,1 s y 2,8 s; 15 + 15 + 15 + 12 = los 57; ningún roto; ERIC
+  sin respuesta (8 s), ResearchGate 403 (sin respuesta, como se quería: no es
+  roto), Acta Scientiae sin chequear (`http:`).

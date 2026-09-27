@@ -6,6 +6,7 @@ import { indexacionDeGoogle } from "./indexacion-de-google";
 import { copiaDeVercel } from "./metricas-de-vercel";
 import { podaDeActividad } from "./poda-de-actividad";
 import { podaDeLimitesPorIp, retencionDeContacto, retencionDeCV } from "./retencion-de-mensajes";
+import { saludDeLinks } from "./salud-de-links";
 
 /**
  * Lo que corre el cron diario (`/api/cron/diario`), una vez por día. Vercel
@@ -21,6 +22,7 @@ export const TAREAS_DIARIAS = definirTareas([
   retencionDeContacto,
   retencionDeCV,
   podaDeLimitesPorIp,
+  saludDeLinks,
 ]);
 
 /**
