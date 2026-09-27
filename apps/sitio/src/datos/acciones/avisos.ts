@@ -19,8 +19,9 @@ export async function guardarMisAvisos(activas: string[]): Promise<{ ok: boolean
     if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para cambiar tus avisos." };
     const pedidas = esquema.safeParse(activas);
     if (!pedidas.success) return { ok: false, detalle: "No entendimos qué avisos querés." };
+    const elegidas = new Set(pedidas.data);
     const suyas = await avisosDe(sesion.user.id, sesion.user.rol);
-    for (const { bandeja } of suyas) await guardarAviso(sesion.user.id, bandeja, pedidas.data.includes(bandeja));
+    await Promise.all(suyas.map(({ bandeja }) => guardarAviso(sesion.user.id, bandeja, elegidas.has(bandeja))));
     revalidatePath("/admin/mi-cuenta");
     return { ok: true, detalle: "Listo: tus avisos quedaron así." };
   } catch (e) {

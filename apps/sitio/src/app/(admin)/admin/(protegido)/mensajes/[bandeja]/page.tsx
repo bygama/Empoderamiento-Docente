@@ -18,8 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PaginaDeLaBandeja({ params, searchParams }: Props) {
   const { bandeja } = await params;
   if (!esBandeja(bandeja)) notFound();
-  const { estado, q, borrado } = await searchParams;
-  const sesion = await sesionActual();
+  const [{ estado, q, borrado }, sesion] = await Promise.all([searchParams, sesionActual()]);
   if (!sesion) redirect("/admin/entrar");
   return (
     <Guarda capacidad={capacidadDe(bandeja)}>

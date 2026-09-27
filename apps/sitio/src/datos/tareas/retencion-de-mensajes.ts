@@ -16,8 +16,11 @@ const DIA_MS = 24 * 60 * 60 * 1000;
 const seBorraron = (n: number, uno: string, varios: string) => (n === 1 ? `Se borró 1 ${uno}` : `Se borraron ${n} ${varios}`);
 
 export async function retenerContacto(hoy: Date = new Date()): Promise<ResultadoDeTarea> {
-  const spam = await base.mensaje.deleteMany({ where: { bandeja: "contacto", estado: "spam", estadoEn: { lt: bordeDelSpam(hoy) } } });
-  const viejos = await base.mensaje.deleteMany({ where: { bandeja: "contacto", recibidoEn: { lt: bordeDeGuarda("contacto", hoy) } } });
+  // A la vez: un spam que además pasó los 24 meses lo borra una sola y cuenta una vez.
+  const [spam, viejos] = await Promise.all([
+    base.mensaje.deleteMany({ where: { bandeja: "contacto", estado: "spam", estadoEn: { lt: bordeDelSpam(hoy) } } }),
+    base.mensaje.deleteMany({ where: { bandeja: "contacto", recibidoEn: { lt: bordeDeGuarda("contacto", hoy) } } }),
+  ]);
   const total = spam.count + viejos.count;
   if (!total) return { ok: true, detalle: "No había mensajes de Contacto vencidos." };
   const cuales = `${viejos.count} de más de ${MESES_DE_GUARDA.contacto} meses y ${spam.count} de spam de más de ${DIAS_DE_SPAM} días`;
@@ -37,17 +40,19 @@ export async function retenerCV(hoy: Date = new Date(), almacen: () => AlmacenPr
     },
     select: { id: true, archivo: true },
   });
-  let borrados = 0;
-  let fallidos = 0;
-  for (const { id, archivo } of vencidos) {
-    try {
-      if (archivo) await almacen().borrar(archivo);
-      await base.mensaje.delete({ where: { id } });
-      borrados++;
-    } catch {
-      fallidos++;
-    }
-  }
+  const hechos = await Promise.all(
+    vencidos.map(async ({ id, archivo }) => {
+      try {
+        if (archivo) await almacen().borrar(archivo);
+        await base.mensaje.delete({ where: { id } });
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+  );
+  const borrados = hechos.filter(Boolean).length;
+  const fallidos = hechos.length - borrados;
   const hecho = borrados ? `${seBorraron(borrados, "CV con su archivo", "CV con sus archivos")}.` : "No había CV vencidos.";
   return fallidos ? { ok: false, detalle: `${hecho} No se pudieron borrar ${fallidos}: se reintenta mañana.` } : { ok: true, detalle: hecho };
 }
