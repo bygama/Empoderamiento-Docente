@@ -10,6 +10,7 @@ import type { Puente } from "@/features/biblioteca/contenido/puente";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { crearPuente } from "./puente-investigacion/coreografia-puente";
+import { numeroDeRecurso } from "./puente-investigacion/numero";
 import { PanelRecurso } from "./puente-investigacion/PanelRecurso";
 import { PASO, TEMAS } from "./puente-investigacion/temas";
 
@@ -122,8 +123,11 @@ export function PuenteInvestigacion({ contenido }: { contenido: Puente }) {
               className={live ? "relative h-full" : "flex flex-col gap-5"}
               style={{ "--pila-paso": PASO } as React.CSSProperties}
             >
+              {/* La key es el número del recurso y no su nombre: la lista es
+                  fija y no se reordena, y dos nombres iguales cargados en el
+                  admin no pueden repetirla. */}
               {recursos.map((recurso, i) => (
-                <PanelRecurso key={recurso.nombre} recurso={recurso} tema={temaDe(i)} i={i} total={recursos.length} live={live} />
+                <PanelRecurso key={numeroDeRecurso(i)} recurso={recurso} tema={temaDe(i)} i={i} total={recursos.length} live={live} />
               ))}
             </div>
           </div>

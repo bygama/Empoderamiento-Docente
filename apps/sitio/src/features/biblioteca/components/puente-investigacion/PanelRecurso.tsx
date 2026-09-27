@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Puente } from "@/features/biblioteca/contenido/puente";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { numeroDeRecurso } from "./numero";
 import type { Tema } from "./temas";
 
 /**
@@ -54,7 +55,7 @@ export function PanelRecurso({
           }
         >
           <span className="font-mono text-[0.65rem] tracking-[0.14em]">
-            {`0${i + 1}`}
+            {numeroDeRecurso(i)}
           </span>
           <span className="font-display rotate-180 text-[1.02rem] font-bold tracking-[-0.01em] whitespace-nowrap [writing-mode:vertical-rl]">
             {c.nombre}
@@ -100,7 +101,7 @@ export function PanelRecurso({
               tema.eyebrow
             }
           >
-            {`Recurso 0${i + 1} / 04`}
+            {`Recurso ${numeroDeRecurso(i)} / 04`}
           </p>
           <h3
             className={
