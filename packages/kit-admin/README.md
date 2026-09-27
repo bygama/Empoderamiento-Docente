@@ -22,8 +22,10 @@ aparece «novedad» acá adentro, está mal puesto.
 
 Lo que sabe de ED se queda en la app, en `admin/armazon/`: la sidebar y sus
 módulos, la guarda y «Sin permiso», salir, el tema, la pantalla de acceso con
-la marca, y lo que depende de `lib/contenido/` (el momento, el encabezado de
-la ficha, «Qué cambió», «Cómo se ve»).
+la marca, lo que depende de `lib/contenido/` (el momento, el encabezado de
+la ficha, «Qué cambió», «Cómo se ve») y los errores del editor
+(`useErroresDelEditor`), que conocen el generador de formularios de las
+páginas.
 
 Sí sabe de Next: `CampoFoto` y `ListaFija` usan `next/image`; `BotonEnlace`,
 `Volver`, el `Encabezado` (sus migas), `Pestanas`, `Filtro`, `Buscador` e

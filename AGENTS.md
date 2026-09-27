@@ -188,7 +188,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes (pendientes/, un archivo por módulo), de la semana y de lo nuevo (inicioPara)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes, la indexación en Google, la salud de los links, los archivos de fotos que ninguna fila usa, el resumen semanal (los lunes, en Chile)
             ├── admin/         ← las pantallas del admin
-            │   ├── armazon/     ← lo del armazón que sabe de ED: la sidebar (barra-lateral/), la guarda y «Sin permiso», salir, el tema, la pantalla de acceso, y lo que usa lib/contenido/ (el momento, el encabezado de la ficha, «Qué cambió», «Cómo se ve»); lo demás es del kit
+            │   ├── armazon/     ← lo del armazón que sabe de ED: la sidebar (barra-lateral/), la guarda y «Sin permiso», salir, el tema, la pantalla de acceso, lo que usa lib/contenido/ (el momento, el encabezado de la ficha, «Qué cambió», «Cómo se ve») y los errores del editor, que conocen el generador de las páginas (useErroresDelEditor); lo demás es del kit
             │   ├── inicio/      ← el Inicio: el saludo, los pendientes, la semana y la actividad
             │   ├── actividad/   ← cómo se lee cada tipo de actividad (frase/, un archivo por módulo), para el Inicio y Cuentas
             │   ├── paginas/     ← «Páginas» y el editor (lista, pestañas, secciones, SEO, qué cambió, versiones)

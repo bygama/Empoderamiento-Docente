@@ -401,8 +401,8 @@ velocidad. Usa la paleta y las fuentes de la marca con estas reglas propias.
 Las piezas que no saben nada de ED —los controles de un formulario y las de
 una pantalla— viven en `packages/kit-admin/`, cuyo README dice qué tokens
 espera de la app que lo usa; lo que sabe de ED (la sidebar, la guarda, «Sin
-permiso», la pantalla de acceso, el tema, «Qué cambió» y «Cómo se ve») se
-queda en `apps/sitio/src/admin/armazon/`.
+permiso», la pantalla de acceso, el tema, «Qué cambió», «Cómo se ve» y los
+errores del editor) se queda en `apps/sitio/src/admin/armazon/`.
 Sumado el 2026-09-22 (`work/editor-sin-pared/`); el armazón, la
 sidebar y los temas, el 2026-09-24; el título de pestaña, las pestañas, el
 índice de tarjetas, la lista, el estado vacío y la pantalla de acceso nueva,
