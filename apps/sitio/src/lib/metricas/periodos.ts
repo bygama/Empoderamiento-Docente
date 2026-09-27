@@ -37,10 +37,20 @@ export function rangoFaltante({ ultimoGuardado, hoy }: { ultimoGuardado: Dia | n
   return { desde: desdeDeseado < desdeMinimo ? desdeMinimo : desdeDeseado, hasta };
 }
 
-/** Las ventanas que muestran las tarjetas, y las anteriores para comparar. */
-export function ventanasDe(fechaFin: Dia): Array<{ fechaFin: Dia; dias: 7 | 30; desde: Dia }> {
-  const ventana = (fin: Dia, dias: 7 | 30) => ({ fechaFin: fin, dias, desde: sumarDias(fin, -(dias - 1)) });
-  return [ventana(fechaFin, 7), ventana(fechaFin, 30), ventana(sumarDias(fechaFin, -7), 7), ventana(sumarDias(fechaFin, -30), 30)];
+/** Los períodos que se eligen en Métricas, en días: son las ventanas de la copia. */
+export const PERIODOS = [7, 30, 90] as const;
+export type Periodo = (typeof PERIODOS)[number];
+
+/** El período de un `?periodo=` de la URL; cualquier otra cosa, 30. */
+export function periodoDe(valor: unknown): Periodo {
+  const n = Number(valor);
+  return (PERIODOS as readonly number[]).includes(n) ? (n as Periodo) : 30;
+}
+
+/** Las ventanas de cada período hasta el fin, y después las anteriores para comparar. */
+export function ventanasDe(fechaFin: Dia): Array<{ fechaFin: Dia; dias: Periodo; desde: Dia }> {
+  const ventana = (fin: Dia, dias: Periodo) => ({ fechaFin: fin, dias, desde: sumarDias(fin, -(dias - 1)) });
+  return [...PERIODOS.map((dias) => ventana(fechaFin, dias)), ...PERIODOS.map((dias) => ventana(sumarDias(fechaFin, -dias), dias))];
 }
 
 /** «+12 %», «−3 %», «igual» o «sin datos previos»: como lo diría una persona. */

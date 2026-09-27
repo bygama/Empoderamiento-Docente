@@ -1,15 +1,10 @@
+import { mapearPorDia, mapearVentana, PEDIDO_POR_DIMENSION } from "./mapear";
 import type { Dimension, FilaDiaria, Rango } from "./tipos";
 
 // Cliente de la API pública de Web Analytics de Vercel. No sabe nada de ED:
-// recibe proyecto, token y fechas, devuelve filas.
+// recibe proyecto, token y fechas, devuelve filas. Cómo se mapea cada
+// respuesta vive en `mapear.ts`.
 const BASE = "https://api.vercel.com/v1/query/web-analytics";
-
-const CLAVE_POR_DIMENSION: Record<Exclude<Dimension, "total">, { by: string; limite: number }> = {
-  pagina: { by: "requestPath", limite: 100 },
-  pais: { by: "country", limite: 30 },
-  referido: { by: "referrerHostname", limite: 30 },
-  dispositivo: { by: "deviceType", limite: 10 },
-};
 
 export class ErrorDeAnaliticas extends Error {
   constructor(
@@ -28,43 +23,26 @@ function explicar(estado: number): string {
   return `Vercel respondió ${estado}.`;
 }
 
-type Fila = Record<string, unknown>;
+const CODIGO_DE_PAIS = /^[A-Z]{2}$/;
 
-function filasDe(cuerpo: unknown): Fila[] {
-  const data = (cuerpo as { data?: unknown })?.data;
-  if (Array.isArray(data)) return data as Fila[];
-  if (data && typeof data === "object") return [data as Fila];
-  return [];
+function codigos(paises: readonly string[]): string[] {
+  for (const p of paises) if (!CODIGO_DE_PAIS.test(p)) throw new Error(`«${p}» no es un código de país ISO de dos letras.`);
+  return paises.map((p) => `'${p}'`);
 }
 
-function entero(valor: unknown): number {
-  return typeof valor === "number" && Number.isFinite(valor) ? Math.max(0, Math.round(valor)) : 0;
+/** El filtro OData de un país: `country eq 'CL'`. */
+export function soloPais(pais: string): string {
+  return `country eq ${codigos([pais])[0]}`;
 }
 
-/** Filas de `visits/aggregate` con `by=day` (+ una dimensión) → filas nuestras. */
-export function mapearPorDia(cuerpo: unknown, dimension: Dimension): FilaDiaria[] {
-  return filasDe(cuerpo).map((fila) => {
-    const dia = String(fila.timestamp ?? fila.day ?? "").slice(0, 10);
-    let valor = "";
-    let agrupado = false;
-    if (dimension !== "total") {
-      const crudo = fila[CLAVE_POR_DIMENSION[dimension].by];
-      // La API junta lo que no entra en el límite en una fila «Others».
-      if (crudo === null || crudo === undefined || crudo === "Others") agrupado = crudo === "Others";
-      else valor = String(crudo);
-    }
-    return { fecha: dia, dimension, valor, agrupado, vistas: entero(fila.pageviews), visitantes: entero(fila.visitors) };
-  });
-}
-
-/** Una consulta de rango sin agrupar → vistas y visitantes únicos del rango. */
-export function mapearVentana(cuerpo: unknown): { vistas: number; visitantes: number } {
-  const [fila] = filasDe(cuerpo);
-  return { vistas: entero(fila?.pageviews), visitantes: entero(fila?.visitors) };
+/** El filtro OData del resto: `not (country in ('CL','MX'))`. */
+export function fueraDePaises(paises: readonly string[]): string {
+  return `not (country in (${codigos(paises).join(",")}))`;
 }
 
 export type ClienteDeAnaliticas = {
-  porDia(rango: Rango, dimension: Dimension): Promise<FilaDiaria[]>;
+  /** Por día (o por hora, en `hora`), con un `filtro` OData opcional. */
+  porDia(rango: Rango, dimension: Dimension, filtro?: string): Promise<FilaDiaria[]>;
   ventana(rango: Rango): Promise<{ vistas: number; visitantes: number }>;
 };
 
@@ -94,12 +72,17 @@ export function crearClienteDeAnaliticas({
   }
 
   return {
-    async porDia(rango, dimension) {
+    async porDia(rango, dimension, filtro) {
       const params: Record<string, string> = { since: rango.desde, until: rango.hasta };
+      if (filtro) params.filter = filtro;
       const by = ["day"];
       if (dimension !== "total") {
-        by.push(CLAVE_POR_DIMENSION[dimension].by);
-        params.limit = String(CLAVE_POR_DIMENSION[dimension].limite);
+        const pedido = PEDIDO_POR_DIMENSION[dimension];
+        if ("tiempo" in pedido) by[0] = pedido.tiempo;
+        else {
+          by.push(pedido.by);
+          params.limit = String(pedido.limite);
+        }
       }
       return mapearPorDia(await consultar("visits/aggregate", params, by), dimension);
     },

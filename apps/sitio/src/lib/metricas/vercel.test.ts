@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { ErrorDeAnaliticas, crearClienteDeAnaliticas, mapearPorDia, mapearVentana } from "./vercel";
+import { mapearPorDia, mapearVentana } from "./mapear";
+import { ErrorDeAnaliticas, crearClienteDeAnaliticas, fueraDePaises, soloPais } from "./vercel";
 
 test("el total por día se mapea con valor vacío", () => {
   const filas = mapearPorDia({ data: [{ timestamp: "2026-09-20T00:00:00.000Z", pageviews: 5, visitors: 4 }] }, "total");
@@ -78,4 +79,47 @@ test("la ventana se pide a visits/count con el rango entero", async () => {
   assert.match(urls[0], /since=2026-09-01/);
   assert.match(urls[0], /until=2026-09-07/);
   assert.doesNotMatch(urls[0], /by=/);
+});
+
+test("la hora se mapea con su día UTC y la hora como valor", () => {
+  const filas = mapearPorDia(
+    { data: [{ timestamp: "2026-09-20T14:00:00.000Z", pageviews: 6, visitors: 4 }, { timestamp: "2026-09-20T03:00:00.000Z", pageviews: 1, visitors: 1 }] },
+    "hora",
+  );
+  assert.deepEqual(filas, [
+    { fecha: "2026-09-20", dimension: "hora", valor: "14", agrupado: false, vistas: 6, visitantes: 4 },
+    { fecha: "2026-09-20", dimension: "hora", valor: "03", agrupado: false, vistas: 1, visitantes: 1 },
+  ]);
+});
+
+test("sistema, navegador y campaña toman su clave de la API", () => {
+  const dia = "2026-09-20T00:00:00.000Z";
+  assert.equal(mapearPorDia({ data: [{ timestamp: dia, osName: "Android", pageviews: 1, visitors: 1 }] }, "sistema")[0].valor, "Android");
+  assert.equal(mapearPorDia({ data: [{ timestamp: dia, browserName: "Safari", pageviews: 1, visitors: 1 }] }, "navegador")[0].valor, "Safari");
+  assert.equal(mapearPorDia({ data: [{ timestamp: dia, utmCampaign: "taller-mty", pageviews: 1, visitors: 1 }] }, "campana")[0].valor, "taller-mty");
+});
+
+test("los filtros por país se arman en OData y no aceptan otra cosa que un código", () => {
+  assert.equal(soloPais("CL"), "country eq 'CL'");
+  assert.equal(fueraDePaises(["CL", "MX", "AR"]), "not (country in ('CL','MX','AR'))");
+  assert.throws(() => soloPais("CL' or 1 eq 1"));
+});
+
+test("la hora se pide sola, sin día, y un filtro viaja entero", async () => {
+  const urls: URL[] = [];
+  const cliente = crearClienteDeAnaliticas({
+    token: "x",
+    proyecto: "prj_x",
+    fetchImpl: async (entrada) => {
+      urls.push(new URL(String(entrada)));
+      return Response.json({ data: [] });
+    },
+  });
+  await cliente.porDia({ desde: "2026-09-01", hasta: "2026-09-07" }, "hora");
+  await cliente.porDia({ desde: "2026-09-01", hasta: "2026-09-07" }, "pagina", soloPais("MX"));
+  assert.deepEqual(urls[0].searchParams.getAll("by"), ["hour"]);
+  assert.equal(urls[0].searchParams.get("limit"), null);
+  assert.deepEqual(urls[1].searchParams.getAll("by"), ["day", "requestPath"]);
+  assert.equal(urls[1].searchParams.get("filter"), "country eq 'MX'");
+  assert.equal(urls[1].searchParams.get("limit"), "100");
 });
