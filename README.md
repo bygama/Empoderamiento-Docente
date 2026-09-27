@@ -152,7 +152,7 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
 ├── packages/              ← lo reutilizable, sin dominio de ED
 │   ├── db/     ← cliente Prisma, slugs, redirecciones
 │   ├── auth/   ← better-auth configurado, permisos, guarda
-│   └── kit-admin/  ← los primitivos del admin (fase 2, todavía no existe)
+│   └── kit-admin/  ← los controles de los formularios del admin (su README: los tokens)
 └── apps/
     └── sitio/             ← el sitio y su admin (por ahora, la única app)
         ├── package.json   ← las dependencias viven acá, no en la raíz
@@ -174,8 +174,9 @@ app, no del workspace. Los `.env*` reales están git-ignorados.
             └── lib/           ← hooks/, correo/ (Resend), seguridad/ (CSP) y utilidades
 ```
 
-Todo eso existe salvo `kit-admin`, que está marcado y llega en la fase 2. El
-plan completo, en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
+El plan completo, en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md);
+el kit y el modelo de una entidad, en el
+[ADR-0014](docs/architecture/adrs/0014-kit-admin-y-modelo-de-entidad.md).
 
 Es un **monorepo** (workspace pnpm): hoy hay una sola app y una segunda se
 agregaría al lado, en `apps/`. Lo que se comparte entre proyectos va en
@@ -242,10 +243,10 @@ tiene los cimientos —entrar (con segundo factor por correo), salir y elegir
 contraseña—, **un Inicio** con lo pendiente, los números de la semana y la
 actividad reciente, **Cuentas** (invitar, cambiar roles, suspender y la
 actividad; ver «Las cuentas»), **Métricas con sus búsquedas en Google** (ver
-«Las métricas y lo programado»), **la edición de las páginas**, todas menos
-Novedades (ver «Editar las páginas»), y **Mensajes**, lo que llega por los
-formularios del sitio (ver «Mensajes»); las
-novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
+«Las métricas y lo programado»), **la edición de las páginas** (ver «Editar
+las páginas»), **Mensajes**, lo que llega por los formularios del sitio (ver
+«Mensajes»), y **Novedades**, la primera entidad (ver «Novedades»); la
+biblioteca, los casos y el equipo llegan en la fase siguiente.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
 y el porqué en el [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md).
@@ -327,6 +328,8 @@ en el orden del menú. Se editan enteras, con su SEO:
   versión breve para la lámina), el título de los casos y el cierre.
 - **Biblioteca**: el hero, la presentación de los destacados, el aviso del
   catálogo sin resultados, el puente a Investigación y el cierre.
+- **Novedades**: el hero, las destacadas, «Lo último», «ED en movimiento»,
+  «Recién salido» y el cierre; las novedades mismas, en su módulo.
 - **Contacto**: el titular, la apertura (la frase pilar y el equipo) y el
   cierre. Los temas de consulta no: el envío guarda su título en cada mensaje.
 
@@ -453,6 +456,33 @@ de verdad:
 cuenta de 15 minutos a 1 hora, aunque vengan de distintos lugares), se destraba
 sola al vencer el freno o al elegir una contraseña nueva desde «Olvidé mi
 contraseña».
+
+### Novedades
+
+En `/admin/novedades`, con dos pestañas: **Publicadas** y **Borradores**, y un
+buscador por título. «Nueva novedad» abre la ficha vacía; el primer «Guardar
+borrador» la crea. La ficha tiene el título, la bajada, la fecha (con la
+precisión que da la fuente: año, mes o día), la categoría, la foto, si es la
+destacada, el cuerpo en secciones, la publicación de la Biblioteca que abre y
+la URL, que sigue al título hasta que se publica. Al costado, cómo se ve en
+Google y al compartir el link —con la imagen para redes generada con el
+título, o una propia con «Usar otra»— y dónde se ve en el sitio.
+
+Como una página, guardar **no publica**: «Vista previa» muestra el borrador
+en el sitio y «Publicar» lo pasa. Publicar con otra URL deja la vieja
+llevando a la nueva (308); la destacada es una sola, y marcar otra la
+desmarca. Despublicar la saca del sitio y la deja en Borradores; «Descartar
+cambios» vuelve a lo publicado y «Borrar» se la lleva para siempre. Lo que se
+publica, se despublica, se descarta o se borra queda en la actividad del
+Inicio, y un borrador quieto hace más de 7 días aparece en sus pendientes.
+
+El sitio las lee de la base en `/novedades`, en cada ficha
+(`/novedades/<slug>`, solo las que tienen cuerpo), en el Inicio (las cuatro
+más nuevas) y en el feed **`/novedades/rss.xml`**. Las nueve que había
+entraron con la migración `novedades`. Los controles del formulario son de
+`packages/kit-admin`; el modelo (lo publicado en columnas, el borrador en un
+documento) es el que copian las entidades que siguen:
+[ADR-0014](docs/architecture/adrs/0014-kit-admin-y-modelo-de-entidad.md).
 
 ### Mensajes
 
