@@ -1,22 +1,20 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { Seleccion, TextoCorto } from "@ed/kit-admin";
 import { Boton } from "@/admin/armazon/Boton";
 import { Aviso } from "@/admin/armazon/Campos";
-import { ENTRADA } from "@/admin/campos/clases";
-import { TextoCorto } from "@/admin/campos/TextoCorto";
 import { agregarRedireccion } from "@/datos/acciones/redirecciones";
 
 type Resultado = { ok: boolean; detalle: string; campo?: "desde" | "hacia" };
 
 /**
  * Agregar una redirección a mano (work/ajustes/SPEC.md §5.1): la ruta vieja,
- * escrita, y la nueva, elegida entre las páginas que existen, así no se puede
- * apuntar a una que no está. Lo demás lo valida la acción; su error vuelve al
- * campo que lo causó.
+ * escrita, y la nueva, elegida entre las páginas que existen (la `Seleccion`
+ * del kit), así no se puede apuntar a una que no está. Lo demás lo valida la
+ * acción; su error vuelve al campo que lo causó.
  */
 export function FormularioDeRedireccion({ rutas }: { rutas: readonly string[] }) {
-  const idHacia = useId();
   const [desde, setDesde] = useState("");
   const [hacia, setHacia] = useState(rutas[0] ?? "/");
   const [resultado, setResultado] = useState<Resultado | null>(null);
@@ -36,6 +34,11 @@ export function FormularioDeRedireccion({ rutas }: { rutas: readonly string[] })
   }
 
   const errorDe = (campo: "desde" | "hacia") => (resultado && !resultado.ok && resultado.campo === campo ? resultado.detalle : undefined);
+  // Cambiar el campo que tenía el error lo borra (DESIGN.md §11, «Campos»).
+  const alCambiar = (campo: "desde" | "hacia", poner: (v: string) => void) => (valor: string) => {
+    poner(valor);
+    if (errorDe(campo)) setResultado(null);
+  };
 
   return (
     <form onSubmit={agregar} className="max-w-md space-y-4">
@@ -46,39 +49,19 @@ export function FormularioDeRedireccion({ rutas }: { rutas: readonly string[] })
         ayuda="La ruta vieja, sin el dominio: /taller-2025."
         maximo={200}
         valor={desde}
-        alCambiar={(v) => {
-          setDesde(v);
-          if (errorDe("desde")) setResultado(null);
-        }}
+        alCambiar={alCambiar("desde", setDesde)}
         error={errorDe("desde")}
       />
-      <div>
-        <label htmlFor={idHacia} className="text-admin-meta font-medium">
-          Hacia
-        </label>
-        <select
-          id={idHacia}
-          value={hacia}
-          onChange={(e) => {
-            setHacia(e.target.value);
-            if (errorDe("hacia")) setResultado(null);
-          }}
-          aria-invalid={errorDe("hacia") ? true : undefined}
-          aria-describedby={errorDe("hacia") ? `${idHacia}-error` : undefined}
-          className={`mt-1 ${ENTRADA}`}
-        >
-          {rutas.map((ruta) => (
-            <option key={ruta} value={ruta}>
-              {ruta}
-            </option>
-          ))}
-        </select>
-        {errorDe("hacia") ? (
-          <p id={`${idHacia}-error`} className="mt-1 text-admin-meta text-rojo-error">
-            {errorDe("hacia")}
-          </p>
-        ) : null}
-      </div>
+      <Seleccion
+        nombre="redireccion-hacia"
+        etiqueta="Hacia"
+        ayuda="Una de las páginas que existen."
+        opciones={rutas.map((ruta) => ({ valor: ruta, etiqueta: ruta }))}
+        sinElegir="Elegí una página"
+        valor={hacia}
+        alCambiar={alCambiar("hacia", setHacia)}
+        error={errorDe("hacia")}
+      />
       {resultado && (resultado.ok || !resultado.campo) ? <Aviso tono={resultado.ok ? "bien" : "error"}>{resultado.detalle}</Aviso> : null}
       <Boton variante="secundario" type="submit" disabled={guardando} aria-busy={guardando || undefined}>
         {guardando ? "Agregando…" : "Agregar la redirección"}

@@ -16,7 +16,7 @@ function rigeDesde({ desde, puestoPor }: PlazoParaEditar): string {
 /**
  * Ajustes › Privacidad (work/ajustes/SPEC.md §2.5): los plazos de retención y
  * la política de privacidad del sitio, que todavía no está. La regla del
- * menor va dicha en llano, en la consecuencia del apartado (ADR-0014).
+ * menor va dicha en llano, en la consecuencia del apartado (ADR-0015).
  */
 export function PantallaDePrivacidad({ plazos }: { plazos: Record<Plazo, PlazoParaEditar> }) {
   const rige = { cv: rigeDesde(plazos.cv), contacto: rigeDesde(plazos.contacto), spam: rigeDesde(plazos.spam) };
