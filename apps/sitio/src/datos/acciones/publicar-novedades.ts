@@ -74,7 +74,12 @@ export async function publicarNovedadEnBase(
   }
 }
 
-/** Saca la novedad del sitio y conserva sus columnas: volver a publicarla es un clic. Si era la destacada, deja de serlo. */
+/**
+ * Saca la novedad del sitio y conserva sus columnas: volver a publicarla es un
+ * clic. Si era la destacada, deja de serlo, también en su borrador: volver a
+ * publicarla no le roba la tapa a la que esté. Si no lo era, el borrador queda
+ * como está: marcarla destacada ahí es una intención que despublicar no borra.
+ */
 export async function despublicarNovedadEnBase(
   base: PrismaClient,
   { id, borradorEnVisto }: { id: string; borradorEnVisto: string | null },
@@ -85,7 +90,7 @@ export async function despublicarNovedadEnBase(
   if (!fila.publicada) return { ok: false, detalle: "La novedad no está publicada." };
   const { count } = await base.novedad.updateMany({
     where: { id, publicada: true, borradorEn: fila.borradorEn },
-    data: { publicada: false, destacada: false, ...borradorSinTapa(fila.borrador) },
+    data: { publicada: false, ...(fila.destacada ? { destacada: false, ...borradorSinTapa(fila.borrador) } : {}) },
   });
   if (count === 0) return choqueCon(await base.novedad.findUnique({ where: { id } }), "la novedad");
   const detalle = fila.destacada ? "Despublicada: ya no se ve en el sitio, y dejó de ser la destacada." : "Despublicada: ya no se ve en el sitio.";
