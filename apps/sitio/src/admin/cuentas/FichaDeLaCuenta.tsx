@@ -1,3 +1,4 @@
+import { ROL_AL_DEJAR_LA_DIRECCION } from "@ed/auth";
 import { Aviso } from "@/admin/armazon/Campos";
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Momento } from "@/admin/armazon/Momento";
@@ -50,6 +51,15 @@ export function FichaDeLaCuenta({ cuenta, se, esLaPropia, correoPropio, aviso }:
         <ApartadoDeLaDireccion {...deLaFicha} correoPropio={correoPropio} />
       </div>
     </>
+  );
+}
+
+/** El aviso de haberle pasado la dirección: el apartado que la pasó ya no está. */
+export function AvisoDeDireccion({ nombre }: { nombre: string }) {
+  return (
+    <Aviso tono="bien">
+      Listo: ahora dirige {nombre}, y vos pasaste a {ROL_AL_DEJAR_LA_DIRECCION}.
+    </Aviso>
   );
 }
 

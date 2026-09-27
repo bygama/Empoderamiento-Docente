@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { queSePuede } from "@ed/auth";
-import { AvisoDeInvitacion, FichaDeLaCuenta } from "@/admin/cuentas/FichaDeLaCuenta";
+import { AvisoDeDireccion, AvisoDeInvitacion, FichaDeLaCuenta } from "@/admin/cuentas/FichaDeLaCuenta";
 import { cuentaParaActuar, unaCuenta } from "@/datos/consultas/cuentas";
 import { sesionActual } from "@/datos/sesion";
 
-type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ invitacion?: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ invitacion?: string; direccion?: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cuenta = await cuentaParaActuar((await params).id);
@@ -22,14 +22,21 @@ export default async function UnaCuenta({ params, searchParams }: Props) {
   if (!cuenta?.rol) notFound();
   const conRol = { ...cuenta, rol: cuenta.rol };
   const esLaPropia = cuenta.id === sesion.user.id;
-  const invitacion = (await searchParams).invitacion;
+  const { invitacion, direccion } = await searchParams;
+  // Lo que dejó la pantalla anterior: Invitar, o haberle pasado la dirección.
+  const aviso =
+    invitacion === "salio" || invitacion === "no-salio" ? (
+      <AvisoDeInvitacion salio={invitacion === "salio"} correo={cuenta.correo} />
+    ) : direccion === "pasada" ? (
+      <AvisoDeDireccion nombre={cuenta.nombre} />
+    ) : null;
   return (
     <FichaDeLaCuenta
       cuenta={conRol}
       se={queSePuede(sesion.user.rol, { rol: cuenta.rol, estado: cuenta.estado, esLaPropia })}
       esLaPropia={esLaPropia}
       correoPropio={sesion.user.email}
-      aviso={invitacion === "salio" || invitacion === "no-salio" ? <AvisoDeInvitacion salio={invitacion === "salio"} correo={cuenta.correo} /> : null}
+      aviso={aviso}
     />
   );
 }

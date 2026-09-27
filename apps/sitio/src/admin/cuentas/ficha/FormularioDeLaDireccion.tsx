@@ -11,7 +11,8 @@ import { pasarLaDireccion } from "@/datos/acciones/direccion";
 /**
  * Pasarle la dirección a otra persona: pide otra vez la contraseña de quien
  * dirige y pregunta antes, porque no se deshace sola (la devuelve la otra
- * persona, si quiere).
+ * persona, si quiere). Si anda, este apartado deja de estar (ya no dirigís):
+ * el aviso lo muestra la ficha, que llega con `?direccion=pasada`.
  */
 export function FormularioDeLaDireccion({ idDeCuenta, nombre, correoPropio }: { idDeCuenta: string; nombre: string; correoPropio: string }) {
   const router = useRouter();
@@ -26,8 +27,11 @@ export function FormularioDeLaDireccion({ idDeCuenta, nombre, correoPropio }: { 
     setPasando(true);
     const r = await pasarLaDireccion(idDeCuenta, contrasena);
     setPasando(false);
+    if (r.ok) {
+      router.replace(`/admin/cuentas/${idDeCuenta}?direccion=pasada`);
+      return;
+    }
     setResultado(r);
-    if (r.ok) router.refresh();
   }
 
   const rechazado = resultado !== null && !resultado.ok;
