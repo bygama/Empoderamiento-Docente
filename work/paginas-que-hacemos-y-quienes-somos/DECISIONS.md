@@ -82,3 +82,27 @@ Append-only: fecha — decisión — por qué.
   (no cumple el brief). **La cuarta diferencia de render, aprobada:** el
   `src`/`srcset` de esas dos imágenes de `/quienes-somos` pasa de
   `%2Fquienes-somos%2F` a `%2Ffotos%2F`; mismo archivo, se ve igual.
+- 2026-09-26 — **Revisión r1 (Opus 5.5, medium, «el cambio entero contra su
+  SPEC») sobre `07c2b6b`: PASS**, 0 Critical, 0 Important, 4 Minor y una nota
+  fuera de su lente. Rulings del padre:
+  1. **Minor 2, ratificado sin cambiar el código:** `AvisoDeCompartida` arma la
+     frase en el cliente con el `Comparticion` estructurado que devuelve el
+     servidor, y no recibe un `{ texto, link? }` ya armado como decía el SPEC
+     §2.3; el texto final también quedó distinto del del SPEC. **Por qué:**
+     el servidor (`datos/` y `lib/contenido/`) da los hechos —quién usa qué,
+     de qué página y sección— y el admin pone el copy y el link, que es donde
+     vive la ruta del editor (`EDITOR_DE_PAGINAS`): así `datos/` no importa
+     nada de `admin/` y `lib/contenido/compartido.ts` sigue sin dominio de ED
+     ni copy de pantalla. Las frases son las de DESIGN.md §11 «Sección
+     compartida», que las lista tal cual; se leen mejor que las del SPEC
+     porque nombran la sección de la dueña en el link.
+  2. **Minor 3:** a los tests sintéticos de publicar se suma uno sobre el
+     registro real (`contenido/paginas.test.ts`): `rutasQueMuestran` da
+     `["/que-hacemos", "/"]` para Qué hacemos, `["/"]` para Inicio y
+     `["/quienes-somos"]` para Quiénes somos.
+  3. **Fuera de lente:** `/que-hacemos` le pasaba a `QueHacemosHero` (cliente)
+     las siete áreas enteras y el hero solo usa el nombre corto: ahora recibe
+     `nombresCortos` (`nombresCortos(areas)` en `contenido/areas.ts`), así el
+     payload no lleva datos de más. comparar-render tiene que dar lo mismo.
+  4. **Minor 1 y 4** (el SPEC y el PROGRESS hablan de tres diferencias y del
+     detalle de las clases): no se tocan; la carpeta se borra al cerrar.
