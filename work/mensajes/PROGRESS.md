@@ -2,6 +2,15 @@
 
 ## In progress
 
+- **Estado (2026-09-26): en pausa para la revisión de cierre.** Los 14 pasos
+  hechos y la verificación en PASS (abajo); PR
+  [#185](https://github.com/bygama/Empoderamiento-Docente/pull/185) abierto
+  sobre `main` en `48ed711`. Lo que sigue: el padre abre la revisión (1 seat
+  Opus 5.5, medium, el cambio entero contra el SPEC); si hay hallazgos,
+  vuelven a esta terminal como una ronda de arreglos; con PASS y el rebase
+  final, el commit que borra `work/mensajes/` va en este mismo PR antes del
+  merge.
+
 - 2026-09-26 — Worktree listo: `pnpm install`, `pnpm generate`, base propia
   `ed_mensajes` con las 12 migraciones de `main` aplicadas
   (`pnpm migrate:deploy`), `.env.local` apuntado a ella. SPEC.md escrito
