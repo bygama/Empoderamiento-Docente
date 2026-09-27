@@ -23,10 +23,12 @@ de envío de CV.
 - **Zod 4** (validación de bordes; se usa cuando aparezcan formularios)
 - **pnpm 11** (pinned vía `packageManager`), **Node ≥ 22**
 
-**Backend / persistencia:** **Neon** (Postgres) con **Prisma**, y un **admin a
-medida** en `/admin` con **better-auth**, con fotos en Vercel Blob y correos por
-Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
-[ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md).
+**Backend / persistencia:** **Postgres** con **Prisma**, y un **admin a
+medida** en `/admin` con **better-auth**, con fotos en Blob o en disco y
+correos por Resend. Ver [ADR-0005](docs/architecture/adrs/0005-admin-a-medida.md) y
+[ADR-0007](docs/architecture/adrs/0007-prisma-como-orm.md). Se deploya en
+**Vercel** o en un **VPS con Docker Compose**, con el mismo código
+([Deploy](#deploy)).
 
 > **Estado:** el admin tiene sus ocho módulos —Inicio, Mensajes, Métricas,
 > Contenido, Novedades, Biblioteca, Cuentas y Ajustes— (las fases 2 y 3 de
@@ -78,13 +80,13 @@ admin sí las necesita todas, y el build completo pide al menos
 `BETTER_AUTH_SECRET`, porque la sesión se arma al cargar el admin:
 
 - `DATABASE_URL` y `DATABASE_URL_UNPOOLED` — conexión a Postgres (Docker en
-  local, Neon en Vercel). La segunda es la directa, sin pooler: el pooler corta
+  local, Neon en Vercel, el Postgres del compose en un VPS). La segunda es la directa, sin pooler: el pooler corta
   las transacciones largas de una migración.
 - `NEXT_PUBLIC_SITE_URL` — URL pública del sitio (pública, cliente).
 - `BETTER_AUTH_SECRET` — firma las sesiones del admin. Sin esto no arranca.
 
 `BLOB_READ_WRITE_TOKEN` — fotos a Vercel Blob. **Con el token, las fotos que
-sube el admin van a Blob; sin él (local) van a `apps/sitio/.fotos/`**,
+sube el admin van a Blob; sin él (en local o en un VPS) van a `apps/sitio/.fotos/`**,
 git-ignorada, y las sirve `/api/fotos/<id>`. No hace falta cargarlo en local.
 
 Las dos de los **CV** ([ADR-0012](docs/architecture/adrs/0012-mensajes-cv-privados-y-retencion.md);
@@ -107,16 +109,28 @@ cambió»; ver «Correos» más abajo):
   Resend: `Empoderamiento Docente <no-responder@empoderamientodocente.org>`.
   Con clave y sin remitente, el correo no sale.
 
-Las cuatro de las **métricas** ([ADR-0009](docs/architecture/adrs/0009-analitica-de-vercel-con-copia-diaria.md);
-Métricas, en el admin, lee una copia diaria de la analítica de Vercel):
+Las de las **métricas** (Métricas, en el admin, lee una copia diaria de la
+analítica: de Umami en un VPS, de Vercel Web Analytics en Vercel; se usa la que
+tenga sus variables, [ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md)).
+En un VPS, las tres de **Umami** (el compose pone la primera; las otras dos
+salen de su panel, ver `docs/deploy/vps.md` §5):
+
+- `UMAMI_API_URL` — dónde escucha su API: `http://analitica:3000`, por la red
+  interna.
+- `UMAMI_API_KEY` — una API key de Umami (Settings → API keys).
+- `UMAMI_WEBSITE_ID` — el id del sitio en Umami. Con él, el sitio carga el
+  script de Umami (fuera de Vercel).
+
+En Vercel, las de **Vercel Web Analytics** ([ADR-0009](docs/architecture/adrs/0009-analitica-de-vercel-con-copia-diaria.md)):
 
 - `VERCEL_TOKEN` — token de la cuenta de Vercel para la API de Web Analytics.
   **Abre toda la cuenta**: solo en Production y en tu `.env.local`, nunca en
   un preview ni con `NEXT_PUBLIC_`.
 - `VERCEL_ANALYTICS_PROJECT_ID` — el `prj_…` del proyecto (Settings → General).
 - `VERCEL_TEAM_ID` — vacío en una cuenta personal; el `team_…` si es un equipo.
-- `CRON_SECRET` — lo que el cron diario manda en `Authorization`; Vercel lo
-  inyecta si existe. Sin él, `/api/cron/diario` responde 401 a todo.
+- `CRON_SECRET` — lo que el cron diario manda en `Authorization` (el de
+  `vercel.json` en Vercel, que lo inyecta si existe; el servicio `cron` en un
+  VPS). Sin él, `/api/cron/diario` responde 401 a todo.
 
 Las tres de las **búsquedas** ([ADR-0011](docs/architecture/adrs/0011-search-console-y-un-solo-cron.md);
 Métricas › Búsquedas lee una copia diaria de Search Console). Salen del JSON
@@ -232,15 +246,26 @@ La fuente de verdad sobre cómo opera el repo son los `.md` de la raíz y de
 
 ## Deploy
 
-El sitio corre en **Vercel**: preview por PR, producción desde `main`, con
-**Root Directory = `apps/sitio`** (es un monorepo: Vercel instala desde la raíz
-del workspace y buildea la app). La base es **Neon** (una rama por preview), las
-fotos van a **Vercel Blob** y los correos a **Resend**; las cuatro piezas se
-instalan desde el Marketplace de Vercel y escriben sus variables solas.
-Variables propias en `apps/sitio/.env.example`.
+El mismo código corre en dos hosts, y lo que depende de cada uno se elige por
+variables ([ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md)).
+En los dos, **el build migra y lee la base**: el sitio se prerenderiza con el
+contenido publicado.
 
-Cuando llegue la fase 1 del admin, el build pasa a correr las migraciones de
-Prisma antes de `next build`.
+- **En un VPS de Hostinger, con Docker Compose** ([`docs/deploy/vps.md`](docs/deploy/vps.md)):
+  Caddy con TLS, la app, Postgres, Umami, el cron y los respaldos, todo en el
+  VPS; las fotos y los CV en sus volúmenes. **Se deploya con
+  `scripts/desplegar.sh`, nunca con `docker compose up` a secas**: la imagen de
+  la app sale de un build que corre adentro del compose, con la base. Volver
+  atrás, `scripts/volver.sh`; restaurar un respaldo, `scripts/restaurar.sh`.
+  Las variables, en el `.env` de la raíz (`.env.example`).
+- **En Vercel** ([`docs/deploy/vercel.md`](docs/deploy/vercel.md)): preview por
+  PR, producción desde `main`, con **Root Directory = `apps/sitio`**. La base es
+  **Neon**, las fotos y los CV van a **Vercel Blob**, las visitas a **Vercel Web
+  Analytics**, y `apps/sitio/vercel.json` migra en el build y corre el cron.
+  Variables propias en `apps/sitio/.env.example`.
+
+Mudarse de uno a otro es mover datos (la base, los archivos y las variables):
+cómo, en `docs/deploy/vps.md` §10.
 
 ## Admin
 
@@ -415,18 +440,21 @@ previa, «Qué cambió» y publicar):
 **Métricas** (`/admin/metricas`) tiene cinco pestañas, y la regla de todo el
 módulo: **todo dato gratis y legal, sin cookies, y nunca se identifica a una
 persona ni a una institución**. Resumen, Origen y Qué hace la gente eligen el
-período arriba: 7, 30 o 90 días, contra el anterior. El plan de Vercel de hoy
-(Hobby) contesta hasta 30 días atrás y no cuenta por UTM
-(`PLAN_DE_VERCEL` en `config/metricas.ts`): en 90 días las vistas se suman
-día por día y los visitantes van «—» con el porqué.
+período arriba: 7, 30 o 90 días, contra el anterior. Lo que da cada fuente
+está en `PLANES_DE_LA_FUENTE` (`config/metricas.ts`): **Umami** guarda todo y
+cuenta por UTM, así que los 90 días tienen visitantes y cada link sus visitas
+(con una salvedad: rota la sal de la sesión cada mes, y en 90 días una persona
+que vuelve en otro mes cuenta más de una vez); **Vercel** en el plan Hobby
+contesta hasta 30 días atrás y no cuenta por UTM: en 90 días las vistas se
+suman día por día y los visitantes van «—» con el porqué.
 
 | Pestaña | Qué ve ED | De dónde sale | Cuándo llega |
 | --- | --- | --- | --- |
-| **Resumen** | Visitantes y vistas; la curva de visitantes por día con sus **marcas** (las de publicar una página o una novedad, solas; las de a mano, con «Agregar marca»); por dónde llegan (Buscador · Redes · Asistentes IA · Directo · Otros sitios); las páginas más vistas | la copia diaria de Vercel Web Analytics; las marcas, de `actividad` y `marcas` | hasta ayer (días UTC) |
+| **Resumen** | Visitantes y vistas; la curva de visitantes por día con sus **marcas** (las de publicar una página o una novedad, solas; las de a mano, con «Agregar marca»); por dónde llegan (Buscador · Redes · Asistentes IA · Directo · Otros sitios); las páginas más vistas | la copia diaria de la analítica (Umami o Vercel); las marcas, de `actividad` y `marcas` | hasta ayer (días UTC) |
 | **Búsquedas** | Qué buscó la gente en Google: clics, impresiones y puesto por búsqueda, página y país, y «Casi nos encuentran» | la copia diaria de Search Console | con 2 o 3 días de atraso |
-| **Origen** | Países (Chile, México y Argentina arriba), de dónde llegan, dispositivo, sistema y navegador, la página por país y la mejor hora para publicar, en hora de Chile. **Regiones no hay**: Vercel da el país y nada más fino. Lo que tiene menos de 3 visitas no se nombra | la copia diaria de Vercel | hasta ayer |
+| **Origen** | Países (Chile, México y Argentina arriba), de dónde llegan, dispositivo, sistema y navegador, la página por país y la mejor hora para publicar, en hora de Chile. **Regiones no hay**: alcanza con el país, y una provincia o una ciudad con pocas visitas puede señalar a alguien. Lo que tiene menos de 3 visitas no se nombra | la copia diaria de la analítica | hasta ayer |
 | **Qué hace la gente** | El camino del CV por canal (vio la página, empezó el formulario, lo envió), los contactos enviados y los materiales más consultados | los **contadores propios** (`contadores`): sumas por día, sin IP, sin navegador, sin cookies | en el momento |
-| **Links para compartir** | Links cortos propios (`/l/<codigo>`) con sus clics, visitas y CV | los clics, del servidor; las visitas, de Vercel por su `utm_campaign`, solo con un plan que cuente por UTM (Hobby no: la pantalla lo dice una vez y muestra clics y CV); los CV, de los contadores | en el momento; las visitas, hasta ayer |
+| **Links para compartir** | Links cortos propios (`/l/<codigo>`) con sus clics, visitas y CV | los clics, del servidor; las visitas, de la analítica por su `utm_campaign`, si la fuente cuenta por UTM (Umami sí; Vercel Hobby no: la pantalla lo dice una vez y muestra clics y CV); los CV, de los contadores | en el momento; las visitas, hasta ayer |
 
 Con poco tráfico, cada bloque dice «Todavía no hay datos suficientes» y cuánto
 falta, en vez de dibujar un gráfico que engaña. Un CV cuenta para un link solo
@@ -439,13 +467,14 @@ y el Inicio suma los materiales consultados de la semana.
 El **resumen semanal por correo** sale los lunes (en Chile) a quien lo active
 en Mi cuenta › Avisos —viene apagado—, con los números de la semana de lunes
 a domingo según su rol, todos de la misma semana; empieza cuando la copia de
-Vercel tiene un mes de datos, y hasta entonces Mi cuenta dice cuántos días
-faltan. Espera a la copia de Vercel de esa corrida, que escribe la semana.
+las visitas tiene un mes de datos, y hasta entonces Mi cuenta dice cuántos días
+faltan. Espera a la copia de las visitas de esa corrida, que escribe la semana.
 
-Ninguna pantalla consulta a Vercel ni a Google al renderizar. **Un solo cron**
-(`/api/cron/diario`, a las 4 UTC) corre cada día las tareas registradas en
-`apps/sitio/src/datos/tareas/diarias.ts`, cada una aislada: la copia de Vercel
-Analytics (a las tablas `metricas_*`), la de Search Console (a
+Ninguna pantalla consulta a la analítica ni a Google al renderizar. **Un solo
+cron** (`/api/cron/diario`, a las 4 UTC: el de `vercel.json` en Vercel, el
+servicio `cron` en un VPS) corre cada día las tareas registradas en
+`apps/sitio/src/datos/tareas/diarias.ts`, cada una aislada: la copia de las
+visitas (a las tablas `metricas_*`), la de Search Console (a
 `busquedas_diarias`), la revisión de la indexación (a `indexacion_de_urls`,
 hasta 20 páginas por día: la API tiene cuota), la retención de Mensajes, la
 salud de los links de la Biblioteca (ver [Biblioteca](#biblioteca)) y el
@@ -457,7 +486,7 @@ adelante se suma como una tarea en esa lista, no como un cron nuevo
 ([ADR-0011](docs/architecture/adrs/0011-search-console-y-un-solo-cron.md)).
 
 Sin sus variables, cada copia lo dice y no toca la API; en local no hace falta
-cargarlas. Los días de Vercel son UTC; los de Google, hora del Pacífico, y
+cargarlas. Los días de la analítica son UTC; los de Google, hora del Pacífico, y
 llegan con 2 o 3 días de atraso.
 
 **Para conectar Search Console**, una vez:
@@ -470,8 +499,8 @@ llegan con 2 o 3 días de atraso.
 3. **ED:** en Search Console › Configuración › Usuarios y permisos, agregar el
    correo de la cuenta de servicio (termina en `.iam.gserviceaccount.com`) con
    permiso **Restringido**: solo puede leer.
-4. **Desarrollo:** cargar las tres variables `SEARCH_CONSOLE_*` en Vercel
-   (Production). La primera copia trae los últimos 90 días.
+4. **Desarrollo:** cargar las tres variables `SEARCH_CONSOLE_*` en el servidor
+   (Vercel, en Production; o el `.env` del VPS). La primera copia trae los últimos 90 días.
 
 ### Correos
 
@@ -506,7 +535,8 @@ de verdad:
    enlaces del correo para contar clics, y el de la contraseña pasaría por un
    tercero.
 4. Crear una clave con permiso **solo de envío** y cargarla como
-   `RESEND_API_KEY` en Vercel (Production), junto con `CORREO_REMITENTE`.
+   `RESEND_API_KEY` en el servidor (Vercel, en Production; o el `.env` del
+   VPS), junto con `CORREO_REMITENTE`.
 
 **Si una cuenta queda frenada** (5 contraseñas mal en 15 minutos frenan esa
 cuenta de 15 minutos a 1 hora, aunque vengan de distintos lugares), se destraba
@@ -624,6 +654,10 @@ los plazos editables, en el [ADR-0015](docs/architecture/adrs/0015-ajustes-en-la
    de las fotos, que es público: el acceso de un store no se cambia después.
 3. **Cargar `CV_ABIERTO=si`** en Vercel (Production) y volver a deployar.
 
+En un VPS el paso 2 no hace falta: sin el token, los CV van al volumen privado
+`cv` del compose (que no se sirve por la web y entra en los respaldos). El paso
+3 es `CV_ABIERTO=si` en el `.env` y `scripts/desplegar.sh`.
+
 Mientras tanto, en local se prueba con `CV_ABIERTO=si` en el `.env.local`:
 los PDF quedan en `apps/sitio/.cv/` y se bajan desde la ficha del CV.
 
@@ -645,8 +679,8 @@ configura una vez, en cinco pantallas:
 - **Privacidad:** los plazos de retención, con sus topes. Alargar vale para lo
   que llegue desde ahora; acortar vale para todo y, si borra algo, pregunta
   antes ([ADR-0015](docs/architecture/adrs/0015-ajustes-en-la-base.md)).
-- **Conexiones:** Vercel Analytics, Search Console, Resend, los dos Blob y el
-  cron: si tienen sus variables (por el nombre, nunca el valor) y cómo corrió
+- **Conexiones:** la analítica (Umami en un VPS, Vercel Analytics en Vercel),
+  Search Console, Resend, los dos Blob y el cron: si tienen sus variables (por el nombre, nunca el valor) y cómo corrió
   cada tarea. Es el primer lugar donde mirar si algo dejó de actualizarse.
 
 ### Comandos de base
