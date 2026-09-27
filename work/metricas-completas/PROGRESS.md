@@ -21,8 +21,9 @@
 
 ## Verification
 
-### 2026-09-27 — L DoD — PASS (sobre `74fe1d2`, `main` en `d051c6a` sin commits nuevos)
+### 2026-09-27 — L DoD — PASS (sobre `e88b941`, `main` en `d051c6a` sin commits nuevos)
 
+- Sobre el árbol final: `pnpm typecheck`, `pnpm lint`, `node scripts/verificar-react-doctor.mjs` (100/100, sin diagnósticos) y `pnpm build` → exit 0; `pnpm test` → exit 0 **tres corridas seguidas** (sitio 483: 482 pasan, 0 fallan, 1 saltado). Entre `74fe1d2` y `e88b941`: el texto de Ajustes › Avisos (`d600798`), las vistas del resumen (`74fe1d2`), dos utilidades bajo 100 líneas (`a3f2438`, `762cc77`, `2b36cb2`) y el test intermitente de avisos (`e88b941`, ver «Tried and failed» y DECISIONS). Lo de abajo se midió sobre `74fe1d2` y lo que vino después no toca pantallas ni rutas.
 - L1 static: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
   `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor: 100/100,
   sin diagnósticos», apps/sitio/src: 1000 archivos · packages/db/src: 3 ·
@@ -81,14 +82,17 @@
 
 ## Tried and failed
 
-- 2026-09-27 — La primera `pnpm test` de la verificación dio 1 fallo en
-  `datos/avisos.test.ts` («poner quién recibe…»: `cambiaron: 1` donde se
-  esperaba `0` en la segunda llamada). La segunda corrida pasó entera, y la
-  última también. Es una carrera entre archivos de test que corren en
-  paralelo sobre la misma base: otro archivo crea una cuenta que administra
-  (sin fila en `avisos`, así que recibe el CV de fábrica) entre las dos
-  llamadas del test. La lógica de «sin fila, lo de fábrica» es la de antes
-  para el CV, así que la carrera ya existía; queda como seguimiento.
+- 2026-09-27 — `pnpm test` falló de a ratos en `datos/avisos.test.ts`
+  («poner quién recibe…»: `cambiaron: 1` donde se esperaba `0` en la
+  segunda llamada), dos de cuatro corridas enteras. Causa: seis archivos de
+  test crean cuentas que administran o dirigen en paralelo sobre la misma
+  base, y una nueva sin fila en `avisos` recibe el CV de fábrica, así que la
+  segunda llamada global la apagaba y la contaba. La lógica de «sin fila, lo
+  de fábrica» es la de `main` para el CV: la carrera ya estaba; esta lane,
+  con más tests contra la base, la hizo aparecer más. Arreglado en el test
+  (`e88b941`): acepta como cambios solo las cuentas que aparecieron en el
+  medio, y sin ninguna sigue exigiendo cero. Después, tres corridas enteras
+  en verde.
 - 2026-09-27 — `orca screenshot` → «Screenshot timed out — the browser tab may
   not be visible or the window may not have focus», dos veces; `orca keypress`
   → `ok` sin mover el foco. La evidencia visual y de teclado es por sondas del
