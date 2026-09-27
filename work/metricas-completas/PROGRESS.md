@@ -32,8 +32,163 @@
 - **Lo que sigue:** la revisión de los arreglos, del padre. Después, el
   commit que cierra la lane (saca `work/metricas-completas/`) dentro del PR,
   antes del merge.
+- Estado del entorno: el dev server de la lane (pestaña «next-server», 3029)
+  quedó frenado para el gate, y `ed_metricas` se recreó desde las
+  migraciones para las cinco corridas: no tiene las cuentas ni los datos
+  sembrados de la ronda anterior. Para recorrer el admin, sembrar de nuevo.
 
 ## Verification
+
+### 2026-09-27 — L DoD, ronda de arreglos 1 — gate verde (sobre `39c5a87`…`f375b49`, rebasada sobre `main` en `ddc8ca1`)
+
+Gate del hijo; el PASS lo da la revisión del padre (work-verify §4), que
+todavía no corrió sobre esta ronda.
+
+- Base recién migrada: `ed_metricas` borrada y creada de nuevo, `pnpm
+  migrate:deploy` → «26 migrations found … All migrations have been
+  successfully applied» (la última, `20260927073235_contadores_enlaces_y_marcas`).
+- L2 `pnpm test`, **cinco corridas seguidas** sobre esa base, sin
+  `--test-concurrency` ni reintentos. La salida, las líneas de totales de cada
+  corrida tal cual (`grep` de la salida de `pnpm test`), y su exit:
+
+  ```
+  === corrida 1 (07:42:49Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 550
+    apps/sitio test: ℹ pass 549
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 2 (07:43:18Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 550
+    apps/sitio test: ℹ pass 549
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 3 (07:43:40Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 550
+    apps/sitio test: ℹ pass 549
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 4 (07:44:02Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 550
+    apps/sitio test: ℹ pass 549
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 5 (07:44:24Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 550
+    apps/sitio test: ℹ pass 549
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  listo
+  ```
+
+  El saltado es el de las respuestas grabadas de Vercel, que espera a A1, como
+  en `main`. La primera tanda falló en un test nuevo que dependía de la base
+  («Tried and failed»): se arregló y la tanda se repitió entera.
+- L1 en limpio, en este orden y **sin `.next` ni `next-env.d.ts`**:
+  `pnpm typecheck` → exit 0; `pnpm lint` → exit 0; `node
+  scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor: 100/100, sin
+  diagnósticos», apps/sitio/src: 1116 archivos · packages/db/src: 3 ·
+  packages/auth/src: 27 · packages/kit-admin/src: 22). La primera pasada de
+  react-doctor marcó `async-await-in-loop` y un `includes` en un `filter`
+  en `datos/quien-recibe.ts`: arreglados por código (dentro de `b167f55`).
+- Build: `pnpm build` → exit 0 («✓ Compiled successfully»;
+  `/admin/metricas{,/acciones,/busquedas,/enlaces,/origen}`, `/api/contar`
+  y `/l/[codigo]` dinámicas).
+- L3 `/l/` de punta a punta, con `next start -p 3129` (pestaña de Orca, ya
+  cerrada) y un link sembrado en la base, con un `User-Agent` de iPhone:
+  `HEAD` con `x-ed-metodo: GET` falso → 307, clics 0 → 0; `GET` → 307,
+  `location: /novedades?utm_source=linkedin&utm_medium=link&utm_campaign=…`,
+  `Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate`,
+  clics 0 → 1; `GET` con `x-ed-metodo: HEAD` falso → 307, clics 1 → 2 (el
+  proxy lo pisa); `/l/no-existe` → 404 con «Página no encontrada |
+  Empoderamiento Docente». Las pantallas del admin no se volvieron a recorrer
+  en el navegador: en esta ronda cambian solo textos (el camino del CV, la
+  explicación de Links) y las cifras de 90 días, que prueban
+  `cifras-del-periodo.test.ts` y el build.
+- MINOR 7, el JS de cada página pública (la suma de los chunks que carga su
+  HTML prerenderizado, `<script src>` de `.next/server/app/<pagina>.html`),
+  `next build` de `main` en `ddc8ca1` contra esta rama, en bytes:
+
+  | Página | main | rama | diferencia | main gzip | rama gzip | diferencia gzip |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | index | 818190 | 818803 | +613 | 260611 | 260916 | +305 |
+  | biblioteca | 822224 | 822907 | +683 | 265079 | 265390 | +311 |
+  | contacto | 1178995 | 1179589 | +594 | 340947 | 341172 | +225 |
+  | investigacion | 942407 | 942407 | +0 | 301263 | 301263 | +0 |
+  | novedades | 831559 | 831559 | +0 | 267620 | 267620 | +0 |
+  | que-hacemos | 883326 | 883326 | +0 | 281685 | 281685 | +0 |
+  | quienes-somos | 981416 | 981416 | +0 | 299660 | 299660 | +0 |
+  | sumate-al-equipo | 1155395 | 1156189 | +794 | 334966 | 335262 | +296 |
+  | _not-found | 567780 | 567780 | +0 | 173851 | 173851 | +0 |
+
+  Las cinco que no cuentan cargan los mismos chunks que `main` (mismos
+  nombres, mismos bytes). `/api/contar` está en un solo chunk de cada una de
+  las cuatro que cuentan, el propio de esa página, y en ninguno de las otras.
+  Contra `d051c6a` (la base de la revisión) dio lo mismo: +0 en las que no
+  cuentan, +594 a +794 en las cuatro. **Antes y después son iguales**: no
+  había nada que mover, así que el aumento de 4,9 a 6,2 KB no se reprodujo con
+  este método (DECISIONS).
+- Close review: **la corre el padre**, sobre esta ronda.
+
 
 ### 2026-09-27 — L DoD — PASS (sobre `e88b941`, `main` en `d051c6a` sin commits nuevos)
 
@@ -119,6 +274,18 @@
   not be visible or the window may not have focus», dos veces; `orca keypress`
   → `ok` sin mover el foco. La evidencia visual y de teclado es por sondas del
   DOM (arriba).
+
+- 2026-09-27 — Ronda 1, la primera tanda de `pnpm test` x5 sobre una base
+  recién migrada: las corridas 1 a 4 fallaron en el test nuevo del 400 de
+  Vercel («Del 2001-10-12 al 2001-11-10: 30 días» donde esperaba 1 día; 548
+  pasan, 1 falla, 1 saltado, las cuatro igual). El test dependía de la marca
+  de agua que dejaba la base vieja de la lane, con datos de 2026: en una base
+  vacía no hay marca y la copia pide los 30 días. Justo lo que pedía la
+  revisión (cada test siembra sus filas): ahora siembra su `total` del
+  2001-11-09 (una marca más nueva da lo mismo, por `minimoDias`). La
+  corrida 5, ya con el test arreglado, pasó. Arreglo dentro de `39c5a87`;
+  la tanda de cinco se repitió entera sobre otra base recién migrada
+  («Verification»).
 
 ## Hecho
 
@@ -306,6 +473,41 @@
   cuándo llega); AGENTS.md §3; el spec del admin (§5 las rutas, §6 las
   tablas). `grep -n 0017 docs/architecture/adrs/README.md` → la fila 48.
   `4b37e51`, `5681b08`, `788140b`, `e05da1d`.
+
+- **Ronda de arreglos 1** (revisión r1: FAIL). Cada arreglo con su test; las
+  decisiones, en DECISIONS.
+  - IMPORTANT 1 — `datos/quien-recibe.ts`: quién recibe toca solo las
+    cuentas mostradas, en una transacción que las traba (`FOR KEY SHARE`).
+    El test de la ventana borra una cuenta desde otra conexión antes de
+    escribir: sin la traba, `avisos_cuenta_id_fkey`; con ella, pasa.
+    Aserciones exactas otra vez. `b167f55`.
+  - IMPORTANT 2 — el proxy pone el método real en `x-ed-metodo` en todo
+    pedido a `/l/` (pisa el de afuera) y la página cuenta solo un `GET`
+    (`lib/metricas/clic.ts`). Tests: el proxy pisa un `GET` falso en un
+    `HEAD`, el matcher cubre `/l/`, y la página cuenta el `GET` y no el
+    `HEAD` ni el pedido sin cabecera. `ab0c73f`.
+  - IMPORTANT 3 — `PLAN_DE_VERCEL` (30 días, sin UTM) con su fuente; la
+    copia pide como mucho 30 días y las ventanas de 7, su anterior y 30, cada
+    una en su `try`; 90 días en el Resumen: vistas sumadas día por día,
+    visitantes «—» con el porqué (`datos/consultas/cifras-del-periodo.ts`).
+    Test con un 400 grabado, que siembra su propia marca de agua. `39c5a87`.
+  - MINOR 4 — el resumen semanal cuenta una sola semana, de lunes a domingo
+    (`semanaAntesDe`), y espera a la copia de Vercel (`despuesDe` en el
+    corredor). Tests: la semana que reciben los números y la página más vista
+    (también a mano el lunes a las 23:30 de Chile y cruzando de mes), cada
+    número contra filas de 1997 con el lunes siguiente de señuelo, y el
+    corredor (la espera, aunque la otra falle, y que cuente en su tiempo).
+    `7d584f3`, `34000dc`.
+  - MINOR 5 — «Abierto» al día (abajo).
+  - MINOR 6 — el camino del CV habla de «vistas de la página». `ca4d160`.
+  - MINOR 7 — medido, sin cambios que hacer (abajo y DECISIONS).
+  - Segundo rebase, sobre `ddc8ca1`: conflictos resueltos y la migración
+    regenerada (`20260927073235_contadores_enlaces_y_marcas`, SQL idéntico).
+  - El gate encontró dos cosas en `quien-recibe.ts` (`async-await-in-loop`
+    y un `includes` en un `filter`): arregladas por código, dentro de
+    `b167f55`.
+  - Docs: SPEC §4.1, §6.1, §6.3, §6.4 y §8; ADR-0017; README; el spec del
+    admin; AGENTS.md §3. `2bbcbb5`, `3d55f6b`, `ee2d43a`, `78c65ef`.
 
 ## Abierto
 
