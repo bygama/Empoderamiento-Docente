@@ -12,6 +12,31 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
   2026-09-26, `main` va 64 commits adelante (`15def2c`) y `git merge-tree`
   muestra un solo conflicto, en DESIGN.md (la frase de apertura de §11).
 
+**En pausa con el PR #187 abierto**
+(https://github.com/bygama/Empoderamiento-Docente/pull/187), esperando la
+revisión de cierre del padre. Para retomar en frío:
+
+- **Entorno:** base `ed_paginasqh` (`.env.local` apunta ahí; está en
+  `.gitignore`), cuenta de prueba `prueba-4b@empoderamientodocente.local`
+  (administra), dev server en la pestaña de Orca «dev
+  paginas-que-hacemos-y-quienes-somos» (puerto 3022, con
+  `NEXT_PUBLIC_SITE_URL=http://localhost:3022`), navegador de Orca con el
+  perfil `paginas-qh`. Los scripts de verificación están en
+  `%TEMP%/ed-paginasqh/` (`paso.sh`, `guardar-previo.sh`, `diff-head.mjs`,
+  `nombres.js`, `aviso.js`, `lineas.cjs`): son de sesión, no del repo.
+- **Si llegan hallazgos de la revisión:** se arreglan acá, se re-verifica
+  desde el gate y se anota cada ruling en DECISIONS.
+- **Al rebasear sobre `main` (cuando lo pida el padre):** resolver DESIGN.md
+  §11 (la frase de apertura suma «la sección compartida»); si la 4c ya entró,
+  conciliar `contenido/paginas.ts`, `config/metadata.ts` (la misma
+  `openGraphDeLaPagina`) y el README. Después, **rehacer la referencia de
+  comparar-render con el build del `main` nuevo** (la de `48ed711` queda
+  vieja) y comprobar que siguen siendo solo las cuatro diferencias; correr el
+  gate entero y el pre-push.
+- **Al cerrar** (después del PASS del revisor): el commit que finaliza la
+  lane y el que borra `work/paginas-que-hacemos-y-quienes-somos/`, los dos en
+  este mismo PR.
+
 ## Verification
 
 ### 2026-09-26 — L DoD (aceptaciones del PLAN + gate del repo + SPEC §11) — PASS
