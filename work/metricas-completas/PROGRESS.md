@@ -29,15 +29,136 @@
   (`20260927073235_contadores_enlaces_y_marcas`). Los hashes de «Hecho» de
   antes de esta ronda son de antes de los rebases: se encuentran por su
   asunto (`git log --grep`).
-- **Lo que sigue:** la revisión de los arreglos, del padre. Después, el
-  commit que cierra la lane (saca `work/metricas-completas/`) dentro del PR,
-  antes del merge.
+- ~~**Lo que sigue:** la revisión de los arreglos, del padre.~~ La revisión
+  r2 dio PASS sobre `7ec4363`, con tres arreglos antes del merge y una
+  ratificación.
+- 2026-09-27 — **Ronda de cierre** (task `task_27fbad4f9e3f`, dispatch
+  `ctx_a6f044929413`): los tres arreglos hechos (abajo), el gate entero y el
+  cierre de la lane dentro del PR.
 - Estado del entorno: el dev server de la lane (pestaña «next-server», 3029)
   quedó frenado para el gate, y `ed_metricas` se recreó desde las
   migraciones para las cinco corridas: no tiene las cuentas ni los datos
   sembrados de la ronda anterior. Para recorrer el admin, sembrar de nuevo.
 
 ## Verification
+
+### 2026-09-27 — L DoD — PASS (revisión r2 sobre `7ec4363`; gate de la ronda de cierre sobre `59fb573`, `main` en `ddc8ca1`)
+
+- Close review r2 — el cambio entero contra su SPEC (Opus, medium, del
+  padre): **PASS**. Tal como lo mandó el padre: «El revisor dio PASS en la r2
+  sobre 7ec4363b. Midió HEAD con next start y la cabecera falsificada, el
+  plan de 30 días con el 400 grabado, las cifras de 90 días que no inventan,
+  FOR KEY SHARE, la semana única, comparar-render idéntico contra ddc8ca1 y
+  el gate en limpio.» Con tres arreglos antes del merge (hechos en la ronda
+  de cierre: «Hecho») y la semana en días UTC ratificada (DECISIONS). La
+  corrida 1 de 5 que falló en la r2 era un deadlock de la lane 9
+  (`autorizacion-de-aliados.test.ts`), no de esta lane: lo arregla `equipo`.
+- Base recién migrada: `ed_metricas` borrada y creada de nuevo, `pnpm
+  migrate:deploy` → «26 migrations found … All migrations have been
+  successfully applied».
+- L1 en limpio, en este orden y sin `.next` ni `next-env.d.ts`: `pnpm
+  typecheck` → exit 0; `pnpm lint` → exit 0; `node
+  scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor: 100/100, sin
+  diagnósticos», apps/sitio/src: 1117 archivos · packages/db/src: 3 ·
+  packages/auth/src: 27 · packages/kit-admin/src: 22).
+- L2 `pnpm test`, **cinco corridas seguidas** sobre esa base, sin
+  `--test-concurrency` ni reintentos; las líneas de totales tal cual, y su
+  exit:
+
+  ```
+  === corrida 1 (08:09:04Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 551
+    apps/sitio test: ℹ pass 550
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 2 (08:09:28Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 551
+    apps/sitio test: ℹ pass 550
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 3 (08:09:52Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 551
+    apps/sitio test: ℹ pass 550
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 4 (08:10:16Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 551
+    apps/sitio test: ℹ pass 550
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  === corrida 5 (08:10:39Z)
+    packages/kit-admin test: ℹ tests 3
+    packages/kit-admin test: ℹ pass 3
+    packages/kit-admin test: ℹ fail 0
+    packages/kit-admin test: ℹ cancelled 0
+    packages/kit-admin test: ℹ skipped 0
+    packages/auth test: ℹ tests 46
+    packages/auth test: ℹ pass 46
+    packages/auth test: ℹ fail 0
+    packages/auth test: ℹ cancelled 0
+    packages/auth test: ℹ skipped 0
+    apps/sitio test: ℹ tests 551
+    apps/sitio test: ℹ pass 550
+    apps/sitio test: ℹ fail 0
+    apps/sitio test: ℹ cancelled 0
+    apps/sitio test: ℹ skipped 1
+    exit 0
+  listo
+  ```
+
+- Build: `pnpm build` → exit 0 («✓ Compiled successfully»).
+- L3: Links se comprobó con un render de servidor del bloque contra la base
+  («Hecho», ronda de cierre); `/l/` y el JS por página, en la ronda 1 (abajo),
+  sin cambios desde entonces.
+
 
 ### 2026-09-27 — L DoD, ronda de arreglos 1 — gate verde (sobre `39c5a87`…`f375b49`, rebasada sobre `main` en `ddc8ca1`)
 
@@ -509,14 +630,36 @@ todavía no corrió sobre esta ronda.
   - Docs: SPEC §4.1, §6.1, §6.3, §6.4 y §8; ADR-0017; README; el spec del
     admin; AGENTS.md §3. `2bbcbb5`, `3d55f6b`, `ee2d43a`, `78c65ef`.
 
+- **Ronda de cierre** (revisión r2: PASS, con tres arreglos antes del merge).
+  - Los tests de la copia de Vercel borran solo sus filas (los días que
+    escriben y los fines de sus ventanas), no todo lo anterior al 2001-12-31:
+    se llevaban las de 1997 del test del resumen. Corrido el archivo: 4 pasan
+    y no queda ni una fila de 2001. `3a7b005`.
+  - Links dice una vez por qué no hay visitas en Hobby
+    (`sinVisitasPorque()`); cada fila, solo clics y CV. Render de servidor
+    del bloque contra la base con un link sembrado: «Clics: las veces que se
+    abrió el link. CV: los que se mandaron desde ahí. Vercel no da de dónde
+    vienen las visitas en el plan gratuito: acá se ven los clics y los CV.» y
+    la fila «3 clics · 0 CV»; filas con «— visitas»: 0; veces que se dice el
+    porqué: 1. `d6304e0`.
+  - El resumen semanal no trae los clics de Google. `e9d2541`.
+  - Docs: SPEC §4.1, §6.4 y §8; DECISIONS (con la semana en días UTC,
+    ratificada); ADR-0017; README. `1392d0f`, `d3ca47e`, `59fb573`.
+
 ## Abierto
 
 - ~~La lane 8a no está en `main`~~: entró en `d051c6a` y esta lane se rebasó
   encima (DECISIONS); los pasos 17 y 18, que dependían de ella, están hechos.
   La lane 9 entró en `ddc8ca1` y la rama está rebasada sobre ella.
-- **Para el owner:** los clics de Google del resumen semanal van casi siempre
-  «—» (Search Console llega con 2 o 3 días de atraso; DECISIONS). Sacar el
-  renglón es una línea.
+- ~~**Para el owner:** los clics de Google del resumen semanal…~~ Se sacó el
+  renglón (ronda de cierre, DECISIONS).
+- **Para el deploy (lane 0):** la conexión real con Vercel y con Search
+  Console (sus variables en Production); la primera corrida real, A1, que
+  confirma la forma de `by` repetido (`lib/metricas/vercel.ts`) y graba las
+  respuestas que espera el único test saltado (`lib/metricas/vercel.test.ts`);
+  y Resend en Production para el resumen semanal. Si ED cambia de plan de
+  Vercel, `PLAN_DE_VERCEL` (`config/metricas.ts`) prende la ventana de 90 días
+  y las visitas por link.
 - `datos/actividad.ts` sigue por encima de 100 líneas (lo era en `main`;
   con las lanes 9 y 11, 267): seguimiento, como lo dejaron la Biblioteca y
   esta lane.
