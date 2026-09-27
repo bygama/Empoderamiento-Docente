@@ -30,20 +30,23 @@ function UltimoCambio({ cambiadoEn, cambiadoPor }: Omit<Props, "inicial">) {
  * publicar. Con cambios sin guardar, el encabezado pasa a navy y salir
  * pregunta, como en el editor de páginas. Un error vuelve a su campo y se
  * borra en cuanto se edita (DESIGN.md §11).
+ *
+ * El estado guarda solo lo que se cambió sobre `inicial`, que es lo guardado:
+ * al guardar, la acción revalida esta pantalla y `inicial` llega con lo nuevo,
+ * como `cambiadoEn` y `cambiadoPor`.
  */
 export function FormularioDelSitio({ inicial, cambiadoEn, cambiadoPor }: Props) {
   const idDelFormulario = useId();
-  const [valores, setValores] = useState(inicial);
-  const [guardados, setGuardados] = useState(inicial);
-  const [ultimo, setUltimo] = useState({ cambiadoEn, cambiadoPor });
+  const [cambios, setCambios] = useState<Partial<ValoresDelSitio>>({});
+  const valores: ValoresDelSitio = { ...inicial, ...cambios };
   const [errores, setErrores] = useState<Partial<Record<CampoDelSitio, string>>>({});
   const [resultado, setResultado] = useState<{ ok: boolean; detalle: string } | null>(null);
   const [guardando, setGuardando] = useState(false);
-  const haySinGuardar = CAMPOS_DEL_SITIO.some((c) => valores[c] !== guardados[c]);
+  const haySinGuardar = CAMPOS_DEL_SITIO.some((c) => valores[c] !== inicial[c]);
   useFrenarSalida(haySinGuardar);
 
   function alCambiar(campo: CampoDelSitio, valor: string) {
-    setValores((v) => ({ ...v, [campo]: valor }));
+    setCambios((c) => ({ ...c, [campo]: valor }));
     setErrores((e) => {
       if (!e[campo]) return e;
       const sinEse = { ...e };
@@ -59,9 +62,8 @@ export function FormularioDelSitio({ inicial, cambiadoEn, cambiadoPor }: Props) 
     setGuardando(false);
     setResultado(r);
     if (r.ok) {
-      setGuardados(valores);
+      setCambios({});
       setErrores({});
-      setUltimo({ cambiadoEn: r.cambiadoEn, cambiadoPor: r.cambiadoPor });
       return;
     }
     const errs = r.errores ?? {};
@@ -80,7 +82,7 @@ export function FormularioDelSitio({ inicial, cambiadoEn, cambiadoPor }: Props) 
         detalle={
           <>
             <span>Se ven en el pie de todas las páginas, el menú del celular, Contacto y los formularios. Se publican al guardar.</span>
-            <UltimoCambio {...ultimo} />
+            <UltimoCambio cambiadoEn={cambiadoEn} cambiadoPor={cambiadoPor} />
           </>
         }
         acciones={
