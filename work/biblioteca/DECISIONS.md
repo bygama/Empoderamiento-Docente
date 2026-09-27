@@ -54,3 +54,10 @@
   La firma en blanco al 72 % da 2,56:1 sobre `verde-concepto`; es decorativa
   (`alt=""`, la fila repite el texto) y se deja como en las de hoy — queda
   anotado para Mateo.
+- 2026-09-27 — **`material.ts` se parte en dos** (verificación): pasaba el
+  tope de 100 de una utilidad (116 sin comentarios). Los constructores de cada
+  campo van a `campos-del-material.ts` (60) y `material.ts` junta los dos
+  esquemas y los tipos (59). **`datos/actividad.ts` queda en 138**: ya estaba
+  en 123 en `main`, y es el registro donde AGENTS.md §12 manda sumar los tipos
+  de cada módulo (los cinco de la Biblioteca son 15 líneas). Partirlo es un
+  cambio aparte, de quien lo decida para todos los módulos.
