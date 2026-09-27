@@ -1,5 +1,5 @@
-import Image from "next/image";
-import { ALIADOS } from "@/config/aliados";
+import { LogoDeAliado } from "@/features/aliados/components/LogoDeAliado";
+import { altoDe, type AliadoDelSitio } from "@/features/aliados/contenido/modelo";
 
 /**
  * «Nos acompañan», la banda que cierra «Cómo trabajamos».
@@ -25,11 +25,11 @@ import { ALIADOS } from "@/config/aliados";
  * esquinas inferiores asomaba la card de abajo y ese blanco se continúa con
  * el de «Áreas»; las esquinas de arriba muestran la pila, como las solapas.
  *
- * Los logos son los autorizados de config/aliados (AGENTS §5.4): los mismos
- * que ya publican el pie y la home, con el mismo filtro que los pinta de
- * blanco sobre navy.
+ * Los logos son los publicados y autorizados de la base (AGENTS §5.4), por
+ * props: los mismos que publican el pie y la home, con el mismo filtro que
+ * los pinta de blanco sobre navy.
  */
-export function BandaAliados({ rotulo }: { rotulo: string }) {
+export function BandaAliados({ rotulo, aliados }: { rotulo: string; aliados: readonly AliadoDelSitio[] }) {
   return (
     <div
       data-mirada-banda
@@ -44,19 +44,9 @@ export function BandaAliados({ rotulo }: { rotulo: string }) {
           {rotulo}
         </p>
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-5 md:gap-x-16">
-          {ALIADOS.map((a) => (
-            <li key={a.src} className="flex h-10 items-center">
-              {/* El alto lo manda la clase y el ancho va `auto`: las medidas
-                  del archivo (config/aliados) solo reservan la proporción. */}
-              <Image
-                src={a.src}
-                alt={a.alt}
-                width={a.w}
-                height={a.h}
-                unoptimized={"vectorial" in a}
-                draggable={false}
-                className={`${a.alto.pie} w-auto opacity-75 [filter:brightness(0)_invert(1)]`}
-              />
+          {aliados.map((a) => (
+            <li key={a.id} className="flex h-10 items-center">
+              <LogoDeAliado aliado={a} className={`${altoDe(a.tamano).pie} w-auto opacity-75 [filter:brightness(0)_invert(1)]`} />
             </li>
           ))}
         </ul>

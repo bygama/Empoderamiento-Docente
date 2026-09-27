@@ -12,6 +12,7 @@ import { LenisProvider } from "@/components/providers/LenisProvider";
 import { OPEN_GRAPH_COMUN, TITULO_DEL_SITIO } from "@/config/metadata";
 import { siteConfig } from "@/config/site";
 import { datosDelSitio } from "@/datos/consultas/sitio";
+import { aliadosDelSitio } from "@/datos/consultas/aliados";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -89,7 +90,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * El pie y el menú del celular muestran los datos de Ajustes › Datos del
- * sitio: se leen acá, una vez, y bajan por props. Guardarlos revalida este
+ * sitio y la tira de aliados (los publicados y autorizados): se leen acá, una
+ * vez, y bajan por props. Guardar los datos o tocar un aliado revalida este
  * layout, y con él todas las páginas.
  */
 export default async function RootLayout({
@@ -97,7 +99,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { correo, redes, paises } = await datosDelSitio();
+  const [{ correo, redes, paises }, aliados] = await Promise.all([datosDelSitio(), aliadosDelSitio()]);
   return (
     <html
       lang="es"
@@ -128,7 +130,7 @@ export default async function RootLayout({
               transparente y sube el footer --footer-radio sobre el cierre
               para que el redondeo recorte la escena. */}
           <div data-footer-dock className="bg-white">
-            <Footer sitio={{ redes, paises }} />
+            <Footer sitio={{ redes, paises }} aliados={aliados} />
           </div>
         </LenisProvider>
         {/* Cuenta vistas y visitantes sin cookies (ADR-0009). Solo en producción:

@@ -1,5 +1,6 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { openGraphDeLaPagina } from "@/config/metadata";
+import { aliadosDelSitio } from "@/datos/consultas/aliados";
 import { contenidoDe } from "@/datos/consultas/paginas";
 import { QueHacemosHero } from "@/features/que-hacemos/components/QueHacemosHero";
 import { QueHacemosHeroFaro } from "@/features/que-hacemos/components/QueHacemosHeroFaro";
@@ -45,7 +46,8 @@ export async function generateMetadata(_: unknown, padre: ResolvingMetadata): Pr
 // preguntas del método, que repetían «Cómo trabajamos».
 export default async function QueHacemosPage() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, faro, comoTrabajamos, areas, niveles, proyectos, cierre } = await contenidoDe("que-hacemos");
+  // Los aliados de la banda de «Cómo trabajamos», los publicados y autorizados de la base.
+  const [{ hero, faro, comoTrabajamos, areas, niveles, proyectos, cierre }, aliados] = await Promise.all([contenidoDe("que-hacemos"), aliadosDelSitio()]);
   return (
     <main id="contenido" tabIndex={-1}>
       {/* FONDO COMPARTIDO: el hero y la escena del faro son dos cielos
@@ -73,7 +75,7 @@ export default async function QueHacemosPage() {
             CTA final («Ver las siete áreas») baja a #areas. */}
         <QueHacemosHeroFaro contenido={faro} />
       </div>
-      <MiradaPasos contenido={comoTrabajamos} />
+      <MiradaPasos contenido={comoTrabajamos} aliados={aliados} />
       <AreasQueHacemos contenido={areas} />
       {/* La víbora: una sola, en una capa fija por debajo de Niveles y
           Proyectos, que van transparentes en vivo. */}

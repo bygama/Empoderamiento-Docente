@@ -3,7 +3,8 @@ import { grupo, listaFija, textoCorto } from "@/lib/contenido/campos";
 import { partirCifra } from "./cifra";
 
 // «En números» de Inicio: las cuatro métricas de la franja azul. Los logos de
-// abajo no son de acá: son `config/aliados.ts` (AGENTS.md §5.4).
+// abajo no son de acá: son la tabla `aliados`, que se edita en Contenido ›
+// Aliados (AGENTS.md §5.4).
 //
 // Las cifras salen de los proyectos documentados en el CV de Daniela, uno por
 // uno en docs/content/que-hace-ed-fuentes.md §6: los cuatro programas con la

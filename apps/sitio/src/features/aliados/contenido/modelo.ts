@@ -26,3 +26,19 @@ export function altoDe(tamano: string): { inicio: string; pie: string } {
 }
 
 export const TOPES = { nombre: 60, alt: 200, url: 300, autorizacion: 300 } as const;
+
+/**
+ * Un aliado como lo dibuja la tira: el logo con las medidas y el tipo de su
+ * foto (`next/image` pide las medidas para reservar la proporción, y un SVG
+ * va sin optimizar), su tamaño y, si tiene, su sitio.
+ */
+export type AliadoDelSitio = {
+  id: string;
+  src: string;
+  alt: string;
+  ancho: number;
+  alto: number;
+  vectorial: boolean;
+  tamano: string;
+  url: string | null;
+};

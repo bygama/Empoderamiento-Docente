@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import { ALIADOS } from "@/config/aliados";
+import { LogoDeAliado } from "@/features/aliados/components/LogoDeAliado";
+import { altoDe, type AliadoDelSitio } from "@/features/aliados/contenido/modelo";
 import { partirCifra } from "@/features/home/contenido/cifra";
 import type { EnNumeros } from "@/features/home/contenido/en-numeros";
 
@@ -23,12 +23,12 @@ if (typeof window !== "undefined") {
  * `features/home/contenido/en-numeros.ts` (con de dónde sale cada cifra) o
  * desde la base: se editan en el admin.
  *
- * Logos de aliados: la lista y sus alturas viven en @/config/aliados y son
- * las mismas que usa el Footer.
+ * Logos de aliados: los publicados y autorizados de la base, por props, los
+ * mismos que usa el Footer.
  */
 const fmt = (n: number) => n.toLocaleString("es-AR");
 
-export function DatosDuros({ contenido }: { contenido: EnNumeros }) {
+export function DatosDuros({ contenido, aliados }: { contenido: EnNumeros; aliados: readonly AliadoDelSitio[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
 
@@ -123,18 +123,11 @@ export function DatosDuros({ contenido }: { contenido: EnNumeros }) {
         {/* Alianzas — sin título; logos en blanco sobre el azul, subidos. */}
         <div className="border-white/12 mt-10 border-t pt-9">
           <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-20">
-            {ALIADOS.map((a) => (
-              <li key={a.src} className="flex h-12 items-center">
-                {/* El alto lo manda la clase y el ancho va `auto`: las medidas del
-                    archivo (config/aliados) solo reservan la proporción. */}
-                <Image
-                  src={a.src}
-                  alt={a.alt}
-                  width={a.w}
-                  height={a.h}
-                  unoptimized={"vectorial" in a}
-                  draggable={false}
-                  className={`${a.alto.home} w-auto opacity-60 transition-opacity duration-300 [filter:brightness(0)_invert(1)] hover:opacity-100`}
+            {aliados.map((a) => (
+              <li key={a.id} className="flex h-12 items-center">
+                <LogoDeAliado
+                  aliado={a}
+                  className={`${altoDe(a.tamano).inicio} w-auto opacity-60 transition-opacity duration-300 [filter:brightness(0)_invert(1)] hover:opacity-100`}
                 />
               </li>
             ))}

@@ -2,7 +2,8 @@ import Image from "next/image";
 import { Instagram, Linkedin, Facebook } from "@/components/ui/icons";
 import type { DatosDelSitio, Redes } from "@/config/datos-del-sitio";
 import { siteConfig } from "@/config/site";
-import { ALIADOS } from "@/config/aliados";
+import { LogoDeAliado } from "@/features/aliados/components/LogoDeAliado";
+import { altoDe, type AliadoDelSitio } from "@/features/aliados/contenido/modelo";
 import { NAV_LINKS, CTA_LINK, HOME_LINK } from "@/config/nav";
 import { CreditoSitio } from "./footer/CreditoSitio";
 import { LinkPie } from "./footer/LinkPie";
@@ -44,11 +45,14 @@ const REDES = [
   Icon: typeof Instagram;
 }>;
 
-// Aliados: la lista y sus alturas viven en @/config/aliados (misma tira que
-// la home; acá el renglón es un poco más bajo, por eso `alto.pie`).
+// Aliados: los publicados y autorizados de la base, que le pasa el layout
+// (misma tira que la home; acá el renglón es un poco más bajo, por eso el
+// alto `pie` de su tamaño).
 const { name } = siteConfig;
 
-export function Footer({ sitio: { redes, paises } }: { sitio: Pick<DatosDelSitio, "redes" | "paises"> }) {
+type Props = { sitio: Pick<DatosDelSitio, "redes" | "paises">; aliados: readonly AliadoDelSitio[] };
+
+export function Footer({ sitio: { redes, paises }, aliados }: Props) {
   const year = 2026;
 
   return (
@@ -162,18 +166,11 @@ export function Footer({ sitio: { redes, paises } }: { sitio: Pick<DatosDelSitio
           <div className="border-azul-medio/15 relative border-t pt-8">
             <span className="bg-verde-concepto absolute top-0 left-1/2 h-px w-20 -translate-x-1/2" />
             <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-5">
-              {ALIADOS.map((aliado) => (
-                <li key={aliado.src} className="flex h-11 items-center">
-                  {/* El alto lo manda la clase y el ancho va `auto`: las medidas
-                      del archivo (config/aliados) solo reservan la proporción. */}
-                  <Image
-                    src={aliado.src}
-                    alt={aliado.alt}
-                    width={aliado.w}
-                    height={aliado.h}
-                    unoptimized={"vectorial" in aliado}
-                    draggable={false}
-                    className={`${aliado.alto.pie} w-auto opacity-70 transition-opacity duration-300 hover:opacity-100 [filter:brightness(0)_invert(1)]`}
+              {aliados.map((aliado) => (
+                <li key={aliado.id} className="flex h-11 items-center">
+                  <LogoDeAliado
+                    aliado={aliado}
+                    className={`${altoDe(aliado.tamano).pie} w-auto opacity-70 transition-opacity duration-300 hover:opacity-100 [filter:brightness(0)_invert(1)]`}
                   />
                 </li>
               ))}
