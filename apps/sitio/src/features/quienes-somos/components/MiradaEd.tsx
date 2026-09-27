@@ -6,7 +6,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { acoplarLamina } from "./acople-lamina";
-import { PERSPECTIVAS } from "./mirada/constelacion-mirada";
+import type { MiradaDeQuienesSomos } from "@/features/quienes-somos/contenido/mirada";
+import { partirResaltado } from "@/lib/contenido/resaltado";
+import { armarPerspectivas } from "./mirada/constelacion-mirada";
 import { leerEscena, prepararEstados } from "./mirada/setup-estados";
 import { crearTimelineFases } from "./mirada/timeline-fases";
 import { MapaConstelacion } from "./mirada/MapaConstelacion";
@@ -60,7 +62,9 @@ if (typeof window !== "undefined") {
  * maestro); el markup en `MapaConstelacion`, `DetallePerspectiva`,
  * `FichasPerspectiva`, `SintesisMirada` e `IndicadorFases`.
  */
-export function MiradaEd() {
+export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
+  const perspectivas = armarPerspectivas(contenido.principios);
+  const titulo = partirResaltado(contenido.titulo);
   const rootRef = useRef<HTMLElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
@@ -113,7 +117,7 @@ export function MiradaEd() {
       // en el borde de arriba la pantalla está en blanco.
       data-aterrizaje="fin"
       className="bg-grain-light to-gris-fondo/60 relative z-30 -mt-[4svh] overflow-clip rounded-t-[2.5rem] bg-gradient-to-b from-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.35)]"
-      aria-label="Nuestra mirada"
+      aria-labelledby="mirada-titulo"
     >
       <div
         ref={zoneRef}
@@ -125,7 +129,7 @@ export function MiradaEd() {
             (live ? "sticky top-0 h-[100svh] overflow-hidden" : "")
           }
         >
-          <MapaConstelacion live={live} />
+          <MapaConstelacion live={live} perspectivas={perspectivas} />
 
           {/* ── Núcleo: apertura del mapa ─────────────────────────────────── */}
           <div
@@ -135,31 +139,35 @@ export function MiradaEd() {
               (live ? "h-full" : "h-auto py-24")
             }
           >
+            {/* La volanta nombra la sección (aria-labelledby): es el nombre de la
+                región; el h2 es la afirmación. */}
             <span
+              id="mirada-titulo"
               data-centro-bit
               className="text-gris-texto font-mono text-[0.78rem] font-medium tracking-[0.24em] uppercase"
             >
-              Nuestra mirada
+              {contenido.volanta}
             </span>
             <h2
               data-centro-bit
               className="font-display text-azul-principal mt-5 max-w-[16ch] text-balance font-bold tracking-[-0.02em]"
               style={{ fontSize: "clamp(2.1rem, 1rem + 3.6vw, 3.6rem)", lineHeight: 1.08 }}
             >
-              Una misma mirada, tres{" "}
-              <span className="text-verde-concepto">principios</span>.
+              {titulo.antes}
+              {titulo.clave === null ? null : <span className="text-verde-concepto">{titulo.clave}</span>}
+              {titulo.despues}
             </h2>
           </div>
 
           {/* ── Zonas de lectura + fichas por principio ───────────────────── */}
-          {PERSPECTIVAS.map((p, i) => (
+          {perspectivas.map((p, i) => (
             <div key={p.id} className="contents">
               <DetallePerspectiva p={p} i={i} live={live} />
               <FichasPerspectiva p={p} i={i} live={live} />
             </div>
           ))}
 
-          <SintesisMirada live={live} />
+          <SintesisMirada live={live} sintesis={contenido.sintesis} puente={contenido.puente} />
           <IndicadorFases live={live} />
         </div>
       </div>

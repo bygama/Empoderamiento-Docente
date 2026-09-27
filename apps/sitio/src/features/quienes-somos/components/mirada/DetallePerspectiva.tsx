@@ -1,3 +1,4 @@
+import { partirResaltado } from "@/lib/contenido/resaltado";
 import type { Perspectiva } from "./constelacion-mirada";
 
 type Props = {
@@ -12,6 +13,10 @@ type Props = {
  * motion queda apilada en flow.
  */
 export function DetallePerspectiva({ p, i, live }: Props) {
+  // La frase va sin punto (lo pone el sitio) y lo tachado es su parte entre
+  // dobles asteriscos; la afirmación destaca la suya.
+  const frase = partirResaltado(p.frase);
+  const afirmacion = partirResaltado(p.afirmacion);
   return (
     <div
       data-detalle={i}
@@ -40,29 +45,29 @@ export function DetallePerspectiva({ p, i, live }: Props) {
           className="font-display text-azul-principal font-bold tracking-[-0.02em]"
           style={{ fontSize: "clamp(1.7rem, 1rem + 1.6vw, 2.4rem)", lineHeight: 1.14 }}
         >
-          {p.fraseAntes}
-          {p.tachado ? (
+          {frase.antes}
+          {frase.clave === null ? null : (
             <span className="relative inline-block whitespace-nowrap">
-              <span className="text-azul-principal/70">{p.tachado}</span>
+              <span className="text-azul-principal/70">{frase.clave}</span>
               <span
                 data-strike
                 aria-hidden="true"
                 className="bg-azul-principal/60 absolute top-1/2 left-0 h-[0.07em] w-full -translate-y-1/2 rounded-full"
               />
             </span>
-          ) : null}
-          {p.frasePunto}
+          )}
+          {`${frase.despues}.`}
         </h3>
         <p
           className="font-display text-azul-principal mt-3 font-semibold"
           style={{ fontSize: "clamp(1.25rem, 0.9rem + 1vw, 1.7rem)", lineHeight: 1.25 }}
         >
-          {p.afirmativaPre}
+          {afirmacion.antes}
           {p.acentoTexto ? (
-            <span style={{ color: p.acentoTexto }}>{p.afirmativaAccent}</span>
+            <span style={{ color: p.acentoTexto }}>{afirmacion.clave}</span>
           ) : (
             <span className="relative inline-block">
-              {p.afirmativaAccent}
+              {afirmacion.clave}
               {/* Subrayado editorial: se dibuja izq→der con el scroll */}
               <span
                 data-afirma-underline
@@ -72,7 +77,7 @@ export function DetallePerspectiva({ p, i, live }: Props) {
               />
             </span>
           )}
-          {p.afirmativaPost}
+          {afirmacion.despues}
         </p>
       </div>
     </div>

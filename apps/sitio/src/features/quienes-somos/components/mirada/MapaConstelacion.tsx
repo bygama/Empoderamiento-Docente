@@ -1,4 +1,4 @@
-import { ARCOS, LINEAS, NODOS, PERSPECTIVAS, RAMAS } from "./constelacion-mirada";
+import { ARCOS, LINEAS, NODOS, RAMAS, type Perspectiva } from "./constelacion-mirada";
 
 /**
  * Escenario decorativo: constelación en DOS capas con la misma cámara. Las
@@ -6,7 +6,7 @@ import { ARCOS, LINEAS, NODOS, PERSPECTIVAS, RAMAS } from "./constelacion-mirada
  * cualquier línea que cruce por detrás y sigue pasando por detrás del rótulo
  * del nodo. Decorativa: el contenido real vive en los bloques de texto.
  */
-export function MapaConstelacion({ live }: { live: boolean }) {
+export function MapaConstelacion({ live, perspectivas }: { live: boolean; perspectivas: readonly Perspectiva[] }) {
   return (
     <>
       <div
@@ -81,7 +81,7 @@ export function MapaConstelacion({ live }: { live: boolean }) {
             y el label crece hacia la derecha. Así, al hacer zoom sobre un
             principio, los labels vecinos no asoman sobre la zona de
             lectura (el 02 quedaba cruzando el texto del 01). */}
-        {PERSPECTIVAS.map((p, i) => (
+        {perspectivas.map((p, i) => (
           <div
             key={p.id}
             className="absolute"
@@ -118,7 +118,7 @@ export function MapaConstelacion({ live }: { live: boolean }) {
                 data-nodo-label
                 className="font-display text-azul-principal text-[1.02rem] font-semibold whitespace-nowrap md:text-[1.15rem]"
               >
-                {p.label}
+                {p.nombre}
               </span>
             </div>
           </div>
