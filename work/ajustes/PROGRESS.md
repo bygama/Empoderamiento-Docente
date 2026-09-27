@@ -103,6 +103,18 @@
 - 2026-09-27 — **Paso 18** (`0d99268`): Conexiones. En el 3025, las seis, con
   las variables que faltan por nombre y la corrida fallida en rojo con «Nunca
   salió bien».
+- 2026-09-27 — **Paso 19** (`c63df95`): ADR-0014 (enmienda al 0012) y su fila
+  en el índice. `git diff --stat HEAD~1 -- docs/architecture/adrs`: el ADR y
+  el índice.
+- 2026-09-27 — **Paso 20** (`e74915a`, `83a51e2`, `2408e31`, `ddbd346`, en
+  commits por scope): AGENTS.md §5.3 y §3; README (Ajustes, la indexación,
+  los plazos); `docs/README.md` y AI_GUIDELINES §13, que mandaban los datos
+  de contacto a `config/site.ts` (no estaban en el SPEC §10: quedaban
+  diciendo algo falso); el spec del admin (§5, §6 y §9); DESIGN.md §11 (los
+  usos de Ajustes, el apartado de un solo formulario y la coma de la casilla).
+  `git grep -n "config/site.ts" -- AGENTS.md`: solo la línea de la marca y el
+  tilde histórico de §13.
+- 2026-09-27 — Los 20 pasos hechos. Arranca work-verify.
 
 ## Verification
 
