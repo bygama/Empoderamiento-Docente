@@ -50,24 +50,24 @@
   (el `.prisma` y `actividad-reciente.ts`) apuntan a la carpeta; `prisma
   validate` en verde y `migrate status` «up to date» (un comentario no es
   migración).
-- **Paso 5 — `admin/actividad/frase/`** (`1aa9c74f`): `index.ts` (43) y
+- **Paso 5 — `admin/actividad/frase/`** (`0d2d1500`): `index.ts` (43) y
   `comun.ts` (13: `EventoParaLeer`, `Frase`, `contraer`) más 13 módulos (el
   mayor, `cuentas.ts`, 18). Las 57 frases con siete valores de `sobre` cada
   una salen byte a byte iguales que en `main`. `frase.test.ts` y
   `actividad-reciente.test.ts` → 7 pass; `tsc` y `eslint` 0.
-- **Paso 6 — `admin/cuentas/actividad/modulos/`** (`60f04a1a`): `index.ts`
+- **Paso 6 — `admin/cuentas/actividad/modulos/`** (`e4827d0d`): `index.ts`
   (64) y `comun.ts` (30: `MODULOS_DE_ACTIVIDAD`, `Lectura`, `Existentes`)
   más 13 módulos. `moduloDe` y `pantallaDe` iguales a `main` en los 57 tipos
   × 6 combinaciones de `sobreId` y de lo que existe; `esModuloDeActividad`
   igual (incluido `toString`). `modulos.test.ts` y `filtros.test.ts` → 3
   pass; `tsc` y `eslint` 0.
-- **Paso 7 — `datos/inicio/pendientes/`** (`5dd256f0`, y `db3e257c` para dos
+- **Paso 7 — `datos/inicio/pendientes/`** (`f47f514c`, y `e0611f8c` para dos
   comentarios que nombraban el archivo viejo): `index.ts` (31) y
   `pendiente.ts` (41: `URGENCIAS` y los tipos) más 7 módulos (el mayor,
   `mensajes.ts`, 18). Las 9 filas, en el mismo orden y con los mismos
   campos que en `main`. `pendientes.test.ts` y los cinco `de-*.test.ts` → 17
   pass; `tsc` y `eslint` 0.
-- **Paso 8 — los tres puentes** (`0e03a129`): `BotonEnlace` pasó al
+- **Paso 8 — los tres puentes** (`abbfd69c`): `BotonEnlace` pasó al
   `Boton.tsx` del kit; `armazon/Boton.tsx` y `armazon/clases.ts` borrados, y
   el `export { Aviso }` de `Campos.tsx` también. 77 archivos reescritos por
   un script de paso (`%TEMP%/cierre/reescribir.mjs`, no se commitea) que
@@ -76,8 +76,8 @@
   `armazon/clases"` y `export { Aviso }` → nada; `pnpm typecheck` y `pnpm
   lint` 0; react-doctor **100/100 sin diagnósticos** en los cuatro
   proyectos.
-- **Paso 9 — las piezas sin ED, al kit** (`830c7f8b` la mudanza, `e6bc649e`
-  los comentarios, `ff3b35b9` los hooks):
+- **Paso 9 — las piezas sin ED, al kit** (`cc733c4f` la mudanza, `46ea8a4e`
+  los comentarios, `20ed2000` los hooks):
   - 30 archivos con `git mv` (19 renombres puros, los demás solo con sus
     imports), 136 archivos de la app reescritos con el mismo script.
     `CampoSimple` y `BotonDeAcceso` (P2) en sus 7 formularios, sin alias
@@ -86,11 +86,11 @@
     nuevos: un script compara sus trazos con los de la app y las props base
     (iguales y en el mismo orden).
   - `grep '"@/' packages/kit-admin/src` → nada; ningún módulo de ED en el
-    código ni, después de `e6bc649e`, en los comentarios.
+    código ni, después de `46ea8a4e`, en los comentarios.
   - **El build se frenó** la primera vez: `useFrenarSalida` y
     `useMoverEnOrden`, ahora en el índice del kit, entraban al grafo del
     servidor por cualquier import de `@ed/kit-admin`. Con `"use client"`
-    (`ff3b35b9`) el build pasa.
+    (`20ed2000`) el build pasa.
   - `pnpm typecheck`, `pnpm lint` y `pnpm --filter @ed/kit-admin test` (11
     pass) en 0; react-doctor **100/100 sin diagnósticos**
     (`packages/kit-admin/src: 52 archivos`).
@@ -135,5 +135,30 @@
     al volver al valor original ya no. (En la copia, «Suspender» sobre
     `cierre-edita` suspendió sin confirmar, como en `main`: esa acción no
     pide confirmación; `ed` no se tocó.)
+- **Paso 10 — los documentos de la mudanza** (`8186a892`): el README del
+  kit con las piezas de una pantalla, qué sabe de Next y el cuarto tamaño de
+  tipo que espera (`text-admin-titulo`); cada token del README aparece en
+  `packages/kit-admin/src` y no hay en el kit ninguno fuera de la lista. El
+  ADR-0014 anota la mudanza hecha. DESIGN.md §11: las 16 rutas de las piezas
+  mudadas apuntan a `packages/kit-admin/src/` (existen todas) y la línea de
+  dónde viven dice qué quedó en `admin/armazon/`; `grep admin/armazon/
+  DESIGN.md` nombra solo la sidebar, «Sin permiso», la guarda, la pantalla de
+  acceso, «Qué cambió» y «Cómo se ve».
+- **Paso 11 — los documentos del cierre** (`c9fddbe3`, y `c0864f9e` para
+  cuatro comentarios de código que decían «del armazón» de piezas que ya son
+  del kit): AGENTS.md §3 (el kit, lo que queda en el armazón, los registros
+  como carpetas, sin `por-hacer/`), §12 (las rutas de los registros) y §13
+  (la fase 3 hecha, con una línea por módulo, y la 4 sin el `sitemap.xml` ni
+  las redirecciones, que ya hizo Ajustes); el spec del admin en §3 (el kit),
+  §7 (la actividad), §9 (la fase 3) y §11 (lo que sigue afuera, con el §10 del
+  SPEC padre); AI_GUIDELINES §2 con ejemplos que existen; el README con el
+  estado del admin. `grep` de `por-hacer`, `datos/actividad.ts`,
+  `actividad/frase.ts` y `lineas-accion/data.ts` en esos cuatro → nada (la
+  única mención de `quienes-somos/data/equipo`, en el spec §6, dice que se
+  borró); ninguna ruta de una pieza mudada queda nombrada en un `.md` ni en
+  el código.
+- **Encabezados de commit:** cuatro pasaban los 72 caracteres de
+  `docs/COMMITS.md`; se reescribieron antes del primer push con un filtro
+  de mensajes (el árbol, idéntico), y los hashes de acá, al día.
 
 ## Abierto
