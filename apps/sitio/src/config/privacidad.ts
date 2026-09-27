@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Bandeja, EstadoDeMensaje } from "./mensajes";
 
 // Cuánto se guarda lo que llega por los formularios del sitio (SPEC del mapa
-// del admin §5.6, ADR-0012 y ADR-0014). Los plazos se editan en Ajustes ›
+// del admin §5.6, ADR-0012 y ADR-0015). Los plazos se editan en Ajustes ›
 // Privacidad y viven en `plazos_de_retencion` con su historial; los lee
 // `datos/privacidad.ts`. Acá está la política, sin base: los topes, los de
 // antes y cómo se cuenta, que es lo mismo para la tarea que borra, la fecha

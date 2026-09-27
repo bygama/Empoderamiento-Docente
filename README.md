@@ -501,7 +501,7 @@ borran solos en el cron diario, a los plazos de Ajustes › Privacidad (de
 fábrica, Contacto a los 24 meses, un CV a los 12 con su archivo, el spam a los
 30 días). Decisión en el
 [ADR-0012](docs/architecture/adrs/0012-mensajes-cv-privados-y-retencion.md) y,
-los plazos editables, en el [ADR-0014](docs/architecture/adrs/0014-ajustes-en-la-base.md).
+los plazos editables, en el [ADR-0015](docs/architecture/adrs/0015-ajustes-en-la-base.md).
 
 **El formulario de CV nace apagado.** Para encenderlo, en este orden:
 
@@ -534,7 +534,7 @@ configura una vez, en cinco pantallas:
   CV (la misma preferencia que Mi cuenta › Avisos).
 - **Privacidad:** los plazos de retención, con sus topes. Alargar vale para lo
   que llegue desde ahora; acortar vale para todo y, si borra algo, pregunta
-  antes ([ADR-0014](docs/architecture/adrs/0014-ajustes-en-la-base.md)).
+  antes ([ADR-0015](docs/architecture/adrs/0015-ajustes-en-la-base.md)).
 - **Conexiones:** Vercel Analytics, Search Console, Resend, los dos Blob y el
   cron: si tienen sus variables (por el nombre, nunca el valor) y cómo corrió
   cada tarea. Es el primer lugar donde mirar si algo dejó de actualizarse.

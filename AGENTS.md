@@ -170,7 +170,7 @@ un release candidate de la 8 (ADR-0007).
             │   ├── actividad.ts ← la única puerta para anotar quién hizo qué (registrarActividad, tipos cerrados, QUIEN_VE)
             │   ├── direccion.ts ← quién dirige y nombrar a la primera (los comandos de scripts/)
             │   ├── avisos.ts    ← quién recibe cada aviso por correo, del registro de config/avisos.ts, y mandarlo (tabla avisos)
-            │   ├── privacidad.ts ← los plazos de retención de la base, con su historial (ADR-0014)
+            │   ├── privacidad.ts ← los plazos de retención de la base, con su historial (ADR-0015)
             │   ├── conexiones.ts ← el estado de cada servicio de afuera: sus variables y sus corridas
             │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
@@ -303,7 +303,7 @@ usa lenguaje inclusivo:
 ### 5.3. Datos institucionales centralizados
 
 - Email, dirección, teléfono, países y URLs de redes → la tabla
-  `datos_del_sitio`, editable en Ajustes › Datos del sitio (ADR-0014). El
+  `datos_del_sitio`, editable en Ajustes › Datos del sitio (ADR-0015). El
   sitio los lee por `datos/consultas/sitio.ts` (`datosDelSitio()`) y los pasa
   por props; sin base, van los valores iniciales de
   `config/datos-del-sitio.ts`, que nada del sitio importa directo.

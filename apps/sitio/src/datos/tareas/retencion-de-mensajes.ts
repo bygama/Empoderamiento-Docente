@@ -11,7 +11,7 @@ import { llegoVencido, plazosDeLaBase } from "@/datos/privacidad";
 // plazo. Los plazos son los de Ajustes › Privacidad, de la base y sin
 // respaldo (`plazosDeLaBase`), contados como dice `config/privacidad.ts`: a
 // lo que llegó, el menor entre el plazo de cuando llegó y cualquiera
-// posterior (ADR-0014). El detalle de cada corrida dice cuántos borró y nada
+// posterior (ADR-0015). El detalle de cada corrida dice cuántos borró y nada
 // más: es el rastro de lo automático, que no va a `actividad` porque ahí todo
 // es de una persona.
 

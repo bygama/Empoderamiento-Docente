@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { aLos, enPalabras, esquemaDePlazos, plazoPara, seBorraEl, vencidos, type PlazosDeGuarda, type Tramo } from "./privacidad";
 
 // La política de los plazos, sin base: cómo se cuentan, con historial
-// (ADR-0014). Rige el menor entre el plazo de cuando llegó y cualquiera
+// (ADR-0015). Rige el menor entre el plazo de cuando llegó y cualquiera
 // posterior: alargar no toca lo ya recibido, acortar vale para todo. Vencido
 // es que su fecha de borrado ya pasó: la tarea borra con `lt`, al instante.
 

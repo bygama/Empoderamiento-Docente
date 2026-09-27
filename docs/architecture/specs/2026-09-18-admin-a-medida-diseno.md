@@ -166,7 +166,7 @@ Siete entidades, más las páginas y los ajustes:
 | `plazos_de_retencion` | cada plazo de retención con desde cuándo rige: una fila por cambio | `config/privacidad.ts` |
 | `indexacion_de_urls` | si cada ruta del sitemap está en Google, según Search Console | no existe |
 
-**Ajustes** (`work/ajustes/`, [ADR-0014](../adrs/0014-ajustes-en-la-base.md))
+**Ajustes** (`work/ajustes/`, [ADR-0015](../adrs/0015-ajustes-en-la-base.md))
 no es una tabla genérica de claves: cada cosa que se configura tiene la suya,
 con sus columnas. Los plazos guardan historial porque son una promesa: a lo
 que llegó se le aplica **el menor entre el plazo de cuando llegó y cualquiera
