@@ -9,17 +9,58 @@
   verificada contra better-auth 1.7.5 instalado.
 - 2026-09-26 — SPEC aprobado por el padre con tres condiciones (DECISIONS),
   ya escritas en el SPEC. PLAN.md escrito: 16 pasos. Arranca work-run.
-- 2026-09-26 — Los 16 pasos hechos y verificados (abajo). **Pausa con el PR
-  #186 abierto** (https://github.com/bygama/Empoderamiento-Docente/pull/186):
-  espera la revisión de cierre del padre y, antes del merge, el rebase sobre
-  `main`, que avanzó con `paginas-inicio` (ver «Abierto»). La lane se cierra
-  (se borra esta carpeta) en la ronda que siga a la revisión, antes del
-  merge. Para retomar: `.env.local` apunta a `ed_cuentas`, que tiene cuentas
-  de prueba de las tres (la contraseña se elige de nuevo por «Olvidé mi
-  contraseña», con el enlace en la consola); el dev
-  server va en el 3017, con un perfil de navegador aislado.
+- 2026-09-26 — Los 16 pasos hechos y verificados. **Pausa con el PR #186**
+  (https://github.com/bygama/Empoderamiento-Docente/pull/186), **rebasado
+  sobre `main` (`490547f`) y conciliado** a pedido del padre, con el gate y
+  el recorrido otra vez en verde (abajo): espera la revisión de cierre. La
+  lane se cierra (se borra esta carpeta) después del PASS del revisor, antes
+  del merge. Para retomar: `.env.local` apunta a `ed_cuentas`, que tiene
+  cuentas de prueba de las tres (la contraseña se elige de nuevo por «Olvidé
+  mi contraseña», con el enlace en la consola); el dev server va en el 3017,
+  con un perfil de navegador aislado.
 
 ## Verification
+
+### 2026-09-26 — Después del rebase sobre `main` (`490547f`) — PASS
+
+Rebase de la rama sobre `main` con `paginas-inicio` (#183) y `mensajes`
+(#185), y conciliación (DECISIONS: «Rebase sobre `main`…»). Sobre `d05167d`,
+base `ed_cuentas` con las migraciones de `main` aplicadas.
+Los hashes que citan las entradas de «Hecho» son de antes del rebase: los
+commits son los mismos, con otro hash.
+
+- **Migraciones:** las de `main` (`…231213_versiones_de_paginas`,
+  `…231819_mensajes`) van antes que la mía (`…232051`): nada que regenerar.
+  `pnpm migrate:deploy` y `migrate:status` al día; `migrate diff
+  --from-config-datasource --to-schema prisma/schema --exit-code` → 0, «No
+  difference detected»; desde una base vacía temporal, las tres en orden y
+  el diff en 0 (la base se borró después).
+- **L1 estática, en limpio** (sin `next-env.d.ts` ni `.next`): `pnpm
+  typecheck` → 0; `pnpm lint` → 0, 0 warnings;
+  `node scripts/verificar-react-doctor.mjs` → 0, «100/100, sin
+  diagnósticos» (sitio 648 archivos, db 3, auth 27).
+- **L2:** `pnpm test` → 0 (`@ed/auth` 46/46; sitio 235 pass, 0 fail, 2
+  saltados, los mismos de antes); `pnpm build` → 0 («Compiled
+  successfully»); `next dev -p 3017` → 200.
+- **L3, en el navegador de Orca** (dos perfiles aislados):
+  - Entrar como dirige: la contraseña lleva a `/admin/entrar/codigo` («Te
+    mandamos un código a d•••@ed.test…»), el código → `/admin`.
+  - Actividad: el `Filtro` de módulo con «Contenido» y «Mensajes»; las
+    filas «Dora Dirige publicó Inicio» (→ `/admin/contenido/paginas/inicio`),
+    «…tomó un mensaje sobre Investigación» y «…borró un CV» (sin link). La
+    píldora «Mensajes» → `?modulo=mensajes` y el buscador la conserva
+    (`?modulo=mensajes&q=investig` → una fila); «Borrar la búsqueda» vuelve a
+    `?modulo=mensajes`. A 390 de ancho, sin desborde.
+  - La ficha con `Confirmacion`: «Cancelar la invitación» → «¿Cancelar la
+    invitación de Sol Sininvitar?…», «Cancelar» vuelve al botón, «Sí,
+    cancelarla» borra y lleva a Personas; «Borrar la cuenta» de una sin
+    historia → «Sí, borrar»; suspender y reactivar, sin pregunta, con su
+    aviso; pasar la dirección a Nico con una contraseña mala → «Esa no es tu
+    contraseña.», con la buena → «Listo: ahora dirige Nico Nuevo…»; Nico,
+    entrando con su código en el otro perfil, se la devolvió a Dora.
+  - Mi cuenta: `perfil`, `contrasena`, `rol`, `seguridad`, `sesiones` y
+    `avisos`, las dos secciones nuevas. Personas (la tabla de 12
+    capacidades) e Invitar («← Cuentas», el de `main`) responden.
 
 ### 2026-09-26 — L DoD (gate del brief + SPEC §11) — PASS
 
@@ -384,15 +425,7 @@ dev server en el 3017.
 
 ## Abierto
 
-- **El rebase sobre `main`**, cuando lo pida el padre: `main` avanzó con
-  `paginas-inicio` (4a, `48ed711`). Choques esperables: `datos/actividad.ts`
-  (sus tipos `publico-una-pagina`, `descarto-un-borrador`,
-  `restauro-una-version` necesitan su fila en `QUIEN_VE`, su frase en
-  `admin/actividad/frase.ts` y su módulo en
-  `admin/cuentas/actividad/modulos.ts`, o no compila: es a propósito),
-  `acciones-con-sesion.test.ts` (4a sacó sus excepciones), AGENTS.md,
-  DESIGN.md §11 y README. Su migración (`20260926231213_versiones_de_paginas`)
-  va antes que la mía (`20260926232051`): no hace falta regenerar nada.
+- ~~El rebase sobre `main`~~: hecho (Verification, «Después del rebase»).
 - **La 3c (`inicio`)** crea la frase y la visibilidad de la actividad en los
   mismos lugares (DECISIONS): concilia la que rebasee segunda, y si la 3c ya
   está en `main`, sumo «Ver toda la actividad» hacia `/admin/cuentas/actividad`

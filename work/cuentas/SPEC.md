@@ -158,13 +158,16 @@ Cuentas sale de `admin/por-hacer/guias.ts`. Los componentes, en
 ### 4.4. Actividad — `/admin/cuentas/actividad`
 
 - **Encabezado:** `h1` «Cuentas», pestaña Actividad encendida.
-- **Filtros** en un formulario `GET` (sin JavaScript, la URL es el estado):
-  el **buscador** (§8) y tres `select`: **persona** (todas las cuentas, con
-  las suspendidas), **módulo** y **cuándo** (Todo · Últimas 24 horas ·
-  Últimos 7 días · Últimos 30 días · Últimos 3 meses). **Lectura:** «por
-  fecha» como rangos relativos y no dos fechas sueltas: el servidor no sabe
-  en qué zona está quien mira (Chile, México o Argentina), y un rango no
-  depende de eso. «Sacar los filtros» si hay alguno.
+- **Filtros**, todos en la URL (sin JavaScript): el **buscador** y tres
+  **`Filtro`** de píldoras, los patrones que trajo la lane 7 a `main` (§8):
+  **persona** (todas las cuentas, con las suspendidas), **módulo** y
+  **cuándo** (Todo · Últimas 24 horas · Últimos 7 días · Últimos 30 días ·
+  Últimos 3 meses). Cada filtro conserva los otros y la búsqueda; la
+  búsqueda conserva los filtros. **Lectura:** «por fecha» como rangos
+  relativos y no dos fechas sueltas: el servidor no sabe en qué zona está
+  quien mira (Chile, México o Argentina), y un rango no depende de eso.
+  *(Antes del rebase eran tres `select` en un buscador propio; se
+  concilió con los de `main`: DECISIONS.)*
 - **El buscador** busca, sin distinguir mayúsculas, en el `sobre` de cada fila
   y en el nombre de quien la hizo.
 - **La lista:** «Ana Pérez invitó a Juan Pérez», el módulo y el momento; si lo
@@ -289,7 +292,7 @@ sin código no tiene que sobrevivir al cambio de regla:
 **Riesgo, para el deploy:** desde esta lane, quien dirige y administra
 dependen de que salga un correo para entrar. Sin `RESEND_API_KEY` en
 producción no llega ningún código y **no pueden entrar**. Hoy no hay
-producción (lane 0); el README y el ADR-0012 lo dejan escrito como
+producción (lane 0); el README y el ADR-0013 lo dejan escrito como
 condición del primer deploy: Resend configurado y probado antes de que esta
 lane llegue a producción. Mientras tanto, la pantalla del código lo dice en
 vez de fingir (§5.2). Si alguien
@@ -354,17 +357,13 @@ cuenta).
 
 ## 8. Patrones nuevos (DESIGN.md §11)
 
-Nacen acá, con su primer consumidor, en `admin/armazon/`:
+**«← volver», el buscador, el filtro y confirmar lo que no se deshace** los
+trajo antes a `main` la lane 7 (`Volver.tsx` con el slot `volver` del
+`Encabezado`, `Buscador.tsx`, `Filtro.tsx`, `Confirmacion.tsx`): esta lane
+los consume. Sus versiones propias de «← volver» y del buscador se borraron
+al rebasear (regla del padre: el que rebasea segundo concilia, y queda una de
+cada una). Nacen acá, con su primer consumidor, en `admin/armazon/`:
 
-- **«← volver»** (`Volver.tsx`, y un slot `volver` en `Encabezado`): arriba
-  del `h1`, un link en meta medium `azul-medio` con `ArrowLeft`, al padre de
-  un detalle («← Cuentas»). Reemplaza a las pestañas en los detalles; las
-  migas siguen siendo solo del editor. Primeros consumidores: Invitar y Una
-  cuenta.
-- **Buscador** (`Buscador.tsx`): un formulario `GET` con `role="search"`, el
-  campo `type="search"` con su etiqueta, los filtros que le pase quien lo usa
-  y «Buscar» (secundario). Sin JavaScript. Primer consumidor: Actividad; lo
-  toma Novedades (lane 6).
 - **Paginado** (`Paginado.tsx`): «Más nuevas» · «Página 2 de 7» · «Más
   viejas», links que conservan los filtros de la URL. Primer consumidor:
   Actividad.
@@ -387,7 +386,7 @@ Cada uno con sus contrastes medidos, en los tres temas.
   Resend y el deploy.
 - **DESIGN.md §11:** «← volver», el buscador, el paginado y la tabla. (Cambia
   DESIGN.md: lo revisa Mateo en el PR.)
-- **ADR-0012, «Segundo factor por correo»:** lo que ADR-0010 no decidió —
+- **ADR-0013, «Segundo factor por correo»** (era el 0012; la lane 7 mergeó antes el suyo): lo que ADR-0010 no decidió —
   código por correo y no app, obligatorio por rol con un `CHECK`, la sesión
   que se cierra al volverse obligatorio, 10 minutos, 5 intentos, 30 días de
   dispositivo recordado, sin códigos de respaldo (se recupera cambiando el
