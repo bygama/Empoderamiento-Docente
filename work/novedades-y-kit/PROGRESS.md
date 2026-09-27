@@ -73,6 +73,56 @@
   PLAN da `9|1|1`; y marcar una segunda destacada en una transacción da
   `duplicate key value violates unique constraint
   "novedades_una_sola_destacada"`.
+- **Paso 5 — lo que lee el sitio** (`17de2af`). `datos/consultas/novedades.ts`:
+  `novedadesVisibles` (pura), `novedadesDelSitio` (con `cache` y
+  `draftMode`), `novedadPorSlug`, `redireccionDe`. El guardado de `filaDe`
+  pasa a `datos/consultas/leer-sin-romper.ts`, que usan las dos (su test de
+  páginas sigue 4/4). `NovedadDelSitio` en `novedad.ts`. Aceptación: `tsx
+  --test src/datos/consultas/novedades.test.ts` 4/4; typecheck y lint exit 0.
+- **Paso 6 — el sitio muestra las de la base** (`b84a03e`). Hero (la fecha
+  de la más nueva, o sin tablero si no hay), destacadas, filtros, tarjeta,
+  ficha y guía, e Inicio (`ultimasNovedades`), por props; la ficha busca
+  `redireccionDe` antes del 404 y `slugsConFicha` (sin `draftMode`: corre
+  fuera de un pedido) alimenta `generateStaticParams`. `fechaCorta` pasa a
+  `modelo.ts`. `NovedadDestacada` (217 líneas de código) se parte al tocarla:
+  `destacada/LinkNota.tsx`, `TapaDestacada.tsx`, `SegundaDestacada.tsx`. La
+  ficha deja su `eslint-disable` de `exhaustive-deps`: el efecto depende de
+  `secciones`, que es la referencia del prop. Los íconos de las categorías
+  del `data.ts` no los usaba ningún componente: se van con él (el SPEC §4.2
+  decía que se quedaban). Aceptación: typecheck, lint, `pnpm --filter sitio
+  test` (186 pass, 0 fail, 1 skipped, el de A1), `pnpm build` (prerenderiza
+  `/novedades/unesco-montevideo` y `/novedades/relime-2025` desde la base) y
+  `node scripts/comparar-render.mjs %TEMP%\ed-novedades-base apps/sitio`:
+  sale 1 con **una sola página distinta, `novedades.html` («en texto,
+  imagenes»)**; las otras diez, iguales. Comparando los `<h3>` de las dos,
+  la única diferencia es el orden de «Problematizar la matemática escolar,
+  en Bolema» y «Los criterios de la derivada desde la variación, en AIEM»
+  (SPEC §7.2, aprobado); las 33 imágenes son las mismas y el texto tiene el
+  mismo largo y las mismas palabras. El JS del Inicio baja 14680 bytes: el
+  `data.ts` ya no viaja. (`f31558e`, aparte: react-doctor marcó
+  `only-export-components` en `destacada/LinkNota.tsx`, que exportaba el
+  color; pasa a `destacada/verde-sobre-azul.ts`.)
+- **Paso 7 — RSS e imagen para redes** (`e7ea8e3`). `lib/rss.ts` (+ test,
+  2/2), `features/novedades/rss.ts` (el feed: link a la ficha o al listado,
+  `guid` por slug, la fecha como día), `/novedades/rss.xml` (`force-static`)
+  y el `<link rel="alternate">` en `/novedades`; `novedadesPublicadas()` sin
+  `draftMode` para lo que corre fuera de un pedido. `features/novedades/imagen-para-redes/`:
+  `generar.tsx` (`ImageResponse`, Manrope 700 latín `.woff` de
+  `@fontsource/manrope` 5 con su `OFL.txt` al lado, el logo negativo como
+  fondo —un `<img>` lo frena `@next/next/no-img-element` fuera de un
+  `opengraph-image`—) y `tamano.ts` aparte, para que la metadata de la ficha
+  no cargue `next/og`. La grilla de puntos no la dibuja Satori (probé dos
+  sintaxis): el fondo va liso. `/novedades/[slug]/imagen-para-redes`
+  (`force-static`, con `generateStaticParams`); la ficha pone `og:image` con
+  la propia o la generada. `seoInicial` de Novedades en
+  `contenido/seo.ts` (lo toma el paso 8). Aceptación: `pnpm build` exit 0,
+  prerenderiza el RSS y las dos imágenes; el `.nft.json` de la ruta de la
+  imagen incluye `manrope-latin-700-normal.woff` y `logo-ed-negativo.png`; el
+  HTML de la ficha trae `og:image` = `…/novedades/relime-2025/imagen-para-redes`
+  (1200 × 630, alt con el título). Con `next start` en su pestaña de Orca, en
+  el 3024: el RSS da 9 `<item>` y `Content-Type: application/rss+xml;
+  charset=utf-8`; `/novedades/relime-2025/imagen-para-redes` → `200
+  image/png`; una ficha o una imagen que no existe → 404.
 
 ## Abierto
 
