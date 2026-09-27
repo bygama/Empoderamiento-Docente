@@ -30,7 +30,7 @@ export default async function UnaCuenta({ params, searchParams }: Props) {
   // Lo que dejó la pantalla anterior: Invitar, o haberle pasado la dirección.
   const aviso =
     invitacion === "salio" || invitacion === "no-salio" ? (
-      <AvisoDeInvitacion salio={invitacion === "salio"} correo={cuenta.correo} />
+      <AvisoDeInvitacion salio={invitacion === "salio"} correo={cuenta.correo} vence={cuenta.invitacionVence} />
     ) : direccion === "pasada" ? (
       <AvisoDeDireccion nombre={cuenta.nombre} />
     ) : null;

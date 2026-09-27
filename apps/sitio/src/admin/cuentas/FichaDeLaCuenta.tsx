@@ -64,9 +64,16 @@ export function AvisoDeDireccion({ nombre }: { nombre: string }) {
 }
 
 /** El aviso que deja Invitar al llevar a la cuenta nueva, según si el correo salió. */
-export function AvisoDeInvitacion({ salio, correo }: { salio: boolean; correo: string }) {
+export function AvisoDeInvitacion({ salio, correo, vence }: { salio: boolean; correo: string; vence: string | null }) {
   return salio ? (
-    <Aviso tono="bien">Le mandamos la invitación a {correo}.</Aviso>
+    <Aviso tono="bien">
+      Le mandamos la invitación a {correo}.{" "}
+      {vence ? (
+        <>
+          Vence el <Momento iso={vence} />.
+        </>
+      ) : null}
+    </Aviso>
   ) : (
     <Aviso tono="error">La cuenta quedó creada, pero la invitación no salió: el envío de correos no está andando. Reenviala cuando ande.</Aviso>
   );
