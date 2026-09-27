@@ -13,15 +13,17 @@ export function ListaDeActividad({
   filas,
   cuentasQueExisten,
   materialesQueExisten,
+  perfilesQueExisten,
 }: {
   filas: FilaDeActividad[];
   cuentasQueExisten: ReadonlySet<string>;
   materialesQueExisten?: ReadonlySet<string>;
+  perfilesQueExisten?: ReadonlySet<string>;
 }) {
   return (
     <Lista>
       {filas.map((f) => {
-        const pantalla = pantallaDe(f, cuentasQueExisten, materialesQueExisten);
+        const pantalla = pantallaDe(f, cuentasQueExisten, materialesQueExisten, perfilesQueExisten);
         const frase = fraseDe(f);
         return (
           <Fila

@@ -47,6 +47,11 @@ const MODULO_DE: Record<TipoDeActividad, ModuloDeActividad> = {
   "oculto-un-material": "biblioteca",
   "descarto-cambios-de-un-material": "biblioteca",
   "borro-un-material": "biblioteca",
+  "publico-un-perfil": "contenido",
+  "despublico-un-perfil": "contenido",
+  "descarto-cambios-de-un-perfil": "contenido",
+  "borro-un-perfil": "contenido",
+  "movio-un-perfil": "contenido",
   "tomo-un-mensaje": "mensajes",
   "cerro-un-mensaje": "mensajes",
   "marco-un-mensaje-como-spam": "mensajes",
@@ -87,26 +92,29 @@ const SIN_PANTALLA: readonly TipoDeActividad[] = ["cancelo-la-invitacion", "borr
 /** Los de un caso, que tampoco se borran: son siempre cuatro. */
 const DE_UN_CASO: readonly TipoDeActividad[] = ["publico-un-caso", "descarto-cambios-de-un-caso"];
 
-/** Los de una página. Los demás de Contenido son de un aliado o de una foto, que se borran. */
+/** Los de una página. Los de un perfil del Equipo, que se borra, llevan a su ficha si existe; los demás de Contenido son de un aliado o de una foto, que se borran. */
 const DE_UNA_PAGINA: readonly TipoDeActividad[] = ["publico-una-pagina", "descarto-un-borrador", "restauro-una-version"];
+const DE_UN_PERFIL: readonly TipoDeActividad[] = ["publico-un-perfil", "despublico-un-perfil", "descarto-cambios-de-un-perfil", "movio-un-perfil"];
 
 /**
  * Adónde lleva lo que se tocó, si todavía tiene pantalla: lo de Cuentas, a
  * esa cuenta si existe; lo de una página o un caso, a su editor (no se
- * borran); lo de un material, a su ficha si existe. Un mensaje no: pudo
- * haberse borrado, a mano o por la retención; una novedad, un aliado o una
- * foto tampoco, porque también se borran.
+ * borran); lo de un material o de un perfil, a su ficha si existe. Un
+ * mensaje no: pudo haberse borrado, a mano o por la retención; una novedad,
+ * un aliado o una foto tampoco, porque también se borran.
  */
 export function pantallaDe(
   { tipo, sobreId }: { tipo: TipoDeActividad; sobreId: string | null },
   cuentasQueExisten: ReadonlySet<string>,
   materialesQueExisten: ReadonlySet<string> = new Set(),
+  perfilesQueExisten: ReadonlySet<string> = new Set(),
 ): { href: string; que: string } | null {
   if (!sobreId || SIN_PANTALLA.includes(tipo)) return null;
   const modulo = moduloDe(tipo);
   if (modulo === "cuentas" && cuentasQueExisten.has(sobreId)) return { href: `/admin/cuentas/${sobreId}`, que: "Ver la cuenta" };
   if (DE_UNA_PAGINA.includes(tipo)) return { href: `/admin/contenido/paginas/${sobreId}`, que: "Ver la página" };
   if (DE_UN_CASO.includes(tipo)) return { href: `/admin/contenido/casos/${sobreId}`, que: "Ver el caso" };
+  if (DE_UN_PERFIL.includes(tipo) && perfilesQueExisten.has(sobreId)) return { href: `/admin/contenido/equipo/${sobreId}`, que: "Ver el perfil" };
   if (modulo === "biblioteca" && materialesQueExisten.has(sobreId)) return { href: `/admin/biblioteca/${sobreId}`, que: "Ver el material" };
   return null;
 }

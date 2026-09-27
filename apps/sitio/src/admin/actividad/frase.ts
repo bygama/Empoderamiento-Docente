@@ -12,6 +12,9 @@ const novedad = (sobre: string | null | undefined) => (sobre ? `«${sobre}»` : 
 /** Un material por su título, como era en ese momento; sin él, «un material». */
 const material = (sobre: string | null | undefined) => (sobre ? `«${sobre}»` : "un material");
 
+/** Un perfil del Equipo por el nombre de la persona, como era en ese momento; sin él, «una persona del equipo». */
+const perfil = (sobre: string | null | undefined) => sobre ?? "una persona del equipo";
+
 /**
  * Un mensaje de Contacto por su tema, que es lo único que se anota de él
  * («sobre Investigación»); sin tema, «de Contacto».
@@ -95,6 +98,11 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "borro-un-enlace": ({ quien, sobre }) => `${quien} borró ${entre("el link", sobre)}`,
   "agrego-una-marca": ({ quien, sobre }) => `${quien} agregó ${entre("la marca", sobre)}`,
   "borro-una-marca": ({ quien, sobre }) => `${quien} borró ${entre("la marca", sobre)}`,
+  "publico-un-perfil": ({ quien, sobre }) => `${quien} publicó el perfil de ${perfil(sobre)}`,
+  "despublico-un-perfil": ({ quien, sobre }) => `${quien} despublicó el perfil de ${perfil(sobre)}`,
+  "descarto-cambios-de-un-perfil": ({ quien, sobre }) => `${quien} descartó los cambios del perfil de ${perfil(sobre)}`,
+  "borro-un-perfil": ({ quien, sobre }) => `${quien} borró el perfil de ${perfil(sobre)}`,
+  "movio-un-perfil": ({ quien, sobre }) => `${quien} movió a ${perfil(sobre)} en el orden del equipo`,
 };
 
 /**
