@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { leerFiltros, urlDeActividad } from "./filtros";
+import { conservados, leerFiltros, urlDeActividad } from "./filtros";
 
 test("lee los filtros de la URL e ignora lo que no sirve", () => {
   assert.deepEqual(leerFiltros({ q: "  juan ", persona: "abc", modulo: "cuentas", cuando: "7d", pagina: "2" }), {
@@ -21,6 +21,8 @@ test("lee los filtros de la URL e ignora lo que no sirve", () => {
 });
 
 test("la URL conserva los filtros y deja afuera lo vacío", () => {
-  assert.equal(urlDeActividad({ q: "juan", modulo: "cuentas", pagina: 1 }, 2), "/admin/cuentas/actividad?q=juan&modulo=cuentas&pagina=2");
-  assert.equal(urlDeActividad({ pagina: 5 }, 1), "/admin/cuentas/actividad");
+  assert.equal(urlDeActividad({ q: "juan", modulo: "cuentas" }, 2), "/admin/cuentas/actividad?q=juan&modulo=cuentas&pagina=2");
+  assert.equal(urlDeActividad({}, 1), "/admin/cuentas/actividad");
+  // Buscar conserva los filtros, no la búsqueda ni la página.
+  assert.deepEqual(conservados({ q: "juan", persona: "abc", cuando: "7d", pagina: 3 }), { persona: "abc", cuando: "7d" });
 });
