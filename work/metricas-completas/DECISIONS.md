@@ -47,8 +47,8 @@
   se achicaron** (AGENTS.md §6): `lib/metricas/canales.ts` (106 → 62, la
   lista de dominios en una línea por canal) y `datos/avisos.ts` (114 → 92,
   mandar el aviso de un mensaje nuevo pasó a `datos/avisar-mensaje-nuevo.ts`,
-  sin cambios). `datos/actividad.ts` ya pasaba en `main` (209); esta lane le
-  suma los cuatro tipos de Métricas: queda como seguimiento, como lo dejó la
+  sin cambios). `datos/actividad.ts` ya pasaba en `main` (217); esta lane le
+  suma los cuatro tipos de Métricas (231): queda como seguimiento, como lo dejó la
   Biblioteca.
 - 2026-09-27 — **`/l/[codigo]` es una página, no una ruta de API**: con
   `route.ts`, `notFound()` contestaba un 404 vacío; como página da el 404 del
