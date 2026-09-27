@@ -10,6 +10,9 @@
   propuestas (§12); la aprobación la da el padre por `orca orchestration ask`.
 - 2026-09-27 — SPEC aprobado por el padre con las doce propuestas y tres
   resguardos (DECISIONS). PLAN de 20 pasos escrito; arranca el paso 1.
+- 2026-09-27 — Los 20 pasos hechos; rebaseada sobre `main` en `782aeb27`
+  (Ajustes) y verificada (abajo). Falta la revisión de cierre, que corre el
+  padre después del `worker_done`.
 
 ## Hecho
 
@@ -303,4 +306,114 @@
   del admin y el doc de fuentes diciendo «era»/«antes», y los comentarios
   de las migraciones y del esquema (historia).
 
+## Verification
+
+Sobre `66a42920`, rebaseada sobre `main` en `782aeb27` (la lane de Ajustes).
+
+**Después del paso 20, tres arreglos que salieron de verificar** (commits
+aparte): `07ea387b` saca `public/quienes-somos` de `config/rutas.ts` (llegó
+con Ajustes y declaraba la carpeta que esta lane borró; su test fallaba);
+`07e41dd2` pone `grid-cols-1` en las fichas de caso y aliado (a 390 px la del
+caso medía 530: la grilla sin columnas tomaba el ancho mínimo de un título con
+`truncate`); `66a42920` hace que mover en la tira use `updateMany` (con
+`update`, un aliado borrado a la vez tiraba) y separa los tests que corrían a
+la vez sobre las mismas filas (el registro de fotos pasa al caso 03 y a un
+aliado al principio de la tira; el de aliados mira lugares relativos).
+
+**Estático y de comportamiento** (salida en el scratch de la sesión):
+
+| Comando | Resultado |
+| --- | --- |
+| `pnpm typecheck` | exit 0 (los cuatro proyectos) |
+| `pnpm lint` | exit 0 |
+| `node scripts/verificar-react-doctor.mjs` | exit 0 · `react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 945 archivos · packages/db/src: 3 · packages/auth/src: 27 · packages/kit-admin/src: 22)` |
+| `pnpm test` | exit 0 · sitio 411 tests, 410 pass, 0 fail, 1 skip (el de las respuestas grabadas de Vercel, ajeno); auth 46/46; kit-admin 3/3 |
+| `pnpm build` | exit 0 · `/admin/contenido/{casos,casos/[id],aliados,aliados/nuevo,aliados/[id],fotos,fotos/[id],fotos/subir}` dinámicas, `/investigacion` estática |
+
+La suite se corrió tres veces más: una vuelta falló en `datos/avisos.test.ts`
+(«poner quién recibe…», `cambiaron: 1` en vez de `0`), que es de Ajustes y
+**falla igual en `main` puro** (1 de 4 vueltas en `782aeb27`): queda para el
+padre, no se toca desde esta lane.
+
+**Migraciones desde cero:** base nueva `ed_casos_limpia`, `pnpm
+migrate:deploy` → las 23 aplicadas en orden (las cuatro de Ajustes antes que
+`fotos_de_public`, `casos` y `aliados`). Quedan 47 fotos (0 sin alt), 4 casos,
+5 aliados publicados y autorizados, y ninguna novedad con la ruta vieja de
+`origen-03-pregunta.webp`.
+
+**El sitio contra `main`:** `main` en `782aeb27` buildeado contra
+`ed_casos_main` recién migrada y esta rama contra `ed_casos_limpia`;
+`node scripts/comparar-render.mjs <main> apps/sitio` → 12 páginas; iguales
+todas menos `novedades.html` y `novedades/relime-2025.html`, «DISTINTA en
+imagenes», y la única diferencia es `src`/`srcSet` de
+`/quienes-somos/origen-03-pregunta.webp` → `/fotos/origen-03-pregunta.webp`
+(la deduplicación de la propuesta K). JS: `/investigacion` −17,6 KB (los casos
+salieron del bundle); el resto +0,6 a +2,1 KB.
+
+**De punta a punta en el navegador de Orca** (dev server propio en 3027,
+perfil `casos-aliados-fotos` con `edita` y otro con `administra`, segundo
+factor por el log):
+
+- Aliados (paso 17): crear, publicar sin marca (frena), marcar sin nota
+  (frena), marcar, publicar y verlo en el pie, quitar la marca (sale del
+  sitio), mover con el foco siguiendo, despublicar y borrar.
+- Fotos: subir desde «Subir foto», usarla en un aliado autorizado y publicado
+  (el pie sirve `/api/fotos/<id>`), «Borrar» no se ofrece mientras se usa y
+  dice por qué; reemplazar → la fila y el logo del aliado pasan a la URL nueva,
+  el pie la sirve, el archivo viejo da 404 y en `.fotos/` queda solo el nuevo;
+  sin usos, se borra con su archivo. La actividad anotó subió, autorizó,
+  publicó, reemplazó y borró.
+- Casos: la vista previa de un borrador del caso 02 con «Estás viendo un
+  borrador»; el payload de la escena trae la pregunta del borrador y no la
+  publicada, y `/investigacion` sin la cookie no la tiene; «Volver al sitio
+  publicado» y descartar. (Editar y publicar, en el paso 16; el cambio de URL
+  con su 308, en `editar-casos.test.ts`.)
+- Inicio: las dos filas nuevas con quién ve cada una (paso 19); índice de
+  Contenido y el punto de la sidebar (paso 18).
+- **Temas:** una sonda de contraste (cada texto visible contra su fondo
+  efectivo, WCAG 2.x) en las diez pantallas nuevas × claro, mixto y oscuro:
+  30 de 30 sin textos bajo 4,5:1 (3:1 si es grande) y sin desborde; con el
+  encabezado en «Cambios sin guardar» (ficha de caso y de aliado), 6 de 6.
+- **390 px** (`set viewport 390 844`): Contenido, Casos, la ficha del caso,
+  Fotos, la ficha de una foto, Subir, Aliados, la ficha de un aliado y el
+  Inicio, sin desborde (después del arreglo del ancho).
+- **Teclado:** los 183 controles de esas pantallas llevan su estilo de foco
+  (`focus-visible:` en el control o `has-[…:focus-visible]` en su tarjeta; las
+  casillas y el archivo, el anillo del navegador). El `Tab` real no llega por
+  `orca keypress` en este navegador embebido, así que el recorrido de teclado
+  se probó con foco programático: mover en la tira devuelve el foco al botón,
+  el panel de elegir foto lo pone en el filtro, y confirmar un borrado, en
+  «Cancelar».
+- **Fuga de datos:** las pantallas nuevas son de los tres roles (guarda de
+  Contenido, `editarContenido`); lo reservado es poner la marca, que chequea
+  `autorizarAliados` la acción (test) y la página solo decide si mostrar la
+  casilla habilitada. No hay consulta que devuelva algo reservado por rol.
+
+**Revisión de cierre:** no se corrió desde acá. La corre el padre después del
+`worker_done` (orchestrate); los arreglos que pida vuelven como tarea a esta
+terminal.
+
 ## Abierto
+
+**Sigue:** la revisión de cierre del padre sobre el PR. Si pide arreglos,
+vuelven como tarea a esta terminal (el dev server sigue en 3027, en su
+pestaña). Con el PASS, el cierre de la lane —el commit que borra
+`work/casos-aliados-fotos/`— va en este mismo PR, antes del merge.
+
+Para después, fuera de esta lane:
+
+- **La ficha de una novedad tiene el mismo problema de ancho** que se arregló
+  en la de caso y aliado (`FichaDeNovedad.tsx`: la grilla sin columnas por
+  debajo de `xl`); con un título largo con `truncate` se ensancharía en el
+  celular. No se tocó porque la lane de Biblioteca (8a) está sobre Novedades.
+- **`datos/avisos.test.ts` (de Ajustes) es inestable** cuando la suite corre
+  entera: falla 1 de cada 4 vueltas también en `main` en `782aeb27`
+  («repetirlo no cambia nada»: `cambiaron: 1`).
+- Novedades puede usar `Bloque` y `QueCambioPlegado` del armazón cuando 8a
+  cierre (DECISIONS, el paso 16).
+- Conflictos esperables al integrar con Biblioteca: la `Lista`, los archivos
+  de Novedades que se tocaron (`FormularioDeNovedad`, `PanelDeLaNovedad`,
+  `publicar-novedades.ts` con `redirigir.ts`) y el cron (`diarias.ts`).
+- Sin resolver con el cliente: la nota de autorización de Techint repite lo
+  que dice `docs/content/aliados-fuentes-drive.md` («la hoja de ALIANZAS
+  todavía dice “solicitado”: confirmar con Raquel»).
