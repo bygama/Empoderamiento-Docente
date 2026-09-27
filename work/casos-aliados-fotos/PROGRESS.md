@@ -33,6 +33,15 @@
   (Contenido) y «Ver» solo para los casos en
   `admin/cuentas/actividad/modulos.ts` (DECISIONS), con `modulos.test.ts`
   nuevo. `tsx --test frase.test.ts actividad.test.ts filtros.test.ts
-  modulos.test.ts` → 11 pass, 0 fail; typecheck 0.
+  modulos.test.ts` → 11 pass, 0 fail; typecheck 0. Commit `f4bd728`.
+- **Paso 4 — subir una foto, probado**: `datos/acciones/subir-foto.ts`
+  (`subirFotoEnBase`, con la base y el almacén inyectados; el esquema de la
+  subida se mudó ahí) y `fotos.ts` queda con la sesión, la capacidad y la
+  actividad `subio-una-foto`; el resultado trae el id (la grilla va a la
+  ficha). `subir-foto.test.ts` (un SVG con `<script>` llamado `logo.png`
+  recibe «El archivo no es una imagen jpg, png o webp.» sin fila ni archivo;
+  un webp crea la fila con `subidaPor`; sin alt no sube) +
+  `acciones-con-sesion.test.ts` → 16 pass, 0 fail, 0 skipped (contra
+  `ed_casos`); typecheck 0.
 
 ## Abierto
