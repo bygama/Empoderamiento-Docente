@@ -62,6 +62,14 @@
   el runbook, el primer paso con Resend real es mandar un correo de prueba
   antes de nombrar a quien dirige. Descartada: una variable que deje salir el
   correo por la consola en producción.
+- 2026-09-27 — **El build no pasa por `.compilado/`: viaja como un tar.** En
+  Docker Desktop, los symlinks de pnpm que escribe un contenedor Linux en una
+  carpeta compartida con Windows no se pueden leer después («The file cannot be
+  accessed by the system»), y el `docker build` de la imagen `app` falló. El
+  servicio `construir` saca por stdout un tar con el Dockerfile y el
+  standalone, y `desplegar.sh` lo pasa directo a `docker build -`. Cumple mejor
+  la condición 3 del padre: no queda ninguna copia del build en el disco del
+  host. Lo que se revisa por secretos es la imagen `app`.
 - 2026-09-27 — **Una sola red en el compose.** El SPEC decía dos (`borde` e
   `interna`), pero `app` necesita salir a internet (Resend, Search Console,
   Crossref) y `proxy` también (ACME): una red `internal` no sirve para ninguna.
