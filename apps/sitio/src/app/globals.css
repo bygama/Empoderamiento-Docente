@@ -584,6 +584,16 @@ body {
 
 /* Pista de scroll del perfil inmersivo: un empuje vertical suave y contenido
    (coherente con la coreografía; reemplaza el bounce genérico de Tailwind). */
+/* Un desplegable que se abre sin animar el alto: lo abierto aparece con un
+   fundido corto (Áreas de Qué hacemos en celular, areas/ArticuloArea.tsx; y
+   los grupos de filtros de Biblioteca). */
+@keyframes filtros-abre {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
 @keyframes scroll-nudge {
   0%,
   100% {
