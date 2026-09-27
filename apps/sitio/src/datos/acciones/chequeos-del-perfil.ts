@@ -36,15 +36,32 @@ export async function publicacionQueNoFirma(base: PrismaClient, personaId: strin
 }
 
 /**
+ * El cupo de los niveles: cuántos lugares tiene cada uno y quiénes los ocupan.
+ * El del sitio son los lugares de `NIVELES` entre todos los perfiles
+ * publicados; un test inyecta otro para medir sobre sus propias filas, sin
+ * tocar las de la carga.
+ */
+export type Cupo = {
+  /** Los lugares del nivel; `null` es sin tope. */
+  lugares: (nivel: Nivel) => number | null;
+  /** Si un perfil publicado del nivel ocupa uno de sus lugares, por su URL. */
+  ocupa: (slug: string | null) => boolean;
+};
+
+export const CUPO_DEL_SITIO: Cupo = { lugares: (nivel) => NIVELES[nivel - 1].lugares, ocupa: () => true };
+
+/**
  * Si el nivel no tiene lugar para una persona publicada más: el masthead
  * tiene uno al centro (la Dirección general) y dos a los costados (la
  * Dirección). La Dirección general la garantiza además un índice único; esto
  * lo dice antes, con los nombres.
  */
-export async function nivelSinLugar(base: PrismaClient | Prisma.TransactionClient, id: string, nivel: Nivel): Promise<Fallo | null> {
-  const { rotulo, lugares } = NIVELES[nivel - 1];
+export async function nivelSinLugar(base: PrismaClient | Prisma.TransactionClient, id: string, nivel: Nivel, cupo: Cupo = CUPO_DEL_SITIO): Promise<Fallo | null> {
+  const lugares = cupo.lugares(nivel);
   if (lugares === null) return null;
-  const otras = await base.persona.findMany({ where: { nivel, publicado: true, id: { not: id } }, select: { nombre: true, borrador: true } });
+  const { rotulo } = NIVELES[nivel - 1];
+  const publicadas = await base.persona.findMany({ where: { nivel, publicado: true, id: { not: id } }, select: { slug: true, nombre: true, borrador: true } });
+  const otras = publicadas.filter((o) => cupo.ocupa(o.slug));
   if (otras.length < lugares) return null;
   const quienes = EN_LISTA.format(otras.map(nombreDe));
   const cuantas = lugares === 1 ? "una sola persona" : `${lugares} personas`;

@@ -2,7 +2,7 @@ import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { publicadoDe } from "@/datos/consultas/equipo";
 import { esquemaPersona } from "@/features/quienes-somos/contenido/persona";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
-import { nivelSinLugar, publicacionQueNoFirma } from "./chequeos-del-perfil";
+import { CUPO_DEL_SITIO, nivelSinLugar, publicacionQueNoFirma, type Cupo } from "./chequeos-del-perfil";
 import { columnasDe, nombreDe, problemasDePersona } from "./equipo-en-base";
 import { falloPorIndice } from "./indices-del-equipo";
 import { LISTAS, tomarLaLista } from "./lista-ordenada";
@@ -43,7 +43,7 @@ async function redirigir(tx: Prisma.TransactionClient, viejo: string | null, nue
 
 export async function publicarPersonaEnBase(
   base: PrismaClient,
-  { id, borradorEnVisto, quien }: { id: string; borradorEnVisto: string | null; quien: string },
+  { id, borradorEnVisto, quien, cupo = CUPO_DEL_SITIO }: { id: string; borradorEnVisto: string | null; quien: string; cupo?: Cupo },
 ): Promise<ResultadoDePublicar> {
   const fila = await base.persona.findUnique({ where: { id } });
   if (!fila) return NO_EXISTE;
@@ -60,7 +60,7 @@ export async function publicarPersonaEnBase(
   try {
     await base.$transaction(async (tx) => {
       await tomarLaLista(tx, LISTAS.equipo);
-      const sinLugar = await nivelSinLugar(tx, id, p.nivel);
+      const sinLugar = await nivelSinLugar(tx, id, p.nivel, cupo);
       if (sinLugar) throw new SinLugar(sinLugar);
       await redirigir(tx, fila.publicadoEn ? fila.slug : null, p.slug);
       // La primera vez, o en otro nivel, queda último en el suyo; si no, conserva su lugar.
