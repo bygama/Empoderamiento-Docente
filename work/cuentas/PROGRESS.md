@@ -9,6 +9,113 @@
   verificada contra better-auth 1.7.5 instalado.
 - 2026-09-26 — SPEC aprobado por el padre con tres condiciones (DECISIONS),
   ya escritas en el SPEC. PLAN.md escrito: 16 pasos. Arranca work-run.
+- 2026-09-26 — Los 16 pasos hechos y verificados (abajo). PR abierto; espera
+  la revisión de cierre del padre y, antes del merge, el rebase sobre `main`,
+  que avanzó con `paginas-inicio` (ver «Abierto»).
+
+## Verification
+
+### 2026-09-26 — L DoD (gate del brief + SPEC §11) — PASS
+
+Sobre `aca9c46` (rama `mateo/cuentas`, base `5a07368`), base `ed_cuentas`,
+dev server en el 3017.
+
+- **L1 estática:** `pnpm typecheck` → exit 0; `pnpm lint` → exit 0, 0
+  warnings; `node scripts/verificar-react-doctor.mjs` → exit 0, «100/100, sin
+  diagnósticos» (sitio 534 archivos, db 3, auth 27).
+- **L2 comportamiento:** `pnpm test` → exit 0 (`@ed/auth` 46/46; sitio 167
+  pass, 0 fail, 2 saltados: las respuestas grabadas de A1, de antes, y
+  `nombrar-direccion`, que se saltea solo si la base ya tiene quien dirige);
+  `pnpm build` → exit 0 («Compiled successfully»; `/admin/cuentas`,
+  `/[id]`, `/actividad`, `/invitar` y `/admin/entrar/codigo` dinámicas);
+  arranca: `next dev -p 3017` contesta 200 en `/admin/entrar`.
+- **L3 de punta a punta**, en el navegador de Orca con dos perfiles aislados
+  (`cuentas` y `cuentas-otra`), una cuenta por rol creada con `crear-cuenta`:
+  - Entrar como dirige: la contraseña lleva a `/admin/entrar/codigo` con
+    «Te mandamos un código a d•••@ed.test. Vence en 10 minutos.»; un código
+    malo → «Ese código no es…» y `aria-invalid`; «Mandar otro» → «Te
+    mandamos otro código.»; el bueno con «Recordar este dispositivo» →
+    `/admin`, con la cookie `trust_device`; salir y volver a entrar → directo
+    a `/admin`, sin código.
+  - Invitar (administra) → la ficha con «Le mandamos la invitación a
+    nico@ed.test.», «Invitación pendiente», «Vence el 29/9…»; el correo por
+    la consola («Dora Dirige te invitó… con el rol «administra»… 72
+    horas… Si no esperabas esta invitación»). «Reenviar» → el enlace viejo
+    redirige con `error=INVALID_TOKEN` y el nuevo con `token=`. Aceptar la
+    invitación en «Elegí tu contraseña» → cuenta activa, `twoFactorEnabled =
+    t`, y entrar le pide el código.
+  - Cambiar el rol de Eli (edita, sin segundo factor, 3 sesiones) a
+    administra → «…le cerramos las sesiones…», en la base `administra | t |
+    0`; de vuelta a edita, el segundo factor queda prendido.
+  - Suspender a Eli → el aviso sobrevive al redibujo, el botón pasa a
+    «Reactivar», insignia «Suspendida»; entrar → 403 `CUENTA_SUSPENDIDA`, y en
+    la pantalla, «Tu cuenta está suspendida. Si creés que es un error, hablá
+    con quien dirige o administra.» (sin marcar los campos). Reactivar → «Eli
+    Edita puede volver a entrar.».
+  - Borrar a Zoe (activa, sin historia) → vuelve a Personas y no está. A Yago
+    (sin historia al abrir la ficha, con una fila de actividad sumada
+    después) → «Yago Conhistoria ya hizo cosas en el admin… suspendé su
+    cuenta.»: lo decidió la clave foránea.
+  - Cancelar la invitación de Uli → la cuenta se borra; actividad `invito` y
+    `cancelo-la-invitacion`.
+  - Cerrar las sesiones de Ada → 2 → 0 en la base, y «No tiene el admin
+    abierto en ningún lado.».
+  - Pasar la dirección de Dora a Ada: contraseña mala → «Esa no es tu
+    contraseña.» y `aria-invalid`; la buena → Ada dirige, Dora administra.
+    Ada, entrando con su código en el otro perfil, se la devolvió a Dora → la
+    ficha llegó con «Listo: ahora dirige Dora Dirige, y vos pasaste a
+    administra.» (el arreglo `aca9c46`, abajo).
+  - Cambiar el correo de Ada y de Eli → «…avisamos por correo a las dos
+    direcciones», dos correos «El correo de tu cuenta del admin cambió» (a la
+    vieja y a la nueva) en la consola; las sesiones de Eli 1 → 0.
+  - Actividad: 86 filas → página 1 con 50 y «Más viejas», página 2 con 36 y
+    «Más nuevas»; buscador «yago» + persona + módulo Acceso + últimas 24 horas
+    → 24 filas, sin paginado, los `select` conservan lo elegido, «Sacar los
+    filtros» vuelve a las 50. Quedó anotado cada tipo nuevo: invito 2,
+    reenvio-la-invitacion 1, cancelo-la-invitacion 1, cambio-el-rol 2,
+    cambio-el-correo 2, suspendio 1, reactivo 1, borro-una-cuenta 1,
+    paso-la-direccion 2, cerro-las-sesiones 1, activo- y
+    desactivo-el-segundo-factor 1 y 1. La tabla `twoFactor`: 0 filas.
+  - Mi cuenta › Seguridad: como edita (Eli, entrando con código) «Activo» →
+    «Desactivarlo» con la contraseña → «Apagado» y su aviso → «Activar el
+    segundo factor» → «Activo»; como dirige, «Activo», «Es obligatorio para tu
+    rol…» y ningún botón. Como edita, `/admin/cuentas` → «Esta sección es de
+    quien dirige o administra» y Cuentas no está en la sidebar.
+  - Estados: una invitación vencida → insignia «Invitación vencida»; una
+    cuenta de `crear-cuenta` sin invitar → «Todavía no se le mandó ninguna
+    invitación.» y el botón «Mandar la invitación».
+  - **Los tres temas**, contraste WCAG medido en la página con los colores
+    computados, en Personas, una cuenta y Actividad: claro y mixto, `h1`,
+    pestaña activa, `th` y filas 13,63:1; frases, detalle, raya de la tabla,
+    paginado y detalles de fila 4,83:1; resumen del desplegable y «←
+    Cuentas» 5,11:1; oscuro, 13,59 · 7,08 · 7,14. Ninguno bajo 4,5.
+  - **390 de ancho** (`orca set device "iPhone 12"`): Personas, Invitar, una
+    cuenta, Actividad, Mi cuenta y el código, sin desborde horizontal
+    (`scrollWidth` = 390); la tabla de permisos scrollea dentro de su caja.
+  - **Foco:** cada enfocable de esas seis pantallas (53 en total) lleva la
+    regla de foco de §11 en sus clases (`focus-visible:outline` o el
+    `focus:ring` de `ENTRADA`). El foco real no se pudo ver (abajo).
+- **Arreglado en la verificación** (`aca9c46`): al pasar la dirección, el
+  apartado que la pasa desaparece con el redibujo y se llevaba el aviso;
+  ahora la ficha llega con `?direccion=pasada` y lo muestra en el
+  encabezado. typecheck, lint y react-doctor en verde después.
+- **Revisión de cierre:** la lanza el padre al recibir `worker_done` (lane
+  supervisada; DECISIONS del padre: 1 revisor Opus 5.5, medium, lente «el
+  cambio entero contra su SPEC»). Marcas del PLAN: 6 `high` (pasos 1, 2, 3,
+  4, 7 y 11), 9 `medium` y 1 `low`.
+
+## Tried and failed
+
+- **Capturas:** `orca screenshot --json` cerró el runtime de Orca dos veces
+  seguidas (`runtime_unavailable`); como dice la memoria, no se insistió. Lo
+  visual quedó probado con probes numéricos (contraste, ancho, clases de
+  foco), no con imágenes.
+- **Teclado real:** `orca keypress --key Tab` no mueve el foco dentro de la
+  webview, y `focus({ focusVisible: true })` tampoco activa `:focus-visible`,
+  porque la ventana no tiene el foco del sistema (`document.hasFocus()` →
+  `false`; lo mismo en los controles de Mi cuenta que ya estaban). Se
+  reemplazó por la auditoría de clases de arriba.
+- `orca snapshot` también cerró el runtime; se usó `orca eval`.
 
 ## Hecho
 
@@ -250,7 +357,7 @@
   la pestaña encendida, las frases; `?pagina=2&modulo=cuentas&q=juan` → 200
   con «No hay actividad con esos filtros» y «Sacar los filtros»; parámetros
   basura → 200.
-- **Paso 16 — los documentos** (`8b6d21d`, `f975239`, `adebce1`, `c299689`).
+- **Paso 16 — los documentos** (`8b6d21d`, `f975239`, `adebce1`, `c299689`).
   ADR-0012 «Segundo factor por correo, obligatorio para quien dirige y
   administra» (y su fila en el índice de ADRs); el §7 del spec del admin
   (Cuentas, la suspensión, la invitación de 72 h, `queSePuede` y el segundo
@@ -270,3 +377,21 @@
   rebasear sobre `main` nuevo es del padre.
 
 ## Abierto
+
+- **El rebase sobre `main`**, cuando lo pida el padre: `main` avanzó con
+  `paginas-inicio` (4a, `48ed711`). Choques esperables: `datos/actividad.ts`
+  (sus tipos `publico-una-pagina`, `descarto-un-borrador`,
+  `restauro-una-version` necesitan su fila en `QUIEN_VE`, su frase en
+  `admin/actividad/frase.ts` y su módulo en
+  `admin/cuentas/actividad/modulos.ts`, o no compila: es a propósito),
+  `acciones-con-sesion.test.ts` (4a sacó sus excepciones), AGENTS.md,
+  DESIGN.md §11 y README. Su migración (`20260926231213_versiones_de_paginas`)
+  va antes que la mía (`20260926232051`): no hace falta regenerar nada.
+- **La 3c (`inicio`)** crea la frase y la visibilidad de la actividad en los
+  mismos lugares (DECISIONS): concilia la que rebasee segunda, y si la 3c ya
+  está en `main`, sumo «Ver toda la actividad» hacia `/admin/cuentas/actividad`
+  si no está.
+- **Mi cuenta:** la lane 7 le suma «Avisos»; al rebasear se conservan las dos
+  secciones.
+- **Para el deploy (lane 0):** Resend configurado y probado antes de que esta
+  lane llegue a producción (README, ADR-0012).
