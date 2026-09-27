@@ -11,11 +11,12 @@ import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 // admin nunca la lee en el render. Deja una fila por ruta en
 // `indexacion_de_urls` y borra las de las rutas que ya no están.
 
-/** Cuántas por corrida: la cuota es de 2000 por día y hoy el sitio tiene 9 rutas. */
+/**
+ * Cuántas por corrida: la cuota es de 2000 por día y 600 por minuto, y hoy el
+ * sitio tiene 9 rutas. Van todas a la vez: cada pedido tiene su tiempo máximo
+ * (20 s), así la corrida entra en sus 50.
+ */
 export const MAXIMO_POR_CORRIDA = 20;
-
-/** Pasado esto no se empieza otra: la tarea tiene 50 segundos, y lo revisado queda guardado. */
-export const FRENO_MS = 35_000;
 
 const mensajeDe = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -24,38 +25,32 @@ export async function revisarIndexacion({
   base,
   rutas,
   sitio = siteConfig.url,
-  reloj = Date.now,
 }: {
   cliente: ClienteDeInspeccion;
   base: PrismaClient;
   rutas: readonly string[];
   /** El dominio de las URLs que se inspeccionan: el real, el de la propiedad. */
   sitio?: string;
-  reloj?: () => number;
 }): Promise<ResultadoDeTarea> {
   await base.indexacionDeUrl.deleteMany({ where: { ruta: { notIn: [...rutas] } } });
   const revisadas = new Map((await base.indexacionDeUrl.findMany({ select: { ruta: true, revisadaEn: true } })).map((r) => [r.ruta, r.revisadaEn.getTime()]));
   // Las nunca revisadas primero, después las de revisión más vieja.
   const turno = [...rutas].sort((a, b) => (revisadas.get(a) ?? -1) - (revisadas.get(b) ?? -1)).slice(0, MAXIMO_POR_CORRIDA);
-  const empezo = reloj();
-  let hechas = 0;
-  let enGoogle = 0;
-  // De a una: la cuota por minuto es de Google, y el orden es el de la prioridad.
-  for (const ruta of turno) {
-    if (reloj() - empezo > FRENO_MS) break;
-    try {
-      const inspeccion = await cliente.inspeccionar(new URL(ruta, sitio).toString());
-      const fila = { ...inspeccion, revisadaEn: new Date() };
-      await base.indexacionDeUrl.upsert({ where: { ruta }, create: { ruta, ...fila }, update: fila });
-      hechas += 1;
-      if (inspeccion.veredicto === "PASS") enGoogle += 1;
-    } catch (e) {
-      return { ok: false, detalle: `Se revisaron ${hechas} de ${rutas.length} URLs y se cortó: ${mensajeDe(e)}` };
-    }
+  // Aisladas: una que falla no se lleva a las otras, y lo revisado queda guardado.
+  const lecturas = await Promise.allSettled(turno.map(async (ruta) => ({ ruta, ...(await cliente.inspeccionar(new URL(ruta, sitio).toString())) })));
+  const hechas = lecturas.flatMap((l) => (l.status === "fulfilled" ? [l.value] : []));
+  const revisadaEn = new Date();
+  await base.$transaction(
+    hechas.map(({ ruta, ...inspeccion }) => base.indexacionDeUrl.upsert({ where: { ruta }, create: { ruta, ...inspeccion, revisadaEn }, update: { ...inspeccion, revisadaEn } })),
+  );
+  const enGoogle = hechas.filter((h) => h.veredicto === "PASS").length;
+  const fallos = lecturas.flatMap((l) => (l.status === "rejected" ? [l.reason] : []));
+  if (fallos.length) {
+    return { ok: false, detalle: `Se revisaron ${hechas.length} de ${rutas.length} URLs; ${fallos.length} no se pudieron revisar: ${mensajeDe(fallos[0])}` };
   }
-  const quedan = rutas.length - hechas;
+  const quedan = rutas.length - hechas.length;
   const resto = quedan ? `; las otras ${quedan}, en la próxima corrida` : "";
-  return { ok: true, detalle: `Se revisaron ${hechas} de ${rutas.length} URLs: ${enGoogle} en Google${resto}.` };
+  return { ok: true, detalle: `Se revisaron ${hechas.length} de ${rutas.length} URLs: ${enGoogle} en Google${resto}.` };
 }
 
 /** Arma el cliente con las variables de Search Console. Sin ellas, la corrida sale fallida y no toca la API. */
