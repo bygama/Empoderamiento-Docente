@@ -34,6 +34,18 @@ export function cvRecibidos(desde: Date, hasta: Date): Promise<number> {
   return base.mensaje.count({ where: { bandeja: "cv", recibidoEn: { gte: desde, lt: hasta } } });
 }
 
+/** Lo que llegó a una bandeja después de `desde`, sin lo que ya se marcó como spam. */
+export function llegaronDesde(bandeja: Bandeja, desde: Date): Promise<number> {
+  return base.mensaje.count({ where: { bandeja, recibidoEn: { gt: desde }, estado: { not: "spam" } } });
+}
+
+/** «llegó 1 CV», «llegaron 3 mensajes de contacto», o `null` si no llegó nada: la frase de «desde tu última visita». */
+export function fraseDeLlegados(bandeja: Bandeja, n: number): string | null {
+  if (n <= 0) return null;
+  const que = bandeja === "cv" ? "CV" : n === 1 ? "mensaje de contacto" : "mensajes de contacto";
+  return `${n === 1 ? "llegó" : "llegaron"} ${n} ${que}`;
+}
+
 const nadie = (n: number) => (n === 1 ? "Nadie lo tomó todavía." : "Nadie los tomó todavía.");
 
 /** «3 CV nuevos», o `null` si no hay ninguno. */
