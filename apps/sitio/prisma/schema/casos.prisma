@@ -1,0 +1,53 @@
+// Los casos de investigación (work/casos-aliados-fotos/SPEC.md §4): una
+// columna por lo que tenía features/investigacion/data/casos.ts, como pide el
+// spec del admin §6, y el molde de Novedades (ADR-0014).
+
+/// Uno de los cuatro casos de investigación. **Son siempre cuatro**: entraron
+/// con la migración `casos`, se editan y no se crean, no se borran ni se
+/// despublican (la escena de la pila está armada para ellos). Por eso las
+/// columnas del contenido no son nulas y no hay un `publicado` booleano.
+///
+/// **La fila tiene dos copias:** lo publicado, en columnas —lo que lee
+/// `/investigacion`—, y el borrador, en un documento que puede estar a
+/// medias. Las dos se validan con los esquemas de
+/// `features/investigacion/contenido/caso.ts`.
+model Caso {
+  /// caso-01 … caso-04: fijos, y la ficha del admin (/admin/contenido/casos/[id]).
+  id                    String    @id
+  /// 01 … 04: el lugar en la pila. No se edita.
+  numero                String    @unique
+  /// El ancla de hoy (/investigacion#<slug>) y la ficha de la fase 4. Si
+  /// cambia al publicar, queda el 308 de /investigacion/casos/<viejo>.
+  slug                  String    @unique
+  pregunta              String
+  eje                   String
+  indicio               String
+  /// La ficha técnica: período, ámbito y estado (EN CURSO | CERRADO).
+  periodo               String
+  ambito                String
+  estado                String
+  contexto              String
+  preguntaInvestigacion String    @map("pregunta_investigacion")
+  /// { foto: { src, alt, foco }, sujecion, rotulo }: la foto es de Fotos.
+  lamina                Json
+  /// [{ titulo, descripcion, movible }]: el id y el rótulo salen de la posición.
+  evidencias            Json
+  analisis              String
+  aprendizaje           String
+  queCambio             String    @map("que_cambio")
+  /// [{ titulo, href }]: href es una ruta del sitio.
+  produccionRelacionada Json      @map("produccion_relacionada")
+  /// Prende las marcas DEMO y la aclaración al pie del expediente.
+  esDemo                Boolean   @default(false) @map("es_demo")
+  aclaracion            String?
+  /// La última publicación y quién, en llano. Quién es nulo en la carga inicial.
+  publicadoEn           DateTime? @map("publicado_en")
+  publicadoPor          String?   @map("publicado_por")
+  /// El documento que se edita; nulo es «el borrador es lo publicado».
+  borrador              Json?
+  /// El último guardado, y la marca del aviso de choque.
+  borradorEn            DateTime? @map("borrador_en")
+  borradorPor           String?   @map("borrador_por")
+
+  @@map("casos")
+}

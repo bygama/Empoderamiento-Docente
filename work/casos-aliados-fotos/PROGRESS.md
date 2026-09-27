@@ -42,6 +42,14 @@
   recibe «El archivo no es una imagen jpg, png o webp.» sin fila ni archivo;
   un webp crea la fila con `subidaPor`; sin alt no sube) +
   `acciones-con-sesion.test.ts` → 16 pass, 0 fail, 0 skipped (contra
-  `ed_casos`); typecheck 0.
+  `ed_casos`); typecheck 0. Commit `9eafc8c`.
+- **Paso 5 — los casos en la base**: `features/investigacion/contenido/caso.ts`
+  (`esquemaCaso` y `esquemaBorradorDeCaso`) y `modelo-de-casos.ts` (los
+  cuatro fijos, sujeciones, estados, topes, slugs reservados); `Caso` en
+  `prisma/schema/casos.prisma` y la migración `20260927031538_casos` con los
+  cuatro, generados por un script que no se commitea y validados con
+  `esquemaCaso`; `publicadoDeCaso` en `datos/consultas/casos.ts`.
+  `migrate:deploy` → aplicada (los cuatro, 5/5/4/9 evidencias);
+  `caso.test.ts` → 3 pass, 0 fail, 0 skipped; typecheck 0.
 
 ## Abierto
