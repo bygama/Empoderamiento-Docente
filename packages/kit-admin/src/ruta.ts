@@ -1,4 +1,4 @@
-/** Si `ruta` es `href` o cuelga de él: `/admin/contenido/paginas/inicio` está en `/admin/contenido/paginas`, `/admin/contenido/paginas-viejas` no. */
+/** Si `ruta` es `href` o cuelga de él: `/admin/productos/3` está en `/admin/productos`, `/admin/productos-viejos` no. */
 export function estaEn(ruta: string, href: string): boolean {
   return ruta === href || ruta.startsWith(`${href}/`);
 }
