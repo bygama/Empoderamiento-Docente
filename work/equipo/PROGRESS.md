@@ -10,6 +10,10 @@
 - 2026-09-27 — **SPEC aprobado por el padre** con el cambio J (sin arrastre:
   «Subir» y «Bajar» como Aliados) y las precisiones H y N (DECISIONS).
   PLAN.md escrito: 13 pasos; el 11 y el 12 esperan a la lane 9.
+- 2026-09-27 — **Cierre.** La revisión r2 dio PASS sobre `da155d73`; la ronda
+  de cierre arregló su Minor (el cupo inyectado, abajo), pasó el gate y las
+  cinco corridas, y la lane se cierra en este PR: el commit que sigue a este
+  borra `work/equipo/`.
 - 2026-09-27 — **Ronda de arreglos 1** (revisión r1: FAIL con un Important y
   cuatro Minor, todos arreglados; ver «Hecho» y `## Verification`). Vuelve
   al mismo revisor.
@@ -313,7 +317,54 @@
     tests nuevos, otra vez con el candado apagado a mano, fallan («ronda 0» y
     `[ true, true ]`); con él, los 6 archivos que tocan esto → 15 pass.
 
+- **Ronda de cierre** (revisión r2 sobre `da155d73`: PASS, con un Minor).
+  - **Lo que midió el revisor**, según el padre: 40 rondas de «Subir» a la
+    vez con un borrado en el medio, en Equipo y en Aliados (0 transacciones
+    cortadas, 0 órdenes mal); que las listas no se bloquean entre sí, que el
+    candado se suelta aunque la acción falle, que los tests nuevos fallan sin
+    el arreglo, que borrar mientras se guarda no pisa nada, 5 de 5 en los
+    tests, 390 px con Playwright sin desborde en los tres temas, y el rebase
+    (migraciones, render solo 57 → 62, las 78 tarjetas).
+  - **El Minor, el test que despublicaba a Raquel Ayala** (`8bb77609`,
+    `fec61819`): `nivelSinLugar` y `publicarPersonaEnBase` reciben un `Cupo`
+    (DECISIONS); el test publica dos filas propias a la vez en el nivel 3 con
+    un cupo de un lugar contado solo entre ellas. Con el candado apagado a
+    mano falla («entra una» da dos); con él, `publicar-equipo.test.ts` → 5
+    pass, y Raquel y la Dirección quedan como estaban.
+  - **Limpieza:** borradas las bases `ed_equipo_antes`, `ed_equipo_orden`,
+    `ed_equipo_tests`, `ed_equipo_tests_r1`, `ed_equipo_tests_r1b` y, después
+    de sus corridas, `ed_equipo_tests_cierre`, y la carpeta `C:/tmp/ed-antes` (git ya no la tenía como worktree).
+
 ## Verification
+
+### Ronda de cierre
+
+Sobre `fec61819`, encima de `main` en `d7c8107b` (sin cambios desde la
+ronda 1: no hizo falta rebasear).
+
+- **Gate en limpio** (sin `apps/sitio/.next` ni `next-env.d.ts`, typecheck
+  antes del build): `pnpm typecheck` → exit 0; `pnpm lint` → exit 0;
+  `node scripts/verificar-react-doctor.mjs` → «react-doctor: 100/100, sin
+  diagnósticos (apps/sitio/src: 1181 archivos · packages/db/src: 3 archivos ·
+  packages/auth/src: 27 archivos · packages/kit-admin/src: 22 archivos)»;
+  `pnpm build` → exit 0 («Compiled successfully», 68/68 páginas estáticas).
+- **`pnpm test` 5 veces seguidas sobre una base recién migrada**
+  (`ed_equipo_tests_cierre`, vacía y con las 28 migraciones en su orden):
+
+  ```
+  === corrida 1 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 2 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 3 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 4 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  === corrida 5 exit=0 kit-admin 3/3 · auth 46/46 · sitio 578: 577 pass, 0 fail, 1 skipped
+  ```
+
+  El salteado es el de Métricas («falta correr A1»).
+- **El test del cupo agarra el bug:** con `tomarLaLista` apagado a mano, «dos
+  que publican a la vez donde queda un solo lugar» falla; con el candado,
+  pasa.
+
+Veredicto de cierre: la revisión r2 dio PASS sobre `da155d73` (informado por el padre); su Minor se arregló en esta ronda y el gate y las cinco corridas de arriba son sobre el código final.
 
 ### Ronda de arreglos 1
 
@@ -433,14 +484,9 @@ Sobre `95d5cc46`, rebasada sobre `main` en `ddc8ca1d` (la lane 9 adentro).
 
 ## Abierto
 
-- `ed_equipo_orden`, `ed_equipo_tests`, `ed_equipo_tests_r1` y `ed_equipo_tests_r1b` (donde se probaron las migraciones
-  desde cero y los tests) y `ed_equipo_antes` (la de `comparar-render`)
-  quedan en `ed-postgres`: son locales y se pueden borrar al cerrar.
 - En `ed_equipo` queda la cuenta de prueba de la verificación (`equipo-prueba@ejemplo.org`,
   edita, con su actividad); su clave no quedó guardada: para volver a entrar,
-  «Olvidé mi contraseña» y el link del log del dev server. El worktree
-  `C:/tmp/ed-antes` (`main` en `ddc8ca1d`, buildeado) es la línea de base de
-  `comparar-render`: se borra con `git worktree remove` al cerrar.
+  «Olvidé mi contraseña» y el link del log del dev server.
 - `docs/AI_GUIDELINES.md` §2 da de ejemplo un `data.ts` que ya no existe
   (DECISIONS, «Visto al pasar»).
 - Fase 4: los ~110 KB del recorrido viajan en el payload del HTML de

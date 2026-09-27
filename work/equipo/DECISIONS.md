@@ -190,6 +190,15 @@
   dos del equipo. Pasan a `20260927081656_equipo` y
   `20260927081756_fotos_del_equipo`, con el mismo contenido: solo se
   aplicaron en las bases locales de la lane.
+- 2026-09-27 — **El cupo de un nivel se inyecta** (Minor de la revisión r2): el
+  test de publicar a la vez despublicaba a Raquel Ayala para liberar un lugar
+  en la Dirección, una fila que no es suya y de la carga. `nivelSinLugar` y
+  `publicarPersonaEnBase` reciben un `Cupo` (los lugares de cada nivel y
+  quiénes los ocupan, por su URL); el del sitio, `CUPO_DEL_SITIO`, es el de
+  siempre. El test usa un lugar contado solo entre sus dos filas del nivel 3.
+  El cupo dice también quiénes ocupan, y no solo cuántos lugares hay, porque
+  los cuatro niveles tienen perfiles de la carga: con solo los lugares, un
+  cupo de uno ya estaría lleno.
 - 2026-09-27 — **Visto al pasar, sin tocar:** `docs/AI_GUIDELINES.md` §2
   («Dónde va un archivo de datos») da de ejemplo `quienes-somos/data/equipo.ts`,
   que esta lane borra; el único `data/` de contenido que queda es
