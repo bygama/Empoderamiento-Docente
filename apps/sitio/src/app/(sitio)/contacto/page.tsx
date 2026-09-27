@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cvAbierto } from "@/config/cv";
+import { contenidoDe } from "@/datos/consultas/paginas";
 import { ContactoExperiencia } from "@/features/contacto/components/ContactoExperiencia";
 
 export const metadata: Metadata = {
@@ -15,10 +16,12 @@ export const metadata: Metadata = {
  * barra fija de abajo. Todo dentro de ContactoExperiencia. «Sumate al equipo»
  * lleva a /sumate-al-equipo solo con el CV encendido; si no, al correo.
  */
-export default function ContactoPage() {
+export default async function ContactoPage() {
+  // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
+  const { titular } = await contenidoDe("contacto");
   return (
     <main id="contenido" tabIndex={-1}>
-      <ContactoExperiencia cvAbierto={cvAbierto()} />
+      <ContactoExperiencia cvAbierto={cvAbierto()} titular={titular} />
     </main>
   );
 }

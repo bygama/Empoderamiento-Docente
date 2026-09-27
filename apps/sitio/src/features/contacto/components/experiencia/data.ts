@@ -49,10 +49,6 @@ export const EQUIPO_FOTOS = [
 ];
 export const EQUIPO_RESTO = 8;
 
-// Un solo titular para toda la experiencia: nace gigante en el hero y aterriza
-// como encabezado del selector. No hay un segundo titular.
-export const TITULO = "Hablemos.";
-
 // Segunda puerta del contacto: sumarse al equipo. Sin upload (todavía no hay
 // backend), el mailto precarga asunto y un cuerpo-plantilla que recuerda
 // adjuntar el CV.

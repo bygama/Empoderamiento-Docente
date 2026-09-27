@@ -1,14 +1,14 @@
 import Image from "next/image";
-import { EQUIPO_FOTOS, EQUIPO_RESTO, TITULO } from "./data";
+import { EQUIPO_FOTOS, EQUIPO_RESTO } from "./data";
 import { TITULO_TIPO } from "./estilos";
 
 /**
  * Columna de identidad de la apertura (izquierda): rayita, el titular que
  * ATERRIZA desde el hero, la frase-pilar y el equipo real (foto + cartel en
  * desktop, fila compacta en mobile). Composición editorial asimétrica, idioma
- * de la home.
+ * de la home. El titular llega por props.
  */
-export function ColumnaIdentidad() {
+export function ColumnaIdentidad({ titulo }: { titulo: string }) {
   return (
     <div className="lg:flex lg:h-full lg:flex-col lg:justify-between">
       {/* Bloque superior: rayita + titular + bajada. */}
@@ -30,9 +30,9 @@ export function ColumnaIdentidad() {
           className={`${TITULO_TIPO.familia} mt-4 ${TITULO_TIPO.peso}`}
           style={{ fontSize: "clamp(2.2rem, 1rem + 4vw, 4.2rem)", lineHeight: 0.95 }}
         >
-          <span className="sr-only">{TITULO}</span>
+          <span className="sr-only">{titulo}</span>
           <span data-ap-titulo aria-hidden="true" className="relative inline-block whitespace-nowrap">
-            {TITULO}
+            {titulo}
           </span>
         </h2>
       </div>

@@ -71,7 +71,8 @@ function desarmar(c: Contexto) {
     const fsDst = parseFloat(cs.fontSize);
     const ratio = fsDst > 0 ? fsSrc / fsDst : 1;
 
-    const gt = crearGhostTitulo(d, cs, fsDst);
+    // El texto del destino: el titular es editable y el clon dice lo mismo que él.
+    const gt = crearGhostTitulo(dstTit.textContent ?? "", d, cs, fsDst);
     c.estado.ghosts.push(gt);
 
     gsap.set(h2, { autoAlpha: 0 });
