@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { z } from "zod";
-import { problemasDeCompartidos } from "@/lib/contenido/compartido";
+import { problemasDeCompartidos, rutasQueMuestran } from "@/lib/contenido/compartido";
 import { describir } from "@/lib/contenido/describir";
 import { partesDe, type SeccionRegistrada } from "@/lib/contenido/documento";
 import { CLAVE_SEO } from "@/lib/contenido/seo";
@@ -35,6 +35,12 @@ test("el formulario de cada parte se puede dibujar", () => {
 
 test("lo compartido apunta a una sección que existe, de otra página, sin cadenas", () => {
   assert.deepEqual(problemasDeCompartidos(PAGINAS), []);
+});
+
+test("publicar Qué hacemos regenera también Inicio, que muestra lo que comparte; publicar Inicio, solo Inicio", () => {
+  assert.deepEqual(rutasQueMuestran(PAGINAS, "que-hacemos"), ["/que-hacemos", "/"]);
+  assert.deepEqual(rutasQueMuestran(PAGINAS, "inicio"), ["/"]);
+  assert.deepEqual(rutasQueMuestran(PAGINAS, "quienes-somos"), ["/quienes-somos"]);
 });
 
 test("ninguna sección se llama como la clave del SEO", () => {
