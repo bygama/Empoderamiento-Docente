@@ -17,8 +17,12 @@ const esObjeto = (v: unknown): v is Objeto => typeof v === "object" && v !== nul
 const campo = (v: unknown, clave: string) => (esObjeto(v) ? v[clave] : undefined);
 const item = (v: unknown, i: number) => (Array.isArray(v) ? v[i] : undefined);
 
-/** Igualdad profunda, sin mirar el orden de las claves: el mismo contenido guardado dos veces no es un cambio. */
-function igual(a: unknown, b: unknown): boolean {
+/**
+ * Igualdad profunda, sin mirar el orden de las claves: el mismo contenido
+ * guardado dos veces no es un cambio. La usa también «Cambios sin guardar» de
+ * la ficha de un caso y de un aliado (el `jsonb` guarda las claves en su orden).
+ */
+export function igual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (!esObjeto(a) || !esObjeto(b) || Array.isArray(a) !== Array.isArray(b)) return false;
   const claves = Object.keys(a);

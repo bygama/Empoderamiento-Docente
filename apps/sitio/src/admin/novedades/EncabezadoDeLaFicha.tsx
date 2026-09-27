@@ -2,7 +2,7 @@ import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia, type Tono } from "@/admin/armazon/Insignia";
 import { Momento } from "@/admin/armazon/Momento";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-novedad";
-import { AccionesDeLaFicha } from "./AccionesDeLaFicha";
+import { AccionesDeLaFicha } from "@/admin/armazon/AccionesDeLaFicha";
 import type { Pendiente } from "./useGuardarNovedad";
 
 type Props = {

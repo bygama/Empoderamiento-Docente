@@ -186,6 +186,26 @@
   URL del 01 frena, el choque, publicar con otra URL deja el 308, sin
   borrador «ya está publicado así», descartar) + `acciones-con-sesion` +
   `publicar-novedades` → 21 pass, 0 fail, 0 skipped; typecheck 0; después:
-  el caso 04 con su slug y sin borrador, cero redirecciones.
+  el caso 04 con su slug y sin borrador, cero redirecciones. Commit
+  `88c6a36f`.
+- **Paso 15 — Casos en el admin**: `datos/consultas/casos-del-admin.ts`
+  (`listaDeCasos`, `fichaDeCaso`); `admin/casos/` (`ListaDeCasos`,
+  `FichaDeCaso` con `useAccionesDelCaso`, `EncabezadoDelCaso`, el formulario
+  en `formulario-del-caso/` —`ElCaso` con la ficha técnica y
+  `CasoProvisional`, `ElExpediente` con la lámina sin foco y «Elegir una ya
+  subida», `LasListas` con evidencias y producción—, `SeVeElCaso`,
+  `DescartarElCaso`, `formulario.ts` que guarda el título de las evidencias
+  en mayúsculas, y `cambios.ts` con su test); las rutas `/contenido/casos` y
+  `/[id]`. Al armazón: `AccionesDeLaFicha` (mudada de Novedades),
+  `FilaDeAccion` (Novedades y Fotos la usan), `Bloque` y `QueCambioPlegado`;
+  `igual` de `lib/contenido/comparar.ts` pasa a exportarse (DECISIONS).
+  DESIGN.md §11 al día. En el navegador (cuenta `edita`): la lista con los
+  cuatro; la ficha del caso 03 con sus bloques; cambiar el indicio prende
+  «Cambios sin guardar» y «Qué cambió · un campo»; guardar → «Borrador
+  guardado…» y la insignia «Cambios sin publicar»; publicar → «Publicado: el
+  sitio ya lo muestra», la columna cambiada, el borrador nulo,
+  `publico-un-caso` en la actividad y `/investigacion` sirviendo el indicio
+  nuevo; se volvió a publicar el de antes. `cambios.test.ts` 1 pass;
+  `pnpm --filter sitio typecheck` 0, lint 0, react-doctor 100/100.
 
 ## Abierto

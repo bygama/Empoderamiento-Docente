@@ -17,6 +17,22 @@
   3. **El SQL generado** de cada migración lleva un comentario con de qué
      salió y cómo se generó (el script no se commitea).
 
+- 2026-09-27 — **Lo que se repite de la ficha de una entidad sube al
+  armazón, sin tocar lo que Biblioteca (8a, en vuelo) cambia** (paso 15).
+  Casos es el segundo consumidor: `AccionesDeLaFicha` se mudó de
+  `admin/novedades/` a `admin/armazon/` (8a no lo toca) y la fila de «Deshacer»
+  pasó a `FilaDeAccion` (la usan Novedades y Fotos). El «Qué cambió» plegado y
+  el `Bloque` del formulario nacen en el armazón como piezas nuevas; los de
+  Novedades quedan como están, porque 8a está cambiando `QueCambio.tsx` y
+  `FormularioDeNovedad.tsx`: que Novedades use los del armazón es un cambio
+  mecánico para cuando las dos lanes estén en `main` (Abierto). Por lo mismo,
+  la miniatura del logo en la lista de Aliados va adentro de lo principal de
+  la `Fila`, sin sumarle una prop (8a le suma `miniatura`).
+- 2026-09-27 — **Subir una foto a la biblioteca tiene su pantalla**
+  (`/admin/contenido/fotos/subir`), como «Nueva novedad», y no un
+  formulario que se abre en la grilla (el SPEC §7.3 decía «en la misma
+  pantalla»): reusa el `CampoFoto` del kit entero (alt obligatorio, tope,
+  errores) y al subir lleva a la ficha.
 - 2026-09-27 — **«Ver» en Cuentas › Actividad lleva a un caso, no a un
   aliado ni a una foto** (paso 3). El SPEC decía «a la ficha del aliado o de
   la foto, nada si se borró»; saber si todavía existen pedía otra consulta en
