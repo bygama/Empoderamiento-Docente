@@ -1256,7 +1256,7 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
 - Primer consumidor: Novedades. Las entidades que siguen (materiales, casos,
   equipo) la repiten con sus campos.
 - **Segundo consumidor: un material** (2026-09-27, `work/biblioteca/`), con
-  las acciones de la ficha compartidas (`admin/novedades/AccionesDeLaFicha.tsx`)
+  las acciones de la ficha compartidas (`admin/armazon/AccionesDeLaFicha.tsx`)
   y tres piezas que suma:
   - **La imagen generada con «Usar otra»** vale también para la portada: sin
     una propia, la ficha muestra la tipográfica generada en vivo (240 px,
@@ -1272,6 +1272,16 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
   - **El panel** lleva «Salud del link» arriba de «Se ve en»: el resultado del
     último chequeo en meta medium, qué pasó y cuándo, y en `gris-texto` cómo
     se chequea.
+- **Los casos** (`admin/casos/`, `work/casos-aliados-fotos/`) la repiten sin
+  «Nuevo» ni «Borrar» ni «Despublicar», porque son cuatro y siempre están en el
+  sitio: la insignia es «Publicado» (normal) o «Cambios sin publicar»
+  (fuerte), y al pie va solo «Deshacer» con «Descartar los cambios», cuando
+  hay borrador. Las piezas que se repiten viven en el armazón:
+  `AccionesDeLaFicha` (Guardar borrador · Vista previa · Publicar), `Bloque`
+  (el título de un bloque del formulario), `FilaDeAccion` (una fila de
+  «Deshacer o sacar del sitio», que usa también la ficha de una foto) y
+  `QueCambioPlegado` (el `details` con la cuenta, que recibe las diferencias
+  ya armadas).
 
 ### Agregar con datos de afuera
 

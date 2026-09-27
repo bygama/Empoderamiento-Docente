@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Boton } from "@/admin/armazon/Boton";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
+import { FilaDeAccion } from "@/admin/armazon/FilaDeAccion";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-novedad";
 import type { Pendiente } from "./useGuardarNovedad";
 
@@ -14,19 +15,6 @@ type Props = {
   alDespublicar: () => void;
   alBorrar: () => void;
 };
-
-/** Una acción con lo que pasa si se toca, a la izquierda, y su botón a la derecha. */
-function Accion({ titulo, consecuencia, children }: { titulo: string; consecuencia: string; children: React.ReactNode }) {
-  return (
-    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
-      <div className="min-w-0 max-w-prose">
-        <p className="font-medium">{titulo}</p>
-        <p className="mt-0.5 text-admin-meta text-gris-texto">{consecuencia}</p>
-      </div>
-      {children}
-    </li>
-  );
-}
 
 /**
  * Lo que deshace una novedad o la saca del sitio (SPEC §5.3 de
@@ -45,7 +33,7 @@ export function SalidaDeNovedad({ titulo, estado, pendiente, alDescartar, alDesp
       </h2>
       <ul className="divide-y divide-azul-claro/60">
         {estado.publicada && estado.borradorEn ? (
-          <Accion titulo="Descartar los cambios" consecuencia="Vuelve a lo que está publicado. Lo que se guardó como borrador desde entonces se pierde.">
+          <FilaDeAccion titulo="Descartar los cambios" consecuencia="Vuelve a lo que está publicado. Lo que se guardó como borrador desde entonces se pierde.">
             {confirmando === "descartar" ? (
               <Confirmacion
                 pregunta="¿Descartar los cambios sin publicar? No se puede deshacer."
@@ -59,16 +47,16 @@ export function SalidaDeNovedad({ titulo, estado, pendiente, alDescartar, alDesp
                 Descartar cambios
               </Boton>
             )}
-          </Accion>
+          </FilaDeAccion>
         ) : null}
         {estado.publicada ? (
-          <Accion titulo="Despublicar" consecuencia="Deja de verse en el sitio y pasa a Borradores. Volver a publicarla es un clic; si era la destacada, deja de serlo.">
+          <FilaDeAccion titulo="Despublicar" consecuencia="Deja de verse en el sitio y pasa a Borradores. Volver a publicarla es un clic; si era la destacada, deja de serlo.">
             <Boton variante="secundario" disabled={corriendo} aria-busy={pendiente === "despublicar" || undefined} onClick={alDespublicar}>
               {pendiente === "despublicar" ? "Despublicando…" : "Despublicar"}
             </Boton>
-          </Accion>
+          </FilaDeAccion>
         ) : null}
-        <Accion titulo="Borrar" consecuencia="Se borra para siempre: si estaba en el sitio, deja de verse, y su dirección da error.">
+        <FilaDeAccion titulo="Borrar" consecuencia="Se borra para siempre: si estaba en el sitio, deja de verse, y su dirección da error.">
           {confirmando === "borrar" ? (
             <Confirmacion
               pregunta={`¿Borrar «${titulo}» para siempre? No se puede deshacer.`}
@@ -82,7 +70,7 @@ export function SalidaDeNovedad({ titulo, estado, pendiente, alDescartar, alDesp
               Borrar la novedad
             </Boton>
           )}
-        </Accion>
+        </FilaDeAccion>
       </ul>
     </section>
   );

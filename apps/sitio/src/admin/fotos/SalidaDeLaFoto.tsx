@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { Aviso, Boton, claseDeBoton } from "@ed/kit-admin";
 import { Confirmacion } from "@/admin/armazon/Confirmacion";
+import { FilaDeAccion } from "@/admin/armazon/FilaDeAccion";
 import { borrarFoto, reemplazarFoto } from "@/datos/acciones/fotos";
 import { MAXIMO_BYTES } from "@/lib/contenido/fotos";
 
@@ -16,19 +17,6 @@ type Props = {
   enElCodigo: number;
   delRepositorio: boolean;
 };
-
-/** Una acción con lo que pasa si se toca, a la izquierda, y lo que la hace a la derecha. */
-function Accion({ titulo, consecuencia, children }: { titulo: string; consecuencia: string; children?: React.ReactNode }) {
-  return (
-    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
-      <div className="min-w-0 max-w-prose">
-        <p className="font-medium">{titulo}</p>
-        <p className="mt-0.5 text-admin-meta text-gris-texto">{consecuencia}</p>
-      </div>
-      {children}
-    </li>
-  );
-}
 
 /** Qué pasa si se borra: que no se puede mientras se use, o qué se lleva. */
 function siSeBorra(usos: number, delRepositorio: boolean): string {
@@ -107,7 +95,7 @@ export function SalidaDeLaFoto({ id, usos, enElCodigo, delRepositorio }: Props) 
         </Aviso>
       ) : null}
       <ul className="divide-y divide-azul-claro/60">
-        <Accion
+        <FilaDeAccion
           titulo="Reemplazar el archivo"
           consecuencia={siSeReemplaza(usos, enElCodigo)}
         >
@@ -134,8 +122,8 @@ export function SalidaDeLaFoto({ id, usos, enElCodigo, delRepositorio }: Props) 
               </Boton>
             ) : null}
           </div>
-        </Accion>
-        <Accion titulo="Borrar" consecuencia={siSeBorra(usos, delRepositorio)}>
+        </FilaDeAccion>
+        <FilaDeAccion titulo="Borrar" consecuencia={siSeBorra(usos, delRepositorio)}>
           {/* Usada, no hay botón: la frase dice dónde sacarla primero. */}
           {usos === 0 && confirmando ? (
             <Confirmacion
@@ -151,7 +139,7 @@ export function SalidaDeLaFoto({ id, usos, enElCodigo, delRepositorio }: Props) 
               Borrar la foto
             </Boton>
           ) : null}
-        </Accion>
+        </FilaDeAccion>
       </ul>
     </section>
   );

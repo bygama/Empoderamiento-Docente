@@ -1,7 +1,7 @@
 import { Encabezado } from "@/admin/armazon/Encabezado";
 import { Insignia, type Tono } from "@/admin/armazon/Insignia";
 import { Momento } from "@/admin/armazon/Momento";
-import { AccionesDeLaFicha } from "@/admin/novedades/AccionesDeLaFicha";
+import { AccionesDeLaFicha } from "@/admin/armazon/AccionesDeLaFicha";
 import type { EstadoDeLaFicha } from "@/datos/consultas/ficha-de-material";
 import type { Pendiente } from "./useGuardarMaterial";
 
