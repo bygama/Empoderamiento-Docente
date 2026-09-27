@@ -95,6 +95,12 @@
   renglón, como los párrafos de una novedad, y no una lista variable
   anidada más; los hitos, las estancias y las publicaciones, que tienen
   varios campos, sí son listas variables (DESIGN.md §11).
+- 2026-09-27 — **La URL de un perfil sigue al nombre** (lo mostró la prueba en
+  el navegador): el SPEC §6.3 no decía de dónde sale la de un perfil nuevo, y
+  sin esto no se publicaba sin escribirla a mano. Se copia la regla de la
+  ficha de una novedad (sigue al título hasta que alguien la escribe o se
+  publica), con su ayuda «Así queda: /quienes-somos?persona=…». Publicado,
+  la ayuda nombra el link viejo que se pierde al cambiarla.
 - 2026-09-27 — **Visto al pasar, sin tocar:** `docs/AI_GUIDELINES.md` §2
   («Dónde va un archivo de datos») da de ejemplo `quienes-somos/data/equipo.ts`,
   que esta lane borra; el único `data/` de contenido que queda es
