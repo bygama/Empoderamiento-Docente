@@ -6,8 +6,60 @@ Lane 4b del XL [`mapa-del-admin`](../mapa-del-admin/SPEC.md). SPEC en
 
 ## In progress
 
-- work-verify: el gate entero, la vista previa y la revalidación de punta a
-  punta.
+- work-verify PASS (abajo). Falta la revisión de cierre, que abre el padre al
+  recibir `worker_done` (1 asiento, Opus 5.5, medium, «el cambio entero
+  contra su SPEC»), y el rebase sobre `main` cuando el padre lo pida: al
+  2026-09-26, `main` va 64 commits adelante (`15def2c`) y `git merge-tree`
+  muestra un solo conflicto, en DESIGN.md (la frase de apertura de §11).
+
+## Verification
+
+### 2026-09-26 — L DoD (aceptaciones del PLAN + gate del repo + SPEC §11) — PASS
+
+Sobre `f0bb38c`, base `ed_paginasqh`, en esta sesión:
+
+- **L1 static:** `pnpm typecheck` → exit 0 · `pnpm lint` → exit 0 ·
+  `node scripts/verificar-react-doctor.mjs` → exit 0 («react-doctor:
+  100/100, sin diagnósticos», apps/sitio/src 554 archivos · packages/db/src 3
+  · packages/auth/src 17).
+- **L2 behavioral:** `pnpm test` → exit 0 (packages/auth 28/28; apps/sitio
+  188: 187 ok, 0 fallas, 1 omitido que ya venía —las respuestas grabadas de
+  Search Console—; los de integración corren contra `ed_paginasqh`) ·
+  `pnpm build` → exit 0 (`/`, `/que-hacemos` y `/quienes-somos` siguen ○
+  estáticas) · arranca: `next dev -p 3022` → «Ready», y `next start -p 3022`
+  sobre el build de producción → «Ready in 138ms».
+- **Render:** `node scripts/comparar-render.mjs "$TEMP/ed-paginasqh/antes"
+  apps/sitio` → exit 1 con exactamente las cuatro diferencias aprobadas y
+  ninguna otra: `que-hacemos` en `head` (og:title, og:description,
+  twitter:title, twitter:description) e `imagenes` (la #3, la posición de la
+  foto de clase a `style`); `quienes-somos` en `head` (las mismas cuatro) e
+  `imagenes` (las #2 y #3, `%2Fquienes-somos%2F` → `%2Ffotos%2F`). Las otras
+  nueve páginas, iguales; `index.html` igual. Contra el build del paso
+  anterior, cada paso dio 0 salvo su propia excepción (entradas de abajo).
+- **L3 end-to-end** (navegador de Orca, perfil `paginas-qh`, cuenta de
+  prueba):
+  - **La vista previa** (pedido del padre). En el editor de Qué hacemos, el
+    título del área 1 pasó a «Desarrollo profesional docente (prueba)» →
+    «Guardar borrador» («Borrador guardado. El sitio sigue mostrando lo
+    publicado.») → «Vista previa». **En vista previa, `/` muestra la primera
+    carta del abanico como «Desarrollo profesional docente (prueba)»** (7
+    cartas) y `/que-hacemos` el artículo igual: Inicio lee el borrador de Qué
+    hacemos, como el suyo. Con «Volver al sitio publicado», **`/` vuelve a
+    «Desarrollo profesional docente»**: el sitio publicado no ve el borrador.
+  - **La revalidación de las dos rutas.** Build de producción
+    (`NEXT_PUBLIC_SITE_URL=http://localhost:3022 pnpm build`, exit 0) y
+    `next start -p 3022` en la pestaña de Orca. Antes de publicar, `curl /` →
+    «Desarrollo profesional docente», `x-nextjs-cache: HIT`, `s-maxage=31536000`
+    (el prerender). «Publicar» en Qué hacemos → «Publicado: el sitio ya
+    muestra esta versión.». Después, sin rebuild: `curl /` → **«Desarrollo
+    profesional docente (prueba)»** (dos veces, `HIT` ya regenerado) y
+    `/que-hacemos` también. Publicar la dueña regeneró `/`.
+  - Limpieza: la fila de `que-hacemos` de `ed_paginasqh` se borró
+    (`DELETE 1`; las versiones se fueron en cascada: 0), y el dev server
+    volvió a su pestaña.
+- **Close review:** no se abre acá. La abre el padre al recibir
+  `worker_done` (DECISIONS del padre, 2026-09-26: 1 revisor Opus 5.5,
+  medium, «el cambio entero contra su SPEC»).
 
 ## Abierto
 
