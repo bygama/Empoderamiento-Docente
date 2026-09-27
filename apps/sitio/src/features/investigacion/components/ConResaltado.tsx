@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 import { Highlight } from "@/components/ui/Highlight";
 import { fragmentos, type Fragmento } from "@/lib/contenido/resaltado";
 
@@ -12,16 +12,20 @@ function conPosicion(texto: string): Array<Fragmento & { desde: number }> {
   });
 }
 
+const marcador = (texto: string) => <Highlight>{texto}</Highlight>;
+
 /**
- * Un título con su parte resaltada entre dobles asteriscos («**Investigamos**
- * para transformar…»), con lo resaltado en el marcador de la marca. Deja el
- * mismo HTML que el `<Highlight>` escrito a mano que reemplaza.
+ * Un texto con su parte resaltada entre dobles asteriscos («**Investigamos**
+ * para transformar…»). Lo resaltado va en el marcador de la marca, o como lo
+ * dibuje la sección con `resaltar` (el garabato de las preguntas, el
+ * subrayado de la lámina). Deja el mismo HTML que el resaltado escrito a mano
+ * que reemplaza.
  */
-export function ConResaltado({ texto }: { texto: string }) {
+export function ConResaltado({ texto, resaltar = marcador }: { texto: string; resaltar?: (texto: string) => ReactNode }) {
   return (
     <>
       {conPosicion(texto).map((f) => (
-        <Fragment key={f.desde}>{f.resaltado ? <Highlight>{f.texto}</Highlight> : f.texto}</Fragment>
+        <Fragment key={f.desde}>{f.resaltado ? resaltar(f.texto) : f.texto}</Fragment>
       ))}
     </>
   );

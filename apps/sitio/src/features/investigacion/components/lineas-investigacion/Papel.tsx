@@ -2,9 +2,11 @@ import Link from "next/link";
 import { alClicVerCaso } from "@/features/investigacion/casos/abrir-caso";
 import { ClipPapel, FlechaManuscrita, SubrayadoMarcador } from "@/features/investigacion/casos/Garabatos";
 import { ROTULO_MICRO } from "@/features/investigacion/casos/tintes";
+import type { Lineas } from "@/features/investigacion/contenido/lineas";
+import { ConResaltado } from "../ConResaltado";
 
-/** Una línea de la mesa: su nombre, su pregunta con la clave que subraya el marcador y el caso que la muestra en acción. */
-export type Linea = { nombre: string; pregunta: string; clave: string; caso: string };
+/** Una línea de la mesa: su nombre y su pregunta, con la parte que subraya el marcador entre dobles asteriscos. */
+type Linea = Lineas["lineas"][number];
 
 /**
  * La mesa de trabajo: seis papeles sobre la carpeta, de TRES materiales que
@@ -36,24 +38,22 @@ function Cinta({ className = "" }: { className?: string }) {
   );
 }
 
-/** La pregunta con su clave subrayada a marcador (doble pasada, temblor humano). */
-function Pregunta({ texto, clave }: { texto: string; clave: string }) {
-  const donde = texto.indexOf(clave);
-  if (donde < 0) return <>{texto}</>;
+/** La clave de la pregunta, subrayada a marcador (doble pasada, temblor humano). */
+function subrayada(clave: string) {
   return (
-    <>
-      {texto.slice(0, donde)}
-      <span className="relative whitespace-nowrap">
-        {clave}
-        <SubrayadoMarcador className="text-verde-concepto pointer-events-none absolute inset-x-0 -bottom-[0.18em] h-[0.5em] w-full" />
-      </span>
-      {texto.slice(donde + clave.length)}
-    </>
+    <span className="relative whitespace-nowrap">
+      {clave}
+      <SubrayadoMarcador className="text-verde-concepto pointer-events-none absolute inset-x-0 -bottom-[0.18em] h-[0.5em] w-full" />
+    </span>
   );
 }
 
-/** Un papel de la mesa: el material cambia, la pregunta no. */
-export function Papel({ linea, indice }: { linea: Linea; indice: number }) {
+/**
+ * Un papel de la mesa: el material cambia, la pregunta no. `caso` es el slug
+ * del expediente que la muestra en acción; lo pone la carpeta, por el lugar
+ * de la línea en la lista.
+ */
+export function Papel({ linea, caso, indice }: { linea: Linea; caso: string; indice: number }) {
   const material = MATERIALES[indice % 3];
   const numero = String(indice + 1).padStart(2, "0");
   // Tres tonos que se distinguen entre sí y de la carpeta (que es
@@ -93,14 +93,14 @@ export function Papel({ linea, indice }: { linea: Linea; indice: number }) {
         {material === "nota" && (
           <FlechaManuscrita className="text-verde-concepto float-left mt-1 mr-2 h-5 w-8 rotate-[12deg]" />
         )}
-        <Pregunta texto={linea.pregunta} clave={linea.clave} />
+        <ConResaltado texto={linea.pregunta} resaltar={subrayada} />
       </h3>
       {/* Al caso que la muestra en acción: en la misma página desliza hasta
           la pila y abre el expediente (abrir-caso.ts); el href es el link
           directo del caso, por si se abre en otra pestaña. */}
       <Link
-        href={`#${linea.caso}`}
-        onClick={alClicVerCaso(linea.caso)}
+        href={`#${caso}`}
+        onClick={alClicVerCaso(caso)}
         aria-label={`Ver en acción: ${linea.nombre}`}
         className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto mt-5 inline-flex items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
       >
