@@ -36,6 +36,10 @@ const SIN_CAPACIDAD: Record<string, { acciones: string[]; motivo: string }> = {
     acciones: ["cambiarMiNombre"],
     motivo: "es la cuenta propia: la tiene todo rol con sesión, como el Inicio (SPEC de roles-y-actividad §3)",
   },
+  "datos/acciones/avisos.ts": {
+    acciones: ["guardarMisAvisos"],
+    motivo: "son los avisos de la cuenta propia; adentro solo toca las bandejas que su rol ve (SPEC de work/mensajes/ §9)",
+  },
 };
 
 const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
