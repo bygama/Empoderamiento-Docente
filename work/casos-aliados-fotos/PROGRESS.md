@@ -69,6 +69,16 @@
   `quienes-somos/origen-03` por `fotos/origen-03` en `main` da igual: es el
   dedupe aprobado (propuesta K). El script sale 1 por esas dos. Suite entera
   `pnpm --filter sitio test` → 319 tests, 318 pass, 0 fail, 1 skipped (el
-  de antes); typecheck 0.
+  de antes); typecheck 0. Commit `219c19d5`.
+- **Paso 7 — los aliados en la base**: `features/aliados/contenido/aliado.ts`
+  (`esquemaAliado`, `esquemaBorradorDeAliado`; la URL solo `https://`) y
+  `modelo.ts` (`TAMANOS` chico/mediano/grande con sus clases, `altoDe`,
+  topes); `Aliado` en `prisma/schema/aliados.prisma` y la migración
+  `20260927032338_aliados` con los cinco (publicados, autorizados, con la
+  nota de dónde consta; Techint con el pendiente de confirmar con Raquel),
+  generados por un script que no se commitea y validados con
+  `esquemaAliado`; `publicadoDeAliado` en `datos/consultas/aliados.ts`.
+  `migrate:deploy` → aplicada; `aliado.test.ts` → 4 pass, 0 fail, 0
+  skipped; typecheck 0.
 
 ## Abierto
