@@ -2,12 +2,13 @@ import { after, test } from "node:test";
 import assert from "node:assert/strict";
 import { config as cargarEntorno } from "dotenv";
 import { SIN_PERMISO } from "@ed/auth";
+import { tiraMovida } from "./tira-de-aliados";
 
-// El ciclo de un aliado y su marca contra el Postgres local. El de prueba se
-// llama «Prueba aliado» y se borra al final; mover lo lleva y lo trae, así los
-// cinco de verdad quedan en su orden. Los lugares se miran relativos (un lugar
-// más arriba que antes; los cinco en su orden), no por número: puede haber
-// otros aliados en la tabla, de otro archivo de tests o de una prueba a mano.
+// El ciclo de un aliado y su marca contra el Postgres local. **El test crea
+// sus propios aliados y mide contra ellos**, nunca contra el estado de la
+// tabla: los archivos de tests corren a la vez y otros suman o borran aliados
+// en el medio (ronda de arreglos 2, DECISIONS). El lugar en la tira se mira
+// como el orden de los dos que crea; la punta, con `tiraMovida`, que es pura.
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
@@ -20,26 +21,38 @@ async function modulos() {
   return { base, ...editar, ...publicar, ...autorizar };
 }
 
-const CINCO = ["UNESCO", "Techint", "Bloom", "UCSH", "Science Up"];
-
-const aliado = { nombre: "Prueba aliado", logo: { src: "/aliados/unesco.png", alt: "Prueba aliado", foco: { x: 0.5, y: 0.5 } }, tamano: "chico", url: "" };
+const aliado = (nombre: string) => ({ nombre, logo: { src: "/aliados/unesco.png", alt: nombre, foco: { x: 0.5, y: 0.5 } }, tamano: "chico", url: "" });
+const creados: string[] = [];
 
 after(async () => {
   if (!process.env.DATABASE_URL) return;
   const { base } = await modulos();
-  await base.aliado.deleteMany({ where: { OR: [{ nombre: "Prueba aliado" }, { borrador: { path: ["nombre"], equals: "Prueba aliado" } }] } });
+  await base.aliado.deleteMany({ where: { id: { in: creados } } });
+});
+
+test("mover en la tira: un lugar, y en la punta nada", () => {
+  assert.deepEqual(tiraMovida(["a", "b", "c"], "b", "antes"), ["b", "a", "c"]);
+  assert.deepEqual(tiraMovida(["a", "b", "c"], "b", "despues"), ["a", "c", "b"]);
+  assert.equal(tiraMovida(["a", "b", "c"], "a", "antes"), null);
+  assert.equal(tiraMovida(["a", "b", "c"], "c", "despues"), null);
+  assert.equal(tiraMovida(["a", "b", "c"], "z", "antes"), undefined);
 });
 
 test("crear, que sin la marca no se publique, que quien edita no la ponga, y el ciclo entero", sinBase, async () => {
   const m = await modulos();
-  const creado = await m.crearAliadoEnBase(m.base, { contenido: aliado, quien: "Ana" });
-  assert.equal(creado.ok, true);
-  if (!creado.ok) return;
-  // La tira, en orden, con los cinco de verdad y el de prueba; `todas` trae también las ajenas.
-  const todas = () => m.base.aliado.findMany({ orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true, nombre: true } });
-  const tira = async () => (await todas()).flatMap((a) => (a.id === creado.id ? ["Prueba aliado"] : CINCO.filter((n) => n === a.nombre)));
+  const primero = await m.crearAliadoEnBase(m.base, { contenido: aliado("Prueba aliado primero"), quien: "Ana" });
+  const creado = await m.crearAliadoEnBase(m.base, { contenido: aliado("Prueba aliado"), quien: "Ana" });
+  assert.equal(primero.ok && creado.ok, true);
+  if (!primero.ok || !creado.ok) return;
+  creados.push(primero.id, creado.id);
+  // El orden de los dos que creó el test: crear pone al nuevo después del anterior.
+  const orden = async () => {
+    const filas = await m.base.aliado.findMany({ where: { id: { in: [primero.id, creado.id] } }, orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true } });
+    return filas.map((f) => (f.id === creado.id ? "creado" : "primero"));
+  };
   const fila = await m.base.aliado.findUniqueOrThrow({ where: { id: creado.id } });
-  assert.deepEqual([fila.autorizado, fila.publicado, (await todas()).at(-1)?.id], [false, false, creado.id]);
+  assert.deepEqual([fila.autorizado, fila.publicado], [false, false]);
+  assert.deepEqual(await orden(), ["primero", "creado"]);
 
   // Sin la marca no se publica, ni con un borrador completo.
   const sinMarca = await m.publicarAliadoEnBase(m.base, { id: creado.id, borradorEnVisto: creado.borradorEn, quien: "Ana" });
@@ -56,14 +69,11 @@ test("crear, que sin la marca no se publique, que quien edita no la ponga, y el 
   const despues = await m.base.aliado.findUniqueOrThrow({ where: { id: creado.id } });
   assert.deepEqual([despues.publicado, despues.nombre, despues.borrador, despues.autorizadoPor], [true, "Prueba aliado", null, "Ana"]);
 
-  // Moverlo antes y volverlo: pasa un lugar para arriba, sea quien sea el vecino, y la tira queda como estaba.
-  const lugar = async () => (await todas()).findIndex((a) => a.id === creado.id);
-  const alFinal = await lugar();
+  // Moverlo antes y volverlo: pasa delante del que se creó antes, y vuelve atrás.
   assert.deepEqual(await m.moverAliadoEnBase(m.base, { id: creado.id, hacia: "antes" }), { ok: true, movio: true });
-  assert.equal(await lugar(), alFinal - 1);
+  assert.deepEqual(await orden(), ["creado", "primero"]);
   assert.deepEqual(await m.moverAliadoEnBase(m.base, { id: creado.id, hacia: "despues" }), { ok: true, movio: true });
-  assert.equal(await lugar(), alFinal);
-  assert.deepEqual(await m.moverAliadoEnBase(m.base, { id: creado.id, hacia: "despues" }), { ok: true, movio: false });
+  assert.deepEqual(await orden(), ["primero", "creado"]);
 
   // Quitar la marca lo saca de la tira aunque siga publicado; despublicar y borrar.
   const quitada = await m.autorizarAliadoEnBase(m.base, { id: creado.id, autorizado: false, nota: "", rol: "dirige", quien: "Ana" });
@@ -71,5 +81,5 @@ test("crear, que sin la marca no se publique, que quien edita no la ponga, y el 
   assert.equal((await m.despublicarAliadoEnBase(m.base, { id: creado.id, borradorEnVisto: null })).ok, true);
   const borrado = await m.borrarAliadoEnBase(m.base, { id: creado.id, borradorEnVisto: null });
   assert.deepEqual(borrado, { ok: true, nombre: "Prueba aliado", estabaEnElSitio: false });
-  assert.deepEqual(await tira(), CINCO);
+  assert.equal(await m.base.aliado.count({ where: { id: creado.id } }), 0);
 });

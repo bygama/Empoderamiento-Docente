@@ -68,8 +68,11 @@ test("cada módulo encuentra la foto donde está, y dice si está en el sitio, s
     ],
   );
   // Lo que el sitio muestra del código también es un uso: la foto de Quiénes somos en el Inicio.
-  const delCodigo = usos.get("/fotos/formadoras-pizarra-umce.webp") ?? [];
-  assert.ok(delCodigo.some((u) => u.en === "codigo" && u.donde.startsWith("Inicio › ")), JSON.stringify(delCodigo));
+  // Es «del código» mientras el Inicio no se publicó nunca: se mide en la base, no se supone.
+  const enInicio = (usos.get("/fotos/formadoras-pizarra-umce.webp") ?? []).filter((u) => u.donde.startsWith("Inicio › "));
+  assert.ok(enInicio.length, "la foto de Quiénes somos tiene que aparecer en el Inicio");
+  const inicio = await base.pagina.findUnique({ where: { slug: "inicio" }, select: { publicado: true } });
+  if (!inicio?.publicado) assert.ok(enInicio.every((u) => u.en === "codigo"), JSON.stringify(enInicio));
 });
 
 test("reemplazar cambia la URL en cada módulo y dice qué regenerar", sinBase, async () => {
