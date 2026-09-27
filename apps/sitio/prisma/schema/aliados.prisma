@@ -1,0 +1,47 @@
+// Los aliados con logo (work/casos-aliados-fotos/SPEC.md §5): lo que tenía
+// config/aliados.ts, más el nombre, la URL y la autorización. El molde de
+// Novedades (ADR-0014), con una cosa aparte: la autorización.
+
+/// Un aliado y su logo en la tira del pie, del Inicio y de Qué hacemos.
+///
+/// **Sin `autorizado`, el logo no se publica nunca** (AGENTS.md §5.4): publicar
+/// lo exige, y la consulta del sitio (`aliadosDelSitio`) filtra por esta
+/// columna siempre, también en la vista previa. La marca no va al borrador:
+/// es un hecho sobre ED, no contenido, y la ponen solo quien dirige o
+/// administra (`autorizarAliados`), con la nota de dónde consta.
+///
+/// **La fila tiene dos copias**, como una novedad: lo publicado en columnas,
+/// nulas solo mientras nunca se publicó, y el borrador en un documento. Las
+/// dos se validan con los esquemas de `features/aliados/contenido/aliado.ts`.
+model Aliado {
+  id            String    @id @default(uuid())
+  /// Cómo lo llaman el admin y la actividad: «UCSH».
+  nombre        String?
+  /// { src, alt, foco }: una foto de Fotos. El alt es lo que se lee en la tira.
+  logo          Json?
+  /// chico | mediano | grande: cuánto alto le da la tira (features/aliados/contenido/modelo.ts).
+  tamano        String?
+  /// Su sitio, con https://. Con URL, el logo es un link.
+  url           String?
+  /// El lugar en la tira: de menor a mayor.
+  orden         Int
+  /// El sitio lo muestra (si además está autorizado). Despublicar conserva las columnas.
+  publicado     Boolean   @default(false)
+  publicadoEn   DateTime? @map("publicado_en")
+  /// Quién, en llano. Nulo en los que entraron con la migración.
+  publicadoPor  String?   @map("publicado_por")
+  /// El documento que se edita; nulo es «el borrador es lo publicado».
+  borrador      Json?
+  /// El último guardado, y la marca del aviso de choque.
+  borradorEn    DateTime? @map("borrador_en")
+  borradorPor   String?   @map("borrador_por")
+  autorizado    Boolean   @default(false)
+  /// Dónde consta la autorización: la carta, el mail o la carpeta.
+  autorizacion  String?
+  autorizadoEn  DateTime? @map("autorizado_en")
+  autorizadoPor String?   @map("autorizado_por")
+  creadoEn      DateTime  @default(now()) @map("creado_en")
+  creadoPor     String?   @map("creado_por")
+
+  @@map("aliados")
+}
