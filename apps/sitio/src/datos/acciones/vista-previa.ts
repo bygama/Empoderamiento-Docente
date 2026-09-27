@@ -57,3 +57,24 @@ export async function abrirVistaPreviaDeNovedad(id: string): Promise<{ ok: true;
     return { ok: false, detalle: "No se pudo abrir la vista previa; probá de nuevo en un rato." };
   }
 }
+
+/**
+ * Enciende la vista previa y lleva al catálogo de la Biblioteca, donde cada
+ * material se ve como quedaría al publicarlo (work/biblioteca/). Muestra lo
+ * guardado: la ficha guarda antes de llamar.
+ */
+export async function abrirVistaPreviaDeMaterial(id: string): Promise<{ ok: true; url: string } | { ok: false; detalle: string }> {
+  try {
+    const sesion = await auth.api.getSession({ headers: await headers() });
+    if (!sesion) return { ok: false, detalle: "Hay que entrar al admin para ver la vista previa." };
+    if (!puede(sesion.user.rol, "editarBiblioteca")) return { ok: false, detalle: SIN_PERMISO };
+    const valido = z.uuid().safeParse(id);
+    const fila = valido.success ? await base.material.findUnique({ where: { id: valido.data }, select: { id: true } }) : null;
+    if (!fila) return { ok: false, detalle: "Ese material no existe." };
+    await encenderVistaPrevia();
+    return { ok: true, url: "/biblioteca#materiales" };
+  } catch (e) {
+    console.error("abrirVistaPreviaDeMaterial:", e);
+    return { ok: false, detalle: "No se pudo abrir la vista previa; probá de nuevo en un rato." };
+  }
+}

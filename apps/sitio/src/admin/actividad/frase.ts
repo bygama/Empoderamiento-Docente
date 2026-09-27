@@ -9,6 +9,9 @@ const pagina = (sobre: string | null | undefined) => sobre ?? "una página";
 /** Una novedad por su título, como era en ese momento; sin él, «una novedad». */
 const novedad = (sobre: string | null | undefined) => (sobre ? `«${sobre}»` : "una novedad");
 
+/** Un material por su título, como era en ese momento; sin él, «un material». */
+const material = (sobre: string | null | undefined) => (sobre ? `«${sobre}»` : "un material");
+
 /**
  * Un mensaje de Contacto por su tema, que es lo único que se anota de él
  * («sobre Investigación»); sin tema, «de Contacto».
@@ -57,6 +60,11 @@ const FRASES: Record<TipoDeActividad, (evento: EventoParaLeer) => string> = {
   "borro-una-redireccion": ({ quien, sobre }) => `${quien} borró ${sobre ? `la redirección ${sobre}` : "una redirección"}`,
   "cambio-quien-recibe-un-aviso": ({ quien, sobre }) => `${quien} cambió quién recibe los avisos${sobre ? ` de ${sobre}` : ""}`,
   "cambio-los-plazos-de-guarda": ({ quien, sobre }) => `${quien} cambió los plazos de privacidad${sobre ? `: ${sobre}` : ""}`,
+  "agrego-un-material": ({ quien, sobre }) => `${quien} agregó el material ${material(sobre)}`,
+  "publico-un-material": ({ quien, sobre }) => `${quien} publicó el material ${material(sobre)}`,
+  "oculto-un-material": ({ quien, sobre }) => `${quien} ocultó el material ${material(sobre)}`,
+  "descarto-cambios-de-un-material": ({ quien, sobre }) => `${quien} descartó los cambios del material ${material(sobre)}`,
+  "borro-un-material": ({ quien, sobre }) => `${quien} borró el material ${material(sobre)}`,
 };
 
 /**

@@ -114,3 +114,26 @@
   SciELO, la RMF E y la Fundación Roberto Rocca). Aceptación: `pnpm exec tsx
   --test "src/lib/metadatos/*.test.ts"` → 7 pass, 0 fail; `tsc --noEmit` →
   exit 0.
+
+- **Paso 7 — las acciones de un material.** En `datos/acciones/`:
+  `editar-materiales.ts` (crear —un DOI que ya está no entra—, guardar con el
+  aviso de choque, descartar, borrar), `publicar-materiales.ts` (publicar en
+  una transacción: columnas, autorías reemplazadas, el lugar de destacado
+  soltado y el chequeo borrado si cambió el link; ocultar, que suelta el
+  lugar), `vecinos-de-materiales.ts` (`soltarElLugar`, que solo toca el
+  borrador del otro si pedía ese lugar; `novedadesQueLoAbren`),
+  `materiales-en-base.ts` (errores con las etiquetas de
+  `features/biblioteca/contenido/etiquetas.ts`, `doiOcupado`, `columnasDe`,
+  `autoriasDe`), `indices-de-materiales.ts` (el DOI y el lugar, por nombre de
+  índice) y `revalidar-materiales.ts` (la Biblioteca, el Inicio, la portada
+  generada y las novedades que lo abren). Las Server Actions:
+  `materiales.ts` (crear, guardar, borrar) y `ciclo-de-materiales.ts`
+  (publicar, ocultar, descartar), cada una con la sesión y
+  `editarBiblioteca` primero; `abrirVistaPreviaDeMaterial` en
+  `vista-previa.ts`. Los cinco tipos de actividad con `QUIEN_VE`
+  (`editarBiblioteca`), `VA_AL_INICIO`, su frase y el módulo «Biblioteca» de
+  Cuentas › Actividad. Aceptación: `pnpm exec tsx --test
+  src/datos/acciones/editar-materiales.test.ts` → 3 pass (contra
+  `ed_biblioteca`; los cuatro destacados de los 57 quedan como estaban, visto
+  con `psql`); `acciones-con-sesion`, `actividad`, `frase` y los de Cuentas ›
+  Actividad → 25 pass; `tsc --noEmit` → exit 0.
