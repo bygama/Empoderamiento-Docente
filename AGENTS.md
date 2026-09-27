@@ -661,10 +661,15 @@ Reglas para el admin y sus datos:
 - **Tres roles, dirige, administra y edita**, con sus capacidades en
   `packages/auth/src/permisos.ts`, el único archivo que compara contra el
   string de un rol: todo lo demás pregunta `puede(rol, "…")`. Cada layout de
-  módulo pasa por `<Guarda capacidad>` («Sin permiso» si no la tiene), cada
-  Server Action chequea su capacidad justo después de la sesión, y lo que se
-  hace se anota con `registrarActividad` (`datos/actividad.ts`).
-  `guarda.test.ts` y `acciones-con-sesion.test.ts` fallan si algo se olvida.
+  módulo pasa por `<Guarda capacidad>` («Sin permiso» si no la tiene), pero
+  **esa guarda solo oculta la interfaz**: Next manda la página en el payload
+  igual. Los datos los protege el chequeo donde se leen: cada página de un
+  módulo que deja afuera a algún rol chequea su capacidad antes de leer nada,
+  y las consultas de `datos/` que devuelven algo reservado reciben el rol y
+  sin la capacidad no devuelven nada. Cada Server Action chequea la suya justo
+  después de la sesión, y lo que se hace se anota con `registrarActividad`
+  (`datos/actividad.ts`). `guarda.test.ts` y `acciones-con-sesion.test.ts`
+  fallan si algo se olvida.
 - **Lo que un módulo le suma al Inicio va por registro, nunca tocando su
   pantalla:** una fila de pendientes (con su urgencia y su capacidad), un
   número de la semana o lo nuevo desde tu visita, en `datos/inicio/`; quién

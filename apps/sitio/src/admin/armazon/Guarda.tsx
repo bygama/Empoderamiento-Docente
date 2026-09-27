@@ -9,10 +9,16 @@ import { SinPermiso } from "./SinPermiso";
  * llama con otra). Con la capacidad, dibuja el módulo; sin ella, «Sin
  * permiso».
  *
- * **Es la guarda de la experiencia, no toda la seguridad.** Next no vuelve a
- * correr un layout al navegar entre las páginas que envuelve, así que lo que
- * escribe o lee algo delicado lo verifica otra vez donde pasa: cada Server
- * Action chequea su capacidad (`acciones-con-sesion.test.ts`).
+ * **En un layout, solo oculta la interfaz: no protege ningún dato.** Next
+ * dibuja el layout y la página en paralelo, y la página viaja en el payload
+ * aunque el layout muestre «Sin permiso»; tampoco vuelve a correr el layout al
+ * navegar entre las páginas que envuelve. Lo que protege los datos es el
+ * chequeo donde se leen o se escriben: cada página de un módulo que deja
+ * afuera a algún rol chequea su capacidad antes de leer (`guarda.test.ts`),
+ * las consultas de `datos/` que lo necesitan reciben el rol y no devuelven
+ * nada sin ella, y cada Server Action chequea la suya
+ * (`acciones-con-sesion.test.ts`). Envolviendo lo que lee adentro de una
+ * página, como en Mensajes, sí corta: lo que no se dibuja no se lee.
  */
 export async function Guarda({ capacidad, children }: { capacidad: Capacidad; children: React.ReactNode }) {
   const sesion = await sesionActual();
