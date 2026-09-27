@@ -3,12 +3,12 @@ import { catalogoInicial, esquemaCatalogo } from "@/features/biblioteca/contenid
 import { cierreDeBibliotecaInicial, esquemaCierreDeBiblioteca } from "@/features/biblioteca/contenido/cierre";
 import { destacadosInicial, esquemaDestacados } from "@/features/biblioteca/contenido/destacados";
 import { esquemaHeroBiblioteca, heroBibliotecaInicial } from "@/features/biblioteca/contenido/hero";
+import { esquemaPuente, puenteInicial } from "@/features/biblioteca/contenido/puente";
+import { seoBibliotecaInicial } from "@/features/biblioteca/contenido/seo";
 import { aperturaInicial, esquemaApertura } from "@/features/contacto/contenido/apertura";
 import { cierreDeContactoInicial, esquemaCierreDeContacto } from "@/features/contacto/contenido/cierre";
 import { seoContactoInicial } from "@/features/contacto/contenido/seo";
 import { esquemaTitular, titularInicial } from "@/features/contacto/contenido/titular";
-import { esquemaPuente, puenteInicial } from "@/features/biblioteca/contenido/puente";
-import { seoBibliotecaInicial } from "@/features/biblioteca/contenido/seo";
 import { areasInicial, esquemaAreas } from "@/features/home/contenido/areas";
 import { bibliotecaYNovedadesInicial, esquemaBibliotecaYNovedades } from "@/features/home/contenido/biblioteca-y-novedades";
 import { comoTrabajamosInicial, esquemaComoTrabajamos } from "@/features/home/contenido/como-trabajamos";
