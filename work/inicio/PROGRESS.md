@@ -116,7 +116,39 @@
   de Search Console más corto (DECISIONS). typecheck, lint y react-doctor
   100/100 otra vez; `pendientes.test.ts` 4 pasan.
 
+### Ajuste del padre antes de la revisión
+
+- **La actividad del Inicio, solo con lo que cambia algo** — `eb62f21`
+  (código y test), `c51cacf` (DESIGN.md §11), `311a8a1` (AGENTS.md §12).
+  `VA_AL_INICIO: Record<TipoDeActividad, boolean>` al lado de `QUIEN_VE` y
+  `tiposDelInicio(rol)`; `actividadReciente` consulta con eso y no filtra a
+  mano. Test nuevo contra la base, `datos/inicio/actividad-reciente.test.ts`:
+  un «entró» no aparece y un «publicó» sí, para dirige y para edita. Visto en
+  rojo con `entro: true` («dirige no ve el "entró"») y en verde restaurado.
+
 ## Verification
+
+### 2026-09-26 — M DoD, con el ajuste de la actividad — PASS
+
+Sobre `311a8a1` (más los docs de la lane), encima de `origin/main` en
+`48ed711`, sin cambios desde el rebase.
+
+- L1 static, en limpio: `rm -rf apps/sitio/.next apps/sitio/next-env.d.ts`
+  (los dos ignorados por git) y después `pnpm typecheck` → exit 0 ·
+  `pnpm lint` → exit 0 · `node scripts/verificar-react-doctor.mjs` → exit 0
+  («react-doctor: 100/100, sin diagnósticos», apps/sitio/src 550 archivos ·
+  packages/db/src 3 · packages/auth/src 17).
+- L2 behavioral: `pnpm test` contra `ed` → exit 0: packages/auth 28 pasan,
+  0 fallan; apps/sitio 186, 185 pasan, 0 fallan, 1 saltado (el de antes: las
+  respuestas grabadas de A1). `pnpm build` → exit 0 («Compiled
+  successfully», `ƒ /admin`).
+- L3 end-to-end (navegador de Orca, perfil aislado, `ed_inicio` resembrada
+  con nueve eventos de sesión y tres de páginas): el Inicio de Daniela
+  (dirige) muestra en la actividad solo «Gastón Prueba descartó el borrador
+  de Quiénes somos», «Raquel Ayala publicó Inicio» y «Daniela
+  Reyes-Gasperini restauró una versión de Inicio»; ningún «entró» ni
+  «salió». Captura rehecha: `inicio-dirige-mixto.png` (1568 × 921).
+- Close review: la lanza el padre.
 
 ### 2026-09-26 — M DoD después del rebase — PASS
 

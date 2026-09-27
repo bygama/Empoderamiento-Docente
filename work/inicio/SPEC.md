@@ -50,7 +50,7 @@ pliegue):
 │                                          │ │dos  —    │ │  —       │  │
 │ Actividad reciente   Ver toda la activ.  │ │Todavía no│ │Todavía no│  │
 │ ┌──────────────────────────────────────┐ │ └──────────┘ └──────────┘  │
-│ │ Raquel Ayala entró       hace 2 horas│ │ Los últimos 7 días con     │
+│ │ Raquel Ayala publicó Inicio  hace 2 h│ │ Los últimos 7 días con     │
 │ │ …  (hasta 8)                         │ │ datos, contra los 7 antes. │
 │ └──────────────────────────────────────┘ │                            │
 └──────────────────────────────────────────────────────────────────────┘
@@ -143,6 +143,13 @@ son secundarias, como en «Sin permiso» y Mi cuenta.
 - **Cómo se lee cada tipo** también es un `Record<TipoDeActividad, …>`: un
   tipo nuevo no compila hasta decir quién lo ve y cómo se lee. Es lo que
   obliga al que se mergea segundo (3b, 4a) a sumarlo.
+- **Solo lo que cambia algo** (ajuste del padre después de ver las
+  capturas, DECISIONS): el Inicio muestra publicar, descartar, restaurar y lo
+  que sumen los módulos; entrar, salir y lo que alguien cambia de su propia
+  cuenta no, porque taparían eso, y siguen en Cuentas › Actividad. Es un
+  tercer dato por tipo, `VA_AL_INICIO: Record<TipoDeActividad, boolean>`, al
+  lado de `QUIEN_VE`; la consulta del Inicio no filtra a mano. El texto del
+  vacío queda igual.
 - «Ver toda la actividad» (terciario, solo `usarCuentas`) lleva a
   `/admin/cuentas/actividad`, de la 3b (ver §7, pregunta 1).
 
