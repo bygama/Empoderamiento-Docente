@@ -2,21 +2,12 @@
 
 import { ListaVariable, Seleccion, TextoCorto } from "@ed/kit-admin";
 import { errorDe } from "@/admin/campos/errores";
-import { COLORES, TOPES } from "@/features/quienes-somos/contenido/modelo-del-equipo";
+import { TOPES } from "@/features/quienes-somos/contenido/modelo-del-equipo";
 import type { PropsDelRecorrido } from "./bloques";
+import { colorDe, OPCIONES_DE_COLOR } from "./colores";
 import { categoriaVacia } from "./vacios";
 
 type Categoria = PropsDelRecorrido["recorrido"]["categorias"][number];
-
-/** Los tres acentos, dichos por lo que significan (DESIGN.md: el color es un acento, nunca un fondo). */
-export const OPCIONES_DE_COLOR = [
-  { valor: "verde", etiqueta: "Verde · el aula, los conceptos" },
-  { valor: "azul", etiqueta: "Azul · la investigación" },
-  { valor: "naranja", etiqueta: "Naranja · la transformación (poco)" },
-] as const;
-
-/** El color elegido, con su tipo, o vacío si no es uno de los tres. */
-export const colorDe = (v: string) => COLORES.find((c) => c === v) ?? "";
 
 /**
  * Las categorías del recorrido: el índice vivo que acompaña la lectura de las
