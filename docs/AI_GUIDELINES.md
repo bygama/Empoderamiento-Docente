@@ -295,7 +295,7 @@ diseño en
 
 ## 13. Configuración centralizada
 
-`apps/sitio/src/config/site.ts` exporta la config institucional (forma real):
+`apps/sitio/src/config/site.ts` exporta lo de la marca (forma real):
 
 ```ts
 export const siteConfig = {
@@ -303,16 +303,16 @@ export const siteConfig = {
   shortName: "ED",
   url: "https://empoderamientodocente.org",
   description: "…",
-  contacto: { email: "…", direccion: { ... } },
-  paises: ["Chile", "México", "Argentina", "Colombia", "Brasil"],
-  redes: {} as { instagram?: string; linkedin?: string; facebook?: string },
   mensajesPilares: [ ... ],
 } as const;
 ```
 
-Cualquier valor que aparezca en más de un componente vive acá. No
-hardcodear el mail, la dirección ni los handles de redes en JSX. Los
-handles de redes siguen vacíos hasta tenerlos confirmados — no inventar URLs.
+Los datos de contacto —correo, WhatsApp, dirección, países y redes— se
+editan en Ajustes › Datos del sitio y viven en la base (ADR-0014). Una
+página del sitio los lee con `datosDelSitio()` (`datos/consultas/sitio.ts`)
+y los pasa por props a sus componentes, que nunca los importan. No
+hardcodear el mail, la dirección ni las redes en JSX; una red sin URL no se
+muestra — no inventar URLs.
 
 ---
 

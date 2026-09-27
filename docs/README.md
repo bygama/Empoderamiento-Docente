@@ -59,7 +59,7 @@ el código en una sesión futura, va a un `.md`.**
 | Mensaje canónico, claim, tagline, pilar de marca   | `MESSAGING.md`                     |
 | Cambio en el formato de commits                    | `COMMITS.md`                       |
 | Quirk específico de Claude Code                    | `../CLAUDE.md`                     |
-| Datos institucionales, contacto, redes             | `apps/sitio/src/config/site.ts` (fuente canónica)                       |
+| Datos institucionales, contacto, redes             | Ajustes › Datos del sitio (tabla `datos_del_sitio`, ADR-0014); la marca, en `apps/sitio/src/config/site.ts` |
 
 Si una decisión arquitectónica grande aparece (ej: sumar un backend o
 persistencia, agregar i18n, cambiar de hosting), planteala en conversación
