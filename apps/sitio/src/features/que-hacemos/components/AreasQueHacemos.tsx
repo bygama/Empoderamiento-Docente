@@ -3,10 +3,13 @@
 import { useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import { AREAS } from "@/features/que-hacemos/data/areas";
+import type { AreasDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
+import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { sinMarcas } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
+import { ANCLAS_DE_AREAS, idDeArea } from "./areas/anclas";
 import { IndiceAreas } from "./areas/IndiceAreas";
 import { PanelArea } from "./areas/PanelArea";
 import { crearAterrizaje } from "./areas/coreografia-titulo";
@@ -18,12 +21,14 @@ import { crearAterrizaje } from "./areas/coreografia-titulo";
  * entendía qué hace ED. Esta sección es la respuesta y nada se esconde detrás
  * de una animación. A la izquierda (desktop) un índice que se LLENA a medida
  * que se lee y sirve para saltar; en celular, chips deslizables. El único JS
- * es ese avance: sin él todo se lee igual, marcando la primera área.
+ * es ese avance: sin él todo se lee igual, marcando la primera área. Los
+ * textos y las fotos llegan por props (features/que-hacemos/contenido/areas.ts
+ * o la base); las anclas son estructura (areas/anclas.ts).
  */
 /** Los ids de las anclas, en el orden de la página. */
-const IDS_AREAS = AREAS.map((a) => `area-${a.id}`);
+const IDS_AREAS = ANCLAS_DE_AREAS.map((_, i) => idDeArea(i));
 
-export function AreasQueHacemos() {
+export function AreasQueHacemos({ contenido }: { contenido: AreasDeQueHacemos }) {
   // Misma regla que el índice del borde derecho y que el navbar: la última
   // sección cuya cima ya pasó el 40% de la pantalla. Reusar el hook no es solo
   // ahorrar código —los tres índices marcan siempre lo mismo, que es para lo
@@ -106,7 +111,7 @@ export function AreasQueHacemos() {
               data-areas-caja
               className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col lg:justify-center"
             >
-              <IndiceAreas activa={activa} />
+              <IndiceAreas activa={activa} titulo={contenido.titulo} areas={contenido.areas} />
             </div>
           </div>
 
@@ -118,10 +123,10 @@ export function AreasQueHacemos() {
               se clava al ras y el primer artículo aterriza esos 8rem más
               abajo. */}
           <div data-areas-articulos className="mt-10 lg:mt-0 lg:pt-32">
-            {AREAS.map((a, i) => (
+            {contenido.areas.map((a, i) => (
               <article
-                key={a.id}
-                id={`area-${a.id}`}
+                key={IDS_AREAS[i]}
+                id={IDS_AREAS[i]}
                 data-area={i}
                 // Dos columnas recién desde XL, y en PROPORCIONES.
                 //
@@ -144,29 +149,30 @@ export function AreasQueHacemos() {
                     className="font-display mt-3 text-[1.7rem] font-bold tracking-[-0.02em] md:text-[2.2rem]"
                     style={{ lineHeight: 1.12 }}
                   >
-                    {a.nombre}
+                    {a.titulo}
                   </h3>
                   <p className="text-verde-concepto-texto font-display mt-3 text-[1.1rem] font-semibold md:text-[1.25rem]">
-                    {a.idea}
+                    {a.frase}
                   </p>
                   <p className="text-azul-principal/85 mt-5 max-w-[62ch] font-sans text-[1.02rem] leading-relaxed md:text-[1.1rem]">
-                    {a.queEs}
+                    {sinMarcas(a.detalle)}
                   </p>
 
                   {/* TERCER NIVEL DE LECTURA: el panel separa el detalle sin
                       esconder nada —la sección existe para que no se esconda—,
                       así se lee primero qué es el área. */}
-                  <PanelArea area={a} />
+                  <PanelArea area={a} rotulos={contenido.rotulos} />
                 </div>
 
                 <div className="mt-8 xl:mt-0 xl:h-full">
                   <div className="relative aspect-[16/9] overflow-hidden rounded-[1.5rem] xl:aspect-auto xl:h-full">
                     <Image
-                      src={a.foto}
-                      alt={a.alt}
+                      src={a.foto.src}
+                      alt={a.foto.alt}
                       fill
                       sizes="(min-width: 1280px) 30vw, 100vw"
                       className="object-cover"
+                      style={estiloDeFoco(a.foto.foco)}
                     />
                   </div>
                 </div>

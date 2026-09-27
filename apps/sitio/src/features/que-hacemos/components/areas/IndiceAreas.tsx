@@ -1,4 +1,6 @@
-import { AREAS } from "@/features/que-hacemos/data/areas";
+import type { AreaDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
+import { fragmentos } from "@/lib/contenido/resaltado";
+import { idDeArea } from "./anclas";
 
 /**
  * Clases de un ítem del índice según por dónde va la lectura: el riel se
@@ -24,9 +26,10 @@ function clasesDelItem(recorrido: boolean, activo: boolean) {
  * El título y el índice de las áreas: al costado en desktop, chips
  * deslizables en celular. Los `data-areas-*` son los que mueve la
  * coreografía del aterrizaje (coreografia-titulo.ts); sin ella todo se ve
- * en su lugar.
+ * en su lugar. El `nav` se nombra con el título (`aria-labelledby`): si
+ * alguien lo edita, el nombre lo sigue.
  */
-export function IndiceAreas({ activa }: { activa: number }) {
+export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo: string; areas: readonly AreaDeQueHacemos[] }) {
   return (
     <>
       {/* El titular volvió el 2026-09-11 (el usuario: «falta el título a
@@ -43,13 +46,22 @@ export function IndiceAreas({ activa }: { activa: number }) {
           bajada no vuelve. Desde el 2026-09-16 además ATERRIZA: entra
           grande en el centro y se encoge hasta acá (el mismo elemento). */}
       <h2
+        id="areas-titulo"
         data-areas-titulo
         className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance lg:text-[1.5rem]"
         style={{ lineHeight: 1.2 }}
       >
-        Áreas de <span className="text-azul-medio">especialización</span>
+        {fragmentos(titulo).map((f) =>
+          f.resaltado ? (
+            <span key={f.texto} className="text-azul-medio">
+              {f.texto}
+            </span>
+          ) : (
+            f.texto
+          ),
+        )}
       </h2>
-      <nav aria-label="Áreas de especialización" className="mt-5 lg:mt-6 lg:w-full">
+      <nav aria-labelledby="areas-titulo" className="mt-5 lg:mt-6 lg:w-full">
         <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:relative lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
           {/* El riel que se dibuja de un trazo mientras el título aterriza,
               debajo de los bordes de los ítems (que lo pintan de verde o
@@ -59,13 +71,13 @@ export function IndiceAreas({ activa }: { activa: number }) {
             data-areas-riel
             className="bg-azul-principal/10 pointer-events-none absolute inset-y-0 left-0 hidden w-0.5 lg:block"
           />
-          {AREAS.map((a, i) => {
+          {areas.map((a, i) => {
             const activo = i === activa;
             const recorrido = i <= activa;
             return (
-              <li key={a.id} data-areas-item className="shrink-0">
+              <li key={idDeArea(i)} data-areas-item className="shrink-0">
                 <a
-                  href={`#area-${a.id}`}
+                  href={`#${idDeArea(i)}`}
                   aria-current={activo ? "true" : undefined}
                   className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
                 >
@@ -74,9 +86,9 @@ export function IndiceAreas({ activa }: { activa: number }) {
                   >
                     0{i + 1}
                   </span>
-                  {/* El indice usa el rotulo corto cuando existe; el
-                      articulo sigue con el nombre completo del cartel. */}
-                  <span>{a.nombreCorto ?? a.nombre}</span>
+                  {/* El índice usa el nombre corto; el artículo sigue con
+                      el nombre completo del cartel. */}
+                  <span>{a.nombreCorto}</span>
                 </a>
               </li>
             );
