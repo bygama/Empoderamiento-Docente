@@ -1,68 +1,31 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
-import { ArrowUpRight, Search } from "@/components/ui/icons";
 import { getLenis } from "@/lib/lenis";
 import { EVENTO_URL } from "@/lib/navegar";
+import { MATERIALES } from "../data/materiales";
+import { FilaMaterial } from "./materiales-listado/FilaMaterial";
+import { FiltrosCatalogo } from "./materiales-listado/FiltrosCatalogo";
 import {
-  accionDe,
-  ANIOS,
-  MATERIALES,
-  PUBLICOS,
-  TIPOS,
-  type Material,
-} from "../data/materiales";
-
-/** Búsqueda tolerante a tildes y mayúsculas ("evaluacion" matchea "Evaluación"). */
-const normalizar = (s: string) =>
-  s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-type Filtros = {
-  tipo: string | null;
-  publico: string | null;
-  anio: number | null;
-};
-
-const SIN_FILTROS: Filtros = { tipo: null, publico: null, anio: null };
+  escribirTipoEnUrl,
+  normalizar,
+  SIN_FILTROS,
+  tipoDeUrl,
+  type Filtros,
+} from "./materiales-listado/filtros";
 
 /** Filas que se muestran de entrada y que suma cada «Ver más». */
 const PASO = 8;
 
-/** `?tipo=` de la URL, si es un tipo real del catálogo. */
-function tipoDeUrl(): string | null {
-  const t = new URLSearchParams(window.location.search).get("tipo");
-  return t && (TIPOS as readonly string[]).includes(t) ? t : null;
-}
-
-/** Escribe (o borra) `?tipo=` sin tocar el historial ni el hash. */
-function escribirTipoEnUrl(tipo: string | null) {
-  const qs = new URLSearchParams(window.location.search);
-  if (tipo) qs.set("tipo", tipo);
-  else qs.delete("tipo");
-  const q = qs.toString();
-  window.history.replaceState(
-    window.history.state,
-    "",
-    `${window.location.pathname}${q ? `?${q}` : ""}${window.location.hash}`,
-  );
-}
-
 /**
  * Listado de recursos (#materiales, sitemap: "Buscador + filtros · Listado").
- * Arquitectura de la referencia: sidebar de filtros a la izquierda —
- * buscador arriba y grupos de píldoras (tipo, público, año) — STICKY en
- * desktop, así solo la columna de resultados acompaña el scroll. El sidebar
- * tiene que entrar completo en un viewport de laptop (~800px): por eso el
- * tema NO tiene grupo propio (se pisaba con tipo y era el grupo más alto);
- * sigue visible como chip en cada fila y la búsqueda lo matchea. A la
- * derecha, filas separadas por hairlines: portada fotográfica (placeholder
- * con fotos del hero hasta tener las reales), chips de tipo + tema, título,
- * descripción, metadata en mono y el link de acción en naranja (única
- * acción por fila, DESIGN §1).
+ * Arquitectura de la referencia: sidebar de filtros a la izquierda
+ * (materiales-listado/FiltrosCatalogo.tsx), STICKY en desktop, así solo la
+ * columna de resultados acompaña el scroll. A la derecha, filas separadas
+ * por hairlines (materiales-listado/FilaMaterial.tsx): portada fotográfica
+ * (placeholder con fotos del hero hasta tener las reales), chips de tipo +
+ * tema, título, descripción, metadata en mono y el link de acción en naranja
+ * (única acción por fila, DESIGN §1).
  *
  * Filtros y búsqueda operan de verdad sobre el catálogo: un valor por grupo
  * (como la referencia), "Todos" lo destilda. Sin animación de entrada — es
@@ -181,63 +144,14 @@ export function MaterialesListado() {
       <div className="mx-auto max-w-screen-xl px-5 md:px-10">
         <div className="grid gap-y-10 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-x-14">
           {/* ── Sidebar: buscador + filtros (sticky en desktop) ─────────── */}
-          <aside
-            aria-label="Buscador y filtros del catálogo"
-            className="lg:sticky lg:top-28 lg:self-start"
-          >
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="font-display text-h3 text-azul-principal font-bold tracking-[-0.01em]">
-                Filtros
-              </h2>
-              {hayFiltros && (
-                <button
-                  type="button"
-                  onClick={limpiar}
-                  className="text-gris-texto hover:text-azul-principal font-sans text-[0.83rem] underline underline-offset-4 transition-colors"
-                >
-                  Limpiar todo
-                </button>
-              )}
-            </div>
-
-            <div className="border-azul-principal/15 focus-within:border-azul-medio focus-within:ring-azul-claro/60 mt-5 flex items-center gap-2.5 rounded-lg border bg-white px-3.5 transition-colors focus-within:ring-2">
-              <span className="text-gris-texto shrink-0">
-                <Search size={18} />
-              </span>
-              <label htmlFor="materiales-buscar" className="sr-only">
-                Buscar en el catálogo
-              </label>
-              <input
-                id="materiales-buscar"
-                type="search"
-                value={busqueda}
-                onChange={(e) => buscar(e.target.value)}
-                placeholder="Buscá por título, tema o autora…"
-                className="text-azul-principal placeholder:text-gris-texto h-11 min-w-0 flex-1 bg-transparent font-sans text-[0.95rem] outline-none"
-              />
-            </div>
-
-            <FiltroGrupo
-              label="Tipo de material"
-              opciones={TIPOS}
-              valor={filtros.tipo}
-              onChange={(tipo) => cambiarFiltro({ tipo })}
-            />
-            <FiltroGrupo
-              label="Público"
-              opciones={PUBLICOS}
-              valor={filtros.publico}
-              onChange={(publico) => cambiarFiltro({ publico })}
-            />
-            <FiltroGrupo
-              label="Año"
-              opciones={ANIOS.map(String)}
-              valor={filtros.anio === null ? null : String(filtros.anio)}
-              onChange={(anio) =>
-                cambiarFiltro({ anio: anio === null ? null : Number(anio) })
-              }
-            />
-          </aside>
+          <FiltrosCatalogo
+            busqueda={busqueda}
+            filtros={filtros}
+            hayFiltros={hayFiltros}
+            onBuscar={buscar}
+            onCambiar={cambiarFiltro}
+            onLimpiar={limpiar}
+          />
 
           {/* ── Resultados ──────────────────────────────────────────────── */}
           <div>
@@ -307,124 +221,5 @@ export function MaterialesListado() {
         </div>
       </div>
     </section>
-  );
-}
-
-/**
- * Grupo de filtros de un solo valor: "Todos" + una píldora por opción.
- * Tocar la opción activa la destilda (vuelve a "Todos").
- */
-function FiltroGrupo({
-  label,
-  opciones,
-  valor,
-  onChange,
-}: {
-  label: string;
-  opciones: readonly string[];
-  valor: string | null;
-  onChange: (valor: string | null) => void;
-}) {
-  return (
-    <fieldset className="mt-8">
-      <legend className="text-gris-texto font-mono text-[0.7rem] tracking-[0.12em] uppercase">
-        {label}
-      </legend>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Pildora activa={valor === null} onClick={() => onChange(null)}>
-          Todos
-        </Pildora>
-        {opciones.map((opcion) => (
-          <Pildora
-            key={opcion}
-            activa={valor === opcion}
-            onClick={() => onChange(valor === opcion ? null : opcion)}
-          >
-            {opcion}
-          </Pildora>
-        ))}
-      </div>
-    </fieldset>
-  );
-}
-
-function Pildora({
-  activa,
-  onClick,
-  children,
-}: {
-  activa: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={activa}
-      onClick={onClick}
-      className={`rounded-lg border px-3 py-1.5 font-sans text-[0.82rem] font-medium transition-colors ${
-        activa
-          ? "border-azul-principal bg-azul-principal text-white"
-          : "border-azul-principal/15 text-azul-principal hover:bg-azul-claro/30 bg-white"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function FilaMaterial({ material: m }: { material: Material }) {
-  return (
-    <article className="grid gap-5 py-7 md:grid-cols-[218px_minmax(0,1fr)] md:gap-8 md:py-8">
-      {/* Portada: cualquier foto que el equipo cargue (mock: fotos del hero) */}
-      <div className="bg-azul-claro/30 relative aspect-[16/9] overflow-hidden rounded-xl md:aspect-[4/3]">
-        <Image
-          src={m.portada}
-          alt=""
-          fill
-          sizes="(min-width: 768px) 218px, 100vw"
-          className="object-cover"
-        />
-      </div>
-
-      <div className="flex min-w-0 flex-col">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="bg-azul-principal rounded-md px-2.5 py-1 font-sans text-[0.72rem] font-medium text-white">
-            {m.tipo}
-          </span>
-          <span className="bg-gris-fondo text-azul-principal rounded-md px-2.5 py-1 font-sans text-[0.72rem] font-medium">
-            {m.tema}
-          </span>
-        </div>
-
-        <h3 className="font-display text-azul-principal mt-3 text-[1.3rem] leading-snug font-bold tracking-[-0.01em]">
-          {m.titulo}
-        </h3>
-        <p className="text-azul-principal/70 mt-1.5 font-sans text-[0.9rem] leading-snug">
-          {m.autores}
-        </p>
-        <p className="text-gris-texto mt-2 max-w-[68ch] font-sans text-[0.97rem] leading-relaxed">
-          {m.descripcion}
-        </p>
-
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-5">
-          <p className="text-gris-texto font-mono text-[0.72rem] tracking-[0.08em] uppercase">
-            {m.fecha} · {m.paginas ? `${m.paginas} páginas` : m.formato}
-          </p>
-          {/* Se abre en otra pestaña: la revista, la editorial o el PDF. */}
-          <a
-            href={m.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-naranja-accion group inline-flex items-center gap-1.5 font-sans text-[0.92rem] font-medium"
-          >
-            {accionDe(m)}
-            <span className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
-              <ArrowUpRight size={17} />
-            </span>
-          </a>
-        </div>
-      </div>
-    </article>
   );
 }
