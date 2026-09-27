@@ -4,6 +4,7 @@ import { esquemaNovedad } from "@/features/novedades/contenido/novedad";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { falloPorIndice } from "./indices-de-novedades";
 import { borradorSinTapa, columnasDe, materialQueNoEsta, problemasDeNovedad, tituloDe } from "./novedades-en-base";
+import { redirigir } from "./redirigir";
 
 // Publicar y despublicar una novedad (SPEC §5.3 de `work/novedades-y-kit/`),
 // con el cliente inyectado como editar-novedades.ts. Publicar copia el
@@ -26,16 +27,6 @@ async function soltarLaDestacada(tx: Prisma.TransactionClient, id: string): Prom
   return enElSitio ? tituloDe(enElSitio) : null;
 }
 
-/** El 308 del slug viejo al nuevo, sin cadenas: lo que llevaba al viejo pasa a llevar al nuevo, y nada sale del nuevo. */
-async function redirigir(tx: Prisma.TransactionClient, viejo: string | null, nuevo: string) {
-  const hacia = `/novedades/${nuevo}`;
-  if (viejo && viejo !== nuevo) {
-    const desde = `/novedades/${viejo}`;
-    await tx.redireccion.updateMany({ where: { hacia: desde }, data: { hacia } });
-    await tx.redireccion.upsert({ where: { desde }, create: { desde, hacia }, update: { hacia } });
-  }
-  await tx.redireccion.deleteMany({ where: { desde: hacia } });
-}
 
 export async function publicarNovedadEnBase(
   base: PrismaClient,
@@ -56,7 +47,7 @@ export async function publicarNovedadEnBase(
   try {
     const exDestacada = await base.$transaction(async (tx) => {
       const ex = n.destacada ? await soltarLaDestacada(tx, id) : null;
-      await redirigir(tx, fila.publicadaEn ? fila.slug : null, n.slug);
+      await redirigir(tx, fila.publicadaEn && fila.slug ? `/novedades/${fila.slug}` : null, `/novedades/${n.slug}`);
       // La condición sobre `borradorEn` hace que un guardado que se cuele en el medio no se publique sin haberse visto.
       const { count } = await tx.novedad.updateMany({
         where: { id, borradorEn: fila.borradorEn },

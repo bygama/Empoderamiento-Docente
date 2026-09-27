@@ -170,5 +170,22 @@
   subida…» y prende «Cambios sin guardar»; elegir la original lo apaga (no se
   guardó nada). `pnpm typecheck` 0, `pnpm lint` 0,
   `node scripts/verificar-react-doctor.mjs` → 100/100 (kit en 22 archivos).
+  Commit `3e0fbab1`; rama pusheada (el pre-push dio «Todo en verde»).
+- **Paso 14 — casos: guardar, publicar y descartar**:
+  `features/investigacion/contenido/etiquetas-de-casos.ts` (cómo se llama
+  cada campo, para errores, formulario y «Qué cambió»);
+  `datos/acciones/casos-en-base.ts` (errores en el campo, URL de otro caso,
+  columnas, la ruta de la ficha), `editar-casos.ts` (guardar con choque,
+  descartar), `publicar-casos.ts` (valida entero, copia a columnas y escribe
+  el 308 de `/investigacion/casos/<viejo>` en la transacción); el 308 sin
+  cadenas pasa a `datos/acciones/redirigir.ts`, que ahora usan Novedades y
+  los casos; las acciones en `casos.ts` (sesión, `editarContenido`, revalidan
+  `/investigacion` y anotan publicó y descartó) y `abrirVistaPreviaDeCaso` en
+  `vista-previa.ts` (`/investigacion#<slug>`). `editar-casos.test.ts` (sobre
+  el caso 04, que queda como estaba: a medias se guarda y no se publica, la
+  URL del 01 frena, el choque, publicar con otra URL deja el 308, sin
+  borrador «ya está publicado así», descartar) + `acciones-con-sesion` +
+  `publicar-novedades` → 21 pass, 0 fail, 0 skipped; typecheck 0; después:
+  el caso 04 con su slug y sin borrador, cero redirecciones.
 
 ## Abierto
