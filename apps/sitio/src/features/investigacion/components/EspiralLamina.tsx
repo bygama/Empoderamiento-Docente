@@ -1,10 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
-import { Highlight } from "@/components/ui/Highlight";
+import type { Ciclo } from "@/features/investigacion/contenido/ciclo";
+import { ConResaltado } from "./ConResaltado";
 import { EspiralSvg } from "./EspiralSvg";
-import { REMATE_TEXTO, VUELTA_1, VUELTA_2, type Estacion } from "./estaciones";
 import { ANOTACIONES, INDICE_REMATE, posicionAnotacion, type Lado } from "./lamina-espiral";
-
-const ESTACIONES_EN_ORDEN: ReadonlyArray<Estacion> = [...VUELTA_1, ...VUELTA_2];
 
 /**
  * La caja de cada anotación se cuelga del ancla (donde termina la guía)
@@ -61,25 +59,20 @@ const TIPO = {
   titulo: { fontSize: "clamp(1.9rem, 0.9rem + 2.2vw, 3rem)", lineHeight: 1.06 } satisfies CSSProperties,
 } as const;
 
-/** El texto con su frase clave marcada: el subrayado verde es un span
- *  aparte para poder dibujarlo con scaleX (el `Highlight` de los títulos
- *  usa text-decoration, que no se anima con transform). */
-function ConClave({ texto, clave }: { texto: string; clave: string }) {
-  const i = texto.indexOf(clave);
-  if (i < 0) return <>{texto}</>;
+/** La frase clave de la versión breve (entre dobles asteriscos), marcada: el
+ *  subrayado verde es un span aparte para poder dibujarlo con scaleX (el
+ *  `Highlight` de los títulos usa text-decoration, que no se anima con
+ *  transform). */
+function conSubrayado(clave: string) {
   return (
-    <>
-      {texto.slice(0, i)}
-      <mark className="text-azul-principal relative bg-transparent font-medium whitespace-nowrap">
-        {clave}
-        <span
-          data-anot-subrayado
-          aria-hidden="true"
-          className="bg-verde-concepto absolute inset-x-0 -bottom-[0.1em] h-[0.12em]"
-        />
-      </mark>
-      {texto.slice(i + clave.length)}
-    </>
+    <mark className="text-azul-principal relative bg-transparent font-medium whitespace-nowrap">
+      {clave}
+      <span
+        data-anot-subrayado
+        aria-hidden="true"
+        className="bg-verde-concepto absolute inset-x-0 -bottom-[0.1em] h-[0.12em]"
+      />
+    </mark>
   );
 }
 
@@ -113,9 +106,11 @@ function Anotacion({ indice, children }: { indice: number; children: ReactNode }
  * (título, nota de la bisagra, «Implementar no es terminar»); Facundo
  * (2026-09-12) pidió que al empezar el recorrido vuelen todos los títulos
  * y la figura quede sola con sus anotaciones. Todo lo que se mueve lo
- * mueve coreografia-espiral.ts.
+ * mueve coreografia-espiral.ts. Los textos llegan por props: cada estación
+ * con su versión breve, que es la que entra en su caja.
  */
-export function EspiralLamina() {
+export function EspiralLamina({ contenido }: { contenido: Ciclo }) {
+  const estaciones = [...contenido.pedagogico, ...contenido.evidencia];
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center">
       {/* El rincón narrador. */}
@@ -125,7 +120,7 @@ export function EspiralLamina() {
           className="font-display absolute inset-x-0 top-0 max-w-[18ch] font-extrabold tracking-[-0.025em]"
           style={TIPO.titulo}
         >
-          Cómo una <Highlight>experiencia</Highlight> se convierte en transformación.
+          <ConResaltado texto={contenido.titulo} />
         </h2>
       </div>
 
@@ -143,19 +138,19 @@ export function EspiralLamina() {
         style={{ height: "clamp(340px, 54svh, 560px)" }}
       >
         <EspiralSvg lamina />
-        {ESTACIONES_EN_ORDEN.map((e, i) => (
+        {estaciones.map((e, i) => (
           <Anotacion key={e.nombre} indice={i}>
             <h3 data-anot-nombre className="font-display font-bold tracking-[-0.01em]" style={TIPO.nombre}>
               {e.nombre}
             </h3>
             <p data-anot-texto className="text-azul-principal/80 mt-2.5" style={TIPO.texto}>
-              <ConClave texto={e.breve} clave={e.clave} />
+              <ConResaltado texto={e.breve} resaltar={conSubrayado} />
             </p>
           </Anotacion>
         ))}
         <Anotacion indice={INDICE_REMATE}>
           <p data-anot-texto className="font-display font-medium" style={TIPO.remate}>
-            {REMATE_TEXTO}
+            {contenido.remate}
           </p>
         </Anotacion>
         {/* Ancla interna: Volvemos a investigar vive en la segunda vuelta. */}

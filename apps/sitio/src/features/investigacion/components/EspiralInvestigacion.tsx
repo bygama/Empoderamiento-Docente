@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import type { Ciclo } from "@/features/investigacion/contenido/ciclo";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { crearEspiral } from "./coreografia-espiral";
@@ -29,12 +30,13 @@ import { EspiralLamina } from "./EspiralLamina";
  * el remate: la evidencia vuelve al proceso. Hoja 03 del archivo,
  * sobre el mismo papel que el hero. Escena en EspiralLamina.tsx,
  * coreografía en coreografia-espiral.ts, geometría de la lámina en
- * lamina-espiral.ts, copy en estaciones.ts.
+ * lamina-espiral.ts; el copy llega por props (de
+ * `features/investigacion/contenido/ciclo.ts` o de la base).
  *
  * `#evidencia` es un ancla interna que salta a la bisagra.
  * Touch / reduced-motion: EspiralEstatica (que es también lo que dibuja el SSR).
  */
-export function EspiralInvestigacion() {
+export function EspiralInvestigacion({ contenido }: { contenido: Ciclo }) {
   const zonaRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
@@ -96,7 +98,7 @@ export function EspiralInvestigacion() {
             Archivo ED · Hoja 03 · Ciclo de investigación aplicada
           </span>
 
-          {live ? <EspiralLamina /> : <EspiralEstatica />}
+          {live ? <EspiralLamina contenido={contenido} /> : <EspiralEstatica contenido={contenido} />}
         </div>
       </div>
     </section>

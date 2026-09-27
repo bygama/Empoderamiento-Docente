@@ -27,6 +27,9 @@ const MUESTRAS_POR_PASO = 24;
 
 export const ESTACIONES = 8;
 
+/** El rótulo de una estación: «01» … «08». */
+export const numero = (i: number) => String(i + 1).padStart(2, "0");
+
 const radio = (theta: number) => RADIO_0 + RADIO_PASO * (theta / PASO);
 
 function punto(theta: number): readonly [number, number] {

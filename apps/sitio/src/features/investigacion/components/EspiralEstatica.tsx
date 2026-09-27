@@ -1,14 +1,8 @@
-import { Highlight } from "@/components/ui/Highlight";
+import type { Ciclo, Estacion } from "@/features/investigacion/contenido/ciclo";
 import { ROTULO_MICRO } from "../casos/tintes";
+import { ConResaltado } from "./ConResaltado";
+import { numero } from "./espiral";
 import { EspiralSvg } from "./EspiralSvg";
-import {
-  BISAGRA_TEXTO,
-  REMATE_TEXTO,
-  VUELTA_1,
-  VUELTA_2,
-  numero,
-  type Estacion,
-} from "./estaciones";
 
 function Bloque({ numeroTexto, nombre, texto, destacado }: Estacion & { numeroTexto: string }) {
   return (
@@ -32,9 +26,11 @@ function Bloque({ numeroTexto, nombre, texto, destacado }: Estacion & { numeroTe
 /**
  * La espiral sin coreografía: touch, reduced-motion y el SSR. Las dos
  * listas en flujo, con la espiral formada a un costado. `#evidencia` es el
- * ancla de la segunda vuelta.
+ * ancla de la segunda vuelta. Es la que muestra el texto completo de cada
+ * estación, la bisagra y el título de la evidencia.
  */
-export function EspiralEstatica() {
+export function EspiralEstatica({ contenido }: { contenido: Ciclo }) {
+  const { pedagogico, evidencia } = contenido;
   return (
     <div className="relative z-10 mx-auto grid w-full max-w-screen-xl gap-x-16 gap-y-12 px-6 py-20 md:px-12 lg:grid-cols-[0.9fr_1.1fr]">
       <div className="mx-auto w-full max-w-[420px] lg:sticky lg:top-24 lg:self-start">
@@ -43,29 +39,28 @@ export function EspiralEstatica() {
       <div className="space-y-16">
         <div>
           <h2 className="font-display max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
-            Cómo una <Highlight>experiencia</Highlight> se convierte en
-            transformación.
+            <ConResaltado texto={contenido.titulo} />
           </h2>
           <ol className="mt-8 space-y-8">
-            {VUELTA_1.map((e, i) => (
+            {pedagogico.map((e, i) => (
               <li key={e.nombre}>
                 <Bloque {...e} numeroTexto={numero(i)} />
               </li>
             ))}
           </ol>
           <p className="font-display mt-8 max-w-[34ch] text-[1.25rem] leading-[1.4] font-medium">
-            {BISAGRA_TEXTO}
+            {contenido.bisagra}
           </p>
         </div>
         <div id="evidencia">
           <h2 className="font-display max-w-[18ch] text-h2 font-extrabold tracking-[-0.02em]">
-            Implementar no es <Highlight>terminar</Highlight>.
+            <ConResaltado texto={contenido.tituloEvidencia} />
           </h2>
-          <p className="mt-5 max-w-[42ch] text-body">{REMATE_TEXTO}</p>
+          <p className="mt-5 max-w-[42ch] text-body">{contenido.remate}</p>
           <ol className="mt-8 space-y-8">
-            {VUELTA_2.map((e, i) => (
+            {evidencia.map((e, i) => (
               <li key={e.nombre}>
-                <Bloque {...e} numeroTexto={numero(i + VUELTA_1.length)} />
+                <Bloque {...e} numeroTexto={numero(i + pedagogico.length)} />
               </li>
             ))}
           </ol>
