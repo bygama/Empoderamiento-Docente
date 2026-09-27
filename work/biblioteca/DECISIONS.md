@@ -41,3 +41,16 @@
   3026 lo tiene un `next start` de la lane hermana `ajustes` (su worktree,
   visto con `Get-NetTCPConnection`), que no es mío para cortarlo. El 3046
   estaba libre; `NEXT_PUBLIC_SITE_URL` apunta a él.
+- 2026-09-27 — **El ADR es el 0016, no el 0015** (paso 15): la lane hermana
+  `ajustes` ya tomó el 0015 en su rama (`origin/mateo/ajustes`, «Llevar a la
+  base lo que Ajustes edita»), con su PR abierto. SPEC §14 y PLAN paso 15 dicen
+  0015 porque se escribieron antes; el código (`lib/red/`) y los docs dicen
+  0016. Si al mergear el orden cambia, el número se corre en un solo lugar
+  (el índice) y en tres comentarios.
+- 2026-09-27 — **DESIGN.md §7 suma «Acción de texto» y «Portada tipográfica
+  de un material»** (paso 15): son del sitio, no del admin, así que no van en
+  §11. La portada lleva tres colores que no son tokens (`#14203A`, `#177B60`,
+  `#3D4A63`): salen de las 57 portadas que ya existían y la generada los copia.
+  La firma en blanco al 72 % da 2,56:1 sobre `verde-concepto`; es decorativa
+  (`alt=""`, la fila repite el texto) y se deja como en las de hoy — queda
+  anotado para Mateo.

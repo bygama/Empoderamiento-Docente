@@ -4,7 +4,7 @@ import { ipQueNoSePide } from "./ip";
 
 // A dónde se puede pedir algo que eligió una persona, y cómo se resuelve su
 // nombre sin que un DNS lo desvíe a la red interna (SPEC §11 de
-// `work/biblioteca/`, ADR-0015). Sin ED.
+// `work/biblioteca/`, ADR-0016). Sin ED.
 
 export type Direccion = { address: string; family: number };
 /** Cómo se resuelve un nombre: todas sus direcciones. Se inyecta en los tests. */

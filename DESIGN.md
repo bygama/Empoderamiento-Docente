@@ -215,6 +215,51 @@ del manual:
 
 Reservar para una palabra por titular, no abusar.
 
+### Acción de texto
+
+Una acción que no es la de la fila ni la de la sección: «Limpiar todo» en los
+filtros de la Biblioteca y «Copiar cita APA» en cada material (2026-09-27,
+`work/biblioteca/`).
+
+- Texto `gris-texto` subrayado (`underline-offset-4`), Inter a `0.83rem`;
+  hover `azul-principal`; foco con el anillo `verde-concepto`. Da 4,83:1 sobre
+  blanco.
+- **No es naranja**: el naranja es la acción de la fila («Leer en…»), y dos
+  naranjas compiten (§1, regla 2).
+- Lo que pasó se anuncia en un `role="status"` aparte («Cita copiada» en el
+  botón, la frase entera para el lector de pantalla). Si el navegador no deja
+  copiar, la cita aparece debajo, seleccionable.
+
+### Portada tipográfica de un material
+
+Las 57 portadas de la Biblioteca son piezas tipográficas de 900 × 900: el
+color del tipo, «TIPO · FUENTE · AÑO» arriba, el título en Manrope, los
+autores y «Empoderamiento Docente». Un material sin portada propia muestra la
+misma pieza, generada con `next/og` (`features/biblioteca/portada/`,
+2026-09-27, `work/biblioteca/`). `next/og` no lee los tokens de `globals.css`:
+los colores van en hex en ese archivo, como en la imagen para redes de
+Novedades.
+
+| Tipo | Fondo | Raya |
+| --- | --- | --- |
+| Artículos | `azul-principal` | `verde-concepto` |
+| Capítulos de libro | `azul-medio` | `azul-claro` |
+| Libros | `verde-concepto` | `azul-claro` |
+| Tesis | `#14203A` | `verde-concepto` |
+| Actas de congreso | `gris-fondo` | `verde-concepto` |
+| Divulgación | `#177B60` | `azul-claro` |
+| Materiales | `azul-claro` | `azul-principal` |
+
+- `#14203A`, `#177B60` y el `#3D4A63` de la firma sobre fondo claro **no son
+  tokens**: salen de las portadas que ya existían, y la generada las copia
+  para que no se note cuál es cuál.
+- La portada es **decorativa** (`alt=""`): la fila repite el título y los
+  autores en texto. Igual, medido: el título blanco da 3,53:1 sobre
+  `verde-concepto` y más de 5:1 sobre los demás fondos oscuros; la firma, en
+  blanco al 72 %, da 2,56:1 sobre `verde-concepto` y 3,5:1 sobre `azul-medio`
+  y `#177B60`. Sobre los claros, el título da 12,37:1 (`gris-fondo`) y
+  7,68:1 (`azul-claro`).
+
 ---
 
 ## 8. Mapeo a Tailwind

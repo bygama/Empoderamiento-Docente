@@ -127,7 +127,8 @@ mientras tanto no va al sitemap.
 
 **Tres decisiones:**
 
-- **Los 63 materiales no llevan ficha propia.** Cada uno ya tiene su URL
+- **Los 57 materiales no llevan ficha propia** (acá decía 63; el archivo que
+  migró la lane `work/biblioteca/` tenía 57). Cada uno ya tiene su URL
   canónica en la revista o editorial que lo publicó. Una ficha nuestra sería
   contenido delgado y duplicado. Los 4 casos y los 15 perfiles sí la llevan:
   son originales de ED y no existen en ningún otro lado.
@@ -154,8 +155,9 @@ Siete entidades, más las páginas y los ajustes:
 | Tabla | Qué guarda | Origen hoy |
 | --- | --- | --- |
 | `fotos` | imagen, alt obligatorio, punto focal | `public/**` |
-| `novedades` | slug, fecha, categoría, título, bajada, imagen, destacada, cuerpo, publicación, imagen para redes | la migración `novedades` (era `features/novedades/data/novedades.ts`, borrado) |
-| `materiales` | título, autores, tipo, tema, público, año, formato, portada, URL | `features/biblioteca/data/materiales.ts` |
+| `novedades` | slug, fecha, categoría, título, bajada, imagen, destacada, cuerpo, el material que abre (`material_id`), imagen para redes | la migración `novedades` (era `features/novedades/data/novedades.ts`, borrado); `material_id`, de la migración `material_de_las_novedades` |
+| `materiales` | título, autores (solo la firma que no es una lista), descripción, tipo, tema, público, fecha, formato, páginas, portada, URL, fuente, DOI, cita, lugar de destacado y sus textos, el último chequeo del link | la migración `biblioteca` (era `features/biblioteca/data/materiales.ts`, borrado) |
+| `autorias` | quién firma cada material publicado, en orden, y el perfil del equipo si es de ED | la migración `biblioteca` |
 | `casos` | número, pregunta, eje, indicio, ficha, contexto, evidencias, análisis | `features/investigacion/data/casos.ts` |
 | `equipo` | perfil: nombre, rol, lugar, etapas con hitos y publicaciones | `features/quienes-somos/data/equipo.ts` |
 | `aliados` | nombre, logo, URL, **autorizado** (sin marcar no se publica: §5.4) | `config/aliados.ts` |
@@ -216,6 +218,17 @@ columnas), descartar cambios y borrar. Publicar con otra URL deja el 308 de
 la vieja en `redirecciones`, sin cadenas, y el sitio lo lee antes del 404.
 Novedades es la primera; materiales, casos, equipo y aliados copian el molde
 con sus columnas.
+
+**Materiales** (2026-09-27, `work/biblioteca/`,
+[ADR-0016](../adrs/0016-agregar-por-doi-y-salud-de-links.md)) copian el molde
+con dos agregados. Quién firma va en `autorias`, una fila por autor con su
+orden y, si es de ED, la clave de su perfil (texto hasta que exista la tabla
+del equipo): así «los materiales de tal persona» es una consulta. Y lo que se
+puede generar con los datos no se guarda: sin `autores`, la firma une las
+autorías; sin `cita`, la cita APA se arma con los datos de hoy; sin
+`portada`, el sitio muestra la tipográfica generada. El DOI es único y cada
+uno de los cuatro lugares de destacado también. `chequeo_en`, `chequeo` y
+`chequeo_detalle` los escribe la tarea `salud-de-links` del cron diario.
 
 ## 7. Acceso y seguridad
 
@@ -391,4 +404,4 @@ secciones, con su pestaña SEO, como las demás páginas.
   y la lane `work/metricas/` (2026-09-21).
 - Cambios de diseño del sitio, de geometría o de animaciones.
 - Aprobación previa a publicar.
-- Fichas propias para los 63 materiales (ver §5).
+- Fichas propias para los 57 materiales (ver §5).
