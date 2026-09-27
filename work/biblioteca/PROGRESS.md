@@ -231,3 +231,17 @@
   (`agrego-`, `publico-`, `oculto-`, `borro-un-material`). El clic de Orca no
   llega a los botones del formulario: se probó con `eval` sobre el DOM (la
   maña conocida del navegador embebido).
+
+- **Paso 12 — agregar por DOI, ISBN o link.** `admin/biblioteca/AgregarMaterial.tsx`
+  (el paso 1: el campo, «Buscar datos» —el primario— y «Cargar a mano»; el
+  error en un aviso; el DOI repetido con el link al que ya está, sin pasar al
+  paso 2; y el paso 2, la ficha llena con el origen de cada dato y los
+  parecidos). `/admin/biblioteca/nuevo` lo dibuja. DESIGN.md §11, «Agregar con
+  datos de afuera». Aceptación: `tsc --noEmit` → exit 0; `eslint
+  src/admin/biblioteca` → sin salida. En el navegador (cuenta que edita): el
+  DOI de RELIME → «Ese DOI ya está en la Biblioteca: «Resignificación…». Abrirlo»;
+  el link de la RMF E → la ficha llena, cada campo «De Crossref.», «Cambios
+  sin guardar», y Luis Manuel Cabrera Chim sugerido como «Luis Cabrera Chim»
+  del Equipo; «Guardar borrador» → la fila con el DOI, las 4 autorías, la
+  persona y la cita de Crossref (visto con `psql`), y las marcas se van;
+  después se borró desde la ficha.

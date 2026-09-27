@@ -1168,3 +1168,25 @@ cómo se ve y dónde. `apps/sitio/src/admin/novedades/FichaDeNovedad.tsx`.
   - **El panel** lleva «Salud del link» arriba de «Se ve en»: el resultado del
     último chequeo en meta medium, qué pasó y cuándo, y en `gris-texto` cómo
     se chequea.
+
+### Agregar con datos de afuera
+
+Crear una cosa pegando un identificador que ya la describe en otro lado (un
+material por su DOI, su ISBN o su link), en dos pasos en la misma ruta.
+`apps/sitio/src/admin/biblioteca/AgregarMaterial.tsx`.
+
+- **Paso 1:** el encabezado con «← Biblioteca» y una frase que dice que nada
+  se guarda todavía; un solo campo («DOI, ISBN o link», la `ENTRADA` del
+  admin, de `max-w-xl`) con un ejemplo en su ayuda; **«Buscar datos», el
+  primario**, y «Cargar a mano», terciario; debajo, en meta `gris-texto`,
+  dónde se busca. Mientras busca, «Buscando…» con `aria-busy`. Lo que no se
+  encontró, o un DOI que ya está, va en un aviso de error arriba de los
+  botones; el del DOI repetido lleva el link al que ya está y no pasa al
+  paso 2.
+- **Paso 2:** la ficha de siempre (arriba, «Ficha de una entidad»), llena, con
+  «Cambios sin guardar» desde el principio: todavía no se guardó nada.
+- **De dónde salió cada dato:** la ayuda de cada campo que vino de afuera
+  empieza por su fuente, en la misma meta `gris-texto`: «De Crossref.», «De
+  OpenAlex.», «De la página.». Editar el campo borra la marca, y guardar las
+  borra todas: desde ahí el dato es de quien lo guardó.
+- Primer consumidor: «Agregar material» (2026-09-27, `work/biblioteca/`).
