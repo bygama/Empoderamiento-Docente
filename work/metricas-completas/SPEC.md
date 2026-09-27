@@ -97,13 +97,34 @@ referido, dispositivo):
 | --- | --- | --- |
 | `sistema` | el `osName` | `by=day,osName`, límite 20 |
 | `navegador` | el `browserName` | `by=day,browserName`, límite 20 |
-| `campana` | el `utmCampaign` (el código de un link, §6.4) | `by=day,utmCampaign`, límite 100 |
+| `campana` | el `utmCampaign` (el código de un link, §6.4) | `by=day,utmCampaign`, límite 100 — **solo si el plan da UTM** (Hobby no) |
 | `hora` | la hora UTC, `00` a `23`; `fecha` es el día UTC de esa hora | `by=hour` |
 | `pagina-cl` · `pagina-mx` · `pagina-ar` · `pagina-otros` | la ruta | `by=day,requestPath` con `filter` por país, límite 100 |
 
-Y `metricas_ventanas` suma la ventana de **90 días** (y su anterior) a las de 7
-y 30. La marca de agua sigue siendo la fila `total`, que corre última. Los
-países fijos (Chile, México, Argentina) viven en `config/metricas.ts`; el
+**El plan manda** (ronda de arreglos 1): `PLAN_DE_VERCEL` en
+`config/metricas.ts` dice lo que da el plan de hoy, con su fuente (la página
+de límites de Web Analytics de Vercel, actualizada el 2026-08-25): Hobby,
+«Reporting Window: 1 Month» y sin UTM. Por eso:
+
+- **Nunca se pide más atrás que la ventana del plan** (30 días): cada corrida
+  copia como mucho 30 días, y `metricas_ventanas` guarda solo las ventanas
+  que caben —la de 7, su anterior y la de 30—. La de 90 y la anterior a la de
+  30 no se piden: empiezan antes de lo que Vercel contesta.
+- **Cada ventana es independiente:** la que falla no frena a las otras ni a
+  las filas del día, y el detalle de la corrida la nombra («No se pudo: la de
+  30 días hasta el …»). La marca de agua sigue siendo la fila `total`, que
+  corre última y **depende solo de las filas del día**.
+- **Los 90 días del Resumen:** las vistas son la suma de las filas `total`
+  de cada día, si la copia tiene el período entero (si no, «—» con «La copia
+  todavía no tiene los 90 días enteros»); las personas distintas no se suman
+  día por día, así que visitantes va «—» y la nota dice por qué. La
+  comparación es solo contra un período anterior **entero**; si no, «sin
+  datos previos».
+- **Sin UTM**, la consulta `campana` no se hace y las visitas de un link van
+  «—» (§6.4). Si el plan cambia, se cambia `PLAN_DE_VERCEL` y lo demás lo
+  sigue.
+
+Los países fijos (Chile, México, Argentina) viven en `config/metricas.ts`; el
 cliente (`lib/metricas/vercel.ts`) solo aprende a pasar un `filter` y las
 dimensiones nuevas, sin saber de ED.
 
@@ -245,8 +266,8 @@ tienen menos de 3, dicen «menos de 3»; una celda del cruce, lo mismo.
   y la línea de «Datos hasta el …», como hoy. Sin primario: nada es «la»
   acción de esta pantalla.
 - **El período** (Filtro) y dos `Cifra`: visitantes y vistas del período,
-  contra el anterior, de `metricas_ventanas` (7, 30 y 90). Debajo, la línea que
-  explica visitantes · visitas · vistas (§3).
+  contra el anterior, de `metricas_ventanas` (7 y 30); en 90, lo que dice
+  §4.1. Debajo, la línea que explica visitantes · visitas · vistas (§3).
 - **La curva:** los visitantes de cada día del período, con sus **marcas**
   (§6.1.1). Es la `Curva` nueva del armazón (§7).
 - **Canales:** Buscador · Redes · Asistentes IA · Directo · Otros sitios, en
@@ -315,8 +336,10 @@ sin cookies, sin IP y sin saber quién.»
 - **El camino del CV** (`#cv`): una `Tabla` con los cinco canales y el total
   en las filas y «Vio la página · Empezó el formulario · Lo envió» en las
   columnas. Con el formulario cerrado (`CV_ABIERTO` apagado) y sin datos, el
-  estado vacío lo dice: «El formulario de CV está cerrado: cuando se abra,
-  acá se ve cuánta gente llega hasta mandarlo.»
+  estado vacío lo dice: «El formulario de CV está cerrado» y «Cuando se abra,
+  acá se ve cuántas veces se abre la página, se empieza el formulario y se
+  manda, y por dónde llegó la gente.» `cv-vio` cuenta cargas: con poco dato,
+  se dice en **vistas de la página** (§3), no en personas.
 - **Contactos enviados** (`#contactos`): una `Cifra` del período contra el
   anterior y, debajo, por canal.
 - **Materiales más consultados** (`#materiales`): los 10 más consultados del
@@ -344,17 +367,22 @@ página lleva, quién lo creó y cuándo; las cifras de todo el tiempo —**clic
 `cv-envio` con ese link)—; y a la derecha **«Copiar»** (secundario, con aviso
 «Copiado» para el lector) y **«Borrar»** (destructivo, con `Confirmacion`: «¿Borrar el
 link? Si ya lo compartiste, deja de andar.»), que anota `borro-un-enlace`. Sin
-datos de Vercel, las visitas van «—». Vacía: «Todavía no hay links» y qué son.
+datos de Vercel, o sin UTM en el plan (§4.1), las visitas van «—», y la
+explicación del bloque lo dice. Vacía: «Todavía no hay links» y qué son.
 Debajo de la lista, la línea de §5.3: cuándo un CV cuenta para un link.
 
-**`/l/[codigo]`** (`app/l/[codigo]/route.ts`, declarada en `config/rutas.ts`):
+**`/l/[codigo]`** (`app/(sitio)/l/[codigo]/page.tsx`, declarada en
+`config/rutas.ts`). Es una página y no un `route.ts` porque ahí `notFound()`
+contesta un 404 vacío; una página no ve el método, así que el proxy le pasa el
+real en `x-ed-metodo` y pisa el que venga de afuera (DECISIONS, ronda 1):
 
 - Busca el código; si no existe, el 404 del sitio.
 - Redirige con **307** (temporal, nunca 308) y `Cache-Control: no-store` a
   `destino?utm_source=<canal>&utm_medium=link&utm_campaign=<codigo>`. Así
   Vercel cuenta las visitas del link sin nada propio.
 - **Cuenta el clic en el servidor**, sin cookies, aunque la persona bloquee la
-  analítica: `enlace-clic` con el id del link. Solo un `GET`, y no cuentan las
+  analítica: `enlace-clic` con el id del link. Solo un `GET` —un `HEAD`, o un
+  pedido sin la cabecera del proxy, no cuenta—, y no cuentan las
   vistas previas de las redes ni los robots (un `User-Agent` de la lista de
   `lib/metricas/robots.ts`: se lee, no se guarda). Tope: 3 clics por hora por
   IP y link (HMAC «enlace:<id>:IP»); pasado, redirige igual y no cuenta.
@@ -406,6 +434,16 @@ contrastes en los tres temas.
   Console está conectado), contactos enviados, CV recibidos (solo con
   `verCV`, como el Inicio) y materiales consultados (cuando cuenten); la
   página más vista; y «Ver las métricas». Sin nada de ninguna persona.
+- **Una sola semana para todo** (ronda de arreglos 1): la de los siete días
+  antes del lunes de Chile en que sale (`semanaAntesDe`), y cada número la
+  cuenta en días UTC, como se guardan las sumas: visitantes y vistas, de la
+  ventana de 7 días que termina el domingo; contactos, materiales y la página
+  más vista, de lunes a domingo; los CV, del lunes a las 0 al lunes siguiente
+  a las 0 (UTC). Los clics de Google, solo si Search Console ya llegó al
+  domingo; si no, «—» con el porqué (Google los da con 2 o 3 días de atraso,
+  así que el lunes a la madrugada casi siempre falta). La tarea espera a la
+  copia de Vercel de la misma corrida (`despuesDe`), que es la que escribe
+  la ventana del domingo.
 - **Sale por Resend** con `mandarCorreo`, que gana un `idempotencia` opcional:
   la clave es `resumen-semanal:<lunes>:<cuenta>`, así una segunda corrida el
   mismo lunes no lo manda dos veces. Un correo que no sale no frena a los

@@ -54,3 +54,88 @@
   `route.ts`, `notFound()` contestaba un 404 vacío; como página da el 404 del
   sitio y el `redirect()` es el mismo 307, sin caché por ser dinámica (en
   `next start`: `private, no-cache, no-store, max-age=0, must-revalidate`).
+- 2026-09-27 — **Ronda de arreglos 1** (revisión de cierre r1: FAIL, 3
+  IMPORTANT y 4 MINOR). Lo que se decidió en cada uno:
+- 2026-09-27 — **IMPORTANT 1, el test intermitente de avisos, se arregla en
+  el código, no en el test.** `e88b941` aflojaba la aserción; la revisión lo
+  rechazó con razón: la carrera era real. `ponerQuienRecibe` cambiaba **todas**
+  las cuentas de la base y leía y escribía sueltos, así que una cuenta borrada
+  en el medio hacía fallar la acción entera por `avisos_cuenta_id_fkey`, y una
+  invitada en el medio quedaba apagada sin que nadie la hubiera visto. Ahora
+  toca solo las cuentas **mostradas** en la pantalla (`mostradas`, validada
+  con Zod) y lo hace en una transacción que las traba con `FOR KEY SHARE`
+  (`datos/quien-recibe.ts`): un borrado espera a que termine. El test de la
+  ventana borra una cuenta desde otra conexión justo antes de escribir: sin
+  la traba da `avisos_cuenta_id_fkey`, con ella pasa. Las aserciones volvieron
+  a ser exactas. Sin `--test-concurrency=1` ni reintentos.
+- 2026-09-27 — **IMPORTANT 2, `/l/` es una página, y lo que se había perdido
+  al pasarla se recuperó con el proxy** (opción B, aprobada por el padre:
+  «falla del lado seguro: sin la cabecera no se cuenta nada, y el 404 sigue
+  siendo la página del sitio»). Por qué no un `route.ts`: ahí `notFound()`
+  contesta un 404 vacío, sin la página del sitio. Lo que se perdió al pasarla
+  a página: el `route.ts` contaba solo el `GET`, y una página no ve el
+  método, así que un `HEAD` (los que mandan las vistas previas y los
+  chequeadores de links) contaba como un clic. Ahora el proxy pone el método
+  real en `x-ed-metodo` en **todo** pedido a `/l/` y la página cuenta solo si
+  dice `GET` (`lib/metricas/clic.ts`). **No se puede falsificar:** el proxy
+  pisa la cabecera que venga de afuera con `req.method` antes de pasar el
+  pedido (`NextResponse.next({ request: { headers } })`), y el matcher cubre
+  `/l/`; los dos con test. Sin la cabecera no cuenta nada: si el proxy dejara
+  de correr, se pierden clics, no se inventan.
+- 2026-09-27 — **IMPORTANT 3, la copia pide solo lo que da el plan.**
+  `PLAN_DE_VERCEL = { ventanaDeReporteDias: 30, utm: false }` en
+  `config/metricas.ts`, con su fuente: la página de límites de Web Analytics
+  de Vercel (actualizada el 2026-08-25), Hobby, «Reporting Window: 1 Month» y
+  «UTM Parameters: -». Lo de UTM apareció al leer esa misma página: sin UTM,
+  `campana` siempre volvería vacía, así que no se pide y las visitas de un
+  link van «—» con la explicación (se prende cambiando la constante). La
+  corrida copia como mucho 30 días y guarda las ventanas de 7, su anterior y
+  30; cada una en su `try`, y la que falla va al detalle. La fila `total`, la
+  marca de agua, depende solo de las filas del día. En 90 días: vistas
+  sumando las filas del día (solo con el período entero copiado) y
+  visitantes «—» con el porqué; la comparación, solo contra un período
+  anterior entero. Test con una respuesta 400 grabada.
+- 2026-09-27 — **MINOR 4, una sola semana para todo el resumen, contada en
+  días UTC.** La semana sale del lunes de Chile (`semanaAntesDe`) y todos los
+  números la reciben. Cada uno la cuenta en días **UTC**, no en horas de
+  Chile: los contadores y las filas de Vercel se guardan por día UTC y no se
+  pueden partir, y contar los CV en hora de Chile los haría discrepar del
+  resto. El correo dice «del 21 al 27» y los siete números cuentan esos siete
+  días UTC (en Chile, del domingo 20 a las 21 al domingo 27 a las 21, con
+  UTC−3). `numerosPara` es el «Esta semana» del Inicio, que cuenta los siete
+  días hasta hoy a propósito: el correo dejó de usarlo y
+  `numerosDelResumen(rol, semana)` usa la semana que recibe.
+- 2026-09-27 — **El resumen espera a la copia de Vercel** (`despuesDe` en
+  `lib/tareas/`): el lunes las dos corren en la misma corrida y la ventana del
+  domingo la escribe la copia. Sin esperar, el resumen leía la ventana vieja
+  (antes) o no encontraba la del domingo (ahora). La espera cuenta en el
+  tiempo de la que espera, así la corrida entera sigue cabiendo en los 60
+  segundos de la función. Alternativa descartada: mandar el resumen los
+  martes, que contradice el «los lunes» del brief.
+- 2026-09-27 — **Los clics de Google del resumen van casi siempre «—»**:
+  Search Console da los datos con 2 o 3 días de atraso, y el lunes a la
+  madrugada todavía no llegó el domingo. Contar otra semana para Google
+  rompería la regla de una sola semana, así que el renglón dice por qué no
+  hay número. **Para el owner:** si prefiere sacar ese renglón del correo, es
+  una línea en `numeros-del-resumen.ts`.
+- 2026-09-27 — **MINOR 6:** el camino del CV dice «vistas de la página»
+  (§3), porque `cv-vio` cuenta cargas.
+- 2026-09-27 — **MINOR 7, el JS de las páginas públicas: no se reprodujo el
+  aumento.** Medido sumando los chunks que carga cada página prerenderizada
+  (los `<script src>` de `.next/server/app/<pagina>.html`), `main` contra la
+  rama con `next build` de las dos: las páginas que no cuentan
+  (`quienes-somos`, `novedades`, `investigacion`, `que-hacemos`, `_not-found`)
+  cargan **los mismos chunks, byte a byte**; las cuatro que cuentan (Inicio,
+  Biblioteca, Contacto, Súmate) suman de 0,6 a 0,8 KB (0,2 a 0,3 KB en gzip),
+  y el código de contar aparece solo en sus chunks propios. No hubo nada que
+  mover. Los números y el script, en PROGRESS; si la revisión midió otra cosa,
+  con ese script se compara igual.
+- 2026-09-27 — **Segundo rebase, sobre `ddc8ca1` (la lane 9 en `main`)**, a
+  pedido del padre. Conflictos resueltos juntando las dos partes:
+  `datos/actividad.ts`, `admin/actividad/frase.ts` y su test, DESIGN.md §11,
+  `datos/tareas/diarias.ts` (las dos tareas nuevas) y AGENTS.md §3.
+  `admin/cuentas/actividad/modulos.ts` y `config/rutas.ts` se juntaron solos
+  y se revisaron. **La migración se regeneró** con Prisma sobre una base con
+  las migraciones de `main` (`migrate dev --create-only`): pasó de
+  `20260927051631_…` a `20260927073235_contadores_enlaces_y_marcas`, con el
+  SQL idéntico (`diff` vacío), y entró en su commit original.
