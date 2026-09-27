@@ -41,7 +41,8 @@ export type TipoDeActividad = (typeof TIPOS_DE_ACTIVIDAD)[number];
  * la misma regla en los dos lados. Un tipo nuevo no compila hasta decir quién
  * lo ve. Entrar, salir y lo que alguien cambia de su propia cuenta es de las
  * cuentas: lo ve quien usa Cuentas. Lo que se hace con una página lo ve quien
- * edita el contenido.
+ * edita el contenido; con un mensaje de Contacto, quien ve Contacto; y que se
+ * borró un CV, solo quien ve los CV.
  */
 export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   entro: "usarCuentas",
@@ -51,6 +52,11 @@ export const QUIEN_VE: Record<TipoDeActividad, Capacidad> = {
   "publico-una-pagina": "editarContenido",
   "descarto-un-borrador": "editarContenido",
   "restauro-una-version": "editarContenido",
+  "tomo-un-mensaje": "verContacto",
+  "cerro-un-mensaje": "verContacto",
+  "marco-un-mensaje-como-spam": "verContacto",
+  "borro-un-mensaje": "verContacto",
+  "borro-un-cv": "verCV",
 };
 
 /**
@@ -68,6 +74,11 @@ export const VA_AL_INICIO: Record<TipoDeActividad, boolean> = {
   "publico-una-pagina": true,
   "descarto-un-borrador": true,
   "restauro-una-version": true,
+  "tomo-un-mensaje": true,
+  "cerro-un-mensaje": true,
+  "marco-un-mensaje-como-spam": true,
+  "borro-un-mensaje": true,
+  "borro-un-cv": true,
 };
 
 /** Los tipos que ese rol puede ver, en el orden de la lista. Un rol que no es de los tres no ve ninguno. */
