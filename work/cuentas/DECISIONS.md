@@ -36,3 +36,33 @@
   esos lugares con esa forma y concilia la que rebasee segunda. Si la 3c ya
   está en `main`, sumo «Ver toda la actividad» del Inicio hacia mi pantalla si
   no está. El SPEC §4.4 decía `como-se-lee.ts`: manda esta línea.
+- 2026-09-26 — **Cortes del PLAN movidos, sin cambiar el alcance** (work-run):
+  `segundoFactorObligatorio` entró en el paso 1 (el `CHECK` y su espejo en
+  código van juntos), y el correo del código y el resultado de
+  `mandarCorreo` en el paso 3 (`mandarCodigo` es obligatoria en
+  `OpcionesDeAuth`: sin cablearla, el paso 3 no compilaba). El paso 11 fue
+  dos commits (paquete y app).
+- 2026-09-26 — **`crear-cuenta` crea con el rol de fábrica y después
+  `ponerRol`**: `internalAdapter.createUser` no escribe columnas que
+  better-auth no conoce, y administra sin `twoFactorEnabled` choca con el
+  `CHECK`. Invitar sí crea directo, porque ahí el plugin ya está configurado.
+- 2026-09-26 — **`entro` lo anota un plugin propio que corre después del de
+  `twoFactor`**: better-auth corre los ganchos de la config antes que los de
+  los plugins (visto en su `api/dispatch.mjs`), y solo después del plugin se
+  sabe si la contraseña ya es una sesión. Verificado antes, con un script
+  descartable, que el `ctx.context` de `sendOTP` es el mismo que ve el gancho
+  (así se espera el envío del código).
+- 2026-09-26 — **Pasar la dirección cuenta en el bloqueo por cuenta**:
+  `verifyPassword` llamado desde el servidor saltea el rate limit por IP;
+  `confirmarContrasena` (`@ed/auth`) suma cada fallo al bloqueo de ADR-0010.
+- 2026-09-26 — **Confirmar antes de lo que no se deshace con `window.confirm`**
+  (suspender, borrar, cancelar, cerrar sesiones, cambiar el correo, pasar la
+  dirección): es lo que ya usa «Descartar» del editor de páginas; no se
+  inventó un patrón de confirmación nuevo.
+- 2026-09-26 — **El aviso de pasar la dirección va en la URL**
+  (`?direccion=pasada`), como el de Invitar: el apartado que la pasa deja de
+  existir con el redibujo (encontrado en la verificación, `aca9c46`).
+- 2026-09-26 — **Borrar se ofrece solo si la cuenta no tiene actividad**, pero
+  la acción no lo pregunta: intenta el `DELETE` y contesta lo que diga la
+  clave foránea. Una pendiente no muestra «Borrar»: muestra «Cancelar la
+  invitación», que hace lo mismo.
