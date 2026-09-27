@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { destinoConUtm, destinoDelEnlace, esUnClic } from "./abrir-enlace";
+import { CABECERA_DEL_METODO } from "@/lib/metricas/clic";
+import { contarClic, destinoConUtm, destinoDelEnlace } from "./abrir-enlace";
 import type { Enlace } from "./enlaces";
 
 const ENLACE: Enlace = {
@@ -43,8 +44,26 @@ test("un conteo que falla no rompe la redirección", async () => {
   assert.ok(destino?.startsWith("/que-hacemos?"));
 });
 
-test("un clic es de una persona: ni un robot, ni la vista previa de una red", () => {
-  assert.equal(esUnClic(new Headers({ "user-agent": PERSONA })), true);
-  assert.equal(esUnClic(new Headers({ "user-agent": "LinkedInBot/1.0" })), false);
-  assert.equal(esUnClic(new Headers()), false);
+/** Cuántas veces cuenta un pedido con esas cabeceras, sin tocar la base. */
+async function cuantasCuenta(cabeceras: Record<string, string>): Promise<number> {
+  let sumados = 0;
+  await contarClic(new Headers(cabeceras), ENLACE, { tope: async () => true, sumar: async () => void sumados++ });
+  return sumados;
+}
+
+test("un GET de una persona cuenta; un HEAD no; sin la cabecera del proxy, tampoco", async () => {
+  assert.equal(await cuantasCuenta({ [CABECERA_DEL_METODO]: "GET", "user-agent": PERSONA }), 1);
+  assert.equal(await cuantasCuenta({ [CABECERA_DEL_METODO]: "HEAD", "user-agent": PERSONA }), 0);
+  assert.equal(await cuantasCuenta({ "user-agent": PERSONA }), 0);
+});
+
+test("ni un robot ni la vista previa de una red cuentan, aunque sean un GET", async () => {
+  assert.equal(await cuantasCuenta({ [CABECERA_DEL_METODO]: "GET", "user-agent": "LinkedInBot/1.0" }), 0);
+  assert.equal(await cuantasCuenta({ [CABECERA_DEL_METODO]: "GET" }), 0);
+});
+
+test("pasado el tope de su IP no cuenta", async () => {
+  let sumados = 0;
+  await contarClic(new Headers({ [CABECERA_DEL_METODO]: "GET", "user-agent": PERSONA }), ENLACE, { tope: async () => false, sumar: async () => void sumados++ });
+  assert.equal(sumados, 0);
 });
