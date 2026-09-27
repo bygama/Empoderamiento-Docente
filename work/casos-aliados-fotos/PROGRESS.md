@@ -206,6 +206,24 @@
   sitio ya lo muestra», la columna cambiada, el borrador nulo,
   `publico-un-caso` en la actividad y `/investigacion` sirviendo el indicio
   nuevo; se volvió a publicar el de antes. `cambios.test.ts` 1 pass;
-  `pnpm --filter sitio typecheck` 0, lint 0, react-doctor 100/100.
+  `pnpm --filter sitio typecheck` 0, lint 0, react-doctor 100/100. Commit
+  `6a5a9fbb`.
+- **Paso 16 — aliados: el ciclo y la marca**: `features/aliados/contenido/etiquetas.ts`;
+  `datos/acciones/aliados-en-base.ts`, `editar-aliados.ts` (crear al final de
+  la tira y sin autorizar, guardar con choque, descartar, borrar),
+  `publicar-aliados.ts` (exige `autorizado`, el logo tiene que estar en
+  Fotos; despublicar conserva las columnas), `autorizar-aliados.ts` (la marca
+  con su nota, que vuelve a chequear `autorizarAliados` con el rol, y mover
+  en la tira renumerándola), `revalidar-aliados.ts` (el layout entero); las
+  acciones en `aliados.ts` y `ciclo-de-aliados.ts` (`autorizarAliado` pide
+  `autorizarAliados`; la actividad de publicó, despublicó, borró, autorizó y
+  quitó). Las vistas previas de un caso y de un aliado pasan a
+  `vista-previa-de-contenido.ts`, y `vista-previa.ts` vuelve a ser el de
+  `main` (con las dos pasaba las 100 líneas). `editar-aliados.test.ts`
+  (crear en el lugar 6 sin marca; publicar sin marca frena; `edita` no
+  marca —`SIN_PERMISO`—; sin nota no marca; marcado se publica; mover y
+  volver; quitar la marca, despublicar y borrar; la tira queda
+  UNESCO·Techint·Bloom·UCSH·Science Up en 1..5) + `acciones-con-sesion` +
+  `consultas/aliados.test.ts` → 18 pass, 0 fail, 0 skipped; typecheck 0.
 
 ## Abierto
