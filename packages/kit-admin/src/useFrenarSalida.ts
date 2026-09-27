@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 
 const PREGUNTA = "Tenés cambios sin guardar. Si salís ahora, se pierden. ¿Salir igual?";
