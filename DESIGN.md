@@ -361,7 +361,7 @@ el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso» y el apartado, el
 mismo día (`work/roles-y-actividad/`); las pestañas de una página, el error en
 el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
 vista previa de buscador y redes, también (`work/paginas-inicio/`); el
-número, el filtro, el buscador, «volver» y confirmar lo que no se deshace, ese mismo día (`work/mensajes/`). Todos los contrastes están
+número, el filtro, el buscador, «volver», confirmar lo que no se deshace y la casilla, ese mismo día (`work/mensajes/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
@@ -771,7 +771,23 @@ pasa si se toca**; a la derecha, lo que se toca.
 - **Sin primario si los apartados son independientes**: en Mi cuenta hay tres
   formularios y ninguno es la acción de la pantalla, así que los tres botones
   son secundarios. El aviso de cada uno va entre sus campos y su botón.
-- Primer consumidor: Mi cuenta. Lo reusa Ajustes.
+- Primer consumidor: Mi cuenta (Perfil, Contraseña, Tu rol, Sesiones y
+  Avisos). Lo reusa Ajustes.
+
+### Casilla
+
+La nativa, en `accent-azul-principal`, de 16 px: el navegador le da el
+borde (3:1 o más, WCAG 1.4.11) y la invierte sola donde hay
+`color-scheme: dark`. **La etiqueta la envuelve**, así se marca tocando la
+frase y no solo el cuadrito.
+
+- **Cuando prende un campo** («Lleva un botón», en el editor), la etiqueta
+  va en meta medium, pegada al campo que prende.
+- **Cuando las casillas son lo que se elige** (los avisos de Mi cuenta),
+  cada fila es de 44 px con el texto en cuerpo, y van juntas en un
+  `fieldset` con su `legend` en meta medium («Mandame un correo con cada»).
+- Primer consumidor: el campo opcional del editor (`admin/campos/Campo.tsx`);
+  registrada con los avisos de Mi cuenta (2026-09-26, `work/mensajes/`).
 
 ### Pantalla de acceso
 

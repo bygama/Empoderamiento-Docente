@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { MiCuenta } from "@/admin/mi-cuenta/MiCuenta";
+import { avisosDe } from "@/datos/avisos";
 import { sesionesAbiertas } from "@/datos/consultas/mi-cuenta";
 import { sesionActual } from "@/datos/sesion";
 
@@ -18,6 +19,7 @@ export default async function PaginaMiCuenta() {
       rol={sesion.user.rol}
       sesiones={await sesionesAbiertas(sesion.user.id)}
       idDeEstaSesion={sesion.session.id}
+      avisos={await avisosDe(sesion.user.id, sesion.user.rol)}
     />
   );
 }

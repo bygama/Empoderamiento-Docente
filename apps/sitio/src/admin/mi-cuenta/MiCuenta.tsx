@@ -1,7 +1,9 @@
 import { QUE_PUEDE, esRol, esUnaSola, quienPuede } from "@ed/auth";
 import { Apartado } from "@/admin/armazon/Apartado";
 import { Encabezado } from "@/admin/armazon/Encabezado";
+import type { Bandeja } from "@/config/mensajes";
 import type { SesionAbierta } from "@/datos/consultas/mi-cuenta";
+import { FormularioDeAvisos } from "./FormularioDeAvisos";
 import { FormularioDeLaContrasena } from "./FormularioDeLaContrasena";
 import { FormularioDelNombre } from "./FormularioDelNombre";
 import { Sesiones } from "./Sesiones";
@@ -12,21 +14,23 @@ type Props = {
   rol: unknown;
   sesiones: SesionAbierta[];
   idDeEstaSesion: string;
+  /** Un aviso por bandeja que su rol ve (`datos/avisos.ts`). */
+  avisos: ReadonlyArray<{ bandeja: Bandeja; activo: boolean }>;
 };
 
 /**
  * Mi cuenta (SPEC de work/roles-y-actividad §5): lo que cada persona toca de
  * sí misma. Tres formularios que no dependen uno del otro, así que ninguno es
- * el primario de la pantalla: los tres botones son secundarios. Avisos y
- * Seguridad llegan con Mensajes y con el segundo factor.
+ * el primario de la pantalla: todos los botones son secundarios. Avisos
+ * llegó con Mensajes; Seguridad llega con el segundo factor.
  */
-export function MiCuenta({ nombre, correo, rol, sesiones, idDeEstaSesion }: Props) {
+export function MiCuenta({ nombre, correo, rol, sesiones, idDeEstaSesion, avisos }: Props) {
   // La cuenta de quien dirige no la toca nadie más: ni su rol ni su correo.
   const dirige = esRol(rol) && esUnaSola(rol);
   const quienLaCambia = dirige ? "La dirección no se cambia: se pasa a otra persona, desde Cuentas." : `Lo cambia ${quienPuede("usarCuentas")}, desde Cuentas.`;
   return (
     <>
-      <Encabezado titulo="Mi cuenta" detalle="Tus datos, tu contraseña y dónde tenés el admin abierto." />
+      <Encabezado titulo="Mi cuenta" detalle="Tus datos, tu contraseña, dónde tenés el admin abierto y qué correos te llegan." />
       <div>
         <Apartado id="perfil" titulo="Perfil" descripcion="Tu nombre es el que figura en lo que publicás.">
           <div className="space-y-6">
@@ -56,6 +60,15 @@ export function MiCuenta({ nombre, correo, rol, sesiones, idDeEstaSesion }: Prop
         <Apartado id="sesiones" titulo="Sesiones" descripcion="Dónde tenés el admin abierto. La ubicación es aproximada: sale de la conexión.">
           <Sesiones sesiones={sesiones} idDeEstaSesion={idDeEstaSesion} />
         </Apartado>
+        {avisos.length ? (
+          <Apartado
+            id="avisos"
+            titulo="Avisos"
+            descripcion="Te llega un correo con cada mensaje nuevo de las bandejas que marques. No trae lo que escribieron: lo leés en el admin."
+          >
+            <FormularioDeAvisos avisos={avisos} />
+          </Apartado>
+        ) : null}
       </div>
     </>
   );
