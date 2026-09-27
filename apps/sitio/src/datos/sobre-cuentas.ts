@@ -34,7 +34,7 @@ export async function sobreLaCuenta(
   hacer: (cuenta: Objetivo) => Promise<Resultado>,
 ): Promise<Resultado> {
   const id = esquemaDelId.safeParse(idDeCuenta);
-  const cuenta = id.success ? await cuentaParaActuar(id.data) : null;
+  const cuenta = id.success ? await cuentaParaActuar(sesion.user.rol, id.data) : null;
   if (!cuenta?.rol) return { ok: false, detalle: "Esa cuenta ya no existe." };
   const se = queSePuede(sesion.user.rol, { rol: cuenta.rol, estado: cuenta.estado, esLaPropia: cuenta.id === sesion.user.id });
   if (!se[accion]) return NO_PUEDE;

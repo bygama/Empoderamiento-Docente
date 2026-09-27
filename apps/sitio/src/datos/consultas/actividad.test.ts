@@ -42,13 +42,13 @@ test("filtra por tipos, por persona, desde una fecha y por texto en el sobre o e
       { cuentaId: ana, tipo: "suspendio", sobre: "Luz Gómez", en: hace(1) },
     ],
   });
-  const tipos = (await listarActividad({ tipos: TODOS, persona: ana, pagina: 1 })).filas.map((f) => f.tipo);
+  const tipos = (await listarActividad("administra", { tipos: TODOS, persona: ana, pagina: 1 })).filas.map((f) => f.tipo);
   assert.deepEqual(tipos, ["suspendio", "invito", "entro"]);
-  assert.equal((await listarActividad({ tipos: ["invito"], persona: ana, pagina: 1 })).total, 1);
-  assert.equal((await listarActividad({ tipos: TODOS, persona: ana, dias: 7, pagina: 1 })).total, 2);
-  assert.deepEqual((await listarActividad({ tipos: TODOS, persona: ana, texto: "pérez", pagina: 1 })).filas.map((f) => f.sobre), ["Juan Pérez"]);
-  assert.equal((await listarActividad({ tipos: TODOS, persona: ana, texto: "ana filt", pagina: 1 })).total, 3);
-  assert.equal((await listarActividad({ tipos: [], persona: ana, pagina: 1 })).total, 0);
+  assert.equal((await listarActividad("administra", { tipos: ["invito"], persona: ana, pagina: 1 })).total, 1);
+  assert.equal((await listarActividad("administra", { tipos: TODOS, persona: ana, dias: 7, pagina: 1 })).total, 2);
+  assert.deepEqual((await listarActividad("administra", { tipos: TODOS, persona: ana, texto: "pérez", pagina: 1 })).filas.map((f) => f.sobre), ["Juan Pérez"]);
+  assert.equal((await listarActividad("administra", { tipos: TODOS, persona: ana, texto: "ana filt", pagina: 1 })).total, 3);
+  assert.equal((await listarActividad("administra", { tipos: [], persona: ana, pagina: 1 })).total, 0);
 });
 
 test("pagina de a 50, la más nueva arriba, y una página que no existe muestra la última", sinBase, async () => {
@@ -57,10 +57,21 @@ test("pagina de a 50, la más nueva arriba, y una página que no existe muestra 
   const leo = await cuenta("Leo Paginas");
   const inicio = Date.now() - 1_000_000;
   await base.actividad.createMany({ data: Array.from({ length: 55 }, (_, i) => ({ cuentaId: leo, tipo: "entro", en: new Date(inicio + i * 1000) })) });
-  const primera = await listarActividad({ tipos: TODOS, persona: leo, pagina: 1 });
+  const primera = await listarActividad("administra", { tipos: TODOS, persona: leo, pagina: 1 });
   assert.equal(POR_PAGINA, 50);
   assert.deepEqual([primera.total, primera.paginas, primera.filas.length], [55, 2, 50]);
   assert.ok(new Date(primera.filas[0]?.en ?? 0) > new Date(primera.filas[49]?.en ?? 0));
-  const segunda = await listarActividad({ tipos: TODOS, persona: leo, pagina: 9 });
+  const segunda = await listarActividad("administra", { tipos: TODOS, persona: leo, pagina: 9 });
   assert.deepEqual([segunda.pagina, segunda.filas.length], [2, 5]);
+});
+
+test("sin usarCuentas no lee nada, aunque pida tipos que su rol ve en otro lado", sinBase, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { listarActividad } = await import("./actividad");
+  const mia = await cuenta("Mia Sinpermiso");
+  await base.actividad.createMany({ data: [{ cuentaId: mia, tipo: "publico-una-pagina", sobre: "Inicio", sobreId: "inicio" }, { cuentaId: mia, tipo: "invito", sobre: "Juan" }] });
+  assert.equal((await listarActividad("administra", { tipos: TODOS, persona: mia, pagina: 1 })).total, 2);
+  for (const rol of ["edita", undefined, "otro"]) {
+    assert.deepEqual(await listarActividad(rol, { tipos: TODOS, persona: mia, pagina: 1 }), { filas: [], total: 0, pagina: 1, paginas: 1 });
+  }
 });

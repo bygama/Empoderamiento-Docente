@@ -1,6 +1,15 @@
-import { esRol, esUnaSola, type EstadoDeCuenta, type Rol } from "@ed/auth";
+import { esRol, esUnaSola, puede, type EstadoDeCuenta, type Rol } from "@ed/auth";
 import { base } from "@/datos/cliente";
 import { sesionesAbiertas, type SesionAbierta } from "./mi-cuenta";
+
+/**
+ * Las cuentas, para Cuentas (SPEC de work/cuentas §4). **Cada consulta recibe
+ * primero el rol de quien mira y, sin `usarCuentas`, no lee nada.** La guarda
+ * del layout no alcanza: en el App Router la página se renderiza igual y viaja
+ * en el payload aunque el layout no la dibuje. Así, una página nueva que se
+ * olvide de chequear tampoco filtra nada.
+ */
+const PUEDE_VER = "usarCuentas";
 
 /** Una cuenta, como la muestra la lista de Personas (SPEC de work/cuentas §2 y §4.1). */
 export type CuentaEnLista = {
@@ -84,21 +93,24 @@ function enLista(fila: Fila, accesos: Map<string, Date>): CuentaEnLista {
   return { ...datosDe(fila), ultimoAcceso: accesos.get(fila.id)?.toISOString() ?? null };
 }
 
-/** Todas las cuentas: quien dirige primero, después por nombre. */
-export async function listarCuentas(): Promise<CuentaEnLista[]> {
+/** Todas las cuentas: quien dirige primero, después por nombre. Vacía si ese rol no usa Cuentas. */
+export async function listarCuentas(rolDeQuienMira: unknown): Promise<CuentaEnLista[]> {
+  if (!puede(rolDeQuienMira, PUEDE_VER)) return [];
   const [filas, accesos] = await Promise.all([base.user.findMany({ select: SELECCION }), ultimosAccesos()]);
   const primero = (c: CuentaEnLista) => (c.rol && esUnaSola(c.rol) ? 0 : 1);
   return filas.map((f) => enLista(f, accesos)).sort((a, b) => primero(a) - primero(b) || a.nombre.localeCompare(b.nombre, "es"));
 }
 
-/** Lo que una acción necesita saber de la cuenta sobre la que actúa, o `null` si no existe. */
-export async function cuentaParaActuar(id: string): Promise<DatosDeCuenta | null> {
+/** Lo que una acción necesita saber de la cuenta sobre la que actúa, o `null` si no existe o ese rol no usa Cuentas. */
+export async function cuentaParaActuar(rolDeQuienMira: unknown, id: string): Promise<DatosDeCuenta | null> {
+  if (!puede(rolDeQuienMira, PUEDE_VER)) return null;
   const fila = await base.user.findUnique({ where: { id }, select: SELECCION });
   return fila && datosDe(fila);
 }
 
-/** Una cuenta con su pantalla entera, o `null` si no existe. */
-export async function unaCuenta(id: string): Promise<FichaDeCuenta | null> {
+/** Una cuenta con su pantalla entera, o `null` si no existe o ese rol no usa Cuentas. */
+export async function unaCuenta(rolDeQuienMira: unknown, id: string): Promise<FichaDeCuenta | null> {
+  if (!puede(rolDeQuienMira, PUEDE_VER)) return null;
   const fila = await base.user.findUnique({ where: { id }, select: { ...SELECCION, twoFactorEnabled: true } });
   if (!fila) return null;
   const [accesos, actividad, sesiones] = await Promise.all([

@@ -1,18 +1,21 @@
 import type { Prisma } from "@/../prisma/generado/client";
-import { esTipoDeActividad, type TipoDeActividad } from "@/datos/actividad";
+import { puede } from "@ed/auth";
+import { esTipoDeActividad, tiposQueVe, type TipoDeActividad } from "@/datos/actividad";
 import { base } from "@/datos/cliente";
 
 /**
  * La actividad del admin para leerla: Cuentas › Actividad (SPEC de
  * work/cuentas §4.4). Paginada en la base, porque la tabla guarda 12 meses.
- * Recibe tipos y no módulos: qué tipos son de qué módulo, y cuáles puede ver
- * un rol, lo deciden la pantalla y `QUIEN_VE`.
+ * Recibe tipos y no módulos: qué tipos son de qué módulo lo decide la
+ * pantalla. **Recibe primero el rol de quien mira**: sin `usarCuentas` no lee
+ * nada, y de los tipos pedidos se queda con los que ese rol ve (`QUIEN_VE`).
+ * La guarda del layout no alcanza: la página viaja en el payload igual.
  */
 
 export const POR_PAGINA = 50;
 
 export type FiltrosDeActividad = {
-  /** Los que se pueden mostrar; vacío es nada. */
+  /** Los que pide la pantalla (un módulo, o todos); vacío es nada. */
   tipos: readonly TipoDeActividad[];
   /** El id de una cuenta. */
   persona?: string;
@@ -36,8 +39,13 @@ export type FilaDeActividad = {
 
 export type PaginaDeActividad = { filas: FilaDeActividad[]; total: number; pagina: number; paginas: number };
 
-export async function listarActividad({ tipos, persona, dias, texto, pagina }: FiltrosDeActividad): Promise<PaginaDeActividad> {
-  if (!tipos.length) return { filas: [], total: 0, pagina: 1, paginas: 1 };
+const NADA: PaginaDeActividad = { filas: [], total: 0, pagina: 1, paginas: 1 };
+
+export async function listarActividad(rolDeQuienMira: unknown, { tipos: pedidos, persona, dias, texto, pagina }: FiltrosDeActividad): Promise<PaginaDeActividad> {
+  if (!puede(rolDeQuienMira, "usarCuentas")) return NADA;
+  const visibles = new Set(tiposQueVe(rolDeQuienMira));
+  const tipos = pedidos.filter((t) => visibles.has(t));
+  if (!tipos.length) return NADA;
   const desde = dias ? new Date(Date.now() - dias * 24 * 60 * 60 * 1000) : undefined;
   const where: Prisma.ActividadWhereInput = {
     tipo: { in: [...tipos] },

@@ -30,26 +30,37 @@ after(async () => {
 
 test("pendiente sin contraseña, activa con ella, y suspendida gana a las dos", sinBase, async () => {
   const { unaCuenta } = await import("./cuentas");
-  assert.equal((await unaCuenta(await cuenta()))?.estado, "pendiente");
-  assert.equal((await unaCuenta(await cuenta({ conContrasena: true })))?.estado, "activa");
-  assert.equal((await unaCuenta(await cuenta({ conContrasena: true, suspendida: true })))?.estado, "suspendida");
-  assert.equal(await unaCuenta(randomUUID()), null);
+  assert.equal((await unaCuenta("administra", await cuenta()))?.estado, "pendiente");
+  assert.equal((await unaCuenta("administra", await cuenta({ conContrasena: true })))?.estado, "activa");
+  assert.equal((await unaCuenta("administra", await cuenta({ conContrasena: true, suspendida: true })))?.estado, "suspendida");
+  assert.equal(await unaCuenta("administra", randomUUID()), null);
 });
 
 test("el último acceso es lo más nuevo entre su último «entró» y sus sesiones abiertas", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
   const { unaCuenta, listarCuentas } = await import("./cuentas");
   const id = await cuenta({ conContrasena: true });
-  assert.equal((await unaCuenta(id))?.ultimoAcceso, null);
+  assert.equal((await unaCuenta("administra", id))?.ultimoAcceso, null);
 
   const entro = new Date("2026-09-01T10:00:00.000Z");
   await base.actividad.create({ data: { cuentaId: id, tipo: "entro", en: entro } });
-  assert.equal((await unaCuenta(id))?.ultimoAcceso, entro.toISOString());
+  assert.equal((await unaCuenta("administra", id))?.ultimoAcceso, entro.toISOString());
 
   await base.session.create({ data: { id, token: id, userId: id, expiresAt: new Date(Date.now() + 3_600_000) } });
-  const ficha = await unaCuenta(id);
+  const ficha = await unaCuenta("administra", id);
   assert.ok(ficha?.ultimoAcceso && new Date(ficha.ultimoAcceso) > entro);
   assert.equal(ficha?.tieneActividad, true);
   assert.equal(ficha?.sesiones.length, 1);
-  assert.equal((await listarCuentas()).find((c) => c.id === id)?.ultimoAcceso, ficha?.ultimoAcceso);
+  assert.equal((await listarCuentas("administra")).find((c) => c.id === id)?.ultimoAcceso, ficha?.ultimoAcceso);
+});
+
+test("sin usarCuentas no devuelve nada: ni la lista, ni la ficha, ni la cuenta para una acción", sinBase, async () => {
+  const { listarCuentas, unaCuenta, cuentaParaActuar } = await import("./cuentas");
+  const id = await cuenta({ conContrasena: true });
+  assert.ok(await unaCuenta("administra", id));
+  for (const rol of ["edita", undefined, "otro"]) {
+    assert.deepEqual(await listarCuentas(rol), []);
+    assert.equal(await unaCuenta(rol, id), null);
+    assert.equal(await cuentaParaActuar(rol, id), null);
+  }
 });
