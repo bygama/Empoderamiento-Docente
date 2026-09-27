@@ -31,12 +31,19 @@ function Miniatura({ src }: { src: string | null }) {
   );
 }
 
+/** «Consultado 3 veces este mes»: las del contador de Métricas, del 1 del mes hasta hoy. */
+function consultadoEsteMes(veces: number): string {
+  if (veces === 0) return "Sin consultas este mes";
+  return `Consultado ${veces} ${veces === 1 ? "vez" : "veces"} este mes`;
+}
+
 /**
  * Los materiales de la Biblioteca (`Lista` de DESIGN.md §11, con miniatura):
- * la portada, el título y, debajo, quién firma, el tipo y el año; a la
- * derecha el estado, la salud y «Editar», con el título para el lector.
+ * la portada, el título y, debajo, quién firma, el tipo, el año y cuántas
+ * veces se abrió este mes (`consultas`, por id); a la derecha el estado, la
+ * salud y «Editar», con el título para el lector.
  */
-export function ListaDeMateriales({ filas }: { filas: readonly FilaDeMaterial[] }) {
+export function ListaDeMateriales({ filas, consultas = new Map() }: { filas: readonly FilaDeMaterial[]; consultas?: ReadonlyMap<string, number> }) {
   return (
     <Lista>
       {filas.map((f) => {
@@ -47,7 +54,12 @@ export function ListaDeMateriales({ filas }: { filas: readonly FilaDeMaterial[] 
             key={f.id}
             miniatura={<Miniatura src={f.portada} />}
             principal={f.titulo ? f.titulo : <span className="text-gris-texto">{titulo}</span>}
-            detalle={[f.autores, f.tipo, f.anio].filter(Boolean).join(" · ") || "Todavía sin datos"}
+            detalle={
+              <>
+                <span className="block">{[f.autores, f.tipo, f.anio].filter(Boolean).join(" · ") || "Todavía sin datos"}</span>
+                <span className="block">{consultadoEsteMes(consultas.get(f.id) ?? 0)}</span>
+              </>
+            }
             insignias={
               <>
                 {insignia ? <Insignia tono={insignia.tono}>{insignia.texto}</Insignia> : null}
