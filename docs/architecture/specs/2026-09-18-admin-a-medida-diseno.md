@@ -164,9 +164,9 @@ Siete entidades, más las páginas y los ajustes:
 | `fotos` | imagen, alt obligatorio; el punto focal y el alt de cada lugar van con cada uso, que la encuentra por su URL | la migración `fotos_de_public` (las de `public/fotos`, `novedades`, `investigacion` y `aliados`) y las que sube el admin |
 | `novedades` | slug, fecha, categoría, título, bajada, imagen, destacada, cuerpo, el material que abre (`material_id`), imagen para redes | la migración `novedades` (era `features/novedades/data/novedades.ts`, borrado); `material_id`, de la migración `material_de_las_novedades` |
 | `materiales` | título, autores (solo la firma que no es una lista), descripción, tipo, tema, público, fecha, formato, páginas, portada, URL, fuente, DOI, cita, lugar de destacado y sus textos, el último chequeo del link | la migración `biblioteca` (era `features/biblioteca/data/materiales.ts`, borrado) |
-| `autorias` | quién firma cada material publicado, en orden, y el perfil del equipo si es de ED | la migración `biblioteca` |
+| `autorias` | quién firma cada material publicado, en orden, y el perfil del equipo si es de ED (`persona_id`, fk a `equipo`, `SET NULL`) | la migración `biblioteca`; la fk, de la migración `equipo` |
 | `casos` | número, pregunta, eje, indicio, ficha, contexto, evidencias, análisis | la migración `casos` (era `features/investigacion/data/casos.ts`, borrado) |
-| `equipo` | perfil: nombre, rol, lugar, etapas con hitos y publicaciones | `features/quienes-somos/data/equipo.ts` |
+| `equipo` | la tarjeta (nombre, rol, país, nivel, foto, orden) y el recorrido: quién es, la figura, las etapas con sus hitos y sus publicaciones (referencias a la Biblioteca), el cierre | la migración `equipo` (era `features/quienes-somos/data/equipo.ts`, borrado) |
 | `aliados` | nombre, logo, URL, **autorizado** (sin marcar no se publica: §5.4), atado al logo, al nombre y al texto del logo que se autorizaron (`autorizado_logo`, `autorizado_nombre`, `autorizado_alt`): con otro de los tres, publicar se niega y el sitio no lo muestra | la migración `aliados` (era `config/aliados.ts`, borrado) |
 | `cuentas` | mail, nombre, rol | no existe |
 | `paginas` | una fila por página, con su pestaña de SEO | los componentes y sus `data.ts` |
@@ -236,6 +236,21 @@ autorías; sin `cita`, la cita APA se arma con los datos de hoy; sin
 `portada`, el sitio muestra la tipográfica generada. El DOI es único y cada
 uno de los cuatro lugares de destacado también. `chequeo_en`, `chequeo` y
 `chequeo_detalle` los escribe la tarea `salud-de-links` del cron diario.
+
+**Equipo** (2026-09-27, `work/equipo/`) copia el molde: la tarjeta y el
+recorrido en columnas (una por texto; la formación, las categorías, la figura
+y las etapas en `jsonb`), nulas juntas en un perfil sin recorrido, y el
+borrador en un documento. La Dirección general es una sola (un índice único
+parcial) y la Dirección lleva dos; el orden es dentro del nivel y no va al
+borrador. **Las publicaciones de un perfil salen de la Biblioteca:** cada
+etapa guarda referencias a materiales que la persona firma (por el id del
+material), con el detalle y los conceptos del perfil; el título, el año, el
+tipo y el link son los del material, y una referencia a uno oculto o que la
+persona ya no firma no llega al sitio. Lo que no tiene link se escribe en la
+etapa. `autorias.persona` pasó a `persona_id`, con su fk. La bio y el LinkedIn
+de cada persona, que nada del sitio leía, no se mudaron: están en
+`docs/content/equipo-sin-publicar.md` para el JSON-LD de la fase 4, como las
+personas de referencia de Ajustes.
 
 **Métricas** (2026-09-27, `work/metricas-completas/`,
 [ADR-0017](../adrs/0017-contadores-propios-y-links-cortos.md)) no es
