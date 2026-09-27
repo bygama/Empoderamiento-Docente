@@ -137,3 +137,24 @@
   `ed_biblioteca`; los cuatro destacados de los 57 quedan como estaban, visto
   con `psql`); `acciones-con-sesion`, `actividad`, `frase` y los de Cuentas ›
   Actividad → 25 pass; `tsc --noEmit` → exit 0.
+
+- **Paso 8 — buscar datos.** `datos/biblioteca/`: `de-afuera.ts` (`camposDe`:
+  lo de una fuente pasado a los campos de un material —el tipo de la fuente a
+  uno de los siete, la fecha a `AAAA-MM`, las páginas de un rango, el resumen
+  cortado en una palabra, el link del DOI, y la cita con los apellidos exactos
+  solo si la fuente los separa o trae el volumen—; `juntar`: cada campo con la
+  primera fuente que lo dio), `buscar-datos.ts` (`buscarDatos`: DOI → Crossref,
+  y si no está OpenAlex; ISBN → Crossref; link → la página por el pedido
+  protegido, y si sus etiquetas traen un DOI, primero Crossref; después las
+  `citation_*` y el Open Graph) y `contra-la-biblioteca.ts` (el DOI que ya
+  está, los títulos parecidos, las personas del Equipo que ya firman con ese
+  nombre, y el `User-Agent` con el contacto del sitio). Las Server Actions
+  `buscarDatosDeMaterial` y `materialesParecidos` en
+  `datos/acciones/buscar-datos.ts`. `jatsATexto` saca también un «Resumen»
+  pegado al texto (visto en Bolema). Aceptación: `pnpm exec tsx --test
+  "src/datos/biblioteca/*.test.ts" src/datos/acciones/acciones-con-sesion.test.ts`
+  → 17 pass; `"src/lib/metadatos/*.test.ts"` → pass; `tsc --noEmit` → exit 0.
+  Contra las fuentes de verdad (script de un uso): un DOI de Bolema → todo de
+  Crossref; SciELO sin DOI → todo «de la página», con 21 páginas y la cita con
+  volumen y número; la RMF E → su `citation_doi` llevó a Crossref; el ISBN de
+  Gedisa → «No encontramos datos» (Crossref no lo tiene).

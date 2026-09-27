@@ -70,4 +70,5 @@ test("fechas de etiquetas, entidades y JATS", () => {
   assert.deepEqual(["2026/01/01", "08/2022", "2022-8-01", "2022", "sin fecha"].map(fechaDeEtiqueta), ["2026-01", "2022-08", "2022-08", "2022", undefined]);
   assert.equal(decodificarEntidades("Matem&aacute;tica &amp; &#x201C;ciencia&#8221; &raro;"), "Matemática & “ciencia” &raro;");
   assert.equal(jatsATexto("<jats:title>Resumen</jats:title><jats:p>Un  texto\n con <jats:italic>cursiva</jats:italic>.</jats:p>"), "Un texto con cursiva.");
+  assert.equal(jatsATexto("<jats:p>Resumen El objetivo de este escrito.</jats:p>"), "El objetivo de este escrito.");
 });
