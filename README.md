@@ -242,9 +242,9 @@ tiene los cimientos —entrar (con segundo factor por correo), salir y elegir
 contraseña—, **un Inicio** con lo pendiente, los números de la semana y la
 actividad reciente, **Cuentas** (invitar, cambiar roles, suspender y la
 actividad; ver «Las cuentas»), **Métricas con sus búsquedas en Google** (ver
-«Las métricas y lo programado»), **la edición de Inicio** (ver «Editar las
-páginas») y **Mensajes**, lo que llega por los formularios del sitio (ver
-«Mensajes»); las
+«Las métricas y lo programado»), **la edición de las páginas**, todas menos
+Novedades (ver «Editar las páginas»), y **Mensajes**, lo que llega por los
+formularios del sitio (ver «Mensajes»); las
 novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
@@ -313,15 +313,30 @@ lo tienen siempre). Decisión en el
 ### Editar las páginas
 
 En Contenido › Páginas (`/admin/contenido/paginas`) están las siete del sitio
-en el orden del menú. Se editan enteras **Inicio** (el hero, «¿Quiénes somos?»,
-«Misión», «En números», «Cómo trabajamos», «Áreas de especialización» y los
-textos de «Biblioteca y Novedades»), **Qué hacemos** (el hero, la escena del
-faro, «Cómo trabajamos», las áreas, los niveles, los proyectos y el cierre) y
-**Quiénes somos** (el hero, el origen, «Nuestra mirada» y los textos de «Quiénes
-sostienen ED»; las personas del equipo tienen su propio módulo). Cada sección nueva se suma escribiendo
-su esquema en `src/features/<pagina>/contenido/` y anotándola en
-`src/contenido/paginas.ts`, y el SEO de una página, con su `seo` en el mismo
-registro.
+en el orden del menú. Se editan enteras, con su SEO:
+
+- **Inicio**: el hero, «¿Quiénes somos?», «Misión», «En números», «Cómo
+  trabajamos», «Áreas de especialización» y los textos de «Biblioteca y
+  Novedades».
+- **Qué hacemos**: el hero, la escena del faro, «Cómo trabajamos», las áreas,
+  los niveles, los proyectos y el cierre.
+- **Quiénes somos**: el hero, el origen, «Nuestra mirada» y los textos de
+  «Quiénes sostienen ED»; las personas del equipo tienen su propio módulo.
+- **Investigación**: el hero y los cuatro pasos de su historia, las seis
+  líneas, el ciclo de investigación aplicada (las ocho estaciones, con su
+  versión breve para la lámina), el título de los casos y el cierre.
+- **Biblioteca**: el hero, la presentación de los destacados, el aviso del
+  catálogo sin resultados, el puente a Investigación y el cierre.
+- **Contacto**: el titular, la apertura (la frase pilar y el equipo) y el
+  cierre. Los temas de consulta no: el envío guarda su título en cada mensaje.
+
+Lo que muestran los casos, los materiales y las novedades se edita en su
+módulo, no en la página; los destinos de los botones y los rótulos de interfaz
+quedan en el código. Cada sección nueva se suma escribiendo su esquema en
+`src/features/<pagina>/contenido/` y anotándola en `src/contenido/paginas.ts`,
+y el SEO de una página, con su `seo` en el mismo registro: una página que no es
+la raíz arma su metadata con `openGraphDeLaPagina(padre)`
+(`src/config/metadata.ts`), o pierde la imagen del sitio al compartirse.
 
 **Lo que dos páginas muestran igual se edita en una sola.** Las siete áreas y
 las frases en verde del método viven en Qué hacemos, e Inicio las lee de ahí:
