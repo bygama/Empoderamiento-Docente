@@ -1,7 +1,8 @@
 # SPEC — Biblioteca: los materiales en la base, agregar por DOI y la salud de los links
 
 - **Fecha:** 2026-09-26
-- **Estado:** esperando la aprobación del padre (design-first)
+- **Estado:** aprobado por el padre el 2026-09-26, con dos precisiones (C e
+  I, ya escritas abajo; ver DECISIONS)
 - **Decide:** el padre de `work/mapa-del-admin/` (Mateo le delegó la
   aprobación, tablas y dependencias incluidas: DECISIONS del padre,
   2026-09-26)
@@ -59,7 +60,7 @@ son nulas solo mientras el material nunca se publicó.
 | --- | --- | --- | --- |
 | `id` | `uuid`, pk | la ficha: `/admin/biblioteca/[id]` | nueva |
 | `titulo` | `text`, nulo | | `titulo` |
-| `autores` | `text`, nulo | **cómo se leen** en el sitio: «A, B y C», o lo que haga falta («… (editores)») | `autores` · **[propuesta C]** |
+| `autores` | `text`, nulo | **nula por defecto**: el sitio lee las autorías unidas («A, B y C»). Solo la llevan las firmas que no son una lista («… (editores)»), como excepción | `autores` · **[C, precisada]** |
 | `descripcion` | `text`, nulo | | `descripcion` |
 | `tipo` | `text`, nulo | uno de los 7, lista cerrada en código | `tipo` |
 | `tema` | `text`, nulo | uno de los 11, lista cerrada en código | `tema` |
@@ -159,10 +160,9 @@ Como `features/novedades/contenido/`, en `features/biblioteca/contenido/`:
   `Intl.ListFormat`, que ya pone «e Iván») y el borrador vacío.
 - **`cita.ts`** — `citaApa(material)`, pura y con tests (§8.4).
 
-**Qué pide publicar** (`esquemaMaterial`): título, al menos un autor y cómo se
-leen, tipo, tema, público, fecha (al menos el año), formato, `url` y fuente, y
+**Qué pide publicar** (`esquemaMaterial`): título, al menos un autor, tipo, tema, público, fecha (al menos el año), formato, `url` y fuente, y
 si es destacado su rótulo, frase y detalle. **Opcional**: descripción,
-páginas, portada, DOI y cita. Lo opcional es lo que miden las insignias de
+páginas, portada, DOI, cita y la firma escrita (`autores`). Lo opcional es lo que miden las insignias de
 salud (§9.1).
 
 **Topes**, del contenido de hoy con aire: título 200 (hoy 158), cómo se leen
@@ -189,15 +189,19 @@ mismo archivo:
    genera un script desde `materiales.ts`, que valida cada fila con
    `esquemaMaterial`; el script no se commitea (como en Novedades).
 3. **Sus autorías**: los nombres salen de partir `autores` por «, », « y » y
-   « e »; las tres firmas que no son una lista («… (editores)», «Coordinación
-   de…, con…», «… y diez autoras y autores más») se cargan a mano con sus
-   nombres y conservan su texto en `autores`. Las personas de ED se vinculan
+   « e », y `autores` queda nula (el script comprueba que la lista unida da el
+   texto de hoy, letra por letra); las tres firmas que no son una lista («…
+   (editores)», «Coordinación de…, con…», «… y diez autoras y autores más»)
+   se cargan a mano con sus nombres y son las únicas que conservan su texto en
+   `autores`. Las personas de ED se vinculan
    por nombre, con una tabla revisada a mano en el script (§4.1).
 4. **Los DOI**: los de las 36 `url` de doi.org.
 5. **Las citas APA**: para las 36 con DOI, con los nombres de Crossref
    (apellido y nombre separados, volumen, número y páginas); para las 21 sin
    DOI, con `citaApa` y revisadas una por una. Pedirlas a Crossref es del
-   script, una vez, no de la migración.
+   script, una vez, al escribir la migración: quedan en el SQL como datos
+   fijos, con un comentario de dónde y cuándo salieron, y **aplicar la
+   migración nunca depende de la red** (I, precisada).
 6. **Los cuatro destacados**, con su lugar, rótulo, frase y detalle.
 7. **Las portadas**: las 57 de `public/biblioteca/portadas/`, centradas, con
    el alt «Portada de «título»» (el sitio las muestra decorativas, con alt
@@ -321,7 +325,8 @@ La «Ficha de una entidad» de DESIGN.md §11, con los campos de un material:
 - **Bloques**: «El material» (título, descripción, tipo, tema, público,
   fecha, formato, páginas); «Autores» (una `ListaVariable` de hasta 30: el
   nombre y, en un select, «De afuera» o una persona del Equipo; debajo, «Cómo
-  se leen», que sigue a la lista hasta que se escribe a mano); «Dónde se lee»
+  se lee la firma, solo si no es una lista de autores», vacío por defecto, con
+  la ayuda que dice cómo se va a leer si queda vacío); «Dónde se lee»
   (`url`, fuente, DOI); «Portada» (la generada, con «Usar otra» y «Volver a la
   generada», el patrón de la imagen para redes); «Cita APA» (con «Volver a la
   generada»); «Destacado» (el lugar, «No es destacado» o 1 a 4, diciendo quién
@@ -471,9 +476,8 @@ el formulario (una ruta del admin, con sesión).
 
 - **A.** Son 57 materiales, no 63: la regla de inventario manda el archivo.
 - **B.** Sin slug: los materiales no tienen URL propia en el sitio.
-- **C.** `autores` (texto, cómo se leen) se queda al lado de `autorias`: tres
-  firmas no son una lista y el sitio tiene que quedar igual; en la ficha, el
-  texto sigue a la lista hasta que se escribe a mano.
+- **C.** (precisada) `autores` es nula por defecto y el texto sale de las
+  autorías; solo las tres firmas que no son una lista la llevan escrita.
 - **D.** Cada autoría con nombre siempre y la persona opcional; `persona` es la
   clave del Equipo como texto, validada contra las 15 de hoy, y la 8b le pone
   la FK. La migración ya vincula por nombre.
