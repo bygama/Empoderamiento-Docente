@@ -10,7 +10,8 @@ type Props = { cuenta: FichaDeCuenta & { rol: NonNullable<FichaDeCuenta["rol"]> 
 /**
  * Suspender o reactivar, y borrar si nunca hizo nada. Suspender y reactivar
  * comparten `key`: son el mismo botón que cambia, y su aviso sobrevive al
- * redibujo. Si no se puede nada, se dice por qué.
+ * redibujo. No preguntan: se deshacen una con la otra. Borrar sí, porque no
+ * vuelve. Si no se puede nada, se dice por qué.
  */
 export function AccionesDeEstado({ cuenta, se }: Props) {
   if (!se.suspender && !se.reactivar && !se.borrar) {
@@ -31,7 +32,6 @@ export function AccionesDeEstado({ cuenta, se }: Props) {
           idDeCuenta={cuenta.id}
           texto="Suspender"
           enCurso="Suspendiendo…"
-          confirmar={`¿Suspender a ${cuenta.nombre}? Se le cierran las sesiones y no puede entrar hasta que se reactive su cuenta.`}
         />
       ) : null}
       {se.reactivar ? <BotonDeAccion key="estado" accion={reactivar} idDeCuenta={cuenta.id} texto="Reactivar" enCurso="Reactivando…" /> : null}
@@ -43,7 +43,7 @@ export function AccionesDeEstado({ cuenta, se }: Props) {
           texto="Borrar la cuenta"
           enCurso="Borrando…"
           variante="destructivo"
-          confirmar={`¿Borrar la cuenta de ${cuenta.nombre}? No se puede deshacer.`}
+          confirmar={{ pregunta: `¿Borrar la cuenta de ${cuenta.nombre}? No se puede deshacer.`, boton: "Sí, borrar" }}
           irA={CUENTAS.href}
         />
       ) : null}
@@ -70,7 +70,7 @@ export function AccionesDeInvitacion({ cuenta, se }: Props) {
           texto="Cancelar la invitación"
           enCurso="Cancelando…"
           variante="destructivo"
-          confirmar={`¿Cancelar la invitación de ${cuenta.nombre}? Se borra su cuenta y el enlace deja de servir.`}
+          confirmar={{ pregunta: `¿Cancelar la invitación de ${cuenta.nombre}? Se borra su cuenta y el enlace deja de servir.`, boton: "Sí, cancelarla" }}
           irA={CUENTAS.href}
         />
       ) : null}
