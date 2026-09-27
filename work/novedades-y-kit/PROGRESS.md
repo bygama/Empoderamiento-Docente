@@ -255,7 +255,93 @@
   ven los tres roles, y contra la base: cuenta el de 8 días y no el de 2).
   `pnpm --filter sitio test` 260/260 (1 salteado), lint y react-doctor 100.
 
+- **Paso 16 — DESIGN.md §11** (`a0a577c`). «Fecha», «Selección», «Lista
+  variable» y «Ficha de una entidad» nuevos; la casilla como componente del
+  kit; el estado vacío con su acción (ya no «llega con Novedades»); «Qué
+  cambió» plegado en una entidad y su lista en el armazón; las figuras de
+  «Cómo se ve» en `armazon/ComoSeVe.tsx` y cómo van en el panel. Aceptación:
+  `git grep -c -E "ListaVariable|Casilla|Seleccion|Se ve en" -- DESIGN.md` →
+  6.
+- **Paso 17 — el ADR y el spec del admin** (`fa9c9db`). **ADR-0014** (el 0013
+  lo tiene `work/cuentas/`, visto en `origin/mateo/cuentas`): el kit y su
+  frontera, y el modelo de entidad entero (columnas y borrador, dos esquemas,
+  estados, seis acciones, lo que garantiza la base, la vista previa, «Qué
+  cambió», la migración), con su fila en el índice. El spec del admin: el kit
+  tal como quedó (§3), la tabla `novedades` y el modelo (§6), la fase 2 hecha
+  (§9). Aceptación: `git grep -l "kit-admin" -- docs/architecture/adrs
+  docs/architecture/specs` lista `0014-kit-admin-y-modelo-de-entidad.md` y
+  el spec.
+- **Paso 18 — AGENTS.md y el README** (`fb9ba80`). AGENTS.md §3 (el árbol:
+  el kit, `admin/novedades/`, `campos/` sin los controles, las consultas y
+  acciones nuevas, `novedades/contenido/`, `lib/rss.ts`), §12 (la fase 2
+  existe; el modelo de entidad en una regla) y §13 (la fase 2, tildada). El
+  README: el kit, la sección «Novedades» con el feed y el ADR-0014.
+  Aceptación: `git grep -c "Lo único que todavía no existe es" -- AGENTS.md`
+  → exit 1 (no está); `git grep -c "kit-admin" -- AGENTS.md README.md` → 6 y
+  4.
+- **Limpieza:** las dos novedades de prueba («Prueba de la ficha», «Otra
+  prueba») borradas de `ed_novedades`; quedan las nueve publicadas.
+
+## Verification
+
+### 2026-09-26 — DoD de la lane (los 18 pasos + el gate del brief) — PASS
+
+- L1 static: `pnpm typecheck` → exit 0 (db, auth, kit-admin, sitio);
+  `pnpm lint` → exit 0; `node scripts/verificar-react-doctor.mjs` → exit 0,
+  «react-doctor: 100/100, sin diagnósticos (apps/sitio/src: 685 archivos ·
+  packages/db/src: 3 · packages/auth/src: 17 · packages/kit-admin/src: 19)».
+- L2 behavioral: `pnpm test` → exit 0 (sitio 265: 264 pass, 0 fail, 1
+  salteado, «las respuestas grabadas de la API se mapean enteras — sin
+  respuestas grabadas: falta correr A1», de antes; kit 3/3; auth 28/28).
+  `pnpm build` → exit 0: prerenderiza `/novedades`, las dos fichas y sus
+  imágenes, `/novedades/rss.xml`, y `/admin/novedades/imagen-para-redes` es
+  dinámica; su `.nft.json` lleva `manrope-latin-700-normal.woff` y
+  `logo-ed-negativo.png`. Arranca: el dev server de la lane en :3024 sirve
+  `/novedades` 200.
+- L2 render: base fresca de `main` (`15def2c`, worktree temporal con la
+  misma base, ya borrado) contra esta rama, `node scripts/comparar-render.mjs
+  <main>/apps/sitio apps/sitio` → exit 1, esperado: iguales todas salvo
+  `novedades.html` y las dos fichas. Sin mirar el orden, `novedades.html`
+  tiene las mismas 806 palabras, 51 links y 33 imágenes; solo cambian de
+  lugar «Problematizar la matemática escolar, en Bolema» y «Los criterios de
+  la derivada desde la variación, en AIEM» (el orden por fecha, aprobado). En
+  las cabeceras, lo buscado: el `alternate` del RSS y el título y la
+  descripción de la página en og/twitter; en las fichas, su título, su bajada
+  y la imagen generada (`/novedades/<slug>/imagen-para-redes`) en vez de las
+  del sitio. El Inicio, igual.
+- L3 end-to-end (navegador de Orca, sesión real): los recorridos de los pasos
+  11 a 14 (crear, guardar, errores en el campo, foto, publicar, 308 al
+  cambiar la URL, la destacada, despublicar, borrar, descartar, vista previa,
+  el panel) y, de nuevo en este cierre: el Inicio muestra «Nueva novedad»
+  (`/admin/novedades/nueva`) y la actividad de las novedades («… publicó la
+  novedad «…»», «… borró la novedad «Tercera prueba»», «… descartó los
+  cambios de la novedad «…»»); con un borrador de prueba llevado a 9 días,
+  el pendiente «1 novedad en borrador hace más de 7 días · «Otra prueba» ·
+  Ir a Borradores» (`/admin/novedades/borradores`). La imagen del panel sin
+  cookie → 307 a `/admin/entrar` (proxy) y con una cookie falsa → 401 (la
+  ruta). **Temas:** el menor contraste del texto del panel es 4,83:1 en claro
+  y en mixto y 7,08:1 en oscuro (medido en la página, con la cookie
+  `tema-del-admin`). **390 px:** el HTML de la ficha en un `srcdoc` de 390
+  (el admin no se deja enmarcar): sin desborde (375 de ancho útil), el panel
+  de 327 debajo del formulario y antes de «Qué cambió» y «Deshacer o sacar del
+  sitio». **Teclado:** el orden es formulario → panel → «Qué cambió» →
+  salida; «Usar otra» y «Ver en el sitio» llevan `claseDeBoton`
+  (`focus-visible:outline-2` `outline-offset-2` `outline-azul-medio`). El
+  anillo no se pudo ver en vivo: `orca keypress --key Tab` no mueve el foco
+  y un `focus()` por script no enciende `:focus-visible`.
+- Close review: **no se corre acá.** Es un hijo supervisado: el padre abre la
+  revisión de cierre después de `worker_done`.
+
 ## Abierto
 
 - **`publicacion` es texto hasta la lane 8** (DECISIONS, B): la lane 8
   (`biblioteca-y-equipo`) la pasa a una relación con materiales.
+- **`scrub: true` de antes, mudado:** `coreografia-movimiento.ts` lo trae de
+  `EdEnMovimiento` tal cual (AGENTS.md §8 pide 0.5 como mínimo); no se tocó
+  para no cambiar el sitio en esta lane.
+- **`RotadorPalabras.tsx` sigue por encima del tope de 200** (297 líneas con sus
+  comentarios; AGENTS.md §6): no se tocó.
+- **«Desde tu última visita»** del Inicio podría contar las novedades
+  publicadas; no lo pide el brief.
+- **`openGraphDeLaPagina`** (`config/metadata.ts`) es igual a la de la 4c,
+  que todavía no está en `main`: la que llegue segunda se queda con una.
