@@ -171,8 +171,10 @@ un release candidate de la 8 (ADR-0007).
             │   ├── avisos.ts    ← quién recibe el correo de cada mensaje nuevo, y mandarlo (tabla avisos)
             │   ├── limites-por-ip.ts ← el tope de envíos de los formularios públicos, atómico
             │   ├── formularios/ ← recibir Contacto y CV: validar, contar, guardar, avisar (ADR-0012)
-            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv)
-            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos)
+            │   ├── roles.ts     ← el único camino para cambiar un rol (ponerRol: prende el segundo factor si lo pide)
+            │   ├── sobre-cuentas.ts ← lo común de las acciones de Cuentas (queSePuede sobre la cuenta, borrar si nunca hizo nada)
+            │   ├── consultas/   ← lo que lee el sitio y el admin (paginas, editor-de-paginas, historial-de-paginas, metricas, busquedas, mensajes, ficha-de-mensaje, archivo-de-cv, cuentas, actividad)
+            │   ├── acciones/    ← Server Actions del admin (paginas, versiones, vista-previa, fotos, metricas, busquedas, mensajes, avisos, cuentas, invitaciones, estado-de-cuentas, direccion)
             │   │                   y lo que hacen en la base (editar-, publicar-, versiones-de-paginas, choque, mover-mensajes)
             │   ├── inicio/      ← lo que lee el Inicio: los registros de pendientes, de la semana y de lo nuevo (inicioPara)
             │   └── tareas/      ← lo programado: las tareas del cron diario (diarias.ts) y su registro (ADR-0011), la retención de mensajes
@@ -652,8 +654,10 @@ Reglas para el admin y sus datos:
   respuesta válida para una acción). La sesión dura 12 h sin uso y su cookie es
   `SameSite=Strict`: por eso el proxy rebota a la misma URL la navegación que
   llega de otro sitio sin ella. Contraseñas en Argon2id, bloqueo por cuenta,
-  tokens hasheados y la CSP del admin con nonce: ADR-0010. Nada del admin es
-  público.
+  tokens hasheados y la CSP del admin con nonce: ADR-0010. **Segundo factor
+  por correo**, obligatorio para dirige y administra (el CHECK
+  `user_segundo_factor_obligatorio`) y opcional para edita, y una cuenta
+  suspendida no abre sesión: ADR-0013. Nada del admin es público.
 - **Tres roles, dirige, administra y edita**, con sus capacidades en
   `packages/auth/src/permisos.ts`, el único archivo que compara contra el
   string de un rol: todo lo demás pregunta `puede(rol, "…")`. Cada layout de
