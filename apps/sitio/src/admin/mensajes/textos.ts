@@ -1,5 +1,5 @@
 import { BANDEJAS, type Bandeja, type EstadoDeMensaje } from "@/config/mensajes";
-import { DIAS_DE_SPAM, MESES_DE_GUARDA } from "@/config/privacidad";
+import { aLos } from "@/config/privacidad";
 
 // Lo que dicen las pantallas de Mensajes, en un lugar: el módulo, y qué decir
 // cuando una bandeja no tiene nada en un estado.
@@ -17,8 +17,12 @@ const DE_DONDE: Record<Bandeja, string> = {
   cv: "el formulario de CV del sitio",
 };
 
-/** Qué decir cuando la bandeja no tiene nada en ese estado. */
-export function vacioDe(bandeja: Bandeja, estado: EstadoDeMensaje, cvAbierto: boolean): { titulo: string; texto: string } {
+/**
+ * Qué decir cuando la bandeja no tiene nada en ese estado. `plazos` son los
+ * que rigen hoy en Ajustes › Privacidad: el de la bandeja, en meses, y el del
+ * spam, en días.
+ */
+export function vacioDe(bandeja: Bandeja, estado: EstadoDeMensaje, cvAbierto: boolean, plazos: { guarda: number; spam: number }): { titulo: string; texto: string } {
   const { varias } = COSA[bandeja];
   switch (estado) {
     case "nuevo":
@@ -32,9 +36,9 @@ export function vacioDe(bandeja: Bandeja, estado: EstadoDeMensaje, cvAbierto: bo
     case "en-curso":
       return { titulo: `No hay ${varias} en curso`, texto: "Los que alguien tome con «Lo tomo yo» aparecen acá." };
     case "cerrado":
-      return { titulo: `No hay ${varias} cerrados`, texto: `Se borran solos a los ${MESES_DE_GUARDA[bandeja]} meses de llegar.` };
+      return { titulo: `No hay ${varias} cerrados`, texto: `Se borran solos ${aLos(bandeja, plazos.guarda)} de llegar.` };
     case "spam":
-      return { titulo: "No hay spam", texto: `Lo que se marque como spam se borra solo a los ${DIAS_DE_SPAM} días.` };
+      return { titulo: "No hay spam", texto: `Lo que se marque como spam se borra solo ${aLos("spam", plazos.spam)}.` };
   }
 }
 

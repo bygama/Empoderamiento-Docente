@@ -19,8 +19,10 @@ test("cada fila de Mensajes aparece cuando hay algo y no cuando no hay", () => {
   assert.equal(filaDeCvNuevos(3)?.titulo, "3 CV nuevos");
   assert.equal(filaDeMensajesSinLeer(0), null);
   assert.equal(filaDeMensajesSinLeer(2)?.titulo, "2 mensajes de contacto sin leer");
-  assert.equal(filaDeCvQueSeBorran(0), null);
-  assert.equal(filaDeCvQueSeBorran(1)?.titulo, "1 CV se borra en 7 días");
+  assert.equal(filaDeCvQueSeBorran(0, 12), null);
+  assert.equal(filaDeCvQueSeBorran(1, 12)?.titulo, "1 CV se borra en 7 días");
+  assert.equal(filaDeCvQueSeBorran(1, 12)?.detalle, "A los 12 meses de llegar se borran solos, con su archivo.");
+  assert.equal(filaDeCvQueSeBorran(1, 1)?.detalle, "Al mes de llegar se borran solos, con su archivo.");
 });
 
 test("quien edita ve los mensajes de contacto sin leer, pero ninguna fila de CV", () => {
@@ -63,9 +65,10 @@ test("los CV que se borran en 7 días son los de seBorraEl, también el spam", s
   ];
   try {
     await base.mensaje.createMany({ data: filas });
-    assert.equal(await cvQueSeBorranPronto(hoy), 2);
+    const deAntes = { cv: [{ desde: new Date(0), valor: 12 }], contacto: [{ desde: new Date(0), valor: 24 }], spam: 30 };
+    assert.equal(await cvQueSeBorranPronto(hoy, deAntes), 2);
     const limite = new Date(hoy.getTime() + 7 * 86_400_000);
-    const segunLaFicha = filas.filter((f) => f.bandeja === "cv" && seBorraEl({ ...f, bandeja: "cv", estado: f.estado as "nuevo" | "spam" }) <= limite);
+    const segunLaFicha = filas.filter((f) => f.bandeja === "cv" && seBorraEl({ ...f, bandeja: "cv", estado: f.estado as "nuevo" | "spam" }, deAntes) <= limite);
     assert.equal(segunLaFicha.length, 2);
   } finally {
     await base.mensaje.deleteMany({ where: { correo } });

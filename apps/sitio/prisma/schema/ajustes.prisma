@@ -31,3 +31,24 @@ model DatosDelSitio {
 
   @@map("datos_del_sitio")
 }
+
+/// Cada plazo de retención, con desde cuándo rige: una fila por cambio, y
+/// nunca se edita una (work/ajustes/SPEC.md §4, ADR-0014). El historial es lo
+/// que cumple la promesa: a lo que llegó se le aplica el menor entre el plazo
+/// que regía al llegar y cualquiera posterior, así alargar no toca lo ya
+/// recibido y acortar vale para todo (`config/privacidad.ts`). La migración
+/// `plazos_de_retencion` cargó los tres de antes, vigentes desde siempre.
+model PlazoDeRetencion {
+  id        String   @id @default(uuid())
+  /// cv | contacto (en meses) · spam (en días). Lista cerrada en código
+  /// (`config/privacidad.ts`), no en un enum de Postgres.
+  que       String
+  valor     Int
+  /// Desde cuándo rige. Los iniciales, desde el 1 de enero de 1970: siempre.
+  desde     DateTime @default(now())
+  /// El nombre de quien lo puso, en llano; null en los iniciales.
+  puestoPor String?  @map("puesto_por")
+
+  @@index([que, desde])
+  @@map("plazos_de_retencion")
+}

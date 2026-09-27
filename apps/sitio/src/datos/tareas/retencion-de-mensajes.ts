@@ -1,29 +1,35 @@
-import { DIAS_DE_SPAM, MESES_DE_GUARDA, bordeDeGuarda, bordeDelSpam } from "@/config/privacidad";
+import { bordeDelSpam, enPalabras, type PlazosDeGuarda } from "@/config/privacidad";
 import type { AlmacenPrivado } from "@/lib/formularios/almacen-privado";
 import type { ResultadoDeTarea, Tarea } from "@/lib/tareas/registro";
 import { base } from "@/datos/cliente";
 import { almacenDeCV } from "@/datos/formularios/cv";
 import { podarLimites } from "@/datos/limites-por-ip";
+import { llegoVencido, plazosDeLaBase } from "@/datos/privacidad";
 
 // La retención de Mensajes (work/mensajes/SPEC.md §8), como tareas del cron
-// diario (ADR-0011): Contacto a los 24 meses, un CV a los 12 con su archivo y
-// el spam a los 30 días de marcado; los plazos, de `config/privacidad.ts`. El
-// detalle de cada corrida dice cuántos borró y nada más: es el rastro de lo
-// automático, que no va a `actividad` porque ahí todo es de una persona.
+// diario (ADR-0011): Contacto, un CV con su archivo y el spam, cada uno a su
+// plazo. Los plazos son los de Ajustes › Privacidad, de la base y sin
+// respaldo (`plazosDeLaBase`), contados como dice `config/privacidad.ts`: a
+// lo que llegó, el menor entre el plazo de cuando llegó y cualquiera
+// posterior (ADR-0014). El detalle de cada corrida dice cuántos borró y nada
+// más: es el rastro de lo automático, que no va a `actividad` porque ahí todo
+// es de una persona.
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 
 const seBorraron = (n: number, uno: string, varios: string) => (n === 1 ? `Se borró 1 ${uno}` : `Se borraron ${n} ${varios}`);
 
-export async function retenerContacto(hoy: Date = new Date()): Promise<ResultadoDeTarea> {
-  // A la vez: un spam que además pasó los 24 meses lo borra una sola y cuenta una vez.
+/** `plazos` se pasa para probar con unos fijos; el cron los lee de la base. */
+export async function retenerContacto(hoy: Date = new Date(), plazos?: PlazosDeGuarda): Promise<ResultadoDeTarea> {
+  const { contacto, spam: diasDeSpam } = plazos ?? (await plazosDeLaBase());
+  // A la vez: un spam que además pasó su plazo lo borra una sola y cuenta una vez.
   const [spam, viejos] = await Promise.all([
-    base.mensaje.deleteMany({ where: { bandeja: "contacto", estado: "spam", estadoEn: { lt: bordeDelSpam(hoy) } } }),
-    base.mensaje.deleteMany({ where: { bandeja: "contacto", recibidoEn: { lt: bordeDeGuarda("contacto", hoy) } } }),
+    base.mensaje.deleteMany({ where: { bandeja: "contacto", estado: "spam", estadoEn: { lt: bordeDelSpam(diasDeSpam, hoy) } } }),
+    base.mensaje.deleteMany({ where: { bandeja: "contacto", ...llegoVencido(contacto, hoy) } }),
   ]);
   const total = spam.count + viejos.count;
   if (!total) return { ok: true, detalle: "No había mensajes de Contacto vencidos." };
-  const cuales = `${viejos.count} de más de ${MESES_DE_GUARDA.contacto} meses y ${spam.count} de spam de más de ${DIAS_DE_SPAM} días`;
+  const cuales = `${viejos.count} ${viejos.count === 1 ? "que pasó" : "que pasaron"} su plazo y ${spam.count} de spam de más de ${enPalabras("spam", diasDeSpam)}`;
   return { ok: true, detalle: `${seBorraron(total, "mensaje de Contacto", "mensajes de Contacto")}: ${cuales}.` };
 }
 
@@ -32,17 +38,18 @@ export async function retenerContacto(hoy: Date = new Date()): Promise<Resultado
  * se pudo borrar, la fila queda para que la corrida de mañana lo reintente, y
  * esta queda como fallida.
  */
-export async function retenerCV(hoy: Date = new Date(), almacen: () => AlmacenPrivado = almacenDeCV): Promise<ResultadoDeTarea> {
-  const vencidos = await base.mensaje.findMany({
+export async function retenerCV(hoy: Date = new Date(), almacen: () => AlmacenPrivado = almacenDeCV, plazos?: PlazosDeGuarda): Promise<ResultadoDeTarea> {
+  const { cv, spam } = plazos ?? (await plazosDeLaBase());
+  const aBorrar = await base.mensaje.findMany({
     where: {
       bandeja: "cv",
-      OR: [{ recibidoEn: { lt: bordeDeGuarda("cv", hoy) } }, { estado: "spam", estadoEn: { lt: bordeDelSpam(hoy) } }],
+      OR: [...llegoVencido(cv, hoy).OR, { estado: "spam", estadoEn: { lt: bordeDelSpam(spam, hoy) } }],
     },
     select: { id: true, archivo: true, estado: true },
   });
   // Lo que se borró de cada uno: si era spam o no, para el detalle; `null` si no se pudo.
   const hechos = await Promise.all(
-    vencidos.map(async ({ id, archivo, estado }) => {
+    aBorrar.map(async ({ id, archivo, estado }) => {
       try {
         if (archivo) await almacen().borrar(archivo);
         await base.mensaje.delete({ where: { id } });

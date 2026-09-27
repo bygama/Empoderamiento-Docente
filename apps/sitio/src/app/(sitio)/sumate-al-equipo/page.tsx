@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { camposDelCV, cvAbierto } from "@/config/cv";
+import { vigente } from "@/config/privacidad";
 import { datosDelSitio } from "@/datos/consultas/sitio";
+import { plazosDeGuarda } from "@/datos/privacidad";
 import { SumateAlEquipo } from "@/features/cv/components/SumateAlEquipo";
 
 export const metadata: Metadata = {
@@ -18,10 +20,10 @@ export const metadata: Metadata = {
  */
 export default async function SumateAlEquipoPage() {
   if (!cvAbierto()) notFound();
-  const sitio = await datosDelSitio();
+  const [sitio, plazos] = await Promise.all([datosDelSitio(), plazosDeGuarda()]);
   return (
     <main id="contenido" tabIndex={-1}>
-      <SumateAlEquipo campos={camposDelCV(sitio.paises)} correo={sitio.correo} />
+      <SumateAlEquipo campos={camposDelCV(sitio.paises)} correo={sitio.correo} mesesDeGuarda={vigente(plazos.cv)} />
     </main>
   );
 }

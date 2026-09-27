@@ -79,6 +79,7 @@ export function ContactoExperiencia({
   apertura,
   cierre,
   contacto,
+  mesesDeGuarda,
 }: {
   cvAbierto: boolean;
   titular: Titular;
@@ -86,6 +87,8 @@ export function ContactoExperiencia({
   cierre: CierreDeContacto;
   /** El correo, el WhatsApp, la oficina y los países, de Ajustes › Datos del sitio. */
   contacto: ContactoDelSitio;
+  /** Cuántos meses se guarda un contacto, de Ajustes › Privacidad. */
+  mesesDeGuarda: number;
 }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
@@ -200,6 +203,7 @@ export function ContactoExperiencia({
           envio={envio}
           cvAbierto={cvAbierto}
           contacto={contacto}
+          mesesDeGuarda={mesesDeGuarda}
           onCambiar={() => cambiarTema(contexto())}
           onEnviar={(e: FormEvent<HTMLFormElement>) => void enviar(contexto(), e, contacto.correo)}
         />
