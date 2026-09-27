@@ -846,7 +846,9 @@ el sitio?» de un vistazo. `apps/sitio/src/admin/inicio/`.
   línea y los números quedan a distinta altura); de a dos solo entre `sm` y
   `lg`, y si quedan impares (quien edita no ve los CV), el último toma las
   dos columnas. Debajo, el período una sola vez. **La actividad**, una
-  `Lista` de una línea por evento.
+  `Lista` de una línea por evento, solo con lo que cambia algo del sitio o
+  del admin (publicar, descartar, restaurar…): las sesiones y la cuenta
+  propia taparían eso y quedan en Cuentas › Actividad.
 - **Los dos títulos de arriba van a la misma altura:** «Pendientes» tiene 40
   px de alto, como la fila de «Esta semana» con su link. Si la semana es más
   alta que la columna de la izquierda, el sobrante va abajo, nunca entre los
