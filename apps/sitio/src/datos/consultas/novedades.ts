@@ -35,7 +35,7 @@ function paraElSitio(documento: unknown, id: string): NovedadDelSitio | null {
     console.warn(`La novedad ${id} no pasa su esquema; no se muestra.`);
     return null;
   }
-  return { ...valida.data, cuerpo: anclasDe(valida.data.cuerpo) };
+  return { ...valida.data, id, cuerpo: anclasDe(valida.data.cuerpo) };
 }
 
 /**
@@ -48,7 +48,7 @@ function paraElSitio(documento: unknown, id: string): NovedadDelSitio | null {
 function visible(fila: Fila, enVistaPrevia: boolean): NovedadDelSitio | null {
   if (!enVistaPrevia) return fila.publicada ? paraElSitio(publicadoDe(fila), fila.id) : null;
   const borrador = fila.borrador === null ? null : esquemaNovedad.safeParse(fila.borrador);
-  if (borrador?.success) return { ...borrador.data, cuerpo: anclasDe(borrador.data.cuerpo) };
+  if (borrador?.success) return { ...borrador.data, id: fila.id, cuerpo: anclasDe(borrador.data.cuerpo) };
   return fila.publicada ? paraElSitio(publicadoDe(fila), fila.id) : null;
 }
 

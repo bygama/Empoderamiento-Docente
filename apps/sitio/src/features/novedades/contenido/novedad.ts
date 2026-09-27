@@ -98,5 +98,9 @@ export type Novedad = z.output<typeof esquemaNovedad>;
 export type BorradorDeNovedad = z.output<typeof esquemaBorrador>;
 export type SeccionDelCuerpo = Novedad["cuerpo"][number];
 
-/** Lo que reciben los componentes del sitio: la novedad, con el ancla de cada sección del cuerpo (`anclasDe`). */
-export type NovedadDelSitio = Omit<Novedad, "cuerpo"> & { cuerpo: Array<SeccionDelCuerpo & { ancla: string }> };
+/**
+ * Lo que reciben los componentes del sitio: la novedad, con el ancla de cada
+ * sección del cuerpo (`anclasDe`) y el id de su fila, que no cambia aunque
+ * cambie la URL (el `guid` del RSS).
+ */
+export type NovedadDelSitio = Omit<Novedad, "cuerpo"> & { id: string; cuerpo: Array<SeccionDelCuerpo & { ancla: string }> };
