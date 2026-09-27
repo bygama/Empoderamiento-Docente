@@ -53,7 +53,7 @@ export async function borrarCuenta(idDeCuenta: string): Promise<Resultado> {
     if (!puede(sesion.user.rol, "usarCuentas")) return NO_PUEDE;
     return await sobreLaCuenta(sesion, idDeCuenta, "borrar", async (cuenta) => {
       if ((await borrarSiNuncaHizoNada(cuenta.id)) === "tiene-historia") {
-        return { ok: false, detalle: `${cuenta.nombre} ya hizo cosas en el admin y su nombre queda en la historia: suspendela.` };
+        return { ok: false, detalle: `${cuenta.nombre} ya hizo cosas en el admin y su nombre queda en la historia: suspendé su cuenta.` };
       }
       await registrarActividad({ tipo: "borro-una-cuenta", quien: sesion.user.id, sobre: cuenta.nombre, sobreId: cuenta.id });
       revalidatePath("/admin/cuentas", "layout");

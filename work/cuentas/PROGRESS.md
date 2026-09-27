@@ -192,7 +192,7 @@
   «Buscador» y «Paginado», con contrastes y primer consumidor, y la línea de
   historia del §11. Aceptación: `pnpm --filter sitio typecheck` y `lint` exit
   0; react-doctor 100/100.
-- **Paso 13 — Personas e Invitar** (este commit). `cuentas/layout.tsx` con
+- **Paso 13 — Personas e Invitar** (`5305a6b`). `cuentas/layout.tsx` con
   `<Guarda capacidad="usarCuentas">`; `cuentas/page.tsx` (Personas: el
   encabezado con las pestañas Personas · Actividad y el primario «Invitar a
   alguien», «Qué puede cada rol» y la lista) y `cuentas/invitar/page.tsx`
@@ -212,5 +212,26 @@
   puede cada rol», las tres cuentas e «Invitar a alguien», título «Cuentas ·
   Admin ED»; `/admin/cuentas/invitar` → 200, «Invitar · Admin ED»; como
   edita, `/admin/cuentas` → «Esta sección es de quien dirige o administra».
+- **Paso 14 — una cuenta** (este commit). `cuentas/[id]/page.tsx` (título con
+  el nombre, 404 si no existe, `queSePuede` con la sesión, y el aviso de
+  Invitar por `?invitacion=salio|no-salio`). `admin/cuentas/FichaDeLaCuenta.tsx`
+  compone: «← Cuentas», el nombre con la insignia, correo y último acceso, y
+  los apartados de `ficha/Apartados.tsx` (Datos con el cambio de correo,
+  Rol con el selector, Estado o Invitación, Segundo factor, Sesiones, La
+  dirección), cada uno según `queSePuede`. Piezas de cliente en `ficha/`:
+  `BotonDeAccion` (confirma con `window.confirm`, como «Descartar» del editor
+  de páginas, lo que no se deshace con un clic; suspender y reactivar
+  comparten `key` para que el aviso sobreviva), `FormularioDelRol`,
+  `FormularioDelCorreo` y `FormularioDeLaDireccion`; `ficha/Acciones.tsx`
+  para Estado e Invitación. `mi-cuenta/Sesiones.tsx` exporta
+  `ListaDeSesiones` (las filas), que usan Mi cuenta y la ficha. Copy
+  revisado con lenguaje inclusivo (sin pronombres con género sobre la
+  persona). react-doctor pidió partir la ficha (complejidad 14): los
+  apartados pasaron a su archivo. Aceptación: `pnpm --filter sitio
+  typecheck`, `lint` y `test` (165 pass) exit 0; react-doctor 100/100; en el
+  3017 como administra: `/admin/cuentas/no-existe` → 404; la de Eli → 200 con
+  Datos, Rol, Estado, Segundo factor y Sesiones, y «Suspender», «Cambiar el
+  rol», «Cambiar el correo», «Cerrar sus sesiones»; la de quien dirige →
+  sin acciones y «no se suspende ni se borra: se pasa la dirección».
 
 ## Abierto
