@@ -29,7 +29,7 @@ export function ApartadoDeDatos({ cuenta, se, esLaPropia }: DeLaFicha) {
           .
         </p>
       ) : null}
-      {se.cambiarElCorreo ? <FormularioDelCorreo idDeCuenta={cuenta.id} correo={cuenta.correo} esLaPropia={esLaPropia} /> : <p className="break-all">{cuenta.correo}</p>}
+      {se.cambiarElCorreo ? <FormularioDelCorreo idDeCuenta={cuenta.id} correo={cuenta.correo} /> : <p className="break-all">{cuenta.correo}</p>}
     </Apartado>
   );
 }
@@ -94,7 +94,6 @@ export function ApartadoDeSesiones({ cuenta, se }: DeLaFicha) {
               idDeCuenta={cuenta.id}
               texto="Cerrar sus sesiones"
               enCurso="Cerrando…"
-              confirmar={`¿Cerrar las sesiones de ${cuenta.nombre}?`}
             />
           ) : null}
         </div>

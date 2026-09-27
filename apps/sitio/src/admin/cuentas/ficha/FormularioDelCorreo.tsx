@@ -7,10 +7,11 @@ import { Aviso, Campo } from "@/admin/armazon/Campos";
 import { cambiarElCorreo } from "@/datos/acciones/cuentas";
 
 /**
- * Cambiar el correo con que entra una cuenta. Pregunta antes: le cierra las
- * sesiones, y un correo mal escrito la deja sin poder recibir su código.
+ * Cambiar el correo con que entra una cuenta: le cierra las sesiones (si es la
+ * propia, las otras) y avisa a las dos direcciones. No pregunta antes: se
+ * deshace cambiándolo de nuevo (DESIGN.md §11 pide confirmar lo que no vuelve).
  */
-export function FormularioDelCorreo({ idDeCuenta, correo, esLaPropia }: { idDeCuenta: string; correo: string; esLaPropia: boolean }) {
+export function FormularioDelCorreo({ idDeCuenta, correo }: { idDeCuenta: string; correo: string }) {
   const router = useRouter();
   const [resultado, setResultado] = useState<{ ok: boolean; detalle: string } | null>(null);
   const [guardando, setGuardando] = useState(false);
@@ -19,8 +20,6 @@ export function FormularioDelCorreo({ idDeCuenta, correo, esLaPropia }: { idDeCu
   async function cambiar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     const nuevo = String(new FormData(evento.currentTarget).get("correo") ?? "");
-    const quien = esLaPropia ? "Se cierran tus otras sesiones" : "Se le cierran las sesiones";
-    if (!window.confirm(`¿Cambiar el correo a ${nuevo}? ${quien} y avisamos a las dos direcciones.`)) return;
     setGuardando(true);
     const r = await cambiarElCorreo(idDeCuenta, nuevo);
     setGuardando(false);
