@@ -6,6 +6,7 @@ import { estaAutorizado, loQueSeAutoriza } from "@/features/aliados/contenido/au
 import { TOPES } from "@/features/aliados/contenido/modelo";
 import { NO_EXISTE, nombreDelAliado } from "./aliados-en-base";
 import type { Fallo } from "./choque";
+import { tiraMovida } from "./tira-de-aliados";
 
 // La marca «Autorizado» de un aliado y su lugar en la tira
 // (`work/casos-aliados-fotos/SPEC.md` §5 y §5.1), con el cliente inyectado.
@@ -61,15 +62,12 @@ export async function autorizarAliadoEnBase(
 
 /** Sube o baja un lugar en la tira, cambiándolo con el de al lado. En una punta, no hace nada. */
 export async function moverAliadoEnBase(base: PrismaClient, { id, hacia }: { id: string; hacia: "antes" | "despues" }): Promise<{ ok: true; movio: boolean } | Fallo> {
-  const filas = await base.aliado.findMany({ orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true, orden: true } });
-  const i = filas.findIndex((f) => f.id === id);
-  if (i < 0) return NO_EXISTE;
-  const j = hacia === "antes" ? i - 1 : i + 1;
-  if (j < 0 || j >= filas.length) return { ok: true, movio: false };
+  const filas = await base.aliado.findMany({ orderBy: [{ orden: "asc" }, { creadoEn: "asc" }], select: { id: true } });
+  const nuevo = tiraMovida(filas.map((f) => f.id), id, hacia);
+  if (nuevo === undefined) return NO_EXISTE;
+  if (nuevo === null) return { ok: true, movio: false };
   // Se renumera toda la tira en su orden nuevo: así un orden repetido de antes no deja dos en el mismo lugar.
   // `updateMany` y no `update`: si alguien borró un aliado entre la lectura y esto, se saltea en vez de tirar.
-  const nuevo = filas.map((f) => f.id);
-  [nuevo[i], nuevo[j]] = [nuevo[j], nuevo[i]];
   await base.$transaction(nuevo.map((idDe, k) => base.aliado.updateMany({ where: { id: idDe }, data: { orden: k + 1 } })));
   return { ok: true, movio: true };
 }

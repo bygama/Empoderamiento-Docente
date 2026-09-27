@@ -17,6 +17,9 @@ cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
 const carpeta = mkdtempSync(path.join(os.tmpdir(), "ed-editar-fotos-"));
 const almacen = almacenEnDisco(carpeta);
+// Lo que crea cada test, por id: se borra al final sin tocar filas de otros tests que corren a la vez.
+const novedades: string[] = [];
+const aliados: string[] = [];
 
 async function modulos() {
   const { base } = await import("@/datos/cliente");
@@ -60,7 +63,11 @@ test("borrar frena si se usa, y si no se usa se lleva la fila y el archivo", sin
 test("reemplazar cambia el archivo en cada uso y en la fila, y borra el viejo después", sinBase, async () => {
   const { base, reemplazarFotoEnBase } = await modulos();
   const foto = await subida("Prueba editar reemplazar");
-  await base.novedad.create({ data: { slug: "prueba-editar-foto", titulo: "Prueba", imagen: { src: foto.src, alt: "En la novedad", foco: { x: 0.5, y: 0.5 } }, publicada: true } });
+  // Su propia novedad, con un slug que no toma el prefijo de ningún otro test, y se lee por su id.
+  const propia = await base.novedad.create({
+    data: { slug: `fotos-reemplazo-${foto.id}`, titulo: "Prueba", imagen: { src: foto.src, alt: "En la novedad", foco: { x: 0.5, y: 0.5 } }, publicada: true },
+  });
+  novedades.push(propia.id);
   // Con un uso en el código no se reemplaza, y no deja archivo nuevo.
   const antes = readdirSync(carpeta).length;
   const frenada = await reemplazarFotoEnBase(base, almacen, { id: foto.id, archivo: await webp("#e36c2d"), registro: enElCodigo(foto.src) });
@@ -72,7 +79,7 @@ test("reemplazar cambia el archivo en cada uso y en la fila, y borra el viejo de
   assert.equal(r.ok, true);
   const fila = await base.foto.findUniqueOrThrow({ where: { id: foto.id } });
   assert.notEqual(fila.url, foto.src);
-  const novedad = await base.novedad.findFirstOrThrow({ where: { slug: "prueba-editar-foto" } });
+  const novedad = await base.novedad.findUniqueOrThrow({ where: { id: propia.id } });
   assert.deepEqual(novedad.imagen, { src: fila.url, alt: "En la novedad", foco: { x: 0.5, y: 0.5 } });
   assert.ok(r.ok && r.regenerar.some((x) => x.ruta === "/novedades"));
   // El viejo no está; el nuevo sí.
@@ -82,19 +89,25 @@ test("reemplazar cambia el archivo en cada uso y en la fila, y borra el viejo de
 
 test("el logo autorizado de un aliado no se reemplaza: cambiaría el logo sin que nadie lo autorice", sinBase, async () => {
   const { base, reemplazarFotoEnBase } = await modulos();
-  const logo = await base.foto.findUniqueOrThrow({ where: { url: "/aliados/unesco.png" } });
+  // Su propia foto y su propio aliado, autorizado con ese logo.
+  const logo = await subida("Prueba editar logo");
+  const aliado = await base.aliado.create({
+    data: { nombre: "Prueba editar aliado", logo: { src: logo.src, alt: "Logo", foco: { x: 0.5, y: 0.5 } }, tamano: "chico", orden: -1, autorizado: true, autorizadoLogo: logo.src, autorizadoNombre: "Prueba editar aliado", autorizadoAlt: "Logo" },
+  });
+  aliados.push(aliado.id);
   const antes = readdirSync(carpeta).length;
   const r = await reemplazarFotoEnBase(base, almacen, { id: logo.id, archivo: await webp("#e36c2d") });
-  assert.deepEqual(r, { ok: false, detalle: "Es el logo autorizado de UNESCO: subí el nuevo y cambialo desde su ficha, que pide volver a autorizarlo." });
+  assert.deepEqual(r, { ok: false, detalle: "Es el logo autorizado de Prueba editar aliado: subí el nuevo y cambialo desde su ficha, que pide volver a autorizarlo." });
   // Ni la fila ni el archivo cambiaron, y no quedó un archivo nuevo.
-  assert.equal((await base.foto.findUniqueOrThrow({ where: { id: logo.id } })).url, "/aliados/unesco.png");
+  assert.equal((await base.foto.findUniqueOrThrow({ where: { id: logo.id } })).url, logo.src);
   assert.equal(readdirSync(carpeta).length, antes);
 });
 
 after(async () => {
   if (process.env.DATABASE_URL) {
     const { base } = await modulos();
-    await base.novedad.deleteMany({ where: { slug: "prueba-editar-foto" } });
+    await base.novedad.deleteMany({ where: { id: { in: novedades } } });
+    await base.aliado.deleteMany({ where: { id: { in: aliados } } });
     await base.foto.deleteMany({ where: { alt: { startsWith: "Prueba editar" } } });
   }
   await rm(carpeta, { recursive: true, force: true });
