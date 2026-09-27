@@ -59,8 +59,11 @@ export function ponerCabeceras(cabeceras: Headers, { csp, esAdmin }: { csp: stri
   // `robots.txt` es un pedido, no una regla: esto es la negativa de verdad, y
   // viaja en la respuesta aunque alguien llegue por un link directo.
   cabeceras.set("X-Robots-Tag", "noindex, nofollow");
-  // Una página del admin no se guarda en ningún cache intermedio.
-  cabeceras.set("Cache-Control", "no-store, max-age=0");
+  // Nada del admin se guarda en ningún cache, ni intermedio ni del navegador:
+  // cada respuesta es de una sesión (`private`). Pisa la de la ruta —también
+  // con `next start`—, así que esta es la que viaja, incluida la descarga de
+  // un CV (work/mensajes/, ADR-0012).
+  cabeceras.set("Cache-Control", "private, no-store, max-age=0");
   // Una ventana que el admin abre, o que abre al admin, no se pueden tocar
   // (`window.opener`), y nada del admin se carga desde otro sitio.
   cabeceras.set("Cross-Origin-Opener-Policy", "same-origin");
