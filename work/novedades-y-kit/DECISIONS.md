@@ -25,3 +25,21 @@
   listado, «Problematizar la matemática escolar», 2025, pasa después de «Los
   criterios de la derivada», 2025-05, por el orden por fecha): aprobado, y va
   en PROGRESS con el diff de `scripts/comparar-render.mjs`.
+- 2026-09-26 — **El validador de fotos acepta también `public/novedades/` y
+  `public/quienes-somos/`** (`lib/contenido/fotos.ts`, `CARPETAS_DE_FOTOS`).
+  Dos de las nueve imágenes de hoy viven ahí (el logo de UNESCO y la foto de
+  la destacada), y moverlas a `public/fotos/` cambiaba el HTML del sitio (y la
+  de Quiénes somos la usa también su página). Una lista y no «cualquier
+  carpeta»: `public/` tiene también logos y PDF. Los frenos contra el path
+  traversal son los mismos, con su test. Hoy la 4b y la 4c no tocan esa
+  línea (visto en sus worktrees); si alguna necesita `public/investigacion/`,
+  la suma a la lista.
+- 2026-09-26 — **Los esquemas y lo que no necesita Zod, en dos archivos**
+  (`features/novedades/contenido/novedad.ts` y `modelo.ts`). El PLAN los
+  ponía juntos; separados, las categorías, los topes y el orden llegan a los
+  componentes del navegador sin Zod (como `lib/contenido/buscador.ts` con el
+  SEO). Por lo mismo, `@ed/db` publica `slug.ts` en un subpath: su índice
+  arrastra el adaptador de Postgres.
+- 2026-09-26 — **Las fechas de la tabla son `TIMESTAMP(3)`, como las de las
+  demás tablas**, y no `timestamptz` como decía el SPEC §4: lo que manda es
+  que el esquema sea uno solo.
