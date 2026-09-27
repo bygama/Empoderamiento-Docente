@@ -1,25 +1,13 @@
 import { slug } from "@ed/db";
 import type { CanalDeEnlace } from "@/config/metricas";
+import { codigoDesde, pareceCodigo } from "@/lib/metricas/codigo";
 import { base } from "./cliente";
 
 /**
  * Los links para compartir (tabla `enlaces`, SPEC de work/metricas-completas/
- * §6.4): crear, borrar y buscar por código. El código sale del nombre y no
- * cambia nunca: está pegado en un posteo.
+ * §6.4): crear, borrar y buscar por código. El código sale del nombre
+ * (`lib/metricas/codigo.ts`) y no cambia nunca: está pegado en un posteo.
  */
-
-/** Hasta dónde llega el código: más largo no entra cómodo en un posteo. */
-export const LARGO_DEL_CODIGO = 40;
-
-/** El código que propone un nombre: su slug hasta 40, o «link» si no queda nada. */
-export function codigoDesde(nombre: string): string {
-  return slug.desdeTexto(nombre).slice(0, LARGO_DEL_CODIGO).replace(/-+$/, "") || "link";
-}
-
-/** Si un texto tiene la forma de un código: lo que no, ni se busca. */
-export function pareceCodigo(texto: string): boolean {
-  return texto.length > 0 && texto.length <= LARGO_DEL_CODIGO + 4 && slug.esValido(texto);
-}
 
 export type Enlace = { id: string; codigo: string; nombre: string; destino: string; canal: string; creadoEn: Date; creadoPor: string };
 
