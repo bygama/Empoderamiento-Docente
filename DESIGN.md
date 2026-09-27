@@ -1134,6 +1134,24 @@ sola serie, en la familia azul.
   el de poco dato (arriba), sin dibujar la curva; con datos, la curva.
 - Primer consumidor: los visitantes por día de Métricas › Resumen, con sus
   marcas (sumado el 2026-09-27, `work/metricas-completas/`).
+- **La grilla de día × hora** (`apps/sitio/src/admin/metricas/MejorHora.tsx`):
+  arriba, la respuesta en una frase en cuerpo («Cuando más gente entra, en
+  hora de Chile: los martes de 10 a 11, …»); debajo, una tabla de verdad de 7
+  días × 24 horas, con 2 px de la superficie entre celdas
+  (`border-spacing-0.5`) y cinco pasos de `azul-medio` (al 15, 35, 55, 80 y
+  100 %), el cero en `gris-fondo`, relleno sin texto. El tono se invierte
+  solo en el oscuro. Los pasos bajos no llegan a 3:1 contra la superficie
+  (1,22:1 el más claro; 5,11:1 · 7,14:1 el más fuerte): por eso cada celda
+  lleva su número para el lector y en el `title`, y la frase dice la
+  respuesta. Las horas se rotulan de a tres; los días, abreviados, con el
+  nombre entero para el lector. Debajo, «Menos … Más» con los pasos, decorativo.
+  En el celular la tabla scrollea de costado (`min-w-2xl`). Primer consumidor:
+  «Mejor hora para publicar», en Métricas › Origen.
+- **Lo chico no se nombra:** en lo que podría señalar a una persona (un país,
+  un sitio, un sistema raro), lo que tiene menos de 3 visitas va a una fila
+  «Otros» al final, que lo dice («con menos de 3 visitas cada uno: no se
+  nombran»), y una celda de una tabla dice «menos de 3». Primer consumidor:
+  Métricas › Origen.
 
 ### Inicio
 
