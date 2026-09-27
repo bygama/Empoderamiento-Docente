@@ -6,9 +6,9 @@ import {
   RADIO_NODO,
   RADIO_PERSONAJE,
   VIEWBOX_ESPIRAL,
+  numero,
   rotuloNodo,
 } from "./espiral";
-import { numero } from "./estaciones";
 import { ANOTACIONES, guiaAnotacion } from "./lamina-espiral";
 
 /**
