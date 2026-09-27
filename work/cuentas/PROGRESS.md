@@ -9,9 +9,14 @@
   verificada contra better-auth 1.7.5 instalado.
 - 2026-09-26 — SPEC aprobado por el padre con tres condiciones (DECISIONS),
   ya escritas en el SPEC. PLAN.md escrito: 16 pasos. Arranca work-run.
-- 2026-09-26 — Los 16 pasos hechos y verificados (abajo). PR abierto; espera
-  la revisión de cierre del padre y, antes del merge, el rebase sobre `main`,
-  que avanzó con `paginas-inicio` (ver «Abierto»).
+- 2026-09-26 — Los 16 pasos hechos y verificados (abajo). **Pausa con el PR
+  #186 abierto** (https://github.com/bygama/Empoderamiento-Docente/pull/186):
+  espera la revisión de cierre del padre y, antes del merge, el rebase sobre
+  `main`, que avanzó con `paginas-inicio` (ver «Abierto»). La lane se cierra
+  (se borra esta carpeta) en la ronda que siga a la revisión, antes del
+  merge. Para retomar: `.env.local` apunta a `ed_cuentas`, que tiene cuentas
+  de prueba de las tres (contraseña `contrasena-de-prueba-cuentas`); el dev
+  server va en el 3017, con un perfil de navegador aislado.
 
 ## Verification
 
