@@ -8,6 +8,8 @@
 #
 # Corre tres cosas, de la mas barata a la mas cara (~10s en total):
 #   typecheck (~1s) · react-doctor (~3s) · lint (~6s)
+# Y antes, un chequeo instantaneo: que los .sh de scripts/ y deploy/ lleven el
+# bit de ejecucion en git (el runbook del VPS los corre directo).
 # El build NO va aca: es de CI, tarda demasiado para un push.
 #
 # Corre TODAS aunque una falle, asi ves la lista completa de una y no vas
@@ -24,6 +26,20 @@ fallo=0
 titulo() {
   printf '\n\033[1m> %s\033[0m\n' "$1"
 }
+
+titulo 'scripts ejecutables'
+# docs/deploy/vps.md manda a correr `scripts/desplegar.sh` y los demas tal
+# cual: sin el bit (100755) en el indice, en Ubuntu contestan «Permission
+# denied». En Windows git no lo pone solo (core.fileMode=false), asi que un .sh
+# nuevo entra sin el: `git update-index --chmod=+x <archivo>`. El pathspec
+# `*.sh` de git cruza carpetas, asi que cubre deploy/db/ y deploy/respaldo/.
+sin_bit=$(git ls-files -s -- 'scripts/*.sh' 'deploy/*.sh' | grep -v '^100755' || true)
+if [ -n "$sin_bit" ]; then
+  printf '%s\n' "$sin_bit" | cut -f2 | sed 's/^/  sin el bit de ejecucion: /'
+  fallo=1
+else
+  echo '  todos con el bit'
+fi
 
 titulo 'typecheck'
 if ! pnpm typecheck; then fallo=1; fi
