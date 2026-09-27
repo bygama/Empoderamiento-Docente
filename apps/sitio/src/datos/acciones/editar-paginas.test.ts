@@ -67,7 +67,7 @@ test("guardar, chocar, publicar y descartar", { skip: !hayBase && "sin DATABASE_
   const pub = await publicarEnBase(base, { slug: SLUG, quien: "Raquel", borradorEnVisto: r2.borradorEn }, registro);
   assert.equal(pub.ok, true);
   if (!pub.ok) return;
-  assert.equal(pub.ruta, "/prueba-edicion");
+  assert.deepEqual(pub.rutas, ["/prueba-edicion"]);
   const fila = await base.pagina.findUnique({ where: { slug: SLUG } });
   assert.deepEqual(fila?.publicado, { bloque: { titulo: "Dos" } });
   assert.equal(fila?.publicadoPor, "Raquel");

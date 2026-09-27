@@ -6,6 +6,7 @@ import { DatosDuros } from "@/features/home/components/DatosDuros";
 import { ComoTrabajamos } from "@/features/home/components/ComoTrabajamos";
 import { LineasAccion } from "@/features/home/components/LineasAccion";
 import { BibliotecaNovedades } from "@/features/home/components/BibliotecaNovedades";
+import { areasDeInicio } from "@/features/home/contenido/compartido";
 import { metadataDeSeo } from "@/lib/contenido/seo";
 
 // El título, la descripción y la imagen para redes salen del SEO de la página
@@ -17,7 +18,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   // El contenido publicado (o el borrador, en vista previa); sin base, el inicial del código.
-  const { hero, quienesSomos, mision, enNumeros, comoTrabajamos, areas, bibliotecaYNovedades } = await contenidoDe("inicio");
+  // Lo compartido vive en Qué hacemos (su publicado, o su borrador en vista previa).
+  const [{ hero, quienesSomos, mision, enNumeros, comoTrabajamos, areas, bibliotecaYNovedades }, queHacemos] = await Promise.all([
+    contenidoDe("inicio"),
+    contenidoDe("que-hacemos"),
+  ]);
   return (
     <main>
       {/* Se entra directo al Inicio: el portón «Comenzá la experiencia»
@@ -35,7 +40,7 @@ export default async function Home() {
       {/* Áreas de especialización (el abanico de siete cartas). Había salido
           de la home junto con la llegada del bloque plano y vuelve a su lugar
           original, después de «Cómo trabajamos» (2026-09-09). */}
-      <LineasAccion contenido={areas} />
+      <LineasAccion contenido={areas} areas={areasDeInicio(queHacemos.areas)} />
       <BibliotecaNovedades contenido={bibliotecaYNovedades} />
     </main>
   );

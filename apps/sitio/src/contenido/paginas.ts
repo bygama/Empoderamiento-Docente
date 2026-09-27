@@ -43,7 +43,13 @@ export const PAGINAS = {
       mision: { nombre: "Misión", esquema: esquemaMision, inicial: misionInicial },
       enNumeros: { nombre: "En números", esquema: esquemaEnNumeros, inicial: enNumerosInicial },
       comoTrabajamos: { nombre: "Cómo trabajamos", esquema: esquemaComoTrabajamos, inicial: comoTrabajamosInicial },
-      areas: { nombre: "Áreas de especialización", esquema: esquemaAreas, inicial: areasInicial },
+      // Las siete áreas son las de Qué hacemos: acá se editan el título, la bajada y el enlace.
+      areas: {
+        nombre: "Áreas de especialización",
+        esquema: esquemaAreas,
+        inicial: areasInicial,
+        usa: { pagina: "que-hacemos", seccion: "areas", que: "Las siete áreas" },
+      },
       bibliotecaYNovedades: { nombre: "Biblioteca y Novedades", esquema: esquemaBibliotecaYNovedades, inicial: bibliotecaYNovedadesInicial },
     },
     // El SEO de hoy (SPEC §6 de work/paginas-inicio/): con esto la página tiene pestaña SEO.

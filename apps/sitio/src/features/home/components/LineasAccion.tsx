@@ -8,6 +8,7 @@ import { ArrowRight } from "@/components/ui/icons";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import type { Areas } from "@/features/home/contenido/areas";
+import type { AreaDeInicio } from "@/features/home/contenido/compartido";
 import { CartaArea } from "./lineas-accion/CartaArea";
 import { crearManoCartas } from "./lineas-accion/mano-cartas";
 
@@ -30,10 +31,10 @@ const CARD_W = 360; // px — fallback del ancho de carta (el real se mide en ru
  * que animar, así no hay flash grilla→abanico). Los textos llegan por props
  * (de `features/home/contenido/areas.ts` o de la base).
  */
-export function LineasAccion({ contenido }: { contenido: Areas }) {
+export function LineasAccion({ contenido, areas }: { contenido: Areas; areas: readonly AreaDeInicio[] }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
-  const cantidad = contenido.areas.length;
+  const cantidad = areas.length;
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -207,7 +208,7 @@ export function LineasAccion({ contenido }: { contenido: Areas }) {
 
           {/* Las cartas. */}
           <ul className="deck-cards mt-14 md:mt-16">
-            {contenido.areas.map((area, i) => (
+            {areas.map((area, i) => (
               <li key={area.titulo} data-deck-card className="deck-card">
                 <CartaArea area={area} indice={i} total={cantidad} azulBase={i % 2 === 1} />
               </li>

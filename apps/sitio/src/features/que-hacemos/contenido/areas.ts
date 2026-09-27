@@ -14,6 +14,9 @@ import { ANCLAS_DE_AREAS } from "../components/areas/anclas";
 // sistemas educativos» y salió «Acompañamiento», que sigue nombrado dentro de
 // Desarrollo profesional.
 //
+// Esta lista es la ÚNICA fuente de las áreas: Inicio muestra el título, la
+// frase y el detalle de cada una en su abanico, y publicar Qué hacemos
+// regenera las dos páginas (SPEC §2 de work/paginas-que-hacemos-y-quienes-somos/).
 // Lo específico de esta página —qué te llevás, para quién— viene de docs/content/que-hace-ed-fuentes.md
 // §3 y §6. Los «hechos» con nombre y cifra que se mostraban al pie de cada
 // área salieron el 2026-09-09 a pedido del owner y nunca pasaron la
@@ -24,19 +27,20 @@ import { ANCLAS_DE_AREAS } from "../components/areas/anclas";
 // sin punto final en las líneas cortas (pedido de Raquel).
 
 const area = grupo({
-  titulo: textoCorto({ maximo: 60, etiqueta: "Título", ayuda: "El nombre completo del área, tal cual el cartel." }),
+  titulo: textoCorto({ maximo: 60, etiqueta: "Título", ayuda: "El nombre completo del área, tal cual el cartel. También es el título de su carta en Inicio." }),
   nombreCorto: textoCorto({
     maximo: 24,
     etiqueta: "Nombre corto",
     ayuda: "En el índice de la izquierda y en los botones del hero: tiene que entrar en una columna angosta.",
   }),
-  frase: textoCorto({ maximo: 70, etiqueta: "Frase", ayuda: "La idea fuerza, en verde, debajo del título." }),
-  // Una sola idea marcada por detalle: la que distingue al área (Gastón,
-  // 2026-09-14). Acá el detalle se lee entero, sin negrita.
+  frase: textoCorto({ maximo: 70, etiqueta: "Frase", ayuda: "La idea fuerza, en verde, debajo del título. También va en la carta de Inicio." }),
+  // Una sola idea en negrita por detalle: la que distingue al área (Gastón,
+  // 2026-09-14). La negrita la muestra la carta de Inicio; acá el detalle se
+  // lee entero.
   detalle: textoCorto({
     maximo: 210,
     etiqueta: "Detalle",
-    ayuda: "Qué es el área, en una o dos oraciones. Una sola idea entre **dobles asteriscos**: la que distingue al área, una frase del texto y no una palabra suelta. Acá se lee sin negrita.",
+    ayuda: "Qué es el área, en una o dos oraciones. Una sola idea entre **dobles asteriscos**: la que distingue al área, una frase del texto y no una palabra suelta. Va en negrita en la carta de Inicio; acá, sin negrita.",
   }).refine((texto) => resaltadoValido(texto, { exactamente: 1 }), resaltadoExacto(1)),
   teLlevas: listaFija(3, textoCorto({ maximo: 32, etiqueta: "Punto" }), {
     etiqueta: "Qué te llevás",
@@ -63,7 +67,7 @@ export const esquemaAreas = z.object({
   areas: listaFija(ANCLAS_DE_AREAS.length, area, {
     etiqueta: "Áreas",
     etiquetaDelItem: "Área",
-    ayuda: `Son ${ANCLAS_DE_AREAS.length}, en este orden: el índice, los botones del hero y las anclas están armados para esa cantidad.`,
+    ayuda: `Son ${ANCLAS_DE_AREAS.length}, en este orden: el índice, los botones del hero y las anclas están armados para esa cantidad. Inicio muestra el título, la frase y el detalle de cada una.`,
   }),
 });
 

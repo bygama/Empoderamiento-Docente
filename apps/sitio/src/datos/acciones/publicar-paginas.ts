@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { PAGINAS } from "@/contenido/paginas";
+import { rutasQueMuestran } from "@/lib/contenido/compartido";
 import { comoDocumento, partesDe, propioDe, type PaginaRegistrada, type RegistroDePaginas } from "@/lib/contenido/documento";
 import { primerProblema } from "@/lib/contenido/problemas";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
@@ -13,7 +14,8 @@ import { choqueCon, vioLaFila, type Fallo } from "./choque";
 /** Cuántas publicaciones se guardan por página: las más viejas se podan al publicar. */
 export const MAXIMO_DE_VERSIONES = 10;
 
-export type ResultadoDePublicar = { ok: true; detalle: string; publicadoEn: string; publicadoPor: string; ruta: string } | Fallo;
+/** `rutas`: las que muestran algo de la página —la suya y las que usan lo que ella comparte—, para regenerarlas. */
+export type ResultadoDePublicar = { ok: true; detalle: string; publicadoEn: string; publicadoPor: string; rutas: string[] } | Fallo;
 
 export async function publicarEnBase(
   base: PrismaClient,
@@ -59,5 +61,5 @@ export async function publicarEnBase(
     return true;
   });
   if (!escrito) return choqueCon(await base.pagina.findUnique({ where: { slug } }));
-  return { ok: true, detalle: "Publicado: el sitio ya muestra esta versión.", publicadoEn: ahora.toISOString(), publicadoPor: quien, ruta: pagina.ruta };
+  return { ok: true, detalle: "Publicado: el sitio ya muestra esta versión.", publicadoEn: ahora.toISOString(), publicadoPor: quien, rutas: rutasQueMuestran(registro, slug) };
 }
