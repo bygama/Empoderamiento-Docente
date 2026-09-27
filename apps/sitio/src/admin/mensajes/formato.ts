@@ -1,15 +1,7 @@
 import type { Bandeja } from "@/config/mensajes";
 import { siteConfig } from "@/config/site";
 
-// Cómo se dicen en la ficha las fechas largas, el peso de un archivo y el
-// asunto de la respuesta.
-
-const DIA = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "numeric", year: "numeric", timeZone: "UTC" });
-
-/** «21/9/2028»: un día con su año, en hora universal (el borrado corre una vez por día). */
-export function diaConAnio(iso: string): string {
-  return DIA.format(new Date(iso));
-}
+// Cómo se dicen en la ficha el peso de un archivo y el asunto de la respuesta.
 
 const NUMERO = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 });
 

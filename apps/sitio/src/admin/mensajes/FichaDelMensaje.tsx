@@ -5,7 +5,7 @@ import { Momento } from "@/admin/armazon/Momento";
 import { BANDEJAS, ETIQUETA_DEL_ESTADO, type EstadoDeMensaje } from "@/config/mensajes";
 import type { FichaDeMensaje } from "@/datos/consultas/ficha-de-mensaje";
 import { AccionesDelMensaje } from "./AccionesDelMensaje";
-import { diaConAnio, mailtoDeRespuesta, peso } from "./formato";
+import { mailtoDeRespuesta, peso } from "./formato";
 import { COSA } from "./textos";
 
 /** Nuevo pide atención; En curso es el estado estable; Cerrado y Spam ya no piden nada. */
@@ -40,7 +40,9 @@ export function FichaDelMensaje({ ficha, miId }: { ficha: FichaDeMensaje; miId: 
             <span>
               Llegó el <Momento iso={ficha.recibidoEn} />
             </span>
-            <span>Se borra el {diaConAnio(ficha.seBorraEl)}</span>
+            <span>
+              Se borra el <Momento iso={ficha.seBorraEl} dia />
+            </span>
             {tomadoPor ? <span>Tomado por {tomadoPor}</span> : null}
           </>
         }
