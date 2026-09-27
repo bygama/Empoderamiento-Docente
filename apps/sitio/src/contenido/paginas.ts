@@ -11,6 +11,7 @@ import { areasInicial as areasDeQueHacemos, esquemaAreas as esquemaAreasDeQueHac
 import { esquemaFaro, faroInicial } from "@/features/que-hacemos/contenido/faro";
 import { esquemaHero as esquemaHeroDeQueHacemos, heroInicial as heroDeQueHacemos } from "@/features/que-hacemos/contenido/hero";
 import { esquemaNiveles, nivelesInicial } from "@/features/que-hacemos/contenido/niveles";
+import { esquemaProyectos, proyectosInicial } from "@/features/que-hacemos/contenido/proyectos";
 import {
   comoTrabajamosInicial as comoTrabajamosDeQueHacemos,
   esquemaComoTrabajamos as esquemaComoTrabajamosDeQueHacemos,
@@ -50,6 +51,7 @@ export const PAGINAS = {
       comoTrabajamos: { nombre: "Cómo trabajamos", esquema: esquemaComoTrabajamosDeQueHacemos, inicial: comoTrabajamosDeQueHacemos },
       areas: { nombre: "Áreas de especialización", esquema: esquemaAreasDeQueHacemos, inicial: areasDeQueHacemos },
       niveles: { nombre: "Niveles", esquema: esquemaNiveles, inicial: nivelesInicial },
+      proyectos: { nombre: "Proyectos y aplicaciones", esquema: esquemaProyectos, inicial: proyectosInicial },
     },
   },
   "quienes-somos": { ruta: "/quienes-somos", nombre: "Quiénes somos", secciones: {} },
