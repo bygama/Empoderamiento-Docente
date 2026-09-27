@@ -15,7 +15,9 @@ import { refrescarAdmin, revalidarSitio } from "./revalidar-novedades";
 // ciclo-de-novedades.ts, y la vista previa en vista-previa.ts. Toda acción
 // empieza por la sesión y sigue con `editarNovedades` (AGENTS.md §12), y
 // contesta en llano si algo falla. Guardar un borrador no queda en la
-// actividad: no cambia el sitio (SPEC padre §5.8); borrar, sí.
+// actividad: no cambia el sitio (SPEC padre §5.8); borrar, sí. Guardar tampoco
+// revalida: las pantallas del admin se piden de nuevo al navegar, y un refresco
+// del primer guardado de `/nueva`, que ya pasó a `/[id]`, rearmaría la ficha.
 
 const SIN_SESION = { ok: false as const, detalle: "Hay que entrar al admin." };
 const esquemaPedido = z.object({ id: z.uuid(), borradorEnVisto: z.string().nullable() });
@@ -32,9 +34,7 @@ export async function crearNovedad(pedido: { contenido: unknown }): Promise<Resu
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return SIN_SESION;
     if (!puede(sesion.user.rol, "editarNovedades")) return { ok: false, detalle: SIN_PERMISO };
-    const r = await crearNovedadEnBase(base, { contenido: pedido?.contenido, quien: sesion.user.name });
-    if (r.ok) refrescarAdmin();
-    return r;
+    return await crearNovedadEnBase(base, { contenido: pedido?.contenido, quien: sesion.user.name });
   } catch (e) {
     return fallo("crearNovedad", e);
   }
@@ -47,9 +47,7 @@ export async function guardarNovedad(pedido: { id: string; contenido: unknown; b
     if (!puede(sesion.user.rol, "editarNovedades")) return { ok: false, detalle: SIN_PERMISO };
     const valido = esquemaPedido.safeParse(pedido);
     if (!valido.success) return { ok: false, detalle: "El pedido no tiene la forma esperada." };
-    const r = await guardarNovedadEnBase(base, { ...valido.data, contenido: pedido.contenido, quien: sesion.user.name });
-    if (r.ok) refrescarAdmin();
-    return r;
+    return await guardarNovedadEnBase(base, { ...valido.data, contenido: pedido.contenido, quien: sesion.user.name });
   } catch (e) {
     return fallo("guardarNovedad", e);
   }
