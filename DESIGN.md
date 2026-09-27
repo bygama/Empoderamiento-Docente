@@ -361,7 +361,8 @@ el 2026-09-26 (`work/patrones-del-admin/`); «Sin permiso» y el apartado, el
 mismo día (`work/roles-y-actividad/`); las pestañas de una página, el error en
 el campo, el largo recomendado, el aviso con una acción, «Qué cambió» y la
 vista previa de buscador y redes, también (`work/paginas-inicio/`); el
-número, el filtro, el buscador, «volver», confirmar lo que no se deshace y la casilla, ese mismo día (`work/mensajes/`). Todos los contrastes están
+número, el filtro, el buscador, «volver», confirmar lo que no se deshace y
+la casilla, ese mismo día (`work/mensajes/`). Todos los contrastes están
 medidos con la fórmula de WCAG 2.x. En el tema mixto el contenido usa los
 valores del claro, así que donde abajo dice «claro» vale para los dos.
 
