@@ -313,12 +313,22 @@ lo tienen siempre). Decisión en el
 ### Editar las páginas
 
 En Contenido › Páginas (`/admin/contenido/paginas`) están las siete del sitio
-en el orden del menú. Por ahora se edita **Inicio entero**: el hero, «¿Quiénes
-somos?», «Misión», «En números», «Cómo trabajamos», «Áreas de especialización»
-y los textos de «Biblioteca y Novedades». Cada sección nueva se suma escribiendo
+en el orden del menú. Se editan enteras **Inicio** (el hero, «¿Quiénes somos?»,
+«Misión», «En números», «Cómo trabajamos», «Áreas de especialización» y los
+textos de «Biblioteca y Novedades»), **Qué hacemos** (el hero, la escena del
+faro, «Cómo trabajamos», las áreas, los niveles, los proyectos y el cierre) y
+**Quiénes somos** (el hero, el origen, «Nuestra mirada» y los textos de «Quiénes
+sostienen ED»; las personas del equipo tienen su propio módulo). Cada sección nueva se suma escribiendo
 su esquema en `src/features/<pagina>/contenido/` y anotándola en
 `src/contenido/paginas.ts`, y el SEO de una página, con su `seo` en el mismo
 registro.
+
+**Lo que dos páginas muestran igual se edita en una sola.** Las siete áreas y
+las frases en verde del método viven en Qué hacemos, e Inicio las lee de ahí:
+la tarjeta de la sección lo avisa en las dos páginas (en Inicio, con el link a
+donde se edita), y publicar Qué hacemos regenera también Inicio. Se anota con
+`usa` en la sección del registro que las toma
+(`src/lib/contenido/compartido.ts`).
 
 La pantalla de una página tiene cuatro pestañas:
 
