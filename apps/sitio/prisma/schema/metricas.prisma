@@ -9,8 +9,12 @@
 /// pisa a la otra.
 model MetricaDiaria {
   fecha      DateTime @db.Date
-  dimension  String   // total | pagina | pais | referido | dispositivo
-  valor      String   // "" · la ruta · el país (ISO-2) · el host · el tipo
+  // total | pagina | pais | referido | dispositivo | sistema | navegador |
+  // campana | hora | pagina-cl | pagina-mx | pagina-ar | pagina-otros
+  dimension  String
+  // "" · la ruta · el país (ISO-2) · el host · el tipo · el sistema · el
+  // navegador · el utm_campaign · la hora UTC ("00" a "23")
+  valor      String
   agrupado   Boolean  @default(false)
   vistas     Int
   visitantes Int      // únicos DE ESE DÍA: no se suman entre días
@@ -24,10 +28,69 @@ model MetricaDiaria {
 /// tarjetas; sumar los días daría un número inflado.
 model MetricaVentana {
   fechaFin   DateTime @db.Date  // el último día de la ventana (ayer)
-  dias       Int               // 7 | 30
+  dias       Int               // 7 | 30 | 90
   vistas     Int
   visitantes Int
 
   @@id([fechaFin, dias])
   @@map("metricas_ventanas")
+}
+
+// Lo que cuenta el sitio mismo y lo que se agrega desde Métricas
+// (work/metricas-completas/SPEC.md §4.2, ADR-0017). Nada de una persona: ni
+// IP, ni navegador, ni hora; solo sumas por día.
+
+/// Un evento raro del sitio (un CV enviado, un material consultado, un clic en
+/// un link corto), sumado por día. La lista de eventos y de canales es cerrada
+/// y vive en código (`config/metricas.ts`, `lib/metricas/canales.ts`), no en
+/// un enum de Postgres. Se escribe solo por `datos/contadores.ts`, con un
+/// `INSERT … ON CONFLICT` que suma uno. No se poda: son sumas.
+model Contador {
+  /// El día UTC.
+  fecha  DateTime @db.Date
+  evento String
+  /// buscador | redes | asistentes-ia | directo | otros-sitios, o "" donde no
+  /// aplica. Se guarda el canal, nunca el sitio de donde vino la persona.
+  canal  String
+  /// El id del material, o el id del link que trajo a la persona; "" si nada.
+  clave  String   @default("")
+  cuenta Int
+
+  @@id([fecha, evento, canal, clave])
+  @@map("contadores")
+}
+
+/// Un link corto para compartir: `/l/<codigo>` cuenta el clic y lleva a
+/// `destino` con los UTM, así Vercel cuenta las visitas que trajo.
+model Enlace {
+  id        String   @id @default(uuid())
+  /// Lo que va en `/l/<codigo>`: sale del nombre, en minúsculas y sin tildes.
+  codigo    String   @unique
+  /// «Taller en Monterrey».
+  nombre    String
+  /// La ruta del sitio, de `rutasDelSitio()`: "/que-hacemos".
+  destino   String
+  /// linkedin | whatsapp | instagram | mail | otro (lista en `config/metricas.ts`).
+  canal     String
+  creadoEn  DateTime @default(now()) @map("creado_en")
+  /// Quién, en llano, como `novedades.creada_por`.
+  creadoPor String   @map("creado_por")
+
+  @@map("enlaces")
+}
+
+/// Una marca que se agrega a mano en la curva del Resumen («Posteamos en
+/// LinkedIn»). Las de publicar una página o una novedad no van acá: salen de
+/// `actividad`.
+model Marca {
+  id        String   @id @default(uuid())
+  /// El día que marca.
+  fecha     DateTime @db.Date
+  texto     String
+  creadaEn  DateTime @default(now()) @map("creada_en")
+  /// Quién, en llano.
+  creadaPor String   @map("creada_por")
+
+  @@index([fecha])
+  @@map("marcas")
 }
