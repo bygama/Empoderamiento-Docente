@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { SelloED } from "@/components/brand/SelloED";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { partirResaltado } from "@/lib/contenido/resaltado";
 import { irAElemento } from "@/lib/indice";
+import type { EquipoDeQuienesSomos } from "@/features/quienes-somos/contenido/equipo";
 import { DANIELA, EQUIPO, porTier, type Persona } from "@/features/quienes-somos/data/equipo";
 import { PersonCard } from "@/features/quienes-somos/components/PersonCard";
 import { TeamProfileOverlay } from "@/features/quienes-somos/components/TeamProfileOverlay";
@@ -39,7 +41,9 @@ import { Nivel } from "./impulsan-ed/Nivel";
  * animación.
  */
 
-export function ImpulsanEd() {
+export function ImpulsanEd({ contenido }: { contenido: EquipoDeQuienesSomos }) {
+  const { niveles } = contenido;
+  const titulo = partirResaltado(contenido.titulo);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   const [selected, setSelected] = useState<{ persona: Persona; el: HTMLElement } | null>(null);
@@ -87,7 +91,7 @@ export function ImpulsanEd() {
     <section
       id="equipo"
       data-indice="El equipo"
-      aria-label="Quiénes sostienen ED — el equipo"
+      aria-labelledby="equipo-titulo"
       // La página termina sobre esta lámina navy y el footer también es
       // navy. Con el tint "propio" el footer se monta --footer-radio sobre
       // ella con la muesca TRANSPARENTE: el redondeo recorta la lámina real,
@@ -126,19 +130,21 @@ export function ImpulsanEd() {
       <div ref={rootRef} className="relative z-10 mx-auto max-w-screen-xl px-5 py-24 md:px-10 md:py-28">
         {/* ── Encabezado ─────────────────────────────────────────────────── */}
         <div className="max-w-2xl">
-          <span data-team-head className="text-azul-claro/80 font-mono text-[0.78rem] font-medium tracking-[0.24em] uppercase">
-            Quiénes sostienen ED
+          {/* La volanta nombra la sección (aria-labelledby). */}
+          <span id="equipo-titulo" data-team-head className="text-azul-claro/80 font-mono text-[0.78rem] font-medium tracking-[0.24em] uppercase">
+            {contenido.volanta}
           </span>
           <h3
             data-team-head
             className="font-display mt-5 font-bold tracking-[-0.02em] text-white"
             style={{ fontSize: "clamp(1.9rem, 0.9rem + 2.9vw, 3rem)", lineHeight: 1.08 }}
           >
-            La red tiene <span className="text-verde-concepto">nombres</span>.
+            {titulo.antes}
+            {titulo.clave === null ? null : <span className="text-verde-concepto">{titulo.clave}</span>}
+            {titulo.despues}
           </h3>
           <p data-team-head className="text-azul-claro/80 mt-4 max-w-[54ch] font-sans text-[1rem] leading-relaxed">
-            Una red de especialistas, trayectorias y experiencias que hace
-            posible el trabajo de ED.
+            {contenido.bajada}
           </p>
         </div>
 
@@ -156,7 +162,7 @@ export function ImpulsanEd() {
         >
           {/* N1 — Dirección General (retrato grande, al centro) */}
           <div className="sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[30rem] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none">
-            <KickerRotulo>Dirección general</KickerRotulo>
+            <KickerRotulo>{niveles.direccionGeneral}</KickerRotulo>
             <div data-reveal className="mt-4">
               <PersonCard persona={DANIELA} onOpen={openProfile} />
             </div>
@@ -172,7 +178,7 @@ export function ImpulsanEd() {
                 i === 0 ? "lg:col-start-1" : "lg:col-start-3"
               }`}
             >
-              <KickerRotulo>Dirección</KickerRotulo>
+              <KickerRotulo>{niveles.direccion}</KickerRotulo>
               <div data-reveal className="mt-4">
                 <PersonCard persona={persona} onOpen={openProfile} />
               </div>
@@ -182,8 +188,8 @@ export function ImpulsanEd() {
 
         {/* ── N3 — Líderes de área y proyecto: 2×2, cuatro pares ─────────── */}
         <Nivel
-          volanta="Áreas y proyectos"
-          titulo="Quienes lideran áreas y proyectos"
+          volanta={niveles.lideres.volanta}
+          titulo={niveles.lideres.titulo}
           spine="entra"
           revealY="30"
           revealDur="0.62"
@@ -203,8 +209,8 @@ export function ImpulsanEd() {
 
         {/* ── N4 — Facilitación y diseño de materiales: 3×2 ──────────────── */}
         <Nivel
-          volanta="Facilitación y materiales"
-          titulo="Quienes facilitan y diseñan"
+          volanta={niveles.facilitacion.volanta}
+          titulo={niveles.facilitacion.titulo}
           spine="sale"
           revealY="24"
           revealDur="0.52"
