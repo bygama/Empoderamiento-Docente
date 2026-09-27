@@ -238,11 +238,13 @@ Prisma antes de `next build`.
 ## Admin
 
 Vive en `/admin`, construido a medida sobre **Prisma** y **better-auth**. Hoy
-tiene los cimientos —entrar, salir y elegir contraseña—, **un Inicio** con lo
-pendiente, los números de la semana y la actividad reciente, **Métricas con
-sus búsquedas en Google** (ver «Las métricas y lo programado»), **la edición
-de Inicio** (ver «Editar las páginas») y **Mensajes**, lo que llega por los
-formularios del sitio (ver «Mensajes»); las
+tiene los cimientos —entrar (con segundo factor por correo), salir y elegir
+contraseña—, **un Inicio** con lo pendiente, los números de la semana y la
+actividad reciente, **Cuentas** (invitar, cambiar roles, suspender y la
+actividad; ver «Las cuentas»), **Métricas con sus búsquedas en Google** (ver
+«Las métricas y lo programado»), **la edición de Inicio** (ver «Editar las
+páginas») y **Mensajes**, lo que llega por los formularios del sitio (ver
+«Mensajes»); las
 novedades, la biblioteca, los casos y el equipo llegan en las fases siguientes.
 El diseño completo está en
 [`docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md`](docs/architecture/specs/2026-09-18-admin-a-medida-diseno.md)
@@ -262,12 +264,15 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 # 3. El esquema
 pnpm migrate
 
-# 4. Las cuentas. No hay registro público: esta es la única puerta.
+# 4. La primera cuenta. No hay registro público: las demás se invitan desde Cuentas.
 pnpm --filter sitio crear-cuenta tu@correo.org "Tu nombre" administra
 ```
 
 Después, `/admin/olvide-mi-contrasena` con ese correo. Sin `RESEND_API_KEY`
-el correo sale entero **por la consola del servidor**, con el enlace.
+el correo sale entero **por la consola del servidor**, con el enlace. Con
+`dirige` o `administra`, entrar pide además **un código de 6 dígitos por
+correo** (el segundo factor, obligatorio para esos roles): en local también
+sale por la consola.
 
 Los roles son tres: `dirige`, `administra` y `edita` (sin rol, `edita`).
 **Dirige es una sola persona, de ED y no del desarrollo**, y la base no deja
@@ -289,6 +294,21 @@ ahí en más, la dirección se pasa desde Cuentas.
 > las nueve tablas que dejó Payload. Quedó huérfana con la fase 0 y no la toca
 > nadie: borrala cuando quieras con
 > `docker exec ed-postgres psql -U postgres -c "DROP DATABASE ed_panel;"`.
+
+### Las cuentas
+
+En Cuentas (`/admin/cuentas`, solo quien dirige y quien administra) están las
+personas con su rol, su último acceso y su estado, y qué puede cada rol. Desde
+ahí se **invita** (correo, nombre y rol; llega «Elegí tu contraseña», que vence
+a las 72 h y se puede reenviar o cancelar), se cambia el rol o el correo de
+alguien, se le cierran las sesiones, y se **suspende en vez de borrar**: una
+cuenta suspendida no entra, pero su nombre queda en la actividad. Borrar solo
+se puede si nunca hizo nada. Quien dirige le pasa la dirección a otra persona
+desde su cuenta, con su contraseña. **Actividad** (`/admin/cuentas/actividad`)
+dice quién hizo qué y cuándo, con buscador y filtros. El segundo factor de cada
+persona se activa en Mi cuenta › Seguridad (para `edita`; los otros dos roles
+lo tienen siempre). Decisión en el
+[ADR-0013](docs/architecture/adrs/0013-segundo-factor-por-correo.md).
 
 ### Editar las páginas
 
@@ -371,11 +391,22 @@ llegan con 2 o 3 días de atraso.
 
 ### Correos
 
-El admin manda dos: **«Elegí tu contraseña»** (el enlace de «Olvidé mi
-contraseña», que vence en una hora) y **«Tu contraseña cambió»** (cada vez que
-alguien elige una, con las demás sesiones ya cerradas). Salen por la API de
-Resend, en segundo plano, desde `CORREO_REMITENTE`. Decisión y detalles en el
-[ADR-0010](docs/architecture/adrs/0010-seguridad-del-acceso.md).
+El admin manda **«Elegí tu contraseña»** (el enlace de «Olvidé mi
+contraseña», que vence en una hora, y la invitación de Cuentas, que vence a las
+72 h), **«Tu contraseña cambió»** (cada vez que alguien elige una, con las demás
+sesiones ya cerradas), **«Tu código para entrar»** (el segundo factor) y **«El
+correo de tu cuenta del admin cambió»** (a la dirección vieja y a la nueva).
+Salen por la API de Resend desde `CORREO_REMITENTE`; el del código se espera,
+y si no salió la pantalla lo dice. Decisión y detalles en el
+[ADR-0010](docs/architecture/adrs/0010-seguridad-del-acceso.md) y el
+[ADR-0013](docs/architecture/adrs/0013-segundo-factor-por-correo.md).
+
+> **Condición del primer deploy con Cuentas: Resend configurado y probado.**
+> Desde el segundo factor, quien dirige y quien administra necesitan que les
+> llegue el código para entrar: sin `RESEND_API_KEY` en producción, o con el
+> dominio sin verificar, no entran. Probalo mandándote un código antes de
+> publicar. Si igual alguien queda afuera, con acceso a la base se le pasa el
+> rol a `edita` y se le apaga el segundo factor.
 
 **Lo que tiene que hacer ED en Resend**, una vez, antes de que salgan correos
 de verdad:
