@@ -298,3 +298,78 @@
   había escrito en los pasos de UI). Aceptación: `git diff --stat main --
   docs AGENTS.md README.md DESIGN.md` → los cinco más el ADR nuevo; `pnpm lint`
   → exit 0.
+
+- **Verificación — dos arreglos que salieron al verificar.** `material.ts`
+  pasaba el tope de 100 de una utilidad (116 sin comentarios): los campos van
+  a `campos-del-material.ts` (60) y los esquemas quedan en 59 (`7e9a4ae1`).
+  Y en la `Lista` con miniatura, con los títulos largos de los materiales,
+  «Editar» caía debajo del texto en escritorio: el bloque de la izquierda
+  crece y parte su texto antes de empujar la acción (`flex-1 basis-64`), y la
+  acción baja recién a 390 (`bfcc4629`, DESIGN.md §11 «Lista» lo dice).
+
+## Verification
+
+### 2026-09-27 — L DoD (lane de un XL) — PASS
+
+Sobre `bfcc4629`, el árbol final de la lane.
+
+- L1 estática: `pnpm typecheck` → exit 0; `pnpm lint` → exit 0; `node
+  scripts/verificar-react-doctor.mjs` → exit 0, «react-doctor: 100/100, sin
+  diagnósticos (apps/sitio/src: 874 archivos · packages/db/src: 3 ·
+  packages/auth/src: 27 · packages/kit-admin/src: 19)». Topes: ningún `.tsx`
+  nuevo o tocado pasa de 200 ni ninguna utilidad nueva de 100 (sin
+  comentarios); `datos/actividad.ts` queda en 138 y ya estaba en 123 en
+  `main` (DECISIONS).
+- L2 comportamiento: `pnpm test` → exit 0 (kit-admin 3/3, auth 46/46, sitio
+  350 pass · 0 fail · 1 skipped, el de las respuestas grabadas de Métricas,
+  que ya estaba en `main`); `pnpm build` → exit 0 (`/biblioteca` y
+  `/biblioteca/portada/[id]` estáticas, las cuatro del admin dinámicas);
+  `pnpm migrate:status` → «18 migrations found… Database schema is up to
+  date!». Arranca: `next start -p 3056` y `next dev -p 3046` contestan 200.
+- Render: `node scripts/comparar-render.mjs
+  "$LOCALAPPDATA/Temp/ed-biblioteca-base" apps/sitio` → 11 páginas iguales y
+  `biblioteca.html: DISTINTA en texto` (exit 1, esperado); el texto de
+  `biblioteca.html` sin «Copiar cita APA» es idéntico al de `main` (8
+  botones, `iguales sin el boton: True`). El JS de `/`, `/biblioteca` y las
+  fichas de novedades baja ~85–91 KB: el catálogo viaja como props.
+- L3 punta a punta, **permisos con `next start`** (los tres roles tienen
+  `editarBiblioteca`, así que no hay rol sin permiso: se probó sin sesión, con
+  una cookie falsa y con la sesión de edita, con un material nuevo solo en
+  borrador «ZZSECRETOBORRADORNUEVO» y un cambio sin publicar «ZZSECRETOCAMBIO»
+  cargados antes del build):
+  - `grep` de los dos en todo `.next/server/app` y `.next/static` → nada;
+  - sin cookie: las cuatro rutas del admin → 307 a `/admin/entrar`, 0
+    coincidencias; `/biblioteca/portada/<borrador>` → 404;
+  - cookie falsa (`better-auth.session_token=falso.falso`, pasa el proxy):
+    `/admin/biblioteca`, `/nuevo` y las dos fichas → 307 a `/admin/entrar`,
+    0 coincidencias con los secretos ni con títulos publicados en el HTML
+    entero; `/admin/biblioteca/portada` → 401;
+  - sesión de edita: `/admin/biblioteca` → 200 con los dos (control
+    positivo); `/biblioteca` y `/` → 200 sin ninguno.
+  Los datos de prueba se borraron (57 publicados, 0 borradores).
+- L3 punta a punta, **navegador** (Orca para leer y auditar; Playwright solo
+  para lo que Orca no tiene: el ancho de 390 y las capturas, que en Orca dan
+  «Screenshot timed out»):
+  - contraste de todo el texto visible (auditoría por DOM, `body` entero:
+    sidebar incluida), con un material en `roto` un momento para ver la
+    insignia, el número y la fila del Inicio: lista filtrada, ficha,
+    «Agregar» paso 1, «Agregar» paso 2 (el link de la RMF E, 9 marcas «De
+    Crossref.», nada guardado) e Inicio → **ninguno por debajo de su mínimo**
+    en los tres temas; mínimo 4,54:1 en claro y mixto, 6,01:1 en oscuro
+    (7,08:1 en el Inicio);
+  - 390 de ancho (lista, lista filtrada, ficha, «Agregar», Inicio,
+    `/biblioteca`): 0 elementos fuera de pantalla, sin scroll horizontal; los
+    filtros scrollean de costado, como dice DESIGN.md §11 «Filtro»;
+  - foco con Tab (40 en la lista, 70 en la ficha, 20 en «Agregar», 60 en
+    `/biblioteca`): todo lo enfocado tiene indicador visible, salvo el overlay
+    de desarrollo de Next y los dos buscadores del sitio, que ya estaban en
+    `main` y lo marcan en su contenedor (`focus-within:ring-2`);
+  - «Copiar cita APA» en Chromium con permiso de portapapeles: foco
+    `verde-concepto` de 2 px, Enter → «Cita copiada», el `status` dice «La
+    cita APA se copió.», el portapapeles tiene la cita («Rojas Viveros, R.,
+    Porras, A., Cabrera Chim, L. M. y Corona-Galindo, M. G. (2026). Taller…»)
+    y a los 2,5 s vuelve a «Copiar cita APA»;
+  - capturas (fuera del repo, `%LOCALAPPDATA%\Temp\biblioteca-capturas\`):
+    lista claro 1280 y 390, lista con link roto mixto, lista oscuro 390, ficha
+    claro 1280 y oscuro 390, Inicio mixto, `/biblioteca` 1280.
+- Revisión de cierre: la lanza el padre (lane supervisada; work-run §4).
