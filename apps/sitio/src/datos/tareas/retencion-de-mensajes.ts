@@ -38,22 +38,24 @@ export async function retenerCV(hoy: Date = new Date(), almacen: () => AlmacenPr
       bandeja: "cv",
       OR: [{ recibidoEn: { lt: bordeDeGuarda("cv", hoy) } }, { estado: "spam", estadoEn: { lt: bordeDelSpam(hoy) } }],
     },
-    select: { id: true, archivo: true },
+    select: { id: true, archivo: true, estado: true },
   });
+  // Lo que se borró de cada uno: si era spam o no, para el detalle; `null` si no se pudo.
   const hechos = await Promise.all(
-    vencidos.map(async ({ id, archivo }) => {
+    vencidos.map(async ({ id, archivo, estado }) => {
       try {
         if (archivo) await almacen().borrar(archivo);
         await base.mensaje.delete({ where: { id } });
-        return true;
+        return estado === "spam";
       } catch {
-        return false;
+        return null;
       }
     }),
   );
-  const borrados = hechos.filter(Boolean).length;
+  const borrados = hechos.filter((h) => h !== null).length;
+  const deSpam = hechos.filter((h) => h === true).length;
   const fallidos = hechos.length - borrados;
-  const hecho = borrados ? `${seBorraron(borrados, "CV con su archivo", "CV con sus archivos")}.` : "No había CV vencidos.";
+  const hecho = borrados ? `${seBorraron(borrados, "CV con su archivo", "CV con sus archivos")} (${deSpam} de spam).` : "No había CV vencidos.";
   return fallidos ? { ok: false, detalle: `${hecho} No se pudieron borrar ${fallidos}: se reintenta mañana.` } : { ok: true, detalle: hecho };
 }
 

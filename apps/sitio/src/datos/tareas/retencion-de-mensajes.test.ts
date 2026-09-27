@@ -46,7 +46,7 @@ test("Contacto: se va lo de más de 24 meses y el spam de más de 30 días, qued
   assert.deepEqual(quedan.map((q) => q.nombre), ["queda", "spam-nuevo"]);
 });
 
-test("CV: el vencido se va con su archivo; el que no, se queda, y la corrida queda registrada", sinBase, async () => {
+test("CV: el vencido y el spam vencido se van con su archivo; el que no, se queda, y la corrida lo desglosa", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
   const { almacenPrivadoEnDisco } = await import("@/lib/formularios/almacen-privado");
   const { correrTareas } = await import("@/lib/tareas/corredor");
@@ -58,20 +58,23 @@ test("CV: el vencido se va con su archivo; el que no, se queda, y la corrida que
   const carpeta = await mkdtemp(path.join(tmpdir(), "ed-retencion-"));
   carpetas.push(carpeta);
   const almacen = almacenPrivadoEnDisco(carpeta);
-  const [vencido, vigente] = [randomUUID(), randomUUID()];
-  for (const id of [vencido, vigente]) await almacen.guardar(`cv/${id}.pdf`, new TextEncoder().encode("%PDF-1.7"), "application/pdf");
+  const [vencido, spam, vigente] = [randomUUID(), randomUUID(), randomUUID()];
+  for (const id of [vencido, spam, vigente]) await almacen.guardar(`cv/${id}.pdf`, new TextEncoder().encode("%PDF-1.7"), "application/pdf");
   await base.mensaje.createMany({
     data: [
       { id: vencido, bandeja: "cv", nombre: "vencido", correo, archivo: `cv/${vencido}.pdf`, recibidoEn: fecha("1999-12-01") },
+      { id: spam, bandeja: "cv", nombre: "spam", correo, archivo: `cv/${spam}.pdf`, recibidoEn: fecha("2000-10-01"), estado: "spam", estadoEn: fecha("2000-12-01") },
       { id: vigente, bandeja: "cv", nombre: "vigente", correo, archivo: `cv/${vigente}.pdf`, recibidoEn: fecha("2000-06-01") },
     ],
   });
 
   const [corrida] = await correrTareas([{ ...retencionDeCV, correr: () => retenerCV(HOY, () => almacen) }], { registrar: registrarCorrida, limiteMs: 10_000 });
-  assert.deepEqual(corrida, { clave: "retencion-de-cv", ok: true, detalle: "Se borró 1 CV con su archivo." });
+  const detalle = "Se borraron 2 CV con sus archivos (1 de spam).";
+  assert.deepEqual(corrida, { clave: "retencion-de-cv", ok: true, detalle });
   assert.equal(await almacen.leer(`cv/${vencido}.pdf`), null);
+  assert.equal(await almacen.leer(`cv/${spam}.pdf`), null);
   assert.notEqual(await almacen.leer(`cv/${vigente}.pdf`), null);
   assert.deepEqual((await base.mensaje.findMany({ where: { correo, bandeja: "cv" } })).map((m) => m.nombre), ["vigente"]);
   const registrada = await base.corridaDeTarea.findFirst({ where: { tarea: "retencion-de-cv", corridaEn: { gte: empezo } } });
-  assert.equal(registrada?.detalle, "Se borró 1 CV con su archivo.");
+  assert.equal(registrada?.detalle, detalle);
 });
