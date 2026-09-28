@@ -113,14 +113,14 @@ export function CierreBiblioteca({ contenido }: { contenido: CierreDeBiblioteca 
           />
           <span
             data-cierre-bola
-            className="bg-azul-medio/25 absolute -bottom-44 -left-36 h-[26rem] w-[26rem] rounded-full"
+            className="bg-azul-medio/25 absolute -bottom-44 -left-36 h-[26rem] w-[26rem] rounded-full max-md:-bottom-24 max-md:-left-20 max-md:h-[14rem] max-md:w-[14rem]"
           />
           <PuntosFaro />
         </div>
 
         <SelloED className="absolute top-7 left-7 z-20 md:top-9 md:left-9" />
 
-        <div className="relative z-10 flex min-h-[58svh] flex-col items-center justify-center px-5 py-24 text-center md:px-10 md:py-28">
+        <div className="relative z-10 flex min-h-[58svh] flex-col items-center justify-center px-5 py-24 text-center md:px-10 md:py-28 max-md:min-h-[48lvh] max-md:py-16">
           <RevealLines
             as="h2"
             className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em]"
