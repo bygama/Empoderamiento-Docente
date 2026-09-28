@@ -105,24 +105,23 @@ export function crearDestacados({ root, row, slot, artsWrap, items, setActivo }:
 
       // ── Fase 3: barrido por divisoria ───────────────────────────────
       // La divisoria del artículo i recorre la pila de abajo (S+H) hacia
-      // arriba (S); el clip de la imagen anterior avanza en el mismo rango
-      // de scroll, así el borde del recorte ES la línea.
+      // arriba (S) con el scroll natural, sin GSAP. Por eso el recorte no
+      // es un tween con scrub —un suavizado lo despegaría de la línea—:
+      // se escribe en cada tick desde el progreso crudo de ese mismo
+      // rango, así el borde del recorte ES la línea. Acá el `scrub` no
+      // suaviza nada porque no hay animación atada; solo hace que
+      // `onUpdate` corra en cada tick.
       arts.slice(1).forEach((art, k) => {
-        gsap.fromTo(
-          imgs[k],
-          { clipPath: "inset(0% 0% 0% 0%)" },
-          {
-            clipPath: "inset(0% 0% 100% 0%)",
-            ease: "none",
-            scrollTrigger: {
-              trigger: art,
-              start: () => `top ${S() + H()}`,
-              end: () => `top ${S()}`,
-              scrub: true,
-              invalidateOnRefresh: true,
-            },
-          },
-        );
+        const recortar = (p: number) => gsap.set(imgs[k], { clipPath: `inset(0% 0% ${p * 100}% 0%)` });
+        recortar(0);
+        ScrollTrigger.create({
+          trigger: art,
+          start: () => `top ${S() + H()}`,
+          end: () => `top ${S()}`,
+          scrub: 0.5,
+          onRefresh: (self) => recortar(self.progress),
+          onUpdate: (self) => recortar(self.progress),
+        });
       });
 
       // ── Cierre: desvanecer ANTES del unpin (evita el salto) ─────────
