@@ -190,6 +190,13 @@ base, arma la imagen `app` con el commit como etiqueta y levanta todo. Necesita
 internet (npm, las imágenes de Docker y las fuentes de Google, que baja el
 build). Al final dice `Listo: https://<dominio> corre <commit>`.
 
+**Si `construir` falla por las fuentes de Google** (un error al bajar de
+`fonts.gstatic.com`, o `Can't resolve
+'@vercel/turbopack-next/internal/font/google/font'`), volvé a correr
+`scripts/desplegar.sh`: el build baja las fuentes cada vez y a veces falla de
+pasada. El script frena antes de tocar el sitio que corre, así que no se
+rompió nada.
+
 ## 5. Umami
 
 Su panel no sale a internet: se usa por un túnel. En el VPS, un Umami de un
@@ -230,13 +237,13 @@ No hay registro público: las cuentas entran por un comando.
 
 | Qué | Cómo |
 | --- | --- |
-| Deployar una versión nueva | `git pull && scripts/desplegar.sh` (el sitio deja de contestar unos segundos, cuando se cambia el contenedor: ver «Corte») |
+| Deployar una versión nueva | `git pull && scripts/desplegar.sh` (el sitio deja de contestar unos segundos, cuando se cambia el contenedor: ver «Corte»; si falla por las fuentes de Google, otra vez: §4) |
 | Ver qué corre | `docker compose ps` |
 | El log de la app | `docker compose logs -f app` (o `proxy`, `analitica`…) |
 | El cron | `docker compose logs --since 48h cron`; a mano, `docker compose exec cron node /etc/ed-cron/correr.mjs` |
 | Los respaldos | `docker compose logs --since 48h respaldo`; a mano, `docker compose exec respaldo sh /respaldo/respaldar.sh` |
 | Volver a la versión anterior | `scripts/volver.sh` lista las 5 que hay; `scripts/volver.sh <commit>` la pone a correr |
-| Restaurar un respaldo | `scripts/restaurar.sh` lista los que hay; `scripts/restaurar.sh <AAAA-MM-DD>` (pide confirmación) |
+| Restaurar un respaldo | `scripts/restaurar.sh` lista los que hay; `scripts/restaurar.sh <AAAA-MM-DD>` (pide confirmación, y termina con un deploy: §8) |
 | Un comando de `scripts/` | `docker compose run --rm herramientas pnpm --filter sitio <comando>` |
 
 **Corte.** Medido en local: durante un `desplegar.sh`, el sitio deja de
@@ -259,9 +266,14 @@ capa cubre algo distinto:
    últimos `DIAS_DE_RESPALDO`, 14 por defecto): las dos bases (`pg_dump`), las
    fotos y los CV. **Cubre** un error de la app, un borrado, una migración que
    salió mal. **No cubre** perder el disco o el VPS. Se restaura con
-   `scripts/restaurar.sh <fecha>` (probado: base, fotos, CV, Umami y hasta las
-   sesiones vuelven). Los CV respaldados siguen la retención de los CV: uno que
-   la retención borró desaparece de los respaldos a los 14 días.
+   `scripts/restaurar.sh <fecha>`, con el compose andando o bajado: levanta la
+   base si no corre, la restaura con las fotos y los CV, y termina con un
+   `desplegar.sh`, que migra si el respaldo es de antes de una migración y
+   vuelve a armar las páginas del sitio con la base restaurada (se
+   prerenderizan leyéndola). Probado desde volúmenes vacíos: base, fotos, CV,
+   Umami y hasta las sesiones vuelven. Los CV respaldados siguen la retención
+   de los CV: uno que la retención borró desaparece de los respaldos a los 14
+   días.
 2. **Los de Hostinger.** Todos los planes KVM traen un **backup semanal
    automático, gratis**, guardado fuera del servidor; se guardan dos semanales
    (y dos diarios, si se paga el backup diario). Además, **un snapshot manual**:
@@ -282,6 +294,35 @@ capa cubre algo distinto:
    (`scp -r deploy@<ip>:ed/respaldos ~/respaldos-ed` si no hay `rsync`.)
    **Cubre** perder el VPS y la cuenta de Hostinger. Los respaldos llevan CV y
    datos de contacto: van a un disco cifrado, y nunca a un lugar compartido.
+   Guardá también **una copia del `.env`** fuera del VPS (en un gestor de
+   contraseñas): no va en los respaldos, y trae la API key de Umami, que no se
+   puede volver a leer.
+
+### Restaurar en un VPS nuevo, desde la copia de afuera
+
+Si se perdió el VPS (o se muda a otro), con la capa 3:
+
+1. **El servidor y el DNS**, como la primera vez: §1 y §2, con el dominio
+   apuntando a la IP nueva.
+2. **El código y las variables:** `git clone` como en §3, y el `.env` de la
+   copia (`scp .env deploy@<ip>:ed/.env`, y `chmod 600 .env`). Si no hay copia,
+   uno nuevo desde `.env.example`: las claves y los secretos pueden ser otros
+   (las sesiones abiertas se cierran y hay que volver a entrar), pero
+   `UMAMI_API_KEY` hay que crearla de nuevo en el panel de Umami después (§5,
+   pasos 3 y 4; el sitio de Umami y su `UMAMI_WEBSITE_ID` vuelven con la base).
+3. **El respaldo:** la carpeta de la fecha, a `respaldos/` del clon:
+
+   ```sh
+   rsync -az ~/respaldos-ed/<AAAA-MM-DD> deploy@<ip>:ed/respaldos/
+   ```
+
+4. **`scripts/restaurar.sh <AAAA-MM-DD>`**, en el VPS. Sin nada corriendo y sin
+   imagen del sitio, levanta la base (vacía, con sus dos usuarios), restaura
+   las dos bases, las fotos y los CV, y corre el primer deploy con esa base.
+   Termina en `Listo: https://<dominio> corre <commit>`. Probado en local así,
+   sin volúmenes ni imagen del sitio: la foto con los mismos bytes, el CV, las
+   novedades y las visitas de Umami.
+5. El **recorrido final** (§12).
 
 ## 9. El disco
 
