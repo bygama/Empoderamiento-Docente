@@ -59,16 +59,24 @@ host se elige por variables de entorno.** Para el VPS, el compose de la raíz
    la imagen `app`, etiquetada con el commit (las últimas 5 quedan, y
    `scripts/volver.sh` pone otra a correr). `desplegar.sh` es la única entrada
    del deploy: `docker compose up` a secas no arranca desde cero, porque la
-   imagen `app` no existe hasta que `construir` corre con la base.
+   imagen `app` no existe hasta que `construir` corre con la base. El
+   standalone lo pide `next.config.ts` **solo fuera de Vercel** (`output:
+   "standalone"` si no está `VERCEL`): Vercel arma su propia salida y no lo
+   necesita, y así su build queda como estaba.
 4. **Las visitas, de Umami en el VPS.** La copia diaria (ADR-0009) sigue igual,
-   pero su cliente se elige por variables: Umami si están `UMAMI_API_URL`,
-   `UMAMI_API_KEY` y `UMAMI_WEBSITE_ID`, Vercel Web Analytics si están las de
-   Vercel. El filtro por país dejó de ser OData y cada cliente lo traduce. El
+   pero su cliente se elige por variables, con **una sola regla**
+   (`fuenteDeVisitas`) que usan también el script del sitio y Ajustes ›
+   Conexiones, así lo que se cuenta es lo que se copia: Umami si están
+   `UMAMI_API_URL`, `UMAMI_API_KEY` y `UMAMI_WEBSITE_ID`; si no, Vercel Web
+   Analytics si el sitio corre en Vercel (`VERCEL`) con sus variables; si no,
+   ninguna. El filtro por país dejó de ser OData y cada cliente lo traduce. El
    plan de cada fuente vive en `PLANES_DE_LA_FUENTE`: con Umami, que guarda todo
    y da la campaña de cada visita, se piden las ventanas de 90 días y se cuentan
-   las visitas de los links cortos. El sitio carga un solo script: el de Vercel
-   en Vercel, el de Umami fuera de Vercel con su variable, ninguno si no.
-   Esto cambia el ADR-0009: Vercel Web Analytics deja de ser la única fuente.
+   las visitas de los links cortos. El sitio carga un solo script, el de la
+   fuente activa, o ninguno. El de Umami (`/umami/script.js`) lo sirve el proxy
+   del VPS: en Vercel con las variables de Umami daría 404, y Conexiones lo
+   avisa. Esto cambia el ADR-0009: Vercel Web Analytics deja de ser la única
+   fuente.
 5. **El cron, un servicio en el VPS.** El de `vercel.json` sigue en Vercel; en
    el VPS, el servicio `cron` llama a la misma ruta por la red interna a las
    04:00 UTC con el mismo secreto. Un solo cron que corre todas las tareas

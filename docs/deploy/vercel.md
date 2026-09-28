@@ -36,8 +36,11 @@ En Settings › Environment Variables (qué es cada una: `apps/sitio/.env.exampl
 tres de Search Console y, para la copia de las visitas, `VERCEL_TOKEN` y
 `VERCEL_ANALYTICS_PROJECT_ID` (y `VERCEL_TEAM_ID` si el proyecto es de un
 equipo) **solo en Production**: el token abre la cuenta entera (ADR-0009).
-Web Analytics se prende en el proyecto; el sitio carga su script solo, porque
-corre en Vercel. Las de Umami no se cargan acá.
+Web Analytics se prende en el proyecto, y el sitio carga su script cuando
+están esas variables: una sola regla elige la fuente del script y de la copia
+(ADR-0018). **Las de Umami no se cargan acá**: con ellas la fuente sería Umami
+también en Vercel, y su script (`/umami/script.js`) lo sirve el proxy del VPS,
+así que acá daría 404. Ajustes › Conexiones lo avisa.
 
 ## La primera cuenta
 
