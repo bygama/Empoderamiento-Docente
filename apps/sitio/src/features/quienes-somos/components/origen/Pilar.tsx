@@ -21,7 +21,7 @@ export function Pilar({
   return (
     <div
       data-beat={i}
-      className={`flex h-full items-center motion-reduce:h-auto motion-reduce:py-24 ${GRILLA}`}
+      className={`flex h-full items-center motion-reduce:h-auto motion-reduce:py-24 [[data-modo=quieto]_&]:h-auto max-lg:[[data-modo=quieto]_&]:py-16 ${GRILLA}`}
     >
       <div className="text-center md:text-left">
         <span

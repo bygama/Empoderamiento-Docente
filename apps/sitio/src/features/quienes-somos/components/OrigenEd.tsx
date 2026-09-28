@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { OrigenDeQuienesSomos } from "@/features/quienes-somos/contenido/origen";
 import { partirResaltado } from "@/lib/contenido/resaltado";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { ALTO_CAPITULOS_LVH, crearCapitulosMovil } from "./origen/capitulos-movil";
 import { crearOrigen } from "./origen/coreografia-origen";
 import { PanelFotos } from "./origen/PanelFotos";
 import { PilaresOrigen } from "./origen/PilaresOrigen";
@@ -53,6 +54,14 @@ import { BeatRemate } from "./origen/BeatRemate";
  * coreografía en `coreografia-origen.ts` (+ `estados-origen`,
  * `timeline-origen`, `panel-fotos`), markup en `PanelFotos`, `PilaresOrigen`,
  * `TrayectoriaHorizontal`, `TrayectoriaVertical` y `BeatRemate`.
+ *
+ * Tres modos (`data-modo`), igual gramática que Niveles/Proyectos en Qué
+ * hacemos: `vivo` (≥ 1024px, también táctil) corre la lámina fija de arriba
+ * sin cambios; `movil` (bajo 1024px con alto suficiente) reemplaza los
+ * gestos de escritorio por el PASADOR DE CAPÍTULOS (`capitulos-movil.ts`):
+ * los mismos cinco beats, uno por pantalla, conducidos por el scroll de su
+ * propia zona; `quieto` (motion reducido o pantalla muy baja) deja los
+ * beats en flujo, sin pin ni animación.
  */
 export function OrigenEd({ contenido }: { contenido: OrigenDeQuienesSomos }) {
   const { queEs, remate } = contenido;
@@ -60,19 +69,47 @@ export function OrigenEd({ contenido }: { contenido: OrigenDeQuienesSomos }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
+  // Arranca en "vivo": es el HTML que el sitio sirve hoy (SSR y primer
+  // render, sin JS) — mismas clases, byte a byte. El efecto de modo lo baja
+  // a "movil"/"quieto" ANTES del primer paint post-hidratación cuando
+  // corresponde (layout effect, no hay flash de escritorio en celular).
+  const [modo, setModo] = useState<"quieto" | "vivo" | "movil">("vivo");
+
+  useIsomorphicLayoutEffect(() => {
+    const decidir = () => {
+      if (reduced) return setModo("quieto");
+      if (window.matchMedia("(min-width: 1024px)").matches) return setModo("vivo");
+      if (window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)").matches) {
+        return setModo("movil");
+      }
+      setModo("quieto");
+    };
+    decidir();
+    // ≥ 1024 corre la historia de escritorio como siempre (también táctil).
+    const mqVivo = window.matchMedia("(min-width: 1024px)");
+    const mqMovil = window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)");
+    mqVivo.addEventListener("change", decidir);
+    mqMovil.addEventListener("change", decidir);
+    return () => {
+      mqVivo.removeEventListener("change", decidir);
+      mqMovil.removeEventListener("change", decidir);
+    };
+  }, [reduced]);
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
     const zone = zoneRef.current;
-    if (!root || !zone || reduced) return;
-    return crearOrigen(root, zone);
-  }, [reduced]);
+    if (!root || !zone) return;
+    if (modo === "vivo") return crearOrigen(root, zone);
+    if (modo === "movil") return crearCapitulosMovil(root, zone);
+  }, [modo]);
 
   return (
     <section
       ref={rootRef}
       id="origen"
       data-indice="Origen"
+      data-modo={modo}
       className="bg-azul-principal relative z-20 -mt-[5svh] overflow-clip rounded-t-[2.5rem] text-white shadow-[0_-24px_60px_-30px_rgb(15_23_42/0.45)]"
       aria-label="Origen, sentido y evolución"
     >
@@ -87,11 +124,29 @@ export function OrigenEd({ contenido }: { contenido: OrigenDeQuienesSomos }) {
         className="pointer-events-none absolute top-[8%] left-1/2 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgb(31_154_120/0.14)_0%,transparent_65%)]"
       />
 
-      <div ref={zoneRef} className="relative h-[560svh] motion-reduce:h-auto">
-        <div className="sticky top-0 h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto">
+      <div
+        ref={zoneRef}
+        data-origen-zona
+        className={
+          "relative " +
+          (modo === "vivo" ? "h-[560svh] " : modo === "quieto" ? "h-auto " : "") +
+          "motion-reduce:h-auto"
+        }
+        style={modo === "movil" ? { height: `${ALTO_CAPITULOS_LVH}lvh` } : undefined}
+      >
+        <div
+          data-origen-escena
+          className={
+            "top-0 w-full overflow-hidden motion-reduce:static motion-reduce:h-auto " +
+            (modo === "movil" ? "sticky h-lvh" : modo === "quieto" ? "static h-auto" : "sticky h-[100svh]")
+          }
+        >
           <div
             data-story-tilt
-            className="relative h-full w-full [transform-style:preserve-3d] motion-reduce:h-auto"
+            className={
+              "relative h-full w-full [transform-style:preserve-3d] motion-reduce:h-auto" +
+              (modo === "quieto" ? " h-auto" : "")
+            }
           >
             <PanelFotos fotos={contenido.fotos} />
 
@@ -104,7 +159,7 @@ export function OrigenEd({ contenido }: { contenido: OrigenDeQuienesSomos }) {
                 vertical. ── */}
             <div
               data-beat="3"
-              className="flex h-full flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24"
+              className="flex h-full flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24 [[data-modo=quieto]_&]:h-auto max-lg:[[data-modo=quieto]_&]:py-16"
             >
               <span className="text-azul-claro/80 font-mono text-[0.78rem] font-medium tracking-[0.24em] uppercase">
                 {queEs.volanta}
@@ -127,7 +182,7 @@ export function OrigenEd({ contenido }: { contenido: OrigenDeQuienesSomos }) {
 
             {/* Indicador de progreso de la historia (5 beats) */}
             <div
-              className="absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-2.5 motion-reduce:hidden"
+              className="absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-2.5 motion-reduce:hidden [[data-modo=quieto]_&]:hidden"
               aria-hidden="true"
             >
               {Array.from({ length: 5 }, (_, i) => (
