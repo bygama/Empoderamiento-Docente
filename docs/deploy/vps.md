@@ -360,7 +360,7 @@ guardan la misma clave en Blob y en disco (`cv/<id>.pdf`): se bajan del store
 privado y se copian al volumen `cv` con esa clave. Las **fotos** cambian de URL
 (de Blob a `/api/fotos/<id>`), y hay que reescribir cada uso con el registro de
 `apps/sitio/src/datos/fotos/`: **el script que hace las dos copias todavía no
-existe** (queda anotado en `work/deploy-en-vps/`); mientras tanto, se puede
+existe** (es un seguimiento pendiente); mientras tanto, se puede
 dejar el token de Blob en el `.env` y las fotos siguen en Blob. Después, las
 variables: sin `VERCEL_*`, con las de Umami.
 
