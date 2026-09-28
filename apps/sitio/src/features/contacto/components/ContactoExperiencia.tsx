@@ -15,6 +15,8 @@ import { finIntro, montarIntro, saltarIntro } from "./experiencia/coreografia-in
 import { cambiarTema, elegirTema } from "./experiencia/coreografia-paneles";
 import { enviar, otraConsulta } from "./experiencia/coreografia-envio";
 import { useSaltoIntro } from "./experiencia/useSaltoIntro";
+import { useTopeMovil } from "./experiencia/useTopeMovil";
+import { panelClases } from "./experiencia/movil";
 import { PanelHero } from "./experiencia/PanelHero";
 import { ColumnaIdentidad } from "./experiencia/ColumnaIdentidad";
 import { IndiceTemas } from "./experiencia/IndiceTemas";
@@ -149,19 +151,20 @@ export function ContactoExperiencia({
   // Mientras la intro corre, cualquier intento de scroll la saltea.
   useSaltoIntro(reduced, introListo, estado, () => saltarIntro(contexto()));
 
+  useTopeMovil(vista);
+
   return (
     <section
       ref={rootRef}
-      className="bg-grain-light relative isolate h-[100svh] overflow-hidden bg-gradient-to-b from-white via-white to-gris-fondo/50"
+      className="bg-grain-light relative isolate h-[100svh] overflow-hidden bg-gradient-to-b from-white via-white to-gris-fondo/50 max-lg:h-auto max-lg:min-h-[100lvh] max-lg:overflow-x-clip max-lg:overflow-y-visible"
       aria-label="Contacto"
     >
       {/* Fondo de nodos vivo durante toda la experiencia */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 opacity-30">
         <MathField className="h-full w-full" />
       </div>
-
       {/* ── Escenario: los cuatro estados apilados ────────────────────────── */}
-      <div className="relative z-10 mx-auto h-full w-full max-w-screen-xl px-5 md:px-10">
+      <div className="relative z-10 mx-auto h-full w-full max-w-screen-xl px-5 md:px-10 max-lg:h-auto">
         {/* 0 · HERO */}
         <PanelHero activo={vista === "hero"} titulo={titular.titulo} />
 
@@ -184,7 +187,7 @@ export function ContactoExperiencia({
           data-panel="apertura"
           aria-hidden={vista !== "apertura"}
           inert={vista !== "apertura"}
-          className="absolute inset-x-5 top-0 bottom-0 flex overflow-x-hidden overflow-y-auto pt-24 pb-8 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pt-24 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-8 [@media(max-height:760px)]:md:pt-[5.5rem] [@media(max-height:760px)]:md:pb-6"
+          className={`absolute inset-x-5 top-0 bottom-0 flex overflow-x-hidden overflow-y-auto pt-24 pb-8 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pt-24 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-8 [@media(max-height:760px)]:md:pt-[5.5rem] [@media(max-height:760px)]:md:pb-6 ${panelClases(vista === "apertura")} max-lg:pb-12`}
         >
           {/* Composición editorial asimétrica (idioma de la home): columna de
               identidad a la izquierda (titular + equipo real) y el ÍNDICE de
@@ -217,7 +220,6 @@ export function ContactoExperiencia({
           onOtra={() => otraConsulta(contexto())}
         />
       </div>
-
     </section>
   );
 }

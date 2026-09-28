@@ -5,6 +5,7 @@ import type { Envio } from "./contexto";
 import { mailtoDelCV, type Tema } from "./data";
 import { RailTema } from "./RailTema";
 import { CamposContacto } from "./CamposContacto";
+import { panelClases } from "./movil";
 
 type Props = {
   activo: boolean;
@@ -31,7 +32,7 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto,
       data-panel="formulario"
       aria-hidden={!activo}
       inert={!activo}
-      className="absolute inset-x-5 top-0 bottom-0 flex overflow-y-auto pt-24 pb-24 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-10 [@media(max-height:760px)]:md:pb-6"
+      className={`absolute inset-x-5 top-0 bottom-0 flex overflow-y-auto pt-24 pb-24 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-10 [@media(max-height:760px)]:md:pb-6 ${panelClases(activo)} max-lg:pb-12`}
     >
       {/* my-auto (y no justify-center en el padre): si el contenido no
           entra, se scrollea desde arriba sin que el tope quede recortado
@@ -44,7 +45,7 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto,
           type="button"
           data-campo
           onClick={onCambiar}
-          className="group text-gris-texto hover:text-verde-concepto mb-3 inline-flex items-center gap-1.5 font-mono text-[0.7rem] font-medium tracking-[0.14em] uppercase transition-colors"
+          className="group text-gris-texto hover:text-verde-concepto mb-3 inline-flex items-center gap-1.5 font-mono text-[0.7rem] font-medium tracking-[0.14em] uppercase transition-colors max-lg:min-h-11 max-lg:py-2"
         >
           <ArrowRight
             size={14}
@@ -74,7 +75,7 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto,
           <div data-campo className="flex justify-center lg:col-start-2">
             <a
               href={cvAbierto ? "/sumate-al-equipo" : mailtoDelCV(contacto.correo)}
-              className="group text-gris-texto hover:text-azul-principal inline-flex items-center gap-1.5 font-sans text-[0.85rem] transition-colors"
+              className="group text-gris-texto hover:text-azul-principal inline-flex items-center gap-1.5 font-sans text-[0.85rem] transition-colors max-lg:min-h-11"
             >
               ¿Querés estar de este lado?{" "}
               <span className="text-azul-principal group-hover:text-verde-concepto font-medium transition-colors">
