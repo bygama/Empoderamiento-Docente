@@ -417,7 +417,10 @@ Ninguna IA ejecuta sin confirmación explícita del usuario:
 El repo llegó a `react-doctor` **100/100 sin diagnósticos** el 2026-09-08,
 partiendo de 57/100 con 126 hallazgos. La regla es no volver atrás.
 `.githooks/pre-push` corre typecheck, react-doctor y lint —unos 10 segundos—
-y **frena el push** si alguno falla. Se instala solo con `pnpm install`.
+y **frena el push** si alguno falla. Antes, un chequeo instantáneo: que cada
+`.sh` de `scripts/` y `deploy/` lleve en git el bit de ejecución (`100755`),
+porque el runbook del VPS los corre directo y en Windows git no lo pone solo
+(`git update-index --chmod=+x <archivo>`). Se instala solo con `pnpm install`.
 
 - **Se arregla por código, siempre.** Prohibidos `react-doctor-disable`,
   `doctor.config.*`, la clave `reactDoctor` en `package.json` y los
