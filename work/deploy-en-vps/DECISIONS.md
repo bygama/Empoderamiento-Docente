@@ -95,3 +95,45 @@
   hay producción con historial en `corridas_de_tareas`, y el nombre deja de
   depender de la fuente.
 - 2026-09-27 — **Retención de respaldos: 14 días**, en una carpeta del host.
+- 2026-09-27 — **Ronda de arreglos 1 (revisor r1, FAIL por dos Important y uno
+  plausible).** Lo que se decidió al arreglar:
+  - **El bit de ejecución lo cuida el `pre-push`.** Los siete `.sh` de
+    `scripts/` y `deploy/` pasan a `100755`, y el hook frena si uno queda sin
+    él: en Windows `core.fileMode=false` y un `.sh` nuevo entra con `100644`.
+    Va en el hook y no en `pnpm test` porque es del repo, no de una app, y el
+    hook es el gate que ya corre en cada push (AGENTS.md §5.8 sigue nombrando
+    las tres de siempre: sumarle esta es un meta-doc, lo decide el padre).
+  - **`restaurar.sh` termina con `desplegar.sh`, siempre.** Levantar `db` antes
+    era el arreglo pedido; al probarlo apareció el resto: el sitio se
+    prerenderiza leyendo la base, así que después de restaurar las páginas
+    seguían mostrando lo de antes, y en un VPS nuevo no hay imagen que levantar.
+    El deploy migra (si el respaldo es de antes de una migración), arma las
+    páginas con la base restaurada y, en un VPS nuevo, es el primero. Si ya
+    había imagen, el sitio vuelve con ella mientras se construye la nueva.
+  - **Una sola regla para la fuente de visitas** (el padre: «Umami si están sus
+    variables; si no, Vercel si corre en Vercel con sus variables; si no,
+    ninguna»), en `fuenteDeVisitas`, y la usan el script, la copia y
+    Conexiones. Consecuencias: las de Vercel fuera de Vercel ya no arman la
+    copia (antes sí, con el token en un `.env.local`), y en Vercel con las de
+    Umami el script es el de Umami, que ahí da 404. Eso último no se tapa con
+    un rewrite (sin cuenta de Vercel no se puede probar, y la IP de las visitas
+    llegaría de Vercel): Conexiones lo avisa en la fila de Umami y la guía de
+    Vercel dice que ahí no van.
+  - **Los nombres de imagen salen del proyecto del compose**
+    (`<proyecto>-fuente`, `<proyecto>-sitio`; `ed` por defecto o
+    `COMPOSE_PROJECT_NAME`). Los scripts leen el nombre con `docker compose
+    config --no-interpolate`, que no imprime secretos ni pide las variables.
+  - **SSH: un `sshd_config.d/00-ed.conf`** en lugar de editar solo
+    `sshd_config`. En SSH gana el primer valor leído y el `Include` de
+    `sshd_config.d/` está arriba, así que un `50-cloud-init.conf` con
+    `PasswordAuthentication yes` le ganaba (probado en `ubuntu:24.04`); un
+    archivo que se lee antes que todos lo arregla aunque cloud-init vuelva.
+  - **`output: "standalone"` solo fuera de Vercel** (`next.config.ts`): Vercel
+    arma su propia salida y no lo necesita, y así su build queda como estaba.
+    Anotado también en el ADR-0018.
+  - **La base `postgres` es solo del superusuario**: `crear-bases.sh` revoca el
+    CONNECT de PUBLIC. Los respaldos (`dropdb`/`createdb` como `postgres`) la
+    siguen usando.
+  - **Quedan como están:** la imagen colgada si se redeploya el mismo commit (el
+    runbook dice cómo podarla) y la entrada del VPS en el DECISIONS del padre
+    (la sube el padre).

@@ -61,6 +61,10 @@ buildx con `--driver-opt network=` no resuelve el nombre `db` en el `RUN`
   - **`app`** (`ed-sitio:<commit>` y `ed-sitio:actual`): Node 24 alpine con el
     standalone y nada más, usuario `node`, `node apps/sitio/server.js`. Su
     contexto de build es el tar que saca `construir` (abajo).
+  - El prefijo `ed` es el nombre del proyecto del compose: `ed` por defecto, u
+    otro con `COMPOSE_PROJECT_NAME`, y los scripts lo leen del compose *(ronda
+    de arreglos 1: antes era fijo y la poda podía tocar las imágenes de otra
+    copia en el mismo servidor)*.
 - `next.config.ts` pasa a `output: "standalone"` con `outputFileTracingRoot` en
   la raíz del workspace (la misma que `turbopack.root`).
 - El servicio one-shot **`construir`** (imagen `fuente`, en la red interna,
@@ -73,8 +77,8 @@ buildx con `--driver-opt network=` no resuelve el nombre `db` en el `RUN`
   pipefail`, idempotente, frena en el primer paso que falla sin tocar el `app`
   que corre): build de `fuente` → `up -d db analitica` → `run --rm migrar` →
   `run --rm construir | docker build -t ed-sitio:<commit> -` → tag `actual` →
-  `up -d` → `caddy reload` → borra las imágenes de `app` más viejas que las
-  **últimas 5**. `docker compose up` a secas no arranca desde cero (la imagen
+  `up -d` → `caddy reload` → borra las imágenes de `app` de este proyecto más
+  viejas que las **últimas 5**. `docker compose up` a secas no arranca desde cero (la imagen
   `app` no existe hasta que `construir` corrió), y el runbook y el README lo
   dicen.
 - **`scripts/volver.sh <commit>`** retaguea `ed-sitio:<commit>` como `actual` y
@@ -167,9 +171,14 @@ existen en self-hosted: Settings › API keys), `startAt`/`endAt` en ms,
   propio, `FiltroDePais = { pais } | { fueraDe: [...] }`, y cada cliente lo
   traduce (Vercel: el OData de hoy, con los mismos tests; Umami:
   `country=eq.CL` / `country=neq.CL,MX,AR`). Los métodos no cambian.
-- **Se elige por las variables**: con `UMAMI_API_URL`, `UMAMI_API_KEY` y
-  `UMAMI_WEBSITE_ID`, Umami; si no, con las de Vercel, Vercel; si no, ninguna
-  (como hoy). `lib/metricas/entorno.ts` dice cuál (`fuenteDeVisitas()`).
+- **Se elige por las variables, con una sola regla** que usan la copia, el
+  script del sitio y Ajustes › Conexiones (`fuenteDeVisitas()`, en
+  `lib/metricas/entorno.ts`): con `UMAMI_API_URL`, `UMAMI_API_KEY` y
+  `UMAMI_WEBSITE_ID`, Umami; si no, Vercel si el sitio corre en Vercel
+  (`VERCEL`) con sus variables; si no, ninguna. *(Ronda de arreglos 1: antes la
+  copia tomaba las de Vercel en cualquier host y el script miraba solo
+  `VERCEL`, así que en Vercel con los dos juegos se contaba una fuente y se
+  copiaba la otra.)*
 
 **Qué da Umami para cada dimensión que usan Resumen y Origen:**
 
@@ -207,19 +216,21 @@ historial que perder, y el nombre ya no depende de la fuente. Sus archivos
 (`datos/tareas/metricas-de-vercel.ts`, `consultas-de-vercel.ts`) se renombran
 igual.
 
-**El script.** El layout del sitio carga **uno solo**, en producción, según
-dónde corre, con una función pura (`scriptDeAnalitica(entorno)`) y un test de
-las combinaciones:
+**El script.** El layout del sitio carga **uno solo**, en producción: el de la
+fuente activa (la regla de arriba), con una función pura
+(`scriptDeAnalitica(entorno)`) y un test de las combinaciones:
 
-| Entorno | Script |
+| Fuente activa | Script |
 | --- | --- |
-| `VERCEL` (lo pone Vercel en el build y en el runtime) | `<Analytics />` de `@vercel/analytics`, que pega a `/_vercel/insights`, que solo existe en Vercel |
-| fuera de Vercel, con `UMAMI_WEBSITE_ID` | `<script defer src="/umami/script.js" data-website-id=…>`, que solo sirve Caddy |
-| fuera de Vercel, sin `UMAMI_WEBSITE_ID` | ninguno |
+| Umami (sus tres variables, en cualquier host) | `<script defer src="/umami/script.js" data-website-id=…>`, que solo sirve Caddy |
+| Vercel (`VERCEL`, que pone Vercel en el build y en el runtime, y sus variables) | `<Analytics />` de `@vercel/analytics`, que pega a `/_vercel/insights`, que solo existe en Vercel |
+| ninguna | ninguno |
 
-Nunca los dos, y nunca uno que dé 404: el de Vercel fuera de Vercel no
-existe, y `/umami/…` en Vercel tampoco (en Vercel, `VERCEL` manda aunque haya
-variables de Umami). Caddy sirve `/umami/script.js` y
+Nunca los dos, y lo que cuenta el script es lo que copia la tarea. El de
+Vercel fuera de Vercel no se carga nunca. `/umami/…` en Vercel no existe: con
+las variables de Umami en Vercel, la fuente es Umami igual y su script daría
+404, así que **Conexiones lo avisa** en la fila de Umami (cuenta como error) y
+la guía de Vercel dice que ahí no van. Caddy sirve `/umami/script.js` y
 `/umami/api/send` desde el mismo dominio (el tracker arma el endpoint desde la
 URL del script: `…/umami` + `/api/send`, verificado en `src/tracker/index.ts` de
 v3.4.0). Todo lo demás de Umami —el panel, su login, su API— **no se publica**:
@@ -233,7 +244,8 @@ navegador que no haya violaciones, y el comentario de `cabeceras.ts` lo dice.
 **Ajustes › Conexiones** muestra la fuente que corresponde: «Umami»
 (`UMAMI_API_URL`, `UMAMI_API_KEY`, `UMAMI_WEBSITE_ID`) si están sus variables o
 si el sitio no corre en Vercel, y «Vercel Analytics» si corre en Vercel sin
-Umami. El cron deja de ser «de Vercel». Los textos del admin que dicen «se
+Umami (la misma regla, `fuenteEsperada`, que nombra la del host cuando no hay
+ninguna). El cron deja de ser «de Vercel». Los textos del admin que dicen «se
 configuran en Vercel» pasan a «en el servidor» (Vercel o el `.env` del VPS).
 
 **Tests.** El cliente de Umami con respuestas **grabadas de una instancia local
@@ -274,11 +286,19 @@ vista por Caddy, Umami la cuenta y «Actualizar ahora» / el cron la trae.
   vive solo en el mismo VPS no cubre perder el VPS, y se dice.
 - **A mano y restaurar:** `docker compose exec respaldo sh
   /respaldo/respaldar.sh` y `scripts/restaurar.sh <fecha>` (pide confirmación;
-  para `app`, `analitica` y `cron`, corre `/respaldo/restaurar.sh` en el
-  servicio `respaldo` —recrea las dos bases desde el dump, vacía y rellena los
-  volúmenes de fotos y CV— y vuelve a levantar todo).
-- **Probado en local**: respaldar, borrar el volumen de la base y el de fotos,
-  restaurar, y que las fotos y la base vuelvan.
+  levanta `db` si no corre, para `app`, `analitica` y `cron`, corre
+  `/respaldo/restaurar.sh` en el servicio `respaldo` —recrea las dos bases
+  desde el dump, vacía y rellena los volúmenes de fotos y CV—, vuelve a
+  levantar todo si ya había imagen del sitio y termina con `desplegar.sh`, que
+  migra si el respaldo es de antes de una migración y prerenderiza el sitio
+  con la base restaurada). *(Ronda de arreglos 1: antes no levantaba `db`, y
+  con el compose bajado salía con 1.)*
+- **En un VPS nuevo**, desde la copia de afuera: clonar, el `.env` (guardado
+  afuera), la carpeta del respaldo en `respaldos/` y `scripts/restaurar.sh`,
+  que ahí hace además el primer deploy (runbook §8).
+- **Probado en local**: respaldar, bajar el compose, borrar los volúmenes de la
+  base, fotos y CV, restaurar, y que las fotos y la base vuelvan; y lo mismo
+  sin ninguna imagen del sitio (el VPS nuevo).
 
 ### 3.8 Los dos caminos y la mudanza
 
@@ -300,7 +320,10 @@ El README y `docs/deploy/` cuentan los dos hosts:
 ### 3.9 El runbook, `docs/deploy/vps.md`
 
 De un VPS de Hostinger vacío (Ubuntu) al sitio andando: usuario sin root, SSH
-con clave (y sin contraseña ni root), firewall con `ufw` (22, 80, 443) y la
+con clave (cómo cargarla la primera vez; sin contraseña ni root, con un
+`sshd_config.d/00-ed.conf` que le gana al `50-cloud-init.conf`, verificado con
+`sshd -T`, y probando en otra terminal antes de cerrar la sesión), firewall con
+`ufw` (22, 80, 443) y la
 advertencia de que Docker se saltea `ufw` en los puertos publicados (por eso
 solo `proxy` publica), Docker Engine con su repo oficial, clonar, `.env` desde
 el ejemplo, `scripts/desplegar.sh`. Umami: el túnel, cambiar la contraseña por
@@ -373,7 +396,13 @@ factor, publicar una novedad, recibir un contacto y verla en el Inicio.
   - los segundos de corte de un segundo `desplegar.sh`, y `volver.sh` a la
     imagen anterior.
 - **El test de `scriptDeAnalitica`**: Umami, Vercel, ninguno, y los dos
-  configurados (gana Vercel en Vercel).
+  configurados (gana Umami, como en la copia); y los de `fuenteDeVisitas` y
+  `clienteDesdeEntorno` con solo las de Vercel (en Vercel y fuera) y con los
+  dos juegos.
+- **Los `.sh` de `scripts/` y `deploy/` con el bit de ejecución** en git, y el
+  `pre-push` que frena si uno no lo tiene.
+- **`restaurar.sh` desde volúmenes vacíos**, con el compose bajado, y en un VPS
+  nuevo (sin imagen del sitio).
 - **`scripts/comparar-render.mjs` contra `main`**: la única diferencia es el
   script de analítica (fuera de Vercel y sin `UMAMI_WEBSITE_ID`, ninguno, donde
   `main` ponía el de Vercel), explicada en PROGRESS.

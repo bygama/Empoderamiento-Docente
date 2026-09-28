@@ -3,11 +3,10 @@
 ## In progress
 
 - **Pausa: PR #198 abierto** (https://github.com/bygama/Empoderamiento-Docente/pull/198),
-  sin mergear, esperando la revisión de cierre del padre (la lanza al recibir
-  `worker_done`). Los 14 pasos del PLAN (más el 4b) están hechos y la
-  verificación L está en PASS (abajo).
-- **Lo que sigue:** los hallazgos de la revisión, si los hay (un arreglo por
-  hallazgo, re-verificar desde la capa que toque); cuando el padre lo pida,
+  sin mergear. La revisión de cierre (r1) dio FAIL; la **ronda de arreglos 1**
+  está hecha y pusheada (abajo, «Verification»), y el mismo revisor la vuelve
+  a mirar.
+- **Lo que sigue:** lo que diga r1 en la re-revisión; cuando el padre lo pida,
   rebase sobre `main`; y el cierre de la lane (el commit que borra
   `work/deploy-en-vps/`) en el PR, antes del merge.
 - **Estado local de la prueba** (nada de esto va a git): el compose `ed` sigue
@@ -18,6 +17,80 @@
   base `ed_vps` de `ed-postgres` es la de los tests de esta lane.
 
 ## Verification
+
+### 2026-09-27 — Ronda de arreglos 1 — PASS
+
+Los hallazgos de r1 (FAIL: dos Important y uno plausible, más los Minor 4, 6,
+7, 8, 9 y 11), un commit por arreglo, cada uno pusheado al tenerlo (`b8fd502f`
+a `99cb62f7`). El 5 y el 10 quedan como estaban (el padre). Decisiones, en
+DECISIONS («Ronda de arreglos 1»).
+
+- **1, scripts ejecutables** (`b8fd502f`, `efb92d08`, `8baf86c7`): los siete
+  `.sh` de `scripts/` y `deploy/` en `100755`, y el `pre-push` frena si uno
+  queda sin el bit. En Linux, desde `git archive` (los modos del índice, como
+  los deja un clon en Ubuntu), `./scripts/restaurar.sh`:
+  - en `d2546399`: `-rw-rw-r--` y `sh: ./scripts/restaurar.sh: Permission
+    denied`, exit 126;
+  - en HEAD: `-rwxrwxr-x` los siete, y corre (`Uso: … Los que hay: (ninguno)`,
+    exit 2; antes del `8baf86c7` salía con 1 por `pipefail` sin llegar a su
+    `exit 2`).
+  - El chequeo del hook, en rojo (`update-index --chmod=-x` sobre dos) → «sin
+    el bit de ejecucion: deploy/db/crear-bases.sh», «…: scripts/volver.sh»,
+    `fallo=1`; en verde → «todos con el bit», `fallo=0`.
+- **2, `restaurar.sh`** (`7d5cac01`, `0ff59c43`): levanta `db`, restaura y
+  termina con `desplegar.sh`. Escenario del SPEC: respaldo a mano, `docker
+  compose down`, `docker volume rm ed_datos-db ed_fotos ed_cv`, `echo restaurar
+  | bash scripts/restaurar.sh 2026-09-27` → **exit 0 en 87 s**: crea
+  `ed_datos-db` (el log de `db`: «running
+  /docker-entrypoint-initdb.d/crear-bases.sh»), `[restaurar] la base ed … la
+  base umami … los archivos de fotos … de cv … listo`, el sitio vuelve con la
+  imagen de antes y el deploy termina en «Listo: https://localhost corre
+  8baf86c7ed8f». Antes y después: novedades 9/9, fotos 63/63, mensajes 1/1,
+  cuentas 1/1, sesiones 1/1, eventos de Umami 3/3; la foto subida por Caddy,
+  200 y `cmp` idéntico (sha256 `e3778e4b…`); el CV en `.cv/cv/`; `.fotos` y
+  `.cv` de `node` y `node` escribe en `.fotos`.
+  - **VPS nuevo** (lo mismo, más `docker rmi` de las tres `ed-sitio:*`, sin
+    ninguna imagen del sitio) → **exit 0 en 71 s**, sin el `up` intermedio, el
+    deploy desde la base restaurada; `/`, `/novedades` (con la de UNESCO) y
+    `/admin/entrar` 200, la foto con el mismo sha256, el CV, 9 novedades.
+  - El runbook (§8) dice cómo restaurar en un VPS nuevo desde la copia de
+    afuera, y que se guarde el `.env` fuera del VPS.
+- **3, SSH** (`57ae883e`): en `ubuntu:24.04` con `openssh-server`, un
+  `50-cloud-init.conf` con `PasswordAuthentication yes` y `sshd_config` editado
+  → `sshd -T`: `permitrootlogin no`, **`passwordauthentication yes`**; con los
+  comandos del runbook (`00-ed.conf` y el `sed` sobre `sshd_config.d/`) →
+  `sshd -t` ok, `permitrootlogin no`, `passwordauthentication no`. El runbook
+  suma cargar la clave (`ssh-copy-id` o el pipe de PowerShell, o el panel), la
+  verificación y probar en otra terminal antes de cerrar la sesión de root.
+- **4, nombres de imagen** (`fa5a7031`): `<proyecto>-fuente` y
+  `<proyecto>-sitio`. `docker compose config --no-interpolate` → `ed`; con
+  `COMPOSE_PROJECT_NAME=ed-prueba` → `ed-prueba`, y las imágenes
+  `ed-prueba-fuente:actual` y `ed-prueba-sitio:actual`. `desplegar.sh` en HEAD
+  → exit 0 en 75 s, «Listo: https://localhost corre 99cb62f770e8», la poda
+  lista `ed-sitio` y nada más; `volver.sh 8baf86c7ed8f` y de vuelta
+  `99cb62f770e8` → el contenedor corre exactamente la imagen pedida
+  (`b385ec67…`, `5f9b14ef…`), `/` 200; una que no existe → exit 1 y la lista.
+- **6, standalone solo fuera de Vercel** (`99cb62f7`): en DECISIONS y en el
+  ADR-0018.
+- **7 y 8, una sola regla para la fuente** (`cd511f72`, `99cb62f7`):
+  `fuenteDeVisitas` la usan el script, la copia y Conexiones; Conexiones avisa
+  Umami en Vercel. Tests nuevos: `entorno.test.ts` (5: solo las de Vercel en
+  Vercel → Vercel y el cliente le pide a `https://api.vercel.com`; los dos
+  juegos → Umami y le pide a `http://analitica:3000`; las de Vercel fuera de
+  Vercel → ninguna), `script.test.ts` (4) y el aviso en `conexiones.test.ts`.
+  En el compose (deploy `99cb62f770e8`, con las tres de Umami): el HTML de `/`
+  trae `<script defer="" src="/umami/script.js" data-website-id="…">` y 0
+  `_vercel`. SPEC §3.5 y §6 alineados.
+- **9, las fuentes de Google**: el runbook (§4 y §7) dice que se vuelve a correr
+  `desplegar.sh`.
+- **11, la base `postgres`** (`230cf0e1`): en la base recreada desde cero,
+  `ed → postgres` y `umami → postgres`: «FATAL: permission denied for database
+  "postgres"»; `ed → ed` y `umami → umami`: 1; `ed → umami`: denied.
+- **El gate:** typecheck en limpio (los `.tsbuildinfo` borrados antes) → exit
+  0; `pnpm test` cinco veces seguidas → exit 0 las cinco, cada una kit-admin
+  11/11, auth 46/46, sitio 594 pass + 1 skipped (el fixture de Vercel de
+  siempre), 0 fail; lint, react-doctor 100/100 y typecheck, en el `pre-push` de
+  cada uno de los seis push, «Todo en verde».
 
 ### 2026-09-27 — L DoD — PASS
 
