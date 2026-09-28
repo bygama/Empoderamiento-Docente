@@ -12,6 +12,11 @@ type Props = {
   placeholder?: string;
   /** Cómo se anuncia la lista abierta. El formulario de CV lo usa también para el nivel. */
   etiqueta?: string;
+  /** Valor controlado desde afuera (p. ej. PaisCampo, para que sobreviva el
+   * cruce de breakpoint entre este dropdown y el `<select>` nativo). Si no
+   * viene, el componente sigue manejando su propio estado como siempre. */
+  value?: string;
+  onChange?: (v: string) => void;
 };
 
 /**
@@ -32,10 +37,17 @@ export function PaisDropdown({
   options,
   placeholder = "Elegir…",
   etiqueta = "País",
+  value: valueProp,
+  onChange: onChangeProp,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [interno, setInterno] = useState("");
   const [active, setActive] = useState(0);
+  const value = valueProp ?? interno;
+  const setValue = (v: string) => {
+    setInterno(v);
+    onChangeProp?.(v);
+  };
   const rootRef = useRef<HTMLDivElement | null>(null);
   const optionRefs = useRef<(HTMLLIElement | null)[]>([]);
   const listId = useId();
