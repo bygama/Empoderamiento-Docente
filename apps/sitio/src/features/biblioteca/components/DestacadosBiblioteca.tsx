@@ -10,6 +10,7 @@ import { crearDestacados } from "./destacados/coreografia-destacados";
 import { IntroDestacados } from "./destacados/IntroDestacados";
 import { IndiceDestacados } from "./destacados/IndiceDestacados";
 import { ArticuloDestacado } from "./destacados/ArticuloDestacado";
+import { BarajaMovil } from "./destacados/BarajaMovil";
 
 /**
  * Material destacado (sitemap) — coreografía de la referencia, en tres fases:
@@ -87,8 +88,11 @@ export function DestacadosBiblioteca({ contenido, destacados }: { contenido: Des
       {/* ── Fase 1: intro con pantalla propia ───────────────────────────── */}
       <IntroDestacados contenido={contenido} items={destacados} refRow={rowRef} />
 
+      {/* Bajo `lg`: la baraja deslizable, en vez de la banda azul pineada. */}
+      <BarajaMovil items={destacados} />
+
       {/* ── Fases 2 y 3: banda azul con índice + artículos ──────────────── */}
-      <div className="bg-azul-principal relative">
+      <div className="bg-azul-principal relative max-lg:hidden">
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(circle,#fff_1.1px,transparent_1.6px)] [background-size:22px_22px]"

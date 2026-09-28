@@ -68,7 +68,7 @@ export function IntroDestacados({
             divisoria. */}
         <div
           ref={refRow}
-          className="z-30 mt-10 grid grid-cols-2 gap-3 md:col-span-9 md:mt-0 md:grid-cols-4 md:gap-4"
+          className="z-30 mt-10 grid grid-cols-2 gap-3 md:col-span-9 md:mt-0 md:grid-cols-4 md:gap-4 max-lg:hidden"
         >
           {items.map(({ material }) => (
             <div
