@@ -168,7 +168,7 @@ export function TeamProfileOverlay({
         ref={backRef}
         type="button"
         onClick={requestClose}
-        className="border-azul-principal/15 text-azul-principal hover:border-verde-concepto hover:text-verde-concepto focus-visible:outline-verde-concepto fixed top-6 left-6 z-10 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2.5 font-sans text-[0.9rem] font-medium backdrop-blur-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:top-8 md:left-8"
+        className="border-azul-principal/15 text-azul-principal hover:border-verde-concepto hover:text-verde-concepto focus-visible:outline-verde-concepto fixed top-6 left-6 z-10 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2.5 font-sans text-[0.9rem] font-medium backdrop-blur-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:top-8 md:left-8 max-lg:min-h-11 max-lg:min-w-11"
       >
         <ArrowRight size={16} className="rotate-180" />
         Volver al equipo
@@ -185,7 +185,7 @@ export function TeamProfileOverlay({
             "link",
           )
         }
-        className="border-azul-principal/15 text-azul-principal hover:border-verde-concepto hover:text-verde-concepto focus-visible:outline-verde-concepto fixed top-6 right-6 z-10 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2.5 font-sans text-[0.9rem] font-medium backdrop-blur-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:top-8 md:right-8"
+        className="border-azul-principal/15 text-azul-principal hover:border-verde-concepto hover:text-verde-concepto focus-visible:outline-verde-concepto fixed top-6 right-6 z-10 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2.5 font-sans text-[0.9rem] font-medium backdrop-blur-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 max-lg:min-h-11 md:top-8 md:right-8"
       >
         <Enlace size={16} aria-hidden="true" />
         {copiado === "link" ? "Copiado" : "Copiar link"}
