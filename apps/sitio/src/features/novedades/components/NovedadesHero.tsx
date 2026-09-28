@@ -66,7 +66,7 @@ export function NovedadesHero({ contenido, fechaDeLaUltima }: { contenido: HeroD
   return (
     <section
       ref={rootRef}
-      className="bg-azul-principal relative isolate flex min-h-[88svh] flex-col justify-between overflow-hidden rounded-b-[2rem] pt-28 pb-10 text-white md:rounded-b-[2.75rem] md:pt-32"
+      className="bg-azul-principal relative isolate flex min-h-[88svh] flex-col justify-between overflow-hidden rounded-b-[2rem] pt-28 pb-10 text-white max-md:min-h-[78lvh] md:rounded-b-[2.75rem] md:pt-32"
       aria-label="Novedades"
     >
       {/* Fondo: glow de faro contenido + forma plana (manual §6) */}

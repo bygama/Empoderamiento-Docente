@@ -18,7 +18,7 @@ export function PaginacionNovedades({
   onCambiar: (pagina: number) => void;
 }) {
   const base =
-    "flex h-9 w-9 items-center justify-center rounded-full font-mono text-[0.72rem] transition-colors";
+    "flex h-9 w-9 items-center justify-center rounded-full font-mono text-[0.72rem] transition-colors max-lg:h-11 max-lg:w-11";
   const flecha = (activa: boolean) =>
     `${base} border border-azul-principal/15 text-azul-principal ${
       activa

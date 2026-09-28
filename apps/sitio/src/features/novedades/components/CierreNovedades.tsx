@@ -120,7 +120,7 @@ export function CierreNovedades({ contenido, redes }: { contenido: CierreDeNoved
 
         <SelloED className="absolute top-7 left-7 z-20 md:top-9 md:left-9" />
 
-        <div className="relative z-10 flex min-h-[58svh] flex-col items-center justify-center px-5 py-24 text-center md:px-10 md:py-28">
+        <div className="relative z-10 flex min-h-[58svh] flex-col items-center justify-center px-5 py-24 text-center max-md:min-h-[48lvh] max-md:py-16 md:px-10 md:py-28">
           <RevealLines
             as="h2"
             className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em]"
