@@ -47,6 +47,12 @@ type Cfg = {
   labelAtRest: boolean;
   /** Mostrar el label en hover (en las compactas de N4 va solo la flecha). */
   labelOnHover: boolean;
+  /**
+   * En táctil no hay hover: el label entra en reposo, pero solo donde cabe
+   * junto al país. En N3 y N4 (dos columnas en celular) lo aplastaba a 0 px;
+   * ahí la flecha sigue siendo la señal de acceso, como en escritorio.
+   */
+  labelTactil: boolean;
   /** Cuerpo de las iniciales en la card sin foto (ver `SinFoto`). */
   iniciales: string;
 };
@@ -77,10 +83,10 @@ type Cfg = {
 const VIDRIO = "bg-white/80 backdrop-blur-[10px]";
 
 const CFG: Record<Tier, Cfg> = {
-  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", radiusB: "rounded-b-[1.5rem]", plate: VIDRIO, pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, iniciales: "text-[7rem]" },
-  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", radiusB: "rounded-b-[1.4rem]", plate: VIDRIO, pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[5.5rem]" },
-  3: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.35rem]", radiusB: "rounded-b-[1.35rem]", plate: VIDRIO, pad: "p-[1.15rem]", nombre: "text-[1.18rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, iniciales: "text-[4.4rem]" },
-  4: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.15rem]", radiusB: "rounded-b-[1.15rem]", plate: VIDRIO, pad: "p-[0.95rem]", nombre: "text-[1.02rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, iniciales: "text-[3.1rem]" },
+  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", radiusB: "rounded-b-[1.5rem]", plate: VIDRIO, pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, labelTactil: true, iniciales: "text-[7rem]" },
+  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", radiusB: "rounded-b-[1.4rem]", plate: VIDRIO, pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, labelTactil: true, iniciales: "text-[5.5rem]" },
+  3: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.35rem]", radiusB: "rounded-b-[1.35rem]", plate: VIDRIO, pad: "p-[1.15rem]", nombre: "text-[1.18rem] max-md:text-[1.06rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem] max-md:text-[0.64rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, labelTactil: false, iniciales: "text-[4.4rem]" },
+  4: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.15rem]", radiusB: "rounded-b-[1.15rem]", plate: VIDRIO, pad: "p-[0.95rem]", nombre: "text-[1.02rem] max-md:text-[1rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem] max-md:text-[0.64rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, labelTactil: false, iniciales: "text-[3.1rem]" },
 };
 
 /**
@@ -125,7 +131,11 @@ function Caption({
   variant: "rest" | "hover";
 }) {
   const hover = variant === "hover";
-  const showLabel = hover ? cfg.labelOnHover : cfg.labelAtRest;
+  // En reposo el label se renderiza donde lo pide el tier: por mouse
+  // (labelAtRest) o, si cabe junto al país (labelTactil), oculto con `hidden`
+  // y revelado solo por el media query `hover: none`, donde no existe el hover
+  // que hoy lo trae. En escritorio con mouse el resultado es idéntico a antes.
+  const showLabel = hover ? cfg.labelOnHover : cfg.labelAtRest || cfg.labelTactil;
   return (
     <span
       aria-hidden="true"
@@ -156,7 +166,14 @@ function Caption({
         </span>
         <span className="flex shrink-0 items-center gap-1.5">
           {showLabel && (
-            <span className={cx("font-sans font-medium whitespace-nowrap", cfg.label, hover ? "text-white" : "text-azul-principal/80")}>
+            <span
+              className={cx(
+                "font-sans font-medium whitespace-nowrap",
+                cfg.label,
+                hover ? "text-white" : "text-azul-principal/80",
+                !hover && !cfg.labelAtRest && "hidden [@media(hover:none)]:inline",
+              )}
+            >
               Ver trayectoria
             </span>
           )}
@@ -211,6 +228,7 @@ export function PersonCard({
         "group relative block w-full cursor-pointer overflow-hidden text-left ring-1 ring-white/10 transition-shadow duration-500",
         "hover:shadow-[0_28px_70px_-26px_rgb(31_154_120/0.45)] focus-visible:shadow-[0_28px_70px_-26px_rgb(31_154_120/0.45)]",
         "focus-visible:outline-verde-concepto focus-visible:outline-2 focus-visible:outline-offset-2",
+        "max-lg:active:scale-[0.985] max-lg:transition-[box-shadow,transform]",
         cfg.aspect,
         cfg.radius,
       )}
