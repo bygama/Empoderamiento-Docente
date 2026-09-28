@@ -138,7 +138,7 @@ export function TapaCarpeta({
             </button>
             <span
               aria-hidden={!desplegada}
-              className={`mt-2 block h-5 font-sans text-[0.88rem] transition-[opacity,translate] duration-300 ${
+              className={`mt-2 block h-5 font-sans text-[0.88rem] transition-[opacity,translate] duration-300 [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0 ${
                 desplegada
                   ? "opacity-100 motion-safe:translate-y-0"
                   : "opacity-0 motion-safe:translate-y-1"

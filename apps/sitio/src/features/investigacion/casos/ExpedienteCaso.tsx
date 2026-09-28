@@ -145,7 +145,7 @@ export function ExpedienteCaso({
           la carpeta; esto avisa que hay recorrido. Se apaga al scrollear. */}
       <p
         aria-hidden="true"
-        className={`${ROTULO_MICRO} text-azul-principal/70 fixed bottom-8 left-8 z-[55] hidden items-center gap-2.5 transition-opacity duration-500 lg:flex ${
+        className={`${ROTULO_MICRO} text-azul-principal/70 fixed bottom-8 left-8 z-[55] hidden items-center gap-2.5 transition-opacity duration-500 max-lg:flex max-lg:bottom-[calc(5.25rem+env(safe-area-inset-bottom))] max-lg:left-5 lg:flex ${
           telonOpaco && !recorrido ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
