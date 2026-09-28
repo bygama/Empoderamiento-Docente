@@ -153,8 +153,8 @@ sudo usermod -aG docker deploy   # y volvé a entrar por SSH
 Antes del primer deploy, para que Let's Encrypt pueda emitir el certificado:
 
 - **El dominio:** un registro `A` (y `AAAA`, si el VPS tiene IPv6) del dominio
-  a la IP del VPS. Caddy atiende exactamente el `DOMINIO` del `.env`; si
-  además hace falta `www.`, se suma al `Caddyfile` como redirección.
+  a la IP del VPS, y `www` como CNAME al dominio. Caddy atiende el `DOMINIO`
+  del `.env` y redirige `www.` a él, con su propio certificado.
 - **Resend** (los correos): sumá el dominio en Resend y cargá en el DNS los
   registros que te da: **SPF** (TXT), **DKIM** (TXT o CNAME) y el MX del
   retorno. Sumá **DMARC**: un TXT en `_dmarc` con `v=DMARC1; p=none;
