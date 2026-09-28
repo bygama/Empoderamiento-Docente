@@ -110,22 +110,26 @@ cambió»; ver «Correos» más abajo):
   Con clave y sin remitente, el correo no sale.
 
 Las de las **métricas** (Métricas, en el admin, lee una copia diaria de la
-analítica: de Umami en un VPS, de Vercel Web Analytics en Vercel; se usa la que
-tenga sus variables, [ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md)).
+analítica: de Umami en un VPS, de Vercel Web Analytics en Vercel,
+[ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md)). Una
+sola regla elige la fuente, y el script que carga el sitio es el de esa misma:
+Umami si están sus tres variables; si no, Vercel si el sitio corre en Vercel con
+las suyas; si no, ninguna.
 En un VPS, las tres de **Umami** (el compose pone la primera; las otras dos
 salen de su panel, ver `docs/deploy/vps.md` §5):
 
 - `UMAMI_API_URL` — dónde escucha su API: `http://analitica:3000`, por la red
   interna.
 - `UMAMI_API_KEY` — una API key de Umami (Settings → API keys).
-- `UMAMI_WEBSITE_ID` — el id del sitio en Umami. Con él, el sitio carga el
-  script de Umami (fuera de Vercel).
+- `UMAMI_WEBSITE_ID` — el id del sitio en Umami. Con las otras dos, el sitio
+  carga el script de Umami (`/umami/script.js`, que sirve el proxy del VPS: en
+  Vercel no existe, y Conexiones lo avisa).
 
 En Vercel, las de **Vercel Web Analytics** ([ADR-0009](docs/architecture/adrs/0009-analitica-de-vercel-con-copia-diaria.md)):
 
 - `VERCEL_TOKEN` — token de la cuenta de Vercel para la API de Web Analytics.
-  **Abre toda la cuenta**: solo en Production y en tu `.env.local`, nunca en
-  un preview ni con `NEXT_PUBLIC_`.
+  **Abre toda la cuenta**: solo en Production, nunca en un preview ni con
+  `NEXT_PUBLIC_`. Fuera de Vercel no se usa aunque esté.
 - `VERCEL_ANALYTICS_PROJECT_ID` — el `prj_…` del proyecto (Settings → General).
 - `VERCEL_TEAM_ID` — vacío en una cuenta personal; el `team_…` si es un equipo.
 - `CRON_SECRET` — lo que el cron diario manda en `Authorization` (el de
