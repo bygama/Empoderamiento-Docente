@@ -20,7 +20,7 @@ export default function NotFound() {
       <section
         data-footer-dock-tint="gris"
         aria-label="Página no encontrada"
-        className="bg-gris-fondo bg-grain-light relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 pt-36 pb-24 md:px-12"
+        className="bg-gris-fondo bg-grain-light relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 pt-36 pb-24 max-md:pt-28 md:px-12"
       >
         <div className="mx-auto w-full max-w-screen-xl">
           <p className="text-verde-concepto font-mono text-[0.72rem] font-medium tracking-[0.24em] uppercase">
@@ -42,7 +42,7 @@ export default function NotFound() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="group border-azul-principal/10 text-azul-principal hover:border-azul-principal/40 font-display flex items-center justify-between rounded-2xl border bg-white px-5 py-4 text-[1.1rem] font-bold transition-colors"
+                  className="group border-azul-principal/10 text-azul-principal hover:border-azul-principal/40 font-display flex items-center justify-between rounded-2xl border bg-white px-5 py-4 text-[1.1rem] font-bold transition-colors max-lg:min-h-12"
                 >
                   {link.label}
                   <ArrowUpRight
