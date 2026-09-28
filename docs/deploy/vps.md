@@ -55,19 +55,72 @@ Por eso:
 
 ## 1. El servidor
 
-En el panel de Hostinger, el VPS con **Ubuntu 24.04 LTS**. Después, por SSH
-como root, una sola vez:
+En el panel de Hostinger, el VPS con **Ubuntu 24.04 LTS** (el de ED:
+`2.24.68.136`). Los ejemplos usan una clave SSH llamada `ed-vps`
+(`~/.ssh/ed-vps` y `~/.ssh/ed-vps.pub`); si no la tenés, `ssh-keygen -t
+ed25519 -f ~/.ssh/ed-vps`.
+
+**Tu clave pública en el root**, una sola vez. O por el panel de Hostinger (la
+sección de claves SSH del VPS: pegás el contenido de `ed-vps.pub`), o desde tu
+máquina con la contraseña de root que eligiste al crear el VPS, la primera y
+última vez que se usa:
 
 ```sh
-# Un usuario sin root, con sudo, y tu clave pública
+# Linux, macOS o Git Bash
+ssh-copy-id -i ~/.ssh/ed-vps.pub root@<ip>
+# PowerShell (Windows no trae ssh-copy-id)
+type $env:USERPROFILE\.ssh\ed-vps.pub | ssh root@<ip> "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+```
+
+`ssh -i ~/.ssh/ed-vps root@<ip>` tiene que entrar sin pedir la contraseña.
+Adentro, como root:
+
+```sh
+# Un usuario sin root, con sudo (adduser te pide su contraseña: es la de sudo),
+# y la misma clave
 adduser deploy && usermod -aG sudo deploy
 rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy
 ```
 
-Desde tu máquina, comprobá que `ssh deploy@<ip>` entra con la clave. Recién
-entonces, en el VPS, cerrá el root y las contraseñas: en
-`/etc/ssh/sshd_config`, `PermitRootLogin no` y `PasswordAuthentication no`, y
-`sudo systemctl reload ssh`.
+> **No cierres esa sesión hasta el final de este paso.** Si algo de abajo sale
+> mal, es tu única puerta: con la contraseña apagada y sin la clave, quedás
+> afuera y solo queda la consola del panel de Hostinger.
+
+**En otra terminal**, comprobá que `ssh -i ~/.ssh/ed-vps deploy@<ip>` entra sin
+contraseña y que `sudo -v` acepta la de `deploy`. Recién entonces, en la
+sesión de root que quedó abierta, cerrá el root y las contraseñas.
+
+Ubuntu lee primero `/etc/ssh/sshd_config.d/*.conf` (el `Include` está arriba de
+`sshd_config`), y en SSH **gana el primer valor que se lee**. En las imágenes
+cloud, `50-cloud-init.conf` suele traer `PasswordAuthentication yes`, así que
+cambiar solo `sshd_config` no alcanza (probado en Ubuntu 24.04: con
+`PasswordAuthentication no` en `sshd_config` y ese archivo, `sshd -T` dice
+`yes`). Por eso va un archivo propio que se lee antes que todos:
+
+```sh
+# Lo que hay hoy, en todos los archivos (sin los comentarios)
+grep -RiE "^\s*(passwordauthentication|permitrootlogin)" /etc/ssh/sshd_config /etc/ssh/sshd_config.d/
+# El nuestro, que se lee primero; y el de cloud-init, que no contradiga
+printf 'PermitRootLogin no\nPasswordAuthentication no\nKbdInteractiveAuthentication no\n' > /etc/ssh/sshd_config.d/00-ed.conf
+sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config.d/*.conf
+sshd -t && systemctl restart ssh
+# La configuración que de verdad rige
+sshd -T | grep -Ei "passwordauthentication|permitrootlogin"
+```
+
+La última línea tiene que decir exactamente esto (si dice `yes`, algún archivo
+de `sshd_config.d/` lo sigue pisando: volvé al `grep`):
+
+```
+permitrootlogin no
+passwordauthentication no
+```
+
+Y otra vez **en otra terminal**, con la sesión de root todavía abierta: `ssh -i
+~/.ssh/ed-vps deploy@<ip>` entra; `ssh root@<ip>` y `ssh -o
+PubkeyAuthentication=no deploy@<ip>` contestan `Permission denied
+(publickey)`. Recién ahí cerrá la sesión de root. De acá en más, todo como
+`deploy`.
 
 El firewall deja pasar SSH y la web, nada más:
 
