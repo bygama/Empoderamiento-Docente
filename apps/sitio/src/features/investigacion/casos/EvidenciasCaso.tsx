@@ -114,7 +114,7 @@ export function EvidenciasCaso({ evidencias, tinte }: Props) {
             <li
               key={evidencia.id}
               {...(evidencia.movible ? { "data-evidencia-movible": "" } : {})}
-              className={`relative w-full rounded-xl shadow-[0_16px_40px_-22px_rgb(31_45_77/0.4)] ${capa.ancho} ${capa.extra} ${
+              className={`relative w-full rounded-xl shadow-[0_16px_40px_-22px_rgb(31_45_77/0.4)] max-lg:[rotate:0deg]! ${capa.ancho} ${capa.extra} ${
                 capa.estilo === "nota"
                   ? `${FONDO_NOTA[capa.tono] ?? clases.suave} p-6`
                   : `border bg-white ${clases.borde} ${capa.estilo === "ficha" ? "overflow-hidden" : "p-6"}`
