@@ -7,6 +7,7 @@ import type { Ciclo } from "@/features/investigacion/contenido/ciclo";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { crearEspiral } from "./coreografia-espiral";
+import { crearEspiralMovil } from "./coreografia-espiral-movil";
 import { EspiralEstatica } from "./EspiralEstatica";
 import { EspiralLamina } from "./EspiralLamina";
 
@@ -39,14 +40,30 @@ import { EspiralLamina } from "./EspiralLamina";
 export function EspiralInvestigacion({ contenido }: { contenido: Ciclo }) {
   const zonaRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
-  const [live, setLive] = useState(false);
+  // quieto = EspiralEstatica sola (lo que dibuja el SSR); vivo = la lámina de
+  // escritorio; movil = la espiral pegada que acompaña la lectura bajo lg.
+  // Se decide entero en cada corrida y se vuelve a decidir al cambiar cualquier
+  // media query (rotar el dispositivo), no solo al montar.
+  const [modo, setModo] = useState<"quieto" | "vivo" | "movil">("quieto");
+  const live = modo === "vivo";
 
   useIsomorphicLayoutEffect(() => {
     if (reduced) {
-      setLive(false);
+      setModo("quieto");
       return;
     }
-    setLive(window.matchMedia("(hover: hover) and (min-width: 64rem)").matches);
+    const mqVivo = window.matchMedia("(hover: hover) and (min-width: 64rem)");
+    const mqMovil = window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)");
+    const decidir = () => {
+      setModo(mqVivo.matches ? "vivo" : mqMovil.matches ? "movil" : "quieto");
+    };
+    decidir();
+    mqVivo.addEventListener("change", decidir);
+    mqMovil.addEventListener("change", decidir);
+    return () => {
+      mqVivo.removeEventListener("change", decidir);
+      mqMovil.removeEventListener("change", decidir);
+    };
   }, [reduced]);
 
   useIsomorphicLayoutEffect(() => {
@@ -75,9 +92,19 @@ export function EspiralInvestigacion({ contenido }: { contenido: Ciclo }) {
     };
   }, [live]);
 
+  // Bajo `lg`: la espiral queda sticky arriba y acompaña los ocho pasos
+  // que se leen debajo (EspiralEstatica).
+  useIsomorphicLayoutEffect(() => {
+    if (modo !== "movil") return;
+    const zona = zonaRef.current;
+    if (!zona) return;
+    return crearEspiralMovil(zona);
+  }, [modo]);
+
   return (
     <section
       id="ciclo"
+      data-modo={modo}
       data-indice="Ciclo de investigación aplicada"
       // Desde el navbar se aterriza al final de la escena (ver irASeccion).
       data-aterrizaje="fin"
@@ -90,7 +117,7 @@ export function EspiralInvestigacion({ contenido }: { contenido: Ciclo }) {
           cortada al ras. */}
       <div ref={zonaRef} className="p-2.5">
         <div
-          className={`ring-azul-principal/10 bg-grain-light text-azul-principal relative isolate overflow-hidden rounded-xl bg-white shadow-[0_4px_12px_-8px_rgb(31_45_77/0.35)] ring-1 ${
+          className={`ring-azul-principal/10 bg-grain-light text-azul-principal relative isolate overflow-hidden rounded-xl bg-white shadow-[0_4px_12px_-8px_rgb(31_45_77/0.35)] ring-1 [[data-modo=movil]_&]:overflow-clip ${
             live ? "flex h-[calc(100svh-1.25rem)]" : "min-h-[calc(100svh-1.25rem)]"
           }`}
         >
