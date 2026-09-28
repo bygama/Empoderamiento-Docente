@@ -2,21 +2,52 @@
 
 ## In progress
 
-- **Pausa: PR #198 abierto** (https://github.com/bygama/Empoderamiento-Docente/pull/198),
-  sin mergear. La revisión de cierre (r1) dio FAIL; la **ronda de arreglos 1**
-  está hecha y pusheada (abajo, «Verification»), y el mismo revisor la vuelve
-  a mirar.
-- **Lo que sigue:** lo que diga r1 en la re-revisión; cuando el padre lo pida,
-  rebase sobre `main`; y el cierre de la lane (el commit que borra
-  `work/deploy-en-vps/`) en el PR, antes del merge.
-- **Estado local de la prueba** (nada de esto va a git): el compose `ed` sigue
-  corriendo en Docker Desktop (80 y 443) con el `.env` de prueba de la raíz
-  (claves generadas, `COMPOSE_FILE` con `compose.prueba.yaml`) y
-  `respaldos/2026-09-27/` con datos de prueba. Para bajarlo:
-  `docker compose down` (conserva volúmenes) o `docker compose down -v`. La
-  base `ed_vps` de `ed-postgres` es la de los tests de esta lane.
+- **Cerrando: PR #198** (https://github.com/bygama/Empoderamiento-Docente/pull/198),
+  sin mergear. La revisión r2 dio PASS sobre `97c1e7f7`; la **ronda de
+  cierre** (abajo, «Verification») hizo los tres arreglos que pidió el padre,
+  el rebase sobre `origin/main` (`e8b269f1`) y el gate. El commit siguiente a
+  este borra `work/deploy-en-vps/`; lo que sobrevive a la carpeta (los
+  seguimientos, la memoria del build y lo que el runbook deja para Mateo) va
+  en el `worker_done` al padre.
+- **Estado local:** el compose de prueba está abajo, sin sus volúmenes
+  (`ed_datos-db`, `ed_fotos`, `ed_cv`, `ed_caddy-datos`, `ed_caddy-config`),
+  sin sus imágenes (`ed-sitio:*`, `ed-fuente:actual`, Umami, Caddy,
+  `node:24-alpine`, `postgres:17-alpine`, y las de prueba `alpine:3.22` y
+  `ubuntu:24.04`), sin el `.env` de la raíz y sin `respaldos/`. Quedan la
+  base `ed_vps` de `ed-postgres` (la de los tests de esta lane) y la caché de
+  build de Docker.
 
 ## Verification
+
+### 2026-09-27 — Ronda de cierre — PASS
+
+r2 dio PASS sobre `97c1e7f7`. Lo que pidió el padre para antes del merge:
+
+- **El script de Vercel sin el token** (`d221a497` después del rebase): en
+  Vercel carga aunque falten el token y el proyecto, que son solo de la copia;
+  la copia y Conexiones siguen pidiéndolos, y Conexiones, en Vercel sin
+  token, dice «Falta la copia y Métricas no se actualiza, pero las visitas se
+  están contando». Tests: `script.test.ts` (Vercel con token, sin token y con
+  Umami a medias → el de Vercel), `entorno.test.ts` (`{ VERCEL }` y `{ VERCEL,
+  VERCEL_TOKEN }` → sin copia) y `conexiones.test.ts` (la fila, sin error);
+  20/20 en los cuatro archivos. SPEC, DECISIONS, `vercel.md`, README,
+  `.env.example` y ADR-0018 alineados.
+- **La IP fuera del runbook** (`47826ab9`): `git grep "2\.24\.68\.136\|<ip>"`
+  vacío; `<IP del VPS>` en los 12 lugares. La IP sigue en la historia de la
+  rama (el commit del SSH de la ronda 1).
+- **AGENTS.md §5.8** (`19f9d905`): el chequeo del bit en la lista del
+  `pre-push`. Es meta-doc: lo revisa Mateo en el PR.
+- **Rebase** sobre `origin/main` (`e8b269f1`, solo `work/mapa-del-admin/`): sin
+  conflictos, 44 commits; los siete `.sh` siguen en `100755`.
+- **El gate, después del rebase:** `tsconfig.tsbuildinfo` borrado y `pnpm
+  typecheck` → exit 0; `pnpm lint` → exit 0; `node
+  scripts/verificar-react-doctor.mjs` → exit 0, «100/100, sin diagnósticos»
+  (apps/sitio/src 1207 archivos, packages/db 3, auth 27, kit-admin 52); `pnpm
+  build` → exit 0, «Generating static pages … (68/68)»; `pnpm test` cinco
+  veces → exit 0 las cinco, kit-admin 11/11, auth 46/46, sitio 595 pass + 1
+  skipped (el fixture de Vercel de siempre), 0 fail. Arranque: `next start`
+  sobre ese build → `/`, `/novedades` y `/admin/entrar` 200.
+- **El compose de prueba, abajo** («Estado local», arriba).
 
 ### 2026-09-27 — Ronda de arreglos 1 — PASS
 
