@@ -41,7 +41,7 @@ export function CierreQueHacemos({ contenido }: { contenido: CierreDeQueHacemos 
           scale: 1,
           y: 0,
           ease: "none",
-          scrollTrigger: { trigger: root, start: "top 92%", end: "top 45%", scrub: true },
+          scrollTrigger: { trigger: root, start: "top 92%", end: "top 45%", scrub: 0.5 },
         },
       );
       gsap.fromTo(

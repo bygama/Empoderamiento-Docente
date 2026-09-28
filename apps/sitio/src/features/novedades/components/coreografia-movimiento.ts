@@ -44,7 +44,7 @@ export function crearMovimiento({ zone, stage, contador, total }: Escena): () =>
       gsap.fromTo(
         luz,
         { autoAlpha: 0, scale: 0.45 },
-        { autoAlpha: 1, scale: 1, ease: "none", scrollTrigger: { trigger: zone, start: "top bottom", end: "top top", scrub: true } },
+        { autoAlpha: 1, scale: 1, ease: "none", scrollTrigger: { trigger: zone, start: "top bottom", end: "top top", scrub: 0.5 } },
       );
     }
 

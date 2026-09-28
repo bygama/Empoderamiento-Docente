@@ -24,7 +24,7 @@ export function crearCoreografiaEquipo(root: HTMLElement): () => void {
           scale: 1,
           y: 0,
           ease: "none",
-          scrollTrigger: { trigger: sheet, start: "top 96%", end: "top 14%", scrub: true },
+          scrollTrigger: { trigger: sheet, start: "top 96%", end: "top 14%", scrub: 0.5 },
         },
       );
     }

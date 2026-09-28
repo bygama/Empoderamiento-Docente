@@ -32,7 +32,7 @@ export function crearQuienes({ wrap, zone, panel, heroScroll }: Escena) {
         trigger: heroEl,
         start: "top top",
         end: "bottom top",
-        scrub: true,
+        scrub: 0.6,
         onUpdate: (self) => {
           heroScroll.current = self.progress;
         },
@@ -70,7 +70,7 @@ export function crearQuienes({ wrap, zone, panel, heroScroll }: Escena) {
         ease: "none",
         stagger: 0.4,
         duration: 1,
-        scrollTrigger: { trigger: zone, start, end, scrub: true },
+        scrollTrigger: { trigger: zone, start, end, scrub: 0.5 },
       });
     };
 

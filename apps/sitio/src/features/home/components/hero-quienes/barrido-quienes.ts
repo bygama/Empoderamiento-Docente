@@ -53,7 +53,7 @@ export function barrerQuienes({ about, mision, line, panel, zone }: Record<"abou
     trigger: zone,
     start: () => "top top-=" + window.innerHeight * 1.0,
     end: () => "top top-=" + window.innerHeight * 1.5,
-    scrub: true,
+    scrub: 0.6,
     onRefresh: (self) => {
       measure();
       apply(self.progress);

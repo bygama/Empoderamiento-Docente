@@ -222,7 +222,7 @@ export function crearHistoria({
       trigger: zona,
       start: "top top",
       end: `+=${RECORRIDO}`,
-      scrub: true,
+      scrub: 0.5,
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,

@@ -29,7 +29,7 @@ function armarBeat0(root: HTMLElement, q: (sel: string) => HTMLElement | null) {
     q("[data-beat='0'] h2"),
     q("[data-beat='0'] p"),
   ].filter((el): el is HTMLElement => Boolean(el));
-  const introST = { trigger: root, start: "top 72%", end: "top 25%", scrub: true };
+  const introST = { trigger: root, start: "top 72%", end: "top 25%", scrub: 0.5 };
   if (introRule) {
     gsap.fromTo(
       introRule,

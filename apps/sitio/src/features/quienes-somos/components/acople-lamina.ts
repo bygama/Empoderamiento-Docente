@@ -42,7 +42,7 @@ export function acoplarLamina(
       scale: 1,
       y: 0,
       ease: "none",
-      scrollTrigger: { trigger: root, start: "top 96%", end: fin, scrub: true },
+      scrollTrigger: { trigger: root, start: "top 96%", end: fin, scrub: 0.5 },
     },
   );
 }

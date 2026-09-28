@@ -22,7 +22,7 @@ export function crearTimelineOrigen(
       trigger: zone,
       start: "top top",
       end: "bottom bottom",
-      scrub: true,
+      scrub: 0.5,
       onUpdate: (self) => setDot(self.progress),
     },
   });
