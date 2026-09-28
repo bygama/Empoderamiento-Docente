@@ -1,5 +1,5 @@
 import { urlDesviada } from "@/lib/correo/resend";
-import { fuenteEsperada, VARIABLES_DE_LA_FUENTE } from "@/lib/metricas/entorno";
+import { fuenteDeVisitas, fuenteEsperada, VARIABLES_DE_LA_FUENTE } from "@/lib/metricas/entorno";
 
 // Los servicios de afuera de los que depende el sitio (Ajustes › Conexiones,
 // work/ajustes/SPEC.md §2.6): cómo se configura cada uno —por los nombres de
@@ -32,6 +32,12 @@ export const CONEXIONES: readonly Conexion[] = [
     tareas: ["copia-de-visitas"],
     sinConfigurar: "Métricas no se actualiza.",
     mostrar: (entorno) => fuenteEsperada(entorno) === "umami",
+    // Con sus variables Umami es la fuente también en Vercel (una sola regla:
+    // lib/metricas/entorno.ts), pero su script lo sirve el proxy del VPS.
+    avisar: (entorno) =>
+      entorno.VERCEL && fuenteDeVisitas(entorno) === "umami"
+        ? "El sitio corre en Vercel, donde no hay proxy que sirva /umami/script.js: el script de Umami da 404 y no se cuenta ninguna visita. En Vercel, dejá vacías las variables de Umami."
+        : null,
   },
   {
     clave: "vercel-analytics",

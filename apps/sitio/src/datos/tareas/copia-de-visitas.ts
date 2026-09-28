@@ -99,7 +99,7 @@ export async function sincronizarMetricas({
  */
 export async function copiarMetricas({ minimoDias = 0 }: { minimoDias?: number } = {}): Promise<ResultadoDeTarea> {
   const cliente = clienteDesdeEntorno();
-  if (!cliente) return { ok: false, detalle: `${SIN_VARIABLES_DE_METRICAS}: las de Umami (${VARIABLES_DE_LA_FUENTE.umami.join(", ")}) o las de Vercel (${VARIABLES_DE_LA_FUENTE.vercel.join(", ")}). Ver el README.` };
+  if (!cliente) return { ok: false, detalle: `${SIN_VARIABLES_DE_METRICAS}: las de Umami (${VARIABLES_DE_LA_FUENTE.umami.join(", ")}) o, en Vercel, las de Vercel (${VARIABLES_DE_LA_FUENTE.vercel.join(", ")}). Ver el README.` };
   return sincronizarMetricas({ cliente, base: baseDeLaApp, minimoDias });
 }
 
