@@ -25,7 +25,7 @@ import { useRiel } from "./lanzamientos/useRiel";
  * la Biblioteca, quedan acá.
  */
 export function LanzamientosRecientes({ contenido }: { contenido: LanzamientosDeNovedades }) {
-  const { trackRef, wrapRef, pillRef, fadeRef, ends, scrollByCard, handlers } = useRiel();
+  const { trackRef, wrapRef, pillRef, fadeRef, progRef, ends, scrollByCard, handlers } = useRiel();
 
   return (
     <section id="recien-salido" data-indice="Recién salido" className="bg-gris-fondo" aria-label="Lanzamientos y recursos recientes">
@@ -41,6 +41,12 @@ export function LanzamientosRecientes({ contenido }: { contenido: LanzamientosDe
             >
               {contenido.titulo}
             </RevealLines>
+            <p
+              data-riel-pista
+              className="text-gris-texto mt-3 font-mono text-[0.68rem] tracking-[0.16em] uppercase md:hidden"
+            >
+              Deslizá →
+            </p>
           </div>
           <div className="mb-2 hidden shrink-0 items-center gap-6 md:flex">
             {/* Prev/next: la vía accesible del riel (el drag no existe para
@@ -84,12 +90,26 @@ export function LanzamientosRecientes({ contenido }: { contenido: LanzamientosDe
           aria-label="Riel de lanzamientos recientes"
           tabIndex={0}
           {...handlers}
-          className="scrollbar-none focus-visible:ring-verde-concepto/50 mt-8 flex gap-5 overflow-x-auto px-5 pb-20 select-none focus-visible:ring-2 focus-visible:outline-none md:cursor-none md:px-10"
+          className="scrollbar-none focus-visible:ring-verde-concepto/50 mt-8 flex gap-5 overflow-x-auto px-5 pb-20 select-none focus-visible:ring-2 focus-visible:outline-none max-md:snap-x max-md:snap-mandatory max-md:scroll-px-5 md:cursor-none md:px-10"
         >
           {contenido.lanzamientos.map((l) => (
             <Lanzamiento key={l.titulo} lanzamiento={l} />
           ))}
           <FinalDelRiel final={contenido.final} />
+        </div>
+
+        {/* Barra de progreso del riel: solo celular (el prev/next + pill ya
+            avisan en desktop). */}
+        <div
+          aria-hidden="true"
+          className="mx-5 -mt-14 mb-6 h-0.5 overflow-hidden rounded-full bg-azul-principal/10 md:hidden"
+        >
+          <div
+            ref={progRef}
+            data-riel-progreso
+            className="bg-verde-concepto h-full w-full origin-left transition-transform duration-150"
+            style={{ transform: "scaleX(0)" }}
+          />
         </div>
 
         {/* Velo derecho: "hay más". Se apaga al llegar al final del riel. */}

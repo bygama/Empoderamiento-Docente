@@ -13,6 +13,8 @@ export function useRiel() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const pillRef = useRef<HTMLDivElement | null>(null);
   const fadeRef = useRef<HTMLDivElement | null>(null);
+  // Barra de progreso del riel en celular (en desktop avisan el prev/next y la pill).
+  const progRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   const st = useRef({ down: false, startX: 0, startScroll: 0, vx: 0, lastX: 0, raf: 0 });
 
@@ -41,6 +43,10 @@ export function useRiel() {
     const start = el.scrollLeft <= 8;
     const end = el.scrollLeft >= el.scrollWidth - el.clientWidth - 8;
     if (fadeRef.current) fadeRef.current.style.opacity = end ? "0" : "1";
+    if (progRef.current) {
+      const max = el.scrollWidth - el.clientWidth;
+      progRef.current.style.transform = `scaleX(${max > 0 ? el.scrollLeft / max : 1})`;
+    }
     setEnds((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
   };
 
@@ -112,5 +118,5 @@ export function useRiel() {
     onScroll: syncEdges,
   };
 
-  return { trackRef, wrapRef, pillRef, fadeRef, ends, scrollByCard, handlers };
+  return { trackRef, wrapRef, pillRef, fadeRef, progRef, ends, scrollByCard, handlers };
 }

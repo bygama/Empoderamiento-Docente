@@ -7,7 +7,7 @@ type Props = { lanzamiento: LanzamientosDeNovedades["lanzamientos"][number] };
 /** Una tarjeta del riel: la foto a sangre y, abajo sobre un degradé, el tipo y el título. */
 export function Lanzamiento({ lanzamiento: l }: Props) {
   return (
-    <article className="group relative aspect-[3/4] w-[76vw] shrink-0 overflow-hidden rounded-2xl sm:w-[42vw] lg:w-[23rem]">
+    <article className="group relative aspect-[3/4] w-[76vw] shrink-0 overflow-hidden rounded-2xl max-md:snap-start sm:w-[42vw] lg:w-[23rem]">
       <Image
         src={l.foto.src}
         alt=""

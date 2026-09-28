@@ -7,7 +7,7 @@ export function FinalDelRiel({ final }: { final: LanzamientosDeNovedades["final"
   return (
     <Link
       href="/biblioteca"
-      className="group border-azul-principal/15 hover:border-verde-concepto/50 flex aspect-[3/4] w-[60vw] shrink-0 flex-col items-start justify-end rounded-2xl border bg-white p-6 transition-colors sm:w-[32vw] lg:w-[17rem]"
+      className="group border-azul-principal/15 hover:border-verde-concepto/50 flex aspect-[3/4] w-[60vw] shrink-0 flex-col items-start justify-end rounded-2xl border bg-white p-6 transition-colors max-md:snap-start sm:w-[32vw] lg:w-[17rem]"
     >
       <span className="bg-verde-concepto/10 text-verde-concepto-texto mb-4 flex h-11 w-11 items-center justify-center rounded-xl">
         <ArrowUpRight size={22} />
