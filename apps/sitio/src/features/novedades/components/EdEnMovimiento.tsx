@@ -1,14 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { MovimientoDeNovedades } from "@/features/novedades/contenido/movimiento";
-import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { crearMovimiento } from "./coreografia-movimiento";
+import { altoMovilLvh, crearMovimientoMovil } from "./ed-en-movimiento/coreografia-movil";
+import { Momento } from "./ed-en-movimiento/Momento";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -25,10 +25,11 @@ if (typeof window !== "undefined") {
  * scroll como timeline (scrub). Lanes alternadas izq/der con stagger para que
  * haya ~2 momentos visibles a la vez.
  *
- * Sin motion / touch sin hover / pantallas chicas: NO se activa el dolly (que
- * necesita scroll fino y espacio). Cae a una grilla estática legible con las
- * fotos y sus etiquetas. `live` arranca en false (coincide con SSR) y se
- * enciende al montar solo si corresponde. La coreografía vive en
+ * Bajo lg con alto suficiente, PROFUNDIDAD EN ETAPAS
+ * (ed-en-movimiento/coreografia-movil.ts); sin motion o en pantallas bajas,
+ * mosaico quieto con las frases listadas. El modo arranca en «quieto»
+ * (coincide con SSR) y se decide entero al montar y en cada cambio de
+ * pantalla. La coreografía vive en
  * coreografia-movimiento.ts; los momentos llegan por props (de
  * `features/novedades/contenido/movimiento.ts` o de la base).
  */
@@ -57,34 +58,69 @@ export function EdEnMovimiento({ contenido }: { contenido: MovimientoDeNovedades
   const stageRef = useRef<HTMLDivElement | null>(null);
   const counterRef = useRef<HTMLSpanElement | null>(null);
   const reduced = useReducedMotion();
-  const [live, setLive] = useState(false);
+  const [modo, setModo] = useState<"quieto" | "vivo" | "movil">("quieto");
 
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    // Dolly solo con puntero fino y viewport con aire suficiente.
-    if (!window.matchMedia("(hover: hover) and (min-width: 768px)").matches) return;
-    setLive(true);
+    if (reduced) {
+      setModo("quieto");
+      return;
+    }
+    // Dolly solo con puntero fino y viewport con aire suficiente; la escena
+    // de celular pide alto.
+    const vivo = window.matchMedia("(hover: hover) and (min-width: 768px)");
+    const movil = window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)");
+    const decidir = () => {
+      if (vivo.matches) setModo("vivo");
+      else if (movil.matches) setModo("movil");
+      else setModo("quieto");
+    };
+    decidir();
+    vivo.addEventListener("change", decidir);
+    movil.addEventListener("change", decidir);
+    return () => {
+      vivo.removeEventListener("change", decidir);
+      movil.removeEventListener("change", decidir);
+    };
+  }, [reduced]);
 
+  const live = modo === "vivo";
+  const movil = modo === "movil";
+
+  useIsomorphicLayoutEffect(() => {
+    if (!live) return;
     const zone = zoneRef.current;
     const stage = stageRef.current;
     if (!zone || !stage) return;
-
     return crearMovimiento({ zone, stage, contador: () => counterRef.current, total: momentos.length });
-  }, [reduced, momentos.length]);
+  }, [live, momentos.length]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!movil) return;
+    const zone = zoneRef.current;
+    const stage = stageRef.current;
+    if (!zone || !stage) return;
+    return crearMovimientoMovil(zone, stage, counterRef.current);
+  }, [movil]);
 
   return (
     <div
       ref={zoneRef}
       id="ed-en-movimiento"
       data-indice="ED en movimiento"
+      data-modo={modo}
       className={"relative bg-azul-principal " + (live ? "h-[560svh]" : "")}
+      style={movil ? { height: `${altoMovilLvh(momentos.length)}lvh` } : undefined}
       aria-label="ED en movimiento"
     >
       <div
         ref={stageRef}
         className={
           "bg-grain-dark relative isolate overflow-hidden text-white " +
-          (live ? "sticky top-0 flex h-[100svh] flex-col" : "flex min-h-[70svh] flex-col py-24")
+          (live
+            ? "sticky top-0 flex h-[100svh] flex-col"
+            : movil
+              ? "sticky top-0 flex h-lvh flex-col"
+              : "flex min-h-[70svh] flex-col py-24")
         }
       >
         {/* Luz del faro EN el horizonte: elipse angosta y baja sobre la línea de
@@ -104,8 +140,8 @@ export function EdEnMovimiento({ contenido }: { contenido: MovimientoDeNovedades
 
         {/* Progreso de la escena: momento activo / total. Mismo lenguaje que
             las etiquetas de las fotos (mono chico, azul-claro). Decorativo:
-            oculto a lectores de pantalla y solo en modo live. */}
-        {live && (
+            oculto a lectores de pantalla y solo en modo live o móvil. */}
+        {(live || movil) && (
           <p
             aria-hidden="true"
             className="pointer-events-none absolute bottom-8 left-5 z-20 font-mono text-[0.68rem] tracking-[0.16em] text-azul-claro/80 md:left-10"
@@ -118,7 +154,7 @@ export function EdEnMovimiento({ contenido }: { contenido: MovimientoDeNovedades
         {/* Frases al centro: overlay que crossfadea en modo live. Se renderizan
             siempre (así el efecto las encuentra); en estático quedan invisibles
             —son un floreo, no contenido esencial—. */}
-        <div className="pointer-events-none absolute inset-x-0 top-[38%] z-20 flex flex-col items-center gap-2 px-6 text-center">
+        <div className="pointer-events-none absolute inset-x-0 top-[38%] z-20 flex flex-col items-center gap-2 px-6 text-center [[data-modo=movil]_&]:top-[14%]">
           {momentos.map((m) => (
             <p
               key={m.etiqueta}
@@ -136,36 +172,27 @@ export function EdEnMovimiento({ contenido }: { contenido: MovimientoDeNovedades
           className={
             live
               ? "relative flex-1"
-              : "mx-auto mt-10 grid w-full max-w-screen-xl grid-cols-2 gap-4 px-5 md:grid-cols-3 md:px-10"
+              : movil
+                ? "mx-auto mt-auto grid w-full max-w-screen-xl grid-cols-2 gap-3 px-5 pb-16 md:grid-cols-3 md:px-10"
+                : "mx-auto mt-10 grid w-full max-w-screen-xl grid-cols-2 gap-4 px-5 md:grid-cols-3 md:px-10"
           }
         >
           {momentos.map((m) => (
-            <figure
-              key={m.etiqueta}
-              data-mov-card
-              className={
-                live
-                  ? "absolute top-1/2 left-1/2 w-[clamp(200px,22vw,340px)]"
-                  : "relative"
-              }
-            >
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-[0_30px_60px_-30px_rgb(0_0_0/0.7)] ring-1 ring-white/10">
-                <Image
-                  src={m.foto.src}
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 45vw, 340px"
-                  className="object-cover"
-                  style={estiloDeFoco(m.foto.foco)}
-                />
-                <span className="absolute inset-0 bg-azul-principal/10" />
-              </div>
-              <figcaption className="mt-2 font-mono text-[0.68rem] tracking-[0.16em] text-azul-claro/90 uppercase">
-                {m.etiqueta}
-              </figcaption>
-            </figure>
+            <Momento key={m.etiqueta} m={m} live={live} />
           ))}
         </div>
+
+        {/* Quieto (movimiento reducido o pantalla baja): las frases no se
+            ven como floreo, así que van listadas debajo del mosaico. */}
+        {!live && !movil && (
+          <ul data-mov-lista className="mx-auto mt-8 w-full max-w-screen-xl px-5 lg:hidden">
+            {momentos.map((m) => (
+              <li key={m.etiqueta} className="font-display border-t border-white/10 py-3 text-[1.15rem] font-bold tracking-[-0.01em] text-white">
+                {conAcento(m.frase, m.acento)}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
