@@ -171,14 +171,15 @@ existen en self-hosted: Settings › API keys), `startAt`/`endAt` en ms,
   propio, `FiltroDePais = { pais } | { fueraDe: [...] }`, y cada cliente lo
   traduce (Vercel: el OData de hoy, con los mismos tests; Umami:
   `country=eq.CL` / `country=neq.CL,MX,AR`). Los métodos no cambian.
-- **Se elige por las variables, con una sola regla** que usan la copia, el
-  script del sitio y Ajustes › Conexiones (`fuenteDeVisitas()`, en
-  `lib/metricas/entorno.ts`): con `UMAMI_API_URL`, `UMAMI_API_KEY` y
-  `UMAMI_WEBSITE_ID`, Umami; si no, Vercel si el sitio corre en Vercel
-  (`VERCEL`) con sus variables; si no, ninguna. *(Ronda de arreglos 1: antes la
-  copia tomaba las de Vercel en cualquier host y el script miraba solo
-  `VERCEL`, así que en Vercel con los dos juegos se contaba una fuente y se
-  copiaba la otra.)*
+- **Se elige por las variables**, con la regla que usan la copia y Ajustes ›
+  Conexiones (`fuenteDeVisitas()`, en `lib/metricas/entorno.ts`): con
+  `UMAMI_API_URL`, `UMAMI_API_KEY` y `UMAMI_WEBSITE_ID`, Umami; si no, Vercel si
+  el sitio corre en Vercel (`VERCEL`) con su token y su proyecto; si no,
+  ninguna. El script sigue la misma regla salvo en que en Vercel no exige el
+  token (abajo). *(Ronda de arreglos 1: antes la copia tomaba las de Vercel en
+  cualquier host y el script miraba solo `VERCEL`, así que en Vercel con los
+  dos juegos se contaba una fuente y se copiaba la otra. Ronda de cierre: el
+  script de Vercel vuelve a no exigir el token.)*
 
 **Qué da Umami para cada dimensión que usan Resumen y Origen:**
 
@@ -216,18 +217,21 @@ historial que perder, y el nombre ya no depende de la fuente. Sus archivos
 (`datos/tareas/metricas-de-vercel.ts`, `consultas-de-vercel.ts`) se renombran
 igual.
 
-**El script.** El layout del sitio carga **uno solo**, en producción: el de la
-fuente activa (la regla de arriba), con una función pura
-(`scriptDeAnalitica(entorno)`) y un test de las combinaciones:
+**El script.** El layout del sitio carga **uno solo**, en producción, con una
+función pura (`scriptDeAnalitica(entorno)`) y un test de las combinaciones:
 
-| Fuente activa | Script |
+| Entorno | Script |
 | --- | --- |
-| Umami (sus tres variables, en cualquier host) | `<script defer src="/umami/script.js" data-website-id=…>`, que solo sirve Caddy |
-| Vercel (`VERCEL`, que pone Vercel en el build y en el runtime, y sus variables) | `<Analytics />` de `@vercel/analytics`, que pega a `/_vercel/insights`, que solo existe en Vercel |
-| ninguna | ninguno |
+| las tres variables de Umami, en cualquier host | `<script defer src="/umami/script.js" data-website-id=…>`, que solo sirve Caddy |
+| si no, `VERCEL` (lo pone Vercel en el build y en el runtime), con el token o sin él | `<Analytics />` de `@vercel/analytics`, que pega a `/_vercel/insights`, que solo existe en Vercel |
+| si no | ninguno |
 
-Nunca los dos, y lo que cuenta el script es lo que copia la tarea. El de
-Vercel fuera de Vercel no se carga nunca. `/umami/…` en Vercel no existe: con
+Nunca los dos, y cuando hay copia, lo que cuenta el script es lo que se copia.
+**En Vercel el script no exige el token ni el proyecto**: son solo de la
+copia, y Vercel cuenta sin ellos; un deploy antes de cargarlos, o un Preview,
+ya cuenta, y una visita que no se contó no se recupera. Conexiones, en Vercel
+sin el token, dice que falta la copia pero que las visitas se están contando.
+El de Vercel fuera de Vercel no se carga nunca. `/umami/…` en Vercel no existe: con
 las variables de Umami en Vercel, la fuente es Umami igual y su script daría
 404, así que **Conexiones lo avisa** en la fila de Umami (cuenta como error) y
 la guía de Vercel dice que ahí no van. Caddy sirve `/umami/script.js` y
@@ -395,10 +399,10 @@ factor, publicar una novedad, recibir un contacto y verla en el Inicio.
   - ningún secreto en las imágenes;
   - los segundos de corte de un segundo `desplegar.sh`, y `volver.sh` a la
     imagen anterior.
-- **El test de `scriptDeAnalitica`**: Umami, Vercel, ninguno, y los dos
-  configurados (gana Umami, como en la copia); y los de `fuenteDeVisitas` y
-  `clienteDesdeEntorno` con solo las de Vercel (en Vercel y fuera) y con los
-  dos juegos.
+- **El test de `scriptDeAnalitica`**: Umami, Vercel (con el token y sin él),
+  ninguno, y los dos configurados (gana Umami, como en la copia); y los de
+  `fuenteDeVisitas` y `clienteDesdeEntorno` con solo las de Vercel (en Vercel y
+  fuera), Vercel sin el token (sin copia) y los dos juegos.
 - **Los `.sh` de `scripts/` y `deploy/` con el bit de ejecución** en git, y el
   `pre-push` que frena si uno no lo tiene.
 - **`restaurar.sh` desde volúmenes vacíos**, con el compose bajado, y en un VPS

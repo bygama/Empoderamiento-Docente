@@ -19,11 +19,12 @@ export const VARIABLES_DE_LA_FUENTE = {
 const tiene = (entorno: Entorno, fuente: FuenteDeVisitas) => VARIABLES_DE_LA_FUENTE[fuente].every((v) => entorno[v]);
 
 /**
- * La fuente activa, y la única regla para elegirla: la usan el script del
- * sitio (`script.ts`), la copia diaria y Ajustes › Conexiones, así el script
- * que cuenta es siempre el de la fuente que se copia. Umami si están sus
- * variables; si no, Vercel si el sitio corre en Vercel (`VERCEL`, que pone
- * Vercel) con las suyas; si no, ninguna.
+ * La fuente que se copia: la usan la copia diaria y Ajustes › Conexiones.
+ * Umami si están sus variables; si no, Vercel si el sitio corre en Vercel
+ * (`VERCEL`, que pone Vercel) con las suyas; si no, ninguna. El script del
+ * sitio (`script.ts`) sigue la misma regla salvo en una cosa: en Vercel carga
+ * el de Vercel aunque falten el token y el proyecto, que son solo de la copia,
+ * porque una visita que no se contó no se recupera.
  */
 export function fuenteDeVisitas(entorno: Entorno = process.env): FuenteDeVisitas | null {
   if (tiene(entorno, "umami")) return "umami";

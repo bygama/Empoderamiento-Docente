@@ -44,9 +44,13 @@ test("con los dos juegos, Umami también en Vercel: la copia y el script leen la
   assert.equal(await aQuienLePide(entorno), "http://analitica:3000");
 });
 
-test("las de Vercel fuera de Vercel, o una fuente a medias, no arman ninguna", async () => {
+test("las de Vercel fuera de Vercel, Vercel sin su token, o una fuente a medias, no arman ninguna", async () => {
   assert.equal(fuenteDeVisitas(VERCEL), null);
   assert.equal(await aQuienLePide(VERCEL), null);
+  // En Vercel sin el token ni el proyecto no hay copia (el script sí carga: script.test.ts).
+  assert.equal(fuenteDeVisitas({ VERCEL: "1" }), null);
+  assert.equal(await aQuienLePide({ VERCEL: "1" }), null);
+  assert.equal(fuenteDeVisitas({ VERCEL: "1", VERCEL_TOKEN: "t" }), null);
   const umamiAMedias = { VERCEL: "1", ...VERCEL, UMAMI_WEBSITE_ID: "s-1" };
   assert.equal(fuenteDeVisitas(umamiAMedias), "vercel");
   assert.equal(fuenteDeVisitas({}), null);

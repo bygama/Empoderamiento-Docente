@@ -111,10 +111,11 @@ cambió»; ver «Correos» más abajo):
 
 Las de las **métricas** (Métricas, en el admin, lee una copia diaria de la
 analítica: de Umami en un VPS, de Vercel Web Analytics en Vercel,
-[ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md)). Una
-sola regla elige la fuente, y el script que carga el sitio es el de esa misma:
-Umami si están sus tres variables; si no, Vercel si el sitio corre en Vercel con
-las suyas; si no, ninguna.
+[ADR-0018](docs/architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md)). La
+copia es de Umami si están sus tres variables; si no, de Vercel si el sitio
+corre en Vercel con las suyas; si no, no hay. El script que carga el sitio es
+el de Umami en el primer caso y el de Vercel siempre que corra en Vercel, aun
+sin el token: el token es de la copia, y Vercel cuenta sin él.
 En un VPS, las tres de **Umami** (el compose pone la primera; las otras dos
 salen de su panel, ver `docs/deploy/vps.md` §5):
 

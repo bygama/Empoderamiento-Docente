@@ -64,19 +64,20 @@ host se elige por variables de entorno.** Para el VPS, el compose de la raíz
    "standalone"` si no está `VERCEL`): Vercel arma su propia salida y no lo
    necesita, y así su build queda como estaba.
 4. **Las visitas, de Umami en el VPS.** La copia diaria (ADR-0009) sigue igual,
-   pero su cliente se elige por variables, con **una sola regla**
-   (`fuenteDeVisitas`) que usan también el script del sitio y Ajustes ›
-   Conexiones, así lo que se cuenta es lo que se copia: Umami si están
-   `UMAMI_API_URL`, `UMAMI_API_KEY` y `UMAMI_WEBSITE_ID`; si no, Vercel Web
-   Analytics si el sitio corre en Vercel (`VERCEL`) con sus variables; si no,
-   ninguna. El filtro por país dejó de ser OData y cada cliente lo traduce. El
-   plan de cada fuente vive en `PLANES_DE_LA_FUENTE`: con Umami, que guarda todo
-   y da la campaña de cada visita, se piden las ventanas de 90 días y se cuentan
-   las visitas de los links cortos. El sitio carga un solo script, el de la
-   fuente activa, o ninguno. El de Umami (`/umami/script.js`) lo sirve el proxy
-   del VPS: en Vercel con las variables de Umami daría 404, y Conexiones lo
-   avisa. Esto cambia el ADR-0009: Vercel Web Analytics deja de ser la única
-   fuente.
+   pero su cliente se elige por variables (`fuenteDeVisitas`, que usan también
+   Ajustes › Conexiones): Umami si están `UMAMI_API_URL`, `UMAMI_API_KEY` y
+   `UMAMI_WEBSITE_ID`; si no, Vercel Web Analytics si el sitio corre en Vercel
+   (`VERCEL`) con su token y su proyecto; si no, ninguna. El filtro por país
+   dejó de ser OData y cada cliente lo traduce. El plan de cada fuente vive en
+   `PLANES_DE_LA_FUENTE`: con Umami, que guarda todo y da la campaña de cada
+   visita, se piden las ventanas de 90 días y se cuentan las visitas de los
+   links cortos. El sitio carga un solo script: el de Umami si la copia es de
+   Umami; si no, el de Vercel en Vercel **aunque falten el token y el
+   proyecto**, que son solo de la copia (una visita que no se contó no se
+   recupera: un deploy antes de cargarlos, o un Preview, ya cuenta); si no,
+   ninguno. El de Umami (`/umami/script.js`) lo sirve el proxy del VPS: en
+   Vercel con las variables de Umami daría 404, y Conexiones lo avisa. Esto
+   cambia el ADR-0009: Vercel Web Analytics deja de ser la única fuente.
 5. **El cron, un servicio en el VPS.** El de `vercel.json` sigue en Vercel; en
    el VPS, el servicio `cron` llama a la misma ruta por la red interna a las
    04:00 UTC con el mismo secreto. Un solo cron que corre todas las tareas
