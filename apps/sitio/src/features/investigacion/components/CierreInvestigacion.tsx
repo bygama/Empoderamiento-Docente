@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import gsap from "gsap";
 import { SelloED } from "@/components/brand/SelloED";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
@@ -10,6 +10,8 @@ import { LinternaFaro } from "./LinternaFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { CieloCierre } from "./cierre-investigacion/CieloCierre";
+import { CierreLinternaMovil } from "./cierre-investigacion/CierreLinternaMovil";
+import { ALTO_CIERRE_LVH, crearCierreMovil } from "./cierre-investigacion/coreografia-cierre-movil";
 import { NubesCierre } from "./cierre-investigacion/NubesCierre";
 import { crearAscenso } from "./coreografia-cierre";
 
@@ -37,12 +39,34 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
   const zonaRef = useRef<HTMLDivElement | null>(null);
   const hojaRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
+  // Tres modos, decididos enteros en cada corrida y de nuevo en cada cambio
+  // de pantalla: el ascenso de escritorio, la escena de celular (el faro chico
+  // sube y su haz gira hacia cada mensaje) y la hoja quieta.
+  const [modo, setModo] = useState<"quieto" | "vivo" | "movil">("quieto");
+  const live = modo === "vivo";
 
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    // 64rem = el `lg:` de Tailwind v4 (la linterna solo existe desde lg).
-    if (!window.matchMedia("(hover: hover) and (min-width: 64rem)").matches)
+    if (reduced) {
+      setModo("quieto");
       return;
+    }
+    // 64rem = el `lg:` de Tailwind v4 (la linterna grande solo existe desde lg).
+    const mqVivo = window.matchMedia("(hover: hover) and (min-width: 64rem)");
+    const mqMovil = window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)");
+    const decidir = () => {
+      setModo(mqVivo.matches ? "vivo" : mqMovil.matches ? "movil" : "quieto");
+    };
+    decidir();
+    mqVivo.addEventListener("change", decidir);
+    mqMovil.addEventListener("change", decidir);
+    return () => {
+      mqVivo.removeEventListener("change", decidir);
+      mqMovil.removeEventListener("change", decidir);
+    };
+  }, [reduced]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!live) return;
     const zona = zonaRef.current;
     const hoja = hojaRef.current;
     if (!zona || !hoja) return;
@@ -62,7 +86,14 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
       ctx.revert();
       restaurar();
     };
-  }, [reduced]);
+  }, [live]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (modo !== "movil") return;
+    const zona = zonaRef.current;
+    if (!zona) return;
+    return crearCierreMovil(zona);
+  }, [modo]);
 
   return (
     // Con el tint "propio" el footer se monta --footer-radio sobre esta
@@ -70,13 +101,19 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
     // real (el final del degradé, con su grano), que ningún color plano
     // iguala. Por eso la sección deja esa franja de cielo bajo el piso
     // (pb) y el faro se planta sobre el piso, no sobre el borde de la caja.
-    <div ref={zonaRef} data-footer-dock-tint="propio">
+    <div
+      ref={zonaRef}
+      data-footer-dock-tint="propio"
+      data-cierre-pista
+      style={modo === "movil" ? { height: `${ALTO_CIERRE_LVH}lvh` } : undefined}
+    >
       <section
         ref={hojaRef}
+        data-modo={modo}
         id="conversemos"
         data-indice="Cierre"
         aria-label="Cierre e invitación a conversar"
-        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden pb-[var(--footer-radio)] text-white"
+        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden [--faro-movil:clamp(96px,18svh,140px)] pb-[var(--footer-radio)] text-white data-[modo=movil]:sticky data-[modo=movil]:top-0 data-[modo=movil]:h-lvh"
       >
         {/* ── El cielo: cae la noche sobre el archivo. */}
         <CieloCierre />
@@ -113,8 +150,13 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
           </div>
         </div>
 
+        {/* ── Bajo `lg`: el faro chico (llega ya encendido) sube desde el
+            piso entre dos nubes; el haz gira de costado hacia cada mensaje
+            (cierre-investigacion/coreografia-cierre-movil.ts). */}
+        <CierreLinternaMovil />
+
         {/* ── Los dos mensajes que la luz lee de costado: invitaciones. */}
-        <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(200px,17vw)_1fr] lg:gap-x-6">
+        <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(200px,17vw)_1fr] lg:gap-x-6 [[data-modo=movil]_&]:min-h-0 [[data-modo=movil]_&]:h-full [[data-modo=movil]_&]:content-between [[data-modo=movil]_&]:pb-[calc(var(--footer-radio)+var(--faro-movil))]">
           {/* Primera parada del haz: dónde vive lo que investigamos. */}
           <div id="biblioteca" data-cierre-bloque className="max-w-[30rem] lg:max-w-none lg:justify-self-end">
             <h2
@@ -135,7 +177,7 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
           <div aria-hidden="true" className="hidden lg:block" />
 
           {/* Última parada del haz: el camino. */}
-          <div data-cierre-bloque className="max-w-[30rem] lg:max-w-none">
+          <div data-cierre-bloque className="max-w-[min(30rem,calc(100%-var(--faro-movil)-1rem))] lg:max-w-none">
             <p className="text-azul-claro/70 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
               {conversemos.antetitulo}
             </p>
