@@ -1,4 +1,5 @@
 import { TITULO_TIPO } from "./estilos";
+import { panelClases } from "./movil";
 
 /**
  * 0 · HERO — "Hablemos." gigante y EDITORIAL: izquierda y a ancho total, en
@@ -14,9 +15,9 @@ export function PanelHero({ activo, titulo }: { activo: boolean; titulo: string 
       data-panel="hero"
       aria-hidden={!activo}
       inert={!activo}
-      className="absolute inset-x-5 top-0 bottom-0 md:inset-x-10"
+      className={`absolute inset-x-5 top-0 bottom-0 md:inset-x-10 ${panelClases(activo)}`}
     >
-      <div className="flex h-full flex-col justify-center">
+      <div className="flex h-full flex-col justify-center max-lg:min-h-[100svh]">
         <h1
           className={`${TITULO_TIPO.familia} ${TITULO_TIPO.peso}`}
           style={{ fontSize: "clamp(3.4rem, 1rem + 10vw, 9rem)", lineHeight: 0.95 }}

@@ -31,7 +31,7 @@ export function CanalDirecto({ correo, whatsapp, className }: { correo: string; 
   };
 
   const chip =
-    "border-azul-principal/20 text-azul-principal hover:border-azul-principal inline-flex min-h-9 items-center gap-1.5 rounded-full border bg-white/70 px-3.5 font-sans text-[0.85rem] font-medium transition-colors";
+    "border-azul-principal/20 text-azul-principal hover:border-azul-principal inline-flex min-h-9 items-center gap-1.5 rounded-full border bg-white/70 px-3.5 font-sans text-[0.85rem] font-medium transition-colors max-lg:min-h-11 max-lg:px-4";
 
   return (
     <div

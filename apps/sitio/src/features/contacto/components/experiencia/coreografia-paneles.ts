@@ -1,6 +1,8 @@
 import gsap from "gsap";
 import { panelDe, type Contexto } from "./contexto";
 import type { TemaKey } from "./data";
+import { esMovil } from "./movil";
+import { cambiarTemaMovil, elegirTemaMovil } from "./coreografia-paneles-movil";
 
 // ── APERTURA → FORMULARIO: crossfade limpio (sin vuelo) ───────────────────
 // El índice se disuelve y el formulario entra en cascada. El rail — con su
@@ -29,8 +31,13 @@ export function elegirTema(c: Contexto, key: TemaKey, cardEl: HTMLElement) {
       return;
     }
 
-    const otras = gsap.utils.toArray<HTMLElement>("[data-tema-card]").filter((el) => el !== cardEl);
     const campos = gsap.utils.toArray<HTMLElement>("[data-campo]");
+
+    // Rama móvil aparte (coreografia-paneles-movil.ts) para que este archivo
+    // quede bajo el tope de 200 líneas del proyecto.
+    if (esMovil()) return elegirTemaMovil(c, root, campos);
+
+    const otras = gsap.utils.toArray<HTMLElement>("[data-tema-card]").filter((el) => el !== cardEl);
 
     const tl = gsap.timeline({
       defaults: { ease: "power3.inOut" },
@@ -114,6 +121,10 @@ export function cambiarTema(c: Contexto) {
     volverElFoco();
     return;
   }
+
+  // Rama móvil aparte (coreografia-paneles-movil.ts) para que este archivo
+  // quede bajo el tope de 200 líneas del proyecto.
+  if (esMovil()) return cambiarTemaMovil(c, volverElFoco);
 
   c.estado.animando = true;
 
