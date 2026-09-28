@@ -431,6 +431,28 @@
 - 2026-09-28 — **Queda el deploy real** en `2.24.68.136` (Hostinger), siguiendo
   `docs/deploy/vps.md`. Frena en que Mateo cargue la clave `ed-vps` como root.
   Memoria: el build pica unos 5 GB (KVM 2, o KVM 1 con 4 GB de swap).
+- 2026-09-28 — **El VPS, andando** siguiendo `docs/deploy/vps.md`. El padre lo
+  hizo con OK de Mateo («hacelo todo vos»):
+  - usuario `deploy` con clave y sudo;
+  - root y contraseñas cerrados por SSH (`00-ed.conf`, verificado con `sshd -T` y
+    probado desde afuera);
+  - `ufw` con 22, 80 y 443;
+  - actualizaciones automáticas y reinicio por el kernel;
+  - Docker 29.8;
+  - el `.env` con secretos generados en el servidor, más una copia fuera;
+  - dos `desplegar.sh` con exit 0;
+  - Umami por su API: sitio, API key y la clave de admin cambiada;
+  - el cron y un respaldo a mano, y el primer respaldo copiado fuera del VPS.
+
+  El sitio contesta en `https://2-24-68-136.sslip.io`, con certificado de
+  Let's Encrypt y los puertos 3000, 5432 y 8080 cerrados desde afuera.
+  Arreglos de paso: `www.` redirige al dominio (#201), y un `Caddyfile` nuevo
+  llega al proxy aunque `git pull` cambie el inodo (#202).
+
+  **Falta:** que Mateo cambie el `A` de `empoderamientodocente.org` (hoy apunta a
+  Vercel, con TTL 60 s) a la IP del VPS, y Resend, para que el admin mande el
+  segundo factor. El cron diario sale con 500 mientras falte Search Console: las
+  dos tareas de Google fallan en llano.
 
 ## Hecho
 
