@@ -12,6 +12,7 @@ import { PaginacionNovedades } from "./PaginacionNovedades";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { getLenis } from "@/lib/lenis";
+import { centrarChipActivo } from "./filtros-novedades/centrar-chip";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -132,6 +133,9 @@ export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasD
     const filtro: Filtro =
       cat && CATEGORIAS.some((c) => c.clave === cat) ? cat : "todas";
     aplicar(filtro, Number(params.get("pagina")) || 1, { animar: false });
+    // Un cuadro después: el chip recién queda marcado (aria-pressed) cuando
+    // React aplica el estado que puso aplicar().
+    if (filtro !== "todas") requestAnimationFrame(centrarChipActivo);
 
     const grid = gridRef.current;
     if (!grid || reduced) return;
@@ -177,7 +181,11 @@ export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasD
         >
           {/* Cabecera: chips + contador */}
           <div className="border-azul-principal/10 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-b px-5 py-5 md:px-8">
-            <div className="flex flex-wrap gap-2.5" role="group" aria-label="Filtrar por categoría">
+            <div
+              className="flex flex-wrap gap-2.5 max-md:-mx-5 max-md:flex-nowrap max-md:snap-x max-md:overflow-x-auto max-md:px-5 max-md:scrollbar-none max-md:[scrollbar-width:none]"
+              role="group"
+              aria-label="Filtrar por categoría"
+            >
               {chips.map((key) => {
                 const on = activa === key;
                 return (
@@ -186,7 +194,7 @@ export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasD
                     type="button"
                     onClick={() => aplicar(key, 1)}
                     aria-pressed={on}
-                    className={`rounded-full border px-4 py-2 font-mono text-[0.72rem] tracking-[0.1em] uppercase transition-colors ${
+                    className={`rounded-full border px-4 py-2 font-mono text-[0.72rem] tracking-[0.1em] uppercase transition-colors max-lg:min-h-11 max-md:shrink-0 max-md:snap-start ${
                       on
                         ? "border-verde-concepto bg-verde-concepto text-white"
                         : "border-azul-principal/15 text-gris-texto hover:border-verde-concepto/50 hover:text-azul-principal"

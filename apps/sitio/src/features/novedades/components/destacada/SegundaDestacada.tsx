@@ -17,18 +17,18 @@ export function SegundaDestacada({ n, boton }: { n: NovedadDelSitio; boton: stri
   return (
     <article
       data-nd-card
-      className="group border-azul-claro/25 hover:border-azul-claro/50 relative z-10 mt-5 ml-auto flex overflow-hidden rounded-2xl border shadow-[0_30px_60px_-30px_rgb(0_0_0/0.55)] transition-colors duration-300 md:-mt-24 md:w-[56%]"
+      className="group border-azul-claro/25 hover:border-azul-claro/50 relative z-10 mt-5 ml-auto flex overflow-hidden rounded-2xl border shadow-[0_30px_60px_-30px_rgb(0_0_0/0.55)] transition-colors duration-300 max-md:flex-col md:-mt-24 md:w-[56%]"
       style={{
         background: "color-mix(in srgb, var(--color-azul-medio) 24%, var(--color-azul-principal))",
       }}
     >
-      <RevealFoco delay={0.25} className="w-[36%] shrink-0 self-stretch md:w-[40%]">
-        <div className="relative h-full min-h-[8.5rem] w-full overflow-hidden">
+      <RevealFoco delay={0.25} className="w-[36%] shrink-0 self-stretch max-md:w-full max-md:aspect-[16/9] md:w-[40%]">
+        <div className="relative h-full min-h-[8.5rem] w-full overflow-hidden max-md:min-h-0">
           <Image
             src={n.imagen.src}
             alt=""
             fill
-            sizes="(max-width: 768px) 40vw, 280px"
+            sizes="(max-width: 767px) 100vw, 280px"
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             style={estiloDeFoco(n.imagen.foco)}
           />
@@ -44,7 +44,7 @@ export function SegundaDestacada({ n, boton }: { n: NovedadDelSitio; boton: stri
 
         <h3 className="font-display mt-2.5 line-clamp-2 text-[1.1rem] leading-snug font-bold text-white md:text-[1.35rem]">{n.titulo}</h3>
 
-        <LinkNota n={n} className="text-azul-claro mt-4 inline-flex w-fit items-center gap-2.5 font-sans text-[0.88rem] font-medium">
+        <LinkNota n={n} className="text-azul-claro mt-4 inline-flex w-fit items-center gap-2.5 font-sans text-[0.88rem] font-medium max-lg:min-h-11">
           {boton}
           <span className="group-hover:border-naranja-accion group-hover:bg-naranja-accion group-hover:text-white flex h-7 w-7 items-center justify-center rounded-full border border-white/25 transition-colors duration-300">
             <ArrowUpRight size={13} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
