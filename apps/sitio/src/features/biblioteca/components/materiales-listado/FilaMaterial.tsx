@@ -9,14 +9,14 @@ import { CopiarCita } from "./CopiarCita";
 /** Una fila del catálogo: portada, chips de tipo y tema, título, autores, descripción, metadata con «Copiar cita APA» y el link de acción. */
 export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
   return (
-    <article className="grid gap-5 py-7 md:grid-cols-[218px_minmax(0,1fr)] md:gap-8 md:py-8">
+    <article className="grid gap-5 py-7 md:grid-cols-[218px_minmax(0,1fr)] md:gap-8 md:py-8 max-md:grid-cols-[34%_minmax(0,1fr)] max-md:gap-4 max-md:py-5">
       {/* Portada: cualquier foto que el equipo cargue (mock: fotos del hero) */}
-      <div className="bg-azul-claro/30 relative aspect-[16/9] overflow-hidden rounded-xl md:aspect-[4/3]">
+      <div className="bg-azul-claro/30 relative aspect-[16/9] overflow-hidden rounded-xl md:aspect-[4/3] max-md:aspect-[3/4] max-md:self-start">
         <Image
           src={m.portada.src}
           alt=""
           fill
-          sizes="(min-width: 768px) 218px, 100vw"
+          sizes="(min-width: 768px) 218px, 34vw"
           className="object-cover"
           style={estiloDeFoco(m.portada.foco)}
         />
@@ -32,13 +32,13 @@ export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
           </span>
         </div>
 
-        <h3 className="font-display text-azul-principal mt-3 text-[1.3rem] leading-snug font-bold tracking-[-0.01em]">
+        <h3 className="font-display text-azul-principal mt-3 text-[1.3rem] leading-snug font-bold tracking-[-0.01em] max-md:text-[1.08rem]">
           {m.titulo}
         </h3>
         <p className="text-azul-principal/70 mt-1.5 font-sans text-[0.9rem] leading-snug">
           {m.autores}
         </p>
-        <p className="text-gris-texto mt-2 max-w-[68ch] font-sans text-[0.97rem] leading-relaxed">
+        <p className="text-gris-texto mt-2 max-w-[68ch] font-sans text-[0.97rem] leading-relaxed max-md:text-[0.9rem]">
           {m.descripcion}
         </p>
 
@@ -55,7 +55,7 @@ export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => contar("material-consultado", m.id)}
-            className="text-naranja-accion group inline-flex items-center gap-1.5 font-sans text-[0.92rem] font-medium"
+            className="text-naranja-accion group inline-flex items-center gap-1.5 font-sans text-[0.92rem] font-medium max-md:min-h-11"
           >
             {accionDe(m)}
             <span className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
