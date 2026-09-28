@@ -4,8 +4,8 @@ import { crearClienteDeAnaliticas } from "./vercel";
 
 // De dónde salen las visitas, elegido por las variables (ADR-0018): Umami en
 // un VPS, Vercel Web Analytics en Vercel. El token de Vercel abre toda la
-// cuenta, no solo la analítica (ADR-0009): por eso solo va en Production y en
-// el .env.local de quien lo necesite.
+// cuenta, no solo la analítica (ADR-0009): por eso solo va en Production, y
+// fuera de Vercel no se usa aunque esté.
 
 export type FuenteDeVisitas = "umami" | "vercel";
 type Entorno = Record<string, string | undefined>;
@@ -18,10 +18,16 @@ export const VARIABLES_DE_LA_FUENTE = {
 
 const tiene = (entorno: Entorno, fuente: FuenteDeVisitas) => VARIABLES_DE_LA_FUENTE[fuente].every((v) => entorno[v]);
 
-/** La fuente configurada: Umami si están las suyas, si no Vercel si están las suyas, o ninguna. */
+/**
+ * La fuente activa, y la única regla para elegirla: la usan el script del
+ * sitio (`script.ts`), la copia diaria y Ajustes › Conexiones, así el script
+ * que cuenta es siempre el de la fuente que se copia. Umami si están sus
+ * variables; si no, Vercel si el sitio corre en Vercel (`VERCEL`, que pone
+ * Vercel) con las suyas; si no, ninguna.
+ */
 export function fuenteDeVisitas(entorno: Entorno = process.env): FuenteDeVisitas | null {
   if (tiene(entorno, "umami")) return "umami";
-  if (tiene(entorno, "vercel")) return "vercel";
+  if (entorno.VERCEL && tiene(entorno, "vercel")) return "vercel";
   return null;
 }
 

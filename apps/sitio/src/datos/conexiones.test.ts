@@ -15,7 +15,7 @@ async function leer(tarea: string | null) {
   return { ultima: { corridaEn: HOY, ok: true, detalle: "Nada nuevo: ya estaba al día." }, ultimaCorrecta: HOY };
 }
 
-const ENTORNO = { VERCEL_TOKEN: "un-secreto-que-no-sale", VERCEL_ANALYTICS_PROJECT_ID: "prj_x", CRON_SECRET: "otro-secreto", RESEND_API_KEY: "" };
+const ENTORNO = { VERCEL: "1", VERCEL_TOKEN: "un-secreto-que-no-sale", VERCEL_ANALYTICS_PROJECT_ID: "prj_x", CRON_SECRET: "otro-secreto", RESEND_API_KEY: "" };
 
 test("sin usarAjustes no dice nada", async () => {
   assert.deepEqual(await estadoDeLasConexiones("edita", { entorno: ENTORNO, leer }), []);
@@ -49,6 +49,19 @@ test("de las visitas se muestra una sola fuente: la configurada, o la del host",
   // En Vercel, sin ninguna configurada, la que falta es la de Vercel; en un VPS, la de Umami.
   assert.ok((await claves({ VERCEL: "1" })).includes("vercel-analytics") && !(await claves({ VERCEL: "1" })).includes("umami"));
   assert.ok((await claves({})).includes("umami") && !(await claves({})).includes("vercel-analytics"));
+  // Con los dos juegos, la regla es una: Umami, también en Vercel. Y las de Vercel fuera de Vercel no la configuran.
+  assert.ok((await claves({ ...ENTORNO, ...umami })).includes("umami") && !(await claves({ ...ENTORNO, ...umami })).includes("vercel-analytics"));
+  const fueraDeVercel = { VERCEL_TOKEN: ENTORNO.VERCEL_TOKEN, VERCEL_ANALYTICS_PROJECT_ID: ENTORNO.VERCEL_ANALYTICS_PROJECT_ID };
+  assert.ok((await claves(fueraDeVercel)).includes("umami") && !(await claves(fueraDeVercel)).includes("vercel-analytics"));
+});
+
+test("Umami en Vercel avisa, y cuenta como error: su script ahí da 404", async () => {
+  const umami = { UMAMI_API_URL: "https://umami.ed.test", UMAMI_API_KEY: "k", UMAMI_WEBSITE_ID: "s" };
+  const deUmami = async (entorno: Record<string, string>) => (await estadoDeLasConexiones("administra", { entorno, leer })).find((c) => c.clave === "umami")!;
+  assert.equal((await deUmami(umami)).aviso, null);
+  const enVercel = await deUmami({ ...ENTORNO, ...umami });
+  assert.match(enVercel.aviso ?? "", /corre en Vercel.*\/umami\/script\.js/);
+  assert.equal(enVercel.conError, true);
 });
 
 test("el cron mira la última corrida de cualquier tarea", async () => {

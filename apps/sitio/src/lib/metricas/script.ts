@@ -1,19 +1,24 @@
-// Qué script de analítica carga el sitio (ADR-0018): uno solo, según dónde
-// corre, y nunca uno que dé 404. Sin dominio de ED.
+import { fuenteDeVisitas } from "./entorno";
+
+// Qué script de analítica carga el sitio (ADR-0018): el de la fuente activa,
+// la misma que copia la tarea diaria, y uno solo. Sin dominio de ED.
 
 export type ScriptDeAnalitica = { tipo: "vercel" } | { tipo: "umami"; sitio: string } | null;
 
 /**
- * - En Vercel (`VERCEL`, que Vercel pone en el build y en el runtime), el de
- *   Vercel Web Analytics: pega a `/_vercel/insights`, que solo existe ahí.
- *   Manda aunque haya variables de Umami, porque `/umami/…` en Vercel no existe.
- * - Fuera de Vercel, con `UMAMI_WEBSITE_ID`, el de Umami, que sirve el proxy
- *   del VPS en `/umami/script.js`.
- * - Si no, ninguno. Y nunca fuera de producción: no hay nada que medir.
+ * La fuente sale de `fuenteDeVisitas`, la regla que usan también la copia y
+ * Ajustes › Conexiones:
+ * - Umami, con sus tres variables: su script, que sirve el proxy del VPS en
+ *   `/umami/script.js`. En Vercel no hay proxy y daría 404: Conexiones lo
+ *   avisa (`config/conexiones.ts`).
+ * - Vercel, en Vercel con sus variables: el de Vercel Web Analytics, que pega a
+ *   `/_vercel/insights`, que solo existe ahí.
+ * - Ninguna: ninguno. Y nunca fuera de producción: no hay nada que medir.
  */
 export function scriptDeAnalitica(entorno: Record<string, string | undefined>): ScriptDeAnalitica {
   if (entorno.NODE_ENV !== "production") return null;
-  if (entorno.VERCEL) return { tipo: "vercel" };
-  if (entorno.UMAMI_WEBSITE_ID) return { tipo: "umami", sitio: entorno.UMAMI_WEBSITE_ID };
+  const fuente = fuenteDeVisitas(entorno);
+  if (fuente === "umami") return { tipo: "umami", sitio: entorno.UMAMI_WEBSITE_ID! };
+  if (fuente === "vercel") return { tipo: "vercel" };
   return null;
 }
