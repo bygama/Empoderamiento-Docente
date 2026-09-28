@@ -55,8 +55,8 @@ Por eso:
 
 ## 1. El servidor
 
-En el panel de Hostinger, el VPS con **Ubuntu 24.04 LTS** (el de ED:
-`2.24.68.136`). Los ejemplos usan una clave SSH llamada `ed-vps`
+En el panel de Hostinger, el VPS con **Ubuntu 24.04 LTS**; su IP es la
+`<IP del VPS>` de los comandos. Los ejemplos usan una clave SSH llamada `ed-vps`
 (`~/.ssh/ed-vps` y `~/.ssh/ed-vps.pub`); si no la tenés, `ssh-keygen -t
 ed25519 -f ~/.ssh/ed-vps`.
 
@@ -67,12 +67,12 @@ máquina con la contraseña de root que eligiste al crear el VPS, la primera y
 
 ```sh
 # Linux, macOS o Git Bash
-ssh-copy-id -i ~/.ssh/ed-vps.pub root@<ip>
+ssh-copy-id -i ~/.ssh/ed-vps.pub root@<IP del VPS>
 # PowerShell (Windows no trae ssh-copy-id)
-type $env:USERPROFILE\.ssh\ed-vps.pub | ssh root@<ip> "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+type $env:USERPROFILE\.ssh\ed-vps.pub | ssh root@<IP del VPS> "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 ```
 
-`ssh -i ~/.ssh/ed-vps root@<ip>` tiene que entrar sin pedir la contraseña.
+`ssh -i ~/.ssh/ed-vps root@<IP del VPS>` tiene que entrar sin pedir la contraseña.
 Adentro, como root:
 
 ```sh
@@ -86,7 +86,7 @@ rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy
 > mal, es tu única puerta: con la contraseña apagada y sin la clave, quedás
 > afuera y solo queda la consola del panel de Hostinger.
 
-**En otra terminal**, comprobá que `ssh -i ~/.ssh/ed-vps deploy@<ip>` entra sin
+**En otra terminal**, comprobá que `ssh -i ~/.ssh/ed-vps deploy@<IP del VPS>` entra sin
 contraseña y que `sudo -v` acepta la de `deploy`. Recién entonces, en la
 sesión de root que quedó abierta, cerrá el root y las contraseñas.
 
@@ -117,8 +117,8 @@ passwordauthentication no
 ```
 
 Y otra vez **en otra terminal**, con la sesión de root todavía abierta: `ssh -i
-~/.ssh/ed-vps deploy@<ip>` entra; `ssh root@<ip>` y `ssh -o
-PubkeyAuthentication=no deploy@<ip>` contestan `Permission denied
+~/.ssh/ed-vps deploy@<IP del VPS>` entra; `ssh root@<IP del VPS>` y `ssh -o
+PubkeyAuthentication=no deploy@<IP del VPS>` contestan `Permission denied
 (publickey)`. Recién ahí cerrá la sesión de root. De acá en más, todo como
 `deploy`.
 
@@ -206,7 +206,7 @@ rato, publicado solo en el loopback:
 docker compose run --rm -d --name ed-panel-umami -p 127.0.0.1:3001:3000 analitica
 ```
 
-Y en tu máquina: `ssh -L 3001:127.0.0.1:3001 deploy@<ip>`, y abrí
+Y en tu máquina: `ssh -L 3001:127.0.0.1:3001 deploy@<IP del VPS>`, y abrí
 `http://localhost:3001`.
 
 1. Entrá con `admin` / `umami` y **cambiá la contraseña** en el acto.
@@ -288,10 +288,10 @@ capa cubre algo distinto:
    **una vez por semana**, y mejor todos los días:
 
    ```sh
-   rsync -az --delete deploy@<ip>:ed/respaldos/ ~/respaldos-ed/
+   rsync -az --delete deploy@<IP del VPS>:ed/respaldos/ ~/respaldos-ed/
    ```
 
-   (`scp -r deploy@<ip>:ed/respaldos ~/respaldos-ed` si no hay `rsync`.)
+   (`scp -r deploy@<IP del VPS>:ed/respaldos ~/respaldos-ed` si no hay `rsync`.)
    **Cubre** perder el VPS y la cuenta de Hostinger. Los respaldos llevan CV y
    datos de contacto: van a un disco cifrado, y nunca a un lugar compartido.
    Guardá también **una copia del `.env`** fuera del VPS (en un gestor de
@@ -305,7 +305,7 @@ Si se perdió el VPS (o se muda a otro), con la capa 3:
 1. **El servidor y el DNS**, como la primera vez: §1 y §2, con el dominio
    apuntando a la IP nueva.
 2. **El código y las variables:** `git clone` como en §3, y el `.env` de la
-   copia (`scp .env deploy@<ip>:ed/.env`, y `chmod 600 .env`). Si no hay copia,
+   copia (`scp .env deploy@<IP del VPS>:ed/.env`, y `chmod 600 .env`). Si no hay copia,
    uno nuevo desde `.env.example`: las claves y los secretos pueden ser otros
    (las sesiones abiertas se cierran y hay que volver a entrar), pero
    `UMAMI_API_KEY` hay que crearla de nuevo en el panel de Umami después (§5,
@@ -313,7 +313,7 @@ Si se perdió el VPS (o se muda a otro), con la capa 3:
 3. **El respaldo:** la carpeta de la fecha, a `respaldos/` del clon:
 
    ```sh
-   rsync -az ~/respaldos-ed/<AAAA-MM-DD> deploy@<ip>:ed/respaldos/
+   rsync -az ~/respaldos-ed/<AAAA-MM-DD> deploy@<IP del VPS>:ed/respaldos/
    ```
 
 4. **`scripts/restaurar.sh <AAAA-MM-DD>`**, en el VPS. Sin nada corriendo y sin
