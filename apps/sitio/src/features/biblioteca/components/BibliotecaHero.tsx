@@ -80,7 +80,7 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
   return (
     <section
       ref={rootRef}
-      className="bg-azul-principal relative isolate flex min-h-[87svh] flex-col overflow-hidden rounded-b-[2rem] pt-28 pb-5 md:rounded-b-[2.75rem] md:pt-32 md:pb-7"
+      className="bg-azul-principal relative isolate flex min-h-[87svh] max-md:min-h-[80lvh] flex-col overflow-hidden rounded-b-[2rem] pt-28 pb-5 md:rounded-b-[2.75rem] md:pt-32 md:pb-7"
       aria-label="Biblioteca — publicaciones y recursos"
     >
       {/* Fondo: glow de faro contenido + forma plana (manual §6) */}
@@ -160,7 +160,7 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
               e.currentTarget.blur();
               irAMateriales();
             }}
-            className="text-azul-principal placeholder:text-gris-texto min-w-0 flex-1 bg-transparent px-3.5 font-sans text-[0.98rem] outline-none"
+            className="text-azul-principal placeholder:text-gris-texto min-w-0 flex-1 bg-transparent px-3.5 font-sans text-[0.98rem] max-lg:text-[1rem] outline-none"
           />
           <button
             type="button"
