@@ -52,9 +52,17 @@ docker tag "$sitio:$version" "$sitio:actual"
 
 paso "5/5 Levantar todo con la versión nueva"
 docker compose up -d --wait --remove-orphans
-# Caddy no relee su archivo solo: si el deploy trajo un Caddyfile nuevo, así
-# entra sin cortar conexiones.
-docker compose exec -T proxy caddy reload --config /etc/caddy/Caddyfile
+# Caddy no relee su archivo solo. Y el Caddyfile está montado como archivo
+# suelto: `git pull` lo reemplaza por uno nuevo (otro inodo) y el contenedor
+# sigue viendo el viejo, así que un `caddy reload` recargaría lo de antes. Si
+# cambió, se recrea el proxy (un corte de un segundo; los certificados quedan
+# en su volumen); si no, se recarga sin cortar conexiones.
+if docker compose exec -T proxy cat /etc/caddy/Caddyfile </dev/null | cmp -s - deploy/Caddyfile; then
+  docker compose exec -T proxy caddy reload --config /etc/caddy/Caddyfile </dev/null
+else
+  echo "El Caddyfile cambió: se recrea el proxy."
+  docker compose up -d --wait --force-recreate --no-deps proxy
+fi
 
 paso "Quedan las últimas $GUARDAR imágenes de app"
 docker images "$sitio" --format '{{.CreatedAt}}|{{.Tag}}' \
