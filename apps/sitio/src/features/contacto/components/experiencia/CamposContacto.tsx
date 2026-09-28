@@ -1,7 +1,7 @@
 import { ArrowUpRight } from "@/components/ui/icons";
 import { aLos } from "@/config/privacidad";
-import { PaisDropdown } from "../PaisDropdown";
 import type { Envio } from "./contexto";
+import { PaisCampo } from "./PaisCampo";
 import { INPUT_BASE, LABEL_BASE } from "./estilos";
 
 /**
@@ -39,9 +39,8 @@ export function CamposContacto({ envio, correo, paises, mesesDeGuarda }: { envio
         <label htmlFor="ct-pais" className={LABEL_BASE}>
           País
         </label>
-        {/* Dropdown propio (no <select> nativo): comparte la caja de los
-            demás campos y despliega un menú accesible con teclado. */}
-        <PaisDropdown id="ct-pais" name="pais" options={[...paises, "Otro"]} />
+        {/* Dropdown propio en computadora, <select> nativo bajo lg (PaisCampo). */}
+        <PaisCampo id="ct-pais" name="pais" options={[...paises, "Otro"]} />
       </div>
       <div data-campo className="md:col-span-2">
         <label htmlFor="ct-mensaje" className={LABEL_BASE}>
