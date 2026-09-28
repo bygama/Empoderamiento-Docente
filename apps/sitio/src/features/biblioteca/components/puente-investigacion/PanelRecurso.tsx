@@ -8,7 +8,8 @@ import type { Tema } from "./temas";
  * Un panel de la pila: el lomo (número y nombre de abajo hacia arriba, lo
  * único que queda a la vista al taparse) y el cuerpo con la foto, qué es el
  * recurso y de qué línea de investigación nace. En live es absoluto y viaja;
- * en estático se apila vertical. El texto y la foto llegan por props; el
+ * en estático se apila vertical; en celular y tablet (`movil`) es una carta
+ * de la pila con lomo arriba (puente/pila-movil.ts). El texto y la foto llegan por props; el
  * tema (navy o gris) lo pone la pila, por el lugar del panel.
  */
 export function PanelRecurso({
@@ -17,22 +18,27 @@ export function PanelRecurso({
   i,
   total,
   live,
+  movil,
 }: {
   recurso: Puente["recursos"][number];
   tema: Tema;
   i: number;
   total: number;
   live: boolean;
+  movil: boolean;
 }) {
   return (
     <article
       data-pila-card
+      data-puente-card
       className={
         tema.card +
         " overflow-hidden shadow-[0_28px_70px_-32px_rgb(15_23_42/0.45)] " +
         (live
           ? "absolute inset-y-0 rounded-[1.5rem] md:rounded-[2rem]"
-          : "relative rounded-2xl")
+          : movil
+            ? "absolute inset-x-0 top-0 rounded-2xl"
+            : "relative rounded-2xl")
       }
       style={
         live
@@ -63,13 +69,29 @@ export function PanelRecurso({
         </div>
       )}
 
+      {/* En la pila de celular el lomo va arriba y en horizontal: es la
+          franja que queda a la vista cuando la carta siguiente la tapa. */}
+      {movil && (
+        <div
+          aria-hidden="true"
+          data-puente-lomo
+          className={"flex h-12 items-center gap-3 px-5 " + tema.spine}
+        >
+          <span className="font-mono text-[0.65rem] tracking-[0.14em]">{numeroDeRecurso(i)}</span>
+          <span className="font-display text-[1rem] font-bold tracking-[-0.01em]">{c.nombre}</span>
+        </div>
+      )}
+
       <div
         data-pila-body
+        data-puente-cuerpo
         className={
-          "grid h-full items-center gap-7 md:grid-cols-[1fr_1.05fr] md:gap-10 " +
-          (live
-            ? "p-7 pl-[calc(var(--pila-paso)+0.75rem)] md:p-12 md:pl-[calc(var(--pila-paso)+1.5rem)]"
-            : "p-6 md:p-10")
+          movil
+            ? "grid gap-4 p-5 pt-0 md:grid-cols-[1fr_1.05fr] md:gap-8 md:p-8 md:pt-0"
+            : "grid h-full items-center gap-7 md:grid-cols-[1fr_1.05fr] md:gap-10 " +
+              (live
+                ? "p-7 pl-[calc(var(--pila-paso)+0.75rem)] md:p-12 md:pl-[calc(var(--pila-paso)+1.5rem)]"
+                : "p-6 md:p-10")
         }
         style={
           live
@@ -82,7 +104,7 @@ export function PanelRecurso({
             : undefined
         }
       >
-        <figure className="relative aspect-[4/3] max-h-[50svh] w-full overflow-hidden rounded-xl md:rounded-2xl">
+        <figure className="relative aspect-[4/3] max-h-[50svh] w-full overflow-hidden rounded-xl md:rounded-2xl max-md:aspect-[5/2] max-md:max-h-[28lvh]">
           <Image
             src={c.foto.src}
             // Decorativa: el panel ya dice todo (SPEC §3). El alt queda con la foto, para donde se use.
@@ -117,14 +139,14 @@ export function PanelRecurso({
           </h3>
           <p
             className={
-              "mt-4 max-w-[46ch] font-sans text-[1rem] leading-relaxed md:text-[1.08rem] " +
+              "mt-4 max-w-[46ch] font-sans text-[1rem] leading-relaxed md:text-[1.08rem] max-md:text-[0.92rem] " +
               tema.desc
             }
           >
             {c.descripcion}
           </p>
 
-          <div className={"mt-7 border-t pt-5 " + tema.divisor}>
+          <div className={"mt-7 border-t pt-5 max-md:mt-3 " + tema.divisor}>
             <p
               className={
                 "font-mono text-[0.66rem] tracking-[0.16em] uppercase " +
