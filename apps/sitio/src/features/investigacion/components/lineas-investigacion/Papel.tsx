@@ -69,7 +69,7 @@ export function Papel({ linea, caso, indice }: { linea: Linea; caso?: string; in
   return (
     <li
       data-linea
-      className={`text-azul-principal relative px-7 pb-7 shadow-[0_22px_50px_-26px_rgb(31_45_77/0.55),0_2px_6px_-2px_rgb(31_45_77/0.2)] lg:px-8 ${superficie} ${GIROS[indice] ?? ""}`}
+      className={`text-azul-principal relative px-7 pb-7 shadow-[0_22px_50px_-26px_rgb(31_45_77/0.55),0_2px_6px_-2px_rgb(31_45_77/0.2)] lg:px-8 [[data-modo=pila]_&]:absolute [[data-modo=pila]_&]:inset-x-0 [[data-modo=pila]_&]:top-0 ${superficie} ${GIROS[indice] ?? ""}`}
     >
       {material === "hoja" && (
         <ClipPapel className="text-azul-principal/45 absolute -top-3 right-7 h-11 w-6" />
@@ -83,7 +83,7 @@ export function Papel({ linea, caso, indice }: { linea: Linea; caso?: string; in
           {numero}
         </span>
       ) : null}
-      <div className="flex items-center gap-3">
+      <div data-linea-lomo className="flex items-center gap-3">
         <span
           className={`font-display text-verde-concepto-texto text-[1.05rem] font-bold tabular-nums ${material === "ficha" ? "sr-only" : ""}`}
         >
@@ -91,28 +91,32 @@ export function Papel({ linea, caso, indice }: { linea: Linea; caso?: string; in
         </span>
         <span className={`${ROTULO_MICRO} text-gris-texto/80`}>{linea.nombre}</span>
       </div>
-      <h3 className="font-display mt-4 text-[1.32rem] leading-[1.24] font-bold tracking-[-0.015em] text-balance lg:text-[1.42rem]">
-        {material === "nota" && (
-          <FlechaManuscrita className="text-verde-concepto float-left mt-1 mr-2 h-5 w-8 rotate-[12deg]" />
-        )}
-        <ConResaltado texto={linea.pregunta} resaltar={subrayada} />
-      </h3>
-      {/* Al caso que la muestra en acción: en la misma página desliza hasta
-          la pila y abre el expediente (abrir-caso.ts); el href es el link
-          directo del caso, por si se abre en otra pestaña. */}
-      {caso ? (
-        <Link
-          href={`#${caso}`}
-          onClick={alClicVerCaso(caso)}
-          aria-label={`Ver en acción: ${linea.nombre}`}
-          className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto mt-5 inline-flex items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
-          Ver en acción
-          <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none">
-            →
-          </span>
-        </Link>
-      ) : null}
+      {/* En la pila de celular el lomo (número y nombre) queda a la vista al
+          taparse; el cuerpo es lo que se esconde (lineas-investigacion/pila-movil.ts). */}
+      <div data-linea-cuerpo>
+        <h3 className="font-display mt-4 text-[1.32rem] leading-[1.24] font-bold tracking-[-0.015em] text-balance lg:text-[1.42rem]">
+          {material === "nota" && (
+            <FlechaManuscrita className="text-verde-concepto float-left mt-1 mr-2 h-5 w-8 rotate-[12deg]" />
+          )}
+          <ConResaltado texto={linea.pregunta} resaltar={subrayada} />
+        </h3>
+        {/* Al caso que la muestra en acción: en la misma página desliza hasta
+            la pila y abre el expediente (abrir-caso.ts); el href es el link
+            directo del caso, por si se abre en otra pestaña. */}
+        {caso ? (
+          <Link
+            href={`#${caso}`}
+            onClick={alClicVerCaso(caso)}
+            aria-label={`Ver en acción: ${linea.nombre}`}
+            className="group text-azul-principal hover:bg-azul-principal focus-visible:outline-verde-concepto mt-5 inline-flex items-center gap-2 rounded-full border border-current px-3 py-1.5 text-[0.78rem] font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 [[data-modo=pila]_&]:mt-4"
+          >
+            Ver en acción
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none">
+              →
+            </span>
+          </Link>
+        ) : null}
+      </div>
     </li>
   );
 }

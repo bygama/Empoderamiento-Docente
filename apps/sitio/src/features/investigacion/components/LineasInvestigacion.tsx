@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -16,6 +16,7 @@ import { ConResaltado } from "./ConResaltado";
 import { BocaCarpeta } from "./lineas-investigacion/BocaCarpeta";
 import { crearLineas } from "./lineas-investigacion/coreografia-lineas";
 import { numeroDePapel } from "./lineas-investigacion/numero";
+import { ALTO_PILA_LINEAS_LVH, crearPilaLineas } from "./lineas-investigacion/pila-movil";
 import { Papel } from "./lineas-investigacion/Papel";
 import { PuntosCampo } from "./PuntosCampo";
 
@@ -46,23 +47,75 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
   const carpetaRef = useRef<HTMLDivElement | null>(null);
   const listaRef = useRef<HTMLOListElement | null>(null);
   const reduced = useReducedMotion();
+  // Cuatro modos, decididos enteros en cada corrida y de nuevo en cada cambio
+  // de pantalla: la carpeta que entra girando (escritorio con puntero), un
+  // giro corto al entrar (tablet), la PILA (celular con alto suficiente) y
+  // la lista quieta (movimiento reducido o pantalla baja).
+  const [modo, setModo] = useState<"vivo" | "tablet" | "pila" | "quieto">("quieto");
 
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 64rem)").matches)
-      return;
+    const mqVivo = window.matchMedia("(hover: hover) and (min-width: 64rem)");
+    const mqTablet = window.matchMedia("(min-width: 48rem) and (max-width: 63.999rem)");
+    const mqPila = window.matchMedia("(max-width: 47.999rem) and (min-height: 38.75rem)");
+    const decidir = () => {
+      if (reduced) setModo("quieto");
+      else if (mqVivo.matches) setModo("vivo");
+      else if (mqTablet.matches) setModo("tablet");
+      else if (mqPila.matches) setModo("pila");
+      else setModo("quieto");
+    };
+    decidir();
+    mqVivo.addEventListener("change", decidir);
+    mqTablet.addEventListener("change", decidir);
+    mqPila.addEventListener("change", decidir);
+    return () => {
+      mqVivo.removeEventListener("change", decidir);
+      mqTablet.removeEventListener("change", decidir);
+      mqPila.removeEventListener("change", decidir);
+    };
+  }, [reduced]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (modo !== "vivo") return;
     const zona = zonaRef.current;
     const carpeta = carpetaRef.current;
     const lista = listaRef.current;
     if (!zona || !carpeta || !lista) return;
     return crearLineas({ zona, carpeta, lista });
-  }, [reduced]);
+  }, [modo]);
+
+  // Tablet: la carpeta entra con un giro corto, sin pin.
+  useIsomorphicLayoutEffect(() => {
+    if (modo !== "tablet") return;
+    const carpeta = carpetaRef.current;
+    if (!carpeta) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        carpeta,
+        { rotation: 3, transformOrigin: "50% 50%" },
+        {
+          rotation: 0,
+          ease: "power2.out",
+          scrollTrigger: { trigger: carpeta, start: "top bottom", end: "top 35%", scrub: 0.6 },
+        },
+      );
+    }, carpeta);
+    return () => ctx.revert();
+  }, [modo]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (modo !== "pila") return;
+    const zona = zonaRef.current;
+    if (!zona) return;
+    return crearPilaLineas(zona);
+  }, [modo]);
 
   return (
     <section
       ref={zonaRef}
       id="lineas"
       data-indice="Líneas de investigación"
+      data-modo={modo}
       aria-label="Líneas de investigación"
       // isolate: el grano mezcla adentro. El clip recorta a los costados y
       // por abajo (la carpeta que sale inclinada se mete bajo la sección
@@ -93,12 +146,24 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
       >
         <BocaCarpeta />
 
-        {/* Contenido: dentro del viewport (en desktop compensa el ancho extra). */}
-        <div className="relative px-6 pt-28 pb-24 md:px-10 lg:mx-[10vw] lg:pt-32 lg:pb-28">
+        {/* Contenido: dentro del viewport (en desktop compensa el ancho extra).
+            data-lineas-pista es la pista de scroll de la pila en celular: en
+            los demás modos su alto lo da el contenido, sin pin. */}
+        <div
+          data-lineas-pista
+          className="relative px-6 pt-28 pb-24 md:px-10 lg:mx-[10vw] lg:pt-32 lg:pb-28"
+          style={modo === "pila" ? { height: `${ALTO_PILA_LINEAS_LVH}lvh` } : undefined}
+        >
+          {/* La escena de la pila: la caja pegada mientras la pista
+              scrollea; en los demás modos `contents` no toca el layout. */}
+          <div
+            data-lineas-escena
+            className={modo === "pila" ? "sticky top-0 flex h-lvh flex-col" : "contents"}
+          >
           {/* Número fantasma: rotulación de archivo. */}
           <span
             aria-hidden="true"
-            className="font-display text-azul-principal/[0.08] pointer-events-none absolute top-10 left-6 text-[8rem] leading-none font-extrabold tracking-tight select-none md:left-10 lg:top-12 lg:text-[10rem]"
+            className="font-display text-azul-principal/[0.08] pointer-events-none absolute top-10 left-6 text-[8rem] leading-none font-extrabold tracking-tight select-none md:left-10 lg:top-12 lg:text-[10rem] [[data-modo=pila]_&]:hidden"
           >
             02
           </span>
@@ -107,7 +172,7 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
               sitemap, como en todas las hojas de la página. */}
           <span
             aria-hidden="true"
-            className={`${ROTULO_MICRO} text-azul-principal/60 border-azul-principal/40 absolute top-14 right-6 hidden rotate-[-4deg] rounded-[3px] border px-3 py-1.5 md:right-10 lg:block`}
+            className={`${ROTULO_MICRO} text-azul-principal/60 border-azul-principal/40 absolute top-14 right-6 hidden rotate-[-4deg] rounded-[3px] border px-3 py-1.5 md:right-10 lg:block [[data-modo=pila]_&]:hidden`}
           >
             ARCHIVO ED · HOJA 02 · LÍNEAS DE INVESTIGACIÓN
           </span>
@@ -137,7 +202,15 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
                 número del papel y no su texto: la lista es fija y no se
                 reordena, y dos nombres iguales cargados en el admin no
                 pueden repetirla. */}
-            <ol ref={listaRef} className="mt-14 grid items-start gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-2 lg:gap-y-12">
+            <ol
+              ref={listaRef}
+              data-lineas-pila
+              className={
+                modo === "pila"
+                  ? "relative mt-6 min-h-0 flex-1"
+                  : "mt-14 grid items-start gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-2 lg:gap-y-12 md:max-lg:grid-cols-2"
+              }
+            >
               {contenido.lineas.map((linea, i) => (
                 <Papel key={numeroDePapel(i)} linea={linea} caso={casos.find((c) => c.id === CASO_DE_CADA_LINEA[i])?.slug} indice={i} />
               ))}
@@ -161,6 +234,7 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
             height={433}
             className="pointer-events-none absolute right-6 bottom-8 h-12 w-auto opacity-[0.16] select-none md:right-10 lg:bottom-10 lg:h-14"
           />
+          </div>
         </div>
       </div>
     </section>
