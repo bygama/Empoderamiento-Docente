@@ -419,6 +419,18 @@
   task `task_3ed490b47257`, dispatch `ctx_70dd670c98b9`. El VPS de ED es
   `2.24.68.136` (Hostinger). La clave `ed-vps` está generada del lado de Mateo y
   espera que la instale.
+- 2026-09-28 — r2 de #198: **PASS**, con los tres Important cerrados y probados.
+  En el cierre, el script de Vercel carga en Vercel aunque falte el token, la IP
+  sale del runbook y AGENTS §5.8 suma el chequeo del bit. La sesión de la hija
+  se perdió con la actualización de Orca (el dispatch falló en
+  `agent_readiness`) y siguió en una sesión nueva sobre el mismo worktree. Gate
+  de la hija después del rebase: typecheck, lint y build 0, react-doctor
+  100/100, test cinco veces exit 0. **#198 mergeado** → `main` en `eddab2aa`, el mismo
+  árbol que se midió. Fuera: su worktree, sus terminales, la base `ed_vps` y el
+  compose de prueba.
+- 2026-09-28 — **Queda el deploy real** en `2.24.68.136` (Hostinger), siguiendo
+  `docs/deploy/vps.md`. Frena en que Mateo cargue la clave `ed-vps` como root.
+  Memoria: el build pica unos 5 GB (KVM 2, o KVM 1 con 4 GB de swap).
 
 ## Hecho
 
@@ -487,3 +499,13 @@
 - Las cuentas de prueba de las lanes (`cierre-*@ed.test`, `equipo-prueba@ejemplo.org`
   y las anteriores) quedan en la base `ed` local. Tienen actividad, y la clave
   foránea no deja borrarlas. Es solo la base de desarrollo.
+- De `deploy-en-vps`, para después:
+  - `www.`: el Caddyfile atiende solo el dominio; si ED lo quiere, va como
+    redirección.
+  - El script para mudar fotos y CV entre Blob y disco. Mientras tanto, el
+    procedimiento está en `vps.md` §10.
+  - El fixture de Vercel `__fixtures__/pagina-por-dia.json`, sin grabar.
+  - El tracker de Umami en un navegador real, que se prueba en el recorrido
+    final.
+  - La caché de build de Docker en esta máquina (~2,4 GB): se borra con
+    `docker builder prune` cuando moleste.
