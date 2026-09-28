@@ -95,7 +95,7 @@ export function CategoriasRail() {
       <div
         ref={railRef}
         onScroll={actualizar}
-        className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-full bg-white p-2 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.4)]"
+        className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-full bg-white p-2 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.4)] max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-2"
       >
         {CATEGORIAS.map(({ label, Icon }, i) => (
           <button
@@ -103,7 +103,7 @@ export function CategoriasRail() {
             type="button"
             data-bh-pill
             onClick={irAlListado}
-            className={`flex shrink-0 items-center gap-2.5 rounded-full px-4 py-2.5 font-sans text-[0.9rem] font-medium whitespace-nowrap transition-colors ${
+            className={`flex shrink-0 items-center gap-2.5 rounded-full px-4 py-2.5 font-sans text-[0.9rem] font-medium whitespace-nowrap transition-colors max-lg:min-h-11 max-lg:snap-start ${
               i === 0
                 ? "bg-azul-principal text-white"
                 : "bg-gris-fondo text-azul-principal hover:bg-azul-claro/40"
