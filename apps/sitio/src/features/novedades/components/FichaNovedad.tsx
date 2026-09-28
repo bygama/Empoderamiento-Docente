@@ -13,6 +13,7 @@ import type { NovedadDelSitio } from "@/features/novedades/contenido/novedad";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
 import { useTransicionFaro, FLAG_ENTRADA_FARO } from "./TransicionFaro";
 import { GuiaNota } from "./GuiaNota";
+import { GuiaNotaRiel } from "./GuiaNotaRiel";
 import { RevealFoco } from "./RevealFoco";
 import { AccionPublicacion } from "./AccionPublicacion";
 
@@ -21,7 +22,7 @@ import { AccionPublicacion } from "./AccionPublicacion";
  * Nominal traducido a ED: columna de lectura a la izquierda (meta, titular,
  * lede y secciones tituladas) y a la derecha, sticky, la foto y la "guía de
  * la nota" (índice con sección activa según scroll). En mobile la foto va
- * bajo el titular y la guía se omite.
+ * bajo el titular y la guía se muestra como riel horizontal (`GuiaNotaRiel`).
  *
  * Si se llegó vía la transición del faro (flag en sessionStorage), los
  * reveals del titular y la foto esperan a que el telón destape (~0.7s).
@@ -101,7 +102,7 @@ export function FichaNovedad({ n, material }: { n: NovedadDelSitio; material: Ma
         <Link
           href="/novedades"
           onClick={volver}
-          className="group text-gris-texto hover:text-azul-principal inline-flex items-center gap-2 font-mono text-[0.72rem] tracking-[0.14em] uppercase transition-colors"
+          className="group text-gris-texto hover:text-azul-principal inline-flex max-lg:min-h-11 items-center gap-2 font-mono text-[0.72rem] tracking-[0.14em] uppercase transition-colors"
         >
           <ArrowRight size={14} className="rotate-180 transition-transform group-hover:-translate-x-0.5" />
           Todas las novedades
@@ -136,6 +137,10 @@ export function FichaNovedad({ n, material }: { n: NovedadDelSitio; material: Ma
                 <Image src={n.imagen.src} alt="" fill sizes="100vw" className="object-cover" style={estiloDeFoco(n.imagen.foco)} priority />
               </div>
             </RevealFoco>
+
+            {secciones.length > 1 && (
+              <GuiaNotaRiel secciones={secciones} activa={activa} onIr={irASeccion} />
+            )}
 
             <p className="text-azul-principal mt-8 font-sans text-[1.15rem] leading-relaxed font-medium">
               {n.bajada}
