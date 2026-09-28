@@ -17,7 +17,7 @@ export function BeatRemate({ frase, texto }: { frase: string; texto: string }) {
   return (
     <div
       data-beat="4"
-      className="flex h-full flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24"
+      className="flex h-full flex-col items-center justify-center px-6 text-center motion-reduce:h-auto motion-reduce:py-24 [[data-modo=quieto]_&]:h-auto max-lg:[[data-modo=quieto]_&]:py-16"
     >
       <h3
         className="font-display font-bold tracking-[-0.02em]"
