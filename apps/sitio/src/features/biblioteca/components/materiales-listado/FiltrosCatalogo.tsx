@@ -60,7 +60,7 @@ export function FiltrosCatalogo({
     <aside
       ref={columnaRef}
       aria-label="Buscador y filtros del catálogo"
-      className="lg:sticky lg:top-28 lg:-mx-2 lg:-mt-1 lg:max-h-[calc(100svh-8.5rem)] lg:self-start lg:overflow-y-auto lg:px-2 lg:data-[desborda]:overscroll-contain lg:pt-1 lg:pb-6 lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] lg:[scrollbar-width:thin]"
+      className="max-lg:hidden lg:sticky lg:top-28 lg:-mx-2 lg:-mt-1 lg:max-h-[calc(100svh-8.5rem)] lg:self-start lg:overflow-y-auto lg:px-2 lg:data-[desborda]:overscroll-contain lg:pt-1 lg:pb-6 lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] lg:[scrollbar-width:thin]"
     >
       <div className="flex items-baseline justify-between gap-4">
         <h2 className="font-display text-h3 text-azul-principal font-bold tracking-[-0.01em]">

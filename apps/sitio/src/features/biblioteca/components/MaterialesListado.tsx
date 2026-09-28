@@ -7,6 +7,7 @@ import { getLenis } from "@/lib/lenis";
 import { EVENTO_URL } from "@/lib/navegar";
 import { FilaMaterial } from "./materiales-listado/FilaMaterial";
 import { FiltrosCatalogo } from "./materiales-listado/FiltrosCatalogo";
+import { FiltrosMovil } from "./materiales-listado/FiltrosMovil";
 import {
   coincide,
   escribirTipoEnUrl,
@@ -160,6 +161,18 @@ export function MaterialesListado({ contenido, materiales }: { contenido: Catalo
 
           {/* ── Resultados ──────────────────────────────────────────────── */}
           <div>
+            {/* Bajo lg la columna no va: una barra pegajosa y una hoja inferior
+                con los mismos filtros (FiltrosMovil). */}
+            <FiltrosMovil
+              busqueda={busqueda}
+              onBuscar={buscar}
+              anios={anios}
+              filtros={filtros}
+              onCambiar={cambiarFiltro}
+              onLimpiar={limpiar}
+              hayFiltros={hayFiltros}
+              total={resultados.length}
+            />
             <p
               aria-live="polite"
               className="text-gris-texto font-mono text-[0.72rem] tracking-[0.08em] uppercase"

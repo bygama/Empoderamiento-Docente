@@ -1,0 +1,108 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Search, X } from "@/components/ui/icons";
+import type { Filtros } from "./filtros";
+import { HojaFiltros } from "./HojaFiltros";
+
+type Props = {
+  busqueda: string;
+  onBuscar: (v: string) => void;
+  /** Los años que tiene el catálogo (los arma el listado). */
+  anios: readonly number[];
+  filtros: Filtros;
+  onCambiar: (parcial: Partial<Filtros>) => void;
+  onLimpiar: () => void;
+  hayFiltros: boolean;
+  total: number;
+};
+
+/**
+ * Filtros del catálogo bajo `lg`: la sidebar de escritorio no cabe arriba de
+ * los resultados (era una pantalla entera antes del primer material). Acá
+ * queda una BARRA pegajosa bajo el header —buscador, botón «Filtros» con la
+ * cuenta de filtros puestos y los chips activos, cada uno con su ×— y una
+ * HOJA inferior con los tres grupos (HojaFiltros). Mismo estado y mismos
+ * callbacks que la sidebar: `?tipo=` sigue viajando en la URL.
+ */
+export function FiltrosMovil({ busqueda, onBuscar, anios, filtros, onCambiar, onLimpiar, hayFiltros, total }: Props) {
+  const [abierta, setAbierta] = useState(false);
+
+  // Si el viewport cruza a `lg` con la hoja abierta (rotación, resize de
+  // ventana), el contenedor se esconde (`lg:hidden`) pero el <dialog> sigue
+  // `open` y el body queda con `overflow: hidden` para siempre.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 64rem)");
+    const alCambiar = (e: MediaQueryListEvent) => {
+      if (e.matches) setAbierta(false);
+    };
+    mq.addEventListener("change", alCambiar);
+    return () => mq.removeEventListener("change", alCambiar);
+  }, []);
+
+  const activos: { etiqueta: string; quitar: () => void }[] = [];
+  if (filtros.tipo) activos.push({ etiqueta: filtros.tipo, quitar: () => onCambiar({ tipo: null }) });
+  if (filtros.publico) activos.push({ etiqueta: filtros.publico, quitar: () => onCambiar({ publico: null }) });
+  if (filtros.anio !== null) activos.push({ etiqueta: String(filtros.anio), quitar: () => onCambiar({ anio: null }) });
+
+  return (
+    <div data-filtros-movil className="sticky top-[4.75rem] z-20 -mx-5 border-b border-azul-principal/10 bg-white px-5 pt-3 pb-3 lg:hidden">
+      <div className="border-azul-principal/15 focus-within:border-azul-medio focus-within:ring-azul-claro/60 flex items-center gap-2.5 rounded-lg border bg-white px-3.5 transition-colors focus-within:ring-2">
+        <span className="text-gris-texto shrink-0">
+          <Search size={18} />
+        </span>
+        <label htmlFor="materiales-buscar-movil" className="sr-only">
+          Buscar en el catálogo
+        </label>
+        <input
+          id="materiales-buscar-movil"
+          type="search"
+          value={busqueda}
+          onChange={(e) => onBuscar(e.target.value)}
+          placeholder="Buscá por título, tema o autora…"
+          className="text-azul-principal placeholder:text-gris-texto h-11 min-w-0 flex-1 bg-transparent font-sans text-[1rem] outline-none"
+        />
+      </div>
+
+      <div className="mt-2.5 flex items-center gap-2">
+        <button
+          type="button"
+          data-abrir-filtros
+          aria-expanded={abierta}
+          aria-haspopup="dialog"
+          onClick={() => setAbierta(true)}
+          className="border-azul-principal text-azul-principal inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg border px-4 font-sans text-[0.92rem] font-medium"
+        >
+          Filtros
+          {activos.length > 0 && (
+            <span className="bg-azul-principal rounded-full px-2 py-0.5 font-mono text-[0.7rem] text-white">
+              {activos.length}
+            </span>
+          )}
+        </button>
+        {/* Chips activos en riel horizontal: se ve qué filtro hay puesto sin abrir la hoja. */}
+        <div className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
+          {activos.map((a) => (
+            <span
+              key={a.etiqueta}
+              data-chip-activo
+              className="bg-azul-principal inline-flex shrink-0 items-center gap-1 rounded-md pl-2.5 font-sans text-[0.8rem] font-medium text-white"
+            >
+              {a.etiqueta}
+              <button type="button" aria-label={`Quitar ${a.etiqueta}`} onClick={a.quitar} className="flex h-11 w-9 items-center justify-center">
+                <X size={14} />
+              </button>
+            </span>
+          ))}
+          {hayFiltros && (
+            <button type="button" onClick={onLimpiar} className="text-gris-texto min-h-11 shrink-0 px-2 font-sans text-[0.83rem] underline underline-offset-4">
+              Limpiar todo
+            </button>
+          )}
+        </div>
+      </div>
+
+      <HojaFiltros abierta={abierta} onCerrar={() => setAbierta(false)} anios={anios} filtros={filtros} onCambiar={onCambiar} onLimpiar={onLimpiar} total={total} />
+    </div>
+  );
+}
