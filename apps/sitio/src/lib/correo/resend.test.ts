@@ -22,7 +22,17 @@ function fetchFalso(respuestas: Array<Response | Error | "cuelga">) {
     llamadas.push({ url, init });
     const r = respuestas[llamadas.length - 1];
     if (r === "cuelga") {
-      return new Promise((_, rechazar) => init.signal?.addEventListener("abort", () => rechazar(init.signal?.reason)));
+      // Un fetch de verdad mantiene vivo el loop con su socket mientras espera;
+      // el timer de AbortSignal.timeout no lo hace (es unref'd). Sin algo
+      // pendiente, el loop se vacía antes del abort y el test nunca termina.
+      // Acotado a 5 s: si el abort no llega, el test falla rápido igual.
+      const vivo = setTimeout(() => {}, 5_000);
+      return new Promise((_, rechazar) =>
+        init.signal?.addEventListener("abort", () => {
+          clearTimeout(vivo);
+          rechazar(init.signal?.reason);
+        }),
+      );
     }
     if (r instanceof Error) throw r;
     return r;
