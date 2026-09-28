@@ -10,17 +10,20 @@ test("con las variables de Umami, el de Umami", () => {
   assert.deepEqual(scriptDeAnalitica({ ...PRODUCCION, ...UMAMI }), { tipo: "umami", sitio: "s-1" });
 });
 
-test("en Vercel con sus variables, el de Vercel", () => {
+test("en Vercel, el de Vercel, con sus variables o sin ellas: el token es de la copia", () => {
   assert.deepEqual(scriptDeAnalitica({ ...PRODUCCION, VERCEL: "1", ...VERCEL }), { tipo: "vercel" });
+  // Antes de cargar el token, o en un Preview, las visitas se cuentan igual.
+  assert.deepEqual(scriptDeAnalitica({ ...PRODUCCION, VERCEL: "1" }), { tipo: "vercel" });
+  // Umami a medias no es Umami: en Vercel, el de Vercel.
+  assert.deepEqual(scriptDeAnalitica({ ...PRODUCCION, VERCEL: "1", UMAMI_WEBSITE_ID: "s-1" }), { tipo: "vercel" });
 });
 
 test("con los dos juegos, el de Umami, que es la fuente que se copia", () => {
   assert.deepEqual(scriptDeAnalitica({ ...PRODUCCION, VERCEL: "1", ...VERCEL, ...UMAMI }), { tipo: "umami", sitio: "s-1" });
 });
 
-test("sin una fuente entera, fuera de Vercel con las de Vercel, o fuera de producción, ninguno", () => {
+test("fuera de Vercel sin Umami entero, o fuera de producción, ninguno", () => {
   assert.equal(scriptDeAnalitica(PRODUCCION), null);
-  assert.equal(scriptDeAnalitica({ ...PRODUCCION, VERCEL: "1" }), null);
   assert.equal(scriptDeAnalitica({ ...PRODUCCION, UMAMI_WEBSITE_ID: "s-1" }), null);
   assert.equal(scriptDeAnalitica({ ...PRODUCCION, ...VERCEL }), null);
   assert.equal(scriptDeAnalitica({ NODE_ENV: "development", ...UMAMI }), null);

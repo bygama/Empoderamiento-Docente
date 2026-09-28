@@ -137,3 +137,13 @@
   - **Quedan como están:** la imagen colgada si se redeploya el mismo commit (el
     runbook dice cómo podarla) y la entrada del VPS en el DECISIONS del padre
     (la sube el padre).
+- 2026-09-27 — **Ronda de cierre (r2 en PASS): el script de Vercel no exige el
+  token.** El padre: «El token y el proyecto sirven solo para la copia; Vercel
+  cuenta las visitas sin ellos. Con la regla de hoy, si ED sale en Vercel antes
+  de cargar el token, o en un Preview, no se cuenta ninguna visita, y eso no se
+  recupera.» La regla queda en dos partes: **la copia y Conexiones**
+  (`fuenteDeVisitas`), Umami con sus variables, si no Vercel en Vercel con el
+  token y el proyecto, si no ninguna; **el script** (`scriptDeAnalitica`),
+  Umami si la copia es de Umami, si no el de Vercel en Vercel sin exigir nada
+  más, si no ninguno. En Vercel sin el token, la fila de Vercel Analytics de
+  Conexiones dice que falta la copia pero que las visitas se están contando.

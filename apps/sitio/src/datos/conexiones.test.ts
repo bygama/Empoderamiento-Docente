@@ -55,6 +55,13 @@ test("de las visitas se muestra una sola fuente: la configurada, o la del host",
   assert.ok((await claves(fueraDeVercel)).includes("umami") && !(await claves(fueraDeVercel)).includes("vercel-analytics"));
 });
 
+test("en Vercel sin el token, falta la copia pero las visitas se cuentan", async () => {
+  const vercel = (await estadoDeLasConexiones("administra", { entorno: { VERCEL: "1" }, leer })).find((c) => c.clave === "vercel-analytics")!;
+  assert.deepEqual(vercel.faltan, ["VERCEL_TOKEN", "VERCEL_ANALYTICS_PROJECT_ID"]);
+  assert.match(vercel.sinConfigurar, /Falta la copia.*las visitas se están contando/);
+  assert.equal(vercel.conError, false);
+});
+
 test("Umami en Vercel avisa, y cuenta como error: su script ahí da 404", async () => {
   const umami = { UMAMI_API_URL: "https://umami.ed.test", UMAMI_API_KEY: "k", UMAMI_WEBSITE_ID: "s" };
   const deUmami = async (entorno: Record<string, string>) => (await estadoDeLasConexiones("administra", { entorno, leer })).find((c) => c.clave === "umami")!;

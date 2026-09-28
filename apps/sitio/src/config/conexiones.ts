@@ -32,8 +32,8 @@ export const CONEXIONES: readonly Conexion[] = [
     tareas: ["copia-de-visitas"],
     sinConfigurar: "Métricas no se actualiza.",
     mostrar: (entorno) => fuenteEsperada(entorno) === "umami",
-    // Con sus variables Umami es la fuente también en Vercel (una sola regla:
-    // lib/metricas/entorno.ts), pero su script lo sirve el proxy del VPS.
+    // Con sus variables Umami es la fuente también en Vercel
+    // (lib/metricas/entorno.ts), pero su script lo sirve el proxy del VPS.
     avisar: (entorno) =>
       entorno.VERCEL && fuenteDeVisitas(entorno) === "umami"
         ? "El sitio corre en Vercel, donde no hay proxy que sirva /umami/script.js: el script de Umami da 404 y no se cuenta ninguna visita. En Vercel, dejá vacías las variables de Umami."
@@ -45,7 +45,9 @@ export const CONEXIONES: readonly Conexion[] = [
     para: "Las visitas de Métricas, copiadas una vez por día.",
     variables: VARIABLES_DE_LA_FUENTE.vercel,
     tareas: ["copia-de-visitas"],
-    sinConfigurar: "Métricas no se actualiza.",
+    // Esta fila solo se muestra en Vercel, y ahí el script de Vercel carga sin
+    // el token (lib/metricas/script.ts): lo que falta es la copia, no la cuenta.
+    sinConfigurar: "Falta la copia y Métricas no se actualiza, pero las visitas se están contando: el script de Vercel carga igual.",
     mostrar: (entorno) => fuenteEsperada(entorno) === "vercel",
   },
   {
