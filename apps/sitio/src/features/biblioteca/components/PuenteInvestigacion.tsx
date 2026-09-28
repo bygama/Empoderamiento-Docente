@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RevealLines } from "@/components/ui/RevealLines";
@@ -12,7 +12,9 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { crearPuente } from "./puente-investigacion/coreografia-puente";
 import { numeroDeRecurso } from "./puente-investigacion/numero";
 import { PanelRecurso } from "./puente-investigacion/PanelRecurso";
+import { ALTO_PILA_LVH, crearPilaPuente } from "./puente-investigacion/pila-movil";
 import { PASO, TEMAS } from "./puente-investigacion/temas";
+import { useModoPuente } from "./puente-investigacion/useModoPuente";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -50,19 +52,21 @@ export function PuenteInvestigacion({ contenido }: { contenido: Puente }) {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const pilaRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
-  const [live, setLive] = useState(false);
+  const rootRef = useRef<HTMLElement | null>(null);
+  // El modo (vivo en escritorio, pila en celular y tablet, estático con
+  // movimiento reducido o pantalla baja) se decide entero en cada corrida
+  // (puente-investigacion/useModoPuente.ts). Gate primero, GSAP después
+  // (efecto aparte): así el layout ya está aplicado cuando se mide.
+  const modo = useModoPuente(reduced);
+  const live = modo === "vivo";
+  const movil = modo === "movil";
 
-  // Gate primero, GSAP después (efecto aparte): así el layout live ya está
-  // aplicado cuando medimos posiciones — con el layout estático los paneles
-  // no tienen offset y el paso mediría 0.
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    // 1024, no 768: cada lomo mide 52px mínimo, así que los 4 se comen 208px.
-    // En tablet el panel abierto quedaba con ~180px por columna y el texto se
-    // amontonaba contra la foto. Abajo de eso va la pila estática.
-    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) return;
-    setLive(true);
-  }, [reduced]);
+    if (!movil) return;
+    const root = rootRef.current;
+    if (!root) return;
+    return crearPilaPuente(root);
+  }, [movil]);
 
   useIsomorphicLayoutEffect(() => {
     if (!live) return;
@@ -75,24 +79,36 @@ export function PuenteInvestigacion({ contenido }: { contenido: Puente }) {
 
   return (
     <section
+      ref={rootRef}
+      data-modo={modo}
       id="puente-investigacion"
       data-indice="Investigación"
       className="relative bg-white pb-16 md:pb-24"
       aria-label="Conexión con Investigación"
     >
-      <div ref={zoneRef} className={live ? "h-[430svh]" : ""}>
+      <div
+        ref={zoneRef}
+        data-puente-pista
+        className={live ? "h-[430svh]" : ""}
+        style={movil ? { height: `${ALTO_PILA_LVH}lvh` } : undefined}
+      >
         <div
           ref={stageRef}
+          data-puente-escena
           className={
             // Clip solo en X: frena a los paneles que asoman por la derecha
             // (sin scrollbar horizontal) pero deja respirar la sombra de las
             // cards hacia abajo — con clip total quedaba cortada en seco al
             // borde del escenario.
-            live ? "sticky top-0 isolate flex h-[100svh] flex-col overflow-x-clip" : ""
+            live
+              ? "sticky top-0 isolate flex h-[100svh] flex-col overflow-x-clip"
+              : movil
+                ? "sticky top-0 isolate flex h-lvh flex-col overflow-x-clip"
+                : ""
           }
         >
           {/* Encabezado: queda a la vista durante toda la escena. */}
-          <div className="mx-auto w-full max-w-screen-xl px-5 pt-20 pb-8 md:px-10 md:pt-24 md:pb-10">
+          <div className="mx-auto w-full max-w-screen-xl px-5 pt-20 pb-8 md:px-10 md:pt-24 md:pb-10 max-lg:pt-[5.25rem] max-lg:pb-5">
             <div className="md:grid md:grid-cols-12 md:items-end md:gap-x-8">
               <RevealLines
                 as="h2"
@@ -115,19 +131,20 @@ export function PuenteInvestigacion({ contenido }: { contenido: Puente }) {
           <div
             className={
               "mx-auto w-full max-w-screen-xl px-5 md:px-10 " +
-              (live ? "min-h-0 flex-1 pb-[3.5svh]" : "pb-4")
+              (live ? "min-h-0 flex-1 pb-[3.5svh]" : movil ? "min-h-0 flex-1 pb-4" : "pb-4")
             }
           >
             <div
               ref={pilaRef}
-              className={live ? "relative h-full" : "flex flex-col gap-5"}
+              data-puente-pila
+              className={live || movil ? "relative h-full" : "flex flex-col gap-5"}
               style={{ "--pila-paso": PASO } as React.CSSProperties}
             >
               {/* La key es el número del recurso y no su nombre: la lista es
                   fija y no se reordena, y dos nombres iguales cargados en el
                   admin no pueden repetirla. */}
               {recursos.map((recurso, i) => (
-                <PanelRecurso key={numeroDeRecurso(i)} recurso={recurso} tema={temaDe(i)} i={i} total={recursos.length} live={live} />
+                <PanelRecurso key={numeroDeRecurso(i)} recurso={recurso} tema={temaDe(i)} i={i} total={recursos.length} live={live} movil={movil} />
               ))}
             </div>
           </div>
