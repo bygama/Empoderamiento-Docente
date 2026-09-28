@@ -5,13 +5,16 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { irAPosicion } from "@/lib/indice";
 import { acoplarLamina } from "./acople-lamina";
 import type { MiradaDeQuienesSomos } from "@/features/quienes-somos/contenido/mirada";
 import { partirResaltado } from "@/lib/contenido/resaltado";
 import { armarPerspectivas } from "./mirada/constelacion-mirada";
 import { leerEscena, prepararEstados } from "./mirada/setup-estados";
 import { crearTimelineFases } from "./mirada/timeline-fases";
+import { crearMapaMovil } from "./mirada/mapa-movil";
 import { MapaConstelacion } from "./mirada/MapaConstelacion";
+import { MapaMovil } from "./mirada/MapaMovil";
 import { DetallePerspectiva } from "./mirada/DetallePerspectiva";
 import { FichasPerspectiva } from "./mirada/FichasPerspectiva";
 import { SintesisMirada } from "./mirada/SintesisMirada";
@@ -69,14 +72,40 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   const [live, setLive] = useState(false);
+  const [modoMovil, setModoMovil] = useState(false);
 
   // La escena solo con puntero fino y ancho desktop real: a 768 los labels
-  // de los nodos ya se montaban sobre la zona de lectura.
+  // de los nodos ya se montaban sobre la zona de lectura. Bajo `lg` (o sin
+  // hover) se sirve el mapa fijo (`modoMovil`) en su lugar. Se suscribe al
+  // `change` de ambas media queries para recalcular al rotar el dispositivo.
   useIsomorphicLayoutEffect(() => {
-    if (reduced) return;
-    if (!window.matchMedia("(hover: hover) and (min-width: 1024px)").matches) return;
-    setLive(true);
+    const decidir = () => {
+      if (reduced) {
+        setLive(false);
+        setModoMovil(false);
+        return;
+      }
+      const vivo = window.matchMedia("(hover: hover) and (min-width: 1024px)").matches;
+      setLive(vivo);
+      setModoMovil(!vivo && window.matchMedia("(max-width: 63.999rem)").matches);
+    };
+    decidir();
+    const mqVivo = window.matchMedia("(hover: hover) and (min-width: 1024px)");
+    const mqMovil = window.matchMedia("(max-width: 63.999rem)");
+    mqVivo.addEventListener("change", decidir);
+    mqMovil.addEventListener("change", decidir);
+    return () => {
+      mqVivo.removeEventListener("change", decidir);
+      mqMovil.removeEventListener("change", decidir);
+    };
   }, [reduced]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!modoMovil) return;
+    const root = rootRef.current;
+    if (!root) return;
+    return crearMapaMovil(root);
+  }, [modoMovil]);
 
   useIsomorphicLayoutEffect(() => {
     if (!live) return;
@@ -113,6 +142,7 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
       ref={rootRef}
       id="mirada"
       data-indice="Nuestra mirada"
+      data-mirada-modo={live ? "vivo" : modoMovil ? "movil" : "quieto"}
       // Desde el navbar se aterriza al final de la escena (ver irASeccion):
       // en el borde de arriba la pantalla está en blanco.
       data-aterrizaje="fin"
@@ -158,6 +188,18 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
               {titulo.despues}
             </h2>
           </div>
+
+          {modoMovil && (
+            <MapaMovil
+              perspectivas={perspectivas}
+              onIr={(i) => {
+                const el = rootRef.current?.querySelector<HTMLElement>(`[data-detalle="${i}"]`);
+                // 160px ≈ header (4.75rem) + mapa fijo (~5rem) + aire: sin este
+                // offset el título queda tapado por ambos, sticky por encima.
+                if (el) irAPosicion(el.getBoundingClientRect().top + window.scrollY - 160);
+              }}
+            />
+          )}
 
           {/* ── Zonas de lectura + fichas por principio ───────────────────── */}
           {perspectivas.map((p, i) => (
