@@ -72,7 +72,7 @@ export function crearHero(scope: HTMLElement) {
       gsap.to(outer, {
         y: extra,
         ease: "none",
-        scrollTrigger: { trigger: scope, start: "top top", end: "bottom top", scrub: true },
+        scrollTrigger: { trigger: scope, start: "top top", end: "bottom top", scrub: 0.5 },
       });
     });
 

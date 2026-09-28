@@ -26,7 +26,7 @@ export function prepararPanel(root: HTMLElement, { panel, lamina, photoFrames, n
       x: 0,
       rotate: 0,
       ease: "none",
-      scrollTrigger: { trigger: root, start: "top 82%", end: "top top", scrub: true },
+      scrollTrigger: { trigger: root, start: "top 82%", end: "top top", scrub: 0.5 },
     },
   );
 }

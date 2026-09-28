@@ -80,7 +80,7 @@ export function crearDestacados({ root, row, slot, artsWrap, items, setActivo }:
           trigger: wrap,
           start: "top 95%",
           end: "top 30%",
-          scrub: true,
+          scrub: 0.5,
           invalidateOnRefresh: true,
         },
       }).to(imgs, {
@@ -133,7 +133,7 @@ export function crearDestacados({ root, row, slot, artsWrap, items, setActivo }:
           trigger: wrap,
           start: "bottom 70%",
           end: "bottom 55%",
-          scrub: true,
+          scrub: 0.5,
           invalidateOnRefresh: true,
         },
       });

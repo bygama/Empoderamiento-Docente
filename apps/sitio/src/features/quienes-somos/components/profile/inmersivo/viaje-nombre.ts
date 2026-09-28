@@ -109,7 +109,7 @@ export function crearTransformacionHero(r: RefsPerfil, st: St, m: MedidasNombre)
     opacity: 0,
     y: -34,
     ease: "none",
-    scrollTrigger: st({ trigger: r.hero.current, start: "top top", end: "30% top", scrub: true }),
+    scrollTrigger: st({ trigger: r.hero.current, start: "top top", end: "30% top", scrub: 0.5 }),
   });
 
   // ── SIDEBAR (índice vivo): nace recién cuando el hero ya se retiró ──
@@ -119,13 +119,13 @@ export function crearTransformacionHero(r: RefsPerfil, st: St, m: MedidasNombre)
       autoAlpha: 1,
       x: 0,
       ease: "none",
-      scrollTrigger: st({ trigger: r.track.current, start: "top 55%", end: "top 28%", scrub: true }),
+      scrollTrigger: st({ trigger: r.track.current, start: "top 55%", end: "top 28%", scrub: 0.5 }),
     });
     // …y se SINTETIZA al llegar a la convergencia (queda solo la identidad).
     gsap.to(r.sidebar.current, {
       autoAlpha: 0,
       ease: "none",
-      scrollTrigger: st({ trigger: r.closing.current, start: "top 62%", end: "top 26%", scrub: true }),
+      scrollTrigger: st({ trigger: r.closing.current, start: "top 62%", end: "top 26%", scrub: 0.5 }),
     });
   }
 }

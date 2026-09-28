@@ -54,7 +54,7 @@ export function CierreNovedades({ contenido, redes }: { contenido: CierreDeNoved
           scale: 1,
           y: 0,
           ease: "none",
-          scrollTrigger: { trigger: root, start: "top 92%", end: "top 45%", scrub: true },
+          scrollTrigger: { trigger: root, start: "top 92%", end: "top 45%", scrub: 0.5 },
         },
       );
       // La bola entra al entrar la tarjeta, mismo gesto que en el hero.
