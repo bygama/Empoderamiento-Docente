@@ -805,6 +805,14 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
    La pista es alta y la escena —título, puntitos y pila— queda fija
    mientras se recorre. En escritorio la pista y la escena son
    `display: contents` y no existen. */
+/* La sección se monta sobre el final del faro, como en escritorio
+   (`lg:-mt-[100svh]`) pero apenas: el deslumbre lava la pantalla a blanco
+   en el último tramo de su pista, y el título con la ficha suben sobre ese
+   blanco en vez de esperar a que pase entero. Sin esto, entre el faro y la
+   pila había un viewport vacío que parecía el final de la página. */
+[data-mirada].is-pila {
+  margin-top: -30lvh;
+}
 [data-mirada].is-pila [data-mirada-pista] {
   display: block;
   height: var(--mirada-pista-alto, 420lvh);
