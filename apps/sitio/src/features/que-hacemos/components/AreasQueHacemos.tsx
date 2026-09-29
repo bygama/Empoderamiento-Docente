@@ -46,7 +46,11 @@ export function AreasQueHacemos({ contenido }: { contenido: AreasDeQueHacemos })
 
   const zonaRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
-  const { abierta, alternar } = useDesplegableAreas(IDS_AREAS);
+  const { abierta, alternar, abrir } = useDesplegableAreas(IDS_AREAS);
+  // El índice (también la franja de celular) marca la que se está LEYENDO,
+  // no la que está abierta: abrir la 05 y seguir bajando hasta la 07 tiene
+  // que mover el chip (Gastón, 2026-09-29). Tocar un chip lleva la lectura
+  // hasta esa área, así que también queda marcada.
 
   // El aterrizaje del título (areas/coreografia-titulo.ts): solo en desktop,
   // donde el índice va al costado; en celular y con reduced motion el título
@@ -108,12 +112,16 @@ export function AreasQueHacemos({ contenido }: { contenido: AreasDeQueHacemos })
           {/* La celda es estática y la caja de adentro es la sticky: la
               coreografía mide la posición natural del título con la celda
               (que no se mueve) y no con la caja (que sí). */}
-          <div data-areas-celda>
+          {/* Bajo lg la celda y la caja no existen (`contents`): así la
+              franja del índice, pegada, tiene como caja de referencia toda
+              la columna de artículos y no la celda chica (un sticky solo
+              recorre lo que mide su contenedor). */}
+          <div data-areas-celda className="max-lg:contents">
             <div
               data-areas-caja
-              className="lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col lg:justify-center"
+              className="max-lg:contents lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col lg:justify-center"
             >
-              <IndiceAreas activa={activa} titulo={contenido.titulo} areas={contenido.areas} />
+              <IndiceAreas activa={activa} titulo={contenido.titulo} areas={contenido.areas} onElegir={abrir} />
             </div>
           </div>
 

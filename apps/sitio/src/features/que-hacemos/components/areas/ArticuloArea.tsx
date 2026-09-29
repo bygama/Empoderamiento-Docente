@@ -49,15 +49,17 @@ export function ArticuloArea({
       // artículo va en una columna, con la foto abajo en 16/9. En celular es
       // una columna flexible para poder poner la foto entre el nombre y el
       // texto (order).
-      className="border-azul-principal/10 scroll-mt-28 border-t py-12 first:border-t-0 first:pt-0 max-lg:flex max-lg:flex-col max-lg:py-0! md:py-16 xl:grid xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] xl:gap-12"
+      // Bajo lg el ancla aterriza debajo de la franja pegada del índice
+      // (header + título + chips, 180 px), no solo debajo del header.
+      className="border-azul-principal/10 scroll-mt-28 border-t py-12 first:border-t-0 first:pt-0 max-lg:flex max-lg:flex-col max-lg:scroll-mt-[11.5rem] max-lg:py-0! md:py-16 xl:grid xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] xl:gap-12"
     >
       <div className="max-lg:contents">
-        {/* Abierta, la cabecera queda pegada arriba mientras se lee el área
-            (debajo del logo y el menú, que flotan), con la flecha para
-            cerrarla. */}
+        {/* Abierta, la cabecera queda separada del cuerpo por una línea. Ya
+            no se pega arriba: lo que se pega mientras se lee es la franja
+            con el índice (IndiceAreas), que marca el área abierta. */}
         <div
           data-area-cabecera
-          className={`relative max-lg:order-1 max-lg:flex max-lg:items-start max-lg:gap-4 max-lg:py-5 ${abierta ? "max-lg:border-azul-principal/10 max-lg:sticky max-lg:top-[4.75rem] max-lg:z-10 max-lg:border-b max-lg:bg-white" : ""}`}
+          className={`relative max-lg:order-1 max-lg:flex max-lg:items-start max-lg:gap-4 max-lg:py-5 ${abierta ? "max-lg:border-azul-principal/10 max-lg:border-b" : ""}`}
         >
           <div className="min-w-0 flex-1">
             <p className="font-mono text-[0.78rem] tracking-[0.18em] text-gris-texto uppercase">Área 0{i + 1}</p>
