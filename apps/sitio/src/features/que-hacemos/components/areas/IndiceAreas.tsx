@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { AreaDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import { fragmentos } from "@/lib/contenido/resaltado";
 import { idDeArea } from "./anclas";
@@ -8,32 +9,72 @@ import { idDeArea } from "./anclas";
  * sólo dónde estás. Va con el borde de CADA ítem y no con una barra de
  * altura en porcentaje: los rótulos no miden todos igual y un porcentaje
  * cortaría a mitad de uno. Fuera del componente para no anidar ternarios en
- * medio del markup.
+ * medio del markup. Bajo lg el mismo relleno va en el borde del chip.
  */
 function clasesDelItem(recorrido: boolean, activo: boolean) {
   const riel = recorrido
-    ? "lg:border-verde-concepto"
-    : "lg:border-azul-principal/10";
+    ? "max-lg:border-verde-concepto/60 lg:border-verde-concepto"
+    : "border-azul-principal/15 lg:border-azul-principal/10";
   if (activo) {
-    return `${riel} border-azul-principal bg-azul-principal text-white lg:bg-transparent lg:font-semibold lg:text-azul-principal`;
+    return "border-azul-principal bg-azul-principal text-white lg:border-verde-concepto lg:bg-transparent lg:font-semibold lg:text-azul-principal";
   }
-  const base =
-    "border-azul-principal/15 text-gris-texto hover:border-azul-principal/40 hover:text-azul-principal";
-  return `${riel} ${base} ${recorrido ? "lg:text-azul-principal/55" : ""}`;
+  const base = "text-gris-texto hover:border-azul-principal/40 hover:text-azul-principal";
+  return `${riel} ${base} ${recorrido ? "max-lg:text-azul-principal/80 lg:text-azul-principal/55" : ""}`;
 }
 
 /**
  * El título y el índice de las áreas: al costado en desktop. En celular y
- * tablet el índice no va: la lista de desplegables ya es el índice
- * (ArticuloArea), y el título crece a título de sección. Los
- * `data-areas-*` son los que mueve la coreografía del aterrizaje
- * (coreografia-titulo.ts); sin ella todo se ve en su lugar. El `nav` se
- * nombra con el título (`aria-labelledby`): si alguien lo edita, el nombre
- * lo sigue.
+ * tablet el índice es una FRANJA PEGADA arriba mientras dura la sección:
+ * los siete chips en un riel, el abierto relleno de azul, los ya leídos con
+ * el borde verde. La franja arranca en `top: 0` con el alto del header como
+ * padding, así el logo y el menú flotan sobre blanco y no sobre la foto o
+ * el texto que pasa por debajo (Gastón, 2026-09-29). Tocar un chip abre esa
+ * área y la deja justo debajo de la franja (`onElegir`). Los `data-areas-*`
+ * son los que mueve la coreografía del aterrizaje de escritorio
+ * (coreografia-titulo.ts); sin ella todo se ve en su lugar.
+ * El `nav` se nombra con el título (`aria-labelledby`): si alguien lo
+ * edita, el nombre lo sigue.
  */
-export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo: string; areas: readonly AreaDeQueHacemos[] }) {
+export function IndiceAreas({
+  activa,
+  titulo,
+  areas,
+  onElegir,
+}: {
+  activa: number;
+  titulo: string;
+  areas: readonly AreaDeQueHacemos[];
+  onElegir?: (i: number) => void;
+}) {
+  const rielRef = useRef<HTMLOListElement | null>(null);
+
+  // El riel se corre solo para acercar el chip activo al centro, moviendo
+  // SOLO el riel (nunca la página); el snap por proximidad lo acomoda al
+  // borde de un chip. En escritorio el índice es una columna sin scroll y
+  // esto no hace nada. Se mide por rectángulos y no por offsetLeft: el
+  // offsetParent del chip depende de qué ancestro esté posicionado.
+  useEffect(() => {
+    const riel = rielRef.current;
+    if (!riel || riel.scrollWidth <= riel.clientWidth) return;
+    const chip = riel.querySelector<HTMLElement>("[aria-current]");
+    if (!chip) return;
+    const suave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const r = riel.getBoundingClientRect();
+    const c = chip.getBoundingClientRect();
+    const izquierda = c.left - r.left + riel.scrollLeft - (r.width - c.width) / 2;
+    riel.scrollTo({ left: Math.max(0, izquierda), behavior: suave ? "smooth" : "auto" });
+  }, [activa]);
+
   return (
-    <>
+    // La FRANJA: bajo lg el título y el índice van juntos, pegados en top 0
+    // con el alto del header de padding (el piso del logo y el menú); a lo
+    // ancho sale de los márgenes del contenedor (-mx) y los repone adentro
+    // (px). En escritorio no existe (`contents`): título e índice quedan en
+    // la columna del costado como siempre.
+    <div
+      data-areas-banda
+      className="max-lg:sticky max-lg:top-0 max-lg:z-20 max-lg:-mx-5 max-lg:border-b max-lg:border-azul-principal/10 max-lg:bg-white/95 max-lg:px-5 max-lg:pt-[4.75rem] max-lg:pb-2 max-lg:backdrop-blur-md md:max-lg:-mx-10 md:max-lg:px-10 lg:contents"
+    >
       {/* El titular volvió el 2026-09-11 (el usuario: «falta el título a
           la izquierda antes de las áreas»). El owner lo había sacado con
           la bajada el 2026-09-09 y quedaba un h2 invisible, que además
@@ -46,11 +87,17 @@ export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo:
           celeste, no resaltada): azul-claro, el celeste del sistema,
           sobre blanco da 1,8:1 y no pasa; azul-medio sí (5,1:1). La
           bajada no vuelve. Desde el 2026-09-16 además ATERRIZA: entra
-          grande en el centro y se encoge hasta acá (el mismo elemento). */}
+          grande en el centro y se encoge hasta acá (el mismo elemento).
+          Bajo lg vive en la franja pegada, en un renglón (si alguien lo
+          alarga desde el admin, se corta con puntos suspensivos en vez de
+          correr la página de costado); en las pantallas
+          más angostas baja un punto para no invadir el margen, y en un
+          celular apaisado (alto ≤ 480px) se esconde: ahí la franja con el
+          título dejaba menos de la mitad de la pantalla para leer. */}
       <h2
         id="areas-titulo"
         data-areas-titulo
-        className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance max-lg:text-azul-principal max-lg:text-[clamp(1.9rem,1.4rem+2vw,2.5rem)] max-lg:font-extrabold max-lg:tracking-[-0.03em] lg:text-[1.5rem]"
+        className="text-gris-texto font-display text-[1.35rem] font-semibold tracking-[-0.01em] text-balance max-lg:text-azul-principal max-lg:text-[1.6rem] max-lg:font-extrabold max-lg:tracking-[-0.025em] max-lg:truncate max-[340px]:text-[1.4rem]! [@media(max-height:480px)_and_(max-width:63.999rem)]:sr-only! lg:text-[1.5rem]"
         style={{ lineHeight: 1.2 }}
       >
         {fragmentos(titulo).map((f) =>
@@ -63,8 +110,11 @@ export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo:
           ),
         )}
       </h2>
-      <nav aria-labelledby="areas-titulo" className="mt-5 max-lg:hidden lg:mt-6 lg:w-full">
-        <ol className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3 lg:relative lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0">
+      <nav aria-labelledby="areas-titulo" className="mt-5 max-lg:mt-3 lg:mt-6 lg:w-full">
+        <ol
+          ref={rielRef}
+          className="scrollbar-none -mx-5 flex gap-2 overflow-x-auto px-5 pb-3 max-lg:snap-x max-lg:snap-proximity max-lg:scroll-px-5 max-lg:pb-2 md:max-lg:-mx-10 md:max-lg:scroll-px-10 md:max-lg:px-10 lg:relative lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0"
+        >
           {/* El riel que se dibuja de un trazo mientras el título aterriza,
               debajo de los bordes de los ítems (que lo pintan de verde o
               gris al aparecer). Solo desktop, que es donde hay riel. */}
@@ -77,11 +127,19 @@ export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo:
             const activo = i === activa;
             const recorrido = i <= activa;
             return (
-              <li key={idDeArea(i)} data-areas-item className="shrink-0">
+              <li key={idDeArea(i)} data-areas-item className="shrink-0 max-lg:snap-start">
                 <a
                   href={`#${idDeArea(i)}`}
                   aria-current={activo ? "true" : undefined}
-                  className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
+                  onClick={(e) => {
+                    // Bajo lg el chip abre el área y la acomoda bajo la
+                    // franja; el ancla del href queda para escritorio y
+                    // para sin JS.
+                    if (!onElegir || !window.matchMedia("(max-width: 63.999rem)").matches) return;
+                    e.preventDefault();
+                    onElegir(i);
+                  }}
+                  className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none max-lg:min-h-11 max-lg:px-4 lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
                 >
                   <span
                     className={`font-mono text-[0.72rem] tabular-nums transition-opacity duration-300 motion-reduce:transition-none ${recorrido ? "opacity-90" : "opacity-50"}`}
@@ -97,6 +155,6 @@ export function IndiceAreas({ activa, titulo, areas }: { activa: number; titulo:
           })}
         </ol>
       </nav>
-    </>
+    </div>
   );
 }
