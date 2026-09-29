@@ -51,16 +51,18 @@ export function crearPilaMirada(root: HTMLElement) {
     gsap.set(cartas, { willChange: "transform, opacity" });
     gsap.set(cartas.slice(1), { y: () => escena.clientHeight });
 
-    // La entrada: el título y el primer panel suben mientras la sección llega.
+    // La entrada: el título y los puntitos ya se ven desde el primer píxel
+    // que asoma (antes entraban invisibles y se leían recién con la sección
+    // al 80 % de la pantalla: un viewport que parecía vacío). El primer panel
+    // sube apenas, en el primer tramo corto de la llegada.
     gsap.fromTo(
-      [titulo, cartas[0]],
+      cartas[0],
       { autoAlpha: 0, y: 24 },
       {
         autoAlpha: 1,
         y: 0,
-        stagger: 0.12,
         ease: "power2.out",
-        scrollTrigger: { trigger: pista, start: "top 80%", end: "top 20%", scrub: 0.6 },
+        scrollTrigger: { trigger: pista, start: "top 100%", end: "top 72%", scrub: 0.6 },
       },
     );
 
