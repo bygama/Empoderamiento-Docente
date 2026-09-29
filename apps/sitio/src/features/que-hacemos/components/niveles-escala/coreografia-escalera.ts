@@ -17,6 +17,15 @@ const RESPIRO = 0.9;
 const NIVELES = 5;
 /** Cuando la cinta toca el nodo k. */
 const toca = (k: number) => CINTA + 0.35 + k * TRAMO;
+/**
+ * El REMATE: con el quinto encendido y su tarjeta adentro, la cinta sigue un
+ * último tramo hasta un nodo final, al centro, y a su lado vuelve la frase
+ * de la apertura, chica: «Del aula al sistema educativo.» cierra el
+ * recorrido micro → macro. Va dentro del respiro que antes no hacía nada
+ * (Gastón, 2026-09-29: la cinta terminaba en una cola colgada al borde).
+ */
+const REMATE = toca(NIVELES - 1) + 0.6;
+const TOCA_REMATE = REMATE + 0.5;
 const FIN = toca(NIVELES - 1) + 0.6 + RESPIRO;
 /** Scroll por unidad, en lvh. */
 const LVH_POR_UNIDAD = 48;
@@ -46,7 +55,12 @@ export function crearEscalera(zona: HTMLElement) {
   const nodos = q<HTMLElement>("[data-esc-nodo]");
   const luces = q<HTMLElement>("[data-esc-luz]");
   const niveles = q<HTMLElement>("[data-esc-nivel]");
-  if (!escalera || !riel || !cinta || !punta || !frase || !cabecera || nodos.length !== NIVELES) return () => {};
+  const remate = zona.querySelector<HTMLElement>("[data-esc-remate]");
+  const remateNodo = zona.querySelector<HTMLElement>("[data-esc-remate-nodo]");
+  const remateFrase = zona.querySelector<HTMLElement>("[data-esc-remate-frase]");
+  if (!escalera || !riel || !cinta || !punta || !frase || !cabecera || !remate || !remateNodo || !remateFrase || nodos.length !== NIVELES) {
+    return () => {};
+  }
 
   // El camino y cuánto mide hasta cada nodo, medidos sobre el layout real.
   const camino = { largo: 1, hasta: [] as number[] };
@@ -61,10 +75,13 @@ export function crearEscalera(zona: HTMLElement) {
       gsap.set(nivel, { scale: escala, transformOrigin: k % 2 === 0 ? "0% 50%" : "100% 50%" });
     });
     const caja = escalera.getBoundingClientRect();
-    const p: Punto[] = nodos.map((n) => {
+    // Los cinco nodos y, último, el del remate.
+    const p: Punto[] = [...nodos, remateNodo].map((n) => {
       const r = n.getBoundingClientRect();
       return { x: r.left + r.width / 2 - caja.left, y: r.top + r.height / 2 - caja.top };
     });
+    // Entra por arriba y termina en el nodo del remate (el último punto): ya
+    // no cae hasta el borde de la caja, que quedaba como una cola colgada.
     let d = `M${p[0].x},0 L${p[0].x},${p[0].y}`;
     const tramos = [d];
     for (let k = 0; k + 1 < p.length; k++) {
@@ -73,7 +90,6 @@ export function crearEscalera(zona: HTMLElement) {
       d += c;
       tramos.push(d);
     }
-    d += ` L${p[p.length - 1].x},${caja.height}`;
     riel.setAttribute("d", d);
     cinta.setAttribute("d", d);
     camino.largo = cinta.getTotalLength();
@@ -88,23 +104,27 @@ export function crearEscalera(zona: HTMLElement) {
   medir();
 
   // Cuánto de la cinta está dibujado a cada tiempo: interpolado entre nodos.
+  // Suave dentro de cada tramo: frena al llegar a cada nodo.
+  const suave = (p: number) => p * p * (3 - 2 * p);
   const dibujado = (t: number) => {
     if (t <= CINTA) return 0;
-    const fin = toca(NIVELES - 1) + 0.6;
-    if (t >= fin) return camino.largo;
+    if (t >= TOCA_REMATE) return camino.largo;
     if (t <= toca(0)) return camino.hasta[0] * ((t - CINTA) / (toca(0) - CINTA));
     let k = 0;
     while (k + 1 < NIVELES && t >= toca(k + 1)) k++;
     const desde = camino.hasta[k];
-    const hacia = k + 1 < NIVELES ? camino.hasta[k + 1] : camino.largo;
-    const hasta = k + 1 < NIVELES ? toca(k + 1) : fin;
-    const p = (t - toca(k)) / (hasta - toca(k));
-    // Suave dentro de cada tramo: frena al llegar a cada nodo.
-    return desde + (hacia - desde) * (p * p * (3 - 2 * p));
+    if (k === NIVELES - 1) {
+      // En el quinto la cinta espera a que entre su tarjeta y recién
+      // después sigue hasta el remate.
+      if (t <= REMATE) return desde;
+      return desde + (camino.largo - desde) * suave((t - REMATE) / (TOCA_REMATE - REMATE));
+    }
+    const hacia = camino.hasta[k + 1];
+    return desde + (hacia - desde) * suave((t - toca(k)) / (toca(k + 1) - toca(k)));
   };
 
   const ctx = gsap.context(() => {
-    gsap.set(nodos, { scale: 0.5, transformOrigin: "50% 50%" });
+    gsap.set([...nodos, remateNodo], { scale: 0.5, transformOrigin: "50% 50%" });
     const creada: { tl?: gsap.core.Timeline } = {};
     const tl = gsap.timeline({
       defaults: { ease: "power2.out" },
@@ -139,6 +159,12 @@ export function crearEscalera(zona: HTMLElement) {
         .to(luces[k], { opacity: 1, duration: 0.3 }, toca(k))
         .fromTo(nivel, { autoAlpha: 0, x: lado }, { autoAlpha: 1, x: 0, duration: 0.5 }, toca(k));
     });
+    // El remate: la cinta toca el nodo final y la frase vuelve, chica. El
+    // contenedor solo se funde: si se trasladara, el nodo (contra el que se
+    // mide el camino) cambiaría de lugar según cuándo mida `medir`.
+    tl.to(remateNodo, { scale: 1, duration: 0.3 }, TOCA_REMATE)
+      .fromTo(remate, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, TOCA_REMATE - 0.05)
+      .fromTo(remateFrase, { y: 10 }, { y: 0, duration: 0.4 }, TOCA_REMATE - 0.05);
     tl.set({}, {}, FIN);
     cinta.style.strokeDashoffset = String(camino.largo);
   }, zona);
