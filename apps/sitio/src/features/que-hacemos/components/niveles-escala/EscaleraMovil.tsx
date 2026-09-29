@@ -86,8 +86,9 @@ export function EscaleraMovil({ contenido, frase }: { contenido: NivelesDeQueHac
           </p>
         </div>
 
-        {/* La escalera: cinco renglones iguales, alternando de lado. */}
-        <div data-esc-escalera className="relative mt-4 grid min-h-0 flex-1 grid-rows-5 gap-2">
+        {/* La escalera: cinco renglones iguales, alternando de lado, y abajo
+            el renglón del remate, a su medida. */}
+        <div data-esc-escalera className="relative mt-4 grid min-h-0 flex-1 grid-rows-[repeat(5,minmax(0,1fr))_auto] gap-2">
           <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
             <path data-esc-riel fill="none" strokeWidth="12" strokeLinecap="round" className="stroke-azul-claro/35" />
             <path data-esc-cinta fill="none" strokeWidth="12" strokeLinecap="round" className="stroke-azul-medio" />
@@ -121,6 +122,29 @@ export function EscaleraMovil({ contenido, frase }: { contenido: NivelesDeQueHac
               </div>
             );
           })}
+          {/* El REMATE: la cinta termina acá, en un nodo lleno al centro, y
+              al lado vuelve la frase de la apertura, chica: cierra el
+              recorrido micro → macro en vez de dejar la cinta colgada. */}
+          {/* Alineado a la columna de los nodos de la izquierda (01, 03, 05):
+              centrado, la frase rozaba el botón fijo de «Volver arriba» en
+              pantallas angostas. El nodo no se anima: la cinta se mide
+              contra él; lo que entra es la frase. */}
+          <div data-esc-remate className="relative flex items-center justify-start gap-3 pt-2 pb-1 pl-[0.9rem]" style={{ opacity: 0 }}>
+            <span
+              data-esc-remate-nodo
+              aria-hidden="true"
+              className="border-azul-medio bg-verde-concepto h-4 w-4 shrink-0 rounded-full border-[3px]"
+            />
+            {/* La misma frase de la apertura (la frase editable de Niveles),
+                en un renglón: en la apertura la segunda línea va aparte. */}
+            <p
+              data-esc-remate-frase
+              aria-hidden="true"
+              className="font-display text-azul-principal text-[1.05rem] font-bold tracking-[-0.02em] whitespace-nowrap"
+            >
+              {contenido.frase.primeraLinea} <span className="text-verde-concepto-texto">{contenido.frase.segundaLinea}</span>
+            </p>
+          </div>
         </div>
       </div>
     </section>
