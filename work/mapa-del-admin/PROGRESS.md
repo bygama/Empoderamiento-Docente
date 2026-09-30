@@ -453,6 +453,20 @@
   Vercel, con TTL 60 s) a la IP del VPS, y Resend, para que el admin mande el
   segundo factor. El cron diario sale con 500 mientras falte Search Console: las
   dos tareas de Google fallan en llano.
+- 2026-09-30 — **El VPS, al día.** `desplegar.sh` con `bddc04df` (el scrub de
+  Facundo, la 404 del admin y la migración `correcciones_del_equipo`, aplicada).
+  Tres respaldos diarios en el VPS (09-28 a 09-30) y el cron corriendo cada día.
+  La contraseña de root, que pasó por el chat, cambiada por una aleatoria que
+  solo está en la máquina de Mateo. La capa 3 de los respaldos, automática: una
+  tarea programada de Windows en la máquina de Mateo espeja `~/ed/respaldos`
+  cada día a las 12:00 (copia lo que falta y borra lo que el VPS ya rotó, para
+  que la retención de los CV valga también afuera).
+
+  **El DNS no se cambia todavía:** Vercel sirve hoy `release/movil-2026-09-28`
+  de Gastón, la adaptación a celular y tablet que main no tiene (su `ENTREGA.md`
+  §4.6: un porte a los componentes que leen de la base, lane propia con
+  Facundo). Pasar el dominio al VPS antes de ese porte le saca al sitio público
+  la versión de celular.
 
 ## Hecho
 
@@ -462,9 +476,8 @@
 - Antes del primer deploy de lo nuevo: Resend configurado y probado (sin mail,
   dirige y administra no entran: segundo factor de la 3b); verificar en
   Vercel cómo llega `X-Forwarded-For` (nota de la lane 2).
-- `scrub: true` en 11 coreografías de 8 archivos del sitio (HeroQuienes, Hero,
-  Biblioteca, Investigación), contra AGENTS.md §8: una lane propia con
-  verificación visual de cada coreografía, fuera del mapa del admin.
+- El cambio de DNS, después del porte de la versión de celular a main (entrada
+  del 2026-09-30).
 - `origen-03-pregunta.webp` está dos veces (`public/fotos/` para Quiénes
   somos y `public/quienes-somos/` para una novedad): deduplicar en la lane 9
   (Fotos), cuando se consolide dónde vive cada archivo.
