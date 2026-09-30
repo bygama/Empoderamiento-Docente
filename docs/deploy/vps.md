@@ -161,6 +161,92 @@ sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io doc
 sudo usermod -aG docker deploy   # y volvé a entrar por SSH
 ```
 
+### Endurecer
+
+Lo que se le hizo al de producción el 2026-09-30, después de una auditoría.
+Cada bloque es independiente; todo con `sudo`.
+
+**Nadie más que `deploy`.** La imagen cloud trae un usuario `ubuntu` con sudo
+sin contraseña: se le saca todo (no se borra: su uid, el 1000, es el `node` de
+la app, y queda más claro que un número suelto). Y el root, sin claves:
+
+```sh
+rm -f /etc/sudoers.d/90-cloud-init-users
+for g in sudo adm lxd cdrom dip; do gpasswd -d ubuntu "$g"; done
+usermod -s /usr/sbin/nologin -L -e 1 ubuntu && visudo -c
+: > /root/.ssh/authorized_keys
+sed -i 's/^\s*PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+```
+
+**SSH, lo justo.** El `00-ed.conf` completo (reemplaza al de arriba):
+
+```
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+AllowUsers deploy
+X11Forwarding no
+AllowAgentForwarding no
+# El túnel al panel de Umami (§5) usa -L; nada más.
+AllowTcpForwarding local
+PermitTunnel no
+LoginGraceTime 30
+```
+
+`sshd -t && systemctl reload ssh`, y probá entrar desde otra terminal antes de
+cerrar la que tenés.
+
+**fail2ban** para el SSH (`apt install -y fail2ban`), en
+`/etc/fail2ban/jail.d/ed.conf`: `[sshd]` con `enabled = true`,
+`backend = systemd`, `maxretry = 5`, `findtime = 10m` y `bantime = 1h`. Qué
+bloqueó: `fail2ban-client status sshd`. Si te bloqueó a vos (tu IP, una hora):
+`fail2ban-client set sshd unbanip <tu IP>` desde la consola del panel.
+
+**4 GB de swap**, en cualquier plan: con la memoria justa, un pico del build o
+una fuga no terminan en el sistema matando procesos.
+
+```sh
+fallocate -l 4G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+echo 'vm.swappiness=10' > /etc/sysctl.d/60-ed-swap.conf && sysctl -p /etc/sysctl.d/60-ed-swap.conf
+```
+
+**Los parches, solos, y el reinicio cuando lo piden.** En
+`/etc/apt/apt.conf.d/52unattended-ed`: los de Docker también, y el reinicio a
+las **05:00 UTC** cuando un parche lo pide (el kernel), después del respaldo
+(03:30) y del cron (04:00):
+
+```
+Unattended-Upgrade::Origins-Pattern {
+        "origin=Docker,archive=${distro_codename},label=Docker CE";
+};
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+Unattended-Upgrade::Automatic-Reboot-Time "05:00";
+```
+
+**Docker**, en `/etc/docker/daemon.json`: los logs rotan (10 MB × 5 por
+contenedor) y `live-restore` deja los contenedores andando mientras Docker se
+actualiza o se reinicia.
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "5" },
+  "live-restore": true
+}
+```
+
+Los logs rigen para los contenedores que se crean después de reiniciar Docker:
+`systemctl restart docker` y `docker compose up -d --force-recreate` (unos
+segundos sin sitio).
+
+Lo demás está en el repo: dos redes (el proxy no llega a la base), y cada
+servicio sin más capacidades que las que usa, sin ganar privilegios y con tope
+de memoria y de procesos (`compose.yaml`); el código de la app es de root
+(`Dockerfile`); y el proxy anota cada pedido con la IP enmascarada, no dice qué
+servidor es y cierra `/api/cron` y TRACE (`deploy/Caddyfile`).
+
 ## 2. El DNS
 
 Antes del primer deploy, para que Let's Encrypt pueda emitir el certificado:
@@ -302,10 +388,18 @@ capa cubre algo distinto:
    **una vez por semana**, y mejor todos los días:
 
    ```sh
-   rsync -az --delete deploy@<IP del VPS>:ed/respaldos/ ~/respaldos-ed/
+   rsync -az deploy@<IP del VPS>:ed/respaldos/ ~/respaldos-ed/
    ```
 
    (`scp -r deploy@<IP del VPS>:ed/respaldos ~/respaldos-ed` si no hay `rsync`.)
+   **Sin `--delete`:** la copia de afuera borra por su cuenta, por fecha (los
+   de más de 14 días, como el VPS, así la retención de los CV vale también
+   afuera), y guarda siempre los 7 más nuevos aunque el VPS deje de mandar. Si
+   borrara lo que el VPS ya no lista, un VPS roto o tomado vaciaría también la
+   copia que tiene que salvarlo. En la máquina de Mateo lo hace una tarea
+   programada de Windows, todos los días a las 12:00, que además vuelve a
+   copiar una fecha si su tamaño cambió en el VPS (un respaldo a mano del mismo
+   día).
    **Cubre** perder el VPS y la cuenta de Hostinger. Los respaldos llevan CV y
    datos de contacto: van a un disco cifrado, y nunca a un lugar compartido.
    Guardá también **una copia del `.env`** fuera del VPS (en un gestor de
