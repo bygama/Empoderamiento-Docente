@@ -1,0 +1,37 @@
+# Cloudflare adelante, por Cloudflare Tunnel (docs/deploy/vps.md §15,
+# work/fortificar-el-vps/). Se suma al compose con dos líneas en el `.env`:
+#   COMPOSE_FILE=compose.yaml:compose.cloudflare.yaml
+#   COMPOSE_PATH_SEPARATOR=:
+#
+# El VPS deja de publicar puertos web: `tunel` sale hacia Cloudflare, y los
+# pedidos entran por ahí. Nadie le pega al proxy por la IP del VPS, y Docker
+# no abre nada por encima de ufw. TLS termina en Cloudflare; adentro del
+# túnel, que va cifrado, Caddy habla HTTP.
+
+services:
+  proxy:
+    ports: !reset []
+    environment:
+      # Caddy atiende HTTP, sin certificados propios (deploy/Caddyfile).
+      ESQUEMA: "http://"
+      # Al proxy solo le habla la red interna: el túnel, que trae la IP de
+      # quien pide en CF-Connecting-IP (lo pisa Cloudflare, nunca el cliente).
+      PROXIES_DE_CONFIANZA: private_ranges
+
+  tunel:
+    # Fijado, como Umami: se sube a mano, leyendo sus notas.
+    image: cloudflare/cloudflared:2026.9.3
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    pids_limit: 512
+    mem_limit: 256m
+    networks: [borde]
+    # El túnel se maneja desde Cloudflare: qué nombre va a qué servicio
+    # (empoderamientodocente.org y www, a http://proxy:80) vive allá.
+    command: ["tunnel", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?falta CLOUDFLARE_TUNNEL_TOKEN en .env}
+    depends_on:
+      proxy:
+        condition: service_started
