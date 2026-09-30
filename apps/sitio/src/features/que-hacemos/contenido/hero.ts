@@ -32,6 +32,6 @@ export type HeroDeQueHacemos = z.infer<typeof esquemaHero>;
 /** El contenido de hoy, tal cual está en el sitio. */
 export const heroInicial: HeroDeQueHacemos = {
   titulo: { primeraLinea: "Generamos y", segundaLinea: "transformamos." },
-  bajada: "Generamos escenarios de aprendizaje situados que transforman hoy la relación cotidiana de docentes con la matemática escolar.",
+  bajada: "Generamos escenarios de aprendizaje situados que transforman hoy la relación cotidiana con la matemática escolar.",
   boton: "Entrá al recorrido",
 };

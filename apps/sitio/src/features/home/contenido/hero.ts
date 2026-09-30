@@ -55,7 +55,7 @@ export type Hero = z.infer<typeof esquemaHero>;
 /** El contenido de hoy, tal cual está en el sitio: lo que se ve sin base y lo que se carga la primera vez. */
 export const heroInicial: Hero = {
   titulo: "La transformación educativa comienza en las matemáticas.",
-  bajada: "Escuchamos cada realidad y diseñamos soluciones educativas a medida, con base en la investigación y más de 15 años de experiencia.",
+  bajada: "Consultora especializada en la transformación del aprendizaje matemático",
   // La acción principal al final del recorrido del ojo, y del lado en que el navbar tiene Contacto (Gastón, 2026-09-11).
   botonPrincipal: { texto: "Contactanos", ruta: "/contacto" },
   botonSecundario: { texto: "Qué hacemos", ruta: "/que-hacemos" },
@@ -66,19 +66,19 @@ export const heroInicial: Hero = {
     { foto: fotoDeRuta("/fotos/exposicion-grafica.webp", "Una formadora señala una gráfica durante una clase"), cartel: { titulo: "Investigación aplicada", descripcion: "Conocimiento que vuelve al aula" } },
     { foto: fotoDeRuta("/fotos/materiales-sobre-la-mesa.webp", "Estudiantes trabajan con papeles de colores sobre una mesa"), cartel: null },
     { foto: fotoDeRuta("/fotos/formadora-guia-taller.webp", "Una formadora guía a docentes durante un taller"), cartel: { titulo: "Acompañamiento situado", descripcion: "Junto a cada docente y escuela" } },
-    { foto: fotoDeRuta("/fotos/encuentro-mesas-rojas.webp", "Encuentro de formación docente con mesas de trabajo"), cartel: { titulo: "Formación docente", descripcion: "Trayectos para docentes de matemáticas" } },
+    { foto: fotoDeRuta("/fotos/encuentro-mesas-rojas.webp", "Encuentro de desarrollo profesional docente con mesas de trabajo"), cartel: { titulo: "Desarrollo profesional docente", descripcion: "Trayectos para docentes de matemáticas" } },
     { foto: fotoDeRuta("/fotos/grupo-en-ronda.webp", "Un grupo discute una tarea sentado en ronda"), cartel: null },
     { foto: fotoDeRuta("/fotos/encuentro-institucional.webp", "Docentes e instituciones reunidas en un encuentro en México"), cartel: { titulo: "Presencia regional", descripcion: "Chile · México · Argentina · Colombia · Brasil" } },
     { foto: fotoDeRuta("/fotos/formadora-sentada-grupo.webp", "Una formadora trabaja sentada junto a un grupo"), cartel: null },
     { foto: fotoDeRuta("/fotos/mesa-con-materiales.webp", "Docentes trabajan con materiales alrededor de una mesa"), cartel: null },
-    { foto: fotoDeRuta("/fotos/cubos-dos-manos.webp", "Dos cubos de papel armados, uno en cada mano"), cartel: { titulo: "Materiales propios", descripcion: "Recursos listos para llevar al aula" } },
+    { foto: fotoDeRuta("/fotos/cubos-dos-manos.webp", "Dos cubos de papel armados, uno en cada mano"), cartel: { titulo: "Mediadores didácticos", descripcion: "Materiales para llevar al aula" } },
   ],
   // Las bandas del celular usan la 1, la 2, la 8 y la 4 (geometria-hero.ts). Solo `comparar-tareas-ronda` es exclusiva del celular.
   tarjetasCelular: [
     { foto: fotoDeRuta("/fotos/docentes-trabajan-aula.webp", "Docentes resuelven una tarea en un aula") },
     { foto: fotoDeRuta("/fotos/comparar-tareas-ronda.webp", "Docentes en ronda comparan dos tareas") },
     { foto: fotoDeRuta("/fotos/formadora-guia-taller.webp", "Una formadora guía a docentes durante un taller") },
-    { foto: fotoDeRuta("/fotos/encuentro-mesas-rojas.webp", "Encuentro de formación docente con mesas de trabajo") },
+    { foto: fotoDeRuta("/fotos/encuentro-mesas-rojas.webp", "Encuentro de desarrollo profesional docente con mesas de trabajo") },
     { foto: fotoDeRuta("/fotos/encuentro-institucional.webp", "Docentes e instituciones reunidas en un encuentro en México") },
     { foto: fotoDeRuta("/fotos/grupo-en-ronda.webp", "Un grupo discute una tarea sentado en ronda") },
     { foto: fotoDeRuta("/fotos/cubos-dos-manos.webp", "Dos cubos de papel armados") },

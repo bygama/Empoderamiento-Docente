@@ -38,6 +38,6 @@ export const movimientoDeNovedadesInicial: MovimientoDeNovedades = {
     },
     { etiqueta: "DISEÑO", frase: "Diseñamos tareas que importan.", acento: "tareas que importan.", foto: fotoDeRuta("/fotos/cubos-mano.webp", "Cubos de papel armados en la palma de una mano") },
     { etiqueta: "CONGRESOS", frase: "Lo llevamos a la región.", acento: "a la región.", foto: fotoDeRuta("/fotos/encuentro-mesas-rojas.webp", "Encuentro de formación docente con mesas de trabajo") },
-    { etiqueta: "CINCO PAÍSES", frase: "En cinco países, a la vez.", acento: "cinco países", foto: fotoDeRuta("/fotos/grupo-al-aire-libre.webp", "Un grupo de docentes posa al aire libre, en una terraza") },
+    { etiqueta: "CINCO PAÍSES", frase: "En cinco países, a la vez.", acento: "cinco países", foto: fotoDeRuta("/fotos/aula-consigna-proyectada.webp", "Docentes en un aula resuelven una consigna proyectada en la pizarra") },
   ],
 };
