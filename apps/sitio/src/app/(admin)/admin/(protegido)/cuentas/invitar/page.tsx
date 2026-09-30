@@ -24,7 +24,7 @@ export default async function Invitar() {
         titulo="Invitar a alguien"
         detalle={`Le llega un correo para elegir su contraseña. El enlace vence a las ${HORAS_DE_LA_INVITACION} horas.`}
       />
-      <FormularioDeInvitacion />
+      <FormularioDeInvitacion correoPropio={sesion.user.email} />
     </div>
   );
 }

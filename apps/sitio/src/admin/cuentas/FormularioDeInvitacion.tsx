@@ -2,19 +2,22 @@
 
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { QUE_PUEDE, ROLES_QUE_SE_ASIGNAN, ROL_POR_DEFECTO } from "@ed/auth";
-import { Aviso, Boton, CampoSimple } from "@ed/kit-admin";
+import { QUE_PUEDE, ROLES_QUE_SE_ASIGNAN, ROL_POR_DEFECTO, darloPideContrasena, type Rol } from "@ed/auth";
+import { Aviso, Boton, CampoContrasena, CampoSimple } from "@ed/kit-admin";
 import { invitar } from "@/datos/acciones/invitaciones";
 
 /**
  * Invitar a alguien (SPEC de work/cuentas §4.2): correo, nombre y rol. Va por
  * `onSubmit` y no por `action`, como el nombre de Mi cuenta: ante un rechazo
  * («ya hay una cuenta con ese correo») se corrige lo escrito, no se empieza de
- * nuevo. Al terminar lleva a la cuenta nueva, que dice si el correo salió.
+ * nuevo. Invitar con un rol que maneja las cuentas pide tu contraseña, como
+ * pasar la dirección: el campo aparece al elegirlo. Al terminar lleva a la
+ * cuenta nueva, que dice si el correo salió.
  */
-export function FormularioDeInvitacion() {
+export function FormularioDeInvitacion({ correoPropio }: { correoPropio: string }) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [elegido, setElegido] = useState<Rol>(ROL_POR_DEFECTO);
+  const [error, setError] = useState<{ detalle: string; campo?: "contrasena" } | null>(null);
   const [mandando, setMandando] = useState(false);
   const idDelError = useId();
 
@@ -23,9 +26,14 @@ export function FormularioDeInvitacion() {
     const datos = new FormData(evento.currentTarget);
     setMandando(true);
     setError(null);
-    const resultado = await invitar({ correo: String(datos.get("correo") ?? ""), nombre: String(datos.get("nombre") ?? ""), rol: String(datos.get("rol") ?? "") });
+    const resultado = await invitar({
+      correo: String(datos.get("correo") ?? ""),
+      nombre: String(datos.get("nombre") ?? ""),
+      rol: String(datos.get("rol") ?? ""),
+      contrasena: String(datos.get("contrasena") ?? ""),
+    });
     if (!resultado.ok || !resultado.id) {
-      setError(resultado.detalle);
+      setError(resultado);
       setMandando(false);
       return;
     }
@@ -47,6 +55,7 @@ export function FormularioDeInvitacion() {
                 value={rol}
                 required
                 defaultChecked={rol === ROL_POR_DEFECTO}
+                onChange={() => setElegido(rol)}
                 className="mt-1 size-4 shrink-0 accent-azul-principal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-medio"
               />
               <span>
@@ -58,9 +67,22 @@ export function FormularioDeInvitacion() {
         </div>
         <p className="mt-3 text-admin-meta text-gris-texto">Dirige no se invita: quien dirige le pasa la dirección a otra persona, desde su cuenta.</p>
       </fieldset>
+      {darloPideContrasena(elegido) ? (
+        <div>
+          <input type="text" name="usuario" autoComplete="username" value={correoPropio} readOnly hidden />
+          <CampoContrasena
+            etiqueta="Tu contraseña"
+            name="contrasena"
+            autoComplete="current-password"
+            ayuda={`Para invitar con el rol ${elegido}, que maneja las cuentas.`}
+            invalido={error?.campo === "contrasena"}
+            idDelError={idDelError}
+          />
+        </div>
+      ) : null}
       {error ? (
         <Aviso tono="error" id={idDelError}>
-          {error}
+          {error.detalle}
         </Aviso>
       ) : null}
       <Boton variante="primario" type="submit" disabled={mandando} aria-busy={mandando || undefined}>

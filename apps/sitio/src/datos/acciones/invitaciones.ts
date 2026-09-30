@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { puede, seAsigna, segundoFactorObligatorio, type Rol } from "@ed/auth";
+import { darloPideContrasena, puede, seAsigna, segundoFactorObligatorio, type Rol } from "@ed/auth";
 import { crearEnlaceDeInvitacion } from "@ed/auth/servidor";
 import { elegiTuContrasena } from "@/correos/elegi-tu-contrasena";
 import { mandarCorreo } from "@/correos/mandar";
@@ -11,7 +11,16 @@ import { registrarActividad } from "@/datos/actividad";
 import { auth, borrarEnlaces } from "@/datos/auth";
 import { base } from "@/datos/cliente";
 import { esquemaDelCorreo, esquemaDelNombre } from "@/datos/esquemas";
-import { HORAS_DE_LA_INVITACION as HORAS, NO_PUEDE, SIN_SESION, borrarSiNuncaHizoNada, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
+import {
+  HORAS_DE_LA_INVITACION as HORAS,
+  NO_PUEDE,
+  SIN_SESION,
+  borrarSiNuncaHizoNada,
+  fallo,
+  pedirTuContrasena,
+  sobreLaCuenta,
+  type Resultado,
+} from "@/datos/sobre-cuentas";
 
 // Invitar, reenviar y cancelar una invitación (SPEC de work/cuentas §4.2): la
 // invitación es «Elegí tu contraseña», que vence a las 72 horas.
@@ -37,8 +46,12 @@ async function mandarInvitacion(cuenta: { id: string; nombre: string; correo: st
 
 export type ResultadoDeInvitar = Resultado & { id?: string; correoSalio?: boolean };
 
-/** Crea la cuenta sin contraseña, con el segundo factor si su rol lo pide, y le manda la invitación. */
-export async function invitar(entrada: { correo: string; nombre: string; rol: string }): Promise<ResultadoDeInvitar> {
+/**
+ * Crea la cuenta sin contraseña, con el segundo factor si su rol lo pide, y le
+ * manda la invitación. Invitar con un rol que maneja las cuentas pide otra vez
+ * tu contraseña (`darloPideContrasena`).
+ */
+export async function invitar(entrada: { correo: string; nombre: string; rol: string; contrasena?: string }): Promise<ResultadoDeInvitar> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return SIN_SESION;
@@ -46,6 +59,10 @@ export async function invitar(entrada: { correo: string; nombre: string; rol: st
     const datos = esquemaDeInvitacion.safeParse(entrada);
     if (!datos.success) return { ok: false, detalle: datos.error.issues[0]?.message ?? "Revisá los datos." };
     const { correo, nombre, rol } = datos.data;
+    if (darloPideContrasena(rol)) {
+      const rechazo = await pedirTuContrasena(sesion, entrada.contrasena);
+      if (rechazo) return rechazo;
+    }
     if (await base.user.findUnique({ where: { email: correo }, select: { id: true } })) return { ok: false, detalle: `Ya hay una cuenta con ${correo}.` };
     const ctx = await auth.$context;
     const { id } = await ctx.internalAdapter.createUser(
