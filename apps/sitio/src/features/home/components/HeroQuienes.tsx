@@ -61,21 +61,25 @@ export function HeroQuienes({ hero, quienesSomos, mision }: Props) {
         <Hero contenido={hero} />
       </div>
 
-      {/* Quiénes somos → barrido verde → Misión (apilado debajo del hero). */}
+      {/* Quiénes somos → barrido verde → Misión (apilado debajo del hero).
+          Bajo lg la zona es más corta: la escena suelta a las 2 pantallas. */}
       <div
         ref={zoneRef}
         id="quienes-somos"
         data-indice="Quiénes somos"
-        className="relative z-20 h-[340svh] motion-reduce:h-auto"
+        // Bajo lg con menos de 620px de alto (celular apaisado) la escena no se
+        // clava: todo en flujo, como con movimiento reducido (la coreografía
+        // tampoco se arma ahí, ver la rama «bajo» en coreografia-quienes.ts).
+        className="relative z-20 h-[340svh] max-lg:h-[300svh] max-lg:motion-reduce:h-auto motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!"
       >
-        <div className="sticky top-0 h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto">
-          <div ref={panelRef} className="relative h-full w-full motion-reduce:h-auto">
+        <div className="sticky top-0 h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:static! [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">
+          <div ref={panelRef} className="relative h-full w-full motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">
             {/* Capa 1: Quiénes somos (se borra). */}
-            <div data-about-layer className="h-full w-full motion-reduce:h-auto">
+            <div data-about-layer className="h-full w-full motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">
               <Manifiesto contenido={quienesSomos} />
             </div>
             {/* Capa 2: Misión (se revela en el mismo lugar). */}
-            <div data-mision-layer className="h-full w-full motion-reduce:h-auto">
+            <div data-mision-layer className="h-full w-full motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">
               <MisionPanel contenido={mision} />
             </div>
             {/* Línea-borrador verde: la costura del barrido (derecha → izquierda). */}
