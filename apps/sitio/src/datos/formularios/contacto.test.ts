@@ -1,6 +1,6 @@
 import { after, test } from "node:test";
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { config as cargarEntorno } from "dotenv";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
@@ -11,12 +11,18 @@ const correo = `prueba-${randomUUID()}@ed.test`;
 const ips: string[] = [];
 const BIEN = { tema: "investigacion", nombre: "Ana Prueba", email: correo, institucion: "Escuela 1", pais: "Chile", mensaje: "Hola", web: "" };
 
+/** Una IP propia de esta prueba, de la red de pruebas de rendimiento (198.18.0.0/15): el cupo sale solo de una IP válida. */
+function ipDePrueba(): string {
+  const [a = 0, b = 0, c = 0] = randomBytes(3);
+  return `198.${18 + (a & 1)}.${b}.${c}`;
+}
+
 /** Un pedido como el del formulario, desde una IP propia de esta prueba. */
-function pedido(cuerpo: unknown, ip = `prueba-${randomUUID()}`): Request {
+function pedido(cuerpo: unknown, ip = ipDePrueba()): Request {
   ips.push(ip);
   return new Request("http://localhost/api/contacto", {
     method: "POST",
-    headers: { "content-type": "application/json", "x-forwarded-for": ip },
+    headers: { "content-type": "application/json", "x-real-ip": ip },
     body: JSON.stringify(cuerpo),
   });
 }
@@ -77,7 +83,7 @@ test("el país es uno de los de Ajustes › Datos del sitio, u «Otro»", sinBas
 
 test("el sexto de la misma IP en una hora recibe 429, con cuándo volver", sinBase, async () => {
   const { recibirContacto, TOPE_DE_CONTACTO } = await import("./contacto");
-  const ip = `prueba-${randomUUID()}`;
+  const ip = ipDePrueba();
   for (let i = 0; i < TOPE_DE_CONTACTO; i++) assert.equal((await recibirContacto(pedido(BIEN, ip))).status, 200);
   const r = await recibirContacto(pedido(BIEN, ip));
   assert.equal(r.status, 429);
