@@ -1,5 +1,5 @@
 import { SIN_PERMISO, queSePuede, type LoQueSePuede, type Rol } from "@ed/auth";
-import type { auth } from "./auth";
+import { borrarEnlaces, type auth } from "./auth";
 import { base } from "./cliente";
 import { cuentaParaActuar } from "./consultas/cuentas";
 import { esquemaDelId } from "./esquemas";
@@ -50,16 +50,6 @@ export function fallo(accion: string, error: unknown): Resultado {
 /** Cierra las sesiones de una cuenta; con `salvo`, todas menos esa (la de quien lo pide, si es la suya). */
 export async function cerrarSesiones(idDeCuenta: string, salvo?: string): Promise<void> {
   await base.session.deleteMany({ where: { userId: idDeCuenta, ...(salvo ? { id: { not: salvo } } : {}) } });
-}
-
-/**
- * Lo que better-auth le guarda a una cuenta en `verification` y no cuelga de
- * ella por clave foránea: los enlaces para elegir la contraseña, el paso
- * pendiente del código, el dispositivo recordado. Reenviar una invitación
- * los borra para que el enlace viejo deje de servir.
- */
-export async function borrarEnlaces(idDeCuenta: string): Promise<void> {
-  await base.verification.deleteMany({ where: { value: idDeCuenta } });
 }
 
 /** El código con que Prisma dice que una clave foránea no dejó hacer algo. */

@@ -58,6 +58,13 @@ export type OpcionesDeAuth = {
   /** Dónde guarda el bloqueo por cuenta sus fallos (bloqueo.ts). */
   bloqueos: AlmacenDeBloqueos;
   /**
+   * Borra lo que better-auth le guarda a una cuenta en `verification`: los
+   * enlaces para elegir la contraseña, el paso pendiente del código y los
+   * dispositivos recordados. El paquete lo llama cuando la contraseña cambia
+   * (por el enlace o desde la cuenta); dónde se borra es de la app.
+   */
+  borrarEnlaces: (idDeCuenta: string) => Promise<void>;
+  /**
    * Anota un suceso de la sesión. Corre en segundo plano y no puede frenar
    * nada: si no se guarda, quien lo implementa lo loguea y no tira.
    */

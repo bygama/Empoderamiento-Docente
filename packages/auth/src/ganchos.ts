@@ -29,7 +29,7 @@ type Contexto = Parameters<Parameters<typeof createAuthMiddleware>[0]>[0];
 
 export type OpcionesDeGanchos = { bloqueos: AlmacenDeBloqueos; secreto: string } & Pick<
   OpcionesDeAuth,
-  "registrar" | "avisarCambioDeContrasena"
+  "registrar" | "avisarCambioDeContrasena" | "borrarEnlaces"
 >;
 
 /**
@@ -54,7 +54,7 @@ export function destrabar(bloqueos: AlmacenDeBloqueos, correo: string, secreto: 
   return bloqueos.borrar(claveDeBloqueo(correo, secreto));
 }
 
-export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena }: OpcionesDeGanchos) {
+export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena, borrarEnlaces }: OpcionesDeGanchos) {
   function claveDe(ctx: Contexto): string | null {
     const correo: unknown = ctx.body?.email;
     return typeof correo === "string" ? claveDeBloqueo(correo, secreto) : null;
@@ -72,7 +72,7 @@ export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContr
     }),
 
     after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path === CAMBIAR_LA_CONTRASENA) return alCambiarLaContrasena(ctx, { registrar, avisarCambioDeContrasena });
+      if (ctx.path === CAMBIAR_LA_CONTRASENA) return alCambiarLaContrasena(ctx, { registrar, avisarCambioDeContrasena, borrarEnlaces });
       const clave = ctx.path === ENTRAR ? claveDe(ctx) : null;
       if (!clave) return;
       const sesion = ctx.context.newSession;

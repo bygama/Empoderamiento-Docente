@@ -34,6 +34,7 @@ async function armar() {
       mandarCodigo: async () => {},
       segundoPlano: () => {},
       bloqueos,
+      borrarEnlaces: async () => {},
       registrar: async () => {},
     }),
     database: memoryAdapter({ user: [], session: [], account: [], verification: [], twoFactor: [] }),

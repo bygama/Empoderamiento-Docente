@@ -20,11 +20,23 @@ import { urlDelSitio } from "@/lib/url-del-sitio";
 
 const url = urlDelSitio();
 
+/**
+ * Lo que better-auth le guarda a una cuenta en `verification` y no cuelga de
+ * ella por clave foránea: los enlaces para elegir la contraseña, el paso
+ * pendiente del código, el dispositivo recordado. Todos llevan el id de la
+ * cuenta como valor. Lo borran elegir o cambiar la contraseña (`@ed/auth`),
+ * cerrarle el acceso a una cuenta desde Cuentas y reenviar una invitación.
+ */
+export async function borrarEnlaces(idDeCuenta: string): Promise<void> {
+  await base.verification.deleteMany({ where: { value: idDeCuenta } });
+}
+
 export const auth = crearAuth({
   base,
   secreto: process.env.BETTER_AUTH_SECRET ?? "",
   urlDelSitio: url,
   bloqueos: almacenDeBloqueos,
+  borrarEnlaces,
   registrar: ({ tipo, idDeCuenta }) => registrarActividad({ tipo, quien: idDeCuenta }),
   segundoPlano,
   mandarResetDeContrasena: async ({ para, nombre, enlace, minutosDeVigencia }) => {

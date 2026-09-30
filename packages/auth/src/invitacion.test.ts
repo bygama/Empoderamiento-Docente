@@ -18,6 +18,7 @@ const sinBloqueos: AlmacenDeBloqueos = {
 };
 
 async function armar() {
+  const db = { user: [], session: [], account: [], verification: [] as Array<{ value: string }>, twoFactor: [] };
   const auth = betterAuth({
     ...configDeAuth({
       secreto: "un-secreto-de-prueba-que-no-sirve-para-nada-mas",
@@ -27,9 +28,13 @@ async function armar() {
       mandarCodigo: async () => {},
       segundoPlano: () => {},
       bloqueos: sinBloqueos,
+      // Como el de la app (datos/auth.ts): todo lo de la cuenta en `verification`.
+      borrarEnlaces: async (idDeCuenta) => {
+        for (let i = db.verification.length - 1; i >= 0; i--) if (db.verification[i]?.value === idDeCuenta) db.verification.splice(i, 1);
+      },
       registrar: async () => {},
     }),
-    database: memoryAdapter({ user: [], session: [], account: [], verification: [], twoFactor: [] }),
+    database: memoryAdapter(db),
     logger: { disabled: true },
     rateLimit: { enabled: false },
   });
@@ -64,6 +69,23 @@ test("el enlace lleva a «Elegí tu contraseña» con su token, y resetPassword 
   assert.ok((await ctx.internalAdapter.findCredentialAccount(cuenta.id))?.password);
   // Sirve una sola vez.
   assert.equal((await elegir(token)).status, 400);
+});
+
+test("elegir la contraseña con un enlace deja sin efecto los otros de la cuenta y sus dispositivos recordados, no los de otra", async () => {
+  const { auth, ctx, cuenta, elegir } = await armar();
+  const tokenDe = async (idDeCuenta: string) => {
+    const { enlace } = await crearEnlaceDeInvitacion(auth, { idDeCuenta, horas: 72, volverA: "/admin/nueva-contrasena" });
+    return new URL(enlace).pathname.split("/").at(-1) ?? "";
+  };
+  const [uno, otro] = [await tokenDe(cuenta.id), await tokenDe(cuenta.id)];
+  const recordado = await ctx.internalAdapter.createVerificationValue({ value: cuenta.id, identifier: "trust-device-de-prueba", expiresAt: new Date(Date.now() + 3_600_000) });
+  const ajena = await ctx.internalAdapter.createUser({ email: "eva@ed.test", name: "Eva", emailVerified: false }, { method: "admin" });
+  const deLaAjena = await tokenDe(ajena.id);
+
+  assert.equal((await elegir(uno)).status, 200);
+  assert.equal((await elegir(otro)).status, 400);
+  assert.equal(await ctx.internalAdapter.findVerificationValue(recordado.identifier), null);
+  assert.equal((await elegir(deLaAjena)).status, 200);
 });
 
 test("vencido, el enlace no sirve", async () => {
