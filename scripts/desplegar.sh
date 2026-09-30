@@ -53,6 +53,11 @@ docker compose up -d --wait db
 paso "3/5 Las migraciones"
 docker compose run --rm migrar
 
+# La versión que corre ahora, para saber después qué cambió. Vacía en el
+# primer deploy.
+previa=$(docker image inspect "$sitio:actual" --format '{{join .RepoTags "\n"}}' 2>/dev/null \
+  | sed -n "s/^$sitio://p" | grep -vx actual | head -n 1 || true)
+
 paso "4/5 El build del sitio con la base, y la imagen app $version"
 # -T: sin terminal, para que por stdout salga solo el tar.
 docker compose run --rm -T --no-deps construir | docker build --target app -t "$sitio:$version" -
@@ -70,6 +75,15 @@ if docker compose exec -T proxy cat /etc/caddy/Caddyfile </dev/null | cmp -s - d
 else
   echo "El Caddyfile cambió: se recrea el proxy."
   docker compose up -d --wait --force-recreate --no-deps proxy
+fi
+# La caché de next/image sobrevive al deploy (su volumen, compose.yaml) y
+# guarda una imagen por URL. Si un archivo de `public/` cambió sin cambiar de
+# nombre, se vería el viejo hasta 4 h: se vacía cuando `public/` cambió, o
+# cuando no se sabe qué corría. Las fotos del admin no la necesitan: cada una
+# nueva tiene su URL.
+if [ -z "$previa" ] || ! git diff --quiet "$previa" HEAD -- apps/sitio/public 2>/dev/null; then
+  echo "Cambió public/ (o no se sabe qué corría): se vacía la caché de imágenes."
+  docker compose exec -T app sh -c 'rm -rf .next/cache/images/*' </dev/null
 fi
 
 paso "Quedan las últimas $GUARDAR imágenes de app"

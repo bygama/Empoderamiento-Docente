@@ -38,9 +38,11 @@ ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 # `.next/static` y `public/`, en `compilado/`.
 COPY --chown=node:node compilado/ ./
 # Las fotos y los CV van a disco (sin token de Blob) en `<cwd>/.fotos` y
-# `<cwd>/.cv`, donde el compose monta sus volúmenes. Se crean del usuario que
-# corre: un volumen nuevo hereda el dueño de la carpeta que tapa.
-RUN mkdir -p apps/sitio/.fotos apps/sitio/.cv && chown node:node apps/sitio/.fotos apps/sitio/.cv
+# `<cwd>/.cv`, y la caché de next/image en `.next/cache/images`: ahí monta el
+# compose sus volúmenes. Se crean del usuario que corre: un volumen nuevo
+# hereda el dueño de la carpeta que tapa.
+RUN mkdir -p apps/sitio/.fotos apps/sitio/.cv apps/sitio/.next/cache/images \
+  && chown node:node apps/sitio/.fotos apps/sitio/.cv apps/sitio/.next/cache apps/sitio/.next/cache/images
 USER node
 WORKDIR /app/apps/sitio
 EXPOSE 3000

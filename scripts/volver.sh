@@ -31,4 +31,7 @@ fi
 docker tag "$sitio:$1" "$sitio:actual"
 # Solo `app`: las migraciones no vuelven atrás, y el resto no cambió.
 docker compose up -d --wait --no-deps app
+# La versión vieja puede tener otros archivos en `public/` con el mismo
+# nombre: la caché de imágenes se vacía (desplegar.sh).
+docker compose exec -T app sh -c 'rm -rf .next/cache/images/*' </dev/null
 echo "Listo: corre $1."
