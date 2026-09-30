@@ -5,6 +5,11 @@ porqué de que los dos convivan está en el
 [ADR-0018](../architecture/adrs/0018-deploy-en-vercel-o-en-un-vps.md); el VPS,
 en [`vps.md`](vps.md).
 
+> **Hoy no se usa.** Desde el 2026-09-30 producción corre en el VPS
+> ([`vps.md`](vps.md), «Producción hoy») y el proyecto de Vercel ya no
+> recibe tráfico. Esto queda para el día que haga falta volver: el código sigue
+> sirviendo para los dos.
+
 ## El proyecto
 
 - Un proyecto de Vercel conectado al repo, con **Root Directory =

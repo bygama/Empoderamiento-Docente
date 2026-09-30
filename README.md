@@ -262,7 +262,9 @@ contenido publicado.
   `scripts/desplegar.sh`, nunca con `docker compose up` a secas**: la imagen de
   la app sale de un build que corre adentro del compose, con la base. Volver
   atrás, `scripts/volver.sh`; restaurar un respaldo, `scripts/restaurar.sh`.
-  Las variables, en el `.env` de la raíz (`.env.example`).
+  Las variables, en el `.env` de la raíz (`.env.example`). **Es producción desde
+  el 2026-09-30**, y `main` se deploya con el botón **Actions › Desplegar**
+  (§14 del runbook).
 - **En Vercel** ([`docs/deploy/vercel.md`](docs/deploy/vercel.md)): preview por
   PR, producción desde `main`, con **Root Directory = `apps/sitio`**. La base es
   **Neon**, las fotos y los CV van a **Vercel Blob**, las visitas a **Vercel Web
