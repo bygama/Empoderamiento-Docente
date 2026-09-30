@@ -8,15 +8,26 @@
 # Solo `proxy` publica puertos. `app`, `db` y `analitica` se alcanzan nada más
 # por la red interna, y por eso la app puede confiar en la IP que le pasa Caddy.
 #
+# Dos redes: `borde`, lo que atiende pedidos (el proxy y lo que expone), y
+# `datos`, lo que habla con Postgres. El proxy no llega a la base.
+#
 # Las variables salen del `.env` de al lado (ver `.env.example`).
 #
 # El proyecto se llama `ed`, salvo que `COMPOSE_PROJECT_NAME` diga otro (en el
 # `.env`, para una segunda copia en el mismo servidor). De ese nombre salen los
-# volúmenes, la red y las dos imágenes, `<proyecto>-fuente` y
+# volúmenes, las redes y las dos imágenes, `<proyecto>-fuente` y
 # `<proyecto>-sitio`: los scripts de `scripts/` lo leen de acá y solo tocan
 # las imágenes del suyo.
 
 name: ed
+
+# Lo que lleva todo servicio que queda corriendo: nadie gana privilegios por un
+# setuid, y un tope de procesos. La memoria va en cada uno: con un tope, una
+# fuga o un pico se quedan en su contenedor y no se llevan la base.
+x-endurecido: &endurecido
+  restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  pids_limit: 512
 
 x-base-de-la-app: &base-de-la-app
   DATABASE_URL: postgresql://ed:${CLAVE_DB_ED:?falta CLAVE_DB_ED en .env}@db:5432/ed
@@ -44,7 +55,15 @@ x-entorno-de-la-app: &entorno-de-la-app
 services:
   db:
     image: postgres:17-alpine
-    restart: unless-stopped
+    <<: *endurecido
+    # La entrada de Postgres arranca como root, le da la carpeta de datos a
+    # `postgres` y baja a ese usuario: solo eso.
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    mem_limit: 1g
+    # Si falta memoria, el sistema mata a otro antes que a la base.
+    oom_score_adj: -500
+    networks: [datos]
     environment:
       POSTGRES_PASSWORD: ${CLAVE_DB_ADMIN:?falta CLAVE_DB_ADMIN en .env}
       CLAVE_DB_ED: ${CLAVE_DB_ED}
@@ -68,6 +87,7 @@ services:
       target: fuente
     command: ["pnpm", "migrate:deploy"]
     environment: *base-de-la-app
+    networks: [datos]
     depends_on:
       db:
         condition: service_healthy
@@ -78,6 +98,10 @@ services:
     # Saca un tar por stdout: el contexto de la imagen `app`.
     command: ["sh", "deploy/construir.sh"]
     environment: *entorno-de-la-app
+    # El build pica unos 5 GB (docs/deploy/vps.md, «Qué VPS»): con este tope,
+    # si se pasa, muere el build y no lo que está corriendo.
+    mem_limit: 6g
+    networks: [datos]
     depends_on:
       migrar:
         condition: service_completed_successfully
@@ -88,6 +112,7 @@ services:
     image: ${COMPOSE_PROJECT_NAME}-fuente:actual
     profiles: ["herramientas"]
     environment: *entorno-de-la-app
+    networks: [datos]
     depends_on:
       db:
         condition: service_healthy
@@ -98,7 +123,10 @@ services:
     # fuente, sale del proyecto (arriba).
     image: ${COMPOSE_PROJECT_NAME}-sitio:actual
     pull_policy: never
-    restart: unless-stopped
+    <<: *endurecido
+    cap_drop: [ALL]
+    mem_limit: 1g
+    networks: [borde, datos]
     environment: *entorno-de-la-app
     volumes:
       - fotos:/app/apps/sitio/.fotos
@@ -121,7 +149,10 @@ services:
     # Umami, fijado: su API cambia entre versiones mayores, y el cliente de la
     # copia (lib/metricas/umami.ts) está probado contra esta.
     image: ghcr.io/umami-software/umami:3.4.0
-    restart: unless-stopped
+    <<: *endurecido
+    cap_drop: [ALL]
+    mem_limit: 768m
+    networks: [borde, datos]
     environment:
       DATABASE_URL: postgresql://umami:${CLAVE_DB_UMAMI}@db:5432/umami
       APP_SECRET: ${UMAMI_APP_SECRET:?falta UMAMI_APP_SECRET en .env}
@@ -144,7 +175,12 @@ services:
     # Todos los días a las 04:00 UTC (el contenedor está en UTC), la misma hora
     # que `apps/sitio/vercel.json`. Node trae el crond de busybox y `fetch`.
     image: node:24-alpine
-    restart: unless-stopped
+    <<: *endurecido
+    # crond corre cada trabajo como su usuario, y para eso cambia de identidad.
+    cap_drop: [ALL]
+    cap_add: [SETGID, SETUID]
+    mem_limit: 256m
+    networks: [borde]
     environment:
       CRON_SECRET: ${CRON_SECRET}
     volumes:
@@ -166,7 +202,13 @@ services:
     # archivos de fotos y CV en `respaldos/` del host (deploy/respaldo/). La
     # misma mayor de Postgres que `db`, para que pg_dump le hable.
     image: postgres:17-alpine
-    restart: unless-stopped
+    <<: *endurecido
+    # crond, más leer los archivos de la app, dárselos al dueño del host y
+    # restaurarlos (scripts/restaurar.sh usa este servicio).
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    mem_limit: 512m
+    networks: [datos]
     environment:
       PGPASSWORD: ${CLAVE_DB_ADMIN}
       DIAS_DE_RESPALDO: ${DIAS_DE_RESPALDO:-14}
@@ -192,7 +234,12 @@ services:
 
   proxy:
     image: caddy:2-alpine
-    restart: unless-stopped
+    <<: *endurecido
+    # Escuchar en el 80 y el 443.
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    mem_limit: 256m
+    networks: [borde]
     ports:
       - "80:80"
       - "443:443"
@@ -209,6 +256,10 @@ services:
         condition: service_healthy
       analitica:
         condition: service_healthy
+
+networks:
+  borde:
+  datos:
 
 volumes:
   datos-db:
