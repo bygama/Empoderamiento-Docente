@@ -36,13 +36,16 @@ WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 # El contexto es el tar de `deploy/construir.sh`: el standalone, con
 # `.next/static` y `public/`, en `compilado/`.
-COPY --chown=node:node compilado/ ./
+# El código es de root: el usuario que corre la app no puede reescribirlo.
+COPY compilado/ ./
 # Las fotos y los CV van a disco (sin token de Blob) en `<cwd>/.fotos` y
 # `<cwd>/.cv`, y la caché de next/image en `.next/cache/images`: ahí monta el
 # compose sus volúmenes. Se crean del usuario que corre: un volumen nuevo
-# hereda el dueño de la carpeta que tapa.
+# hereda el dueño de la carpeta que tapa. `.next` entero también es suyo,
+# porque Next reescribe ahí las páginas que regenera (ISR).
 RUN mkdir -p apps/sitio/.fotos apps/sitio/.cv apps/sitio/.next/cache/images \
-  && chown node:node apps/sitio/.fotos apps/sitio/.cv apps/sitio/.next/cache apps/sitio/.next/cache/images
+  && chown node:node apps/sitio/.fotos apps/sitio/.cv \
+  && chown -R node:node apps/sitio/.next
 USER node
 WORKDIR /app/apps/sitio
 EXPOSE 3000
