@@ -45,7 +45,9 @@ proyecto=$(docker compose config --no-interpolate | sed -n 's/^name: //p')
 sitio="$proyecto-sitio"
 
 paso "1/5 La imagen fuente (dependencias y Prisma)"
-docker compose build migrar
+# --pull: la base de Node (y abajo, la de la imagen app) se trae de nuevo si
+# salió un parche; sin esto, la etiqueta flotante se queda en la primera que bajó.
+docker compose build --pull migrar
 
 paso "2/5 La base"
 docker compose up -d --wait db
@@ -60,7 +62,7 @@ previa=$(docker image inspect "$sitio:actual" --format '{{join .RepoTags "\n"}}'
 
 paso "4/5 El build del sitio con la base, y la imagen app $version"
 # -T: sin terminal, para que por stdout salga solo el tar.
-docker compose run --rm -T --no-deps construir | docker build --target app -t "$sitio:$version" -
+docker compose run --rm -T --no-deps construir | docker build --pull --target app -t "$sitio:$version" -
 docker tag "$sitio:$version" "$sitio:actual"
 
 paso "5/5 Levantar todo con la versión nueva"
