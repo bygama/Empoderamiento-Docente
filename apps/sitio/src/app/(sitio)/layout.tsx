@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
-import { Caveat, Courier_Prime, Inter, Manrope, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -9,53 +8,12 @@ import { Analitica } from "@/components/layout/Analitica";
 import { AterrizajePorLink } from "@/components/layout/AterrizajePorLink";
 import { FranjaDeBorrador } from "@/components/layout/FranjaDeBorrador";
 import { LenisProvider } from "@/components/providers/LenisProvider";
+import { inter, manrope } from "@/config/fuentes/compartidas";
+import { caveat, courierPrime, jetbrainsMono } from "@/config/fuentes/del-sitio";
 import { OPEN_GRAPH_COMUN, TITULO_DEL_SITIO } from "@/config/metadata";
 import { siteConfig } from "@/config/site";
 import { datosDelSitio } from "@/datos/consultas/sitio";
 import { aliadosDelSitio } from "@/datos/consultas/aliados";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-  // 600 real para el activo del navbar: sin el archivo, el navegador
-  // sintetiza la negrita (mas gorda y borrosa que la de verdad).
-  weight: ["400", "500", "600"],
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-manrope",
-  weight: ["500", "700"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-jetbrains-mono",
-  // 600 real para el activo del navbar: sin el archivo, el navegador
-  // sintetiza la negrita (mas gorda y borrosa que la de verdad).
-  weight: ["400", "500", "600"],
-});
-
-// Manuscrita — SOLO para anotaciones "a mano" dentro de los expedientes de
-// Investigación (notas al margen, marcas humanas). No es tipografía de UI.
-const caveat = Caveat({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-caveat",
-  weight: ["500", "600"],
-});
-
-// Maquina de escribir — SOLO para el texto documental de los expedientes de
-// Investigacion (informes mecanografiados del archivo). No es tipografia de UI.
-const courierPrime = Courier_Prime({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-courier-prime",
-  weight: ["400", "700"],
-});
 
 const METADATA: Metadata = {
   metadataBase: new URL(siteConfig.url),
