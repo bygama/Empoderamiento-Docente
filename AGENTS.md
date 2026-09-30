@@ -536,7 +536,12 @@ esa misma guía).
 - **Lenis:** una sola instancia global, integrada con ScrollTrigger.
 - **Imágenes:** `next/image` con `alt`, `width`, `height`, `loading="lazy"`
   excepto LCP.
-- **Fonts:** `next/font/google` con `display: 'swap'` y subset `latin`.
+- **Fonts:** `next/font/local` con `display: 'swap'` y el subset `latin`,
+  desde `apps/sitio/src/config/fuentes/`: los archivos y la licencia (OFL) de
+  cada familia viven en el repo. Nunca `next/font/google`: el build no puede
+  depender de Google, y Turbopack baja cada archivo en cada build sin
+  reintentar (así se cayeron builds del VPS). Una fuente nueva entra al repo
+  como archivo, con su licencia.
 - **Validación:** todo dato de entrada se valida en el borde con **Zod** antes
   de tocar la base — sin excepción, y eso incluye lo que escribe el admin por
   sus Server Actions (ver §12). No hay una capa que valide sola por nosotros.
