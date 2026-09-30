@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { hayCookieDeSesion } from "@ed/auth";
+import { hostDelBlob } from "@/lib/contenido/host-del-blob";
 import { CABECERA_DEL_METODO } from "@/lib/metricas/clic";
 import { nuevoNonce, politicaDeContenido, ponerCabeceras } from "@/lib/seguridad/cabeceras";
 import { esLlegadaDeOtroSitio, paginaDeRebote } from "@/lib/seguridad/rebote";
@@ -64,7 +65,11 @@ export function proxy(req: NextRequest) {
   // lo hace, porque el layout no las cubre— y contesta en llano.
   const esAccion = req.headers.has("next-action");
   const sinSesion = cerrada && !esAccion && !hayCookieDeSesion(req);
-  const csp = politicaDeContenido({ nonce: esAdmin ? nuevoNonce() : null, desarrollo: process.env.NODE_ENV === "development" });
+  const csp = politicaDeContenido({
+    nonce: esAdmin ? nuevoNonce() : null,
+    desarrollo: process.env.NODE_ENV === "development",
+    hostDeFotos: hostDelBlob(process.env.BLOB_READ_WRITE_TOKEN),
+  });
   // Sin cookie puede ser que no haya sesión, o que la cookie (`Strict`) no
   // haya viajado porque el link estaba en otro sitio: esa navegación se
   // rebota a la misma URL antes de mandarla a «entrar» (lib/seguridad/rebote.ts).

@@ -26,8 +26,11 @@ export function nuevoNonce(): string {
  *
  * `'unsafe-eval'` solo en `next dev`: React lo usa para rearmar las pilas de
  * los errores; en producción nunca.
+ *
+ * Las imágenes de otro origen, solo las del Blob del sitio (`hostDeFotos`,
+ * lib/contenido/host-del-blob.ts), y ninguna si las fotos van a disco.
  */
-export function politicaDeContenido({ nonce, desarrollo }: { nonce: string | null; desarrollo: boolean }): string {
+export function politicaDeContenido({ nonce, desarrollo, hostDeFotos }: { nonce: string | null; desarrollo: boolean; hostDeFotos: string | null }): string {
   const eval_ = desarrollo ? " 'unsafe-eval'" : "";
   return [
     "default-src 'self'",
@@ -35,7 +38,7 @@ export function politicaDeContenido({ nonce, desarrollo }: { nonce: string | nul
     // Los estilos siguen abiertos: Next y los componentes ponen `style` en
     // línea, y un estilo inyectado no ejecuta nada.
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
+    `img-src 'self' data: blob:${hostDeFotos ? ` https://${hostDeFotos}` : ""}`,
     "font-src 'self'",
     "connect-src 'self'",
     "object-src 'none'",
