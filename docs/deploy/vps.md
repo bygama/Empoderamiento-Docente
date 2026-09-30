@@ -15,6 +15,19 @@ En el VPS se usa todo lo del VPS: la base, las fotos, los CV, las visitas
 (Umami) y los respaldos viven ahí. Lo único de afuera es Resend, para los
 correos (y Search Console, que es de Google).
 
+## Producción hoy
+
+Desde el 2026-09-30, `empoderamientodocente.org` corre acá (antes, en Vercel).
+
+| | |
+| --- | --- |
+| **Servidor** | Hostinger KVM 2, Ubuntu 24.04, `2.24.68.136` |
+| **DNS** | en Hostinger: `A @` a esa IP y `www` como CNAME al dominio. Los MX, el SPF, el DMARC y los `hostingermail-*._domainkey` son del correo de Hostinger: no se tocan |
+| **Entrar** | `ssh deploy@2.24.68.136`, con una llave por persona (§13). Root y las contraseñas están cerrados por SSH |
+| **Deployar** | el botón de GitHub (§14), o por SSH `cd ~/ed && git pull && scripts/desplegar.sh` |
+| **Los secretos** | el `.env` del servidor, y su copia, la clave de sudo de `deploy`, la de root y la de admin de Umami, en la máquina de Mateo. Nunca en el repo ni en un chat |
+| **La copia de los respaldos** (capa 3, §8) | todos los días, en la máquina de Mateo |
+
 ## Qué corre
 
 | Servicio | Qué es | Puertos |
@@ -237,7 +250,8 @@ No hay registro público: las cuentas entran por un comando.
 
 | Qué | Cómo |
 | --- | --- |
-| Deployar una versión nueva | `git pull && scripts/desplegar.sh` (el sitio deja de contestar unos segundos, cuando se cambia el contenedor: ver «Corte»; si falla por las fuentes de Google, otra vez: §4) |
+| Deployar una versión nueva | el botón de GitHub (§14), o `git pull && scripts/desplegar.sh` (el sitio deja de contestar unos segundos, cuando se cambia el contenedor: ver «Corte»; si falla por las fuentes de Google, otra vez: §4). Uno a la vez: si ya hay otro corriendo, el segundo frena y lo dice |
+| Dar o sacar acceso | §13 |
 | Ver qué corre | `docker compose ps` |
 | El log de la app | `docker compose logs -f app` (o `proxy`, `analitica`…) |
 | El cron | `docker compose logs --since 48h cron`; a mano, `docker compose exec cron node /etc/ed-cron/correr.mjs` |
@@ -391,3 +405,69 @@ factor**, **publicar una novedad** (Contenido › Novedades) y verla en
 `/novedades`, **mandar un contacto** desde `/contacto` y **verlo en el
 Inicio** del admin (y el aviso por correo, si hay alguien en Ajustes › Avisos).
 Si los cuatro pasan, está en producción.
+
+## 13. Quién entra
+
+Se entra como `deploy`, con **una llave por persona** en
+`~/.ssh/authorized_keys`, y cada línea termina con el nombre de su dueña o su
+dueño (`cut -d' ' -f3- ~/.ssh/authorized_keys` los lista). Así se saca a una
+persona sin tocar a las demás. `deploy` maneja Docker, y con eso el servidor
+entero: solo gente de confianza.
+
+- **Dar acceso.** La persona genera su llave en su máquina y manda solo la
+  pública (el `.pub`; la privada no viaja):
+
+  ```sh
+  ssh-keygen -t ed25519 -f ~/.ssh/ed-vps -C "<nombre>-ed-vps"
+  ```
+
+  Alguien que ya entra la suma: `echo '<la línea del .pub>' >> ~/.ssh/authorized_keys`.
+  Que pruebe entrar antes de dar el paso por hecho.
+- **Sacar acceso.** Borrar su línea de `~/.ssh/authorized_keys`, y probar que
+  las demás siguen entrando antes de cerrar la sesión.
+- **Si una llave viajó por un chat**, se reemplaza por una generada en la
+  máquina de la persona, y se borra la vieja.
+- **Si nadie puede entrar:** el panel de Hostinger tiene una terminal en el
+  navegador y cambia la contraseña de root; desde ahí se vuelve a sumar una
+  llave.
+
+## 14. El botón «Desplegar» de GitHub
+
+Deploya `main` sin SSH: **Actions › Desplegar › Run workflow**, para
+cualquiera con permiso de escritura en el repo. Siempre va `main`, aunque
+GitHub ofrezca elegir rama. El log sale en la corrida y queda en
+`~/desplegues/` del VPS (los últimos 20). El repo es público y ese log también;
+`desplegar.sh` no imprime nada del `.env` salvo el dominio.
+
+Cómo anda (`.github/workflows/desplegar.yml`): la corrida entra al VPS con su
+propia llave, y el servidor **ata esa llave a un solo comando**,
+`scripts/desplegar-desde-github.sh`, que trae `main` y corre `desplegar.sh`.
+Pida lo que pida, esa llave no puede hacer otra cosa. El deploy corre
+desprendido de la conexión: si la corrida se corta o se cancela, termina igual.
+
+Armarlo (o rehacerlo en un VPS nuevo):
+
+1. En tu máquina, una llave solo para el botón:
+   `ssh-keygen -t ed25519 -N "" -C "github-actions (botón Desplegar)" -f boton`.
+2. En el VPS, su línea en `~/.ssh/authorized_keys`, con las opciones delante:
+
+   ```
+   restrict,command="/home/deploy/ed/scripts/desplegar-desde-github.sh" <el contenido de boton.pub>
+   ```
+
+   `restrict` apaga el reenvío de puertos y del agente y la terminal;
+   `command` la ata al script.
+3. En GitHub (Settings › Secrets and variables › Actions), desde el clon:
+
+   ```sh
+   gh secret set VPS_LLAVE < boton
+   gh variable set VPS_HOST --body <IP del VPS>
+   gh variable set VPS_LLAVE_DEL_SERVIDOR --body "$(ssh-keyscan -t ed25519 <IP del VPS>)"
+   ```
+
+   La última es la llave del servidor, para que la corrida no le hable a un
+   impostor: compará su huella (`ssh-keygen -lf -` con esa línea) con la de
+   `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` en el VPS.
+4. Borrá `boton` y `boton.pub` de tu máquina.
+
+**Revocarlo:** borrar su línea del VPS y el secreto `VPS_LLAVE`.
