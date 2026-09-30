@@ -16,9 +16,12 @@ log="$HOME/desplegues/$(date -u +%Y-%m-%dT%H%M%SZ).log"
 # ordenar por fecha).
 printf '%s\n' "$HOME"/desplegues/*.log | sort -r | tail -n +20 | xargs -r -d '\n' rm -f --
 
+# El log se crea antes: si lo crea el proceso de abajo, `tail` puede llegar
+# primero, no encontrarlo y marcar en rojo un deploy que sigue andando.
+: >"$log"
 # setsid: el deploy sale del grupo de la sesión SSH, y un corte no lo mata.
 setsid bash -c 'git pull --ff-only && scripts/desplegar.sh; echo "exit=$?"' \
-  >"$log" 2>&1 </dev/null &
+  >>"$log" 2>&1 </dev/null &
 tail -n +1 -f --pid=$! "$log"
 
 codigo=$(sed -n 's/^exit=//p' "$log" | tail -n 1)
