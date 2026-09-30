@@ -28,5 +28,5 @@ export {
   LARGO_MINIMO_CONTRASENA,
 } from "./permisos";
 export type { Capacidad, Rol } from "./permisos";
-export { ROLES_QUE_SE_ASIGNAN, queSePuede, seAsigna } from "./cuentas";
+export { ROLES_QUE_SE_ASIGNAN, darloPideContrasena, queSePuede, seAsigna } from "./cuentas";
 export type { CuentaObjetivo, EstadoDeCuenta, LoQueSePuede } from "./cuentas";

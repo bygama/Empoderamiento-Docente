@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ROLES_QUE_SE_ASIGNAN, queSePuede, seAsigna, type CuentaObjetivo, type LoQueSePuede } from "./cuentas";
+import { ROLES_QUE_SE_ASIGNAN, darloPideContrasena, queSePuede, seAsigna, type CuentaObjetivo, type LoQueSePuede } from "./cuentas";
 
 // La tabla del SPEC de `work/cuentas/` §3, escrita de nuevo a mano. Cada caso
 // dice qué se puede y todo lo demás tiene que ser que no.
@@ -44,6 +44,12 @@ test("una pendiente se reenvía o se cancela; una suspendida se reactiva", () =>
 
 test("quien edita, o lo que no es un rol, no puede nada", () => {
   for (const quien of ["edita", "", "DIRIGE"]) soloEsto(quien, { rol: "edita", ...ACTIVA }, []);
+});
+
+test("dar un rol que maneja las cuentas pide la contraseña de quien lo da; los demás, no", () => {
+  assert.equal(darloPideContrasena("administra"), true);
+  assert.equal(darloPideContrasena("dirige"), true);
+  assert.equal(darloPideContrasena("edita"), false);
 });
 
 test("dirige no se asigna: se pasa", () => {

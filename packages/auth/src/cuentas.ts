@@ -19,6 +19,17 @@ export function seAsigna(valor: unknown): valor is Rol {
   return esRol(valor) && ROLES_QUE_SE_ASIGNAN.includes(valor);
 }
 
+/**
+ * Si dar ese rol (al invitar o con el selector de rol) pide otra vez la
+ * contraseña de quien lo da: los que manejan las cuentas. Con ellos se
+ * invita, se cambian correos y se cierran accesos, así que una sesión ajena
+ * sola no alcanza para repartirlos. Cambiar un correo la pide siempre: es lo
+ * que recupera una cuenta (ADR-0013).
+ */
+export function darloPideContrasena(rol: Rol): boolean {
+  return puede(rol, "usarCuentas");
+}
+
 /** El estado de una cuenta: eligió su contraseña, todavía no, o no puede entrar. */
 export type EstadoDeCuenta = "activa" | "pendiente" | "suspendida";
 
