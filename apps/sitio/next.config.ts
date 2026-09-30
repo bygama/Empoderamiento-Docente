@@ -12,6 +12,9 @@ const raizDelWorkspace = path.join(__dirname, "..", "..");
 const hostDeFotos = hostDelBlob(process.env.BLOB_READ_WRITE_TOKEN);
 
 const nextConfig: NextConfig = {
+  // Sin `X-Powered-By: Next.js`: no le dice a nadie con qué está hecho el
+  // sitio, que es lo primero que mira quien busca una versión con agujeros.
+  poweredByHeader: false,
   // Fuera de Vercel, el build deja un servidor que corre solo
   // (`.next/standalone`): es lo que copia la imagen `app` del VPS (ADR-0018).
   // En Vercel no hace falta, y Vercel arma su propia salida.
