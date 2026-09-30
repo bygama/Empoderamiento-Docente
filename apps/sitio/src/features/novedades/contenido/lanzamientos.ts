@@ -52,7 +52,7 @@ export const lanzamientosDeNovedadesInicial: LanzamientosDeNovedades = {
     {
       tipo: "Artículo · Redalyc 2016",
       titulo: "Oaxaca: una transformación colectiva",
-      foto: fotoDeRuta("/fotos/cierre-encuentro-grupo.webp", "Docentes posan juntos en un aula al cierre de un encuentro"),
+      foto: fotoDeRuta("/fotos/oaxaca-taller-grupo.webp", "El grupo del taller de Oaxaca posa al cierre de un encuentro"),
     },
     {
       tipo: "Artículo · IE REDIECH 2024",
