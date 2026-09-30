@@ -1,14 +1,16 @@
 import { correrTareasDiarias } from "@/datos/tareas/diarias";
+import { esElSecreto } from "@/lib/seguridad/secreto";
 
 // El cron diario pega acá una vez por día y corre todas las tareas registradas
 // (ADR-0011): en Vercel, el de `vercel.json` (en el plan gratis, con hasta una
 // hora de imprecisión); en el VPS, el servicio `cron` del compose, por la red
-// interna (ADR-0018). Sin el secreto correcto, 401 y no se toca nada.
+// interna (ADR-0018). Sin el secreto correcto, 401 y no se toca nada; el
+// secreto se compara en tiempo constante (lib/seguridad/secreto.ts).
 export const maxDuration = 60;
 
 export async function GET(req: Request): Promise<Response> {
   const secreto = process.env.CRON_SECRET;
-  if (!secreto || req.headers.get("authorization") !== `Bearer ${secreto}`) {
+  if (!secreto || !esElSecreto(req.headers.get("authorization"), `Bearer ${secreto}`)) {
     return new Response("No autorizado", { status: 401 });
   }
   const corridas = await correrTareasDiarias();
