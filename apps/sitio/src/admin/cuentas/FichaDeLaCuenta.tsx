@@ -42,8 +42,8 @@ export function FichaDeLaCuenta({ cuenta, se, esLaPropia, correoPropio, aviso }:
         avisos={aviso}
       />
       <div>
-        <ApartadoDeDatos {...deLaFicha} />
-        <ApartadoDelRol {...deLaFicha} />
+        <ApartadoDeDatos {...deLaFicha} correoPropio={correoPropio} />
+        <ApartadoDelRol {...deLaFicha} correoPropio={correoPropio} />
         <ApartadoDelEstado {...deLaFicha} />
         <ApartadoDelSegundoFactor {...deLaFicha} />
         <ApartadoDeSesiones {...deLaFicha} />

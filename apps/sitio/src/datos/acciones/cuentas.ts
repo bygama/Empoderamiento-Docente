@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { puede, seAsigna } from "@ed/auth";
+import { darloPideContrasena, puede, seAsigna } from "@ed/auth";
 import { mandarCorreo } from "@/correos/mandar";
 import { tuCorreoCambio } from "@/correos/tu-correo-cambio";
 import { registrarActividad } from "@/datos/actividad";
@@ -10,12 +10,13 @@ import { auth } from "@/datos/auth";
 import { base } from "@/datos/cliente";
 import { esquemaDelCorreo } from "@/datos/esquemas";
 import { ponerRol } from "@/datos/roles";
-import { NO_PUEDE, SIN_SESION, cerrarElAcceso, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
+import { NO_PUEDE, SIN_SESION, cerrarElAcceso, fallo, pedirTuContrasena, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
 
 // Lo que se le cambia a otra cuenta desde Cuentas (SPEC de work/cuentas §4.3):
 // el rol, el correo y sus sesiones. Quién puede qué lo dice `queSePuede`.
 
-export async function cambiarElRol(idDeCuenta: string, rol: string): Promise<Resultado> {
+/** El rol; si el nuevo maneja las cuentas, pidiendo otra vez tu contraseña (`darloPideContrasena`). */
+export async function cambiarElRol(idDeCuenta: string, rol: string, contrasena?: string): Promise<Resultado> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return SIN_SESION;
@@ -23,6 +24,10 @@ export async function cambiarElRol(idDeCuenta: string, rol: string): Promise<Res
     if (!seAsigna(rol)) return { ok: false, detalle: "Elegí administra o edita." };
     return await sobreLaCuenta(sesion, idDeCuenta, "cambiarElRol", async (cuenta) => {
       if (cuenta.rol === rol) return { ok: true, detalle: `${cuenta.nombre} ya tenía ese rol.` };
+      if (darloPideContrasena(rol)) {
+        const rechazo = await pedirTuContrasena(sesion, contrasena);
+        if (rechazo) return rechazo;
+      }
       // Si el rol nuevo pide el segundo factor y no lo tenía, se lo prende y le cierra las sesiones.
       const { cerroSesiones } = await ponerRol(cuenta.id, rol);
       await registrarActividad({ tipo: "cambio-el-rol", quien: sesion.user.id, sobre: `${cuenta.nombre}, de ${cuenta.rol} a ${rol}`, sobreId: cuenta.id });
@@ -36,12 +41,14 @@ export async function cambiarElRol(idDeCuenta: string, rol: string): Promise<Res
 }
 
 /**
- * El correo con que entra. Le cierra el acceso (si es la propia, las otras
- * sesiones): las sesiones, los enlaces pendientes —también la invitación, que
- * había ido a la dirección vieja— y los dispositivos recordados. Avisa a la
- * dirección vieja y a la nueva (DECISIONS de work/cuentas).
+ * El correo con que entra, pidiendo otra vez tu contraseña: el correo es lo
+ * que recupera una cuenta (ADR-0013), así que cambiarlo es poder entrar a
+ * ella. Le cierra el acceso (si es la propia, las otras sesiones): las
+ * sesiones, los enlaces pendientes —también la invitación, que había ido a la
+ * dirección vieja— y los dispositivos recordados. Avisa a la dirección vieja
+ * y a la nueva (DECISIONS de work/cuentas).
  */
-export async function cambiarElCorreo(idDeCuenta: string, correo: string): Promise<Resultado> {
+export async function cambiarElCorreo(idDeCuenta: string, correo: string, contrasena: string): Promise<Resultado> {
   try {
     const sesion = await auth.api.getSession({ headers: await headers() });
     if (!sesion) return SIN_SESION;
@@ -50,6 +57,8 @@ export async function cambiarElCorreo(idDeCuenta: string, correo: string): Promi
     if (!nuevo.success) return { ok: false, detalle: nuevo.error.issues[0]?.message ?? "Ese correo no sirve." };
     return await sobreLaCuenta(sesion, idDeCuenta, "cambiarElCorreo", async (cuenta) => {
       if (cuenta.correo === nuevo.data) return { ok: true, detalle: "Ese ya era su correo." };
+      const rechazo = await pedirTuContrasena(sesion, contrasena);
+      if (rechazo) return rechazo;
       if (await base.user.findUnique({ where: { email: nuevo.data }, select: { id: true } })) return { ok: false, detalle: `Ya hay otra cuenta con ${nuevo.data}.` };
       await base.user.update({ where: { id: cuenta.id }, data: { email: nuevo.data } });
       const propia = cuenta.id === sesion.user.id;

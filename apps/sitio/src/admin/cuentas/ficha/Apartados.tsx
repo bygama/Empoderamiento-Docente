@@ -16,9 +16,13 @@ import { FormularioDelRol } from "./FormularioDelRol";
 
 export type DeLaFicha = { cuenta: FichaDeCuenta & { rol: Rol }; se: LoQueSePuede; esLaPropia: boolean };
 
-export function ApartadoDeDatos({ cuenta, se, esLaPropia }: DeLaFicha) {
+export function ApartadoDeDatos({ cuenta, se, esLaPropia, correoPropio }: DeLaFicha & { correoPropio: string }) {
   return (
-    <Apartado id="datos" titulo="Datos" descripcion="El correo es con el que entra y adonde le llega el código. Al cambiarlo se le cierran las sesiones y avisamos a las dos direcciones.">
+    <Apartado
+      id="datos"
+      titulo="Datos"
+      descripcion="El correo es con el que entra y adonde le llega el código. Cambiarlo pide tu contraseña; se le cierran las sesiones y avisamos a las dos direcciones."
+    >
       {esLaPropia ? (
         <p className="mb-4 max-w-prose text-admin-meta text-gris-texto">
           Es tu cuenta: tu nombre, tu contraseña y tus sesiones se cambian desde{" "}
@@ -28,17 +32,21 @@ export function ApartadoDeDatos({ cuenta, se, esLaPropia }: DeLaFicha) {
           .
         </p>
       ) : null}
-      {se.cambiarElCorreo ? <FormularioDelCorreo idDeCuenta={cuenta.id} correo={cuenta.correo} /> : <p className="break-all">{cuenta.correo}</p>}
+      {se.cambiarElCorreo ? (
+        <FormularioDelCorreo idDeCuenta={cuenta.id} correo={cuenta.correo} correoPropio={correoPropio} />
+      ) : (
+        <p className="break-all">{cuenta.correo}</p>
+      )}
     </Apartado>
   );
 }
 
-export function ApartadoDelRol({ cuenta, se }: DeLaFicha) {
+export function ApartadoDelRol({ cuenta, se, correoPropio }: DeLaFicha & { correoPropio: string }) {
   return (
     <Apartado id="rol" titulo="Rol" descripcion="Qué puede hacer en el admin. Si el rol nuevo pide el segundo factor y no lo tenía, se le cierran las sesiones.">
       <p className="font-medium capitalize">{cuenta.rol}</p>
       <p className="mt-1 mb-4 max-w-prose text-admin-meta text-gris-texto">{QUE_PUEDE[cuenta.rol]}</p>
-      {se.cambiarElRol ? <FormularioDelRol idDeCuenta={cuenta.id} rol={cuenta.rol} /> : null}
+      {se.cambiarElRol ? <FormularioDelRol idDeCuenta={cuenta.id} rol={cuenta.rol} correoPropio={correoPropio} /> : null}
     </Apartado>
   );
 }

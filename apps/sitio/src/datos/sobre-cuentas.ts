@@ -1,5 +1,8 @@
+import { headers } from "next/headers";
 import { SIN_PERMISO, queSePuede, type LoQueSePuede, type Rol } from "@ed/auth";
-import { borrarEnlaces, type auth } from "./auth";
+import { confirmarContrasena } from "@ed/auth/servidor";
+import { auth, borrarEnlaces } from "./auth";
+import { almacenDeBloqueos } from "./bloqueos-de-acceso";
 import { base } from "./cliente";
 import { cuentaParaActuar } from "./consultas/cuentas";
 import { esquemaDelId } from "./esquemas";
@@ -14,7 +17,8 @@ import { esquemaDelId } from "./esquemas";
 export const HORAS_DE_LA_INVITACION = 72;
 
 export type Sesion = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
-export type Resultado = { ok: boolean; detalle: string };
+/** `campo`: qué campo rechazó, para que el formulario lo marque (`aria-invalid`). */
+export type Resultado = { ok: boolean; detalle: string; campo?: "contrasena" };
 
 export const SIN_SESION: Resultado = { ok: false, detalle: "Hay que entrar al admin para hacer eso." };
 export const NO_PUEDE: Resultado = { ok: false, detalle: SIN_PERMISO };
@@ -39,6 +43,22 @@ export async function sobreLaCuenta(
   const se = queSePuede(sesion.user.rol, { rol: cuenta.rol, estado: cuenta.estado, esLaPropia: cuenta.id === sesion.user.id });
   if (!se[accion]) return NO_PUEDE;
   return hacer({ ...cuenta, rol: cuenta.rol, se });
+}
+
+/**
+ * Pide otra vez la contraseña de quien actúa antes de algo que reparte o
+ * recupera acceso: cambiar un correo, dar un rol que maneja las cuentas
+ * (`darloPideContrasena`) o pasar la dirección. Una sesión robada sola no
+ * alcanza para eso. Cada fallo cuenta en el bloqueo por cuenta como un
+ * intento de entrar (`confirmarContrasena`, ADR-0010). Contesta `null` si
+ * está bien, o el rechazo en llano.
+ */
+export async function pedirTuContrasena(sesion: Sesion, contrasena: unknown): Promise<Resultado | null> {
+  if (typeof contrasena !== "string" || !contrasena) return { ok: false, campo: "contrasena", detalle: "Escribí tu contraseña para confirmar." };
+  const confirmacion = await confirmarContrasena(auth, { headers: await headers(), correo: sesion.user.email, contrasena, bloqueos: almacenDeBloqueos });
+  if (confirmacion === "frenada") return { ok: false, campo: "contrasena", detalle: "Probaste demasiadas veces. Esperá unos minutos y volvé a intentar." };
+  if (confirmacion === "mal") return { ok: false, campo: "contrasena", detalle: "Esa no es tu contraseña." };
+  return null;
 }
 
 /** Un error que no se esperaba: al log, y en llano para quien lo pidió. */
