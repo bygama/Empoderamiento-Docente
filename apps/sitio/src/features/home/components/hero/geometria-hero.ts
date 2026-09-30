@@ -19,6 +19,9 @@ export type Geometria = {
   cy: number;
   /** factor de parallax de scroll medido en el original (>1 = adelanta). */
   par: number;
+  /** `"derecha"` ancla el cartel al borde derecho de la foto: para las
+   *  tarjetas pegadas al margen derecho, donde si no el cartel se sale de pantalla. */
+  cartelA?: "derecha";
 };
 
 // Desktop (≥ lg): las 9 del original más dos sumadas para llenar el vacío de
@@ -26,7 +29,7 @@ export type Geometria = {
 export const GEOMETRIA_CARDS: readonly Geometria[] = [
   { w: 17.36, ar: "300 / 250", cx: 31.25, cy: 7.1, par: 1.027 },
   { w: 12.73, ar: "220 / 280", cx: 81.6, cy: 16.07, par: 1.108 },
-  { w: 13.89, ar: "240 / 320", cx: 93.75, cy: 26.85, par: 1.014 },
+  { w: 13.89, ar: "240 / 320", cx: 91, cy: 26.85, par: 1.014, cartelA: "derecha" },
   { w: 12.73, ar: "220 / 260", cx: 5.21, cy: 25.01, par: 1.068 },
   { w: 16.2, ar: "280 / 240", cx: 16.2, cy: 44.61, par: 1.034 },
   { w: 19.68, ar: "340 / 260", cx: 72.92, cy: 55.71, par: 1.007 },
