@@ -345,8 +345,11 @@ se suba (hasta 4 MB cada una; las del sitio viajan en la imagen); un respaldo
 diario, unos 200 KB más el tamaño de las fotos y los CV, así que 14 días son
 14 veces eso. Lo que más ocupa es Docker: la imagen fuente (~1,5 GB), Umami
 (~1,5 GB), Postgres (~0,4 GB), las 5 imágenes `app` (~0,4 GB cada una, con
-capas compartidas) y la caché del build (~2,5 GB). En total, menos de 10 GB:
-los 50 GB de un KVM 1 alcanzan de sobra.
+capas compartidas) y la caché del build (~2,5 GB). La caché de next/image
+(el volumen `imagenes`), decenas de KB por imagen y tamaño: sobrevive al deploy,
+y `desplegar.sh` la vacía cuando cambia `public/` (a mano:
+`docker compose exec app sh -c 'rm -rf .next/cache/images/*'`). En total,
+menos de 10 GB: los 50 GB de un KVM 1 alcanzan de sobra.
 
 Cómo mirar: `df -h /` (el disco), `docker system df` (lo de Docker) y `du -sh
 ~/ed/respaldos`. Si se llena:
