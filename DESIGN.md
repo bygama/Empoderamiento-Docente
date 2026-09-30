@@ -64,8 +64,9 @@ tipografías, jerarquía, espaciado e iconografía.
 | UI / botones | **Inter**          | 500 Medium  |
 | Mono / código | **JetBrains Mono** | 400 / 500   |
 
-Las tres se cargan vía `next/font/google` con `display: 'swap'` y subset
-`latin` (ver `apps/sitio/src/app/layout.tsx`). Manrope (`font-display`) e Inter
+Las tres se cargan con `next/font/local`, desde los archivos del repo, con
+`display: 'swap'` y subset `latin` (ver `apps/sitio/src/config/fuentes/`).
+Manrope (`font-display`) e Inter
 (`font-sans`) son las principales; JetBrains Mono (`font-mono`) es auxiliar,
 para notación / detalles tipo código.
 
@@ -280,7 +281,7 @@ automáticamente a las clases utilitarias.
   --color-gris-texto: #6b7280;
   --color-rojo-error: #b42318;
 
-  /* tipografías expuestas por next/font/google en apps/sitio/src/app/layout.tsx */
+  /* tipografías expuestas por next/font en apps/sitio/src/config/fuentes/ */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
@@ -324,9 +325,9 @@ Clases utilitarias generadas automáticamente:
   `text-admin-titulo`, `text-admin-seccion`, `text-admin-cuerpo` y
   `text-admin-meta` (§11).
 
-Las fuentes se cargan con `next/font/google` en `apps/sitio/src/app/layout.tsx`, que
-las inyecta como CSS vars (`--font-inter`, `--font-manrope`) que luego
-consume el `@theme`.
+Las fuentes se declaran con `next/font/local` en `apps/sitio/src/config/fuentes/`
+y los layouts las inyectan como CSS vars (`--font-inter`, `--font-manrope`) que
+luego consume el `@theme`.
 
 ---
 
