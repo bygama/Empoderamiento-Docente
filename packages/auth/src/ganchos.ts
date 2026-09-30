@@ -2,6 +2,7 @@ import { createAuthMiddleware, isAPIError } from "better-auth/api";
 import {
   OLVIDO,
   claveDeBloqueo,
+  claveDeCodigos,
   conUnFalloMas,
   respuestaDeFreno,
   segundosDeFreno,
@@ -49,9 +50,14 @@ function rehashearSiHaceFalta(ctx: Contexto, idDeCuenta: string, contrasena: str
   );
 }
 
-/** Un reset de contraseña completo destraba la cuenta: quien lo hizo probó que tiene el buzón. */
-export function destrabar(bloqueos: AlmacenDeBloqueos, correo: string, secreto: string): Promise<void> {
-  return bloqueos.borrar(claveDeBloqueo(correo, secreto));
+/**
+ * Un reset de contraseña completo destraba la cuenta, para entrar y para
+ * probar códigos: quien lo hizo probó que tiene el buzón, que es adonde van
+ * los códigos.
+ */
+export async function destrabar(bloqueos: AlmacenDeBloqueos, cuenta: { id: string; email: string }, secreto: string): Promise<void> {
+  await bloqueos.borrar(claveDeBloqueo(cuenta.email, secreto));
+  await bloqueos.borrar(claveDeCodigos(cuenta.id, secreto));
 }
 
 export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena, borrarEnlaces }: OpcionesDeGanchos) {

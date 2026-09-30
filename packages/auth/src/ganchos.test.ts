@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { betterAuth } from "better-auth";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import { hashPassword as hashearConScrypt } from "better-auth/crypto";
-import { claveDeBloqueo, type AlmacenDeBloqueos, type EstadoDeBloqueo } from "./bloqueo";
+import { claveDeBloqueo, claveDeCodigos, conUnFalloMas, type AlmacenDeBloqueos, type EstadoDeBloqueo } from "./bloqueo";
 import { hashear, verificar } from "./contrasenas";
 import { crearGanchos, destrabar } from "./ganchos";
 import type { SucesoDeSesion } from "./opciones";
@@ -122,12 +122,15 @@ test("entrar bien con un hash scrypt lo pasa a Argon2id", async () => {
   assert.equal(await verificar({ hash: guardado, password: CONTRASENA }), true);
 });
 
-test("un reset de contraseña destraba la cuenta, escriba como escriba el correo", async () => {
-  const { bloqueos, entrar, clave } = await armar("ana@ed.test", hashear);
+test("un reset de contraseña destraba la cuenta, escriba como escriba el correo, y también sus códigos", async () => {
+  const { bloqueos, cuenta, entrar, clave } = await armar("ana@ed.test", hashear);
   for (let i = 0; i < 5; i++) await entrar("ana@ed.test", "una-contrasena-mala");
   assert.notEqual(bloqueos.filas.get(clave)?.hasta ?? null, null);
-  await destrabar(bloqueos, "Ana@ED.test", SECRETO);
+  const deCodigos = claveDeCodigos(cuenta.id, SECRETO);
+  await bloqueos.actualizar(deCodigos, (actual) => conUnFalloMas(actual, new Date()));
+  await destrabar(bloqueos, { id: cuenta.id, email: "Ana@ED.test" }, SECRETO);
   assert.equal(bloqueos.filas.has(clave), false);
+  assert.equal(bloqueos.filas.has(deCodigos), false);
   assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
 });
 
