@@ -25,7 +25,7 @@
      6.57:1 sobre blanco, 5.75:1 sobre su tinte al 8 %. */
   --color-rojo-error: #b42318;
 
-  /* === Tipografías (variables expuestas por next/font en layout.tsx) === */
+  /* === Tipografías (variables expuestas por next/font en config/fuentes/) === */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;

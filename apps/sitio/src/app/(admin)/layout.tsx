@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
 import { connection } from "next/server";
 import "../globals.css";
+import { inter, manrope } from "@/config/fuentes/compartidas";
 
 // El layout raíz del admin. Es el SEGUNDO layout raíz de la app —el otro es el
 // del sitio—, y por eso `app/(sitio)/[...resto]` sigue existiendo: con dos
 // raíces, Next no tiene una 404 global.
-
-const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter", weight: ["400", "500", "600"] });
-const manrope = Manrope({ subsets: ["latin"], display: "swap", variable: "--font-manrope", weight: ["500", "700"] });
 
 export const metadata: Metadata = {
   // Cada pantalla da solo su nombre y el template le suma el admin: «Páginas ·

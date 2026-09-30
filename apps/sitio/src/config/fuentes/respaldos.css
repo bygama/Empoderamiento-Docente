@@ -1,0 +1,53 @@
+/* El respaldo de cada fuente mientras baja su archivo, y para los caracteres
+   que el archivo no trae (las flechas de Investigación): Arial, ajustada para
+   ocupar lo mismo y que el texto no salte cuando llega la fuente (CLS). Son
+   las métricas que usaba la carga desde Google Fonts, que `next/font` saca de
+   su propia tabla (`calculateSizeAdjustValues`, en
+   next/dist/server/font-utils), copiadas tal cual. `next/font/local` las
+   calcularía del archivo y darían hasta un 3 % distinto; por eso cada fuente
+   va con `adjustFontFallback: false` y nombra la suya en `fallback`. */
+
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+  size-adjust: 107.12%;
+}
+
+@font-face {
+  font-family: "Manrope Fallback";
+  src: local("Arial");
+  ascent-override: 103.31%;
+  descent-override: 29.07%;
+  line-gap-override: 0%;
+  size-adjust: 103.19%;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Fallback";
+  src: local("Arial");
+  ascent-override: 75.79%;
+  descent-override: 22.29%;
+  line-gap-override: 0%;
+  size-adjust: 134.59%;
+}
+
+@font-face {
+  font-family: "Caveat Fallback";
+  src: local("Arial");
+  ascent-override: 124.77%;
+  descent-override: 38.99%;
+  line-gap-override: 0%;
+  size-adjust: 76.94%;
+}
+
+@font-face {
+  font-family: "Courier Prime Fallback";
+  src: local("Arial");
+  ascent-override: 58.08%;
+  descent-override: 25.41%;
+  line-gap-override: 0%;
+  size-adjust: 134.5%;
+}
