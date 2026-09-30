@@ -60,7 +60,9 @@ export async function nivelSinLugar(base: PrismaClient | Prisma.TransactionClien
   const lugares = cupo.lugares(nivel);
   if (lugares === null) return null;
   const { rotulo } = NIVELES[nivel - 1];
-  const publicadas = await base.persona.findMany({ where: { nivel, publicado: true, id: { not: id } }, select: { slug: true, nombre: true, borrador: true } });
+  // En el orden del sitio: sin `orderBy`, Postgres devuelve las filas como
+  // quedaron en disco y el aviso nombraba a la gente en cualquier orden.
+  const publicadas = await base.persona.findMany({ where: { nivel, publicado: true, id: { not: id } }, select: { slug: true, nombre: true, borrador: true }, orderBy: { orden: "asc" } });
   const otras = publicadas.filter((o) => cupo.ocupa(o.slug));
   if (otras.length < lugares) return null;
   const quienes = EN_LISTA.format(otras.map(nombreDe));
