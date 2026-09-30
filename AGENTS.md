@@ -152,10 +152,12 @@ build lee la base y corre adentro del compose. Runbook en
 ├── work/                  ← lanes de trabajo: SPEC, PLAN, PROGRESS y
 │                            DECISIONS de cada cambio grande en curso
 ├── .githooks/             ← pre-push: el gate de §5.8 (se instala solo)
+├── .github/workflows/     ← desplegar.yml: el botón que deploya main en el VPS
 ├── scripts/               ← instalar-hooks.mjs, verificar-react-doctor.mjs,
 │                            guarda-prisma.mjs, comparar-render.mjs; y los del
 │                            VPS: desplegar.sh (la única entrada del deploy),
-│                            volver.sh y restaurar.sh
+│                            desplegar-desde-github.sh (lo único que puede
+│                            correr la llave del botón), volver.sh y restaurar.sh
 ├── Dockerfile             ← las imágenes del VPS: `fuente` y `app` (el standalone)
 ├── compose.yaml           ← el VPS: proxy (Caddy), app, db, analitica (Umami),
 │                            cron, respaldo y los de una vez (migrar, construir,
@@ -860,6 +862,13 @@ define al implementar cada fase.
 - [x] **Deploy para los dos hosts** (ADR-0018): la imagen, el compose, Umami,
       el cron, la IP real y los respaldos, probados en local
       (`work/deploy-en-vps/`).
-- [ ] VPS: el servidor de verdad, con el runbook (`docs/deploy/vps.md`)
-- [ ] Vercel: Root Directory = `apps/sitio` cuando exista el proyecto
-- [ ] CI/CD
+- [x] **Producción en el VPS** desde el 2026-09-30: `empoderamientodocente.org`
+      en el Hostinger de ED, con el runbook (`docs/deploy/vps.md`, «Producción
+      hoy») y una llave por persona. Vercel ya no recibe tráfico (el código
+      sigue sirviendo para los dos).
+- [x] **CD:** el botón Actions › Desplegar deploya `main` en el VPS, con una
+      llave atada a un solo comando (`docs/deploy/vps.md` §14).
+- [ ] **CI:** typecheck, lint, react-doctor y build en cada PR (hoy los corre
+      el `pre-push`, salvo el build).
+- [ ] Resend en producción: sin él, nadie que dirige o administra entra al
+      admin (el segundo factor llega por correo).
