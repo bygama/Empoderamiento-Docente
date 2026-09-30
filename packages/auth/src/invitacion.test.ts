@@ -1,4 +1,4 @@
-import { test } from "node:test";
+import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { betterAuth } from "better-auth";
 import { memoryAdapter } from "better-auth/adapters/memory";
@@ -9,6 +9,17 @@ import { crearEnlaceDeInvitacion } from "./invitacion";
 // El enlace de invitación contra better-auth de verdad, con la config de
 // producción (tokens hasheados incluidos): si una versión nueva cambia el
 // formato del reset, estos tests son los que se enteran.
+
+// Elegir la contraseña le pregunta a Have I Been Pwned si está filtrada
+// (config.ts): acá contesta que ninguna, sin red. Lo prueba
+// contrasenas-filtradas.test.ts.
+const fetchDeVerdad = globalThis.fetch;
+before(() => {
+  globalThis.fetch = async () => new Response("0000000000000000000000000000000000A:0");
+});
+after(() => {
+  globalThis.fetch = fetchDeVerdad;
+});
 
 const sinBloqueos: AlmacenDeBloqueos = {
   leer: async () => null,
