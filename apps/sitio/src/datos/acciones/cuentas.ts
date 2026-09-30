@@ -10,7 +10,7 @@ import { auth } from "@/datos/auth";
 import { base } from "@/datos/cliente";
 import { esquemaDelCorreo } from "@/datos/esquemas";
 import { ponerRol } from "@/datos/roles";
-import { NO_PUEDE, SIN_SESION, cerrarSesiones, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
+import { NO_PUEDE, SIN_SESION, cerrarElAcceso, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
 
 // Lo que se le cambia a otra cuenta desde Cuentas (SPEC de work/cuentas §4.3):
 // el rol, el correo y sus sesiones. Quién puede qué lo dice `queSePuede`.
@@ -36,8 +36,10 @@ export async function cambiarElRol(idDeCuenta: string, rol: string): Promise<Res
 }
 
 /**
- * El correo con que entra. Le cierra las sesiones (si es la propia, las
- * otras) y avisa a la dirección vieja y a la nueva (DECISIONS de work/cuentas).
+ * El correo con que entra. Le cierra el acceso (si es la propia, las otras
+ * sesiones): las sesiones, los enlaces pendientes —también la invitación, que
+ * había ido a la dirección vieja— y los dispositivos recordados. Avisa a la
+ * dirección vieja y a la nueva (DECISIONS de work/cuentas).
  */
 export async function cambiarElCorreo(idDeCuenta: string, correo: string): Promise<Resultado> {
   try {
@@ -51,14 +53,15 @@ export async function cambiarElCorreo(idDeCuenta: string, correo: string): Promi
       if (await base.user.findUnique({ where: { email: nuevo.data }, select: { id: true } })) return { ok: false, detalle: `Ya hay otra cuenta con ${nuevo.data}.` };
       await base.user.update({ where: { id: cuenta.id }, data: { email: nuevo.data } });
       const propia = cuenta.id === sesion.user.id;
-      await cerrarSesiones(cuenta.id, propia ? sesion.session.id : undefined);
+      await cerrarElAcceso(cuenta.id, propia ? sesion.session.id : undefined);
       const contenido = tuCorreoCambio({ nombre: cuenta.nombre, anterior: cuenta.correo, nuevo: nuevo.data, cuando: new Date() });
       const salidas = await Promise.all([cuenta.correo, nuevo.data].map((para) => mandarCorreo({ para, contenido }).catch(() => "no-salio" as const)));
       await registrarActividad({ tipo: "cambio-el-correo", quien: sesion.user.id, sobre: cuenta.nombre, sobreId: cuenta.id });
       revalidatePath("/admin", "layout");
       const sesiones = propia ? "Cerramos tus otras sesiones" : "Le cerramos las sesiones";
       const aviso = salidas.includes("no-salio") ? ", pero el aviso por correo no salió." : " y avisamos por correo a las dos direcciones.";
-      return { ok: true, detalle: `Listo: ahora entra con ${nuevo.data}. ${sesiones}${aviso}` };
+      const invitacion = cuenta.estado === "pendiente" ? " La invitación que tenía dejó de servir: reenviala para que le llegue a la dirección nueva." : "";
+      return { ok: true, detalle: `Listo: ahora entra con ${nuevo.data}. ${sesiones}${aviso}${invitacion}` };
     });
   } catch (e) {
     return fallo("cambiarElCorreo", e);
@@ -71,10 +74,10 @@ export async function cerrarSusSesiones(idDeCuenta: string): Promise<Resultado> 
     if (!sesion) return SIN_SESION;
     if (!puede(sesion.user.rol, "usarCuentas")) return NO_PUEDE;
     return await sobreLaCuenta(sesion, idDeCuenta, "cerrarSusSesiones", async (cuenta) => {
-      await cerrarSesiones(cuenta.id);
+      await cerrarElAcceso(cuenta.id);
       await registrarActividad({ tipo: "cerro-las-sesiones", quien: sesion.user.id, sobre: cuenta.nombre, sobreId: cuenta.id });
       revalidatePath("/admin/cuentas", "layout");
-      return { ok: true, detalle: `Listo: cerramos las sesiones de ${cuenta.nombre}.` };
+      return { ok: true, detalle: `Listo: cerramos las sesiones de ${cuenta.nombre} y olvidamos sus dispositivos recordados.` };
     });
   } catch (e) {
     return fallo("cerrarSusSesiones", e);

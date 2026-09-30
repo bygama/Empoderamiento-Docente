@@ -6,7 +6,7 @@ import { puede } from "@ed/auth";
 import { registrarActividad } from "@/datos/actividad";
 import { auth } from "@/datos/auth";
 import { base } from "@/datos/cliente";
-import { NO_PUEDE, SIN_SESION, borrarSiNuncaHizoNada, cerrarSesiones, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
+import { NO_PUEDE, SIN_SESION, borrarSiNuncaHizoNada, cerrarElAcceso, fallo, sobreLaCuenta, type Resultado } from "@/datos/sobre-cuentas";
 
 // Suspender en vez de borrar (SPEC de work/cuentas §4.3): una cuenta
 // suspendida ya no entra, pero su nombre queda en la historia. Borrar, solo
@@ -19,8 +19,10 @@ export async function suspender(idDeCuenta: string): Promise<Resultado> {
     if (!puede(sesion.user.rol, "usarCuentas")) return NO_PUEDE;
     return await sobreLaCuenta(sesion, idDeCuenta, "suspender", async (cuenta) => {
       await base.user.update({ where: { id: cuenta.id }, data: { suspendida: true } });
-      // Las que tenía abiertas, al instante: una suspendida no abre otras (`@ed/auth`, suspendidas.ts).
-      await cerrarSesiones(cuenta.id);
+      // Las que tenía abiertas, al instante, y sus enlaces y dispositivos
+      // recordados: una suspendida no abre otras (`@ed/auth`, suspendidas.ts),
+      // y al reactivarla no vuelve nada de antes.
+      await cerrarElAcceso(cuenta.id);
       await registrarActividad({ tipo: "suspendio", quien: sesion.user.id, sobre: cuenta.nombre, sobreId: cuenta.id });
       revalidatePath("/admin/cuentas", "layout");
       return { ok: true, detalle: `Listo: ${cuenta.nombre} ya no puede entrar. Su nombre sigue en la historia.` };
