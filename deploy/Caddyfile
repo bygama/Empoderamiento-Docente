@@ -3,16 +3,24 @@
 # Caddy con `localhost`, para la prueba local.
 {
 	email {$CORREO_ACME}
+	servers {
+		# Quién puede decir cuál es la IP de quien pide. Sin Cloudflare, nadie:
+		# 127.0.0.1 no le habla nunca al proxy, y vale la de la conexión. Con
+		# Cloudflare (compose.cloudflare.yaml), la red interna, por donde entra
+		# el túnel con la IP en CF-Connecting-IP.
+		trusted_proxies static {$PROXIES_DE_CONFIANZA:127.0.0.1/32}
+		client_ip_headers Cf-Connecting-Ip
+	}
 }
 
-# La IP de quien pide. Caddy ignora el X-Forwarded-For que manda un cliente
-# (no hay `trusted_proxies`: no hay nada delante) y pone la de la conexión.
-# X-Real-IP, en cambio, pasaría tal cual, y la app la lee como segunda opción
-# (lib/formularios/limite.ts, better-auth): se pisa también. La app y Umami
+# La IP de quien pide, `{client_ip}`: la de la conexión, o la que trae el
+# túnel. Las dos cabeceras se pisan con ese único valor, porque la app y
+# better-auth leen X-Real-IP y X-Forwarded-For, y un X-Forwarded-For que se
+# encadena deja adelante lo que haya mandado el cliente. La app y Umami
 # confían en estas cabeceras porque nadie más que Caddy les habla (ADR-0018).
-# Si algún día va un CDN delante, sus rangos van en `trusted_proxies`.
 (ip-real) {
-	header_up X-Real-IP {remote_host}
+	header_up X-Real-IP {client_ip}
+	header_up X-Forwarded-For {client_ip}
 	# La ubicación de una sesión sale de estas en Vercel
 	# (packages/auth/src/ubicacion.ts). Acá no hay Vercel: si llegan, las mandó
 	# el cliente.
@@ -22,11 +30,13 @@
 # www. lleva al dominio con el mismo camino. El DNS de www suele ser un CNAME
 # al dominio; sin este bloque, Caddy no tendría certificado para www y el
 # navegador mostraría un error de TLS.
-www.{$DOMINIO} {
+{$ESQUEMA:}www.{$DOMINIO} {
 	redir https://{$DOMINIO}{uri} permanent
 }
 
-{$DOMINIO} {
+# Con Cloudflare, ESQUEMA es "http://" (compose.cloudflare.yaml): TLS termina
+# allá y el túnel llega por HTTP. Sin él, vacío: Caddy saca el certificado.
+{$ESQUEMA:}{$DOMINIO} {
 	encode zstd gzip
 
 	# Cada pedido, en JSON por la salida del contenedor (Docker la rota: el
