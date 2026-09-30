@@ -468,6 +468,14 @@
   Facundo). Pasar el dominio al VPS antes de ese porte le saca al sitio público
   la versión de celular.
 
+- 2026-09-30 — **El dominio, en el VPS.** Mateo cambió el `A @` de
+  `empoderamientodocente.org` a `2.24.68.136`: el sitio todavía no está lanzado,
+  así que no espera al porte de celular. Un respaldo a mano, `DOMINIO` al dominio
+  en el `.env` (y en la copia de afuera) y `desplegar.sh` con `982dfee5`, exit 0.
+  Las 7 páginas, `/admin/entrar`, `robots.txt` y `sitemap.xml` en 200; `www.`
+  redirige con 301; certificados de Let's Encrypt para los dos; Umami con el
+  dominio nuevo. Vercel ya no recibe nada: el proyecto se puede borrar.
+
 ## Hecho
 
 ## Abierto
@@ -476,8 +484,8 @@
 - Antes del primer deploy de lo nuevo: Resend configurado y probado (sin mail,
   dirige y administra no entran: segundo factor de la 3b); verificar en
   Vercel cómo llega `X-Forwarded-For` (nota de la lane 2).
-- El cambio de DNS, después del porte de la versión de celular a main (entrada
-  del 2026-09-30).
+- El porte de la versión de celular a main (Gastón y Facundo): hoy el sitio
+  público no la tiene.
 - `origen-03-pregunta.webp` está dos veces (`public/fotos/` para Quiénes
   somos y `public/quienes-somos/` para una novedad): deduplicar en la lane 9
   (Fotos), cuando se consolide dónde vive cada archivo.
