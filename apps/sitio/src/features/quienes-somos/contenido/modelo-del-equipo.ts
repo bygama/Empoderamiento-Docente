@@ -48,7 +48,8 @@ export const TOPES = {
   rolCompleto: 90,
   lugar: 50,
   titular: 100,
-  intro: 400,
+  // La bajada más larga es la de Paola Balda, con sus palabras: 463.
+  intro: 480,
   formacion: 6,
   unaFormacion: 120,
   categorias: 6,
