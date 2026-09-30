@@ -23,6 +23,14 @@ if [ ! -f .env ]; then
   echo "Falta .env: copiá .env.example y completalo (docs/deploy/vps.md)." >&2
   exit 1
 fi
+# Un deploy a la vez: el botón de GitHub y alguien por SSH se pueden cruzar, y
+# dos builds juntos pasan la memoria del VPS. El candado vive lo que vive el
+# proceso, así que un deploy cortado no lo deja trabado. Git Bash no trae
+# `flock`: en la prueba local se sigue sin candado.
+if command -v flock >/dev/null; then
+  exec 9>"${TMPDIR:-/tmp}/ed-desplegar.candado"
+  flock -n 9 || { echo "Ya hay un deploy corriendo en este servidor: esperá a que termine." >&2; exit 1; }
+fi
 version=$(git rev-parse --short=12 HEAD)
 if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   echo "Hay cambios sin commitear: la imagen diría $version y no sería eso." >&2
