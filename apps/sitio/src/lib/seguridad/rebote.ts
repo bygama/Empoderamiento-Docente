@@ -10,6 +10,14 @@
  *
  * Sin JS: un `<meta http-equiv="refresh">`, que la CSP no frena porque no es
  * script, y un link «Seguir» para quien tenga el refresh apagado.
+ *
+ * **La contracara: un GET del admin no puede cambiar nada.** El rebote
+ * convierte cualquier link de otro sitio en un GET con la sesión puesta, así
+ * que `SameSite=Strict` protege solo lo que no se hace con un GET. Todo lo
+ * que escribe va por una Server Action o por la API de better-auth, que son
+ * POST y no rebotan; las páginas y las rutas del admin (`route.ts`) solo
+ * leen, por `datos/consultas/`. Lo único que un GET toca es la renovación de
+ * la propia sesión, que hace better-auth. `proxy.test.ts` lo vigila.
  */
 
 /**
