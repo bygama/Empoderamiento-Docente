@@ -1,5 +1,6 @@
 import type { BetterAuthOptions } from "better-auth";
 import { frenarSiEstaSuspendida } from "./suspendidas";
+import { toparLaRenovacion } from "./vida-de-la-sesion";
 
 /**
  * Dónde se abrió cada sesión, para que la persona reconozca las suyas en Mi
@@ -48,7 +49,8 @@ export const CAMPOS_DE_LA_SESION = {
  * Lo que pasa al crear una sesión: al entrar, con el código y cuando cambiar
  * la contraseña abre una nueva. Primero, que la cuenta no esté suspendida
  * (suspendidas.ts); después, dónde se abrió. Una sesión creada fuera de un
- * pedido queda sin ubicación.
+ * pedido queda sin ubicación. Y al renovarla, el tope de 7 días desde que se
+ * abrió (vida-de-la-sesion.ts).
  */
 export const GANCHOS_DE_LA_BASE: BetterAuthOptions["databaseHooks"] = {
   session: {
@@ -58,5 +60,6 @@ export const GANCHOS_DE_LA_BASE: BetterAuthOptions["databaseHooks"] = {
         return { data: { ...sesion, ...ubicacionDelPedido(ctx?.headers ?? ctx?.request?.headers) } };
       },
     },
+    update: { before: toparLaRenovacion },
   },
 };
