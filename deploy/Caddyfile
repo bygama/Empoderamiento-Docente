@@ -13,6 +13,10 @@
 # Si algún día va un CDN delante, sus rangos van en `trusted_proxies`.
 (ip-real) {
 	header_up X-Real-IP {remote_host}
+	# La ubicación de una sesión sale de estas en Vercel
+	# (packages/auth/src/ubicacion.ts). Acá no hay Vercel: si llegan, las mandó
+	# el cliente.
+	header_up -X-Vercel-*
 }
 
 # www. lleva al dominio con el mismo camino. El DNS de www suele ser un CNAME
@@ -24,6 +28,41 @@ www.{$DOMINIO} {
 
 {$DOMINIO} {
 	encode zstd gzip
+
+	# Cada pedido, en JSON por la salida del contenedor (Docker la rota: el
+	# daemon.json del VPS, docs/deploy/vps.md). La IP va enmascarada, como en
+	# las visitas, y sin cookies ni credenciales: sirve para ver un ataque o un
+	# error, no para seguir a una persona.
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip ip_mask 24 48
+				request>client_ip ip_mask 24 48
+				request>headers>Cookie delete
+				request>headers>Authorization delete
+				resp_headers>Set-Cookie delete
+			}
+		}
+	}
+
+	# Sin rastro del servidor en las respuestas.
+	header {
+		-Server
+		-Via
+		defer
+	}
+
+	# El cron llama a la app por la red interna (deploy/cron/correr.mjs):
+	# desde afuera, esa ruta no existe. TRACE no lo usa nada.
+	handle /api/cron/* {
+		respond 404
+	}
+	@trace method TRACE
+	handle @trace {
+		respond 405
+	}
 
 	# Umami (servicio `analitica`): el script que carga el sitio y el pedido
 	# que manda cada vista, y nada más. Su panel, su login y su API no salen a
