@@ -15,8 +15,8 @@ export type CierreDeNovedades = z.infer<typeof esquemaCierreDeNovedades>;
 
 /** El contenido de hoy, tal cual está en el sitio. */
 export const cierreDeNovedadesInicial: CierreDeNovedades = {
-  titulo: "No te pierdas nada.",
-  conRedes: "Escribinos y contamos lo que estamos haciendo, o seguinos en redes para enterarte de cada novedad apenas sale.",
+  titulo: "Enterate de todo.",
+  conRedes: "Seguinos en redes para conocer cada novedad apenas sale.",
   sinRedes: "Escribinos y te contamos lo que estamos haciendo.",
   boton: "Hablemos",
 };

@@ -17,7 +17,7 @@ export type CierreDeBiblioteca = z.infer<typeof esquemaCierreDeBiblioteca>;
 /** El contenido de hoy, tal cual está en el sitio. */
 export const cierreDeBibliotecaInicial: CierreDeBiblioteca = {
   titulo: "Un faro para cada aula.",
-  texto: "Todo lo que investigamos y diseñamos, abierto y listo para usar. La biblioteca sigue creciendo: volvé cuando quieras.",
+  texto: "Todo lo que investigamos y diseñamos, abierto y listo para usar. La biblioteca sigue creciendo: volvé cuando quieras.",
   boton: "¿Buscás un material puntual?",
   enlace: "Ver novedades",
 };

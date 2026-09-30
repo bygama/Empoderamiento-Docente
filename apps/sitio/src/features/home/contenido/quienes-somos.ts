@@ -21,12 +21,12 @@ export const quienesSomosInicial: QuienesSomos = {
   titulo: "¿Quiénes somos?",
   cuerpo: [
     "Somos una manera distinta de comprender **las matemáticas, la educación y el desarrollo profesional docente.** Una convicción hecha acción.",
-    "Partimos de lo construido para seguir construyendo, junto a las comunidades educativas. Empoderamiento Docente **instituye lo instituido:** parte de los saberes existentes y los resignifica, desde la experiencia compartida, en **nuevos modos de comprender, enseñar y construir conocimiento.**",
+    "Partimos de lo construido para seguir construyendo, junto a las comunidades educativas. Empoderamiento Docente **instituye lo instituido:** parte de los saberes existentes y los resignifica, desde la experiencia compartida, **en nuevos modos de comprender, favorecer aprendizajes y construir conocimiento.**",
   ].join("\n\n"),
   // Una sola salida por bloque, hacia la página que lo amplía (Gastón, 2026-09-11).
   enlace: { texto: "Conocé al equipo", ruta: "/quienes-somos" },
   foto: fotoDeRuta(
-    "/fotos/formadoras-pizarra-umce.webp",
-    "Tres formadoras junto a la pizarra de una sesión en la Universidad Metropolitana de Ciencias de la Educación",
+    "/fotos/formadora-recorre-aula.webp",
+    "Una formadora recorre el aula y acompaña a docentes que resuelven una actividad",
   ),
 };

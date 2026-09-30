@@ -61,13 +61,13 @@ export const miradaInicial: MiradaDeQuienesSomos = {
   principios: [
     {
       nombre: "Pensamiento matemático",
-      frase: "La matemática no es solo **resolver cuentas**",
+      frase: "La matemática no es solo resolver cuentas",
       afirmacion: "Es una manera de **pensar, argumentar y actuar** en el mundo.",
       fichas: ["Construir estrategias", "Argumentar", "Tomar decisiones", "Resolver problemas", "Actuar dentro y fuera del aula"],
     },
     {
       nombre: "Empoderamiento desde el saber",
-      frase: "El poder no es **sobre otras personas**",
+      frase: "El poder no es sobre otras personas",
       afirmacion: "Es poder para **transformar**.",
       fichas: ["Saber", "Reflexión", "Experiencia", "Convicción para transformar", "Mirada no deficitaria"],
     },

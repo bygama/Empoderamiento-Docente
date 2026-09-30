@@ -62,7 +62,7 @@ export const puenteInicial: Puente = {
     },
     {
       nombre: "Guías",
-      descripcion: "Orientaciones paso a paso para llevar las ideas al aula sin perderse en el camino.",
+      descripcion: "Intencionalidades que hacen visible los fundamentos de los diseños para entrar en diálogo con la implementación.",
       linea: "Desarrollo del pensamiento matemático",
       foto: fotoDeRuta("/fotos/formadora-recorre-aula.webp", "Una formadora recorre el aula y acompaña a docentes que resuelven una actividad"),
     },

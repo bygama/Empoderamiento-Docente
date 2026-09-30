@@ -19,8 +19,8 @@ export type Mision = z.infer<typeof esquemaMision>;
 export const misionInicial: Mision = {
   titulo: "Misión",
   cuerpo: [
-    "Hacer que **las matemáticas** se conviertan en una oportunidad para **comprender, decidir y transformar el mundo.**",
-    "Buscamos que las y los participantes de nuestros encuentros vivan un proceso de **empoderamiento,** reconocido como un **cambio de relación con el saber matemático escolar,** a través de estrategias basadas en la investigación y la teoría educativa, para promover la **transformación y la mejora educativa.**",
+    "Hacer que **las matemáticas** se conviertan en una oportunidad **para comprender, decidir y transformar el mundo.**",
+    "Proponemos escenarios en los que las y los participantes vivan procesos de **empoderamiento,** reconocido como un **cambio de relación con la matemática escolar,** a través de estrategias basadas en la investigación y la teoría educativa, para promover la **transformación y la mejora educativa.**",
   ].join("\n\n"),
   foto: fotoDeRuta("/fotos/docentes-encuentro-formacion.webp", "Docentes participando de una propuesta de Empoderamiento Docente"),
 };

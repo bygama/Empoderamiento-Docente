@@ -53,7 +53,7 @@ export const comoTrabajamosInicial: ComoTrabajamos = {
     {
       titulo: "Implementamos",
       detalle:
-        "Construimos procesos donde la experiencia, la implementación y la práctica reflexiva fortalecen el desarrollo profesional y generan nuevas formas de relacionarse con las matemáticas y de fortalecer las decisiones pedagógicas.",
+        "Construimos procesos donde la experiencia, la implementación y la práctica reflexiva fortalecen el desarrollo profesional y propician nuevas formas de relacionarse con las matemáticas y de fortalecer las decisiones pedagógicas.",
       foto: fotoDeRuta("/fotos/formadora-acompana-grupo.webp", "Una formadora acompaña a un grupo mientras trabaja — etapa de implementación"),
     },
     {

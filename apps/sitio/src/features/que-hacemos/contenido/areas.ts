@@ -87,9 +87,9 @@ export const areasInicial: AreasDeQueHacemos = {
       nombreCorto: "Desarrollo profesional",
       frase: "La experiencia como fuente de reflexión",
       detalle:
-        "Impulsamos procesos de desarrollo profesional con **sustento vivencial y acompañamiento** que fortalecen la práctica, promueven la reflexión y resignifican las matemáticas.",
-      teLlevas: ["Dispositivo a tu medida", "Formación de liderazgos", "Seguimiento en el aula"],
-      paraQuien: "Ministerios, empresas, fundaciones y redes que forman a escala",
+        "Impulsamos procesos de desarrollo profesional con **sustento vivencial y acompañamiento** que ponen la práctica en diálogo con la reflexión y favorecen procesos de resignificación de las matemáticas.",
+      teLlevas: ["Dispositivo a tu medida", "Formación de liderazgos", "Acompañamiento en el aula"],
+      paraQuien: "Escuelas, instituciones educativas, ministerios, fundaciones y redes que trabajan a escala",
       foto: fotoDeRuta("/fotos/formadora-mesas-redondas.webp", "Una formadora conversa con docentes sentados en mesas redondas"),
     },
     {
@@ -97,7 +97,7 @@ export const areasInicial: AreasDeQueHacemos = {
       nombreCorto: "Materiales didácticos",
       frase: "Cada tarea puede transformar la relación con las matemáticas",
       detalle:
-        "Diseñamos materiales que median la relación entre docentes, matemáticas y aprendizaje, generando **rupturas productivas** que invitan a explorar, argumentar y resignificar.",
+        "Diseñamos materiales que median la relación entre docentes, estudiantes, matemáticas y aprendizaje, generando **rupturas productivas** que invitan a explorar, argumentar y resignificar.",
       teLlevas: ["Colecciones didácticas", "Situaciones de aprendizaje", "Recursos digitales"],
       paraQuien: "Sistemas y redes que necesitan materiales propios para su contexto",
       foto: fotoDeRuta("/fotos/cubos-mano.webp", "Cubos de papel armados en la palma de una mano"),
@@ -107,8 +107,8 @@ export const areasInicial: AreasDeQueHacemos = {
       nombreCorto: "Currículo",
       frase: "La coherencia hace posible el aprendizaje",
       detalle: "Diseñamos arquitecturas curriculares que articulan **conocimiento, progresión y sentido** para orientar trayectorias de aprendizaje.",
-      teLlevas: ["Marcos y programas", "Homologación entre sedes", "Mapas de progresión"],
-      paraQuien: "Ministerios y redes que necesitan coherencia entre qué, cómo y cuándo",
+      teLlevas: ["Marcos y programas", "Fundamentos de la propuesta", "Mapas de progresión"],
+      paraQuien: "Ministerios y redes que buscan coherencia entre qué, cómo y cuándo",
       foto: fotoDeRuta("/fotos/planilla-proyectada.webp", "Docentes trabajan en una mesa frente a una planilla proyectada"),
     },
     {
@@ -118,7 +118,7 @@ export const areasInicial: AreasDeQueHacemos = {
       detalle: "Desarrollamos sistemas de evaluación que generan **evidencia situada** para comprender los aprendizajes y orientar decisiones educativas.",
       teLlevas: ["Instrumentos validados", "Análisis psicométrico", "Informes para decidir"],
       paraQuien: "Instituciones que quieren decidir con evidencia sobre los aprendizajes",
-      foto: fotoDeRuta("/fotos/comparar-tareas-ronda.webp", "Docentes en ronda durante la actividad «Comparar tareas: ¿A o B?»"),
+      foto: fotoDeRuta("/fotos/producciones-geometricas.webp", "Producciones de estudiantes expuestas para analizarlas — etapa de evaluación"),
     },
     {
       titulo: "Investigación en Matemática Educativa",
@@ -127,7 +127,7 @@ export const areasInicial: AreasDeQueHacemos = {
       detalle:
         "Investigamos **las prácticas educativas** para producir conocimiento, compartirlo con la comunidad científica y seguir enriqueciendo el campo de la Matemática Educativa.",
       teLlevas: ["Estudios y sistematización", "Evidencia para decidir", "Publicaciones y difusión"],
-      paraQuien: "Ministerios, universidades y redes que necesitan evidencia de sus aulas",
+      paraQuien: "Instituciones educativas que busquen el diálogo entre la teoría y la práctica",
       foto: fotoDeRuta("/fotos/contexto-significacion.webp", "Una formadora presenta un cuadro sobre contextos de significación"),
     },
     {

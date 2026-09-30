@@ -28,7 +28,7 @@ const ficha = grupo({
   cifra: textoCorto({ maximo: 12, etiqueta: "Cifra", ayuda: "El número que prueba el proyecto, en grande: «75.000»." }),
   unidad: textoCorto({ maximo: 28, etiqueta: "Unidad", ayuda: "Debajo de la cifra, en verde: «docentes»." }),
   nombre: textoCorto({ maximo: 60, etiqueta: "Nombre del proyecto" }),
-  texto: textoCorto({ maximo: 140, etiqueta: "Texto", ayuda: "Una sola frase, de veinte palabras como mucho." }),
+  texto: textoCorto({ maximo: 170, etiqueta: "Texto", ayuda: "Una sola frase, de veinticinco palabras como mucho." }),
 });
 
 /** Un capítulo con la cantidad de fichas que le da el archivo. */
@@ -89,7 +89,7 @@ export const proyectosInicial: ProyectosDeQueHacemos = {
           cifra: "75.000",
           unidad: "docentes",
           nombre: "Plan Nacional Aprender Matemática",
-          texto: "Formación semipresencial de 500 formadoras y formadores, y coordinación de los diez cuadernillos del plan.",
+          texto: "Desarrollo profesional semipresencial de 500 formadoras y formadores, diseño y coordinación de 10 materiales para el aula.",
         },
         {
           sello: "2018 – 2020",
@@ -106,7 +106,7 @@ export const proyectosInicial: ProyectosDeQueHacemos = {
           texto: "Una comunidad web de acceso libre para seguir el trabajo después del curso.",
         },
         {
-          sello: "Pesquería · 2020",
+          sello: "Monterrey · 2020",
           cifra: "300",
           unidad: "horas",
           nombre: "Líderes de Fortalecimiento",
@@ -123,7 +123,7 @@ export const proyectosInicial: ProyectosDeQueHacemos = {
           cifra: "3",
           unidad: "niveles educativos",
           nombre: "Exámenes Nacionales de Matemáticas (EXANI)",
-          texto: "Marco de referencia, especificaciones y reactivos para básica, media superior y superior.",
+          texto: "Diseño de marco de referencia, especificaciones y reactivos para educación media superior, superior y posgrados.",
         },
         {
           sello: "Ciudad de Buenos Aires · 2023 – 2027",
@@ -150,7 +150,7 @@ export const proyectosInicial: ProyectosDeQueHacemos = {
           cifra: "3",
           unidad: "países",
           nombre: "Asesoría general en Matemáticas",
-          texto: "Currícula, evaluaciones, materiales, acompañamiento a líderes, becas al mérito y la estructura de un diplomado docente.",
+          texto: "Desarrollo profesional docente, evaluaciones, materiales, acompañamiento a líderes, diseño instruccional de programas, estructura de diplomado docente, entre otras.",
         },
       ],
     },

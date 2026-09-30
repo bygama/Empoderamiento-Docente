@@ -91,7 +91,7 @@ export const origenInicial: OrigenDeQuienesSomos = {
   },
   sentido: {
     cita: ["Estaba a punto de jubilarme.", "Ahora quiero volver:", "quiero transformar el aula."],
-    quien: "— Una profesora, al cerrar uno de los primeros encuentros de formación docente en México.",
+    quien: "— Una profesora, al cerrar uno de los primeros encuentros de desarrollo profesional docente en México.",
   },
   evolucion: {
     pregunta: "¿Cómo fue tomando forma ED?",
@@ -103,18 +103,18 @@ export const origenInicial: OrigenDeQuienesSomos = {
     hitos: [
       { titulo: "Maestría", texto: "El comienzo: observar y comprender lo que ocurría con las y los docentes." },
       { titulo: "Doctorado", texto: "Explicaciones propias y años de investigación e intervención." },
-      { titulo: "México", texto: "Parte de procesos de desarrollo profesional docente a nivel nacional." },
+      { titulo: "México", texto: "Procesos de desarrollo profesional docente a nivel nacional." },
       { titulo: "Argentina", texto: "La expansión regional, sosteniendo la misma filosofía de trabajo." },
       { titulo: "Hoy", texto: "Una línea de investigación viva y una consultora que impulsa transformación educativa." },
     ],
   },
   remate: {
     frase: "**Vivir** para hacer **vivir.**",
-    texto: "Para transformar el aprendizaje, el cuerpo docente necesita primero vivir una nueva relación con la matemática.",
+    texto: "Para transformar los escenarios de aprendizaje, proponemos al profesorado vivir primero una nueva relación con las matemáticas.",
   },
   fotos: [
     fotoDeRuta("/fotos/docentes-trabajan-aula.webp", "Docentes resuelven una tarea en un aula"),
-    fotoDeRuta("/fotos/origen-02-inflexion.webp", "Encuentro de formación docente frente a la pizarra"),
+    fotoDeRuta("/fotos/origen-02-inflexion.webp", "Encuentro de desarrollo profesional docente frente a la pizarra"),
     fotoDeRuta("/fotos/origen-03-pregunta.webp", "Exposición ante la comunidad educativa en un auditorio"),
   ],
 };
