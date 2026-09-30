@@ -286,15 +286,9 @@ scripts/desplegar.sh
 
 Construye la imagen fuente, levanta la base, migra, corre el build con la
 base, arma la imagen `app` con el commit como etiqueta y levanta todo. Necesita
-internet (npm, las imágenes de Docker y las fuentes de Google, que baja el
-build). Al final dice `Listo: https://<dominio> corre <commit>`.
-
-**Si `construir` falla por las fuentes de Google** (un error al bajar de
-`fonts.gstatic.com`, o `Can't resolve
-'@vercel/turbopack-next/internal/font/google/font'`), volvé a correr
-`scripts/desplegar.sh`: el build baja las fuentes cada vez y a veces falla de
-pasada. El script frena antes de tocar el sitio que corre, así que no se
-rompió nada.
+internet (npm y las imágenes de Docker; las fuentes viven en el repo, así que
+el build no baja nada de Google). Al final dice `Listo: https://<dominio> corre
+<commit>`.
 
 ## 5. Umami
 
@@ -336,7 +330,7 @@ No hay registro público: las cuentas entran por un comando.
 
 | Qué | Cómo |
 | --- | --- |
-| Deployar una versión nueva | el botón de GitHub (§14), o `git pull && scripts/desplegar.sh` (el sitio deja de contestar unos segundos, cuando se cambia el contenedor: ver «Corte»; si falla por las fuentes de Google, otra vez: §4). Uno a la vez: si ya hay otro corriendo, el segundo frena y lo dice |
+| Deployar una versión nueva | el botón de GitHub (§14), o `git pull && scripts/desplegar.sh` (el sitio deja de contestar unos segundos, cuando se cambia el contenedor: ver «Corte»). Uno a la vez: si ya hay otro corriendo, el segundo frena y lo dice |
 | Dar o sacar acceso | §13 |
 | Ver qué corre | `docker compose ps` |
 | El log de la app | `docker compose logs -f app` (o `proxy`, `analitica`…) |
