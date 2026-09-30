@@ -20,6 +20,8 @@ services:
 
   correo:
     image: node:24-alpine
+    # En la red de la app que no es la de la base (compose.yaml).
+    networks: [borde]
     command:
       - node
       - -e
