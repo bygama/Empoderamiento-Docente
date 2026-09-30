@@ -1,6 +1,6 @@
 import { after, test } from "node:test";
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { config as cargarEntorno } from "dotenv";
 
 cargarEntorno({ path: [".env.local"], quiet: true });
@@ -14,12 +14,18 @@ const ips: string[] = [];
 const CAMPOS = { nombre: "Ana Prueba", correo, pais: "México", nivel: "Secundaria o media", area: "Matemática", mensaje: "" };
 const PDF = new TextEncoder().encode("%PDF-1.7\nun CV de prueba");
 
-function pedido({ campos = CAMPOS, archivo = PDF as Uint8Array | null, ip = `prueba-${randomUUID()}` } = {}): Request {
+/** Una IP propia de esta prueba, de la red de pruebas de rendimiento (198.18.0.0/15): el cupo sale solo de una IP válida. */
+function ipDePrueba(): string {
+  const [a = 0, b = 0, c = 0] = randomBytes(3);
+  return `198.${18 + (a & 1)}.${b}.${c}`;
+}
+
+function pedido({ campos = CAMPOS, archivo = PDF as Uint8Array | null, ip = ipDePrueba() } = {}): Request {
   ips.push(ip);
   const datos = new FormData();
   for (const [clave, valor] of Object.entries(campos)) datos.set(clave, valor);
   if (archivo) datos.set("archivo", new File([new Uint8Array(archivo)], "mi-cv.pdf", { type: "application/pdf" }));
-  return new Request("http://localhost/api/cv", { method: "POST", body: datos, headers: { "x-forwarded-for": ip } });
+  return new Request("http://localhost/api/cv", { method: "POST", body: datos, headers: { "x-real-ip": ip } });
 }
 
 after(async () => {
@@ -77,7 +83,7 @@ test("en Vercel sin el token del store privado, 503 y nunca el disco", sinBase, 
 
 test("el cuarto CV de la misma IP en una hora recibe 429", sinBase, async () => {
   const { recibirCV, TOPE_DE_CV } = await import("./cv");
-  const ip = `prueba-${randomUUID()}`;
+  const ip = ipDePrueba();
   for (let i = 0; i < TOPE_DE_CV; i++) assert.equal((await recibirCV(pedido({ ip }), ABIERTO)).status, 200);
   assert.equal((await recibirCV(pedido({ ip }), ABIERTO)).status, 429);
 });
