@@ -12,3 +12,10 @@ export const SEGUNDO_FACTOR_OBLIGATORIO = "SEGUNDO_FACTOR_OBLIGATORIO";
 
 /** La contraseña dio bien, pero la cuenta está suspendida y no abre sesión. */
 export const CUENTA_SUSPENDIDA = "CUENTA_SUSPENDIDA";
+
+/**
+ * La contraseña que se quiso elegir aparece en filtraciones de otros sitios
+ * (el plugin haveIBeenPwned de better-auth, que pone este código). No es
+ * propio: vive acá para que el formulario lo reconozca igual.
+ */
+export const CONTRASENA_FILTRADA = "PASSWORD_COMPROMISED";
