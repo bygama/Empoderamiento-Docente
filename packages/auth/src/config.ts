@@ -106,6 +106,8 @@ export function configDeAuth({
      * Una sesión dura 12 horas sin uso: una jornada. Cada hora de uso la
      * renueva (`updateAge`), así que quien trabaja no se queda afuera a mitad
      * de algo, y una computadora olvidada abierta se cierra sola a la noche.
+     * Renovada o no, **no pasa de 7 días desde que se abrió**: lo pone el
+     * gancho de la base al renovarla (vida-de-la-sesion.ts).
      * `freshAge`: las rutas que better-auth marca como frescas (listar las
      * sesiones por su API, borrar la cuenta) piden haber entrado hace menos de
      * 10 minutos. Cambiar la contraseña no: pide la actual.
