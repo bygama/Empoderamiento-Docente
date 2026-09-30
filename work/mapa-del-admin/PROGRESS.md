@@ -475,6 +475,20 @@
   Las 7 páginas, `/admin/entrar`, `robots.txt` y `sitemap.xml` en 200; `www.`
   redirige con 301; certificados de Let's Encrypt para los dos; Umami con el
   dominio nuevo. Vercel ya no recibe nada: el proyecto se puede borrar.
+- 2026-09-30 — **Acceso y el botón de deploy**, con OK de Mateo:
+  - Una llave por persona para `deploy`: `mateo` (su máquina), y `gaston` y
+    `querque`, generadas en la máquina de Mateo a su pedido y mandadas por
+    WhatsApp. Las dos probadas desde afuera.
+  - El botón Actions › Desplegar (`.github/workflows/desplegar.yml`), con una
+    llave atada a `scripts/desplegar-desde-github.sh` (`restrict,command=`). El
+    deploy corre desprendido de la conexión.
+  - `desplegar.sh` toma un candado (`flock`) para que no haya dos deploys a la
+    vez.
+  - Probado en el VPS en una caja de arena con un deploy falso: sale 0, pasa
+    el código de falla, termina aunque se corte la conexión, poda a 20 logs, y
+    el candado frena el segundo.
+  - El runbook suma «Producción hoy», §13 (quién entra) y §14 (el botón), y
+    AGENTS.md §13 queda al día.
 
 ## Hecho
 
@@ -486,6 +500,12 @@
   Vercel cómo llega `X-Forwarded-For` (nota de la lane 2).
 - El porte de la versión de celular a main (Gastón y Facundo): hoy el sitio
   público no la tiene.
+- Del VPS, lo que necesita cuentas de Mateo:
+  - Resend (sin él, nadie entra al admin);
+  - un monitor de caída (UptimeRobot o Better Stack);
+  - los secretos en un gestor de contraseñas compartido;
+  - que Gastón y querque cambien sus llaves por unas generadas en su máquina
+    (runbook §13).
 - `origen-03-pregunta.webp` está dos veces (`public/fotos/` para Quiénes
   somos y `public/quienes-somos/` para una novedad): deduplicar en la lane 9
   (Fotos), cuando se consolide dónde vive cada archivo.
