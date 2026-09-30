@@ -1,0 +1,36 @@
+# El botón «Desplegar»: pone a correr main en el VPS, sin SSH ni llave propia.
+# Se aprieta en Actions › Desplegar › Run workflow (docs/deploy/vps.md §14).
+#
+# Se conecta con una llave que el servidor ata a un solo comando,
+# scripts/desplegar-desde-github.sh: trae main y deploya. Por eso el botón no
+# elige rama, aunque GitHub ofrezca el desplegable: siempre va main. El repo es
+# público y este log también; desplegar.sh no imprime ningún secreto del .env.
+name: Desplegar
+
+on:
+  workflow_dispatch:
+
+# Uno a la vez: el segundo espera al primero en vez de cortarlo.
+concurrency:
+  group: desplegar
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Deployar main en el VPS
+        env:
+          LLAVE: ${{ secrets.VPS_LLAVE }}
+          LLAVE_DEL_SERVIDOR: ${{ vars.VPS_LLAVE_DEL_SERVIDOR }}
+          VPS: ${{ vars.VPS_HOST }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$LLAVE" > ~/.ssh/desplegar
+          chmod 600 ~/.ssh/desplegar
+          printf '%s\n' "$LLAVE_DEL_SERVIDOR" > ~/.ssh/known_hosts
+          ssh -T -i ~/.ssh/desplegar -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 -o ServerAliveCountMax=10 "deploy@$VPS"
