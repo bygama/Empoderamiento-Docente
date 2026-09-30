@@ -1,5 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { NextRequest } from "next/server";
 import { paginaDeRebote } from "@/lib/seguridad/rebote";
 import { CABECERA_DEL_METODO } from "@/lib/metricas/clic";
@@ -46,6 +49,38 @@ test("un POST de otro sitio no rebota", () => {
 test("las pantallas de acceso no rebotan: no hace falta sesión para verlas", () => {
   const res = pedir("/admin/entrar", DE_OTRO_SITIO);
   assert.equal(res.headers.get("x-middleware-next"), "1");
+});
+
+/** Los archivos de una carpeta, recursivo. */
+function archivosDe(carpeta: string): string[] {
+  return readdirSync(carpeta, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? archivosDe(path.join(carpeta, e.name)) : [path.join(carpeta, e.name)]));
+}
+
+/** El código sin comentarios. Respeta el `//` de una URL. */
+function codigoDe(archivo: string): string {
+  return readFileSync(archivo, "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1");
+}
+
+// El rebote convierte un link de otro sitio en un GET con la sesión puesta:
+// por eso un GET del admin no puede cambiar nada (lib/seguridad/rebote.ts).
+// Lo que contesta un GET son las páginas y las rutas del admin, que leen por
+// datos/consultas/; esto vigila las rutas y las consultas.
+test("un GET del admin no escribe: sus rutas contestan solo GET sin acciones, y las consultas no escriben", () => {
+  const src = path.dirname(fileURLToPath(import.meta.url));
+  const rutas = archivosDe(path.join(src, "app", "(admin)")).filter((a) => path.basename(a) === "route.ts");
+  assert.ok(rutas.length > 0, "no encontró ninguna ruta del admin");
+  for (const ruta of rutas) {
+    const codigo = codigoDe(ruta);
+    const metodos = [...codigo.matchAll(/^export (?:async )?(?:function|const) (\w+)/gm)].map(([, nombre]) => nombre);
+    assert.deepEqual(metodos, ["GET"], `${ruta} contesta algo más que GET`);
+    assert.doesNotMatch(codigo, /@\/datos\/acciones\//, `${ruta} usa una acción`);
+  }
+  const escribe = /\.(?:create|createMany|update|updateMany|upsert|delete|deleteMany)\(|\$executeRaw/;
+  for (const consulta of archivosDe(path.join(src, "datos", "consultas")).filter((a) => !a.endsWith(".test.ts"))) {
+    assert.doesNotMatch(codigoDe(consulta), escribe, `${consulta} escribe`);
+  }
 });
 
 test("el destino del rebote es siempre una ruta de este sitio, escapada", async () => {
