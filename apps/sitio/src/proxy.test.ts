@@ -76,6 +76,23 @@ test("el admin no se deja abrir ni cargar desde otro sitio", () => {
   }
 });
 
+/** La directiva `img-src` de la CSP de una respuesta. */
+function imgSrc(res: Response): string {
+  return (res.headers.get("content-security-policy") ?? "").split("; ").find((d) => d.startsWith("img-src")) ?? "";
+}
+
+test("las imágenes de Blob pasan solo del store del sitio, y solo si hay token", (t) => {
+  const antes = process.env.BLOB_READ_WRITE_TOKEN;
+  t.after(() => {
+    if (antes === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
+    else process.env.BLOB_READ_WRITE_TOKEN = antes;
+  });
+  delete process.env.BLOB_READ_WRITE_TOKEN;
+  for (const ruta of ["/", "/admin/entrar"]) assert.equal(imgSrc(pedir(ruta, {})), "img-src 'self' data: blob:");
+  process.env.BLOB_READ_WRITE_TOKEN = "vercel_blob_rw_AbC123_secreto";
+  for (const ruta of ["/", "/admin/entrar"]) assert.equal(imgSrc(pedir(ruta, {})), "img-src 'self' data: blob: https://abc123.public.blob.vercel-storage.com");
+});
+
 test("el sitio público sigue con su CSP estática, sin nonce", () => {
   const res = pedir("/", {});
   assert.equal(scriptSrc(res), "script-src 'self' 'unsafe-inline'");

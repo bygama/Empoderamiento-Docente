@@ -2,7 +2,14 @@ import path from "node:path";
 
 import type { NextConfig } from "next";
 
+import { hostDelBlob } from "./src/lib/contenido/host-del-blob";
+
 const raizDelWorkspace = path.join(__dirname, "..", "..");
+
+// Las fotos que sube el admin, cuando hay token de Blob: solo las del store
+// propio y su carpeta. Sin token van a disco y las sirve /api/fotos/<id>, del
+// mismo origen, así que no entra ninguna imagen remota.
+const hostDeFotos = hostDelBlob(process.env.BLOB_READ_WRITE_TOKEN);
 
 const nextConfig: NextConfig = {
   // Fuera de Vercel, el build deja un servidor que corre solo
@@ -25,9 +32,7 @@ const nextConfig: NextConfig = {
     root: raizDelWorkspace,
   },
   images: {
-    // Las fotos que sube el admin, cuando hay token de Blob (en disco, sin él,
-    // las sirve /api/fotos/<id>, del mismo origen).
-    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
+    remotePatterns: hostDeFotos ? [{ protocol: "https", hostname: hostDeFotos, pathname: "/fotos/**" }] : [],
   },
   experimental: {
     // Las fotos suben por una Server Action y Next capa el cuerpo en 1 MB
