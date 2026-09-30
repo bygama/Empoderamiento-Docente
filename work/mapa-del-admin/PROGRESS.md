@@ -489,6 +489,21 @@
     el candado frena el segundo.
   - El runbook suma «Producción hoy», §13 (quién entra) y §14 (el botón), y
     AGENTS.md §13 queda al día.
+  - Corrida real del botón: `6bd68f54` en menos de 2 minutos, sin ningún
+    secreto del `.env` en su log público. La llave del botón no abre túneles
+    («administratively prohibited»).
+- 2026-09-30 — **La caché de next/image sobrevive al deploy** (volumen
+  `imagenes`). Medido en el VPS: una imagen nueva cuesta 130 a 570 ms, y de la
+  caché, 25. `desplegar.sh` la vacía si cambió `public/`, y `volver.sh`, siempre.
+  Probado en el VPS con la rama, antes del merge:
+  - la app escribe en el volumen;
+  - después de otro deploy, con el contenedor nuevo, la imagen sale `HIT`;
+  - `volver.sh` la deja en 0.
+
+  Medido en el mismo día: el servidor contesta en ~30 ms y está en Boston.
+  Desde Argentina, la primera respuesta tarda ~500 ms por la distancia. Queda
+  para antes del lanzamiento: Cloudflare adelante (DNS, la IP real en Caddy y
+  Umami, sin cachear el HTML).
 
 ## Hecho
 
