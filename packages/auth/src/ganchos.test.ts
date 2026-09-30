@@ -49,6 +49,7 @@ async function armar(
   const bloqueos = almacenEnMemoria();
   const sucesos: SucesoDeSesion[] = [];
   const avisos: string[] = [];
+  const sinEnlaces: string[] = [];
   const auth = betterAuth({
     database: memoryAdapter({ user: [], session: [], account: [], verification: [] }),
     secret: SECRETO,
@@ -63,6 +64,7 @@ async function armar(
       secreto: SECRETO,
       registrar: registrar ?? (async (suceso) => void sucesos.push(suceso)),
       avisarCambioDeContrasena: async ({ para }) => void avisos.push(para),
+      borrarEnlaces: async (idDeCuenta) => void sinEnlaces.push(idDeCuenta),
     }),
   });
   const ctx = await auth.$context;
@@ -78,7 +80,7 @@ async function armar(
       }),
     );
   const entrar = (email: string, password: string) => pedir("/sign-in/email", { email, password });
-  return { bloqueos, ctx, cuenta, entrar, pedir, sucesos, avisos, clave: claveDeBloqueo(correo, SECRETO) };
+  return { bloqueos, ctx, cuenta, entrar, pedir, sucesos, avisos, sinEnlaces, clave: claveDeBloqueo(correo, SECRETO) };
 }
 
 /** La cookie de sesión que puso una respuesta, lista para mandarla de vuelta. */
@@ -139,16 +141,18 @@ test("salir anota «salio» antes de que la sesión deje de existir", async () =
   assert.equal(sucesos.length, 1);
 });
 
-test("cambiar la contraseña bien la anota y avisa por correo; con la actual mala, nada", async () => {
-  const { cuenta, entrar, pedir, sucesos, avisos } = await armar("ana@ed.test", hashear);
+test("cambiar la contraseña bien la anota, avisa por correo y borra los enlaces de la cuenta; con la actual mala, nada", async () => {
+  const { cuenta, entrar, pedir, sucesos, avisos, sinEnlaces } = await armar("ana@ed.test", hashear);
   const cookie = cookieDe(await entrar("ana@ed.test", CONTRASENA));
   const cambiar = (actual: string) =>
     pedir("/change-password", { currentPassword: actual, newPassword: "otra-contrasena-de-prueba", revokeOtherSessions: true }, cookie);
   assert.equal((await cambiar("una-contrasena-mala")).status, 400);
   assert.deepEqual(avisos, []);
+  assert.deepEqual(sinEnlaces, []);
   assert.equal((await cambiar(CONTRASENA)).status, 200);
   assert.deepEqual(sucesos.at(-1), { tipo: "cambio-su-contrasena", idDeCuenta: cuenta.id });
   assert.deepEqual(avisos, ["ana@ed.test"]);
+  assert.deepEqual(sinEnlaces, [cuenta.id]);
 });
 
 test("si anotar falla, entrar y salir andan igual", async () => {

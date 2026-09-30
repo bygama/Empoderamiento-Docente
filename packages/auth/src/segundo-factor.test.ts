@@ -60,6 +60,7 @@ async function armar(rol: "administra" | "edita", mandarCodigo?: OpcionesDeAuth[
       mandarCodigo: mandarCodigo ?? (async ({ codigo }) => void codigos.push(codigo)),
       segundoPlano: (tarea) => void enSegundoPlano.push(tarea),
       bloqueos: sinBloqueos,
+      borrarEnlaces: async () => {},
       registrar: async (suceso) => void sucesos.push(suceso),
     }),
     database: memoryAdapter(db),

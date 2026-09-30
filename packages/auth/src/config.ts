@@ -29,6 +29,7 @@ export function configDeAuth({
   mandarCodigo,
   segundoPlano,
   bloqueos,
+  borrarEnlaces,
   registrar,
 }: Omit<OpcionesDeAuth, "base">) {
   if (!secreto) {
@@ -75,6 +76,10 @@ export function configDeAuth({
         });
       },
       onPasswordReset: async ({ user }) => {
+        // Los otros enlaces que tuviera (otro reset, la invitación) y los
+        // dispositivos recordados dejan de servir: la contraseña de antes ya
+        // no es la llave, y lo que se abrió con ella tampoco.
+        await borrarEnlaces(user.id);
         await destrabar(bloqueos, user.email, secreto);
         // better-auth espera a este callback antes de contestar, así que el
         // registro y el aviso van a segundo plano acá mismo.
@@ -156,7 +161,7 @@ export function configDeAuth({
 
     plugins: segundoFactor({ mandarCodigo, registrar }),
 
-    hooks: crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena }),
+    hooks: crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena, borrarEnlaces }),
 
     advanced: {
       // better-auth manda acá el correo del reset (`runInBackgroundOrAwait`).

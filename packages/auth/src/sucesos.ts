@@ -42,14 +42,17 @@ function cuentaDevuelta(devuelto: unknown): { id: string; email: string; name: s
 /**
  * Después de `/change-password` bien: se anota y sale «Tu contraseña cambió»,
  * igual que al elegir una nueva por el enlace de «olvidé». Si alguien la
- * cambió con una sesión robada, el correo es lo que se entera.
+ * cambió con una sesión robada, el correo es lo que se entera. Y, como al
+ * elegirla por el enlace, los enlaces pendientes y los dispositivos
+ * recordados dejan de servir.
  */
 export async function alCambiarLaContrasena(
   ctx: Contexto,
-  { registrar, avisarCambioDeContrasena }: Pick<OpcionesDeAuth, "registrar" | "avisarCambioDeContrasena">,
+  { registrar, avisarCambioDeContrasena, borrarEnlaces }: Pick<OpcionesDeAuth, "registrar" | "avisarCambioDeContrasena" | "borrarEnlaces">,
 ): Promise<void> {
   const cuenta = cuentaDevuelta(ctx.context.returned);
   if (!cuenta) return;
+  await borrarEnlaces(cuenta.id);
   await anotar(ctx, registrar, { tipo: "cambio-su-contrasena", idDeCuenta: cuenta.id });
   await ctx.context.runInBackgroundOrAwait(
     avisarCambioDeContrasena({ para: cuenta.email, nombre: cuenta.name || undefined, cuando: new Date() }).catch((e: unknown) => {
