@@ -177,12 +177,15 @@ export function configDeAuth({
        */
       defaultCookieAttributes: { sameSite: "strict" },
       ipAddress: {
-        // La IP real la pone acá el proxy de delante (el borde de Vercel, o
-        // Caddy en un VPS, que descarta la que manda el cliente); sin
-        // decirlo, todas las requests parecerían venir del proxy y
-        // compartirían un solo cupo. Confiar en estas cabeceras es seguro solo
-        // si nadie le habla a la app sin pasar por ese proxy.
-        ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
+        // La IP real la pone el proxy de delante en x-real-ip, **pisando**
+        // la que mande el cliente: el borde de Vercel y Caddy en el VPS.
+        // x-forwarded-for no se lee: según quién esté delante, a la izquierda
+        // viene lo que escribió el cliente. Es la misma cabecera que usan los
+        // cupos de los formularios (lib/formularios/limite.ts). Confiar en ella
+        // es seguro solo si nadie le habla a la app sin pasar por ese proxy.
+        ipAddressHeaders: ["x-real-ip"],
+        // Una IPv6 cuenta por su /64: es el de fábrica, fijado a propósito.
+        ipv6Subnet: 64,
       },
     },
 
