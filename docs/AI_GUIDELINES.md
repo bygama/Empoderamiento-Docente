@@ -357,7 +357,8 @@ Cuando se sumen tests:
 ## 17. Performance
 
 - Imágenes via `next/image`, siempre con `alt` descriptivo.
-- Fuentes via `next/font/google`, `display: 'swap'`.
+- Fuentes via `next/font/local`, desde los archivos del repo
+  (`apps/sitio/src/config/fuentes/`), `display: 'swap'`.
 - Lazy import (`dynamic`) para componentes pesados below-the-fold (mapas,
   carruseles).
 - Auditar con Lighthouse antes de cada release. Target: LCP < 2.5s, CLS < 0.1.
