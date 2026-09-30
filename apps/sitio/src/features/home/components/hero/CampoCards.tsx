@@ -57,7 +57,7 @@ export function CampoCards({ tarjetas }: { tarjetas: Hero["tarjetas"] }) {
                 {tarjeta.cartel && (
                   <div
                     data-card-label
-                    className="absolute -bottom-5 left-3 z-10 w-max max-w-[20rem] rounded-xl bg-white/85 px-3.5 py-2.5 shadow-[0_16px_36px_-18px_rgb(31_45_77_/_0.45)] ring-1 ring-azul-principal/10 backdrop-blur-md"
+                    className={`absolute -bottom-5 ${c.cartelA === "derecha" ? "right-3" : "left-3"} z-10 w-max max-w-[20rem] rounded-xl bg-white/85 px-3.5 py-2.5 shadow-[0_16px_36px_-18px_rgb(31_45_77_/_0.45)] ring-1 ring-azul-principal/10 backdrop-blur-md`}
                   >
                     <p className="font-display text-verde-concepto text-[0.82rem] leading-tight font-semibold tracking-[-0.01em]">
                       {tarjeta.cartel.titulo}
