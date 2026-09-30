@@ -47,9 +47,16 @@ export function fallo(accion: string, error: unknown): Resultado {
   return { ok: false, detalle: "No se pudo; probá de nuevo en un rato." };
 }
 
-/** Cierra las sesiones de una cuenta; con `salvo`, todas menos esa (la de quien lo pide, si es la suya). */
-export async function cerrarSesiones(idDeCuenta: string, salvo?: string): Promise<void> {
+/**
+ * Le cierra el acceso a una cuenta: sus sesiones —con `salvo`, todas menos
+ * esa (la de quien lo pide, si es la suya)— y todo lo que abre una sin
+ * contraseña: los enlaces para elegirla y los dispositivos recordados del
+ * segundo factor (`borrarEnlaces`). Cerrar solo las sesiones dejaba a quien
+ * tuviera un enlace pendiente o un dispositivo recordado a un paso de volver.
+ */
+export async function cerrarElAcceso(idDeCuenta: string, salvo?: string): Promise<void> {
   await base.session.deleteMany({ where: { userId: idDeCuenta, ...(salvo ? { id: { not: salvo } } : {}) } });
+  await borrarEnlaces(idDeCuenta);
 }
 
 /** El código con que Prisma dice que una clave foránea no dejó hacer algo. */

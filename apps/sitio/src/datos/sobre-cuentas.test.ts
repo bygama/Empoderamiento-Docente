@@ -38,6 +38,26 @@ test("una cuenta que nunca hizo nada se borra, con sus enlaces", sinBase, async 
   assert.equal(await base.verification.count({ where: { value: id } }), 0);
 });
 
+test("cerrarle el acceso a una cuenta borra sus sesiones, sus enlaces y sus dispositivos recordados, y nada de otra", sinBase, async () => {
+  const { base } = await import("@/datos/cliente");
+  const { cerrarElAcceso } = await import("./sobre-cuentas");
+  const [id, ajena] = [await cuenta(), await cuenta()];
+  const sesion = (userId: string) => ({ id: randomUUID(), token: randomUUID(), userId, expiresAt: new Date(Date.now() + 3_600_000) });
+  const [propia, otra, deLaAjena] = [sesion(id), sesion(id), sesion(ajena)];
+  await base.session.createMany({ data: [propia, otra, deLaAjena] });
+  // El dispositivo recordado del segundo factor: better-auth le pone el id de la cuenta como valor, como a los enlaces.
+  await base.verification.create({ data: { id: randomUUID(), identifier: `recordado-${id}`, value: id, expiresAt: new Date(Date.now() + 3_600_000) } });
+
+  await cerrarElAcceso(id, propia.id);
+  assert.deepEqual((await base.session.findMany({ where: { userId: id }, select: { id: true } })).map((s) => s.id), [propia.id]);
+  assert.equal(await base.verification.count({ where: { value: id } }), 0);
+
+  await cerrarElAcceso(id);
+  assert.equal(await base.session.count({ where: { userId: id } }), 0);
+  assert.equal(await base.session.count({ where: { userId: ajena } }), 1);
+  assert.equal(await base.verification.count({ where: { value: ajena } }), 1);
+});
+
 test("una con actividad no: la clave foránea contesta y la cuenta queda entera", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
   const { borrarSiNuncaHizoNada } = await import("./sobre-cuentas");
