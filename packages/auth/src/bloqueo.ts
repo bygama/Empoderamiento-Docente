@@ -51,6 +51,17 @@ export function claveDeBloqueo(correo: string, secreto: string): string {
   return createHmac("sha256", secreto).update(`bloqueos-de-acceso:${correo.trim().toLowerCase()}`).digest("hex");
 }
 
+/**
+ * Con qué se guardan los códigos fallidos del segundo factor de una cuenta:
+ * las mismas reglas y la misma tabla que entrar, con otra clave. Aparte a
+ * propósito: la contraseña buena borra los fallos de entrar, y no tiene que
+ * borrar estos, que son de quien ya la sabe. Va por el id y no por el correo:
+ * en el paso del código, la cuenta ya se conoce.
+ */
+export function claveDeCodigos(idDeCuenta: string, secreto: string): string {
+  return createHmac("sha256", secreto).update(`codigos-del-segundo-factor:${idDeCuenta}`).digest("hex");
+}
+
 /** Los segundos que le quedan al freno, o null si la cuenta no está frenada. */
 export function segundosDeFreno(estado: EstadoDeBloqueo | null, ahora: Date): number | null {
   if (!estado?.hasta || estado.hasta <= ahora) return null;

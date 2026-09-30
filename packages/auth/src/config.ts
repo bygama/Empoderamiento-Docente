@@ -80,7 +80,7 @@ export function configDeAuth({
         // dispositivos recordados dejan de servir: la contraseña de antes ya
         // no es la llave, y lo que se abrió con ella tampoco.
         await borrarEnlaces(user.id);
-        await destrabar(bloqueos, user.email, secreto);
+        await destrabar(bloqueos, user, secreto);
         // better-auth espera a este callback antes de contestar, así que el
         // registro y el aviso van a segundo plano acá mismo.
         segundoPlano(
@@ -159,7 +159,7 @@ export function configDeAuth({
       },
     },
 
-    plugins: segundoFactor({ mandarCodigo, registrar }),
+    plugins: segundoFactor({ mandarCodigo, registrar, bloqueos, secreto }),
 
     hooks: crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena, borrarEnlaces }),
 
