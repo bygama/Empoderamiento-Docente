@@ -38,15 +38,16 @@ internos (refactors).
 | 0007  | [Usar Prisma como ORM, en la versión 7.10.0 exacta](0007-prisma-como-orm.md) | Accepted (enmendado por 0008) |
 | 0008  | [Adaptador de Postgres y scrypt](0008-correcciones-de-la-fase-1.md) | Accepted (corrige 0005 y 0007; su §2, scrypt, reemplazado por 0010) |
 | 0009  | [Medir el tráfico con la analítica de Vercel y una copia diaria en Neon](0009-analitica-de-vercel-con-copia-diaria.md) | Accepted (enmendado por 0011: su cron pasa al único) |
-| 0010  | [Seguridad del acceso al admin](0010-seguridad-del-acceso.md) | Accepted (reemplaza el §2 de 0008) |
+| 0010  | [Seguridad del acceso al admin](0010-seguridad-del-acceso.md) | Accepted (reemplaza el §2 de 0008; enmendado por 0019) |
 | 0011  | [Copiar Search Console cada día y correr todo lo programado desde un solo cron](0011-search-console-y-un-solo-cron.md) | Accepted |
 | 0012  | [Los CV en un store privado de Blob, la retención de lo que llega y avisos sin datos](0012-mensajes-cv-privados-y-retencion.md) | Accepted (enmendado por 0015: los plazos) |
-| 0013  | [Segundo factor por correo, obligatorio para quien dirige y administra](0013-segundo-factor-por-correo.md) | Accepted (completa 0010) |
+| 0013  | [Segundo factor por correo, obligatorio para quien dirige y administra](0013-segundo-factor-por-correo.md) | Accepted (completa 0010; enmendado por 0019: los intentos del código) |
 | 0014  | [Los controles del admin en `packages/kit-admin`, y cada entidad con lo publicado en columnas y el borrador en un documento](0014-kit-admin-y-modelo-de-entidad.md) | Accepted |
 | 0015  | [Llevar a la base lo que Ajustes edita, con el plazo prometido como techo](0015-ajustes-en-la-base.md) | Accepted (enmienda 0012) |
 | 0016  | [Agregar un material por DOI, ISBN o link detrás de un pedido protegido contra SSRF, y chequear sus links cada semana](0016-agregar-por-doi-y-salud-de-links.md) | Accepted |
 | 0017  | [Contar los eventos raros del sitio con contadores propios, sin nada de la persona, y medir los posteos con links cortos propios](0017-contadores-propios-y-links-cortos.md) | Accepted |
-| 0018  | [Deploy en Vercel o en un VPS: el código no depende del host](0018-deploy-en-vercel-o-en-un-vps.md) | Accepted |
+| 0018  | [Deploy en Vercel o en un VPS: el código no depende del host](0018-deploy-en-vercel-o-en-un-vps.md) | Accepted (enmendado por 0019: la app lee solo `X-Real-IP`) |
+| 0019  | [Endurecer el acceso: cerrar el acceso entero, pedir la contraseña otra vez y topar sesiones y códigos](0019-endurecer-el-acceso.md) | Accepted (enmienda 0010, 0013 y 0018) |
 
 ---
 
