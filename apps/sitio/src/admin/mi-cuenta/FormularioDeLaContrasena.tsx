@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LARGO_MINIMO_CONTRASENA } from "@ed/auth";
+import { CONTRASENA_FILTRADA, LARGO_MINIMO_CONTRASENA } from "@ed/auth";
 import { Aviso, Boton, CampoContrasena } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
 
@@ -12,6 +12,9 @@ type Resultado = { tono: "bien" | "error"; texto: string; rechazado: Rechazado }
 /** Lo que contesta better-auth, dicho para quien lo lee. */
 function porQueNo(error: { status: number; code?: string }): Resultado {
   if (error.code === "INVALID_PASSWORD") return { tono: "error", texto: "La contraseña actual no es esa.", rechazado: "actual" };
+  if (error.code === CONTRASENA_FILTRADA) {
+    return { tono: "error", texto: "Esa contraseña aparece en filtraciones de otros sitios, así que es de las primeras que se prueban. Elegí otra.", rechazado: "nueva" };
+  }
   if (error.status === 429) return { tono: "error", texto: "Probaste varias veces seguidas. Esperá unos minutos y volvé a intentar.", rechazado: null };
   return { tono: "error", texto: "No se pudo cambiar la contraseña; probá de nuevo en un rato.", rechazado: null };
 }

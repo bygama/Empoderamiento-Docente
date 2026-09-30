@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { LARGO_MINIMO_CONTRASENA } from "@ed/auth";
+import { CONTRASENA_FILTRADA, LARGO_MINIMO_CONTRASENA } from "@ed/auth";
 import { Aviso, BotonDeAcceso, CampoContrasena } from "@ed/kit-admin";
 import { authCliente } from "@/admin/auth-cliente";
 
@@ -39,8 +39,13 @@ export function FormularioNueva() {
     setRechazado(null);
     const { error: fallo } = await authCliente.resetPassword({ newPassword: nueva, token });
     setEnviando(false);
+    if (fallo?.code === CONTRASENA_FILTRADA) {
+      rechazar("contrasena", "Esa contraseña aparece en filtraciones de otros sitios, así que es de las primeras que se prueban. Elegí otra.");
+      return;
+    }
     if (fallo) {
-      setError("Ese enlace ya no sirve. Pedí uno nuevo desde «Olvidé mi contraseña».");
+      // Un 5xx no dice nada del enlace (por ejemplo, no se pudo revisar si la contraseña está filtrada).
+      setError(fallo.status >= 500 ? "No se pudo guardar la contraseña; probá de nuevo en un rato." : "Ese enlace ya no sirve. Pedí uno nuevo desde «Olvidé mi contraseña».");
       return;
     }
     router.push("/admin/entrar");
