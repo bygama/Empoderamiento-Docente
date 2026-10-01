@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { AreaDeQueHacemos } from "@/features/que-hacemos/contenido/areas";
 import { fragmentos } from "@/lib/contenido/resaltado";
 import { idDeArea } from "./anclas";
+import { alClicIrAlArea } from "./ir-al-area";
 
 /**
  * Clases de un ítem del índice según por dónde va la lectura: el riel se
@@ -131,14 +132,10 @@ export function IndiceAreas({
                 <a
                   href={`#${idDeArea(i)}`}
                   aria-current={activo ? "true" : undefined}
-                  onClick={(e) => {
-                    // Bajo lg el chip abre el área y la acomoda bajo la
-                    // franja; el ancla del href queda para escritorio y
-                    // para sin JS.
-                    if (!onElegir || !window.matchMedia("(max-width: 63.999rem)").matches) return;
-                    e.preventDefault();
-                    onElegir(i);
-                  }}
+                  // Bajo lg el chip abre el área y la acomoda bajo la
+                  // franja; en escritorio corta hasta ella. El ancla del
+                  // href queda para sin JS y para otra pestaña.
+                  onClick={alClicIrAlArea(i, onElegir)}
                   className={`focus-visible:outline-verde-concepto flex items-center gap-3 rounded-full border px-3.5 py-1.5 font-sans text-[0.85rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none max-lg:min-h-11 max-lg:px-4 lg:rounded-none lg:border-0 lg:border-l-2 lg:px-4 lg:py-2.5 lg:text-[0.95rem] ${clasesDelItem(recorrido, activo)}`}
                 >
                   <span

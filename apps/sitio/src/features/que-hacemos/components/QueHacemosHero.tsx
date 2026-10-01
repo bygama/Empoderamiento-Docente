@@ -13,6 +13,7 @@ import { CieloPolvo } from "./que-hacemos-hero/CieloPolvo";
 import { TitularQH } from "./que-hacemos-hero/TitularQH";
 import { CapsulaPortal } from "./que-hacemos-hero/CapsulaPortal";
 import { idDeArea } from "./areas/anclas";
+import { alClicIrAlArea } from "./areas/ir-al-area";
 
 /**
  * Hero de Qué hacemos — pantalla completa (100svh) a sangre, sin bordes
@@ -172,7 +173,8 @@ export function QueHacemosHero({
             su bloque en #areas. En celular no van: tres renglones de chips
             le ganaban al titular, competían con la cápsula (tres tipos de
             píldora en una pantalla) y el salto a #areas cruza todo el
-            recorrido. Ahí las áreas se leen en su propia sección. */}
+            recorrido. Ahí las áreas se leen en su propia sección. Cortan
+            hasta el área sin pasar por el ancla nativa (areas/ir-al-area.ts). */}
         <ul
           data-qh-rise
           aria-label="Áreas de trabajo"
@@ -182,6 +184,7 @@ export function QueHacemosHero({
             <li key={idDeArea(i)}>
               <a
                 href={`#${idDeArea(i)}`}
+                onClick={alClicIrAlArea(i)}
                 className="focus-visible:outline-verde-concepto inline-flex min-h-9 items-center rounded-full border border-white/25 px-3.5 font-sans text-[0.85rem] text-white/85 transition-colors hover:border-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 {/* Nombre corto: son siete chips en un hero a pantalla

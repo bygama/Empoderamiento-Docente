@@ -63,8 +63,12 @@ export function ArticuloArea({
         >
           <div className="min-w-0 flex-1">
             <p className="font-mono text-[0.78rem] tracking-[0.18em] text-gris-texto uppercase">Área 0{i + 1}</p>
+            {/* Enfocable solo por código: ahí deja el foco el chip que trae
+                hasta acá (ir-al-area.ts, enfocarArea), como el ancla nativa. */}
             <h3
-              className="font-display mt-3 text-[1.7rem] font-bold tracking-[-0.02em] max-lg:mt-1.5 max-lg:text-[1.3rem]! md:text-[2.2rem] md:max-lg:text-[1.6rem]!"
+              data-area-titulo
+              tabIndex={-1}
+              className="font-display mt-3 text-[1.7rem] font-bold tracking-[-0.02em] outline-none max-lg:mt-1.5 max-lg:text-[1.3rem]! md:text-[2.2rem] md:max-lg:text-[1.6rem]!"
               style={{ lineHeight: 1.12 }}
             >
               {area.titulo}

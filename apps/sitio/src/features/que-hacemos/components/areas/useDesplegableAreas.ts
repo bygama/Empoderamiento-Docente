@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getLenis } from "@/lib/lenis";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
+import { EVENTO_AREA, conDesplegables } from "./ir-al-area";
 
 /** Debajo del logo y el menú flotantes, si no hay franja pegada que mida más. */
 const TOPE_PX = 76;
@@ -38,7 +39,8 @@ function irA(articulo: Element) {
  * tocada quede exactamente donde estaba, y recién ahí se desliza (Lenis)
  * hasta dejarla arriba, que es donde queda pegada mientras se lee.
  *
- * Llegar con `#area-<id>` en la dirección la abre.
+ * Llegar con `#area-<id>` en la dirección la abre, y también un chip del
+ * hero (EVENTO_AREA).
  */
 export function useDesplegableAreas(ids: string[]) {
   const [abierta, setAbierta] = useState<number | null>(null);
@@ -83,22 +85,29 @@ export function useDesplegableAreas(ids: string[]) {
     if (articulo) irA(articulo);
   }, [abierta]);
 
-  // Llegar con el ancla de un área (los chips del hero, otra página) la
-  // abre. Al cargar se mira en el frame siguiente, no durante el efecto.
+  // Llegar con el ancla de un área (otra página, un link compartido) la
+  // abre, y también el pedido de los chips del hero (ir-al-area.ts), que ya
+  // no pasan por la dirección. Al cargar se mira en el frame siguiente, no
+  // durante el efecto.
   useEffect(() => {
-    const desdeAncla = () => {
-      if (!window.matchMedia("(max-width: 63.999rem)").matches) return;
-      const i = ids.indexOf(window.location.hash.slice(1));
-      // Sin ancla de compensación: el ancla del navegador ya deja el
-      // artículo bajo la franja (scroll-mt), y una vieja movería la página.
+    // Sin ancla de compensación: quien la pidió ya deja el artículo bajo la
+    // franja (el ancla del navegador con su scroll-mt, el chip con su
+    // corte), y una vieja movería la página.
+    const abrirSinCompensar = (i: number) => {
       ancla.current = null;
       if (i >= 0) setAbierta(i);
     };
+    const desdeAncla = () => {
+      if (conDesplegables()) abrirSinCompensar(ids.indexOf(window.location.hash.slice(1)));
+    };
+    const pedida = (e: Event) => abrirSinCompensar((e as CustomEvent<number>).detail);
     const raf = requestAnimationFrame(desdeAncla);
     window.addEventListener("hashchange", desdeAncla);
+    window.addEventListener(EVENTO_AREA, pedida);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("hashchange", desdeAncla);
+      window.removeEventListener(EVENTO_AREA, pedida);
     };
   }, [ids]);
 

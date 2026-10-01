@@ -40,6 +40,31 @@ function finDeEscena(seccion: HTMLElement): number | null {
 }
 
 /**
+ * Hasta dónde scrollear para que el borde de un destino quede en su margen,
+ * contando lo que todavía lo va a bajar un pin que lo contiene y no terminó:
+ * al soltarse, GSAP deja al pinneado corrido el largo del pin, así que
+ * medido antes el borde queda corto. Les pasaba a las áreas de Qué hacemos
+ * desde los chips del hero: la columna bajaba 630 px al aterrizar (a 900 de
+ * alto) y el área pedida quedaba asomando abajo, y la 01 caía en plena
+ * puerta, con la columna todavía invisible. El pin cuenta solo si el destino
+ * cae después de que arrancó: el propio pinneado, o lo que va en su borde de
+ * arriba, se alcanza antes y no se corre (el hero de Investigación es una
+ * sección pinneada entera: llegando desde arriba, «Por qué investigamos»
+ * tiene que caer en su principio y no al final de la historia).
+ */
+function bordeDe(el: HTMLElement, margen: number) {
+  const top = el.getBoundingClientRect().top + window.scrollY;
+  let falta = 0;
+  for (const st of ScrollTrigger.getAll()) {
+    if (!st.pin?.contains(el)) continue;
+    // Cuánto lo corrió ya el pin: restándolo queda dónde estaba antes.
+    const corrido = Math.min(Math.max(window.scrollY - st.start, 0), st.end - st.start);
+    if (top - corrido - margen > st.start) falta += st.end - st.start - corrido;
+  }
+  return Math.max(0, top + falta - margen);
+}
+
+/**
  * Ir a una sección de la página. Por defecto DESLIZA (los CTA de los heros
  * son parte de la lectura y el viaje se entiende). `corte: true` va
  * instantáneo: lo necesitan los aterrizajes programáticos —llegar desde
@@ -56,7 +81,7 @@ export function irASeccion(id: string, { corte = false, alFinal = false } = {}) 
   const el = document.getElementById(id);
   if (!el) return;
   const margen = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
-  const arriba = Math.max(0, el.getBoundingClientRect().top + window.scrollY - margen);
+  const arriba = bordeDe(el, margen);
   const destino = (alFinal && finDeEscena(el)) || arriba;
   const enElFin = destino !== arriba;
 
@@ -70,10 +95,7 @@ export function irASeccion(id: string, { corte = false, alFinal = false } = {}) 
   // final de su escena si se aterrizó ahí (se vuelve a calcular: el borde
   // no sirve, porque con la sección pinneada mide 0 y la corrección la
   // empujaba una escena entera más abajo).
-  const objetivo = () => {
-    const bordeAhora = Math.max(0, el.getBoundingClientRect().top + window.scrollY - margen);
-    return (enElFin && finDeEscena(el)) || bordeAhora;
-  };
+  const objetivo = () => (enElFin && finDeEscena(el)) || bordeDe(el, margen);
   let ultimoY = window.scrollY;
   const corregir = () => {
     if (Math.abs(window.scrollY - ultimoY) > 2) return;

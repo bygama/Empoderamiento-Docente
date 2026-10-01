@@ -75,7 +75,7 @@ export function AreasQueHacemos({ contenido }: { contenido: AreasDeQueHacemos })
         celda,
         caja,
         articulos,
-        piezas: q("[data-area]"),
+        piezas: q("[data-area] > *"),
         riel,
         items: q("[data-areas-item]"),
       });
