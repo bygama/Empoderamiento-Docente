@@ -20,9 +20,10 @@ import { useRiel } from "./lanzamientos/useRiel";
  * en el borde derecho insinúa que hay más contenido (se apaga al llegar al
  * final). En touch no hace falta: el riel cortado + scroll nativo ya lo dicen.
  *
- * Los textos y las tarjetas llegan por props (de
- * `features/novedades/contenido/lanzamientos.ts` o de la base); los destinos,
- * la Biblioteca, quedan acá.
+ * Los textos y las tarjetas, cada una con el link a su artículo, llegan por
+ * props (de `features/novedades/contenido/lanzamientos.ts` o de la base); los
+ * dos destinos a la Biblioteca, el link de arriba y la tarjeta del final,
+ * quedan acá.
  */
 export function LanzamientosRecientes({ contenido }: { contenido: LanzamientosDeNovedades }) {
   const { trackRef, wrapRef, pillRef, fadeRef, progRef, ends, scrollByCard, handlers } = useRiel();

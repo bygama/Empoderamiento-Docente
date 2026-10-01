@@ -1,12 +1,24 @@
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 // El riel de «Recién salido» (LanzamientosRecientes.tsx): arrastrar con
 // inercia en desktop, flechas y teclado para quien no arrastra, la pill que
 // reemplaza al cursor y el velo del borde. En touch va el scroll nativo, que
-// ya trae su propia inercia.
+// ya trae su propia inercia. Las tarjetas son links: un clic las abre y un
+// arrastre no.
 
 const hoverFine = () => window.matchMedia("(hover: hover)").matches;
+
+// Hasta acá el mouse hace clic; pasado esto, arrastra. Un pulso que tiembla
+// un par de píxeles al hacer clic sigue siendo un clic.
+const UMBRAL_DE_ARRASTRE = 5;
 
 export function useRiel() {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -16,7 +28,7 @@ export function useRiel() {
   // Barra de progreso del riel en celular (en desktop avisan el prev/next y la pill).
   const progRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
-  const st = useRef({ down: false, startX: 0, startScroll: 0, vx: 0, lastX: 0, raf: 0 });
+  const st = useRef({ down: false, movio: false, startX: 0, startScroll: 0, vx: 0, lastX: 0, raf: 0 });
 
   /* La pill se posiciona directo al DOM (transform instantáneo, sin estado
      React); el "apretar" se transmite escalando el contenido interno, que sí
@@ -60,7 +72,7 @@ export function useRiel() {
   const scrollByCard = (dir: 1 | -1) => {
     const el = trackRef.current;
     if (!el) return;
-    const card = el.querySelector("article");
+    const card = el.firstElementChild;
     const paso = (card ? card.getBoundingClientRect().width : el.clientWidth * 0.8) + 20;
     el.scrollBy({ left: dir * paso, behavior: reduced ? "auto" : "smooth" });
   };
@@ -89,11 +101,15 @@ export function useRiel() {
     },
     onPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => {
       if (!hoverFine()) return; // touch → scroll nativo
+      // Solo el botón principal: con el del medio o el derecho no llega un
+      // clic al soltar, y el arrastre quedaría esperando uno para tragarse.
+      if (e.button !== 0) return;
       const el = trackRef.current;
       if (!el) return;
       cancelAnimationFrame(st.current.raf);
-      Object.assign(st.current, { down: true, startX: e.clientX, startScroll: el.scrollLeft, lastX: e.clientX, vx: 0 });
-      el.setPointerCapture?.(e.pointerId);
+      // El puntero todavía no se captura: capturado, Chrome le entrega el clic
+      // al riel y no al link de la tarjeta, que nunca se abriría.
+      Object.assign(st.current, { down: true, movio: false, startX: e.clientX, startScroll: el.scrollLeft, lastX: e.clientX, vx: 0 });
       setPillPressed(true);
     },
     onPointerMove: (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -101,11 +117,32 @@ export function useRiel() {
       const s = st.current;
       const el = trackRef.current;
       if (!s.down || !el) return;
+      if (!s.movio) {
+        // Hasta el umbral es un clic y el riel no se mueve. Pasado, es un
+        // arrastre: recién ahí se captura, para seguirlo aunque el mouse se
+        // salga del riel.
+        if (Math.abs(e.clientX - s.startX) <= UMBRAL_DE_ARRASTRE) return;
+        s.movio = true;
+        el.setPointerCapture?.(e.pointerId);
+      }
       el.scrollLeft = s.startScroll - (e.clientX - s.startX);
       s.vx = e.clientX - s.lastX;
       s.lastX = e.clientX;
     },
     onPointerUp: onUp,
+    // Si el navegador se queda con el gesto (un dedo en una pantalla táctil
+    // que también tiene mouse), no llega ningún clic que tragarse.
+    onPointerCancel: () => {
+      st.current.movio = false;
+      onUp();
+    },
+    // El clic que llega al soltar un arrastre no abre la tarjeta ni navega.
+    onClickCapture: (e: ReactMouseEvent<HTMLDivElement>) => {
+      if (!st.current.movio) return;
+      st.current.movio = false;
+      e.preventDefault();
+      e.stopPropagation();
+    },
     onPointerEnter: (e: ReactPointerEvent<HTMLDivElement>) => {
       if (!hoverFine() || !pillRef.current) return;
       movePill(e);
