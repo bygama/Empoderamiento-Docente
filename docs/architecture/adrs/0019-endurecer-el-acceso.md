@@ -103,10 +103,12 @@ nuevos.**
    que escribe va por POST (Server Actions y la API de better-auth).
 
 Van además, sin regla nueva: el secreto del cron se compara en tiempo
-constante; las imágenes de Blob se aceptan solo del store del sitio y su
-carpeta `fotos/` (el host sale del token), igual en next/image, en la CSP y en
-la validación de lo que se guarda (`esSrcDeFoto`); `X-Powered-By` no se manda;
-better-auth pasa a 1.7.7.
+constante; las imágenes de Blob se muestran solo del store del sitio y su
+carpeta `fotos/` (el host sale del token, en next/image y en la CSP), y el
+admin guarda solo esas (`validarAlGuardar`); al leer lo guardado, una foto de
+Blob de otro store en `fotos/` sigue pasando el esquema, para que un cambio de
+token no esconda lo publicado ni vuelva una sección a su contenido inicial;
+`X-Powered-By` no se manda; better-auth pasa a 1.7.7.
 
 ## Consecuencias
 
