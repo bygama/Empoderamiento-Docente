@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import type { AlmacenDeBloqueos } from "./bloqueo";
 import { configDeAuth } from "./config";
+import { hashear } from "./contrasenas";
 import { crearEnlaceDeInvitacion } from "./invitacion";
 import type { OpcionesDeAuth } from "./opciones";
 
@@ -33,6 +34,7 @@ const sinBloqueos: AlmacenDeBloqueos = {
 async function armar(opciones: Partial<Omit<OpcionesDeAuth, "base">> = {}) {
   const db = { user: [], session: [], account: [], verification: [] as Array<{ value: string }>, twoFactor: [] };
   const avisos: string[] = [];
+  const codigos: string[] = [];
   const enSegundoPlano: Promise<unknown>[] = [];
   const auth = betterAuth({
     ...configDeAuth({
@@ -40,7 +42,7 @@ async function armar(opciones: Partial<Omit<OpcionesDeAuth, "base">> = {}) {
       urlDelSitio: "http://localhost",
       mandarResetDeContrasena: async () => {},
       avisarCambioDeContrasena: async ({ para }) => void avisos.push(para),
-      mandarCodigo: async () => {},
+      mandarCodigo: async ({ codigo }) => void codigos.push(codigo),
       segundoPlano: (tarea) => void enSegundoPlano.push(tarea),
       bloqueos: sinBloqueos,
       // Como el de la app (datos/auth.ts): todo lo de la cuenta en `verification`.
@@ -69,7 +71,33 @@ async function armar(opciones: Partial<Omit<OpcionesDeAuth, "base">> = {}) {
     await Promise.all(enSegundoPlano.splice(0));
     return res;
   };
-  return { auth, ctx, cuenta, abrir, elegir, avisos };
+  /** Un navegador: guarda las cookies que le ponen y las manda de vuelta. */
+  const navegador = () => {
+    const cookies = new Map<string, string>();
+    return async (ruta: string, cuerpo: object) => {
+      const res = await auth.handler(
+        new Request(`http://localhost/api/auth${ruta}`, {
+          method: "POST",
+          headers: { "content-type": "application/json", origin: "http://localhost", cookie: [...cookies].map(([n, v]) => `${n}=${v}`).join("; ") },
+          body: JSON.stringify(cuerpo),
+        }),
+      );
+      await Promise.all(enSegundoPlano.splice(0));
+      for (const c of res.headers.getSetCookie()) {
+        const [nombre = "", valor = ""] = (c.split(";")[0] ?? "").split("=");
+        if (/max-age=0/i.test(c) || valor === "") cookies.delete(nombre);
+        else cookies.set(nombre, valor);
+      }
+      return res;
+    };
+  };
+  return { auth, ctx, cuenta, abrir, elegir, avisos, codigos, navegador };
+}
+
+/** Si la respuesta de entrar pide el código en vez de traer la sesión. */
+async function pideCodigo(res: Response): Promise<boolean> {
+  const cuerpo: unknown = await res.json();
+  return typeof cuerpo === "object" && cuerpo !== null && "twoFactorRedirect" in cuerpo;
 }
 
 /** El token de un enlace de invitación. */
@@ -93,20 +121,29 @@ test("el enlace lleva a «Elegí tu contraseña» con su token, y resetPassword 
   assert.equal((await elegir(token)).status, 400);
 });
 
-test("elegir la contraseña con un enlace deja sin efecto los otros de la cuenta y sus dispositivos recordados, no los de otra", async () => {
-  const { auth, ctx, cuenta, elegir } = await armar();
-  const tokenDe = async (idDeCuenta: string) => {
+test("elegir la contraseña con un enlace deja sin efecto los otros de la cuenta y su dispositivo recordado, no los de otra", async () => {
+  const { auth, ctx, elegir, codigos, navegador } = await armar();
+  const tokenPara = async (idDeCuenta: string) => {
     const { enlace } = await crearEnlaceDeInvitacion(auth, { idDeCuenta, horas: 72, volverA: "/admin/nueva-contrasena" });
-    return new URL(enlace).pathname.split("/").at(-1) ?? "";
+    return tokenDe(enlace);
   };
-  const [uno, otro] = [await tokenDe(cuenta.id), await tokenDe(cuenta.id)];
-  const recordado = await ctx.internalAdapter.createVerificationValue({ value: cuenta.id, identifier: "trust-device-de-prueba", expiresAt: new Date(Date.now() + 3_600_000) });
+  // Ana tiene contraseña y segundo factor, y recuerda este dispositivo por el flujo de verdad: el código con «Recordar».
+  const ana = await ctx.internalAdapter.createUser({ email: "ana@ed.test", name: "Ana", emailVerified: true, twoFactorEnabled: true }, { method: "admin" });
+  await ctx.internalAdapter.createAccount({ userId: ana.id, providerId: "credential", accountId: ana.id, password: await hashear("la-contrasena-de-antes-de-ana") });
+  const pedir = navegador();
+  const entrar = (password: string) => pedir("/sign-in/email", { email: "ana@ed.test", password });
+  assert.equal(await pideCodigo(await entrar("la-contrasena-de-antes-de-ana")), true);
+  await pedir("/two-factor/send-otp", {});
+  assert.equal((await pedir("/two-factor/verify-otp", { code: codigos.at(-1), trustDevice: true })).status, 200);
+  assert.equal(await pideCodigo(await entrar("la-contrasena-de-antes-de-ana")), false, "el dispositivo quedó recordado");
+
+  const [uno, otro] = [await tokenPara(ana.id), await tokenPara(ana.id)];
   const ajena = await ctx.internalAdapter.createUser({ email: "eva@ed.test", name: "Eva", emailVerified: false }, { method: "admin" });
-  const deLaAjena = await tokenDe(ajena.id);
+  const deLaAjena = await tokenPara(ajena.id);
 
   assert.equal((await elegir(uno)).status, 200);
   assert.equal((await elegir(otro)).status, 400);
-  assert.equal(await ctx.internalAdapter.findVerificationValue(recordado.identifier), null);
+  assert.equal(await pideCodigo(await entrar("la-contrasena-que-eligio")), true, "el dispositivo ya no saltea el código");
   assert.equal((await elegir(deLaAjena)).status, 200);
 });
 

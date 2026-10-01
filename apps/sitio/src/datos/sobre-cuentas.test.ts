@@ -45,12 +45,19 @@ test("cerrarle el acceso a una cuenta borra sus sesiones, sus enlaces y sus disp
   const sesion = (userId: string) => ({ id: randomUUID(), token: randomUUID(), userId, expiresAt: new Date(Date.now() + 3_600_000) });
   const [propia, otra, deLaAjena] = [sesion(id), sesion(id), sesion(ajena)];
   await base.session.createMany({ data: [propia, otra, deLaAjena] });
-  // El dispositivo recordado del segundo factor: better-auth le pone el id de la cuenta como valor, como a los enlaces.
-  await base.verification.create({ data: { id: randomUUID(), identifier: `recordado-${id}`, value: id, expiresAt: new Date(Date.now() + 3_600_000) } });
+  // El dispositivo recordado del segundo factor, escrito por better-auth como lo escribe su plugin
+  // (`trust-device-…` con el id de la cuenta como valor, el identificador hasheado). El flujo
+  // entero —entrar, el código, «Recordar»— corre en @ed/auth (invitacion.test.ts): acá el código
+  // saldría por el correo de la app y lo de segundo plano pide el `after()` de un pedido de Next.
+  const { auth } = await import("@/datos/auth");
+  const recordado = { value: id, identifier: `trust-device-${randomUUID()}`, expiresAt: new Date(Date.now() + 3_600_000) };
+  await (await auth.$context).internalAdapter.createVerificationValue(recordado);
 
+  assert.ok(await (await auth.$context).internalAdapter.findVerificationValue(recordado.identifier));
   await cerrarElAcceso(id, propia.id);
   assert.deepEqual((await base.session.findMany({ where: { userId: id }, select: { id: true } })).map((s) => s.id), [propia.id]);
   assert.equal(await base.verification.count({ where: { value: id } }), 0);
+  assert.equal(await (await auth.$context).internalAdapter.findVerificationValue(recordado.identifier), null);
 
   await cerrarElAcceso(id);
   assert.equal(await base.session.count({ where: { userId: id } }), 0);
