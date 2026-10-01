@@ -1,6 +1,5 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { haveIBeenPwned } from "better-auth/plugins/haveibeenpwned";
 import { hashear, verificar } from "./contrasenas";
 import { crearGanchos, destrabar } from "./ganchos";
 import type { OpcionesDeAuth } from "./opciones";
@@ -162,24 +161,7 @@ export function configDeAuth({
       },
     },
 
-    plugins: [
-      ...segundoFactor({ mandarCodigo, registrar, bloqueos, secreto }),
-      /**
-       * Una contraseña que aparece en filtraciones de otros sitios no se
-       * elige: es de las primeras que prueba quien ataca. Se le pregunta a
-       * Have I Been Pwned por rango (k-anonimato): viajan los 5 primeros
-       * caracteres del SHA-1 de la contraseña, nunca ella ni su hash entero.
-       * Solo donde se elige una (el enlace de «olvidé» y la invitación van
-       * por `/reset-password`; Mi cuenta, por `/change-password`); entrar no
-       * la mira, así que nadie se queda afuera con la que ya tiene. Si el
-       * servicio no contesta, no se guarda y el formulario pide probar de
-       * nuevo (el formulario reconoce `CONTRASENA_FILTRADA`, errores.ts).
-       */
-      haveIBeenPwned({
-        paths: ["/reset-password", "/change-password"],
-        customPasswordCompromisedMessage: "Esa contraseña aparece en filtraciones de otros sitios. Elegí otra.",
-      }),
-    ],
+    plugins: segundoFactor({ mandarCodigo, registrar, bloqueos, secreto }),
 
     hooks: crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena, borrarEnlaces }),
 

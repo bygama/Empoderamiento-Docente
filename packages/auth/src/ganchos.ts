@@ -9,6 +9,7 @@ import {
   type AlmacenDeBloqueos,
 } from "./bloqueo";
 import { hashear, necesitaRehash } from "./contrasenas";
+import { RUTAS_QUE_ELIGEN_CONTRASENA, frenarSiEstaFiltrada } from "./filtradas";
 import type { OpcionesDeAuth } from "./opciones";
 import { alCambiarLaContrasena, anotarLaSalida } from "./sucesos";
 
@@ -17,6 +18,7 @@ import { alCambiarLaContrasena, anotarLaSalida } from "./sucesos";
  * trae y que tiene que pasar en el servidor, no en el formulario: el bloqueo
  * por cuenta (bloqueo.ts) y el paso de scrypt a Argon2id (contrasenas.ts).
  * Y lo que se anota de la sesión: salir y cambiar la contraseña (sucesos.ts).
+ * Antes de elegir una contraseña, que no esté filtrada (filtradas.ts).
  * Entrar no se anota acá: con el segundo factor, la contraseña buena todavía
  * no es una sesión, y eso lo decide el plugin, que corre después
  * (segundo-factor.ts).
@@ -71,6 +73,8 @@ export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContr
     // la contraseña buena. Si no, el freno no frenaría nada.
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === SALIR) return anotarLaSalida(ctx, registrar);
+      // Antes de la ruta, para que una filtrada no gaste el enlace (filtradas.ts).
+      if (RUTAS_QUE_ELIGEN_CONTRASENA.includes(ctx.path ?? "")) return frenarSiEstaFiltrada(ctx);
       const clave = ctx.path === ENTRAR ? claveDe(ctx) : null;
       if (!clave) return;
       const segundos = segundosDeFreno(await bloqueos.leer(clave), new Date());

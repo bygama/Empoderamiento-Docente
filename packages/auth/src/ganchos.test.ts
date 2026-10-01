@@ -1,4 +1,4 @@
-import { test } from "node:test";
+import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { betterAuth } from "better-auth";
 import { memoryAdapter } from "better-auth/adapters/memory";
@@ -13,6 +13,17 @@ import type { SucesoDeSesion } from "./opciones";
 // `/sign-out` y `/change-password` pasen por ellos como en producción, no una
 // copia de su lógica. «Entró» lo anota el plugin del segundo factor, después
 // de estos ganchos: se prueba en segundo-factor.test.ts.
+
+// Cambiar la contraseña le pregunta a Have I Been Pwned si está filtrada
+// (filtradas.ts): acá contesta que ninguna, sin red. Lo prueba
+// contrasenas-filtradas.test.ts.
+const fetchDeVerdad = globalThis.fetch;
+before(() => {
+  globalThis.fetch = async () => new Response("0000000000000000000000000000000000A:0");
+});
+after(() => {
+  globalThis.fetch = fetchDeVerdad;
+});
 
 const SECRETO = "un-secreto-de-prueba-que-no-sirve-para-nada-mas";
 const CONTRASENA = "la-contrasena-buena-de-prueba";

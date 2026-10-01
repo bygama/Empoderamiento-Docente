@@ -15,7 +15,10 @@ export const CUENTA_SUSPENDIDA = "CUENTA_SUSPENDIDA";
 
 /**
  * La contraseña que se quiso elegir aparece en filtraciones de otros sitios
- * (el plugin haveIBeenPwned de better-auth, que pone este código). No es
- * propio: vive acá para que el formulario lo reconozca igual.
+ * (filtradas.ts). Es el mismo código que usa el plugin haveIBeenPwned de
+ * better-auth, por si algún día se vuelve a él.
  */
 export const CONTRASENA_FILTRADA = "PASSWORD_COMPROMISED";
+
+/** No se pudo preguntar si la contraseña está filtrada: no se guardó, y hay que probar de nuevo. */
+export const CONTRASENA_SIN_REVISAR = "CONTRASENA_SIN_REVISAR";
