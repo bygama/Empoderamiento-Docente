@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { altoViewport, anchoDocumento } from "@/lib/viewport";
 import { ACENTOS, AIRE_TITULO, CAMARA, NODOS } from "./constelacion-mirada";
 import { crearIndicador, type Escena } from "./setup-estados";
+import { ubicarFichas } from "./ubicar-fichas";
 
 /**
  * Timeline maestro (14 unidades sobre toda la zona), atado al scroll de
@@ -30,6 +31,9 @@ export function crearTimelineFases(e: Escena, zone: HTMLElement) {
       end: "bottom bottom",
       scrub: 1,
       invalidateOnRefresh: true,
+      // La cámara se recalcula en cada refresh con el alto de ese momento:
+      // las pilas de fichas tienen que acompañarla.
+      onRefresh: () => ubicarFichas(fichaGrupos),
       onUpdate: (self) => setDot(self.progress),
     },
   });
@@ -111,9 +115,12 @@ export function crearTimelineFases(e: Escena, zone: HTMLElement) {
     // Fichas: entran de a una en la pila, con el scroll, y se quedan.
     // Entrada corta (0.12 u ≈ 65px, menos de una muesca de rueda): como
     // mucho una a medias en cualquier parada, y nunca translúcida por
-    // mucho scroll. Se apagan juntas cuando se repliega la lectura
-    // (S+1.88), antes del cambio de cámara (S+2.15).
-    const E0 = 0.4;
+    // mucho scroll. La primera espera a que la cámara frene (S+0.55): en
+    // el 03 el rótulo sube desde abajo cruzando la pila, y con la cámara
+    // en viaje «Perspectiva de género» nacía pegada al título. Se apagan
+    // juntas cuando se repliega la lectura (S+1.88), antes del cambio de
+    // cámara (S+2.15); la quinta termina de entrar en S+1.68.
+    const E0 = 0.6;
     const STEP = 0.24;
     const items = gsap.utils.toArray<HTMLElement>("[data-ficha]", fichaGrupos[i]);
     // CLAMP de pre-nacimiento: al abrirse la fase se re-asegura el estado

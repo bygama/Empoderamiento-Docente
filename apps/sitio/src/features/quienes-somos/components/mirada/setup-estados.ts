@@ -1,6 +1,6 @@
 import gsap from "gsap";
-import { altoViewport, anchoDocumento } from "@/lib/viewport";
-import { BOUNDS, CAMARA, FASE_COLOR } from "./constelacion-mirada";
+import { BOUNDS, FASE_COLOR } from "./constelacion-mirada";
+import { ubicarFichas } from "./ubicar-fichas";
 
 /**
  * Lee las piezas de la escena por data-attribute, acotadas a `root` (evita
@@ -45,15 +45,12 @@ export type Escena = NonNullable<ReturnType<typeof leerEscena>>;
 /**
  * Estados iniciales (solo con motion): posicionamiento imperativo de cámara,
  * zona de lectura, capas y nodos. Es el DUEÑO de la posición de las fichas:
- * cada grupo queda como pila fija bajo su nodo (ver el bloque de fichas).
+ * cada grupo queda como pila fija bajo su nodo (ver el bloque de fichas y
+ * `ubicarFichas`, que el timeline repite en cada refresh).
  */
 export function prepararEstados(e: Escena) {
   const { q, qa, stage, stageLineas, centro, sintesis, detalles, capasCamara } = e;
   const { puentes, nodoCores, nodoHalos, strikes, fichaGrupos, lineas, arcos, ramas, ramdots } = e;
-
-  // clientWidth (sin scrollbar): la cámara aterriza donde el usuario ve.
-  const W = anchoDocumento;
-  const H = altoViewport;
 
   // El hint es de la coreografía: las dos capas reciben la cámara en cada
   // frame, y nodos y fichas entran y salen con el scrub. En las clases
@@ -84,7 +81,9 @@ export function prepararEstados(e: Escena) {
       });
     }
   });
-  gsap.set(strikes, { scaleX: 0, transformOrigin: "left center" });
+  // Hoy ninguna frase tacha nada: sin el guard, GSAP avisa en la consola
+  // que no encontró a quién (el timeline ya pregunta por cada una).
+  if (strikes.length) gsap.set(strikes, { scaleX: 0, transformOrigin: "left center" });
   gsap.set(qa("[data-afirma-underline]"), { scaleX: 0, transformOrigin: "left center" });
 
   // Capas: líneas (3) < fichas (5) < nodos (10) < contenido (20). Las
@@ -108,17 +107,14 @@ export function prepararEstados(e: Escena) {
   // cierra. Nada se mueve mientras se lee y nada cruza nada: a la
   // derecha de la pila queda la zona de lectura (desde ~0.62W) y el
   // único nodo en pantalla durante una fase es el activo.
-  fichaGrupos.forEach((g, i) => {
-    const cam = CAMARA[i];
+  fichaGrupos.forEach((g) => {
     gsap.set(g, {
       position: "absolute",
-      // right/bottom explícitos, no el shorthand inset: GSAP aplica
-      // `inset: auto` después de left/top y los pisa (medido: la pila
-      // quedaba en la esquina 0,0).
+      // right/bottom explícitos, no el shorthand inset: GSAP aplicaba
+      // `inset: auto` después de left/top y los pisaba (medido: la pila
+      // quedaba en la esquina 0,0). left/top los pone `ubicarFichas`.
       right: "auto",
       bottom: "auto",
-      left: cam.tx * W() + 28,
-      top: cam.ty * H() + 54,
       width: "auto",
       padding: 0,
       display: "flex",
@@ -126,7 +122,6 @@ export function prepararEstados(e: Escena) {
       flexWrap: "nowrap",
       alignItems: "flex-start",
       justifyContent: "flex-start",
-      gap: "0.55rem",
       pointerEvents: "none",
     });
     gsap.set(gsap.utils.toArray<HTMLElement>("[data-ficha]", g), {
@@ -137,6 +132,9 @@ export function prepararEstados(e: Escena) {
       willChange: "transform",
     });
   });
+  // Dónde va cada pila y cuánto aire lleva: después del set de las fichas,
+  // porque mide la pila ya con su ancho final.
+  ubicarFichas(fichaGrupos);
   // (Sin "respiración": el vaivén infinito de ±5px del grupo, pensado
   // para que las fichas detenidas no se sintieran muertas, sobre una
   // ficha translúcida reforzaba la sensación de glitch. Con fichas
