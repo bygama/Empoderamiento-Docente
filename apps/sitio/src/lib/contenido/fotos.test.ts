@@ -29,10 +29,39 @@ test("fotoDeRuta arma una foto de public/ centrada, con su propio foco", () => {
   assert.notEqual(a.foco, b.foco);
 });
 
+/** Corre `probar` con ese token de Blob (o sin ninguno) y deja el entorno como estaba. */
+function conToken(token: string | undefined, probar: () => void) {
+  const antes = process.env.BLOB_READ_WRITE_TOKEN;
+  if (token === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
+  else process.env.BLOB_READ_WRITE_TOKEN = token;
+  try {
+    probar();
+  } finally {
+    if (antes === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
+    else process.env.BLOB_READ_WRITE_TOKEN = antes;
+  }
+}
+
+test("del Blob, solo las del store del sitio y su carpeta fotos/, lo mismo que deja mostrar next/image", () => {
+  conToken("vercel_blob_rw_Abc123xyz_secreto", () => {
+    assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), true);
+    assert.equal(esSrcDeFoto("https://otro-store.public.blob.vercel-storage.com/fotos/x.webp"), false);
+    assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/cv/x.pdf"), false);
+    assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/../cv/x.pdf"), false);
+    assert.equal(esSrcDeFoto("http://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), false);
+  });
+  // Sin token las fotos van a disco: ningún Blob es del sitio.
+  conToken(undefined, () => assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), false));
+  // Un token de otra forma deja el dominio de Blob, como next.config.ts, pero igual solo fotos/.
+  conToken("otra-forma", () => {
+    assert.equal(esSrcDeFoto("https://cualquiera.public.blob.vercel-storage.com/fotos/x.webp"), true);
+    assert.equal(esSrcDeFoto("https://cualquiera.public.blob.vercel-storage.com/otra/x.webp"), false);
+  });
+});
+
 test("solo se aceptan las fotos que el sitio sabe mostrar", () => {
   assert.equal(esSrcDeFoto("/fotos/docentes-trabajan-aula.webp"), true);
   assert.equal(esSrcDeFoto("/api/fotos/0f0e0d0c-0b0a-4908-8706-050403020100"), true);
-  assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), true);
   assert.equal(esSrcDeFoto("https://otro.sitio/x.jpg"), false);
   assert.equal(esSrcDeFoto("/api/fotos/../.env.local"), false);
   assert.equal(esSrcDeFoto("fotos/sin-barra.webp"), false);

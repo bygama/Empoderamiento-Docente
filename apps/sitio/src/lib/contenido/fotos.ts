@@ -1,4 +1,5 @@
 import { posicionDelFoco, type Foco, type ValorDeFoto } from "@ed/kit-admin/foto";
+import { hostDelBlob } from "./host-del-blob";
 
 // Cómo se muestra una foto guardada en el contenido: `src`, `alt` y el
 // `object-position` que sale del punto de foco (SPEC §4.4). Sin Zod y sin
@@ -34,15 +35,25 @@ const SEGMENTO_DE_RUTA = /(?!\.{1,2}\/|\.{1,2}$)(?:(?!%2[eEfF])[^\s?#/])+/;
 const CARPETAS_DE_FOTOS = ["fotos", "novedades", "investigacion", "aliados", "biblioteca/portadas", "equipo"];
 const RUTA_DE_FOTO = new RegExp(String.raw`/(?:${CARPETAS_DE_FOTOS.join("|")})/(?:${SEGMENTO_DE_RUTA.source}/)*${SEGMENTO_DE_RUTA.source}`);
 
-// Lo único que el sitio sabe mostrar: sus fotos de public/, las subidas en
-// local y las del Blob de Vercel (el host de next.config.ts). Un host fuera
-// de remotePatterns haría tirar a next/image en cada visita a la home.
-const SRC_PERMITIDO = new RegExp(
-  String.raw`^(${RUTA_DE_FOTO.source}|/api/fotos/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|https://[a-z0-9-]+\.public\.blob\.vercel-storage\.com/[^\s]+)$`,
-);
+// Lo que el sitio sabe mostrar sin salir de su origen: sus fotos de public/ y
+// las subidas en local.
+const SRC_DEL_SITIO = new RegExp(String.raw`^(?:${RUTA_DE_FOTO.source}|/api/fotos/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$`);
+
+/**
+ * Las del Blob: solo del store del sitio y su carpeta fotos/, lo mismo que
+ * deja mostrar next/image (`hostDelBlob`, next.config.ts). Una foto de otro
+ * host haría tirar a next/image en cada visita a la home. Sin token de Blob,
+ * ninguna: las fotos van a disco.
+ */
+function esDelBlobDelSitio(src: string): boolean {
+  const host = hostDelBlob(process.env.BLOB_READ_WRITE_TOKEN);
+  if (!host) return false;
+  const delHost = host.startsWith("*.") ? `[a-z0-9-]+${host.slice(1).replaceAll(".", "\\.")}` : host.replaceAll(".", "\\.");
+  return new RegExp(String.raw`^https://${delHost}/fotos/(?:${SEGMENTO_DE_RUTA.source}/)*${SEGMENTO_DE_RUTA.source}$`).test(src);
+}
 
 export function esSrcDeFoto(src: string): boolean {
-  return SRC_PERMITIDO.test(src);
+  return SRC_DEL_SITIO.test(src) || esDelBlobDelSitio(src);
 }
 
 /**
