@@ -50,8 +50,8 @@ export function crearTemaSegunFondo(nav: HTMLElement): () => void {
   const medir = () => {
     raf = 0;
     const logo = nav.querySelector("[data-nav-logo]")?.getBoundingClientRect();
-    // Con el nav escondido por el auto-hide el punto cae fuera de pantalla y
-    // no hay nada que medir: se queda con el último tema.
+    // Si el logo no está en pantalla no hay nada que medir: se queda con el
+    // último tema.
     if (!logo || logo.bottom <= 0) return;
     const tema = temaEn(logo.left + logo.width / 2, logo.top + logo.height / 2, nav);
     if (tema && nav.dataset.tema !== tema) nav.dataset.tema = tema;
@@ -60,9 +60,9 @@ export function crearTemaSegunFondo(nav: HTMLElement): () => void {
   const pedir = () => {
     if (!raf) raf = requestAnimationFrame(medir);
   };
-  // Y una de cola, cuando el scroll se aquieta: al subir apenas, el auto-hide
-  // trae el nav de vuelta en ~0,45 s y el último evento de scroll puede haber
-  // llegado con el logo todavía fuera de pantalla, sin nada que medir.
+  // Y una de cola, cuando el scroll se aquieta: las escenas con scrub siguen
+  // moviéndose un rato después del último evento, y lo que queda debajo del
+  // logo puede cambiar sin que llegue otro scroll.
   let cola = 0;
   const alScrollear = () => {
     pedir();
@@ -71,8 +71,8 @@ export function crearTemaSegunFondo(nav: HTMLElement): () => void {
   };
 
   medir();
-  // En captura: hay páginas que scrollean adentro de una capa propia
-  // (`data-scroll-principal`) y ese scroll no burbujea hasta la ventana.
+  // En captura: hay capas que scrollean por su cuenta (el expediente de
+  // Investigación) y ese scroll no burbujea hasta la ventana.
   document.addEventListener("scroll", alScrollear, { passive: true, capture: true });
   window.addEventListener("resize", pedir);
   // Al cerrarse un modal vuelve a verse lo de abajo, y puede ser otro fondo: al
