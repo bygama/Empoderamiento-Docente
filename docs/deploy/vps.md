@@ -22,7 +22,7 @@ Desde el 2026-09-30, `empoderamientodocente.org` corre acá (antes, en Vercel).
 | | |
 | --- | --- |
 | **Servidor** | Hostinger KVM 2, Ubuntu 24.04, `2.24.68.136` |
-| **DNS** | en Hostinger: `A @` a esa IP y `www` como CNAME al dominio. Los MX, el SPF, el DMARC y los `hostingermail-*._domainkey` son del correo de Hostinger: no se tocan |
+| **DNS** | en **Cloudflare** (el dominio sigue registrado en Hostinger, con los nameservers de Cloudflare): el dominio y `www` entran por el túnel (§15). Los MX, el SPF, el DMARC, los `hostingermail-*._domainkey`, `autoconfig` y `autodiscover` son del correo de Hostinger: van en gris y no se tocan |
 | **Entrar** | `ssh deploy@2.24.68.136`, con una llave por persona (§13). Root y las contraseñas están cerrados por SSH |
 | **Deployar** | el botón de GitHub (§14), o por SSH `cd ~/ed && git pull && scripts/desplegar.sh` |
 | **Los secretos** | el `.env` del servidor, y su copia, la clave de sudo de `deploy`, la de root y la de admin de Umami, en la máquina de Mateo. Nunca en el repo ni en un chat |
@@ -562,3 +562,74 @@ Armarlo (o rehacerlo en un VPS nuevo):
 4. Borrá `boton` y `boton.pub` de tu máquina.
 
 **Revocarlo:** borrar su línea del VPS y el secreto `VPS_LLAVE`.
+
+## 15. Cloudflare adelante (Cloudflare Tunnel)
+
+Desde el 2026-09-30 el sitio entra por Cloudflare: el DNS está en Cloudflare
+(los nameservers del dominio, en Hostinger, apuntan a los suyos) y el sitio
+llega al VPS por un **túnel**. El túnel sale del VPS hacia Cloudflare y los
+pedidos entran por ahí, así que el VPS no necesita puertos web abiertos.
+Cloudflare pone el certificado de cara al público, cachea lo estático en cada
+país y frena lo obvio. El porqué está en `work/fortificar-el-vps/DECISIONS.md`.
+
+**La cuenta y el token.** La cuenta de Cloudflare tiene a cada persona como
+miembro (Super Administrator, al menos dos). Para operarla desde el servidor
+hay un **token de cuenta**, `ed-operacion`, sin vencimiento y usable **solo
+desde las IP del VPS**. Vive en `~/.config/ed/cloudflare-token` (600). Lleva
+dos políticas:
+
+- **Zona** `empoderamientodocente.org`: DNS, Zone (Read), Zone Settings, Zone
+  DNS Settings, Zone WAF, Zone Transform Rules, Analytics (Read), Cache Purge,
+  Cache Settings y SSL and Certificates.
+- **Cuenta** («Entire Account»): Cloudflare One Connector: cloudflared y
+  Notifications.
+
+Un permiso de cuenta puesto en la política de la zona no sirve: el túnel y
+las notificaciones son de la cuenta.
+
+**El DNS.** Los registros del correo (MX, SPF, DMARC, los tres
+`hostingermail-*._domainkey`, `autoconfig` y `autodiscover`) van **siempre en
+gris** (DNS only): con la nube naranja, la firma DKIM y la configuración de
+los clientes de correo se rompen. El dominio y `www` son CNAME al túnel
+(`<id>.cfargotunnel.com`), en naranja.
+
+**La zona.**
+- SSL Full (strict), HTTPS siempre, TLS mínimo 1.2, TLS 1.3 y HTTP/3.
+- **Apagado todo lo que reescribe el HTML:** Email Obfuscation, Rocket
+  Loader, Speed Brain, Early Hints, Automatic HTTPS Rewrites, Server Side
+  Excludes y 0-RTT (un GET repetido contaría dos veces un link corto).
+- Browser Cache TTL: «Respect Existing Headers». Smart Tiered Cache prendido.
+- **Reglas de caché:**
+  - nunca se cachea `/admin`, `/api/auth` ni `/l/`;
+  - `/_next/image` y `/api/fotos/` se cachean según su propio Cache-Control.
+  - **El HTML no se cachea en el borde**: publicar en el admin se ve al
+    instante. Las páginas mandan `s-maxage=31536000`, así que «Cache
+    Everything» las dejaría un año viejas.
+- Las reglas administradas gratis del WAF, y un tope de 10 POST cada 10 s por
+  IP a `/api/auth/`.
+
+**El túnel**, `ed-vps`, se maneja desde Cloudflare: qué nombre va a qué
+servicio vive allá. En el VPS corre el servicio `tunel` de
+`compose.cloudflare.yaml`, con IP fija en la red `borde`: Caddy le cree el
+`CF-Connecting-IP` **solo a esa IP**. En el `.env`:
+
+```
+CLOUDFLARE_TUNNEL_TOKEN=<el del túnel>
+COMPOSE_FILE=compose.yaml:compose.cloudflare.yaml
+COMPOSE_PATH_SEPARATOR=:
+```
+
+**Dos tiempos.** Al cambiar los nameservers, hay resolvers que siguen hasta
+48 h con los viejos y mandan a la gente directo al VPS.
+
+1. **Mientras tanto:** `CLOUDFLARE_ESQUEMA=` (vacío) en el `.env`. Caddy
+   sigue sacando su certificado y los puertos siguen abiertos, y el túnel le
+   habla a `https://proxy:443` (con `originServerName` el dominio).
+2. **Pasadas las 48 h:** se saca `CLOUDFLARE_ESQUEMA`, se pone
+   `IP_PUBLICADA=127.0.0.1`, y `docker compose up -d`. En el mismo momento,
+   el túnel pasa a `http://proxy:80`. Después se borran del `ufw` las reglas
+   del 80 y el 443.
+
+**Volver atrás** (sin Cloudflare): sacar del `.env` las líneas de esta
+sección, el registro del dominio a un A gris con la IP del VPS, y
+`scripts/desplegar.sh`.
