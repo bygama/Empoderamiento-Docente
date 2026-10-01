@@ -1,6 +1,6 @@
 import type { BetterAuthPlugin } from "better-auth";
 import { createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
-import { claveDeCodigos, conUnFalloMas, respuestaDeFreno, segundosDeFreno, type AlmacenDeBloqueos } from "./bloqueo";
+import { claveDeCodigos, contarUnIntento, respuestaDeFreno, type AlmacenDeBloqueos } from "./bloqueo";
 
 /**
  * **Los códigos fallidos del segundo factor se cuentan por cuenta**, con el
@@ -34,12 +34,9 @@ async function cuentaDelCodigo(ctx: Contexto): Promise<string | null> {
 }
 
 /**
- * **Cada intento se cuenta antes de probarlo**, como un fallo pendiente, en la
- * misma escritura atómica que mira si la cuenta está frenada
- * (`AlmacenDeBloqueos.actualizar`): si se mirara antes y se contara después,
- * una ráfaga de intentos a la vez pasaría entera por el control antes de que
- * se contara el primero. Solo el código bueno borra la cuenta; cualquier otro
- * desenlace (mal, vencido, la cuenta suspendida) queda contado.
+ * **Cada intento se cuenta antes de probarlo** (`contarUnIntento`): solo el
+ * código bueno borra lo contado; cualquier otro desenlace (mal, vencido, la
+ * cuenta suspendida) queda contado.
  */
 export function frenoDeCodigos({ bloqueos, secreto }: { bloqueos: AlmacenDeBloqueos; secreto: string }): { antes: Gancho; despues: Gancho } {
   return {
@@ -49,15 +46,8 @@ export function frenoDeCodigos({ bloqueos, secreto }: { bloqueos: AlmacenDeBloqu
       handler: createAuthMiddleware(async (ctx) => {
         const cuenta = await cuentaDelCodigo(ctx);
         if (!cuenta) return;
-        const ahora = new Date();
-        // Lo que había antes de este intento, visto adentro de la escritura atómica.
-        const antes: { segundos: number | null } = { segundos: null };
-        await bloqueos.actualizar(claveDeCodigos(cuenta, secreto), (actual) => {
-          antes.segundos = segundosDeFreno(actual, ahora);
-          // Frenada, `conUnFalloMas` la deja como estaba.
-          return conUnFalloMas(actual, ahora);
-        });
-        if (antes.segundos !== null) throw respuestaDeFreno(antes.segundos);
+        const segundos = await contarUnIntento(bloqueos, claveDeCodigos(cuenta, secreto));
+        if (segundos !== null) throw respuestaDeFreno(segundos);
       }),
     },
     despues: {
