@@ -62,6 +62,16 @@ export function claveDeCodigos(idDeCuenta: string, secreto: string): string {
   return createHmac("sha256", secreto).update(`codigos-del-segundo-factor:${idDeCuenta}`).digest("hex");
 }
 
+/**
+ * Con qué se guardan los fallos de volver a poner la contraseña con la sesión
+ * abierta (confirmar.ts). Aparte de entrar a propósito: quien sabe un correo
+ * puede trabar el de entrar desde afuera, y eso no tiene que trabar lo que la
+ * persona hace con su sesión. Por el id, como los códigos.
+ */
+export function claveDeConfirmacion(idDeCuenta: string, secreto: string): string {
+  return createHmac("sha256", secreto).update(`confirmar-la-contrasena:${idDeCuenta}`).digest("hex");
+}
+
 /** Los segundos que le quedan al freno, o null si la cuenta no está frenada. */
 export function segundosDeFreno(estado: EstadoDeBloqueo | null, ahora: Date): number | null {
   if (!estado?.hasta || estado.hasta <= ahora) return null;

@@ -3,6 +3,7 @@ import {
   OLVIDO,
   claveDeBloqueo,
   claveDeCodigos,
+  claveDeConfirmacion,
   conUnFalloMas,
   respuestaDeFreno,
   segundosDeFreno,
@@ -53,13 +54,15 @@ function rehashearSiHaceFalta(ctx: Contexto, idDeCuenta: string, contrasena: str
 }
 
 /**
- * Un reset de contraseña completo destraba la cuenta, para entrar y para
- * probar códigos: quien lo hizo probó que tiene el buzón, que es adonde van
- * los códigos.
+ * Un reset de contraseña completo destraba la cuenta: para entrar, para
+ * probar códigos y para confirmar la contraseña con la sesión abierta. Quien
+ * lo hizo probó que tiene el buzón, que es adonde van los códigos, y eligió
+ * la contraseña que se confirma.
  */
 export async function destrabar(bloqueos: AlmacenDeBloqueos, cuenta: { id: string; email: string }, secreto: string): Promise<void> {
   await bloqueos.borrar(claveDeBloqueo(cuenta.email, secreto));
   await bloqueos.borrar(claveDeCodigos(cuenta.id, secreto));
+  await bloqueos.borrar(claveDeConfirmacion(cuenta.id, secreto));
 }
 
 export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContrasena, borrarEnlaces }: OpcionesDeGanchos) {
