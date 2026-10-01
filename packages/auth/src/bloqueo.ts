@@ -93,6 +93,28 @@ export function conUnFalloMas(actual: EstadoDeBloqueo | null, ahora: Date): Esta
 }
 
 /**
+ * Cuenta un intento **antes** de probarlo, como un fallo pendiente, en la
+ * misma escritura atómica que mira si la clave está frenada
+ * (`AlmacenDeBloqueos.actualizar`, con la fila bloqueada en la base). Si se
+ * mirara antes y se contara después, una ráfaga de intentos a la vez pasaría
+ * entera por el control antes de que se contara el primero. El intento bueno
+ * borra lo contado (`borrar`).
+ *
+ * Devuelve los segundos que le quedaban al freno, o `null` si no estaba
+ * frenada y el intento se puede probar. Frenada, el intento no se cuenta.
+ */
+export async function contarUnIntento(bloqueos: AlmacenDeBloqueos, clave: string, ahora: Date = new Date()): Promise<number | null> {
+  // Lo que había antes de este intento, visto adentro de la escritura atómica.
+  const antes: { segundos: number | null } = { segundos: null };
+  await bloqueos.actualizar(clave, (actual) => {
+    antes.segundos = segundosDeFreno(actual, ahora);
+    // Frenada, `conUnFalloMas` la deja como estaba.
+    return conUnFalloMas(actual, ahora);
+  });
+  return antes.segundos;
+}
+
+/**
  * El mismo 429 que contesta el rate limit por IP, con el mismo cuerpo: quien
  * prueba no distingue un freno del otro, y el formulario muestra un solo aviso.
  */

@@ -1,5 +1,5 @@
 import { isAPIError } from "better-auth/api";
-import { claveDeConfirmacion, conUnFalloMas, segundosDeFreno, type AlmacenDeBloqueos } from "./bloqueo";
+import { claveDeConfirmacion, contarUnIntento, type AlmacenDeBloqueos } from "./bloqueo";
 
 /**
  * Pedir otra vez la contraseña de quien tiene la sesión, antes de algo que
@@ -15,9 +15,8 @@ import { claveDeConfirmacion, conUnFalloMas, segundosDeFreno, type AlmacenDeBloq
  * trabar desde afuera cualquiera que sepa el correo, y no tiene que trabar
  * esto.
  *
- * El intento se cuenta **antes** de probarlo, en la misma escritura atómica
- * que mira si está frenada: si se mirara antes y se contara después, una
- * ráfaga de intentos a la vez pasaría entera. La buena borra lo contado.
+ * El intento se cuenta **antes** de probarlo (`contarUnIntento`): una ráfaga
+ * de intentos a la vez no pasa entera. La buena borra lo contado.
  */
 
 export type Confirmacion = "bien" | "mal" | "frenada";
@@ -32,14 +31,7 @@ export async function confirmarContrasena(
   { headers, idDeCuenta, contrasena, bloqueos }: { headers: Headers; idDeCuenta: string; contrasena: string; bloqueos: AlmacenDeBloqueos },
 ): Promise<Confirmacion> {
   const clave = claveDeConfirmacion(idDeCuenta, (await auth.$context).secret);
-  const ahora = new Date();
-  const antes: { segundos: number | null } = { segundos: null };
-  await bloqueos.actualizar(clave, (actual) => {
-    antes.segundos = segundosDeFreno(actual, ahora);
-    // Frenada, `conUnFalloMas` la deja como estaba.
-    return conUnFalloMas(actual, ahora);
-  });
-  if (antes.segundos !== null) return "frenada";
+  if ((await contarUnIntento(bloqueos, clave)) !== null) return "frenada";
   try {
     await auth.api.verifyPassword({ headers, body: { password: contrasena } });
   } catch (error) {
