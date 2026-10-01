@@ -1,12 +1,11 @@
-import { createAuthMiddleware, isAPIError } from "better-auth/api";
+import { createAuthMiddleware } from "better-auth/api";
 import {
   OLVIDO,
   claveDeBloqueo,
   claveDeCodigos,
   claveDeConfirmacion,
-  conUnFalloMas,
+  contarUnIntento,
   respuestaDeFreno,
-  segundosDeFreno,
   type AlmacenDeBloqueos,
 } from "./bloqueo";
 import { hashear, necesitaRehash } from "./contrasenas";
@@ -80,7 +79,10 @@ export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContr
       if (RUTAS_QUE_ELIGEN_CONTRASENA.includes(ctx.path ?? "")) return frenarSiEstaFiltrada(ctx);
       const clave = ctx.path === ENTRAR ? claveDe(ctx) : null;
       if (!clave) return;
-      const segundos = segundosDeFreno(await bloqueos.leer(clave), new Date());
+      // Cada intento se cuenta antes de probar la contraseña (`contarUnIntento`):
+      // si no, una ráfaga a la vez pasaría entera antes del primer fallo
+      // contado. Igual para un correo que no existe: el freno no lo delata.
+      const segundos = await contarUnIntento(bloqueos, clave);
       if (segundos !== null) throw respuestaDeFreno(segundos);
     }),
 
@@ -90,19 +92,15 @@ export function crearGanchos({ bloqueos, secreto, registrar, avisarCambioDeContr
       if (!clave) return;
       const sesion = ctx.context.newSession;
       if (sesion) {
-        // La contraseña buena limpia los fallos y la escalera: era la persona,
-        // pida o no el código después.
+        // La contraseña buena limpia los fallos y la escalera, también el
+        // intento recién contado: era la persona, pida o no el código después.
         await bloqueos.borrar(clave);
         const contrasena: unknown = ctx.body?.password;
         if (typeof contrasena === "string") await rehashearSiHaceFalta(ctx, sesion.user.id, contrasena);
         return;
       }
-      // Solo el 401 cuenta: un correo mal escrito (400) no es un intento.
-      const devuelto = ctx.context.returned;
-      if (!isAPIError(devuelto) || devuelto.statusCode !== 401) return;
-      const ahora = new Date();
-      await bloqueos.actualizar(clave, (actual) => conUnFalloMas(actual, ahora));
-      await ctx.context.runInBackgroundOrAwait(bloqueos.podar(new Date(ahora.getTime() - OLVIDO)));
+      // Lo demás ya quedó contado. Con cada fallo se podan las filas quietas.
+      await ctx.context.runInBackgroundOrAwait(bloqueos.podar(new Date(Date.now() - OLVIDO)));
     }),
   };
 }

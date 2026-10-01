@@ -102,18 +102,42 @@ function cookieDe(res: Response): string {
   return cookie.split(";")[0] ?? "";
 }
 
-test("un 401 cuenta un fallo, y entrar bien borra la fila", async () => {
+test("cada intento cuenta, y entrar bien después de unos fallos anda y borra la fila", async () => {
   const { bloqueos, entrar, clave } = await armar("ana@ed.test", hashear);
-  assert.equal((await entrar("ana@ed.test", "una-contrasena-mala")).status, 401);
-  assert.equal(bloqueos.filas.get(clave)?.fallos, 1);
+  for (let i = 1; i <= 3; i++) {
+    assert.equal((await entrar("ana@ed.test", "una-contrasena-mala")).status, 401);
+    assert.equal(bloqueos.filas.get(clave)?.fallos, i);
+  }
   assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
+  assert.equal(bloqueos.filas.has(clave), false);
+  // La escalera vuelve a empezar: cinco intentos más antes del freno.
+  for (let i = 0; i < 4; i++) assert.equal((await entrar("ana@ed.test", "una-contrasena-mala")).status, 401);
+  assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 200);
+});
+
+test("un correo mal escrito se cuenta aparte: no traba la cuenta de verdad", async () => {
+  const { bloqueos, entrar, clave } = await armar("ana@ed.test", hashear);
+  assert.equal((await entrar("esto-no-es-un-correo", "una-contrasena-mala")).status, 400);
   assert.equal(bloqueos.filas.has(clave), false);
 });
 
-test("solo el 401 cuenta: un correo mal escrito no es un intento", async () => {
-  const { bloqueos, entrar } = await armar("ana@ed.test", hashear);
-  assert.equal((await entrar("esto-no-es-un-correo", "una-contrasena-mala")).status, 400);
-  assert.equal(bloqueos.filas.size, 0);
+test("una ráfaga de intentos a la vez no pasa del tope: se prueban 5 y el resto recibe 429", async () => {
+  const { entrar } = await armar("ana@ed.test", hashear);
+  const rafaga = await Promise.all(Array.from({ length: 12 }, () => entrar("ana@ed.test", "una-contrasena-mala")));
+  assert.deepEqual(
+    rafaga.map((r) => r.status).sort(),
+    [...Array<number>(5).fill(401), ...Array<number>(7).fill(429)],
+  );
+  assert.equal((await entrar("ana@ed.test", CONTRASENA)).status, 429);
+});
+
+test("con un correo que no existe, la ráfaga da lo mismo: el freno no dice qué correos existen", async () => {
+  const { entrar } = await armar("ana@ed.test", hashear);
+  const rafaga = await Promise.all(Array.from({ length: 12 }, () => entrar("nadie@ed.test", "una-contrasena-mala")));
+  assert.deepEqual(
+    rafaga.map((r) => r.status).sort(),
+    [...Array<number>(5).fill(401), ...Array<number>(7).fill(429)],
+  );
 });
 
 test("una cuenta frenada contesta 429 antes de mirar la contraseña, aunque sea la buena", async () => {
