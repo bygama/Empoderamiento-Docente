@@ -3,20 +3,26 @@
 #   COMPOSE_FILE=compose.yaml:compose.cloudflare.yaml
 #   COMPOSE_PATH_SEPARATOR=:
 #
-# El VPS deja de publicar puertos web: `tunel` sale hacia Cloudflare, y los
-# pedidos entran por ahí. Nadie le pega al proxy por la IP del VPS, y Docker
-# no abre nada por encima de ufw. TLS termina en Cloudflare; adentro del
-# túnel, que va cifrado, Caddy habla HTTP.
+# `tunel` sale hacia Cloudflare y los pedidos entran por ahí. Tiene dos
+# tiempos, que se eligen en el `.env`:
+#
+# - **Mientras se propagan los nameservers** (hasta 48 h), hay resolvers que
+#   todavía mandan a la gente directo al VPS: los puertos siguen abiertos y
+#   Caddy saca su certificado. `CLOUDFLARE_ESQUEMA=` (vacío), y el túnel le
+#   habla a https://proxy:443.
+# - **Después**, `IP_PUBLICADA=127.0.0.1` cierra los puertos al mundo y sin
+#   `CLOUDFLARE_ESQUEMA` Caddy atiende HTTP: TLS termina en Cloudflare y
+#   adentro del túnel, que va cifrado, no hace falta. El túnel le habla a
+#   http://proxy:80.
 
 services:
   proxy:
-    ports: !reset []
     environment:
-      # Caddy atiende HTTP, sin certificados propios (deploy/Caddyfile).
-      ESQUEMA: "http://"
-      # Al proxy solo le habla la red interna: el túnel, que trae la IP de
-      # quien pide en CF-Connecting-IP (lo pisa Cloudflare, nunca el cliente).
-      PROXIES_DE_CONFIANZA: private_ranges
+      ESQUEMA: ${CLOUDFLARE_ESQUEMA-http://}
+      # La IP de quien pide la trae el túnel en CF-Connecting-IP, y se le
+      # cree solo a él: su IP es fija, abajo. A nadie más, tampoco a la red
+      # interna, por donde con los puertos abiertos también entra el IPv6.
+      PROXIES_DE_CONFIANZA: 10.89.0.10/32
 
   tunel:
     # Fijado, como Umami: se sube a mano, leyendo sus notas.
@@ -26,12 +32,22 @@ services:
     cap_drop: [ALL]
     pids_limit: 512
     mem_limit: 256m
-    networks: [borde]
+    networks:
+      borde:
+        ipv4_address: 10.89.0.10
     # El túnel se maneja desde Cloudflare: qué nombre va a qué servicio
-    # (empoderamientodocente.org y www, a http://proxy:80) vive allá.
+    # (empoderamientodocente.org y www, al proxy) vive allá.
     command: ["tunnel", "run"]
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?falta CLOUDFLARE_TUNNEL_TOKEN en .env}
     depends_on:
       proxy:
         condition: service_started
+
+networks:
+  # Una red con subred propia, para que el túnel tenga su IP fija. Fuera de
+  # los rangos que Docker reparte solo (172.17-31 y 192.168).
+  borde:
+    ipam:
+      config:
+        - subnet: 10.89.0.0/24

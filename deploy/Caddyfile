@@ -14,10 +14,11 @@
 }
 
 # La IP de quien pide, `{client_ip}`: la de la conexión, o la que trae el
-# túnel. Las dos cabeceras se pisan con ese único valor, porque la app y
-# better-auth leen X-Real-IP y X-Forwarded-For, y un X-Forwarded-For que se
-# encadena deja adelante lo que haya mandado el cliente. La app y Umami
-# confían en estas cabeceras porque nadie más que Caddy les habla (ADR-0018).
+# túnel. La app, better-auth y Umami leen solo X-Real-IP (ADR-0019), y se pisa
+# con ese valor. X-Forwarded-For también, con el mismo único valor: encadenado,
+# deja adelante lo que haya mandado el cliente, y nada de adentro tiene que
+# poder leerlo así. Confían en estas cabeceras porque nadie más que Caddy les
+# habla (ADR-0018).
 (ip-real) {
 	header_up X-Real-IP {client_ip}
 	header_up X-Forwarded-For {client_ip}
