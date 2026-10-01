@@ -229,3 +229,15 @@ las tres que firmaba y no mostraba (UCMaule 2025, Paradigma 2025, ALME 2024), en
 cronológico; y entran tres novedades de «Publicaciones» por sus artículos de 2026 (RECHIEM,
 Cuadernos de Investigación, IIME), cada una abriendo su material. Las bajadas y los textos del
 destacado los escribimos nosotros a partir de los resúmenes de cada artículo.
+
+## Qué quedó hecho (PR de los bugs, 1/10)
+
+1 (tarjeta del hero, más un bug previo de GSAP que corría tarjetas media caja según el ancho),
+4 (la píldora ya no se esconde; el expediente de Investigación baja su cabecera), 22 y 29 (los
+chips cortan hasta su área con `irASeccion`, que ahora cuenta el pin del título; el «atrás» desde
+Contacto vuelve al cierre; en tablet el chip abre el área; el foco de teclado sigue hacia abajo),
+35 (las fichas de Mirada entran con la cámara quieta y se reubican al refrescar; la quinta del 03
+entra a 730 de alto) y 41 (las tarjetas de «Recién salido» abren su artículo en otra pestaña y el
+riel deja pasar el clic; «Toda la biblioteca» vuelve a andar con mouse). Queda anotado: entre 1024
+y 1279 de ancho la tarjeta 1 del hero sigue bajo la píldora, y «Por qué investigamos» desde abajo
+cae al final de su historia (ya pasaba).
