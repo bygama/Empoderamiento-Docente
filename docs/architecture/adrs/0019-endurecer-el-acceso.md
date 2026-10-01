@@ -76,6 +76,7 @@ nuevos.**
    probarlo**, como fallo pendiente, en la misma escritura atómica que mira
    si la cuenta está frenada (la fila bloqueada con `FOR UPDATE`): una ráfaga
    de intentos a la vez no pasa de 5. El intento bueno borra lo contado.
+   Lo mismo en el bloqueo de entrar del ADR-0010, también para correos que no existen.
 5. **Una sesión no pasa de 7 días desde que se abrió**, se use o no. Lo pone
    el gancho de la base que renueva el vencimiento (`toparLaRenovacion`), así
    que lo cumple todo lo que lee la sesión sin mirarlo aparte. Volver a poner
