@@ -8,7 +8,6 @@ import type { DatosDelSitio } from "@/config/datos-del-sitio";
 import { NAV_LINKS, CTA_LINK, HOME_LINK, esPaginaActiva } from "@/config/nav";
 import { NavDropdown } from "./NavDropdown";
 import { crearIntroSegunAncho } from "./header/coreografia-intro";
-import { crearAutoHide } from "./header/auto-hide";
 import { crearTemaSegunFondo } from "./header/tema-fondo";
 import { useSeccionActiva } from "@/lib/hooks/useSeccionActiva";
 import { EVENTO_URL, alClicSubirEnPagina, partirDestino } from "@/lib/navegar";
@@ -26,6 +25,8 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  *    página scrolleada (sin depender de estar parado en el hero).
  *  - Links + CTA en Inter Medium (font-sans, por manual de marca §2: UI/botones);
  *    CTA "Contacto" naranja (único acento de acción).
+ *  - Queda siempre a la vista, también al bajar (pedido de ED, 2026-09-30):
+ *    antes se escondía con el scroll y un salto a una sección la dejaba afuera.
  *
  * Adaptación a ED (invisible, igual que el Header anterior): la intro se dispara
  * por `onReveal`, no en el mount. Eso venía de cuando había un portón de entrada
@@ -94,14 +95,6 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
     const nav = ref.current;
     if (!nav || reducedMotion || !isHome) return;
     return crearIntroSegunAncho(nav);
-  }, [reducedMotion]);
-
-  // Auto-hide de la píldora al scrollear: quién es la superficie dueña del
-  // recorrido y cómo se decide, en `header/auto-hide.ts`.
-  useEffect(() => {
-    const nav = ref.current;
-    if (!nav || reducedMotion) return;
-    return crearAutoHide(nav);
   }, [reducedMotion]);
 
   // El logo suelto (< lg) pasa a negativo sobre fondos oscuros: quién mide y

@@ -38,11 +38,10 @@ type Props = {
  * apoyados sobre el color — collage de evidencias, análisis como hoja
  * mecanografiada con clip, aprendizaje como post-it, síntesis en placa,
  * sello ED con logo estampado directo sobre el cartón y producción como
- * etiquetas. El lugar (capa fija con scroll propio: `data-lenis-prevent`
- * para que Lenis no se coma la rueda y `data-scroll-principal` para que el
- * navbar se esconda y aparezca siguiendo ESTE recorrido y no el de la
- * ventana, que queda congelada debajo) abre con título display ancho +
- * ficha catalográfica y un indicio de scroll que se apaga al recorrer.
+ * etiquetas. El lugar (capa fija con scroll propio, sobre la ventana que
+ * queda congelada debajo: `data-lenis-prevent` para que Lenis no se coma la
+ * rueda) abre con título display ancho + ficha catalográfica y un indicio
+ * de scroll que se apaga al recorrer.
  * Las pestañas de los otros casos son parte del objeto: asoman del canto
  * derecho de la carcasa. Tipografías de material (no de UI): manuscrita
  * para notas, máquina de escribir para el texto documental.
@@ -104,14 +103,15 @@ export function ExpedienteCaso({
       ref={refLugar}
       data-exp-lugar
       data-lenis-prevent
-      data-scroll-principal
       id="expediente-caso"
       aria-label={`Expediente del caso ${caso.numero}`}
       className={`fixed inset-0 z-50 overflow-x-hidden overflow-y-auto overscroll-contain ${
         telonOpaco ? "bg-gris-fondo" : "bg-transparent"
       }`}
     >
-      <div className="relative mx-auto w-[min(96vw,94rem)] px-4 pt-14 pb-24 lg:px-8 lg:pt-16 lg:pb-28">
+      {/* lg:pt-28: la píldora del navbar queda a la vista encima del lugar y
+          termina a 86 px del borde; la cabecera arranca debajo, con aire. */}
+      <div className="relative mx-auto w-[min(96vw,94rem)] px-4 pt-14 pb-24 lg:px-8 lg:pt-28 lg:pb-28">
         <CabeceraExpediente caso={caso} refTitulo={refTitulo} />
 
         {/* ── La carpeta: carcasa tintada = INTERIOR de cartón. La hoja
