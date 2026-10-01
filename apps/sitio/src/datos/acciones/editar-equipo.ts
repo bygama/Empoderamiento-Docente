@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorrador } from "@/features/quienes-somos/contenido/persona";
 import { comoDocumento } from "@/lib/contenido/documento";
+import { validarAlGuardar } from "./al-guardar";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { publicacionQueNoFirma } from "./chequeos-del-perfil";
 import { nombreDe, problemasDePersona, slugOcupado, slugRepetido } from "./equipo-en-base";
@@ -20,7 +21,7 @@ const EL_PERFIL = "el perfil";
 
 /** El primer guardado de `/admin/contenido/equipo/nuevo`: la fila nace con su borrador, al final del orden. */
 export async function crearPersonaEnBase(base: PrismaClient, { contenido, quien }: { contenido: unknown; quien: string }): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido);
+  const valido = validarAlGuardar(() => esquemaBorrador.safeParse(contenido));
   if (!valido.success) return problemasDePersona(valido.error);
   const otra = valido.data.slug ? await slugOcupado(base, valido.data.slug, null) : null;
   if (otra) return slugRepetido(otra);
@@ -39,7 +40,7 @@ export async function guardarPersonaEnBase(
   base: PrismaClient,
   { id, contenido, borradorEnVisto, quien }: { id: string; contenido: unknown; borradorEnVisto: string | null; quien: string },
 ): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido);
+  const valido = validarAlGuardar(() => esquemaBorrador.safeParse(contenido));
   if (!valido.success) return problemasDePersona(valido.error);
   const fila = await base.persona.findUnique({ where: { id } });
   if (!fila) return NO_EXISTE;

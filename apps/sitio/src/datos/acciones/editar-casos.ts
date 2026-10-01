@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorradorDeCaso } from "@/features/investigacion/contenido/caso";
 import { nombreDelCaso, type IdDeCaso } from "@/features/investigacion/contenido/modelo-de-casos";
+import { validarAlGuardar } from "./al-guardar";
 import { falloEnCampoDelCaso, problemasDeCaso, slugDeOtroCaso } from "./casos-en-base";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 
@@ -18,7 +19,7 @@ export async function guardarCasoEnBase(
   base: PrismaClient,
   { id, contenido, borradorEnVisto, quien }: { id: IdDeCaso; contenido: unknown; borradorEnVisto: string | null; quien: string },
 ): Promise<ResultadoDeGuardarCaso> {
-  const valido = esquemaBorradorDeCaso.safeParse(contenido);
+  const valido = validarAlGuardar(() => esquemaBorradorDeCaso.safeParse(contenido));
   if (!valido.success) return problemasDeCaso(valido.error);
   const fila = await base.caso.findUnique({ where: { id } });
   if (!fila) return NO_EXISTE;

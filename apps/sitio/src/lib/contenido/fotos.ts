@@ -1,5 +1,4 @@
 import { posicionDelFoco, type Foco, type ValorDeFoto } from "@ed/kit-admin/foto";
-import { hostDelBlob } from "./host-del-blob";
 
 // Cómo se muestra una foto guardada en el contenido: `src`, `alt` y el
 // `object-position` que sale del punto de foco (SPEC §4.4). Sin Zod y sin
@@ -38,22 +37,50 @@ const RUTA_DE_FOTO = new RegExp(String.raw`/(?:${CARPETAS_DE_FOTOS.join("|")})/(
 // Lo que el sitio sabe mostrar sin salir de su origen: sus fotos de public/ y
 // las subidas en local.
 const SRC_DEL_SITIO = new RegExp(String.raw`^(?:${RUTA_DE_FOTO.source}|/api/fotos/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$`);
+// Una foto de Blob: cualquier store, su carpeta fotos/, con los mismos frenos de segmento.
+const FOTO_DE_BLOB = new RegExp(String.raw`^https://([a-z0-9-]+\.public\.blob\.vercel-storage\.com)/fotos/(?:${SEGMENTO_DE_RUTA.source}/)*${SEGMENTO_DE_RUTA.source}$`);
 
 /**
- * Las del Blob: solo del store del sitio y su carpeta fotos/, lo mismo que
- * deja mostrar next/image (`hostDelBlob`, next.config.ts). Una foto de otro
- * host haría tirar a next/image en cada visita a la home. Sin token de Blob,
- * ninguna: las fotos van a disco.
+ * El host de Blob contra el que se valida mientras corre `validarComoAlGuardar`;
+ * `undefined` cuando se lee. La validación de Zod es sincrónica, así que el
+ * valor vive lo que dura esa llamada y ningún otro pedido lo ve.
  */
-function esDelBlobDelSitio(src: string): boolean {
-  const host = hostDelBlob(process.env.BLOB_READ_WRITE_TOKEN);
-  if (!host) return false;
-  const delHost = host.startsWith("*.") ? `[a-z0-9-]+${host.slice(1).replaceAll(".", "\\.")}` : host.replaceAll(".", "\\.");
-  return new RegExp(String.raw`^https://${delHost}/fotos/(?:${SEGMENTO_DE_RUTA.source}/)*${SEGMENTO_DE_RUTA.source}$`).test(src);
+let hostAlGuardar: string | null | undefined;
+
+/**
+ * Corre `validar` con la regla de guardar: de Blob, solo las fotos del store
+ * del sitio (`hostDeFotos`, de `hostDelBlob`; `null` es que no hay store y no
+ * entra ninguna). La pasa explícita quien guarda (datos/acciones/al-guardar.ts):
+ * el esquema no lee el entorno.
+ */
+export function validarComoAlGuardar<T>(hostDeFotos: string | null, validar: () => T): T {
+  const antes = hostAlGuardar;
+  hostAlGuardar = hostDeFotos;
+  try {
+    return validar();
+  } finally {
+    hostAlGuardar = antes;
+  }
 }
 
+/**
+ * Lo que el sitio sabe mostrar: sus fotos de public/, las subidas en local y
+ * las de Blob, en su carpeta fotos/.
+ *
+ * **De Blob, la regla depende de si se lee o se guarda.** Al leer, cualquier
+ * store: lo guardado no se esconde ni vuelve al contenido inicial porque cambió
+ * el token (otro store, una mudanza de host, local leyendo una base con fotos
+ * de Blob), y next/image y la CSP ya no dejan mostrar una de otro store
+ * (host-del-blob.ts). Al guardar desde el admin (`validarComoAlGuardar`), solo
+ * las del store del sitio.
+ */
 export function esSrcDeFoto(src: string): boolean {
-  return SRC_DEL_SITIO.test(src) || esDelBlobDelSitio(src);
+  if (SRC_DEL_SITIO.test(src)) return true;
+  const host = FOTO_DE_BLOB.exec(src)?.[1];
+  if (!host) return false;
+  if (hostAlGuardar === undefined) return true;
+  if (hostAlGuardar === null) return false;
+  return hostAlGuardar.startsWith("*.") ? host.endsWith(hostAlGuardar.slice(1)) : host === hostAlGuardar;
 }
 
 /**

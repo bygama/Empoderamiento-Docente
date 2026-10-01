@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorradorDeAliado } from "@/features/aliados/contenido/aliado";
+import { validarAlGuardar } from "./al-guardar";
 import { NO_EXISTE, nombreDelAliado, problemasDeAliado } from "./aliados-en-base";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { LISTAS, tomarLaLista } from "./lista-ordenada";
@@ -15,7 +16,7 @@ export type ResultadoDeGuardarAliado = { ok: true; id: string; borradorEn: strin
 
 /** El primer guardado de `/nuevo`: la fila nace con su borrador, al final de la tira y sin autorizar. */
 export async function crearAliadoEnBase(base: PrismaClient, { contenido, quien }: { contenido: unknown; quien: string }): Promise<ResultadoDeGuardarAliado> {
-  const valido = esquemaBorradorDeAliado.safeParse(contenido);
+  const valido = validarAlGuardar(() => esquemaBorradorDeAliado.safeParse(contenido));
   if (!valido.success) return problemasDeAliado(valido.error);
   const ultimo = await base.aliado.aggregate({ _max: { orden: true } });
   const ahora = new Date();
@@ -30,7 +31,7 @@ export async function guardarAliadoEnBase(
   base: PrismaClient,
   { id, contenido, borradorEnVisto, quien }: { id: string; contenido: unknown; borradorEnVisto: string | null; quien: string },
 ): Promise<ResultadoDeGuardarAliado> {
-  const valido = esquemaBorradorDeAliado.safeParse(contenido);
+  const valido = validarAlGuardar(() => esquemaBorradorDeAliado.safeParse(contenido));
   if (!valido.success) return problemasDeAliado(valido.error);
   const fila = await base.aliado.findUnique({ where: { id } });
   if (!fila) return NO_EXISTE;

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { foto, grupo, listaFija, metaDe, parrafo, rutaInterna, textoCorto } from "./campos";
+import { validarComoAlGuardar } from "./fotos";
 
 test("textoCorto recorta, exige algo y no acepta saltos ni más del máximo", () => {
   const campo = textoCorto({ maximo: 10, etiqueta: "Título", ayuda: "Un renglón." });
@@ -35,15 +36,10 @@ test("foto exige un src que el sitio sepa mostrar, alt y un foco entre 0 y 1", (
   const campo = foto({ etiqueta: "Foto" });
   const buena = { src: "/fotos/a.webp", alt: "Docentes en un aula", foco: { x: 0.5, y: 0.5 } };
   assert.deepEqual(campo.parse(buena), buena);
-  // Del Blob, la del store del sitio (fotos.test.ts prueba el resto).
-  const antes = process.env.BLOB_READ_WRITE_TOKEN;
-  process.env.BLOB_READ_WRITE_TOKEN = "vercel_blob_rw_abc_secreto";
-  try {
-    assert.equal(campo.safeParse({ ...buena, src: "https://abc.public.blob.vercel-storage.com/fotos/a.webp" }).success, true);
-  } finally {
-    if (antes === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
-    else process.env.BLOB_READ_WRITE_TOKEN = antes;
-  }
+  // De Blob: al leer, cualquier store; al guardar, el del sitio (fotos.test.ts prueba el resto).
+  const deOtroStore = { ...buena, src: "https://otro.public.blob.vercel-storage.com/fotos/a.webp" };
+  assert.equal(campo.safeParse(deOtroStore).success, true);
+  assert.equal(validarComoAlGuardar("abc.public.blob.vercel-storage.com", () => campo.safeParse(deOtroStore).success), false);
   assert.equal(campo.safeParse({ ...buena, alt: "" }).success, false);
   assert.equal(campo.safeParse({ ...buena, src: "" }).success, false);
   assert.equal(campo.safeParse({ ...buena, src: "https://otro.sitio/a.jpg" }).success, false);
