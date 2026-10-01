@@ -48,13 +48,19 @@ nuevos.**
    y elegir o cambiar la contraseña (`borrarEnlaces`, una opción de
    `crearAuth`), borran sus sesiones —salvo la de quien cambia su propio
    correo— **y** todo lo suyo en `verification`: enlaces pendientes (también
-   la invitación) y dispositivos recordados.
+   la invitación) y dispositivos recordados. Al cambiar la contraseña, esa
+   limpieza va después del registro y del aviso «Tu contraseña cambió», y si
+   la base falla ahí queda en el log: no frena el cierre de las sesiones que
+   hace better-auth ni el aviso.
 2. **Lo que reparte o recupera acceso pide otra vez la contraseña** de quien lo
    hace (`pedirTuContrasena`): cambiar cualquier correo, porque el correo es lo
    que recupera una cuenta (ADR-0013 §6); dar un rol que maneja las cuentas,
    al invitar o con el selector (`darloPideContrasena`, que pregunta por la
-   capacidad `usarCuentas`), y pasar la dirección, como antes. Cada fallo
-   cuenta en el bloqueo por cuenta como un intento de entrar.
+   capacidad `usarCuentas`), y pasar la dirección, como antes. Los intentos
+   tienen **un freno propio por cuenta** (`claveDeConfirmacion`, un HMAC del
+   id), con las reglas del de entrar pero aparte de él: el de entrar lo puede
+   trabar desde afuera cualquiera que sepa el correo, y eso no tiene que
+   trabar lo que la persona hace con su sesión. Un reset completo lo destraba.
 3. **La IP de un cupo sale solo de `X-Real-IP`**, en los formularios, en
    `/api/contar`, en los clics de `/l/` (`ipDelPedido`) y en better-auth
    (`ipAddressHeaders`). El proxy de delante la pisa siempre: el borde de
@@ -66,22 +72,40 @@ nuevos.**
    frenan de 15 minutos a 1 hora) y una clave propia (`claveDeCodigos`, un
    HMAC del id de la cuenta). La contraseña buena no los borra; el código
    bueno y un reset completo, sí. Una cuenta frenada contesta el mismo 429.
+   Acá y en la confirmación de la regla 2, **cada intento se cuenta antes de
+   probarlo**, como fallo pendiente, en la misma escritura atómica que mira
+   si la cuenta está frenada (la fila bloqueada con `FOR UPDATE`): una ráfaga
+   de intentos a la vez no pasa de 5. El intento bueno borra lo contado.
 5. **Una sesión no pasa de 7 días desde que se abrió**, se use o no. Lo pone
    el gancho de la base que renueva el vencimiento (`toparLaRenovacion`), así
    que lo cumple todo lo que lee la sesión sin mirarlo aparte. Volver a poner
    la contraseña (cambiarla, prender o apagar el segundo factor) abre una
    sesión nueva, que cuenta desde ahí.
-6. **No se elige una contraseña filtrada.** El plugin haveIBeenPwned de
-   better-auth, en `/reset-password` (el enlace de «olvidé» y la invitación) y
-   `/change-password`, consulta por rango: viajan los 5 primeros caracteres
-   del SHA-1. Entrar no la mira. Si el servicio no contesta, no se guarda.
+6. **No se elige una contraseña filtrada.** Un gancho de antes de
+   `/reset-password` (el enlace de «olvidé» y la invitación) y de
+   `/change-password` (filtradas.ts) le pregunta a Have I Been Pwned por
+   rango: viajan los 5 primeros caracteres del SHA-1 en mayúsculas, con
+   `Add-Padding: true`, y el relleno (las que aparecen 0 veces) no cuenta.
+   - **Filtrada:** 400 `PASSWORD_COMPROMISED` (`CONTRASENA_FILTRADA`); el
+     formulario marca el campo y pide otra.
+   - **Sin respuesta en 3 segundos, o con error:** 503 `CONTRASENA_SIN_REVISAR`
+     y **no se guarda** (falla cerrado); el formulario pide probar en un rato.
+   - **En los dos casos el enlace sigue sirviendo**: el gancho corre antes de
+     la ruta, y better-auth recién gasta el enlace adentro de ella. Por eso no
+     se usa el plugin haveIBeenPwned de better-auth, que mira adentro del
+     hasheo, cuando el enlace ya se gastó. Desde Mi cuenta, lo mismo: la
+     contraseña no cambia y se puede volver a probar.
+
+   Entrar no la mira: nadie se queda afuera con la que ya tiene.
 7. **Un GET del admin no cambia nada.** El rebote de las cookies `Strict`
    (ADR-0010 §4) convierte un link de otro sitio en un GET con sesión: todo lo
    que escribe va por POST (Server Actions y la API de better-auth).
 
 Van además, sin regla nueva: el secreto del cron se compara en tiempo
-constante; las imágenes de Blob se aceptan solo del store del sitio (el host
-sale del token); `X-Powered-By` no se manda; better-auth pasa a 1.7.7.
+constante; las imágenes de Blob se aceptan solo del store del sitio y su
+carpeta `fotos/` (el host sale del token), igual en next/image, en la CSP y en
+la validación de lo que se guarda (`esSrcDeFoto`); `X-Powered-By` no se manda;
+better-auth pasa a 1.7.7.
 
 ## Consecuencias
 
@@ -106,7 +130,8 @@ sale del token); `X-Powered-By` no se manda; better-auth pasa a 1.7.7.
 - **Una semana después de entrar hay que volver a entrar**, aunque se use todos
   los días.
 - **Elegir una contraseña depende de un servicio de afuera** (Have I Been
-  Pwned): si no contesta, hay que probar más tarde.
+  Pwned): si no contesta en 3 segundos, hay que probar más tarde, con el mismo
+  enlace.
 - Quien prueba códigos puede frenar una cuenta hasta una hora, como con la
   contraseña (la molestia del ADR-0010).
 
@@ -116,7 +141,10 @@ sale del token); `X-Powered-By` no se manda; better-auth pasa a 1.7.7.
   invitación, elegir otra contraseña, probar en un rato).
 - Un host nuevo se suma sabiendo esto: `X-Real-IP` es la única cabecera que se
   lee, y el comentario de `ipDelPedido` lo dice.
-- El freno de los códigos lo destraba un reset completo, al instante.
+- El freno de los códigos y el de la confirmación los destraba un reset
+  completo, al instante.
+- Un rechazo por filtrada o por el servicio caído no gasta la invitación ni el
+  enlace de «olvidé»: se vuelve a probar con el mismo.
 
 ## Alternativas consideradas
 
@@ -144,13 +172,26 @@ sale del token); `X-Powered-By` no se manda; better-auth pasa a 1.7.7.
 - Por qué se descarta: `bloqueos_de_acceso` ya guarda un estado por clave con
   las reglas que hacían falta; otra clave alcanza.
 
+### El plugin haveIBeenPwned de better-auth
+
+- Qué hubiera implicado: nada que escribir.
+- Por qué se descarta: mira adentro del hasheo de la contraseña nueva, y en
+  `/reset-password` better-auth gasta el enlace antes de hashear; un rechazo
+  dejaba la invitación usada. Tampoco pone tiempo límite al pedido.
+
+### La confirmación de la contraseña en el freno de entrar
+
+- Por qué se descarta: ese freno va por el correo y lo traba desde afuera
+  cualquiera que lo sepa; con la sesión abierta, la cuenta ya se conoce.
+
 ## Referencias
 
 - Vercel, *Request headers* (`x-real-ip` idéntica a `x-forwarded-for`, que
   Vercel reescribe).
-- Have I Been Pwned, *Pwned Passwords* (consulta por rango, k-anonimato).
+- Have I Been Pwned, *Pwned Passwords* (consulta por rango, k-anonimato,
+  `Add-Padding`).
 - OWASP, *Session Management Cheat Sheet* (vencimiento absoluto) y
   *Authentication Cheat Sheet* (volver a pedir la contraseña).
 - better-auth 1.7.7: `advanced.ipAddress`, `databaseHooks.session.update`,
-  plugins `two-factor` y `haveibeenpwned`, verificado contra su código
-  instalado.
+  `resetPassword` (gasta el enlace antes de hashear), plugins `two-factor` y
+  `haveibeenpwned`, verificado contra su código instalado.
