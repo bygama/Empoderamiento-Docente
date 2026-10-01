@@ -35,7 +35,15 @@ test("foto exige un src que el sitio sepa mostrar, alt y un foco entre 0 y 1", (
   const campo = foto({ etiqueta: "Foto" });
   const buena = { src: "/fotos/a.webp", alt: "Docentes en un aula", foco: { x: 0.5, y: 0.5 } };
   assert.deepEqual(campo.parse(buena), buena);
-  assert.equal(campo.safeParse({ ...buena, src: "https://abc.public.blob.vercel-storage.com/fotos/a.webp" }).success, true);
+  // Del Blob, la del store del sitio (fotos.test.ts prueba el resto).
+  const antes = process.env.BLOB_READ_WRITE_TOKEN;
+  process.env.BLOB_READ_WRITE_TOKEN = "vercel_blob_rw_abc_secreto";
+  try {
+    assert.equal(campo.safeParse({ ...buena, src: "https://abc.public.blob.vercel-storage.com/fotos/a.webp" }).success, true);
+  } finally {
+    if (antes === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
+    else process.env.BLOB_READ_WRITE_TOKEN = antes;
+  }
   assert.equal(campo.safeParse({ ...buena, alt: "" }).success, false);
   assert.equal(campo.safeParse({ ...buena, src: "" }).success, false);
   assert.equal(campo.safeParse({ ...buena, src: "https://otro.sitio/a.jpg" }).success, false);
