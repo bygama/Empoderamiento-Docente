@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorrador } from "@/features/biblioteca/contenido/material";
+import { validarAlGuardar } from "./al-guardar";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { doiOcupado, doiRepetido, personaQueNoEsta, problemasDeMaterial, sinForma, tituloDe } from "./materiales-en-base";
 
@@ -17,7 +18,7 @@ const EL_MATERIAL = "el material";
 
 /** El primer guardado de `/admin/biblioteca/nuevo`: la fila nace con su borrador. Un DOI que ya está no entra. */
 export async function crearMaterialEnBase(base: PrismaClient, { contenido, quien }: { contenido: unknown; quien: string }): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido, sinForma);
+  const valido = validarAlGuardar(() => esquemaBorrador.safeParse(contenido, sinForma));
   if (!valido.success) return problemasDeMaterial(valido.error, "crearMaterial");
   const otro = valido.data.doi ? await doiOcupado(base, valido.data.doi, null) : null;
   if (otro) return doiRepetido(otro);
@@ -33,7 +34,7 @@ export async function guardarMaterialEnBase(
   base: PrismaClient,
   { id, contenido, borradorEnVisto, quien }: { id: string; contenido: unknown; borradorEnVisto: string | null; quien: string },
 ): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido, sinForma);
+  const valido = validarAlGuardar(() => esquemaBorrador.safeParse(contenido, sinForma));
   if (!valido.success) return problemasDeMaterial(valido.error, "guardarMaterial");
   const fila = await base.material.findUnique({ where: { id } });
   if (!fila) return NO_EXISTE;

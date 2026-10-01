@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { esSrcDeFoto, estiloDeFoco, fotoDeRuta, posicionDelFoco, resolverFoto } from "./fotos";
+import { esSrcDeFoto, estiloDeFoco, fotoDeRuta, posicionDelFoco, resolverFoto, validarComoAlGuardar } from "./fotos";
 
 test("el foco se vuelve un object-position en porcentajes redondos", () => {
   assert.equal(posicionDelFoco({ x: 0.5, y: 0.5 }), "50% 50%");
@@ -29,34 +29,35 @@ test("fotoDeRuta arma una foto de public/ centrada, con su propio foco", () => {
   assert.notEqual(a.foco, b.foco);
 });
 
-/** Corre `probar` con ese token de Blob (o sin ninguno) y deja el entorno como estaba. */
-function conToken(token: string | undefined, probar: () => void) {
-  const antes = process.env.BLOB_READ_WRITE_TOKEN;
-  if (token === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
-  else process.env.BLOB_READ_WRITE_TOKEN = token;
-  try {
-    probar();
-  } finally {
-    if (antes === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
-    else process.env.BLOB_READ_WRITE_TOKEN = antes;
-  }
-}
+const PROPIA = "https://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp";
+const AJENA = "https://otro-store.public.blob.vercel-storage.com/fotos/x.webp";
+const PROPIO = "abc123xyz.public.blob.vercel-storage.com";
 
-test("del Blob, solo las del store del sitio y su carpeta fotos/, lo mismo que deja mostrar next/image", () => {
-  conToken("vercel_blob_rw_Abc123xyz_secreto", () => {
-    assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), true);
-    assert.equal(esSrcDeFoto("https://otro-store.public.blob.vercel-storage.com/fotos/x.webp"), false);
-    assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/cv/x.pdf"), false);
-    assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/../cv/x.pdf"), false);
-    assert.equal(esSrcDeFoto("http://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), false);
+test("al leer, una de Blob de cualquier store, pero solo en su carpeta fotos/ y por https", () => {
+  assert.equal(esSrcDeFoto(PROPIA), true);
+  assert.equal(esSrcDeFoto(AJENA), true);
+  assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/cv/x.pdf"), false);
+  assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/../cv/x.pdf"), false);
+  assert.equal(esSrcDeFoto("http://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), false);
+});
+
+test("al guardar, de Blob solo las del store del sitio; sin store, ninguna; las de public/ y /api/fotos/ igual", () => {
+  validarComoAlGuardar(PROPIO, () => {
+    assert.equal(esSrcDeFoto(PROPIA), true);
+    assert.equal(esSrcDeFoto(AJENA), false);
+    assert.equal(esSrcDeFoto("/fotos/a.webp"), true);
+    assert.equal(esSrcDeFoto("/api/fotos/0f0e0d0c-0b0a-4908-8706-050403020100"), true);
   });
-  // Sin token las fotos van a disco: ningún Blob es del sitio.
-  conToken(undefined, () => assert.equal(esSrcDeFoto("https://abc123xyz.public.blob.vercel-storage.com/fotos/x.webp"), false));
-  // Un token de otra forma deja el dominio de Blob, como next.config.ts, pero igual solo fotos/.
-  conToken("otra-forma", () => {
-    assert.equal(esSrcDeFoto("https://cualquiera.public.blob.vercel-storage.com/fotos/x.webp"), true);
-    assert.equal(esSrcDeFoto("https://cualquiera.public.blob.vercel-storage.com/otra/x.webp"), false);
-  });
+  validarComoAlGuardar(null, () => assert.equal(esSrcDeFoto(PROPIA), false));
+  // Un token de otra forma deja el dominio de Blob, como next.config.ts.
+  validarComoAlGuardar("*.public.blob.vercel-storage.com", () => assert.equal(esSrcDeFoto(AJENA), true));
+  // Terminado (también si tiró), vuelve la regla de leer.
+  assert.throws(() =>
+    validarComoAlGuardar(PROPIO, () => {
+      throw new Error("se cayó adentro");
+    }),
+  );
+  assert.equal(esSrcDeFoto(AJENA), true);
 });
 
 test("solo se aceptan las fotos que el sitio sabe mostrar", () => {

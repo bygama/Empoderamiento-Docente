@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@/../prisma/generado/client";
 import { esquemaBorrador } from "@/features/novedades/contenido/novedad";
+import { validarAlGuardar } from "./al-guardar";
 import { choqueCon, vioLaFila, type Fallo } from "./choque";
 import { falloEnCampo, materialQueNoEsta, problemasDeNovedad, slugOcupado, tituloDe } from "./novedades-en-base";
 
@@ -16,7 +17,7 @@ const NO_EXISTE: Fallo = { ok: false, detalle: "Esa novedad ya no existe: la bor
 
 /** El primer guardado de `/admin/novedades/nueva`: la fila nace con su borrador. */
 export async function crearNovedadEnBase(base: PrismaClient, { contenido, quien }: { contenido: unknown; quien: string }): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido);
+  const valido = validarAlGuardar(() => esquemaBorrador.safeParse(contenido));
   if (!valido.success) return problemasDeNovedad(valido.error);
   const ocupado = valido.data.slug ? await slugOcupado(base, valido.data.slug, null) : null;
   if (ocupado) return falloEnCampo("slug", `Esa URL ya la usa «${ocupado}».`);
@@ -32,7 +33,7 @@ export async function guardarNovedadEnBase(
   base: PrismaClient,
   { id, contenido, borradorEnVisto, quien }: { id: string; contenido: unknown; borradorEnVisto: string | null; quien: string },
 ): Promise<ResultadoDeGuardar> {
-  const valido = esquemaBorrador.safeParse(contenido);
+  const valido = validarAlGuardar(() => esquemaBorrador.safeParse(contenido));
   if (!valido.success) return problemasDeNovedad(valido.error);
   const fila = await base.novedad.findUnique({ where: { id } });
   if (!fila) return NO_EXISTE;
