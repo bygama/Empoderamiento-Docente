@@ -9,17 +9,21 @@ type Props = {
   withArrow?: boolean;
   /** Para interceptar la navegación (por ejemplo, cortar a una sección). */
   onClick?: MouseEventHandler<HTMLAnchorElement>;
+  /** Un destino de afuera (una red, por ejemplo): abre en otra pestaña. */
+  externo?: boolean;
 };
 
 /**
  * CTA primario. Único naranja por viewport (DESIGN.md §1 reglas duras).
  * Sutil micro-shift de la flecha al hover refuerza la dirección del clic.
  */
-export function ButtonPrimary({ href, children, withArrow = true, onClick }: Props) {
+export function ButtonPrimary({ href, children, withArrow = true, onClick, externo = false }: Props) {
   return (
     <Link
       href={href}
       onClick={onClick}
+      target={externo ? "_blank" : undefined}
+      rel={externo ? "noopener noreferrer" : undefined}
       className="group bg-naranja-accion hover:bg-naranja-accion/90 hover:shadow-naranja-accion/30 focus-visible:outline-naranja-accion inline-flex items-center gap-2 rounded-lg px-6 py-3 font-sans text-[0.95rem] font-medium text-white transition-[background-color,box-shadow] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2"
     >
       <span>{children}</span>
