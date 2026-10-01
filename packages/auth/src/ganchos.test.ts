@@ -56,6 +56,7 @@ async function armar(
   correo: string,
   hash: (contrasena: string) => Promise<string>,
   registrar?: (suceso: SucesoDeSesion) => Promise<void>,
+  borrarEnlaces?: (idDeCuenta: string) => Promise<void>,
 ) {
   const bloqueos = almacenEnMemoria();
   const sucesos: SucesoDeSesion[] = [];
@@ -75,7 +76,7 @@ async function armar(
       secreto: SECRETO,
       registrar: registrar ?? (async (suceso) => void sucesos.push(suceso)),
       avisarCambioDeContrasena: async ({ para }) => void avisos.push(para),
-      borrarEnlaces: async (idDeCuenta) => void sinEnlaces.push(idDeCuenta),
+      borrarEnlaces: borrarEnlaces ?? (async (idDeCuenta) => void sinEnlaces.push(idDeCuenta)),
     }),
   });
   const ctx = await auth.$context;
@@ -167,6 +168,16 @@ test("cambiar la contraseña bien la anota, avisa por correo y borra los enlaces
   assert.deepEqual(sucesos.at(-1), { tipo: "cambio-su-contrasena", idDeCuenta: cuenta.id });
   assert.deepEqual(avisos, ["ana@ed.test"]);
   assert.deepEqual(sinEnlaces, [cuenta.id]);
+});
+
+test("si borrar los enlaces falla, cambiar la contraseña igual contesta bien y avisa", async () => {
+  const { entrar, pedir, avisos } = await armar("ana@ed.test", hashear, undefined, async () => {
+    throw new Error("la base no contesta");
+  });
+  const cookie = cookieDe(await entrar("ana@ed.test", CONTRASENA));
+  const res = await pedir("/change-password", { currentPassword: CONTRASENA, newPassword: "otra-contrasena-de-prueba", revokeOtherSessions: true }, cookie);
+  assert.equal(res.status, 200);
+  assert.deepEqual(avisos, ["ana@ed.test"]);
 });
 
 test("si anotar falla, entrar y salir andan igual", async () => {

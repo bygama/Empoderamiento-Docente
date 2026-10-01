@@ -5,6 +5,7 @@ import { crearGanchos, destrabar } from "./ganchos";
 import type { OpcionesDeAuth } from "./opciones";
 import { LARGO_MINIMO_CONTRASENA, ROL_POR_DEFECTO, ROLES } from "./permisos";
 import { segundoFactor } from "./segundo-factor";
+import { limpiarSinFrenar } from "./sucesos";
 import { CAMPO_SUSPENDIDA } from "./suspendidas";
 import { CAMPOS_DE_LA_SESION, GANCHOS_DE_LA_BASE } from "./ubicacion";
 
@@ -76,13 +77,9 @@ export function configDeAuth({
         });
       },
       onPasswordReset: async ({ user }) => {
-        // Los otros enlaces que tuviera (otro reset, la invitación) y los
-        // dispositivos recordados dejan de servir: la contraseña de antes ya
-        // no es la llave, y lo que se abrió con ella tampoco.
-        await borrarEnlaces(user.id);
-        await destrabar(bloqueos, user, secreto);
-        // better-auth espera a este callback antes de contestar, así que el
-        // registro y el aviso van a segundo plano acá mismo.
+        // better-auth espera a este callback antes de contestar y recién
+        // después cierra las sesiones, así que el registro y el aviso van a
+        // segundo plano acá mismo, primero.
         segundoPlano(
           registrar({ tipo: "cambio-su-contrasena", idDeCuenta: user.id }).catch((e: unknown) => {
             console.error("No se anotó «cambio-su-contrasena»:", e instanceof Error ? e.message : e);
@@ -93,6 +90,12 @@ export function configDeAuth({
             console.error("No salió el aviso de contraseña cambiada:", e instanceof Error ? e.message : e);
           }),
         );
+        // Los otros enlaces que tuviera (otro reset, la invitación) y los
+        // dispositivos recordados dejan de servir: la contraseña de antes ya
+        // no es la llave, y lo que se abrió con ella tampoco. Si la base
+        // falla acá, queda en el log: no puede frenar el cierre de sesiones.
+        await limpiarSinFrenar("borrar los enlaces", () => borrarEnlaces(user.id));
+        await limpiarSinFrenar("destrabar la cuenta", () => destrabar(bloqueos, user, secreto));
       },
     },
 
