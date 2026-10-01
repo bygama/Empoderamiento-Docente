@@ -66,9 +66,12 @@ type Escena = {
   caja: HTMLElement;
   /** La columna de los artículos: es lo que se pinnea y lo que se funde al final. */
   articulos: HTMLElement;
-  /** Los artículos, que suben al final. NO la columna: al soltar el pin GSAP
-   *  deja la columna con un translateY del largo del pin, y un tween de `y`
-   *  sobre ella lo pisaba (la columna saltaba 560 px, medido 2026-09-16). */
+  /** Lo de adentro de cada artículo, que sube al final. NO la columna: al
+   *  soltar el pin GSAP deja la columna con un translateY del largo del pin,
+   *  y un tween de `y` sobre ella lo pisaba (la columna saltaba 560 px,
+   *  medido 2026-09-16). Y tampoco el artículo, que es el ancla de los chips:
+   *  si subía con la entrada, el corte desde el hero lo medía 48 px más abajo
+   *  y después corregía con un salto a la vista (2026-09-30). */
   piezas: HTMLElement[];
   riel: HTMLElement;
   items: HTMLElement[];
