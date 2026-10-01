@@ -50,10 +50,57 @@
   por lo que liste el VPS, y copia de nuevo si una fecha cambió en el VPS.
   Probada con carpetas viejas falsas.
 
+- **Fase 1, cerrada:**
+  - un reinicio del VPS a propósito: SSH y el sitio vuelven solos en 2
+    minutos, con los 6 contenedores, el swap, fail2ban y `live-restore`;
+  - `main` deployado con el botón, y los contenedores recreados para tomar la
+    rotación de logs (verificado: `max-size 10m`, `max-file 5` en los seis).
+- **Las fuentes en el repo** (#220, decisión de Mateo):
+  - los 6 woff2 latin con su OFL y las métricas de respaldo exactas de Google;
+  - texto 0 % distinto en las 16 capturas;
+  - un build sin red a Google pasa;
+  - en producción, el deploy no baja nada de Google.
+- **Fase 2, el acceso** (#226, ADR-0019). Un agente lo implementó en su
+  worktree, y otro lo revisó por separado en dos rondas:
+  - la primera pidió cambios: el chequeo de contraseñas filtradas gastaba el
+    enlace de invitación o de reset;
+  - la segunda aprobó, con un arreglo chico (las fotos de Blob se validan
+    estrictas al guardar, no al leer).
+
+  En producción, sin `X-Powered-By` y sin errores en la app.
+- **Fase 3, Cloudflare** (#230, runbook §15). Mateo creó la cuenta y el
+  token `ed-operacion` (de cuenta, sin vencimiento, solo desde las IP del VPS),
+  y cambió los nameservers. Lo demás, por la API:
+  - la configuración de la zona y las reglas de caché;
+  - las reglas administradas del WAF y el tope de 10 POST cada 10 s a
+    `/api/auth/`;
+  - el túnel `ed-vps`, probado primero con un nombre de prueba (después
+    borrado), y el dominio y `www` pasados a él.
+
+  Se aplicó en el tiempo «mientras se propagan»: túnel con IP fija y puertos
+  abiertos. 33 s sin sitio, al recrear la red `borde` con su subred.
+  Verificado:
+  - por Cloudflare (EZE) y directo al VPS, todo en 200;
+  - por los dos caminos, el proxy ve la IP de quien pide.
+- **Medido** (Globalping y desde Argentina):
+  - desde Argentina, el primer byte del HTML pasa de ~0,9 s directo a 0,2–0,46
+    s, y lo estático sale del borde (de 1,1 s a 0,17 s el JS);
+  - México, 120–320 ms (DFW); Chile, ~450 ms, porque el plan gratis lo manda
+    por São Paulo.
+
 ## Abierto
 
-- La fase 1 termina con un reinicio del VPS, para probar que todo vuelve
-  solo, y con recrear los contenedores para que tomen la rotación de logs.
-- Fase 2 (el acceso) y las fuentes: dos agentes en sus worktrees.
-- Fase 3: la cuenta de Cloudflare y el token de Mateo.
-- Pedirles 2FA en GitHub a Gastón y a querque.
+- **Desde el 2026-10-02 (48 h después del cambio de nameservers):** cerrar
+  los puertos. `IP_PUBLICADA=127.0.0.1` y sacar `CLOUDFLARE_ESQUEMA` del
+  `.env`, `docker compose up -d`, el túnel a `http://proxy:80`, y borrar del
+  `ufw` el 80 y el 443 (runbook §15, «Dos tiempos»).
+- Rotar el token `ed-operacion` (pasó por el chat). Es poco urgente: solo sirve
+  desde las IP del VPS.
+- Que Mateo sea Super Administrator de la cuenta de Cloudflare (hoy es la de
+  Gastón), y 2FA en GitHub para los tres.
+- El aviso por correo si el túnel se cae (el token ya puede): falta a qué
+  correo.
+- DNSSEC: prenderlo en Cloudflare y cargar el DS en Hostinger, con cuidado (un
+  DS mal puesto deja el dominio sin resolver).
+- El HTML en el borde (opción B): solo si las mediciones lo piden. Hoy el
+  primer byte desde Argentina es 0,2–0,46 s.
