@@ -49,13 +49,13 @@ export async function sobreLaCuenta(
  * Pide otra vez la contraseña de quien actúa antes de algo que reparte o
  * recupera acceso: cambiar un correo, dar un rol que maneja las cuentas
  * (`darloPideContrasena`) o pasar la dirección. Una sesión robada sola no
- * alcanza para eso. Cada fallo cuenta en el bloqueo por cuenta como un
- * intento de entrar (`confirmarContrasena`, ADR-0010). Contesta `null` si
+ * alcanza para eso. Cada intento cuenta en un freno propio de la cuenta,
+ * aparte del de entrar (`confirmarContrasena`, ADR-0019). Contesta `null` si
  * está bien, o el rechazo en llano.
  */
 export async function pedirTuContrasena(sesion: Sesion, contrasena: unknown): Promise<Resultado | null> {
   if (typeof contrasena !== "string" || !contrasena) return { ok: false, campo: "contrasena", detalle: "Escribí tu contraseña para confirmar." };
-  const confirmacion = await confirmarContrasena(auth, { headers: await headers(), correo: sesion.user.email, contrasena, bloqueos: almacenDeBloqueos });
+  const confirmacion = await confirmarContrasena(auth, { headers: await headers(), idDeCuenta: sesion.user.id, contrasena, bloqueos: almacenDeBloqueos });
   if (confirmacion === "frenada") return { ok: false, campo: "contrasena", detalle: "Probaste demasiadas veces. Esperá unos minutos y volvé a intentar." };
   if (confirmacion === "mal") return { ok: false, campo: "contrasena", detalle: "Esa no es tu contraseña." };
   return null;
