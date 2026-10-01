@@ -17,6 +17,8 @@ export function FormularioDelCorreo({ idDeCuenta, correo, correoPropio }: { idDe
   const router = useRouter();
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [guardando, setGuardando] = useState(false);
+  // Cambia con cada correo cambiado: el campo de tu contraseña se vuelve a armar, vacío.
+  const [cambiados, setCambiados] = useState(0);
   const idDelAviso = useId();
 
   async function cambiar(evento: FormEvent<HTMLFormElement>) {
@@ -26,7 +28,9 @@ export function FormularioDelCorreo({ idDeCuenta, correo, correoPropio }: { idDe
     const r = await cambiarElCorreo(idDeCuenta, String(datos.get("correo") ?? ""), String(datos.get("contrasena") ?? ""));
     setGuardando(false);
     setResultado(r);
-    if (r.ok) router.refresh();
+    if (!r.ok) return;
+    setCambiados((n) => n + 1);
+    router.refresh();
   }
 
   const rechazado = resultado !== null && !resultado.ok;
@@ -47,7 +51,14 @@ export function FormularioDelCorreo({ idDeCuenta, correo, correoPropio }: { idDe
       />
       {/* Para que el gestor de contraseñas complete la tuya, no la de esta cuenta. */}
       <input type="text" name="usuario" autoComplete="username" value={correoPropio} readOnly hidden />
-      <CampoContrasena etiqueta="Tu contraseña" name="contrasena" autoComplete="current-password" invalido={porLaContrasena} idDelError={idDelAviso} />
+      <CampoContrasena
+        key={cambiados}
+        etiqueta="Tu contraseña"
+        name="contrasena"
+        autoComplete="current-password"
+        invalido={porLaContrasena}
+        idDelError={idDelAviso}
+      />
       {resultado ? (
         <Aviso tono={resultado.ok ? "bien" : "error"} id={idDelAviso}>
           {resultado.detalle}
