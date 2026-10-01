@@ -51,7 +51,10 @@ export function crearHero(scope: HTMLElement) {
     gsap.set("[data-hero-halo]", { autoAlpha: 0 });
 
     // Centrado base de cada tarjeta. El scroll-parallax va sobre ESTA capa.
-    gsap.set(outers, { xPercent: -50, yPercent: -50 });
+    // x e y en 0: el translate(-50%, -50%) inline de CampoCards más el
+    // redondeo de offsetWidth/offsetHeight hacían que GSAP sumara media caja
+    // en algunas tarjetas, distintas según el ancho de pantalla.
+    gsap.set(outers, { x: 0, y: 0, xPercent: -50, yPercent: -50 });
 
     const runOnce = () => {
       if (ran) return;

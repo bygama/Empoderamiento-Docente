@@ -25,9 +25,11 @@ export type Geometria = {
 };
 
 // Desktop (≥ lg): las 9 del original más dos sumadas para llenar el vacío de
-// abajo y "bajar" hacia Acerca de.
+// abajo y "bajar" hacia Acerca de. La primera ya no va donde la tenía el
+// original (más grande, arriba al centro): ahí la tapaba la píldora del
+// navbar, que no se esconde. Más chica y en la esquina, queda al costado.
 export const GEOMETRIA_CARDS: readonly Geometria[] = [
-  { w: 17.36, ar: "300 / 250", cx: 31.25, cy: 7.1, par: 1.027 },
+  { w: 13, ar: "300 / 250", cx: 9, cy: 8, par: 1.027 },
   { w: 12.73, ar: "220 / 280", cx: 81.6, cy: 16.07, par: 1.108 },
   { w: 13.89, ar: "240 / 320", cx: 91, cy: 26.85, par: 1.014, cartelA: "derecha" },
   { w: 12.73, ar: "220 / 260", cx: 5.21, cy: 25.01, par: 1.068 },
