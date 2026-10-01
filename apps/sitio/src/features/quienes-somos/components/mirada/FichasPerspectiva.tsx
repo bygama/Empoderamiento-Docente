@@ -8,9 +8,12 @@ type Props = {
 
 /**
  * Fichas conceptuales de un principio: se apilan bajo el nodo activo y
- * entran de a una con el scroll (la posición la fija `prepararEstados`). Sin
+ * entran de a una con el scroll (la posición la fija `ubicarFichas`). Sin
  * semántica interactiva. Fondo sólido: si una línea del mapa cruza por
- * detrás, la ficha la tapa limpia (con /90 se transparentaba).
+ * detrás, la ficha la tapa limpia (con /90 se transparentaba). Sin
+ * transiciones CSS, ni siquiera un delay: GSAP les escribe opacidad y
+ * posición en cada cuadro, y un transition-delay posponía cada escritura
+ * hasta que el scroll paraba (de la segunda en adelante entraban de golpe).
  */
 export function FichasPerspectiva({ p, i, live }: Props) {
   return (
@@ -21,7 +24,7 @@ export function FichasPerspectiva({ p, i, live }: Props) {
         (live ? "" : " mx-auto max-w-xl")
       }
     >
-      {p.fichas.map((f, k) => (
+      {p.fichas.map((f) => (
         <li
           key={f}
           data-ficha
@@ -29,7 +32,6 @@ export function FichasPerspectiva({ p, i, live }: Props) {
           style={{
             color: "#1f2d4d",
             borderLeft: `3px solid ${p.accent}`,
-            transitionDelay: `${k * 40}ms`,
           }}
         >
           {f}
