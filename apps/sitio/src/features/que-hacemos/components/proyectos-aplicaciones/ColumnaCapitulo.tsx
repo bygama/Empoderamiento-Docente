@@ -7,7 +7,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
  * La columna del capítulo de una mitad del escenario en vivo: el título
  * grande del capítulo (uno por capítulo, apilados; la coreografía muestra
  * uno solo), su bajada y el contador de fichas, que sigue la cuenta del
- * archivo entero («05 / 08» en el espejo). `[data-columna]`: la
+ * archivo entero («05 / 07» en el espejo). `[data-columna]`: la
  * coreografía decide cuándo aparece.
  */
 export function ColumnaCapitulo({

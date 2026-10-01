@@ -3,7 +3,7 @@
 // UN SOLO ESCENARIO clavado con dos LADOS (Gastón, 2026-09-10): el lado A
 // con el título a la izquierda y la pila a la derecha (desarrollo
 // profesional, cuatro fichas), y el lado B dado vuelta (currículo y el
-// remate, otras cuatro). Entre los dos, el GIRO: la pila del lado A se va
+// remate, otras tres). Entre los dos, el GIRO: la pila del lado A se va
 // por arriba, el texto se apaga, la víbora sube por el costado derecho y
 // vuelve a bajar por el centro con la cámara siguiéndola, y el lado B
 // aparece. Antes eran dos zonas clavadas con una costura entre medio, y en
@@ -46,8 +46,9 @@ export const PIVOTE_GIRO = "62% 45%";
 
 // Inclinación con la que cada ficha se planta sobre la pila (grados),
 // indexada por ficha GLOBAL: alternadas y chicas, como hojas apoyadas a
-// mano. La del remate, derecha.
-export const ROT = [-1.6, 1.4, -1.2, 1.5, -1.4, 1.2, -1.5, 0];
+// mano. Una por ficha, y la última, la del remate, derecha: si cambia la
+// cantidad de fichas, esta lista cambia con ella.
+export const ROT = [-1.6, 1.4, -1.2, 1.5, -1.4, 1.2, 0];
 
 // La víbora ya no vive acá: es una sola, de Niveles al cierre, en la capa
 // fija de la página (`../vibora/vibora-escena.ts`). Sus hitos en Proyectos

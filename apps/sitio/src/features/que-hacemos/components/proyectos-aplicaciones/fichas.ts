@@ -3,15 +3,15 @@ import type { ProyectosDeQueHacemos } from "@/features/que-hacemos/contenido/pro
 // La estructura del archivo de proyectos: los tres capítulos, las fichas de
 // cada uno, dónde se hizo cada proyecto (su bandera) y su pictograma. Es lo
 // que no se edita desde el admin: una bandera es un dibujo (Bandera.tsx) y un
-// pictograma también (Pictograma.tsx), y el reparto 4 + 3 + 1 es el del
-// escenario —dos lados, la víbora trazada para 4 | 4—. Los textos de cada
-// capítulo y de cada ficha llegan del contenido
+// pictograma también (Pictograma.tsx), y el reparto 4 + 2 + 1 es el del
+// escenario —dos lados, 4 | 3, y la víbora cuenta las fichas de cada uno—.
+// Los textos de cada capítulo y de cada ficha llegan del contenido
 // (features/que-hacemos/contenido/proyectos.ts) y se juntan acá, por
 // posición.
 
 export type PictoKey = "cuadernillos" | "cursos" | "comunidad" | "lideres" | "examen" | "materiales" | "curricula" | "paises";
 
-export type PaisKey = "ar" | "mx" | "br" | "cl" | "co" | "cr";
+export type PaisKey = "ar" | "mx" | "br" | "cl" | "co" | "cr" | "it" | "ro" | "uy";
 
 /**
  * Los países que tienen bandera dibujada (`Bandera.tsx`): donde ED trabajó
@@ -25,6 +25,9 @@ export const PAISES: Record<PaisKey, string> = {
   cl: "Chile",
   co: "Colombia",
   cr: "Costa Rica",
+  it: "Italia",
+  ro: "Rumania",
+  uy: "Uruguay",
 };
 
 /** «México», «Argentina y México», «Argentina, México y Brasil». */
@@ -51,13 +54,13 @@ export const ESTRUCTURA: ReadonlyArray<{ id: string; fichas: readonly Estructura
     id: "curriculo-evaluacion-materiales",
     fichas: [
       { id: "exani", paises: ["mx"], picto: "examen" },
-      { id: "buenos-aires-aprende", paises: ["ar"], picto: "materiales" },
-      { id: "curricula-homologada", paises: ["ar", "mx"], picto: "curricula" },
+      { id: "curricula-homologada", paises: ["ar", "br", "mx"], picto: "curricula" },
     ],
   },
   {
     id: "todo-junto",
-    fichas: [{ id: "techint", paises: ["ar", "mx", "br"], picto: "paises" }],
+    // Los siete en el orden en que los nombró Daniela (2026-09-30).
+    fichas: [{ id: "techint", paises: ["ar", "br", "mx", "co", "it", "ro", "uy"], picto: "paises" }],
   },
 ];
 

@@ -3,12 +3,13 @@ import { PAISES, type PaisKey } from "./fichas";
 
 /**
  * Banderas propias, flat y ondeadas, en un cuadro de 40 x 34 recortado
- * por una onda: todas con la misma forma, para que un juego de dos o
- * tres se lea como un solo objeto. Dibujadas acá y no bajadas de un banco
+ * por una onda: todas con la misma forma, para que un juego de dos, tres o
+ * siete se lea como un solo objeto. Dibujadas acá y no bajadas de un banco
  * de íconos: sin atribución que arrastrar y con un solo estilo. Los
  * colores son los de cada bandera —como los logos de los aliados, no son
- * tokens del sistema— y los emblemas van reducidos a su gesto: el sol, la
- * estrella, el globo, el águila con su serpiente y su laurel.
+ * tokens del sistema— y los emblemas van reducidos a su gesto: los soles
+ * (el de Uruguay, con sus rayos), la estrella, el globo, el águila con su
+ * serpiente y su laurel.
  */
 // La onda de arriba, bajada `y`; y la misma onda de vuelta como borde de
 // abajo. Toda franja horizontal es una BANDA entre dos ondas paralelas
@@ -23,6 +24,8 @@ const banda = (desde: number, hasta: number) => `${ondaArriba(desde)} ${ondaAbaj
 // proporción real, para que el sol y la estrella respiren en su franja).
 const ALTO = 26;
 const ONDA = banda(0, ALTO);
+// Uruguay: nueve franjas iguales, y el cantón ocupa las cinco de arriba.
+const FRANJA_UY = ALTO / 9;
 
 const DIBUJOS: Record<PaisKey, React.ReactNode> = {
   ar: (
@@ -79,6 +82,7 @@ const DIBUJOS: Record<PaisKey, React.ReactNode> = {
   co: (
     <>
       <rect width="40" height="34" fill="#CE1126" />
+      {/* El amarillo ocupa la mitad de arriba; el azul y el rojo, un cuarto cada uno. */}
       <path d={banda(0, ALTO / 2)} fill="#FCD116" />
       <path d={banda(ALTO / 2, (ALTO * 3) / 4)} fill="#003893" />
     </>
@@ -88,6 +92,39 @@ const DIBUJOS: Record<PaisKey, React.ReactNode> = {
       <rect width="40" height="34" fill="#002B7F" />
       <path d={banda(ALTO / 6, (ALTO * 5) / 6)} fill="#FFFFFF" />
       <path d={banda(ALTO / 3, (ALTO * 2) / 3)} fill="#CE1126" />
+    </>
+  ),
+  it: (
+    <>
+      <rect width="40" height="34" fill="#FFFFFF" />
+      <rect width="13.4" height="34" fill="#009246" />
+      <rect x="26.6" width="13.4" height="34" fill="#CE2B37" />
+    </>
+  ),
+  ro: (
+    <>
+      <rect width="40" height="34" fill="#FCD116" />
+      <rect width="13.4" height="34" fill="#002B7F" />
+      <rect x="26.6" width="13.4" height="34" fill="#CE1126" />
+    </>
+  ),
+  uy: (
+    <>
+      <rect width="40" height="34" fill="#FFFFFF" />
+      {[1, 3, 5, 7].map((k) => (
+        <path key={k} d={banda(k * FRANJA_UY, (k + 1) * FRANJA_UY)} fill="#0038A8" />
+      ))}
+      {/* El cantón blanco tapa las franjas a la izquierda, recortado como
+          el de Chile, y adentro el sol: el disco y ocho rayos, del mismo
+          oro que el de Argentina, que es el mismo sol. */}
+      <path d={banda(0, 5 * FRANJA_UY)} fill="#FFFFFF" clipPath="inset(0 62% 0 0)" />
+      <path
+        d="M 8.2 5.1 V 13.9 M 3.8 9.5 H 12.6 M 5.1 6.4 L 11.3 12.6 M 5.1 12.6 L 11.3 6.4"
+        stroke="#F4B63F"
+        strokeWidth="0.9"
+        strokeLinecap="round"
+      />
+      <circle cx="8.2" cy="9.5" r="2.3" fill="#F4B63F" />
     </>
   ),
 };
@@ -115,15 +152,21 @@ export function Bandera({ pais, className }: { pais: PaisKey; className?: string
   );
 }
 
-/** Una o varias banderas, apenas encimadas, como un juego. */
-export function Banderas({ paises }: { paises: readonly PaisKey[] }) {
+/**
+ * Una o varias banderas, apenas encimadas, como un juego. `chicas` es para
+ * cuatro o más, que van en su propia fila (EncabezadoFicha): un escalón
+ * más chicas, y si la ficha es angosta se achican parejas en vez de
+ * empujar el sello.
+ */
+export function Banderas({ paises, chicas = false }: { paises: readonly PaisKey[]; chicas?: boolean }) {
+  const tamano = chicas ? "aspect-[40/34] h-auto w-[2.06rem] min-w-0" : "h-9 w-auto shrink-0";
   return (
-    <span className="flex items-center">
+    <span className={chicas ? "flex min-w-0 items-center" : "flex items-center"}>
       {paises.map((pais, i) => (
         <Bandera
           key={pais}
           pais={pais}
-          className={"h-9 w-auto shrink-0" + (i > 0 ? " -ml-1" : "")}
+          className={tamano + (i > 0 ? " -ml-1" : "")}
         />
       ))}
     </span>

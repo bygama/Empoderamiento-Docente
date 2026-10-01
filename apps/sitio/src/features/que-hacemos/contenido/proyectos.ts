@@ -11,8 +11,8 @@ import { ESTRUCTURA } from "../components/proyectos-aplicaciones/fichas";
 // Daniela (2020 y 2025) y del PPTX Estructura ED
 // (docs/content/que-hace-ed-fuentes.md §6).
 //
-// Nombres propios: solo los que el sitio ya publicaba (CENEVAL, Ciudad de
-// Buenos Aires, Aprender Matemática) y los aliados autorizados (Techint).
+// Nombres propios: solo los que el sitio ya publicaba (CENEVAL, Aprender
+// Matemática) y los aliados autorizados (Techint).
 // SEMS-SEP, OEI y el Ministerio de Educación de Argentina no se nombran: sin
 // autorización (AGENTS.md §5.4). Bloom y UNESCO entran como fichas cuando
 // Daniela confirme nombre y palabras. VALIDAR todo con Raquel y Daniela antes
@@ -126,18 +126,11 @@ export const proyectosInicial: ProyectosDeQueHacemos = {
           texto: "Diseño de marco de referencia, especificaciones y reactivos para educación media superior, superior y posgrados.",
         },
         {
-          sello: "Ciudad de Buenos Aires · 2023 – 2027",
-          cifra: "1.º a 7.º",
-          unidad: "grado",
-          nombre: "Asesoría en Matemáticas del Plan Buenos Aires Aprende",
-          texto: "Colección Matemática en Red, materiales de primer ciclo, revisión de libros de texto y encuentros con coordinaciones.",
-        },
-        {
           sello: "Escuelas Techint · desde 2020",
-          cifra: "2",
+          cifra: "3",
           unidad: "países, una currícula",
           nombre: "Currícula homologada de Matemáticas",
-          texto: "Programas comunes entre sedes de Argentina y México, exámenes de ingreso y egreso y análisis de ganancia educativa.",
+          texto: "Programas comunes entre sedes de Argentina, Brasil y México, exámenes de ingreso y egreso y análisis de ganancia educativa.",
         },
       ],
     },
@@ -147,7 +140,7 @@ export const proyectosInicial: ProyectosDeQueHacemos = {
       fichas: [
         {
           sello: "Techint Group · desde 2020",
-          cifra: "3",
+          cifra: "7",
           unidad: "países",
           nombre: "Asesoría general en Matemáticas",
           texto: "Desarrollo profesional docente, evaluaciones, materiales, acompañamiento a líderes, diseño instruccional de programas, estructura de diplomado docente, entre otras.",

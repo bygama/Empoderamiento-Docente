@@ -1,17 +1,17 @@
-import { nombrarPaises, type Ficha } from "./fichas";
-import { Banderas } from "./Bandera";
+import type { Ficha } from "./fichas";
+import { EncabezadoFicha } from "./EncabezadoFicha";
 import { Pictograma } from "./Pictograma";
 
 /**
  * Una ficha del archivo, con las proporciones y el orden de la tarjeta de
  * referencia (assistantly.com): un tercio del ancho, alto generoso. Arriba
  * a la izquierda, el lugar de honor: la bandera (o el juego de banderas)
- * con el nombre del país al lado —lo internacional toma protagonismo
- * (Gastón, 2026-09-10)— y, en mono arriba a la derecha, con quién y
- * cuándo: el sello va arriba porque el año pesa más que el número de
- * orden; EL NÚMERO como título, en dos renglones (cifra y unidad en
- * verde); el nombre del proyecto y una sola frase, todo a la izquierda; al
- * pie, discreto, «Proyecto NN». El pictograma del tipo de
+ * con el nombre del país —lo internacional toma protagonismo (Gastón,
+ * 2026-09-10)— y, en mono arriba a la derecha, con quién y cuándo: el
+ * sello va arriba porque el año pesa más que el número de orden (los dos,
+ * en EncabezadoFicha). EL NÚMERO como título, en dos renglones (cifra y
+ * unidad en verde); el nombre del proyecto y una sola frase, todo a la
+ * izquierda; al pie, discreto, «Proyecto NN». El pictograma del tipo de
  * proyecto baja de rango: marca de agua grande y tenue en la esquina de
  * abajo a la derecha, textura que no compite con la bandera. En vivo es
  * una hoja absoluta dentro de la pila (`[data-ficha]`, la coreografía la
@@ -46,29 +46,7 @@ export function FichaProyecto({
           <Pictograma tipo={ficha.picto} className="h-36 w-36" />
         </span>
 
-        {/* Encabezado en fila: banderas con el país a la izquierda, y arriba
-            a la derecha SIEMPRE el sello, en mono y en dos renglones, con
-            quién arriba y los años abajo (Gastón, 2026-09-11). El país cede
-            el ancho: se parte antes que el sello. Y si no le alcanza ni así
-            (tres banderas en una card de celular), el nombre baja debajo
-            de las banderas: antes empujaba la card 14px afuera de la
-            pantalla y la página se corría de costado. Solo en celular y
-            tablet (la grilla); en escritorio la card es más ancha. */}
-        <div className="relative flex items-start justify-between gap-5">
-          <div className="flex min-w-0 flex-1 items-center gap-x-3 gap-y-2 max-lg:flex-wrap">
-            <Banderas paises={ficha.paises} />
-            <p className="font-display text-azul-principal text-[1.05rem] leading-tight font-semibold tracking-[-0.01em]">
-              {nombrarPaises(ficha.paises)}
-            </p>
-          </div>
-          <p className="text-gris-texto shrink-0 text-right font-mono text-[0.72rem] leading-relaxed tracking-[0.18em] uppercase">
-            {ficha.sello.split(" · ").map((parte) => (
-              <span key={parte} className="block">
-                {parte}
-              </span>
-            ))}
-          </p>
-        </div>
+        <EncabezadoFicha paises={ficha.paises} sello={ficha.sello} />
 
         <p
           className={`font-display text-azul-principal relative font-extrabold tracking-[-0.03em] ${compacta ? "mt-6" : "mt-9"}`}
