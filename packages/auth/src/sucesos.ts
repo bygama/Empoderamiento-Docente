@@ -11,6 +11,20 @@ import type { OpcionesDeAuth, SucesoDeSesion } from "./opciones";
 type Contexto = Parameters<Parameters<typeof createAuthMiddleware>[0]>[0];
 type Registrar = OpcionesDeAuth["registrar"];
 
+/**
+ * Una limpieza que sigue a un cambio de contraseña (borrar los enlaces,
+ * destrabar la cuenta): se espera, pero si falla queda en el log y no frena
+ * nada. La contraseña ya cambió, y lo que importa más —cerrar las otras
+ * sesiones y avisar— tiene que pasar igual.
+ */
+export async function limpiarSinFrenar(que: string, limpiar: () => Promise<unknown>): Promise<void> {
+  try {
+    await limpiar();
+  } catch (e) {
+    console.error(`No se pudo ${que} después de cambiar la contraseña:`, e instanceof Error ? e.message : e);
+  }
+}
+
 /** Anota un suceso sin que la respuesta lo espere ni se entere si falla. */
 export async function anotar(ctx: Contexto, registrar: Registrar, suceso: SucesoDeSesion): Promise<void> {
   await ctx.context.runInBackgroundOrAwait(
@@ -52,11 +66,12 @@ export async function alCambiarLaContrasena(
 ): Promise<void> {
   const cuenta = cuentaDevuelta(ctx.context.returned);
   if (!cuenta) return;
-  await borrarEnlaces(cuenta.id);
+  // Primero el registro y el aviso; la limpieza después, y sin frenar nada.
   await anotar(ctx, registrar, { tipo: "cambio-su-contrasena", idDeCuenta: cuenta.id });
   await ctx.context.runInBackgroundOrAwait(
     avisarCambioDeContrasena({ para: cuenta.email, nombre: cuenta.name || undefined, cuando: new Date() }).catch((e: unknown) => {
       console.error("No salió el aviso de contraseña cambiada:", e instanceof Error ? e.message : e);
     }),
   );
+  await limpiarSinFrenar("borrar los enlaces", () => borrarEnlaces(cuenta.id));
 }

@@ -5,6 +5,7 @@ import { memoryAdapter } from "better-auth/adapters/memory";
 import type { AlmacenDeBloqueos } from "./bloqueo";
 import { configDeAuth } from "./config";
 import { crearEnlaceDeInvitacion } from "./invitacion";
+import type { OpcionesDeAuth } from "./opciones";
 
 // El enlace de invitación contra better-auth de verdad, con la config de
 // producción (tokens hasheados incluidos): si una versión nueva cambia el
@@ -28,22 +29,26 @@ const sinBloqueos: AlmacenDeBloqueos = {
   podar: async () => {},
 };
 
-async function armar() {
+/** Con `opciones`, se reemplaza lo que la app le pasa (por ejemplo, un `borrarEnlaces` que falla). */
+async function armar(opciones: Partial<Omit<OpcionesDeAuth, "base">> = {}) {
   const db = { user: [], session: [], account: [], verification: [] as Array<{ value: string }>, twoFactor: [] };
+  const avisos: string[] = [];
+  const enSegundoPlano: Promise<unknown>[] = [];
   const auth = betterAuth({
     ...configDeAuth({
       secreto: "un-secreto-de-prueba-que-no-sirve-para-nada-mas",
       urlDelSitio: "http://localhost",
       mandarResetDeContrasena: async () => {},
-      avisarCambioDeContrasena: async () => {},
+      avisarCambioDeContrasena: async ({ para }) => void avisos.push(para),
       mandarCodigo: async () => {},
-      segundoPlano: () => {},
+      segundoPlano: (tarea) => void enSegundoPlano.push(tarea),
       bloqueos: sinBloqueos,
       // Como el de la app (datos/auth.ts): todo lo de la cuenta en `verification`.
       borrarEnlaces: async (idDeCuenta) => {
         for (let i = db.verification.length - 1; i >= 0; i--) if (db.verification[i]?.value === idDeCuenta) db.verification.splice(i, 1);
       },
       registrar: async () => {},
+      ...opciones,
     }),
     database: memoryAdapter(db),
     logger: { disabled: true },
@@ -53,16 +58,22 @@ async function armar() {
   // Como nace una invitada: sin credencial, sin contraseña.
   const cuenta = await ctx.internalAdapter.createUser({ email: "juan@ed.test", name: "Juan", emailVerified: false }, { method: "admin" });
   const abrir = (enlace: string) => auth.handler(new Request(enlace, { method: "GET" }));
-  const elegir = (token: string) =>
-    auth.handler(
+  const elegir = async (token: string) => {
+    const res = await auth.handler(
       new Request("http://localhost/api/auth/reset-password", {
         method: "POST",
         headers: { "content-type": "application/json", origin: "http://localhost" },
         body: JSON.stringify({ token, newPassword: "la-contrasena-que-eligio" }),
       }),
     );
-  return { auth, ctx, cuenta, abrir, elegir };
+    await Promise.all(enSegundoPlano.splice(0));
+    return res;
+  };
+  return { auth, ctx, cuenta, abrir, elegir, avisos };
 }
+
+/** El token de un enlace de invitación. */
+const tokenDe = (enlace: string) => new URL(enlace).pathname.split("/").at(-1) ?? "";
 
 test("el enlace lleva a «Elegí tu contraseña» con su token, y resetPassword crea la credencial", async () => {
   const { auth, ctx, cuenta, abrir, elegir } = await armar();
@@ -97,6 +108,18 @@ test("elegir la contraseña con un enlace deja sin efecto los otros de la cuenta
   assert.equal((await elegir(otro)).status, 400);
   assert.equal(await ctx.internalAdapter.findVerificationValue(recordado.identifier), null);
   assert.equal((await elegir(deLaAjena)).status, 200);
+});
+
+test("si borrar los enlaces o destrabar la cuenta falla, elegir la contraseña igual cierra las sesiones y avisa", async () => {
+  const falla = async () => {
+    throw new Error("la base no contesta");
+  };
+  const { auth, ctx, cuenta, elegir, avisos } = await armar({ borrarEnlaces: falla, bloqueos: { ...sinBloqueos, borrar: falla } });
+  await ctx.internalAdapter.createSession(cuenta.id);
+  const { enlace } = await crearEnlaceDeInvitacion(auth, { idDeCuenta: cuenta.id, horas: 72, volverA: "/admin/nueva-contrasena" });
+  assert.equal((await elegir(tokenDe(enlace))).status, 200);
+  assert.deepEqual(await ctx.internalAdapter.listSessions(cuenta.id), []);
+  assert.deepEqual(avisos, ["juan@ed.test"]);
 });
 
 test("vencido, el enlace no sirve", async () => {
