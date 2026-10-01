@@ -1,8 +1,8 @@
 import type { BetterAuthPlugin } from "better-auth";
 import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { twoFactor } from "better-auth/plugins/two-factor";
-import { claveDeCodigos, conUnFalloMas, respuestaDeFreno, segundosDeFreno } from "./bloqueo";
 import { CODIGO_NO_SALIO, SEGUNDO_FACTOR_OBLIGATORIO } from "./errores";
+import { frenoDeCodigos } from "./freno-de-codigos";
 import type { OpcionesDeAuth } from "./opciones";
 import { segundoFactorObligatorio } from "./permisos";
 import { anotar } from "./sucesos";
@@ -23,7 +23,6 @@ const MINUTOS_DEL_PASO_PENDIENTE = 30;
 const DIAS_DEL_DISPOSITIVO_RECORDADO = 30;
 
 type Opciones = Pick<OpcionesDeAuth, "mandarCodigo" | "registrar" | "bloqueos"> & { secreto: string };
-type Contexto = Parameters<Parameters<typeof createAuthMiddleware>[0]>[0];
 
 /**
  * El envío del código de cada pedido, para que el gancho de
@@ -38,47 +37,18 @@ const PRENDER = "/two-factor/enable";
 const APAGAR = "/two-factor/disable";
 
 /**
- * De quién es el código que se prueba: de la sesión, si ya hay una (prenderlo
- * desde Mi cuenta), o del paso pendiente entre la contraseña y el código,
- * que better-auth guarda en `verification` con el id de la cuenta y firma en
- * su cookie `two_factor`. Es la misma lectura que hace el plugin.
- */
-async function cuentaDelCodigo(ctx: Contexto): Promise<string | null> {
-  const sesion = await getSessionFromCtx(ctx).catch(() => null);
-  if (sesion) return sesion.user.id;
-  const cookie = ctx.context.createAuthCookie("two_factor");
-  const paso = await ctx.getSignedCookie(cookie.name, ctx.context.secret);
-  if (!paso) return null;
-  return (await ctx.context.internalAdapter.findVerificationValue(paso))?.value ?? null;
-}
-
-/**
  * Lo que pasa alrededor del plugin y el plugin no hace. Va en un plugin propio
  * y después del de `twoFactor` porque better-auth corre los ganchos de la
  * config antes que los de los plugins, y esto tiene que ver lo que el plugin
- * decidió.
- *
- * **Los códigos fallidos se cuentan por cuenta**, con el bloqueo de entrar
- * (bloqueo.ts, ADR-0010) y otra clave (`claveDeCodigos`). El plugin da 5
- * intentos por código, pero cada código nuevo trae otros 5: sin esto, quien
- * ya sabe la contraseña podría pedir códigos y probar sin fin. La contraseña
- * buena no borra estos fallos; el código bueno, sí.
+ * decidió. Los códigos fallidos se cuentan por cuenta (freno-de-codigos.ts).
  */
 function alrededorDelCodigo({ registrar, bloqueos, secreto }: Pick<Opciones, "registrar" | "bloqueos" | "secreto">) {
+  const freno = frenoDeCodigos({ bloqueos, secreto });
   return {
     id: "alrededor-del-codigo",
     hooks: {
       before: [
-        {
-          // Una cuenta frenada no prueba códigos, ni el bueno: si no, el freno no frenaría nada.
-          matcher: (ctx) => ctx.path === PROBAR,
-          handler: createAuthMiddleware(async (ctx) => {
-            const cuenta = await cuentaDelCodigo(ctx);
-            if (!cuenta) return;
-            const segundos = segundosDeFreno(await bloqueos.leer(claveDeCodigos(cuenta, secreto)), new Date());
-            if (segundos !== null) throw respuestaDeFreno(segundos);
-          }),
-        },
+        freno.antes,
         {
           // Para dirige y administra es obligatorio: no se apaga. Bajar de rol
           // no lo apaga tampoco; lo apaga la persona, si quiere, después.
@@ -93,20 +63,7 @@ function alrededorDelCodigo({ registrar, bloqueos, secreto }: Pick<Opciones, "re
         },
       ],
       after: [
-        {
-          // Solo el código mal es un fallo; otro error (vencido, la cuenta suspendida) no es un intento.
-          matcher: (ctx) => ctx.path === PROBAR,
-          handler: createAuthMiddleware(async (ctx) => {
-            const devuelto = ctx.context.returned;
-            const fallo = isAPIError(devuelto) && devuelto.body?.code === "INVALID_CODE";
-            if (isAPIError(devuelto) && !fallo) return;
-            const cuenta = ctx.context.newSession?.user.id ?? (await cuentaDelCodigo(ctx));
-            if (!cuenta) return;
-            const clave = claveDeCodigos(cuenta, secreto);
-            if (fallo) await bloqueos.actualizar(clave, (actual) => conUnFalloMas(actual, new Date()));
-            else await bloqueos.borrar(clave);
-          }),
-        },
+        freno.despues,
         {
           // «Entró» es cuando la sesión existe de verdad: con la contraseña si
           // no hay segundo factor o el dispositivo está recordado, o con el
