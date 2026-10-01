@@ -161,6 +161,16 @@ test("los códigos fallidos se cuentan por cuenta: pedir otro código o volver a
   assert.notEqual(bloqueos.filas.get(claveDeCodigos(cuenta.id, SECRETO))?.hasta ?? null, null);
 });
 
+test("una ráfaga de códigos a la vez no pasa del tope: a lo sumo 5 llegan a probarse, y la cuenta queda frenada", async () => {
+  const { codigos, pedir, entrar } = await armar("administra");
+  await entrar();
+  await pedir("/two-factor/send-otp");
+  const rafaga = await Promise.all(Array.from({ length: 12 }, () => pedir("/two-factor/verify-otp", { code: malo(codigos) })));
+  const probados = rafaga.filter((r) => r.status !== 429).length;
+  assert.equal(probados, 5, `se probaron ${probados}`);
+  assert.equal((await pedir("/two-factor/verify-otp", { code: codigos.at(-1) })).status, 429);
+});
+
 test("el código bueno borra los fallos de la cuenta", async () => {
   const { codigos, pedir, entrar, bloqueos, cuenta } = await armar("administra");
   await entrar();
