@@ -23,7 +23,7 @@ function estadoDe(f: { publicadoEn: Date | null; publicadoPor: string | null; bo
   };
 }
 
-/** Los cuatro, en el orden de la pila, con la pregunta y el eje de lo que se edita (el borrador, si hay). */
+/** Los fijos, en el orden de la pila, con la pregunta y el eje de lo que se edita (el borrador, si hay). */
 export async function listaDeCasos(): Promise<FilaDeCaso[]> {
   const filas = await base.caso.findMany({ orderBy: { numero: "asc" } });
   return filas.flatMap((f) => {

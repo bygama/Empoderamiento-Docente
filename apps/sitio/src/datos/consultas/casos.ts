@@ -5,12 +5,13 @@ import { base } from "@/datos/cliente";
 import { TINTE_DEL_CASO } from "@/features/investigacion/casos/tintes";
 import type { CasoInvestigacion } from "@/features/investigacion/casos/tipos";
 import { esquemaCaso, type Caso } from "@/features/investigacion/contenido/caso";
+import { esIdDeCaso } from "@/features/investigacion/contenido/modelo-de-casos";
 import { leerSinRomper } from "./leer-sin-romper";
 
 // Lo que leen el sitio y el admin de los casos (`work/casos-aliados-fotos/SPEC.md`
-// §4 y §8): los cuatro, en el orden de la pila, o en la vista previa cada uno
-// como quedaría al publicarlo. Todo pasa por `esquemaCaso` al leer: una fila
-// que no pasa no llega a la pantalla.
+// §4 y §8): los de `CASOS_FIJOS`, en el orden de la pila, o en la vista previa
+// cada uno como quedaría al publicarlo. Todo pasa por `esquemaCaso` al leer:
+// una fila que no pasa no llega a la pantalla.
 
 /** Las columnas de lo publicado, como documento. La aclaración nula es un texto vacío. */
 export function publicadoDeCaso(fila: Fila): unknown {
@@ -76,7 +77,10 @@ function visible(fila: Fila, enVistaPrevia: boolean): CasoInvestigacion | null {
 
 /** Los casos que ve el sitio, en el orden de la pila. Pura: se prueba sin base. */
 export function casosVisibles(filas: readonly Fila[], enVistaPrevia: boolean): CasoInvestigacion[] {
-  return [...filas]
+  // Solo los fijos, como el admin: una fila que quedó en la base sin estar en
+  // la lista (una base sin la migración `casos_que_quedan`) no se muestra.
+  return filas
+    .filter((fila) => esIdDeCaso(fila.id))
     .sort((a, b) => a.numero.localeCompare(b.numero))
     .map((fila) => visible(fila, enVistaPrevia))
     .filter((c): c is CasoInvestigacion => c !== null);

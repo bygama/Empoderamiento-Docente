@@ -43,6 +43,7 @@ export function ElCaso({ form, cambiar, error, ayudaDeLaUrl }: Props) {
             <Seleccion
               nombre="estado"
               etiqueta="Estado"
+              ayuda="Queda guardado, pero hoy no se ve en el sitio: salió de la ficha del expediente, junto con la cuenta de evidencias (Daniela, 2026-09-30)."
               opciones={ESTADOS.map((e) => ({ valor: e.valor, etiqueta: e.etiqueta }))}
               sinElegir="Elegí el estado"
               valor={form.estado}

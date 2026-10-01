@@ -1,19 +1,21 @@
 // Lo de un caso que no necesita Zod (`work/casos-aliados-fotos/SPEC.md` §4):
-// los cuatro casos fijos, las listas cerradas y los topes. Aparte de caso.ts
+// los casos fijos, las listas cerradas y los topes. Aparte de caso.ts
 // (los esquemas) porque lo leen también los componentes del navegador —el
 // formulario del admin— y Zod no tiene que viajar con ellos.
 
 /**
- * **Son siempre cuatro**: la escena de la pila está armada para ellos (las
- * solapas, los papeles, la coreografía que apila la cuarta al final). Se
- * editan, no se crean ni se borran. El id es el de la fila y el número, su
- * lugar en la pila: ninguno de los dos se edita.
+ * **Los casos son estos y nada más**: el sitio y el admin muestran solo las
+ * filas de esta lista. Eran cuatro; el 02 y el 03 salieron a pedido de
+ * Daniela (2026-09-30) con la migración `casos_que_quedan`, que borró sus
+ * filas y pasó el `caso-04` al número 02 para que la pila no quede con un
+ * hueco. Se editan, no se crean ni se borran desde el admin. El id es el de
+ * la fila (por eso el segundo sigue siendo `caso-04`) y el número, su lugar
+ * en la pila: ninguno de los dos se edita. La escena tiene tintes, pestañas
+ * y papeles para cuatro carpetas; con menos, usa los primeros.
  */
 export const CASOS_FIJOS = [
   { id: "caso-01", numero: "01" },
-  { id: "caso-02", numero: "02" },
-  { id: "caso-03", numero: "03" },
-  { id: "caso-04", numero: "04" },
+  { id: "caso-04", numero: "02" },
 ] as const;
 
 export type IdDeCaso = (typeof CASOS_FIJOS)[number]["id"];
@@ -31,8 +33,14 @@ export function esIdDeCaso(valor: string): valor is IdDeCaso {
  * tenga hoy (SPEC §4.1). El cruce es editorial (Facundo, 2026-09-14) y hay
  * que validarlo con ED; no se edita desde el admin (SPEC §4 de
  * work/paginas-investigacion-y-resto/). Lo leen las líneas y «Se ve en».
+ *
+ * Sin el 02 y el 03 (2026-10-01), la 2.ª línea (Socioepistemología) y la 6.ª
+ * (Evidencia, evaluación y mejora) pasan al 01: Oaxaca arma la matemática
+ * desde el contexto de cada docente —la jícara, el papalote— y es el caso
+ * real con sus efectos documentados. El otro sigue con pensamiento matemático
+ * y currículum, que es su tema.
  */
-export const CASO_DE_CADA_LINEA: readonly IdDeCaso[] = ["caso-01", "caso-02", "caso-01", "caso-04", "caso-04", "caso-03"];
+export const CASO_DE_CADA_LINEA: readonly IdDeCaso[] = ["caso-01", "caso-01", "caso-01", "caso-04", "caso-04", "caso-01"];
 
 /** Cómo lo nombran el admin y la actividad: «Caso 01». */
 export function nombreDelCaso(id: IdDeCaso): string {

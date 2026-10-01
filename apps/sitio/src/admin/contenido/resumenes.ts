@@ -4,7 +4,7 @@
 
 const cuenta = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
 
-/** «4 casos · 1 con cambios sin publicar», o «4 casos». */
+/** «2 casos · 1 con cambios sin publicar», o «2 casos». */
 export function resumenDeCasos(filas: ReadonlyArray<{ estado: { borradorEn: string | null } }>): string {
   const total = cuenta(filas.length, "caso", "casos");
   const conCambios = filas.filter((f) => f.estado.borradorEn).length;

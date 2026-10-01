@@ -112,8 +112,9 @@ export const TINTES: Record<
  */
 /**
  * El tinte de cada carpeta, por el número del caso. Es parte de la escena, no
- * del contenido: cada carpeta de la pila tiene su color, en este orden, y los
- * casos son siempre cuatro (SPEC §4 de work/casos-aliados-fotos/).
+ * del contenido: cada carpeta de la pila tiene su color, en este orden. Hay
+ * colores para cuatro; con los dos casos de hoy (`CASOS_FIJOS`) se usan los
+ * dos primeros.
  */
 export const TINTE_DEL_CASO: Record<string, TinteCarpeta> = { "01": "navy", "02": "medio", "03": "claro", "04": "verde" };
 

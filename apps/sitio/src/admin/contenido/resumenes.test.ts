@@ -5,8 +5,8 @@ import { resumenDeAliados, resumenDeCasos, resumenDeEquipo, resumenDeFotos } fro
 const caso = (borradorEn: string | null) => ({ estado: { borradorEn } });
 
 test("casos: la cuenta y los que tienen cambios sin publicar", () => {
-  assert.equal(resumenDeCasos([caso("2026-09-27T10:00:00.000Z"), caso(null), caso(null), caso(null)]), "4 casos · 1 con cambios sin publicar");
-  assert.equal(resumenDeCasos([caso(null), caso(null), caso(null), caso(null)]), "4 casos");
+  assert.equal(resumenDeCasos([caso("2026-09-27T10:00:00.000Z"), caso(null)]), "2 casos · 1 con cambios sin publicar");
+  assert.equal(resumenDeCasos([caso(null), caso(null)]), "2 casos");
 });
 
 test("aliados: la cuenta y los sin autorizar, con el singular", () => {

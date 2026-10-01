@@ -13,8 +13,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: ficha ? `Caso ${ficha.numero} · Casos` : "Casos" };
 }
 
-// La ficha de un caso (SPEC §7.1). El id es uno de los cuatro fijos
-// (`caso-01`…): cualquier otro es un 404 sin ir a la base.
+// La ficha de un caso (SPEC §7.1). El id es uno de los fijos (`caso-01` y
+// `caso-04`): cualquier otro, también los que se borraron, es un 404 sin ir
+// a la base.
 export default async function PaginaDelCaso({ params }: Props) {
   const ficha = await fichaDeCaso((await params).id);
   if (!ficha) notFound();
