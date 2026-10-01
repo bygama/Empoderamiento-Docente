@@ -10,7 +10,7 @@ import { claveDeCodigos, contarUnIntento, respuestaDeFreno, type AlmacenDeBloque
  * contraseña buena no borra estos fallos; el código bueno, sí (ADR-0019).
  *
  * Son dos ganchos de `/two-factor/verify-otp` que van en el plugin de
- * alrededor del código (segundo-factor.ts), después del de `twoFactor`.
+ * alrededor del código (alrededor-del-codigo.ts), después del de `twoFactor`.
  */
 
 const PROBAR = "/two-factor/verify-otp";

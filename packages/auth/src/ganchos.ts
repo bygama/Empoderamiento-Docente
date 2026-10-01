@@ -21,7 +21,7 @@ import { alCambiarLaContrasena, anotarLaSalida } from "./sucesos";
  * Antes de elegir una contraseña, que no esté filtrada (filtradas.ts).
  * Entrar no se anota acá: con el segundo factor, la contraseña buena todavía
  * no es una sesión, y eso lo decide el plugin, que corre después
- * (segundo-factor.ts).
+ * (alrededor-del-codigo.ts).
  */
 
 const ENTRAR = "/sign-in/email";
