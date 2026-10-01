@@ -91,9 +91,9 @@ didáctico»). El apellido en la base es «Briceño» (así firma sus publicacio
 | 41 | «Recién salido», tarjetas | Se arrastran, no llevan al artículo | «No entiendo, no se puede entrar a los artículos, sólo es para verlos?» | `novedades/components/` (lanzamientos) | diseño/bug |
 | 42 | Cierre | «No te pierdas nada.» / «Escribinos y contamos lo que estamos haciendo, o seguinos en redes para enterarte de cada novedad apenas sale.» / botón «Hablemos» | «Enterate de todo» / «Seguinos en redes para conocer cada novedad apenas sale.» / «El "hablemos" no sé cómo iría ahí… raro. Los estamos invitando a que nos sigan en redes» | `novedades/contenido/cierre.ts` | texto + diseño (qué hacer con el botón) |
 
-Sobre 38: el inventario `docs/content/publicaciones-fuentes-drive.md` ya tiene las diez
-publicaciones de Iván con DOI (2024–2026: modelación, cálculo, derivada, género). Ninguna está en
-la Biblioteca ni en su perfil.
+Sobre 38: las diez publicaciones de Iván (2024–2026: modelación, cálculo, derivada, género) ya
+estaban en la Biblioteca desde la migración `20260927030549_biblioteca`, firmadas por él, y siete
+en su perfil; lo que faltaba era que se vieran en Novedades, el destacado y las tres del perfil.
 
 ## Investigación
 
@@ -219,3 +219,13 @@ Fotos: 40 (la de Oaxaca que mandó Daniela, `public/fotos/oaxaca-taller-grupo.we
 Queda para las otras lanes: 1, 2, 3, 4, 6, 10 (foto), 21, 22, 26, 27, 28 (países), 29, 35, 36, 37,
 38, 41, 43, 44, 45. La foto `pizarra-umce.webp` de «ED en movimiento» (Novedades) tiene el mismo
 banner de la UMCE que la que Daniela sacó del Inicio; ella no la marcó, así que sigue.
+
+## Qué quedó hecho (PR de las publicaciones de Iván, 30/9)
+
+38 y 45, por la migración `20260930233000_publicaciones_de_ivan`: el cuarto destacado de la
+Biblioteca pasa a «Modelación matemática escolar de la elipse en contexto astronómico» (RECHIEM
+2026, la que su perfil marca como destacada) y el de la derivada suelta el lugar; su perfil suma
+las tres que firmaba y no mostraba (UCMaule 2025, Paradigma 2025, ALME 2024), en orden
+cronológico; y entran tres novedades de «Publicaciones» por sus artículos de 2026 (RECHIEM,
+Cuadernos de Investigación, IIME), cada una abriendo su material. Las bajadas y los textos del
+destacado los escribimos nosotros a partir de los resúmenes de cada artículo.
