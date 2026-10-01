@@ -743,7 +743,8 @@ Reglas para el admin y sus datos:
   las páginas, y **toda Server Action del admin empieza por
   `auth.api.getSession`** y contesta en llano si no hay sesión, porque el
   layout no las cubre (el proxy las deja pasar: un redirect no es una
-  respuesta válida para una acción). La sesión dura 12 h sin uso y su cookie es
+  respuesta válida para una acción). La sesión dura 12 h sin uso, nunca más de
+  7 días desde que se abrió (ADR-0019), y su cookie es
   `SameSite=Strict`: por eso el proxy rebota a la misma URL la navegación que
   llega de otro sitio sin ella. Contraseñas en Argon2id, bloqueo por cuenta,
   tokens hasheados y la CSP del admin con nonce: ADR-0010. **Segundo factor
