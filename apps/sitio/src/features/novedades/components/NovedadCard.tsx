@@ -35,16 +35,19 @@ export function NovedadCard({ n }: { n: NovedadDelSitio }) {
   };
 
   return (
-    <div data-card data-id={n.slug} data-cat={n.categoria} className="group relative">
+    // En celular, con `data-fila` (lo pone el listado a todas menos la primera
+    // visible) la card se compacta a una fila: miniatura, categoría y título,
+    // separadas por una línea en vez de caja y sombra.
+    <div data-card data-id={n.slug} data-cat={n.categoria} className="group relative max-sm:mb-5 max-sm:data-[fila]:mb-0">
       {/* Sombra del hover en capa propia animando SOLO opacity (y el mismo
           lift), porque animar box-shadow es paint (regla: transform/opacity).
           Vive fuera del article: su overflow-hidden la recortaría. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[0_2px_4px_rgb(31_45_77/0.06),0_30px_60px_-24px_rgb(31_45_77/0.26)] transition-[translate,opacity] duration-300 ease-out group-hover:-translate-y-1.5 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[0_2px_4px_rgb(31_45_77/0.06),0_30px_60px_-24px_rgb(31_45_77/0.26)] transition-[translate,opacity] duration-300 ease-out group-hover:-translate-y-1.5 group-hover:opacity-100 max-sm:group-data-[fila]:hidden"
       />
-      <article className="border-azul-principal/8 group-hover:border-azul-claro/70 relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgb(31_45_77/0.04),0_18px_40px_-20px_rgb(31_45_77/0.14)] transition-[translate,border-color] duration-300 ease-out group-hover:-translate-y-1.5 max-lg:group-active:translate-y-0.5">
-        <div className="relative aspect-[16/10] w-full overflow-hidden">
+      <article className="border-azul-principal/8 group-hover:border-azul-claro/70 relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgb(31_45_77/0.04),0_18px_40px_-20px_rgb(31_45_77/0.14)] transition-[translate,border-color] duration-300 ease-out group-hover:-translate-y-1.5 max-lg:group-active:translate-y-0.5 max-sm:group-data-[fila]:flex-row max-sm:group-data-[fila]:items-center max-sm:group-data-[fila]:gap-4 max-sm:group-data-[fila]:rounded-none max-sm:group-data-[fila]:border-0 max-sm:group-data-[fila]:border-t max-sm:group-data-[fila]:py-4 max-sm:group-data-[fila]:shadow-none">
+        <div className="relative aspect-[16/10] w-full overflow-hidden max-sm:group-data-[fila]:aspect-square max-sm:group-data-[fila]:w-24 max-sm:group-data-[fila]:shrink-0 max-sm:group-data-[fila]:rounded-xl">
           <Image
             src={n.imagen.src}
             alt=""
@@ -54,22 +57,22 @@ export function NovedadCard({ n }: { n: NovedadDelSitio }) {
             style={estiloDeFoco(n.imagen.foco)}
           />
         </div>
-        <div className="flex flex-1 flex-col p-5">
-          <div className="flex items-center gap-2 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
+        <div className="flex flex-1 flex-col p-5 max-sm:group-data-[fila]:min-w-0 max-sm:group-data-[fila]:p-0">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
             <span className="text-verde-concepto-texto">
               {etiquetaDeCategoria(n.categoria)}
             </span>
-            <span className="bg-gris-texto/40 h-1 w-1 rounded-full" />
+            <span className="bg-gris-texto/40 h-1 w-1 rounded-full max-sm:group-data-[fila]:hidden" />
             <span className="text-gris-texto">{fechaCorta(n.fecha)}</span>
           </div>
-          <h3 className="font-display text-azul-principal mt-3 text-[1.15rem] leading-snug font-bold">
+          <h3 className="font-display text-azul-principal mt-3 text-[1.15rem] leading-snug font-bold max-sm:group-data-[fila]:mt-1.5 max-sm:group-data-[fila]:line-clamp-3 max-sm:group-data-[fila]:text-[1rem]">
             {n.titulo}
           </h3>
-          <p className="text-gris-texto mt-2 line-clamp-2 font-sans text-[0.92rem] leading-relaxed">
+          <p className="text-gris-texto mt-2 line-clamp-2 font-sans text-[0.92rem] leading-relaxed max-sm:hidden">
             {n.bajada}
           </p>
           {conFicha && (
-            <span className="text-azul-principal mt-4 inline-flex items-center gap-1.5 font-sans text-[0.9rem] font-medium">
+            <span className="text-azul-principal mt-4 inline-flex items-center gap-1.5 font-sans text-[0.9rem] font-medium max-sm:group-data-[fila]:hidden">
               Leer la nota
               <ArrowUpRight
                 size={14}
