@@ -49,6 +49,8 @@ function buscarEnCatalogo() {
   bajarAlCatalogo();
 }
 
+/** En celular las píldoras entran desde más lejos: el recorrido deja ver que la fila se desliza. */
+const CELULAR = "(max-width: 47.999rem)";
 
 export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
   const { titulo } = contenido;
@@ -64,7 +66,8 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
       gsap.set("[data-bh-glow]", { autoAlpha: 0 });
       gsap.set("[data-bh-bola]", { x: -170, y: 170 });
       gsap.set("[data-bh-rise]", { autoAlpha: 0, y: 24 });
-      gsap.set("[data-bh-pill]", { autoAlpha: 0, x: 28 });
+      const celular = window.matchMedia(CELULAR).matches;
+      gsap.set("[data-bh-pill]", { autoAlpha: 0, x: celular ? 96 : 28 });
 
       // Tiempos ABSOLUTOS acoplados al barrido del haz (PuntosFaro: delay
       // 0.3 + 1.3s de recorrido, cruza el centro ≈ 0.95s): el titular se
@@ -76,7 +79,7 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
         .to("[data-bh-glow]", { autoAlpha: 1, duration: 1, ease: "power2.out" }, 1.0)
         .to("[data-bh-bola]", { x: 0, y: 0, duration: 1 }, 0.9)
         .to("[data-bh-rise]", { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.12 }, 1.45)
-        .to("[data-bh-pill]", { autoAlpha: 1, x: 0, duration: 0.6, stagger: 0.05 }, 1.7);
+        .to("[data-bh-pill]", { autoAlpha: 1, x: 0, duration: celular ? 0.9 : 0.6, stagger: 0.05 }, 1.7);
     }, root);
 
     return () => ctx.revert();
@@ -85,7 +88,7 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
   return (
     <section
       ref={rootRef}
-      className="bg-azul-principal relative isolate flex min-h-[87svh] max-md:min-h-[80lvh] flex-col overflow-hidden rounded-b-[2rem] pt-28 pb-5 md:rounded-b-[2.75rem] md:pt-32 md:pb-7"
+      className="bg-azul-principal relative isolate flex min-h-[87svh] max-md:min-h-[calc(100svh-3rem)] flex-col overflow-hidden rounded-b-[2rem] pt-28 pb-5 max-md:pb-8 md:rounded-b-[2.75rem] md:pt-32 md:pb-7"
       aria-label="Biblioteca — publicaciones y recursos"
     >
       {/* Fondo: glow de faro contenido + forma plana (manual §6) */}
@@ -129,7 +132,7 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
 
         <p
           data-bh-rise
-          className="mt-6 max-w-[46ch] font-sans text-[1.02rem] leading-relaxed text-white/85 md:text-[1.15rem]"
+          className="mt-6 max-w-[46ch] font-sans text-[1.02rem] leading-relaxed text-white/85 max-md:text-balance md:text-[1.15rem]"
         >
           {contenido.bajada}
         </p>
