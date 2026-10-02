@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Search } from "@/components/ui/icons";
 import { PUBLICOS, TIPOS } from "@/features/biblioteca/contenido/modelo";
 import { vigilarDesborde } from "./columna-desborda";
+import { ESTILO_DE_TIPO } from "@/features/biblioteca/components/portada/estilo-de-tipo";
 import { FiltroGrupo } from "./FiltroGrupo";
 import type { Filtros } from "./filtros";
 
@@ -99,7 +100,7 @@ export function FiltrosCatalogo({
           label={GRUPO_TIPO}
           opciones={TIPOS}
           valor={filtros.tipo}
-          onChange={(tipo) => onCambiar({ tipo })}
+          onChange={(tipo) => onCambiar({ tipo })} estilos={ESTILO_DE_TIPO}
           abierto={grupoAbierto === GRUPO_TIPO}
           onAlternar={alternar(GRUPO_TIPO)}
         />

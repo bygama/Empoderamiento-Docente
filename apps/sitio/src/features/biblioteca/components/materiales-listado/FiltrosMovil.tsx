@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Search, X } from "@/components/ui/icons";
+import { estiloDe, type EstiloDeTipo } from "@/features/biblioteca/components/portada/estilo-de-tipo";
+import type { Tipo } from "@/features/biblioteca/contenido/modelo";
 import type { Filtros } from "./filtros";
 import { HojaFiltros } from "./HojaFiltros";
 
@@ -42,8 +44,9 @@ export function FiltrosMovil({ busqueda, onBuscar, anios, filtros, onCambiar, on
     return () => mq.removeEventListener("change", alCambiar);
   }, []);
 
-  const activos: { etiqueta: string; quitar: () => void }[] = [];
-  if (filtros.tipo) activos.push({ etiqueta: filtros.tipo, quitar: () => onCambiar({ tipo: null }) });
+  // El chip del tipo lleva el color de su tipo, como su portada y su píldora en la hoja.
+  const activos: { etiqueta: string; quitar: () => void; estilo?: EstiloDeTipo }[] = [];
+  if (filtros.tipo) activos.push({ etiqueta: filtros.tipo, quitar: () => onCambiar({ tipo: null }), estilo: estiloDe(filtros.tipo as Tipo) });
   if (filtros.publico) activos.push({ etiqueta: filtros.publico, quitar: () => onCambiar({ publico: null }) });
   if (filtros.anio !== null) activos.push({ etiqueta: String(filtros.anio), quitar: () => onCambiar({ anio: null }) });
 
@@ -88,10 +91,11 @@ export function FiltrosMovil({ busqueda, onBuscar, anios, filtros, onCambiar, on
             <span
               key={a.etiqueta}
               data-chip-activo
-              className="bg-azul-principal inline-flex shrink-0 items-center gap-1 rounded-md pl-2.5 font-sans text-[0.8rem] font-medium text-white"
+              className={`relative inline-flex shrink-0 items-center gap-1 overflow-hidden rounded-md pl-2.5 font-sans text-[0.8rem] font-medium ${a.estilo ? `${a.estilo.fondo} ${a.estilo.borde ? "ring-azul-principal/15 ring-1 ring-inset" : ""}` : "bg-azul-principal text-white"}`}
             >
-              {a.etiqueta}
-              <button type="button" aria-label={`Quitar ${a.etiqueta}`} onClick={a.quitar} className="flex h-11 w-9 items-center justify-center">
+              {a.estilo?.velo ? <span aria-hidden="true" className={`absolute inset-0 ${a.estilo.velo}`} /> : null}
+              <span className="relative">{a.etiqueta}</span>
+              <button type="button" aria-label={`Quitar ${a.etiqueta}`} onClick={a.quitar} className="relative flex h-11 w-9 items-center justify-center">
                 <X size={14} />
               </button>
             </span>
