@@ -5,6 +5,7 @@ import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material
 import { accionDe } from "@/features/biblioteca/contenido/modelo";
 import { contar } from "@/lib/contadores/contar";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { TextoPlegable } from "./TextoPlegable";
 
 type ArticuloDestacadoProps = {
   item: DestacadoDelSitio;
@@ -74,12 +75,13 @@ export function ArticuloDestacado({ item, i, activo, reduced, refItem, refSlot }
         <p className="text-verde-concepto mt-3 font-sans text-[1.05rem] font-semibold">
           {frase}
         </p>
-        <p className="mt-6 max-w-[58ch] font-sans text-[0.98rem] leading-relaxed text-white/80">
-          {material.descripcion}
-        </p>
-        <p className="mt-4 max-w-[58ch] font-sans text-[0.98rem] leading-relaxed text-white/80">
-          {detalle}
-        </p>
+        <div className="mt-6 flex flex-col">
+          <TextoPlegable
+            descripcion={material.descripcion}
+            detalle={detalle}
+            claseParrafo="max-w-[58ch] font-sans text-[0.98rem] leading-relaxed text-white/80"
+          />
+        </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 lg:mt-auto lg:pt-8">
           <p className="font-mono text-[0.72rem] tracking-[0.08em] text-white/45 uppercase">
