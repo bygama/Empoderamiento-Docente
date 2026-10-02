@@ -53,7 +53,10 @@ const elegir = (tipo: string | null) => {
 const sinTipo = () => null;
 
 // En celular las flechas no van: entre las dos se comían un tercio del ancho
-// y dejaban una sola píldora a la vista. Ahí el riel se arrastra con el dedo.
+// y dejaban una sola píldora a la vista. Ahí el riel se arrastra con el dedo,
+// y para que eso se vea no hay banda blanca: las píldoras van sueltas sobre el
+// azul y la fila llega hasta el borde de la pantalla, que es quien corta la
+// última. El buscador queda como lo único blanco del hero.
 const flechaClase = (activa: boolean) =>
   `hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-azul-principal shadow-[0_16px_40px_-16px_rgb(0_0_0_/_0.4)] transition-[opacity,background-color] duration-300 hover:bg-azul-claro/60 md:flex ${
     activa ? "opacity-100" : "pointer-events-none opacity-0"
@@ -86,7 +89,11 @@ export function CategoriasRail() {
     railRef.current?.scrollBy({ left: dir * PASO_SCROLL, behavior: "smooth" });
 
   return (
-    <div className="flex items-center gap-2 md:gap-3">
+    <>
+    <p id="categorias-rotulo" className="mb-3 font-mono text-[0.72rem] tracking-[0.14em] text-white/70 uppercase md:hidden">
+      Explorá por tipo
+    </p>
+    <div role="group" aria-labelledby="categorias-rotulo" className="flex items-center gap-2 md:gap-3">
       <button
         type="button"
         aria-label="Ver categorías anteriores"
@@ -104,7 +111,7 @@ export function CategoriasRail() {
       <div
         ref={railRef}
         onScroll={actualizar}
-        className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-full bg-white p-2 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.4)] max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-2"
+        className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-full bg-white p-2 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.4)] max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-2 max-md:-mx-5 max-md:scroll-px-5 max-md:rounded-none max-md:bg-transparent max-md:px-5 max-md:py-0 max-md:shadow-none"
       >
         {CATEGORIAS.map(({ label, Icon }, i) => {
           const suTipo = i === 0 ? null : label;
@@ -118,8 +125,8 @@ export function CategoriasRail() {
               onClick={() => elegir(suTipo)}
               className={`flex shrink-0 items-center gap-2.5 rounded-full px-4 py-2.5 font-sans text-[0.9rem] font-medium whitespace-nowrap transition-colors max-lg:min-h-11 max-lg:snap-start ${
                 activa
-                  ? "bg-azul-principal text-white"
-                  : "bg-gris-fondo text-azul-principal hover:bg-azul-claro/40"
+                  ? "bg-azul-principal text-white max-md:bg-white max-md:text-azul-principal"
+                  : "bg-gris-fondo text-azul-principal hover:bg-azul-claro/40 max-md:bg-white/10 max-md:text-white max-md:ring-1 max-md:ring-white/20 max-md:ring-inset"
               }`}
             >
               <span className="text-verde-concepto">
@@ -142,5 +149,6 @@ export function CategoriasRail() {
         <ArrowRight size={18} />
       </button>
     </div>
+    </>
   );
 }
