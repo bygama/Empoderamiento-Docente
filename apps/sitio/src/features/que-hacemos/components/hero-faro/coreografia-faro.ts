@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { crearCamara } from "./camara-faro";
 import { crearHaces } from "./haz-faro";
+import { ORIGEN_HAZ } from "./HacesFaro";
 import { armarEscenas } from "./escenas-faro";
 import { armarFaroMovil } from "./coreografia-faro-movil";
 
@@ -41,18 +42,17 @@ export function crearCoreografiaFaro(root: HTMLElement, alto: HTMLElement) {
 
     /* ── Estados iniciales = S0 (el JSX por defecto es el fallback S1
           encendido; acá se apaga y se aleja todo) ─────────────────────── */
-    // PIVOTES DE LA LUZ — nunca svgOrigin: su parse salía corrupto
-    // (medido: xOrigin −2003 en vez de 950, derivando con los refreshes)
-    // y todo transform pivotaba desde cualquier lado. En su lugar,
-    // transformOrigin en el espacio del BBOX de cada elemento, declarado
-    // UNA vez (los tweens usan el caché y ningún refresh lo recalcula):
-    // - halo/núcleo: círculos centrados EXACTO en el foco → "50% 50%".
-    // - haces: el foco (950,388) relativo al bbox de sus conos. Cono izq:
-    //   x −360..946, y 288..644 → (950−(−360), 388−288) = 1310px, 100px.
-    //   Cono der: x 954..2260 → (950−954, 388−288) = −4px, 100px.
-    //   (Si cambia la geometría de los conos en FaroEscena, recalcular.)
-    gsap.set("[data-haz='izq']", { autoAlpha: 0, transformOrigin: "1310px 100px" });
-    gsap.set("[data-haz='der']", { autoAlpha: 0, transformOrigin: "-4px 100px" });
+    // PIVOTES DE LA LUZ, declarados UNA vez (los tweens usan el caché y
+    // ningún refresh los recalcula). Nunca svgOrigin: su parse salía
+    // corrupto (medido: xOrigin −2003 en vez de 950, derivando con los
+    // refreshes) y todo transform pivotaba desde cualquier lado.
+    // - halo/núcleo: círculos centrados EXACTO en el foco → "50% 50%" de
+    //   su bbox.
+    // - haces: son cajas HTML (HacesFaro.tsx) y giran como capa; su pivote
+    //   es el foco dentro de su caja, que sale de la misma geometría
+    //   (ORIGEN_HAZ). will-change: así el giro lo compone la GPU.
+    gsap.set("[data-haz='izq']", { autoAlpha: 0, transformOrigin: ORIGEN_HAZ.izq, willChange: "transform, opacity" });
+    gsap.set("[data-haz='der']", { autoAlpha: 0, transformOrigin: ORIGEN_HAZ.der, willChange: "transform, opacity" });
     gsap.set("[data-halo]", { autoAlpha: 0, scale: 0.3, transformOrigin: "50% 50%" });
     gsap.set("[data-nucleo]", { autoAlpha: 0.16, scale: 0.5, transformOrigin: "50% 50%" });
     gsap.set("[data-linterna]", { opacity: 0.2 });

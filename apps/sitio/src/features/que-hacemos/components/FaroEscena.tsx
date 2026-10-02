@@ -5,6 +5,7 @@ import {
   ORIGEN_CSS,
   PUNTOS_VERBO,
 } from "./faro-geometria";
+import { HacesFaro } from "./hero-faro/HacesFaro";
 
 /**
  * Escena del faro v2 — «Qué hacemos», por CAPAS DE PROFUNDIDAD.
@@ -256,43 +257,6 @@ function CapaFaro() {
           <stop offset="0.6" stopColor="white" stopOpacity="0.55" />
           <stop offset="1" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.25" />
         </radialGradient>
-        {/* Haz: el cerebro tiene que leer LUZ, no shapes. Cada óptica es un
-            único cono con gradiente LATERAL (transparente → penumbra →
-            núcleo blanco → penumbra → transparente): como el cono es más
-            angosto cerca de la linterna, ahí solo muestrea la zona central
-            del gradiente y el feathering acompaña la geometría solo. La
-            caída con la distancia la pone una MÁSCARA longitudinal (blanco
-            en el origen → negro a lo lejos) — sin blur, sin bandas. */}
-        <linearGradient id="qh2-haz-lat-izq" gradientUnits="userSpaceOnUse" x1="-360" y1="288" x2="-360" y2="644">
-          <stop offset="0" style={{ stopColor: AZUL_CLARO }} stopOpacity="0" />
-          <stop offset="0.26" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.13" />
-          <stop offset="0.5" stopColor="white" stopOpacity="0.3" />
-          <stop offset="0.74" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.13" />
-          <stop offset="1" style={{ stopColor: AZUL_CLARO }} stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="qh2-haz-lat-der" gradientUnits="userSpaceOnUse" x1="2260" y1="288" x2="2260" y2="644">
-          <stop offset="0" style={{ stopColor: AZUL_CLARO }} stopOpacity="0" />
-          <stop offset="0.26" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.13" />
-          <stop offset="0.5" stopColor="white" stopOpacity="0.3" />
-          <stop offset="0.74" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.13" />
-          <stop offset="1" style={{ stopColor: AZUL_CLARO }} stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="qh2-haz-fade-izq" gradientUnits="userSpaceOnUse" x1={FOCO_X} y1={FOCO_Y} x2="-360" y2="466">
-          <stop offset="0" stopColor="#fff" />
-          <stop offset="0.45" stopColor="#999" />
-          <stop offset="1" stopColor="#000" />
-        </linearGradient>
-        <linearGradient id="qh2-haz-fade-der" gradientUnits="userSpaceOnUse" x1={FOCO_X} y1={FOCO_Y} x2="2260" y2="466">
-          <stop offset="0" stopColor="#fff" />
-          <stop offset="0.45" stopColor="#999" />
-          <stop offset="1" stopColor="#000" />
-        </linearGradient>
-        <mask id="qh2-haz-mask-izq">
-          <polygon points="946,374 -360,280 -360,652 946,402" fill="url(#qh2-haz-fade-izq)" />
-        </mask>
-        <mask id="qh2-haz-mask-der">
-          <polygon points="954,374 2260,280 2260,652 954,402" fill="url(#qh2-haz-fade-der)" />
-        </mask>
         <radialGradient id="qh2-halo">
           <stop offset="0" stopColor="white" stopOpacity="0.9" />
           <stop offset="0.5" style={{ stopColor: AZUL_CLARO }} stopOpacity="0.28" />
@@ -433,30 +397,12 @@ function CapaFaro() {
         <line x1="950" y1="330.6" x2="950" y2="327.8" style={{ stroke: AZUL_CLARO }} strokeOpacity="0.7" strokeWidth="1" />
       </g>
 
-      {/* ── La luz (apagada por defecto la maneja la coreografía) ──
-          Sin feGaussianBlur: los filtros dentro de un grupo que ROTA en el
-          scrub re-rasterizan la capa entera por frame. La penumbra del cono
-          se construye apilando dos envolventes de opacidad decreciente
-          (bordes escalonados deliberados, lenguaje flat de la escena). */}
-      <g data-luz>
-        {/* Dos ópticas: izquierda y derecha. La coreografía las alterna.
-            NACIMIENTO: los conos ya no salen de un punto matemático — nacen
-            del ANCHO del cristal (segmento vertical dentro de la linterna,
-            a ±4px del foco), así la luz sale de toda la óptica. El segmento
-            queda siempre dentro del vidrio para cualquier rotación del haz
-            (radio máx ~13px < semiancho del cristal), y el mismo sistema de
-            envolventes apiladas + rotación por svgOrigin queda intacto. */}
-        <g data-haz="izq" mask="url(#qh2-haz-mask-izq)">
-          <polygon points="946,376 -360,288 -360,644 946,400" fill="url(#qh2-haz-lat-izq)" />
-          <polygon points="946,381 -360,415 -360,525 946,395" fill="url(#qh2-haz-lat-izq)" opacity="0.85" />
-        </g>
-        <g data-haz="der" opacity="0" mask="url(#qh2-haz-mask-der)">
-          <polygon points="954,376 2260,288 2260,644 954,400" fill="url(#qh2-haz-lat-der)" />
-          <polygon points="954,381 2260,415 2260,525 954,395" fill="url(#qh2-haz-lat-der)" opacity="0.85" />
-        </g>
-        <circle data-halo cx={FOCO_X} cy={FOCO_Y} r="64" fill="url(#qh2-halo)" />
-        <circle data-nucleo cx={FOCO_X} cy={FOCO_Y} r="11" fill="url(#qh2-nucleo)" />
-      </g>
+      {/* ── La luz de la linterna: el halo y el núcleo. Los HACES ya no
+          viven acá: van en cajas propias, encima de este dibujo
+          (hero-faro/HacesFaro.tsx), para que girarlos no obligue a volver a
+          pintar la torre en cada cuadro. */}
+      <circle data-halo cx={FOCO_X} cy={FOCO_Y} r="64" fill="url(#qh2-halo)" />
+      <circle data-nucleo cx={FOCO_X} cy={FOCO_Y} r="11" fill="url(#qh2-nucleo)" />
     </svg>
   );
 }
@@ -548,6 +494,7 @@ export function FaroEscena() {
       <div data-capa="faro" className={capa}>
         <div data-faro-shift className="absolute inset-0">
           <CapaFaro />
+          <HacesFaro />
         </div>
       </div>
       <div data-capa="marMedio" className={capa}>
