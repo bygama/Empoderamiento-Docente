@@ -7,6 +7,7 @@ import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material
 import { accionDe } from "@/features/biblioteca/contenido/modelo";
 import { contar } from "@/lib/contadores/contar";
 import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { TextoPlegable } from "./TextoPlegable";
 
 /**
  * «Material destacado» bajo `lg`: en escritorio las cuatro portadas se pinean,
@@ -124,9 +125,10 @@ export function BarajaMovil({ items }: { items: readonly DestacadoDelSitio[] }) 
                 {material.titulo}
               </h3>
               <p className="text-verde-concepto mt-2 font-sans text-[1rem] font-semibold">{frase}</p>
-              <p className="mt-4 font-sans text-[0.95rem] leading-relaxed text-white/80">{material.descripcion}</p>
-              <p className="mt-3 font-sans text-[0.95rem] leading-relaxed text-white/80">{detalle}</p>
-              <p className="mt-4 font-mono text-[0.7rem] tracking-[0.08em] text-white/45 uppercase">
+              <div className="mt-4 flex flex-col">
+                <TextoPlegable descripcion={material.descripcion} detalle={detalle} plegado={activo !== i} claseParrafo="font-sans text-[0.95rem] leading-relaxed text-white/80" />
+              </div>
+              <p className="mt-2 font-mono text-[0.7rem] tracking-[0.08em] text-white/45 uppercase">
                 {material.autores} · {material.fecha} · {material.paginas ? `${material.paginas} páginas` : material.formato}
               </p>
               <a
