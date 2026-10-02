@@ -57,18 +57,22 @@ export function IntroDestacados({
         >
           <TituloDosTonos texto={contenido.titulo} />
         </h2>
-      </div>
-
-      <div className="mt-20 md:mt-36 md:grid md:grid-cols-12 md:items-end md:gap-x-8">
-        <p className="text-gris-texto max-w-[38ch] font-sans text-[0.97rem] leading-relaxed md:col-span-3">
+        {/* La presentación va debajo del titular, a lo ancho: en la columna
+            angosta de la izquierda, al lado de las portadas, eran cinco
+            renglones (y en tablet, una tira de una palabra por renglón). */}
+        <p className="text-gris-texto mt-6 max-w-[62ch] font-sans text-[0.97rem] leading-relaxed text-pretty md:col-span-9 md:col-start-4 md:mt-8 lg:text-[1.05rem]">
           {contenido.presentacion}
         </p>
+      </div>
+
+      {/* Bajo `lg` las portadas van en la baraja, no acá. */}
+      <div className="mt-24 md:grid md:grid-cols-12 md:gap-x-8 max-lg:hidden">
         {/* Las 4 portadas "viajeras": acá son la fila de la intro; en
             desktop se pinean, convergen sobre el slot y las barre cada
             divisoria. */}
         <div
           ref={refRow}
-          className="z-30 mt-10 grid grid-cols-2 gap-3 md:col-span-9 md:mt-0 md:grid-cols-4 md:gap-4 max-lg:hidden"
+          className="z-30 grid grid-cols-4 gap-4 md:col-span-9 md:col-start-4"
         >
           {items.map(({ material }) => (
             <div
