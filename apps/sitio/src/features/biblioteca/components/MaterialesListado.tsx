@@ -4,11 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Catalogo } from "@/features/biblioteca/contenido/catalogo";
 import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
 import { getLenis } from "@/lib/lenis";
-import { EVENTO_URL } from "@/lib/navegar";
 import { FilaMaterial } from "./materiales-listado/FilaMaterial";
 import { FiltrosCatalogo } from "./materiales-listado/FiltrosCatalogo";
 import { FiltrosMovil } from "./materiales-listado/FiltrosMovil";
 import {
+  alCambiarTipo,
+  alPedirBusqueda,
   coincide,
   escribirTipoEnUrl,
   normalizar,
@@ -56,13 +57,11 @@ export function MaterialesListado({ contenido, materiales }: { contenido: Catalo
       setFiltros((f) => (f.tipo === tipo ? f : { ...f, tipo }));
     };
     leer();
-    window.addEventListener(EVENTO_URL, leer);
-    window.addEventListener("popstate", leer);
-    return () => {
-      window.removeEventListener(EVENTO_URL, leer);
-      window.removeEventListener("popstate", leer);
-    };
+    return alCambiarTipo(leer);
   }, []);
+
+  // Lo que se escribe en el buscador del hero llega acá: el estado es de este listado.
+  useEffect(() => alPedirBusqueda(setBusqueda), []);
 
   // Los años del filtro, de más nuevo a más viejo: los que tiene el catálogo.
   const anios = useMemo(() => [...new Set(materiales.map((m) => m.anio))].sort((a, b) => b - a), [materiales]);

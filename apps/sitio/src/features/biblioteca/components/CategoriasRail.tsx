@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -13,12 +13,12 @@ import {
   Users,
   type IconProps,
 } from "@/components/ui/icons";
+import { alCambiarTipo, bajarAlCatalogo, escribirTipoEnUrl, tipoDeUrl } from "./materiales-listado/filtros";
 
 /**
  * Categorías principales de la Biblioteca (sitemap: "Académica, pedagógicos,
- * proyectos…"). Por ahora las píldoras anclan al futuro listado (#materiales);
- * cuando exista el catálogo pasan a filtrar de verdad — ahí conviene mover
- * esta lista a `features/biblioteca/data/` para compartirla con el listado.
+ * proyectos…"). Cada píldora filtra el catálogo por su tipo y baja al listado
+ * (#materiales); la primera lo muestra entero.
  */
 const CATEGORIAS: { label: string; Icon: (p: IconProps) => React.JSX.Element }[] = [
   // Los rótulos son los TIPOS de contenido/modelo.ts, tal cual: el riel
@@ -43,8 +43,14 @@ const PASO_SCROLL = 280;
  * siempre (fade de opacidad, sin saltos de layout). Píldoras sobrias según
  * DESIGN §9: uniformes en gris-fondo, la primera activa en navy.
  */
-const irAlListado = () =>
-  document.getElementById("materiales")?.scrollIntoView({ behavior: "smooth" });
+// Cada píldora deja su tipo en la URL (`?tipo=`, que el catálogo lee) y baja
+// al listado; «Todo el catálogo» lo saca.
+const elegir = (tipo: string | null) => {
+  escribirTipoEnUrl(tipo);
+  bajarAlCatalogo();
+};
+
+const sinTipo = () => null;
 
 // En celular las flechas no van: entre las dos se comían un tercio del ancho
 // y dejaban una sola píldora a la vista. Ahí el riel se arrastra con el dedo.
@@ -57,6 +63,9 @@ export function CategoriasRail() {
   const railRef = useRef<HTMLDivElement | null>(null);
   const [hayIzq, setHayIzq] = useState(false);
   const [hayDer, setHayDer] = useState(false);
+  // La píldora marcada es el tipo de la URL: lo cambian este riel, los filtros
+  // del catálogo y el submenú del navbar. En el servidor, ninguno.
+  const tipo = useSyncExternalStore(alCambiarTipo, tipoDeUrl, sinTipo);
 
   // Recalcula si quedan categorías ocultas a cada lado (margen de 4px para
   // tolerar subpíxeles del smooth scroll).
@@ -97,24 +106,29 @@ export function CategoriasRail() {
         onScroll={actualizar}
         className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-full bg-white p-2 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.4)] max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-2"
       >
-        {CATEGORIAS.map(({ label, Icon }, i) => (
-          <button
-            key={label}
-            type="button"
-            data-bh-pill
-            onClick={irAlListado}
-            className={`flex shrink-0 items-center gap-2.5 rounded-full px-4 py-2.5 font-sans text-[0.9rem] font-medium whitespace-nowrap transition-colors max-lg:min-h-11 max-lg:snap-start ${
-              i === 0
-                ? "bg-azul-principal text-white"
-                : "bg-gris-fondo text-azul-principal hover:bg-azul-claro/40"
-            }`}
-          >
-            <span className="text-verde-concepto">
-              <Icon size={18} />
-            </span>
-            {label}
-          </button>
-        ))}
+        {CATEGORIAS.map(({ label, Icon }, i) => {
+          const suTipo = i === 0 ? null : label;
+          const activa = tipo === suTipo;
+          return (
+            <button
+              key={label}
+              type="button"
+              data-bh-pill
+              aria-pressed={activa}
+              onClick={() => elegir(suTipo)}
+              className={`flex shrink-0 items-center gap-2.5 rounded-full px-4 py-2.5 font-sans text-[0.9rem] font-medium whitespace-nowrap transition-colors max-lg:min-h-11 max-lg:snap-start ${
+                activa
+                  ? "bg-azul-principal text-white"
+                  : "bg-gris-fondo text-azul-principal hover:bg-azul-claro/40"
+              }`}
+            >
+              <span className="text-verde-concepto">
+                <Icon size={18} />
+              </span>
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       <button
