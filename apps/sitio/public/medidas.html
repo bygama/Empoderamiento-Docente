@@ -1,0 +1,73 @@
+<!doctype html>
+<!--
+  Página de medición (temporal): qué hace el navegador del teléfono con lo
+  fijo cuando aparecen y se esconden sus barras. Se abre en /medidas.html, se
+  scrollea arriba y abajo y se graba la pantalla. No es parte del sitio: no
+  está enlazada ni se indexa. Se borra cuando el diagnóstico esté cerrado.
+-->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <script>
+      // ?cover=1 prueba la variante viewport-fit=cover.
+      document.write(
+        '<meta name="viewport" content="width=device-width, initial-scale=1' +
+          (location.search.includes("cover=1") ? ", viewport-fit=cover" : "") +
+          '" />',
+      );
+    </script>
+    <title>Medidas</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; font: 600 15px/1.25 ui-monospace, Menlo, monospace; color: #111; background: #f4f5f7; }
+      .regla { height: 6000px; background: repeating-linear-gradient(#f4f5f7 0 99px, #9aa 99px 100px); }
+      .barra { position: fixed; left: 8px; right: 8px; padding: 6px 8px; color: #fff; border-radius: 8px; z-index: 5; }
+      #fijo-arriba { top: 8px; background: #c0392b; }
+      #comp-arriba { top: calc(48px + var(--arriba, 0px)); background: #1f9a78; }
+      #fijo-abajo { bottom: 8px; background: #1f2d4d; }
+      #panel { position: fixed; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; border: 2px solid #111; border-radius: 10px; padding: 10px; font-size: 17px; z-index: 6; }
+      #panel b { font-size: 19px; }
+      .u { position: absolute; top: 0; left: 0; width: 1px; visibility: hidden; }
+      #pega { position: sticky; top: 0; height: 40px; background: #f5a623; padding: 10px 8px; margin-top: 300px; z-index: 4; }
+    </style>
+  </head>
+  <body>
+    <div id="fijo-arriba" class="barra">FIJO ARRIBA (top 8)</div>
+    <div id="comp-arriba" class="barra">COMPENSADO (top 48 + visor)</div>
+    <div id="fijo-abajo" class="barra">FIJO ABAJO (bottom 8)</div>
+    <div id="panel"></div>
+    <div class="u" id="u-vh" style="height: 100vh"></div>
+    <div class="u" id="u-svh" style="height: 100svh"></div>
+    <div class="u" id="u-lvh" style="height: 100lvh"></div>
+    <div class="u" id="u-dvh" style="height: 100dvh"></div>
+    <div class="u" id="u-sat" style="height: env(safe-area-inset-top, 0px)"></div>
+    <div class="u" id="u-sab" style="height: env(safe-area-inset-bottom, 0px)"></div>
+    <div id="sonda" style="position: fixed; inset: 0; visibility: hidden; pointer-events: none"></div>
+    <div id="pega">PEGADO (sticky top 0)</div>
+    <div class="regla"></div>
+    <script>
+      var vv = window.visualViewport;
+      var eventos = 0;
+      var h = function (id) { return Math.round(document.getElementById(id).getBoundingClientRect().height); };
+      var t = function (id) { return Math.round(document.getElementById(id).getBoundingClientRect().top); };
+      function pintar() {
+        var arriba = vv ? Math.round(vv.offsetTop) : 0;
+        document.documentElement.style.setProperty("--arriba", arriba + "px");
+        document.getElementById("panel").innerHTML =
+          "<b>visor arriba " + arriba + "</b> · alto " + (vv ? Math.round(vv.height) : "?") + "<br>" +
+          "inner " + innerHeight + " · sonda " + h("sonda") + " · client " + document.documentElement.clientHeight + "<br>" +
+          "vh " + h("u-vh") + " · svh " + h("u-svh") + " · lvh " + h("u-lvh") + " · dvh " + h("u-dvh") + "<br>" +
+          "seguro ↑" + h("u-sat") + " ↓" + h("u-sab") + " · " + (location.search.includes("cover=1") ? "COVER" : "auto") + "<br>" +
+          "fijo↑ top " + t("fijo-arriba") + " · pegado top " + t("pega") + "<br>" +
+          "scroll " + Math.round(scrollY) + " · eventos " + eventos;
+      }
+      function ev() { eventos++; pintar(); }
+      window.addEventListener("resize", ev);
+      window.addEventListener("scroll", pintar, { passive: true });
+      if (vv) { vv.addEventListener("resize", ev); vv.addEventListener("scroll", ev); }
+      setInterval(pintar, 150);
+      pintar();
+    </script>
+  </body>
+</html>
