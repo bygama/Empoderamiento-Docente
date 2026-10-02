@@ -127,6 +127,27 @@ export function aperturaCompacta(opts: {
   );
   tl.to(li.querySelectorAll("[data-carpeta-rotulos]"), { autoAlpha: 0, duration: 0.2, ease: "power1.out" }, 0.2);
 
+  // La pestaña viaja con la carpeta, pero hasta donde la carcasa tiene la
+  // suya (a la derecha). Sin esto, al aparecer la carcasa se veían dos
+  // pestañas con el mismo «Caso 0N» mientras la de la carpeta se apagaba.
+  const tab = q(li, "[data-carpeta-tab]");
+  const pestana = q(shell, "[data-exp-pestana]");
+  const rTab = tab?.getBoundingClientRect();
+  const rPestana = pestana?.getBoundingClientRect();
+  if (tab && rTab && rPestana && rPestana.width > 0) {
+    tl.to(
+      tab,
+      {
+        x: rPestana.left - rTab.left - (rShell.left - rCuerpo.left),
+        y: rPestana.top - rTab.top - (rShell.top - rCuerpo.top),
+        duration: 0.55,
+        ease: "power3.inOut",
+      },
+      0.12,
+    );
+    tl.set(tab, { clearProps: "transform" }, 1.1);
+  }
+
   // Llega, y la tapa se abre: debajo ya está la carcasa, del mismo color.
   tl.set(shell, { autoAlpha: 1 }, 0.64);
   tl.to(front, { rotateX: -72, autoAlpha: 0, duration: 0.32, ease: "power2.in", transformOrigin: "50% 0%" }, 0.64);
