@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useRef } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { irAElemento, irAPosicion } from "@/lib/indice";
 import { EVENTO_CASO } from "../abrir-caso";
 import type { CasoInvestigacion } from "../tipos";
@@ -12,10 +13,12 @@ type Acciones = {
 
 /**
  * Llevar la página adonde el caso `i` se pueda abrir con su carpeta a la
- * vista. Con la escena del índice viva (desktop: la pista mide más que la
- * pantalla, useEscenaIndice), la pila recién está entera al FINAL de la
- * pista —antes el título está grande o el barrido a medio camino—, así que
- * se va ahí; si no, se centra la carpeta como siempre.
+ * vista. Con la escena del índice viva (desktop con puntero,
+ * useEscenaIndice), la pila recién está entera al FINAL de la escena —antes
+ * el título está grande o el barrido a medio camino—, así que se va al final
+ * de su ScrollTrigger, el mismo donde aterriza el índice; calcularlo aparte
+ * con el alto de la pista se desfasaba de la coreografía. Si no hay escena,
+ * se centra la carpeta como siempre.
  */
 function irAlCaso(
   section: HTMLElement,
@@ -23,9 +26,9 @@ function irAlCaso(
   opciones: { corte?: boolean; alTerminar?: () => void },
 ) {
   const pista = section.querySelector<HTMLElement>("[data-casos-pista]");
-  if (pista && pista.offsetHeight > window.innerHeight) {
-    const fin = pista.getBoundingClientRect().top + window.scrollY + pista.offsetHeight - window.innerHeight;
-    irAPosicion(fin, opciones);
+  const escena = pista && ScrollTrigger.getAll().find((st) => st.trigger === pista);
+  if (escena) {
+    irAPosicion(escena.end, opciones);
     return;
   }
   irAElemento(boton, { centrar: true, ...opciones });

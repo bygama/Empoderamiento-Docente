@@ -4,8 +4,8 @@ import { config as cargarEntorno } from "dotenv";
 import type { Caso as Fila, Prisma as TiposDePrisma } from "@/../prisma/generado/client";
 
 // Guardar, publicar y descartar un caso contra el Postgres local. Los casos
-// son cuatro y reales: la prueba usa el 04 y lo deja como estaba, con sus
-// redirecciones de prueba borradas.
+// son los fijos y reales: la prueba usa el `caso-04` (el 02 de la pila) y lo
+// deja como estaba, con sus redirecciones de prueba borradas.
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };

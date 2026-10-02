@@ -13,7 +13,7 @@ type Props = { id: IdDeCaso; numero: string; slug: string; slugPublicado: string
 export function SeVeElCaso({ id, numero, slug, slugPublicado }: Props) {
   const lineas = CASO_DE_CADA_LINEA.filter((c) => c === id).length;
   const lugares = [
-    { lugar: "Investigación", detalle: `En la pila de casos, la carpeta ${numero} de cuatro. Su link directo: /investigacion#${slug || "…"}` },
+    { lugar: "Investigación", detalle: `En la pila de casos, la carpeta ${numero} de dos. Su link directo: /investigacion#${slug || "…"}` },
     ...(lineas
       ? [{ lugar: "Líneas de investigación", detalle: `«Ver en acción» de ${lineas === 1 ? "una línea lo abre" : `${lineas} líneas lo abre`}.` }]
       : []),

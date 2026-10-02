@@ -7,10 +7,10 @@ import type { Prisma } from "@/../prisma/generado/client";
 // página (borrador), una novedad, un material, un caso (borrador), un perfil del
 // Equipo (la tarjeta publicada y la figura en el borrador) y un aliado, y el
 // contenido del código. Todo lo de prueba se deshace al final. Los archivos de
-// tests corren a la vez: el caso es el 03 porque `editar-casos.test.ts` usa el
-// 04, y el aliado va al principio de la tira porque `editar-aliados.test.ts`
-// mueve el suyo al final. El perfil va al nivel 4, que no tiene lugares
-// contados, con una URL que no usa ningún otro test.
+// tests corren a la vez: el caso es el 01 porque `editar-casos.test.ts` usa el
+// otro (`caso-04`), y el aliado va al principio de la tira porque
+// `editar-aliados.test.ts` mueve el suyo al final. El perfil va al nivel 4,
+// que no tiene lugares contados, con una URL que no usa ningún otro test.
 
 cargarEntorno({ path: [".env.local"], quiet: true });
 const sinBase = { skip: !process.env.DATABASE_URL && "sin DATABASE_URL" };
@@ -31,16 +31,16 @@ async function modulos() {
 }
 
 let contacto: { borrador: Prisma.JsonValue } | null = null;
-let caso03: { borrador: Prisma.JsonValue } | null = null;
+let caso01: { borrador: Prisma.JsonValue } | null = null;
 
 before(async () => {
   if (!process.env.DATABASE_URL) return;
   const { base } = await modulos();
   contacto = await base.pagina.findUnique({ where: { slug: "contacto" }, select: { borrador: true } });
-  caso03 = await base.caso.findUnique({ where: { id: "caso-03" }, select: { borrador: true } });
+  caso01 = await base.caso.findUnique({ where: { id: "caso-01" }, select: { borrador: true } });
   const enContacto = { apertura: { equipo: { foto: foto(VIEJA, "En Contacto") } } };
   await base.pagina.upsert({ where: { slug: "contacto" }, create: { slug: "contacto", borrador: enContacto }, update: { borrador: enContacto } });
-  await base.caso.update({ where: { id: "caso-03" }, data: { borrador: { lamina: { foto: foto(VIEJA, "En el caso"), sujecion: "clip", rotulo: "L" } } } });
+  await base.caso.update({ where: { id: "caso-01" }, data: { borrador: { lamina: { foto: foto(VIEJA, "En el caso"), sujecion: "clip", rotulo: "L" } } } });
   await base.novedad.create({ data: { slug: "prueba-usos", titulo: "Prueba usos", imagen: foto(VIEJA, "En la novedad"), publicada: true, publicadaEn: new Date() } });
   await base.material.create({ data: { id: MATERIAL, titulo: "Prueba usos", portada: foto(VIEJA, "En el material"), publicado: true, publicadoEn: new Date() } });
   await base.persona.create({
@@ -58,7 +58,7 @@ after(async () => {
   await base.persona.deleteMany({ where: { id: PERFIL } });
   if (contacto) await base.pagina.update({ where: { slug: "contacto" }, data: { borrador: comoEstaba(contacto.borrador) } });
   else await base.pagina.deleteMany({ where: { slug: "contacto" } });
-  await base.caso.update({ where: { id: "caso-03" }, data: { borrador: comoEstaba(caso03?.borrador) } });
+  await base.caso.update({ where: { id: "caso-01" }, data: { borrador: comoEstaba(caso01?.borrador) } });
 });
 
 test("cada módulo encuentra la foto donde está, y dice si está en el sitio, sin publicar o en el código", sinBase, async () => {
@@ -70,7 +70,7 @@ test("cada módulo encuentra la foto donde está, y dice si está en el sitio, s
       ["sin-publicar", "Contacto › Apertura › El equipo › Foto", "/admin/contenido/paginas/contacto#seccion-apertura", "En Contacto"],
       ["sitio", "Novedad «Prueba usos»", (usos.get(VIEJA) ?? [])[1]?.enlace, "En la novedad"],
       ["sitio", "Material «Prueba usos» › Portada", `/admin/biblioteca/${MATERIAL}`, "En el material"],
-      ["sin-publicar", "Caso 03 › Lámina", "/admin/contenido/casos/caso-03", "En el caso"],
+      ["sin-publicar", "Caso 01 › Lámina", "/admin/contenido/casos/caso-01", "En el caso"],
       ["sitio", "Perfil de Prueba Usos › Tarjeta", `/admin/contenido/equipo/${PERFIL}#bloque-tarjeta`, "En la tarjeta"],
       ["sin-publicar", "Perfil de Prueba Usos › Figura", `/admin/contenido/equipo/${PERFIL}#bloque-figura`, "En la figura"],
       ["sitio", "Aliado Prueba usos › Logo", (usos.get(VIEJA) ?? [])[6]?.enlace, "En el aliado"],

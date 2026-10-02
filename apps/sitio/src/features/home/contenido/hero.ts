@@ -56,8 +56,9 @@ export type Hero = z.infer<typeof esquemaHero>;
 export const heroInicial: Hero = {
   titulo: "La transformación educativa comienza en las matemáticas.",
   bajada: "Consultora especializada en la transformación del aprendizaje matemático",
-  // La acción principal al final del recorrido del ojo, y del lado en que el navbar tiene Contacto (Gastón, 2026-09-11).
-  botonPrincipal: { texto: "Contactanos", ruta: "/contacto" },
+  // La acción principal al final del recorrido del ojo (Gastón, 2026-09-11). Era «Contactanos»: Daniela marcó que
+  // repetía el Contacto de la barra (2026-09-30) y Facundo decidió dejar los botones y mandar el naranja al equipo.
+  botonPrincipal: { texto: "Conocé al equipo", ruta: "/quienes-somos" },
   botonSecundario: { texto: "Qué hacemos", ruta: "/que-hacemos" },
   // Las fotos son de la carpeta que aprobó ED (`public/fotos/`), en el orden de GEOMETRIA_CARDS.
   tarjetas: [

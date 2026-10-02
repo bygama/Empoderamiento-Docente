@@ -40,9 +40,10 @@ test("publicar copia a columnas, deja al perfil último en su nivel, y otra URL 
   assert.equal((await base.redireccion.findUnique({ where: { desde: "/quienes-somos/equipo/prueba-publicar-perfil-c" } }))?.hacia, "/quienes-somos/equipo/prueba-publicar-perfil-d");
 });
 
-test("la Dirección general lleva una sola persona y la Dirección, dos", sinBase, async () => {
+test("la Dirección general lleva una sola persona y la Dirección, tres", sinBase, async () => {
   const { base, crearPersonaEnBase, publicarPersonaEnBase } = await modulos();
-  for (const [nivel, quienes] of [[1, /hoy es Daniela Reyes/], [2, /hoy son Karla Gómez y Raquel Ayala/]] as const) {
+  // En el orden del sitio: Wendolyne Ríos va entre Karla y Raquel (migración 20261001134000).
+  for (const [nivel, quienes] of [[1, /hoy es Daniela Reyes/], [2, /Dirección lleva 3 personas en el sitio, y hoy son Karla Gómez, Wendolyne Ríos y Raquel Ayala/]] as const) {
     const creado = await crearPersonaEnBase(base, { contenido: perfil(`prueba-publicar-perfil-nivel-${nivel}`, nivel), quien: "Ana" });
     if (!creado.ok) return assert.fail(creado.detalle);
     const r = await publicarPersonaEnBase(base, { id: creado.id, borradorEnVisto: creado.borradorEn, quien: "Ana" });

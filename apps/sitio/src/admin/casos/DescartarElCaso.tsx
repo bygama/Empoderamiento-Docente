@@ -7,8 +7,9 @@ type Props = { corriendo: boolean; descartando: boolean; alDescartar: () => void
 
 /**
  * Lo único que deshace un caso (DESIGN.md §11, «Ficha de una entidad»): un
- * caso no se despublica ni se borra, porque son cuatro. Descartar los cambios
- * vuelve a lo publicado y confirma en el lugar. Solo con cambios guardados.
+ * caso no se despublica ni se borra, porque son los fijos de la pila
+ * (`CASOS_FIJOS`). Descartar los cambios vuelve a lo publicado y confirma en
+ * el lugar. Solo con cambios guardados.
  */
 export function DescartarElCaso({ corriendo, descartando, alDescartar }: Props) {
   const [confirmando, setConfirmando] = useState(false);

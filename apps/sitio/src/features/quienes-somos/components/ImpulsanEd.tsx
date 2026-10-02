@@ -18,15 +18,18 @@ import { Nivel } from "./impulsan-ed/Nivel";
 /**
  * "Quiénes sostienen ED" — el EQUIPO con JERARQUÍA institucional en 4 niveles,
  * como un PLIEGO EDITORIAL sobre la lámina navy. Una card base única
- * (PersonCard) a cuatro escalas, en progresión sostenida — 481 → 379 → 304 →
- * 232 px de ancho con el container en su tope de 1280:
+ * (PersonCard) a tres escalas, más chicas que antes (Daniela, 2026-09-30:
+ * «fotos más chicas, es un montón ocupar toda la pantalla», «que en una
+ * mirada sola se vea mucha gente»; antes las cards medían 481 → 379 → 304 →
+ * 232 px de ancho y la sección pasaba de tres pantallas):
  *
- *   N1 Dirección General      → Daniela: card ancha, al CENTRO del masthead.
- *   N2 Dirección              → Karla (izquierda) y Raquel (derecha): cards
- *                               menores, una de cada lado, más abajo y a la
- *                               misma altura entre sí.
- *   N3 Líderes de área/proy.  → grilla ESTABLE de cards medianas (2 columnas).
- *   N4 Facilitación y diseño  → grilla ESTABLE 3×2 de cards compactas.
+ *   N1 Dirección General      → Daniela: card de 22rem, primera del masthead.
+ *   N2 Dirección              → Karla, Wendolyne y Raquel: tres cards menores
+ *                               a su lado, en la misma fila y sin rótulo (eran
+ *                               dos, una de cada lado; Wendolyne subió a la
+ *                               Dirección).
+ *   N3 Líderes de área/proy.  → grilla ESTABLE de cards compactas, filas de 4.
+ *   N4 Facilitación y diseño  → grilla ESTABLE de cards compactas, filas de 4.
  *
  * N3 y N4 comparten estructura: un RAÍL IZQUIERDO con el encabezado del nivel
  * (nodo + volanta numerada + título) y la grilla alineada al MISMO borde derecho
@@ -35,11 +38,11 @@ import { Nivel } from "./impulsan-ed/Nivel";
  * distintas, no una pirámide. El aire entre el título y su grilla crece a
  * medida que se baja de nivel, así que la lectura se abre en vez de comprimirse.
  *
- * Las cuatro personas de N3 son PARES: mismo tamaño, misma escala fotográfica,
- * mismo peso. Nada se mueve solo. Las cards entran con el scroll (opacity +
- * translateY + escala mínima, `once`) y después quedan quietas; a partir de ahí
- * solo responden a hover, teclado y clic. Reduced-motion: todo legible sin
- * animación.
+ * Las personas de cada nivel son PARES: mismo tamaño, misma escala fotográfica,
+ * mismo peso, en el orden de la base. Nada se mueve solo. Las cards entran con
+ * el scroll (opacity + translateY + escala mínima, `once`) y después quedan
+ * quietas; a partir de ahí solo responden a hover, teclado y clic.
+ * Reduced-motion: todo legible sin animación.
  */
 
 export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienesSomos; personas: readonly Persona[] }) {
@@ -54,7 +57,7 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
   const [direccionGeneral] = porNivel(1);
   const lideres = porNivel(3);
   const facilitacion = porNivel(4);
-  // Dirección (nivel 2): académica + institucional. Antes era una sola card.
+  // Dirección (nivel 2): académica, de gestión educativa y de gestión institucional.
   const direccion = porNivel(2);
 
   // El perfil abierto queda en la URL (?persona=clave) sin sumar entradas
@@ -152,52 +155,42 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
           </p>
         </div>
 
-        {/* ── Masthead: N1 Daniela al centro, N2 una de cada lado ─────────
-            Tres columnas: la del medio mide lo que medía la card de Daniela
-            (30rem) y las laterales se reparten el resto, así que las cards de
-            dirección conservan su escala. Las laterales bajan 9rem: Daniela
-            preside y las dos direcciones la flanquean a la misma altura. */}
+        {/* ── Masthead: N1 Daniela y, a su lado, las tres direcciones ─────
+            Una sola fila, en el orden de Daniela (2026-09-30): ella primero y
+            más grande (22rem; era de 30rem al centro) y las direcciones a su
+            lado, alineadas abajo (eran dos, una de cada lado; Wendolyne subió
+            a la Dirección). Solo la Dirección general lleva rótulo: las otras
+            tres van con su rol y nada más (Facundo, 2026-10-02). Así el
+            masthead entra entero en la primera pantalla y las grillas
+            aparecen enseguida. En celular, Daniela sola y las direcciones de
+            a dos. */}
         <div
           data-team-group
           data-reveal-y="34"
           data-reveal-dur="0.85"
           data-reveal-stagger="0.18"
-          className="relative mt-16 grid grid-cols-1 gap-10 max-sm:grid-cols-2 max-sm:gap-x-5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_30rem_minmax(0,1fr)] lg:gap-8"
+          className="relative mt-16 grid grid-cols-1 gap-8 lg:grid-cols-[22rem_minmax(0,1fr)] lg:items-end"
         >
-          {/* N1 — Dirección General (retrato grande, al centro); una sola, y la base lo garantiza */}
+          {/* N1 — Dirección General (retrato grande); una sola, y la base lo garantiza */}
           {direccionGeneral && (
-            <div className="max-lg:order-1 max-sm:col-span-2 sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[30rem] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none">
+            <div className="mx-auto w-full max-w-[22rem] lg:mx-0">
               <KickerRotulo>{niveles.direccionGeneral}</KickerRotulo>
               <div data-reveal className="mt-4">
-                <PersonCard persona={direccionGeneral} onOpen={openProfile} />
+                <PersonCard persona={direccionGeneral} escala={2} onOpen={openProfile} />
               </div>
             </div>
           )}
 
-          {/* N2 — Dirección: una card de cada lado, más abajo, a la misma
-              altura entre sí. Orden de lectura: académica a la izquierda,
-              institucional a la derecha. En celular y tablet van las dos en
-              la misma línea, debajo de la Dirección General, y la segunda va
-              primero (Gastón, 2026-10-02: Raquel antes que Karla); en
-              computadora nada cambia. */}
-          {direccion.map((persona, i) => (
-            <div
-              key={persona.key}
-              className={`lg:row-start-1 lg:mt-[9rem] lg:self-start ${
-                i === 0 ? "max-lg:order-3 lg:col-start-1" : "max-lg:order-2 lg:col-start-3"
-              }`}
-            >
-              {/* En celular y tablet van lado a lado: el rótulo se lee una vez,
-                  sobre la primera; el de la otra conserva su lugar para que
-                  las dos cards arranquen a la misma altura. */}
-              <div className={i === 0 ? "max-lg:invisible" : undefined}>
-                <KickerRotulo>{niveles.direccion}</KickerRotulo>
+          {/* N2 — Dirección: las tres en una fila, en el orden de la base
+              (académica, de gestión educativa, de gestión institucional), sin
+              rótulo: el rol de cada tarjeta ya dice «Directora…». */}
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-6">
+            {direccion.map((persona) => (
+              <div key={persona.key} data-reveal>
+                <PersonCard persona={persona} escala={3} onOpen={openProfile} />
               </div>
-              <div data-reveal className="mt-4">
-                <PersonCard persona={persona} onOpen={openProfile} />
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* ── N3 — Líderes de área y proyecto: 2×2, cuatro pares ─────────── */}
@@ -209,13 +202,13 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
           revealDur="0.62"
           revealStagger="0.09"
         >
-          {/* Alineada al borde derecho del masthead: el bloque cierra donde
-              cierra la columna de dirección, y el aire queda entre el título y
-              la gente. Dos columnas, tantas filas como personas haya. */}
-          <ul className="grid w-full max-w-[40rem] grid-cols-2 gap-6 justify-self-end lg:gap-8">
+          {/* Filas de cuatro (Daniela, 2026-09-30), con la card compacta:
+              antes eran dos columnas de cards medianas. Dos columnas en
+              celular, tres en tablet. */}
+          <ul className="grid w-full grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
             {lideres.map((persona) => (
               <li key={persona.key} data-reveal>
-                <PersonCard persona={persona} onOpen={openProfile} />
+                <PersonCard persona={persona} escala={4} onOpen={openProfile} />
               </li>
             ))}
           </ul>
@@ -230,12 +223,12 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
           revealDur="0.52"
           revealStagger="0.07"
         >
-          {/* Más ancha que la de líderes y con cards menores: seis personas que
-              se leen como un cuerpo denso, no como una fila de créditos. */}
-          <ul className="grid w-full max-w-[46rem] grid-cols-2 gap-5 justify-self-end sm:grid-cols-3">
+          {/* Filas de cuatro, como la de líderes: las dos grillas miden lo
+              mismo y se leen como un cuerpo denso, no como una fila de créditos. */}
+          <ul className="grid w-full grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
             {facilitacion.map((persona) => (
               <li key={persona.key} data-reveal>
-                <PersonCard persona={persona} onOpen={openProfile} />
+                <PersonCard persona={persona} escala={4} onOpen={openProfile} />
               </li>
             ))}
           </ul>

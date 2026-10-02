@@ -24,9 +24,9 @@ import { armarCapitulos } from "./proyectos-aplicaciones/fichas";
  * allá casos, acá proyectos. Detrás, la víbora de Niveles sigue por un
  * único trazo: cruza en solitario con la cámara siguiéndola, repta bajo
  * las fichas, sube y vuelve a bajar en el giro, y se va por abajo hacia el
- * cierre. Antes era una sola pila de ocho: a la quinta ficha cansaba, y la
- * víbora dejaba cuatro huérfanas. Y antes de esto, dos zonas clavadas con
- * una costura donde la víbora nacía cortada.
+ * cierre. Antes era una sola pila con todas: a la quinta ficha cansaba, y
+ * la víbora dejaba huérfanas a las de la segunda mitad. Y antes de esto,
+ * dos zonas clavadas con una costura donde la víbora nacía cortada.
  *
  * Tres modos: en escritorio con mouse, este archivo de dos lados; en
  * celular y tablet (< lg), la misma pila en vertical (PilaFichasMovil,
@@ -46,7 +46,7 @@ export function ProyectosAplicaciones({ contenido }: { contenido: ProyectosDeQue
     return {
       capitulos: caps,
       // Los dos lados del archivo: el capítulo de desarrollo profesional, y
-      // currículo con el remate. El doblez es el de los capítulos (4 + 3 + 1).
+      // currículo con el remate. El doblez es el de los capítulos (4 + 2 + 1).
       lados: [caps.slice(0, 1), caps.slice(1)] as const,
       // Todas las fichas en orden, con el capítulo al que pertenecen.
       fichas: caps.flatMap((cap, c) => cap.fichas.map((f) => ({ ...f, cap: c }))),
@@ -102,7 +102,10 @@ export function ProyectosAplicaciones({ contenido }: { contenido: ProyectosDeQue
                   cap={cap}
                   className="text-gris-texto mt-3 max-w-[48ch] font-sans text-[1.05rem] leading-relaxed"
                 />
-                <div className="mt-8 grid gap-5 sm:grid-cols-2">
+                {/* Una columna con mínimo cero, como las dos de sm: sin eso la
+                    pista toma el ancho mínimo de la ficha, y la de siete
+                    banderas corría la página de costado en un celular. */}
+                <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {fichas.map((f, i) =>
                     f.cap === c ? (
                       <FichaProyecto

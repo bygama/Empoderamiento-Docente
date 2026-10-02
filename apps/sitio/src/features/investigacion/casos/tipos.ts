@@ -6,10 +6,11 @@
  * tinte de cada carpeta (por número, `tintes.ts`) y el id y el rótulo de
  * cada evidencia (por posición).
  *
- * Los casos 01 y 02 son REALES y están sostenidos por publicaciones con
- * arbitraje de ED. Los 03 y 04 son provisionales: cubren evaluación y
- * currículum hasta que haya caso real, y su aclaración lo dice. `esDemo`
- * prende la etiqueta «DEMO» y la aclaración al pie (hoy, en ninguno).
+ * Quedan dos (Daniela, 2026-09-30). El 01 es REAL y está sostenido por
+ * publicaciones con arbitraje de ED. El 02 (la fila `caso-04`) es
+ * provisional: cubre currículum hasta que haya caso real, y su aclaración lo
+ * dice. `esDemo` prende la etiqueta «DEMO» y la aclaración al pie (hoy, en
+ * ninguno).
  */
 
 /** Tinte de carpeta — mapeado a tokens del design system en los componentes. */

@@ -7,7 +7,7 @@ if (typeof window !== "undefined") {
 
 /**
  * La entrada del archivo en desktop (Facundo, 2026-09-14): una
- * sola timeline scrubbeada, SIN pin, sobre una pantalla pegada (sticky)
+ * sola timeline scrubbeada, SIN pin, sobre una escena pegada (sticky)
  * que lleva el título arriba y la pila abajo.
  *
  * 1. EL TÍTULO llega grande y centrado en la pantalla y, en el primer
@@ -15,28 +15,35 @@ if (typeof window !== "undefined") {
  *    izquierda, con la pila todavía invisible debajo.
  * 2. LAS CARPETAS SE APILAN (Gastón, 2026-09-17): mientras el título
  *    termina su viaje —desde el 70 %— entran una por una desde abajo, con
- *    un recorrido corto, en orden: 01 apoya, 02 apoya encima, 03, 04. Se
- *    lee como alguien armando la pila sobre el escritorio. Solo posición y
- *    opacidad, escalonadas; nada encima. (Antes aparecían las cuatro a la
- *    vez con un fundido plano —Facundo, 14-09, que había sacado un barrido
- *    doble de líneas verdes: «sin ningún efecto»—; a Gastón el fundido
- *    plano no le gustó.)
+ *    un recorrido corto, en orden: 01 apoya y 02 apoya encima. Se lee como
+ *    alguien armando la pila sobre el escritorio. Solo posición y opacidad,
+ *    escalonadas; nada encima. La última carpeta termina justo cuando la
+ *    escena se despega, sean las que sean: no queda scroll muerto con la
+ *    pila quieta. (Antes aparecían todas a la vez con un fundido plano
+ *    —Facundo, 14-09, que había sacado un barrido doble de líneas verdes:
+ *    «sin ningún efecto»—; a Gastón el fundido plano no le gustó.)
  *
  * Sin pin de ScrollTrigger a propósito: el expediente abierto es una capa
  * fija adentro de esta sección y un pin (position fixed más spacer) se le
  * cruzaría; el sticky no le molesta. El hook (maquina/useEscenaIndice.ts)
  * la crea en un gsap.context y la revierte al desmontar el índice.
  *
- * LA PANTALLA MIDE LO QUE NECESITA, con la ventana como mínimo (Gastón,
- * 2026-09-16). Medía exactamente una ventana, y aire + título + pila suman
- * ~900 px: en ventanas más bajas la carpeta 04 se salía por el pie y la
- * sección la recortaba contra el cierre. Ahora, si el contenido no entra,
- * la pantalla es más alta que la ventana: se pega arriba mientras dura la
- * pista y, cuando la escena termina, se despega y las carpetas terminan de
- * entrar completas antes del aire de abajo. La pista es siempre la
- * pantalla más los dos tramos, así el achique dura lo mismo. En ventanas
- * bajas además se quita aire (arriba y entre título y pila) para que entre
- * sin crecer.
+ * LA ESCENA MIDE LO QUE NECESITA, y nada más (2026-10-01). Gastón la había
+ * dejado el 16/9 en «lo que necesita, con la ventana como mínimo»: medía
+ * exactamente una ventana, y con cuatro carpetas aire + título + pila
+ * sumaban ~900 px, así que en ventanas más bajas la última se salía por el
+ * pie. Con dos carpetas el mínimo sobraba: la escena cargaba un tercio de
+ * pantalla vacío abajo y, al despegarse, dejaba media pantalla gris antes
+ * del cierre (415 px a 1440×900). Ahora la escena es su contenido y la
+ * pista, la escena más los dos tramos: el sticky dura justo los tramos, así
+ * el achique dura lo mismo con cualquier alto, y la timeline termina cuando
+ * la escena se despega. Con «bottom bottom», una escena más baja que la
+ * ventana terminaba antes del despegue y dejaba ese resto de scroll clavado
+ * sin que pasara nada. Si el contenido no entra en la ventana, la escena se
+ * pega igual y la timeline sigue hasta que su pie llega al borde de abajo,
+ * como antes: las carpetas de abajo terminan de entrar a la vista. En
+ * ventanas bajas además se quita aire (arriba y entre título y pila) para
+ * que entre sin crecer.
  */
 
 /** Tramos de la pista, en pantallas de scroll: el achique y la aparición. */
@@ -67,30 +74,29 @@ export function escenaIndice({
   // ventanas bajas, menos: 5rem arriba y 3rem entre título y pila (el
   // `mt-20` de la lista), lo justo para pasar por debajo del header.
   const lista = pila.firstElementChild as HTMLElement | null;
+  /** Lo que dura la escena pegada, en px de scroll: los dos tramos. */
+  const tramos = () => (TRAMO_TITULO + TRAMO_APARICION) * window.innerHeight;
   const dimensionar = () => {
     const baja = window.innerHeight < VENTANA_BAJA;
     gsap.set(escena, {
       position: "sticky",
       top: 0,
       height: "auto",
-      minHeight: "100svh",
       paddingTop: baja ? "5rem" : "7rem",
     });
     if (lista) gsap.set(lista, { marginTop: baja ? "3rem" : "5rem" });
     ajustarPista();
   };
-  // La pista es siempre la pantalla más los dos tramos. Y se RE-AJUSTA cada
-  // vez que la pantalla cambia de alto —desplegar la anticipación de una
+  // La pista es siempre la escena más los dos tramos. Y se RE-AJUSTA cada
+  // vez que la escena cambia de alto —desplegar la anticipación de una
   // carpeta la estira ~170 px—: si la pista quedara fija, al final de la
-  // pista el sticky tiene que meter la pantalla entera antes del borde y
+  // pista el sticky tiene que meter la escena entera antes del borde y
   // la corre hacia arriba lo que creció; al cerrarse vuelve a bajar, y el
   // cursor quedaba sobre otra carpeta (loop medido 2026-09-17). Con la
-  // pista creciendo lo mismo, la pantalla no se mueve y lo que se empuja
+  // pista creciendo lo mismo, la escena no se mueve y lo que se empuja
   // es lo que sigue, como en cualquier acordeón.
   function ajustarPista() {
-    gsap.set(pista, {
-      height: escena.offsetHeight + (TRAMO_TITULO + TRAMO_APARICION) * window.innerHeight,
-    });
+    gsap.set(pista, { height: escena.offsetHeight + tramos() });
   }
   const observador = new ResizeObserver(ajustarPista);
   observador.observe(escena);
@@ -122,14 +128,18 @@ export function escenaIndice({
     };
   };
 
+  // Termina cuando la escena se despega, que es al pasar los tramos. Si la
+  // escena no entra en la ventana, sigue hasta que su pie llega al borde de
+  // abajo: la última carpeta entra a la vista y no debajo del borde.
+  const fin = () => tramos() + Math.max(0, escena.offsetHeight - window.innerHeight);
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: pista,
       start: "top top",
-      end: "bottom bottom",
+      end: () => `+=${fin()}`,
       scrub: 0.6,
       invalidateOnRefresh: true,
-      // La ventana cambió: la pantalla y la pista se vuelven a medir antes
+      // La ventana cambió: la escena y la pista se vuelven a medir antes
       // de que ScrollTrigger tome sus posiciones.
       onRefreshInit: dimensionar,
     },

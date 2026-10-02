@@ -23,7 +23,7 @@ function Ultimo({ estado }: { estado: FilaDeCaso["estado"] }) {
 }
 
 /**
- * Los cuatro casos (SPEC §7.1 de `work/casos-aliados-fotos/`), una `Lista` en
+ * Los casos fijos (SPEC §7.1 de `work/casos-aliados-fotos/`), una `Lista` en
  * el orden de la pila: «Caso 01» y la pregunta; debajo el eje y lo último que
  * le pasó; a la derecha, si tiene cambios sin publicar, y «Editar». Sin
  * primario: los casos no se crean.

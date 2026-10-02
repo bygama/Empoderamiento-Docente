@@ -17,7 +17,7 @@ export type PantallaDeContenido = {
 
 export const PANTALLAS_DE_CONTENIDO: readonly PantallaDeContenido[] = [
   { clave: "paginas", nombre: "Páginas", href: "/admin/contenido/paginas", que: "Los textos y las fotos de las siete páginas del sitio." },
-  { clave: "casos", nombre: "Casos", href: "/admin/contenido/casos", que: "Los cuatro casos de investigación. Se editan, pero no se crean ni se borran." },
+  { clave: "casos", nombre: "Casos", href: "/admin/contenido/casos", que: "Los dos casos de investigación. Se editan, pero no se crean ni se borran." },
   { clave: "equipo", nombre: "Equipo", href: "/admin/contenido/equipo", que: "Los 15 perfiles, con sus etapas y sus publicaciones de la Biblioteca." },
   { clave: "aliados", nombre: "Aliados", href: "/admin/contenido/aliados", que: "Los logos. Sin la marca «Autorizado», un logo no se publica." },
   { clave: "fotos", nombre: "Fotos", href: "/admin/contenido/fotos", que: "Todas las fotos, con su texto alternativo y dónde se usa cada una." },

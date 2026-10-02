@@ -48,7 +48,7 @@ export function BloqueDeLaTarjeta({ form, cambiar, errores, porNivel, slugPublic
             <Seleccion
               nombre="nivel"
               etiqueta="Nivel"
-              ayuda="Dónde va la tarjeta en Quiénes somos. La Dirección general y la Dirección tienen los lugares contados: una al centro y dos a los costados."
+              ayuda="Dónde va la tarjeta en Quiénes somos. La Dirección general y la Dirección tienen los lugares contados: una y tres, en la primera fila."
               opciones={NUMEROS_DE_NIVEL.map((n) => opcionDe(n, porNivel[n]))}
               sinElegir="Elegí el nivel"
               valor={form.nivel === null ? "" : String(form.nivel)}

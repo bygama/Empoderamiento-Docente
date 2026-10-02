@@ -55,7 +55,7 @@ test("lo que la escena no aguanta no se guarda ni en un borrador", () => {
   assert.equal(e.produccionRelacionada, "Dos producciones no pueden tener el mismo título.");
 });
 
-test("los cuatro casos de la base son los fijos y pasan esquemaCaso", sinBase, async () => {
+test("los casos de la base son los fijos, con su número, y pasan esquemaCaso", sinBase, async () => {
   const { base } = await import("@/datos/cliente");
   const { publicadoDeCaso } = await import("@/datos/consultas/casos");
   const filas = await base.caso.findMany({ orderBy: { numero: "asc" } });

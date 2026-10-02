@@ -12,13 +12,14 @@ import { ALTO_MOVIL_LVH, crearFichasMovil } from "./coreografia-fichas-movil";
 
 /**
  * «Así se ve en la práctica» en celular y tablet (< lg): el mismo archivo de
- * fichas de escritorio, en vertical (Gastón, 2026-09-26; antes eran ocho
- * fichas altas en una columna, unas seis pantallas quietas). Una escena del
- * alto de la pantalla (lvh: que Safari no deje franja al esconder su barra)
- * con el título grande de entrada; después, arriba, el capítulo con su
- * bajada y el contador, y abajo la pila: cada ficha sube, se endereza y se
- * posa inclinada, y las anteriores retroceden. Al cambiar de capítulo la
- * pila se va por arriba. La coreografía, en coreografia-fichas-movil.ts.
+ * fichas de escritorio, en vertical (Gastón, 2026-09-26; antes eran todas
+ * las fichas, altas, en una columna, unas seis pantallas quietas). Una
+ * escena del alto de la pantalla (lvh: que Safari no deje franja al
+ * esconder su barra) con el título grande de entrada; después, arriba, el
+ * capítulo con su bajada y el contador, y abajo la pila: cada ficha sube,
+ * se endereza y se posa inclinada, y las anteriores retroceden. Al cambiar
+ * de capítulo la pila se va por arriba. La coreografía, en
+ * coreografia-fichas-movil.ts.
  */
 export function PilaFichasMovil({
   intro,

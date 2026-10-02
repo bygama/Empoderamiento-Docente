@@ -26,7 +26,6 @@ type Props = {
  */
 export function CabeceraExpediente({ caso, refTitulo }: Props) {
   const { copiado, copiar } = useCopiar();
-  const evidencias = caso.evidencias.length.toString().padStart(2, "0");
   return (
     <header data-exp-entrada data-exp-header className="relative z-10">
       <p
@@ -64,42 +63,30 @@ export function CabeceraExpediente({ caso, refTitulo }: Props) {
       >
         {caso.pregunta}
       </h3>
-      {/* Ficha catalográfica: el documento de identidad del caso. En
-          escritorio, un renglón con puntos; bajo `lg`, una ficha de verdad:
-          el eje y el ámbito en renglones propios con su rótulo a la
-          izquierda, y abajo los tres datos cortos en columnas. */}
+      {/* Ficha catalográfica: el documento de identidad del caso. Solo
+          período y ámbito: «ESTADO: EN CURSO» y «05 EVIDENCIAS» no se
+          entendían (Daniela, 2026-09-30); el estado se sigue cargando en el
+          admin, y las evidencias tienen su rótulo adentro del expediente. En
+          escritorio, un renglón con puntos; bajo `lg`, una ficha de verdad
+          (Gastón, 2026-10-02): el eje, el ámbito y el período en renglones
+          propios con su rótulo a la izquierda. */}
       <div data-exp-ficha className="mt-6 max-lg:mt-5">
         <p className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 max-lg:hidden ${ROTULO_MICRO} text-azul-principal/70`}>
           <span>PERÍODO {caso.ficha.periodo}</span>
           <span aria-hidden="true" className={PUNTO} />
           <span>{caso.ficha.ambito.toUpperCase()}</span>
-          <span aria-hidden="true" className={PUNTO} />
-          <span>{evidencias} EVIDENCIAS</span>
-          <span aria-hidden="true" className={PUNTO} />
-          <span>ESTADO: {caso.ficha.estado}</span>
         </p>
         <dl className="border-azul-principal/15 border-y lg:hidden">
           {[
             ["Eje", caso.eje],
             ["Ámbito", caso.ficha.ambito],
+            ["Período", caso.ficha.periodo],
           ].map(([rotulo, valor]) => (
-            <div key={rotulo} className="border-azul-principal/10 grid grid-cols-[4.25rem_minmax(0,1fr)] items-baseline gap-x-3 border-b py-2.5">
+            <div key={rotulo} className="border-azul-principal/10 grid grid-cols-[4.25rem_minmax(0,1fr)] items-baseline gap-x-3 border-b py-2.5 last:border-b-0">
               <dt className={`${ROTULO_FICHA} text-gris-texto`}>{rotulo}</dt>
               <dd className="text-azul-principal font-sans text-[0.9rem] leading-snug font-medium">{valor}</dd>
             </div>
           ))}
-          <div className="grid grid-cols-3 gap-x-3 py-2.5">
-            {[
-              ["Período", caso.ficha.periodo],
-              ["Evidencias", evidencias],
-              ["Estado", caso.ficha.estado],
-            ].map(([rotulo, valor]) => (
-              <div key={rotulo}>
-                <dt className={`${ROTULO_FICHA} text-gris-texto`}>{rotulo}</dt>
-                <dd className="text-azul-principal mt-1 font-sans text-[0.9rem] leading-snug font-medium first-letter:uppercase">{String(valor).toLowerCase()}</dd>
-              </div>
-            ))}
-          </div>
         </dl>
       </div>
     </header>

@@ -8,8 +8,8 @@ import { choqueCon, vioLaFila, type Fallo } from "./choque";
 // Guardar el borrador de un caso y descartarlo (`work/casos-aliados-fotos/SPEC.md`
 // §6), con el cliente inyectado para probarlo contra el Postgres local;
 // publicar vive en publicar-casos.ts. Un caso no se crea ni se borra: son
-// cuatro. Cada escritura trae el `borradorEn` que vio la pantalla (el aviso
-// de choque de las páginas).
+// los de `CASOS_FIJOS`. Cada escritura trae el `borradorEn` que vio la
+// pantalla (el aviso de choque de las páginas).
 
 export type ResultadoDeGuardarCaso = { ok: true; borradorEn: string; borradorPor: string } | Fallo;
 

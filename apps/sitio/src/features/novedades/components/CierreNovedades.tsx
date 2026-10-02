@@ -29,8 +29,9 @@ const REDES = [
  * que el cierre de Biblioteca: es una PIEZA, no una lámina, y no se funde con
  * el footer. Comparte el fondo COMPLETO del hero de Novedades (glow + bola
  * espejada + PuntosFaro con el haz al cursor), así el remate cierra con la
- * misma firma con la que abre la página. CTA naranja → Contacto + redes (las
- * de Ajustes › Datos del sitio, que le pasa la página).
+ * misma firma con la que abre la página. CTA naranja → la primera red cargada
+ * (Instagram, si está; sin redes, Contacto) + los íconos de las redes (las de
+ * Ajustes › Datos del sitio, que le pasa la página).
  *
  * Como acá el envoltorio es gris-fondo y no blanco, marca la página con
  * data-footer-dock-tint="gris" para que la muesca del footer tome ese mismo
@@ -39,6 +40,9 @@ const REDES = [
 export function CierreNovedades({ contenido, redes }: { contenido: CierreDeNovedades; redes: Redes }) {
   const rootRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
+  // El botón sigue a la sección: invita a las redes, así que va a la primera
+  // cargada (en el orden de REDES, Instagram primero). Sin ninguna, a Contacto.
+  const primeraRed = REDES.map(({ key }) => redes[key]).find((url) => url);
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -140,7 +144,9 @@ export function CierreNovedades({ contenido, redes }: { contenido: CierreDeNoved
             data-cierre-foot
             className="mt-10 flex flex-col items-center gap-7"
           >
-            <ButtonPrimary href="/contacto">{contenido.boton}</ButtonPrimary>
+            <ButtonPrimary href={primeraRed ?? "/contacto"} externo={Boolean(primeraRed)}>
+              {contenido.boton}
+            </ButtonPrimary>
             {/* Solo las redes con URL confirmada: un ícono a «#» es un link muerto. */}
             {REDES.some(({ key }) => redes[key]) && (
               <ul className="flex items-center gap-5">

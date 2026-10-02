@@ -52,9 +52,9 @@ export const CUPO_DEL_SITIO: Cupo = { lugares: (nivel) => NIVELES[nivel - 1].lug
 
 /**
  * Si el nivel no tiene lugar para una persona publicada más: el masthead
- * tiene uno al centro (la Dirección general) y dos a los costados (la
- * Dirección). La Dirección general la garantiza además un índice único; esto
- * lo dice antes, con los nombres.
+ * tiene una al centro (la Dirección general) y tres debajo (la Dirección).
+ * La Dirección general la garantiza además un índice único; esto lo dice
+ * antes, con los nombres.
  */
 export async function nivelSinLugar(base: PrismaClient | Prisma.TransactionClient, id: string, nivel: Nivel, cupo: Cupo = CUPO_DEL_SITIO): Promise<Fallo | null> {
   const lugares = cupo.lugares(nivel);

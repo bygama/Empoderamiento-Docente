@@ -20,6 +20,10 @@ import { PaisDeLaCard } from "./impulsan-ed/PaisDeLaCard";
  * Presencia sutil en reposo (contorno), gana peso en hover (relleno verde).
  * La card entera es un <button> accesible por teclado (Enter/Space nativos,
  * focus-visible, aria-label con nombre + rol).
+ *
+ * `escala` elige una de las cuatro escalas sin atarla al nivel: desde que las
+ * cards se achicaron (Daniela, 2026-09-30) la Dirección general usa la 2, la
+ * Dirección la 3 y las dos grillas la compacta (4). Sin `escala`, la del nivel.
  */
 
 const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(" ");
@@ -161,16 +165,22 @@ function Caption({
       >
         {persona.nombre}
       </span>
-      <span className={cx("mt-0.5 line-clamp-3 font-sans leading-snug sm:line-clamp-2", cfg.rol, hover ? "text-white/85" : "text-azul-principal/75")}>
+      {/* Hasta cuatro renglones, sin recortar: el rol más largo (63 letras,
+          el de Gabriela Buendía) ocupa tres en la card compacta de la grilla
+          de cuatro y cuatro en la de celular. */}
+      <span className={cx("mt-0.5 line-clamp-4 font-sans leading-snug", cfg.rol, hover ? "text-white/85" : "text-azul-principal/75")}>
         {persona.rol}
       </span>
       <span className="mt-2 flex items-center justify-between gap-2 max-lg:mt-auto max-lg:pt-2.5">
         {/* El país cede antes que el CTA: en las compactas "Colombia" + "Ver
             trayectoria" van al límite del ancho útil y el acceso no puede ser
             lo que se recorte. */}
+        {/* Si el país no entra en un renglón («Costa Rica - México» en la card
+            compacta de la grilla de cuatro), baja a dos en vez de cortarse con
+            puntos suspensivos (2026-10-02). */}
         <PaisDeLaCard
           pais={persona.pais}
-          className={cx("min-w-0 truncate font-mono tracking-[0.16em] uppercase", cfg.pais, hover ? "text-azul-claro" : "text-azul-medio")}
+          className={cx("min-w-0 font-mono leading-tight tracking-[0.16em] uppercase", cfg.pais, hover ? "text-azul-claro" : "text-azul-medio")}
         />
         <span className="flex shrink-0 items-center gap-1.5">
           {showLabel && (
@@ -218,13 +228,16 @@ function precargarPerfil(persona: Persona) {
 
 export function PersonCard({
   persona,
+  escala = persona.tier,
   onOpen,
 }: {
   persona: Persona;
+  /** La escala de la card (1 a 4, de la más grande a la compacta). Por defecto, la del nivel. */
+  escala?: Tier;
   /** Abre el perfil full-screen; recibe la persona y el botón (para restaurar foco). */
   onOpen: (persona: Persona, el: HTMLButtonElement) => void;
 }) {
-  const cfg = CFG[persona.tier];
+  const cfg = CFG[escala];
   return (
     <button
       type="button"
@@ -255,7 +268,7 @@ export function PersonCard({
             src={persona.foto.src}
             alt={persona.foto.alt}
             fill
-            sizes={persona.tier <= 2 ? "(max-width: 1024px) 90vw, 640px" : persona.tier === 3 ? "(max-width: 1024px) 45vw, 320px" : "(max-width: 1024px) 30vw, 240px"}
+            sizes={escala <= 2 ? "(max-width: 1024px) 90vw, 640px" : escala === 3 ? "(max-width: 1024px) 45vw, 320px" : "(max-width: 1024px) 30vw, 240px"}
             style={
               {
                 objectPosition: persona.foto.posicion,
