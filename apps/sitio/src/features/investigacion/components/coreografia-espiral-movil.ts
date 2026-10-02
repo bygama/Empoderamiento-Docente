@@ -96,6 +96,7 @@ export function crearEspiralMovil(zona: HTMLElement) {
     camara.setAttribute("transform", `translate(${a.x + (b.x - a.x) * u} ${a.y + (b.y - a.y) * u}) scale(${s})`);
   };
 
+  let observador: IntersectionObserver | undefined;
   const ctx = gsap.context(() => {
     // ── Estado pre-paint: solo la primera lámina, trazo y lazo sin dibujar,
     //    la vuelta interior insinuada y la de afuera todavía sin aparecer.
@@ -139,7 +140,19 @@ export function crearEspiralMovil(zona: HTMLElement) {
       0.75,
     );
     entrada.fromTo(frase, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.5);
-    ScrollTrigger.create({ trigger: pista, start: "top 30%", once: true, onEnter: () => entrada.play() });
+    // La suelta un IntersectionObserver y no un ScrollTrigger: las posiciones
+    // de ScrollTrigger se miden al crearlo y arriba hay escenas que cambian
+    // de alto después. Dos cuadros de espera: con el `lagSmoothing(0)` de
+    // Lenis, una línea que arranca con el reloj de GSAP dormido salta al final.
+    observador = new IntersectionObserver(
+      ([e]) => {
+        if (!e?.isIntersecting) return;
+        observador?.disconnect();
+        requestAnimationFrame(() => requestAnimationFrame(() => entrada.play()));
+      },
+      { rootMargin: "0px 0px -70% 0px" },
+    );
+    observador.observe(pista);
 
     const tl = gsap.timeline({
       defaults: { ease: "none" },
@@ -202,6 +215,7 @@ export function crearEspiralMovil(zona: HTMLElement) {
 
   return () => {
     ScrollTrigger.removeEventListener("refresh", remedir);
+    observador?.disconnect();
     ctx.revert();
     recorrido.restaurar();
     camara.removeAttribute("transform");
