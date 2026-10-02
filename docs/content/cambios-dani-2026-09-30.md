@@ -241,3 +241,48 @@ entra a 730 de alto) y 41 (las tarjetas de «Recién salido» abren su artículo
 riel deja pasar el clic; «Toda la biblioteca» vuelve a andar con mouse). Queda anotado: entre 1024
 y 1279 de ancho la tarjeta 1 del hero sigue bajo la píldora, y «Por qué investigamos» desde abajo
 cae al final de su historia (ya pasaba).
+
+## Decisiones de Facundo (1/10)
+
+- **6, botones del hero:** se quedan los dos, pero el naranja deja de ir a Contacto (ya está en la barra): pasa a
+  «Conocé al equipo» → Quiénes somos.
+- **42, botón del cierre de Novedades:** pasa a «Seguinos en Instagram» y lleva a la primera red cargada en Datos
+  del sitio; sin redes, a Contacto.
+- **36, Nuestra mirada:** se probó en local la versión apilada y quieta (la de celular) también en computadora,
+  y Facundo la rechazó al verla (1/10): «quedó horrible». La escena queda como estaba, con los arreglos del
+  PR #229. Qué bajarle a la Mirada para Daniela se decide aparte, mirándolo.
+- **3, collage del hero:** queda como está.
+- **37, equipo:** se probó una sola grilla de cuatro sin grupos y Facundo la rechazó al verla (1/10): la sección
+  queda como estaba (el masthead y las dos grillas con sus títulos), solo más chica, en filas de cuatro, con el
+  orden, los roles y los nombres que mandó Daniela; Wendolyne sube a la Dirección.
+- **44, casos:** se eliminan el 02 y el 03; el 04 queda y pasa a ser el Nº 02.
+- **Fotos del cliente (2, 10, 21, 37):** al final de todas las correcciones.
+
+## Qué quedó hecho (PR de Proyectos, casos y equipo, 1/10)
+
+6 (el naranja del hero pasa a «Conocé al equipo» → Quiénes somos; «Qué hacemos» queda), 42 (el
+botón del cierre de Novedades pasa a «Seguinos en Instagram» y abre, en otra pestaña, la primera
+red cargada en Datos del sitio; sin redes, Contacto), 26, 27 y 28 (la ficha de Buenos Aires Aprende
+se va; Escuelas Techint queda con tres países, Argentina, Brasil y México; Techint Group con los
+siete, cada uno con su bandera dibujada: entran Colombia, Italia, Rumania y Uruguay, y el
+encabezado de siete banderas va en una fila más chica con el nombre de los países debajo; el
+archivo tiene siete fichas y el contador y la víbora lo siguen solos), 43 (la ficha del expediente
+queda con período y ámbito; el estado se sigue cargando en el admin y la ayuda del campo lo dice),
+44 (el 02 y el 03 se borran con la migración `20261001213000_casos_que_quedan`, con sus
+redirecciones automáticas; el 04 pasa a ser el Nº 02 y su lámina dice «LÁMINA 02»; el sitio y el
+admin muestran solo los casos de `CASOS_FIJOS`; Socioepistemología y Evidencia pasan a «Ver en
+acción» del 01; la pila ya no mide una ventana como mínimo, así con dos carpetas no queda media
+pantalla vacía antes del cierre) y 37 (el equipo más chico, con la sección como
+estaba: el masthead en una fila, Daniela primero y más grande, con el único rótulo, y a su lado las tres
+direcciones con su rol y nada más (Facundo, 2/10), así entra entero en la primera pantalla; las dos grillas con su raíl y su título, con la
+tarjeta compacta en filas de cuatro; el orden, los roles y los nombres de Daniela por la migración
+`20261001134000_equipo_en_una_grilla`; Wendolyne pasa a la Dirección, que ahora tiene tres lugares;
+el tope del rol sube de 60 a 70 por el de Gabriela, de 63).
+
+Queda anotado: la lámina del caso Nº 02 es la misma ilustración del 01 y trae «CASO 01» dibujado
+(ya pasaba; hace falta una lámina propia, que se carga desde el admin); los nombres quedaron como
+los escribió Daniela («Daniela Reyes Gasperini», «Luis Cabrera»), salvo Eduardo, que sigue «Briceño»
+porque así firma (ella puso «Briseño»); AGENTS.md §13 y dos specs siguen diciendo «4 casos».
+
+Queda 36 (la Mirada: se probó quieta y no fue) y, para el final, como se decidió, las fotos del
+cliente (2, 10, 21 y las del equipo).
