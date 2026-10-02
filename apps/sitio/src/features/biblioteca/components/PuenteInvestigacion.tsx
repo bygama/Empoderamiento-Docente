@@ -112,12 +112,16 @@ export function PuenteInvestigacion({ contenido }: { contenido: Puente }) {
             <div className="md:grid md:grid-cols-12 md:items-end md:gap-x-8">
               <RevealLines
                 as="h2"
-                className="font-display text-azul-principal max-w-[18ch] font-bold tracking-[-0.02em] md:col-span-7"
+                // En celular, dos renglones parejos: el cuerpo sigue al ancho de la
+                // pantalla para que el primero («Detrás de cada recurso,») entre entero.
+                className="font-display text-azul-principal max-w-[18ch] font-bold tracking-[-0.02em] md:col-span-7 max-md:max-w-none max-md:text-[7.2vw]! max-md:text-balance"
                 style={{ fontSize: "clamp(2rem, 1rem + 3vw, 3.6rem)", lineHeight: 1.06 }}
               >
                 {contenido.titulo}
               </RevealLines>
-              <div className="mt-8 flex flex-wrap items-center gap-4 md:col-span-4 md:col-start-9 md:mt-0">
+              {/* En celular los dos botones van en un renglón: más angostos, y lo
+                  que ahorran en alto es de las cartas de la pila. */}
+              <div className="mt-8 flex flex-wrap items-center gap-4 md:col-span-4 md:col-start-9 md:mt-0 max-md:mt-5 max-md:gap-2 max-md:[&>a]:px-3.5 max-md:[&>a]:text-[0.88rem] max-md:[&>a]:whitespace-nowrap">
                 <ButtonPrimary href="/investigacion">{contenido.botonPrincipal}</ButtonPrimary>
                 <ButtonSecondary href="/novedades">{contenido.botonSecundario}</ButtonSecondary>
               </div>

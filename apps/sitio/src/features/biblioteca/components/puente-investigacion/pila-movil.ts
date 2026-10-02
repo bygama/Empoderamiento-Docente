@@ -36,14 +36,33 @@ export function crearPilaPuente(root: HTMLElement) {
   // escala no puede invertirse ni achicar el contenido a ilegible.
   // Lecturas y escrituras separadas en pasadas propias: reset → medir →
   // aplicar, para no forzar un reflow por cada tarjeta.
+  //
+  // En celular, antes de achicar el texto cede la FOTO, que es decorativa:
+  // se acorta lo que falte y, si quedara en una tira, no va. Recién lo que
+  // siga sin entrar se escala. (En tablet la foto va al lado del texto:
+  // acortarla no le saca alto a la carta.)
   const ESCALA_MIN = 0.35;
+  const FOTO_MIN = 72;
+  const celular = window.matchMedia("(max-width: 47.999rem)");
   const encajar = () => {
     const cuerpos = cartas.map((c) => c.querySelector<HTMLElement>("[data-puente-cuerpo]"));
+    const fotos = cartas.map((c) => c.querySelector<HTMLElement>("figure"));
     cartas.forEach((c, k) => {
       gsap.set(c, { height: "auto" });
       const cuerpo = cuerpos[k];
       if (cuerpo) gsap.set(cuerpo, { scale: 1 });
+      const foto = fotos[k];
+      if (foto) gsap.set(foto, { clearProps: "height,display" });
     });
+    if (celular.matches) {
+      const sobras = cartas.map((c, k) => ({ falta: c.offsetHeight - (pila.clientHeight - k * lomo()), alto: fotos[k]?.offsetHeight ?? 0 }));
+      sobras.forEach(({ falta, alto }, k) => {
+        const foto = fotos[k];
+        if (!foto || falta <= 0) return;
+        if (alto - falta >= FOTO_MIN) gsap.set(foto, { height: alto - falta });
+        else gsap.set(foto, { display: "none" });
+      });
+    }
     const medidas = cartas.map((c, k) => {
       const cuerpo = cuerpos[k];
       if (!cuerpo) return null;
