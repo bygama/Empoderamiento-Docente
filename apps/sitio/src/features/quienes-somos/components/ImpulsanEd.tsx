@@ -25,8 +25,9 @@ import { Nivel } from "./impulsan-ed/Nivel";
  *
  *   N1 Dirección General      → Daniela: card de 22rem, primera del masthead.
  *   N2 Dirección              → Karla, Wendolyne y Raquel: tres cards menores
- *                               a su lado, en la misma fila (eran dos, una de
- *                               cada lado; Wendolyne subió a la Dirección).
+ *                               a su lado, en la misma fila y sin rótulo (eran
+ *                               dos, una de cada lado; Wendolyne subió a la
+ *                               Dirección).
  *   N3 Líderes de área/proy.  → grilla ESTABLE de cards compactas, filas de 4.
  *   N4 Facilitación y diseño  → grilla ESTABLE de cards compactas, filas de 4.
  *
@@ -157,10 +158,12 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
         {/* ── Masthead: N1 Daniela y, a su lado, las tres direcciones ─────
             Una sola fila, en el orden de Daniela (2026-09-30): ella primero y
             más grande (22rem; era de 30rem al centro) y las direcciones a su
-            lado, alineadas abajo, cada una con su rótulo (eran dos, una de
-            cada lado; Wendolyne subió a la Dirección). Así el masthead entra
-            entero en la primera pantalla y las grillas aparecen enseguida.
-            En celular, Daniela sola y las direcciones de a dos. */}
+            lado, alineadas abajo (eran dos, una de cada lado; Wendolyne subió
+            a la Dirección). Solo la Dirección general lleva rótulo: las otras
+            tres van con su rol y nada más (Facundo, 2026-10-02). Así el
+            masthead entra entero en la primera pantalla y las grillas
+            aparecen enseguida. En celular, Daniela sola y las direcciones de
+            a dos. */}
         <div
           data-team-group
           data-reveal-y="34"
@@ -179,14 +182,12 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
           )}
 
           {/* N2 — Dirección: las tres en una fila, en el orden de la base
-              (académica, de gestión educativa, de gestión institucional). */}
+              (académica, de gestión educativa, de gestión institucional), sin
+              rótulo: el rol de cada tarjeta ya dice «Directora…». */}
           <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-6">
             {direccion.map((persona) => (
-              <div key={persona.key}>
-                <KickerRotulo>{niveles.direccion}</KickerRotulo>
-                <div data-reveal className="mt-4">
-                  <PersonCard persona={persona} escala={3} onOpen={openProfile} />
-                </div>
+              <div key={persona.key} data-reveal>
+                <PersonCard persona={persona} escala={3} onOpen={openProfile} />
               </div>
             ))}
           </div>

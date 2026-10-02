@@ -29,8 +29,9 @@ export const esquemaEquipo = z.object({
   bajada: textoCorto({ maximo: 140, etiqueta: "Bajada" }),
   niveles: grupo(
     {
-      direccionGeneral: textoCorto({ maximo: 30, etiqueta: "Dirección general", ayuda: "Arriba de la tarjeta del centro." }),
-      direccion: textoCorto({ maximo: 30, etiqueta: "Dirección", ayuda: "Arriba de las tres tarjetas de la Dirección, debajo de la del centro." }),
+      // Solo la Dirección general lleva rótulo (Facundo, 2026-10-02): las otras
+      // direcciones van con su rol y nada más, así que su rótulo salió de acá.
+      direccionGeneral: textoCorto({ maximo: 30, etiqueta: "Dirección general", ayuda: "Arriba de la primera tarjeta, la única con rótulo." }),
       lideres: nivelConTitulo("Líderes de áreas y proyectos"),
       facilitacion: nivelConTitulo("Facilitación y materiales"),
     },
@@ -50,7 +51,6 @@ export const equipoInicial: EquipoDeQuienesSomos = {
   bajada: "Una red de especialistas, trayectorias y experiencias que hace posible el trabajo de ED.",
   niveles: {
     direccionGeneral: "Dirección general",
-    direccion: "Dirección",
     lideres: { volanta: "Áreas y proyectos", titulo: "Quienes lideran áreas y proyectos" },
     facilitacion: { volanta: "Facilitación y materiales", titulo: "Quienes facilitan y diseñan" },
   },

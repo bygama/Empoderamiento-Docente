@@ -175,9 +175,12 @@ function Caption({
         {/* El país cede antes que el CTA: en las compactas "Colombia" + "Ver
             trayectoria" van al límite del ancho útil y el acceso no puede ser
             lo que se recorte. */}
+        {/* Si el país no entra en un renglón («Costa Rica - México» en la card
+            compacta de la grilla de cuatro), baja a dos en vez de cortarse con
+            puntos suspensivos (2026-10-02). */}
         <PaisDeLaCard
           pais={persona.pais}
-          className={cx("min-w-0 truncate font-mono tracking-[0.16em] uppercase", cfg.pais, hover ? "text-azul-claro" : "text-azul-medio")}
+          className={cx("min-w-0 font-mono leading-tight tracking-[0.16em] uppercase", cfg.pais, hover ? "text-azul-claro" : "text-azul-medio")}
         />
         <span className="flex shrink-0 items-center gap-1.5">
           {showLabel && (
