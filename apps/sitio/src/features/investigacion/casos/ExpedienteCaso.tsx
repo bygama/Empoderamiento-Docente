@@ -117,10 +117,13 @@ export function ExpedienteCaso({
         {/* ── La carpeta: carcasa tintada = INTERIOR de cartón. La hoja
             blanca (el informe) es corta; el resto del recorrido son
             recursos sueltos apoyados directamente sobre el color ──────── */}
-        <div className="relative mt-12 lg:mt-14">
+        {/* En celular la carpeta va casi de borde a borde (6 px de aire): el
+            margen de la página, el de la carcasa y el de la hoja, anidados,
+            le dejaban al texto dos tercios de la pantalla. */}
+        <div className="relative mt-12 max-md:-mx-[calc(1rem+2vw-0.375rem)] max-md:mt-7 lg:mt-14">
           <div
             ref={refShell}
-            className={`${tinte.carpeta} ${tinte.grano} relative rounded-[1.6rem] p-3 pt-12 shadow-[0_44px_110px_-42px_rgb(31_45_77/0.6)] md:p-5 md:pt-14 lg:p-9 lg:pt-16`}
+            className={`${tinte.carpeta} ${tinte.grano} relative rounded-[1.6rem] p-3 pt-12 shadow-[0_44px_110px_-42px_rgb(31_45_77/0.6)] max-md:px-2 max-md:pb-2 md:p-5 md:pt-14 lg:p-9 lg:pt-16`}
           >
             <PestanasLaterales caso={caso} casos={casos} interactiva={interactiva} onIr={onIr} />
 

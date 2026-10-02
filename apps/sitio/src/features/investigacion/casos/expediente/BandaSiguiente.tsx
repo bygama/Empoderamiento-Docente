@@ -20,7 +20,7 @@ type Props = {
  */
 export function BandaSiguiente({ siguiente, indice, total, interactiva, onIr, onVolver }: Props) {
   return (
-    <div data-exp-entrada data-exp-banda className="mt-20 lg:mt-24">
+    <div data-exp-entrada data-exp-banda className="mt-20 max-lg:mt-12 lg:mt-24">
       {siguiente ? (
         <button
           type="button"

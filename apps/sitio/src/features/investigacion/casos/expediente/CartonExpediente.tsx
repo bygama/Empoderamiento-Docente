@@ -6,6 +6,7 @@ import { ROTULO_MICRO } from "../tintes";
 import { EvidenciasCaso } from "../EvidenciasCaso";
 import { ClipPapel } from "../Garabatos";
 import { RotuloExpediente } from "./RotuloExpediente";
+import { TextoPlegable } from "./TextoPlegable";
 
 type Props = {
   caso: CasoInvestigacion;
@@ -26,7 +27,7 @@ export function CartonExpediente({ caso, oscuro }: Props) {
   const cartonRegla = oscuro ? "border-white/15" : "border-azul-principal/15";
 
   return (
-    <div data-exp-carton className="relative px-1 pt-14 pb-2 lg:px-6 lg:pt-20 lg:pb-4">
+    <div data-exp-carton className="relative px-1 pt-14 pb-2 max-lg:pt-10 lg:px-6 lg:pt-20 lg:pb-4">
       {/* Evidencias: el collage pegado al cartón */}
       <section data-exp-bloque aria-label="Evidencias">
         <RotuloExpediente
@@ -34,24 +35,24 @@ export function CartonExpediente({ caso, oscuro }: Props) {
           marcador={cartonMarcador}
           regla={cartonRegla}
         >{`EVIDENCIAS — ${caso.evidencias.length} DOCUMENTOS`}</RotuloExpediente>
-        <div className={`mt-10 ${cartonTexto}`}>
+        <div className={`mt-10 max-lg:mt-6 ${cartonTexto}`}>
           <EvidenciasCaso evidencias={caso.evidencias} tinte={caso.tinte} />
         </div>
       </section>
 
       {/* Lectura: análisis como hoja mecanografiada suelta +
           aprendizaje como post-it celeste */}
-      <div className="mt-16 grid items-start gap-10 lg:mt-24 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
+      <div className="mt-16 grid items-start gap-10 max-lg:mt-10 max-lg:gap-8 lg:mt-24 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
         <section data-exp-bloque aria-label="Análisis">
           <div
             data-exp-asienta
-            className="bg-grain-light relative rotate-[-0.7deg] rounded-md bg-white p-7 pt-9 shadow-[0_24px_55px_-24px_rgb(10_16_30/0.55)] lg:p-10 lg:pt-11"
+            className="bg-grain-light relative rotate-[-0.7deg] rounded-md bg-white p-7 pt-9 shadow-[0_24px_55px_-24px_rgb(10_16_30/0.55)] max-md:p-5 max-md:pt-8 lg:p-10 lg:pt-11"
           >
             <ClipPapel className="text-gris-texto absolute -top-4 left-8 h-12 w-auto rotate-[4deg] drop-shadow-sm" />
             <RotuloExpediente>ANÁLISIS</RotuloExpediente>
-            <p className="font-typewriter text-azul-principal/90 mt-6 max-w-[58ch] text-[1rem] leading-[1.95]">
+            <TextoPlegable className="font-typewriter text-azul-principal/90 mt-6 max-w-[58ch] text-[1rem] leading-[1.95] max-lg:mt-5 max-lg:text-[0.94rem] max-lg:leading-[1.62]">
               {caso.analisis}
-            </p>
+            </TextoPlegable>
           </div>
         </section>
         <aside data-exp-bloque aria-label="Aprendizaje" className="lg:pt-8">
@@ -80,11 +81,11 @@ export function CartonExpediente({ caso, oscuro }: Props) {
       <section
         data-exp-bloque
         aria-label="Qué cambió"
-        className="relative mt-16 lg:mt-24"
+        className="relative mt-16 max-lg:mt-10 lg:mt-24"
       >
         <div
           data-exp-asienta
-          className="bg-grain-light relative max-w-3xl rotate-[0.5deg] rounded-2xl bg-white px-8 py-10 shadow-[0_26px_60px_-26px_rgb(10_16_30/0.55)] lg:px-12 lg:py-12"
+          className="bg-grain-light relative max-w-3xl rotate-[0.5deg] rounded-2xl bg-white px-8 py-10 shadow-[0_26px_60px_-26px_rgb(10_16_30/0.55)] max-md:px-6 max-md:py-7 lg:px-12 lg:py-12"
         >
           <span
             aria-hidden="true"
@@ -131,7 +132,7 @@ export function CartonExpediente({ caso, oscuro }: Props) {
       </section>
 
       {/* Pie sobre el cartón: producción como etiquetas */}
-      <footer data-exp-bloque className="mt-20 space-y-6 lg:mt-24">
+      <footer data-exp-bloque className="mt-20 space-y-6 max-lg:mt-12 lg:mt-24">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           <span className={`${cartonTexto} ${ROTULO_MICRO}`}>
             PRODUCCIÓN RELACIONADA

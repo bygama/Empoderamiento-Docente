@@ -3,6 +3,7 @@ import { ROTULO_SECCION, TINTES } from "../tintes";
 import { LaminaCaso } from "../LaminaCaso";
 import { FlechaManuscrita, SubrayadoMarcador } from "../Garabatos";
 import { RotuloExpediente } from "./RotuloExpediente";
+import { TextoPlegable } from "./TextoPlegable";
 
 /**
  * SUPERFICIE 1: la hoja blanca — el informe, corto. Margen de hoja con
@@ -16,7 +17,7 @@ export function HojaInforme({ caso }: { caso: CasoInvestigacion }) {
     <div
       data-exp-hoja
       data-exp-entrada
-      className="bg-grain-light renglones-papel relative rounded-[1.2rem] bg-white px-6 py-12 shadow-[0_30px_60px_-26px_rgb(10_16_30/0.5)] md:px-10 lg:px-24 lg:py-16"
+      className="bg-grain-light renglones-papel relative rounded-[1.2rem] bg-white px-6 py-12 shadow-[0_30px_60px_-26px_rgb(10_16_30/0.5)] max-md:px-5 max-md:py-8 md:px-10 lg:px-24 lg:py-16"
     >
       {/* Margen de hoja + perforación + anilla (lg+) */}
       <span
@@ -38,7 +39,7 @@ export function HojaInforme({ caso }: { caso: CasoInvestigacion }) {
 
       {/* Apertura: la lámina LIDERA y el contexto mecanografiado
           la acompaña */}
-      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
+      <div className="grid items-start gap-10 max-lg:gap-7 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
         <section
           data-exp-bloque
           aria-label="Lámina del caso"
@@ -48,9 +49,11 @@ export function HojaInforme({ caso }: { caso: CasoInvestigacion }) {
         </section>
         <section data-exp-bloque aria-label="Contexto" className="lg:pt-4">
           <RotuloExpediente>CONTEXTO</RotuloExpediente>
-          <p className="font-typewriter text-azul-principal/90 mt-7 max-w-[48ch] text-[1rem] leading-[1.95]">
+          {/* Bajo `lg` el mecanografiado aprieta el interlineado (a doble
+              espacio un párrafo se llevaba una pantalla) y arranca plegado. */}
+          <TextoPlegable className="font-typewriter text-azul-principal/90 mt-7 max-w-[48ch] text-[1rem] leading-[1.95] max-lg:mt-5 max-lg:text-[0.94rem] max-lg:leading-[1.62]">
             {caso.contexto}
-          </p>
+          </TextoPlegable>
           <div className="mt-8 hidden items-end gap-3 lg:flex">
             <FlechaManuscrita className="text-azul-medio/80 h-9 w-24 scale-x-[-1] rotate-[-6deg]" />
             <span className="font-hand text-azul-medio text-[1.35rem] leading-none">
@@ -64,7 +67,7 @@ export function HojaInforme({ caso }: { caso: CasoInvestigacion }) {
       <section
         data-exp-bloque
         aria-label="Pregunta de investigación"
-        className={`border-t ${tinte.borde} mt-14 pt-10 pb-2 text-center lg:mt-16 lg:pt-12`}
+        className={`border-t ${tinte.borde} mt-14 pt-10 pb-2 text-center max-lg:mt-8 max-lg:pt-7 lg:mt-16 lg:pt-12`}
       >
         <h4 className={`text-gris-texto ${ROTULO_SECCION} relative inline-block`}>
           <SubrayadoMarcador
