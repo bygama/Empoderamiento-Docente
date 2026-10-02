@@ -30,7 +30,7 @@ export const esquemaEquipo = z.object({
   niveles: grupo(
     {
       direccionGeneral: textoCorto({ maximo: 30, etiqueta: "Dirección general", ayuda: "Arriba de la tarjeta del centro." }),
-      direccion: textoCorto({ maximo: 30, etiqueta: "Dirección", ayuda: "Arriba de las dos tarjetas de los costados." }),
+      direccion: textoCorto({ maximo: 30, etiqueta: "Dirección", ayuda: "Arriba de las tres tarjetas de la Dirección, debajo de la del centro." }),
       lideres: nivelConTitulo("Líderes de áreas y proyectos"),
       facilitacion: nivelConTitulo("Facilitación y materiales"),
     },

@@ -8,12 +8,13 @@ import type { Tipo } from "@/features/biblioteca/contenido/modelo";
 
 /**
  * Los cuatro niveles de la jerarquía, en el orden del sitio. `lugares` es
- * cuántas personas publicadas entran: el masthead tiene una al centro y dos a
- * los costados; los otros dos son grillas.
+ * cuántas personas publicadas entran: el masthead tiene una al centro (la
+ * Dirección general) y tres debajo (la Dirección: eran dos, y Wendolyne Ríos
+ * subió a pedido de Daniela, 2026-09-30); los otros dos son grillas.
  */
 export const NIVELES = [
   { nivel: 1, rotulo: "Dirección general", lugares: 1 },
-  { nivel: 2, rotulo: "Dirección", lugares: 2 },
+  { nivel: 2, rotulo: "Dirección", lugares: 3 },
   { nivel: 3, rotulo: "Líderes de área y proyecto", lugares: null },
   { nivel: 4, rotulo: "Facilitación y diseño de materiales", lugares: null },
 ] as const;
@@ -41,7 +42,8 @@ export type TipoDeFigura = (typeof FIGURAS)[number];
 /** Los largos máximos y las cantidades, del contenido de hoy con aire (el de hoy, entre paréntesis en el SPEC §4.1). */
 export const TOPES = {
   nombre: 30,
-  rol: 60,
+  // El más largo es el de Gabriela Buendía, como lo escribió Daniela: 63.
+  rol: 70,
   pais: 30,
   alt: 200,
   nombreCompleto: 50,
