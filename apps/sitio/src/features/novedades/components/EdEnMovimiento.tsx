@@ -117,9 +117,9 @@ export function EdEnMovimiento({ contenido }: { contenido: MovimientoDeNovedades
         className={
           "bg-grain-dark relative isolate overflow-hidden text-white " +
           (live
-            ? "sticky top-0 flex h-[100svh] flex-col"
+            ? "sticky top-[var(--visor-arriba,0px)] flex h-[100svh] flex-col"
             : movil
-              ? "sticky top-0 flex h-lvh flex-col"
+              ? "sticky top-[var(--visor-arriba,0px)] flex h-lvh flex-col"
               : "flex min-h-[70svh] flex-col py-24")
         }
       >

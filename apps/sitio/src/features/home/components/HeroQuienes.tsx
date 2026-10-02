@@ -72,7 +72,7 @@ export function HeroQuienes({ hero, quienesSomos, mision }: Props) {
         // tampoco se arma ahí, ver la rama «bajo» en coreografia-quienes.ts).
         className="relative z-20 h-[340svh] max-lg:h-[300svh] max-lg:motion-reduce:h-auto motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!"
       >
-        <div className="sticky top-0 h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:static! [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">
+        <div className="sticky top-[var(--visor-arriba,0px)] h-[100svh] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:static! [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">
           <div ref={panelRef} className="relative h-full w-full motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">
             {/* Capa 1: Quiénes somos (se borra). */}
             <div data-about-layer className="h-full w-full motion-reduce:h-auto [@media(max-height:38.74rem)_and_(max-width:63.999rem)]:h-auto!">

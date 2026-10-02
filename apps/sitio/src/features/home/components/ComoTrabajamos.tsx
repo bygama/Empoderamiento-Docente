@@ -9,7 +9,7 @@ import { PasoMetodo } from "./como-trabajamos/PasoMetodo";
 
 /**
  * Bloque sticky scroll-telling. h-[500vh] (380vh en celular: cinco
- * pantallas para cinco pasos se hacían largas con el dedo) + sticky top-0 h-screen
+ * pantallas para cinco pasos se hacían largas con el dedo) + sticky top-[var(--visor-arriba,0px)] h-screen
  * (sin pin:true — compatible con Lenis). 5 pasos con fotos reales que
  * se cross-fadean con el progreso del scroll. Timeline scrubbed mapea
  * 0→1 a las N fases (el número de pasos se lee del contenido). Nav lateral de
@@ -63,7 +63,7 @@ export function ComoTrabajamos({ contenido, frases }: { contenido: ContenidoDeCo
       aria-label="Cómo trabajamos"
     >
       <div className="relative h-[380vh] md:h-[500vh]">
-        <div className="sticky top-0 flex h-svh flex-col overflow-hidden [--metodo-foto:min(16rem,calc(var(--metodo-linea)-8rem))] [--metodo-linea:min(50svh,calc(100svh-19rem))] [--metodo-texto:max(1.75rem,calc((100svh-var(--metodo-linea)-15rem)/2))] max-[359px]:[--metodo-linea:min(50svh,calc(100svh-20.5rem))] md:h-screen">
+        <div className="sticky top-[var(--visor-arriba,0px)] flex h-svh flex-col overflow-hidden [--metodo-foto:min(16rem,calc(var(--metodo-linea)-8rem))] [--metodo-linea:min(50svh,calc(100svh-19rem))] [--metodo-texto:max(1.75rem,calc((100svh-var(--metodo-linea)-15rem)/2))] max-[359px]:[--metodo-linea:min(50svh,calc(100svh-20.5rem))] md:h-screen">
 
           {/* Glow verde ambiental */}
           <div

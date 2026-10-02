@@ -137,7 +137,7 @@ export function OrigenEd({ contenido }: { contenido: OrigenDeQuienesSomos }) {
         <div
           data-origen-escena
           className={
-            "top-0 w-full overflow-hidden motion-reduce:static motion-reduce:h-auto " +
+            "top-[var(--visor-arriba,0px)] w-full overflow-hidden motion-reduce:static motion-reduce:h-auto " +
             (modo === "movil" ? "sticky h-lvh" : modo === "quieto" ? "static h-auto" : "sticky h-[100svh]")
           }
         >

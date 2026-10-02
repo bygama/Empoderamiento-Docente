@@ -101,9 +101,9 @@ export function PuenteInvestigacion({ contenido }: { contenido: Puente }) {
             // cards hacia abajo — con clip total quedaba cortada en seco al
             // borde del escenario.
             live
-              ? "sticky top-0 isolate flex h-[100svh] flex-col overflow-x-clip"
+              ? "sticky top-[var(--visor-arriba,0px)] isolate flex h-[100svh] flex-col overflow-x-clip"
               : movil
-                ? "sticky top-0 isolate flex h-lvh flex-col overflow-x-clip"
+                ? "sticky top-[var(--visor-arriba,0px)] isolate flex h-lvh flex-col overflow-x-clip"
                 : ""
           }
         >

@@ -114,7 +114,7 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
         id="conversemos"
         data-indice="Cierre"
         aria-label="Cierre e invitación a conversar"
-        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden [--faro-movil:clamp(112px,21svh,156px)] pb-[var(--footer-radio)] text-white data-[modo=movil]:sticky data-[modo=movil]:top-0 data-[modo=movil]:h-lvh"
+        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden [--faro-movil:clamp(112px,21svh,156px)] pb-[var(--footer-radio)] text-white data-[modo=movil]:sticky data-[modo=movil]:top-[var(--visor-arriba,0px)] data-[modo=movil]:h-lvh"
       >
         {/* ── El cielo: cae la noche sobre el archivo. */}
         <CieloCierre />

@@ -148,7 +148,7 @@ export function MobileNav({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "re
             // `width`/`height: fit-content`, que le ganan al tamaño implícito
             // del inset y encogían el panel (los ítems quedaban 21px más
             // angostos y 59px más arriba que antes de ser <dialog>).
-            className="fixed inset-0 z-[70] m-0 hidden h-full w-full max-h-none max-w-none overflow-clip border-0 bg-transparent p-0 backdrop:bg-transparent open:block lg:hidden"
+            className="fixed inset-x-0 top-[var(--visor-arriba,0px)] z-[70] m-0 hidden h-[var(--visor-alto,100%)] w-full max-h-none max-w-none overflow-clip border-0 bg-transparent p-0 backdrop:bg-transparent open:block lg:hidden"
             style={{ visibility: "hidden" }}
           >
             {/* Velo: apaga la página de atrás mientras la cortina la cruza. */}

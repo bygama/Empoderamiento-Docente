@@ -54,7 +54,7 @@ export function PilaFichasMovil({
     <div ref={zonaRef} className="relative" style={{ height: `${ALTO_MOVIL_LVH}lvh` }}>
       <div
         data-pm-escena
-        className="bg-gris-fondo sticky top-0 h-lvh overflow-clip bg-[radial-gradient(color-mix(in_srgb,var(--color-azul-claro)_55%,transparent)_1.2px,transparent_1.2px)] bg-[length:22px_22px]"
+        className="bg-gris-fondo sticky top-[var(--visor-arriba,0px)] h-lvh overflow-clip bg-[radial-gradient(color-mix(in_srgb,var(--color-azul-claro)_55%,transparent)_1.2px,transparent_1.2px)] bg-[length:22px_22px]"
       >
         {/* El título grande, solo, antes de las fichas. */}
         <div className="absolute inset-0 flex items-center px-5 md:px-10">

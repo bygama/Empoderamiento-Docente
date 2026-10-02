@@ -15,7 +15,7 @@ export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
       {/* Portada: el tipo y el año con el color del tipo, o la foto que cargue el equipo.
           Acompaña el scroll mientras dura su fila (cuando el texto es más alto
           que ella), pegada bajo el header o, con la barra de filtros, bajo la barra. */}
-      <div className="bg-azul-claro/30 relative aspect-[16/9] overflow-hidden rounded-xl md:aspect-[4/3] max-md:aspect-[3/4] sticky top-[13.5rem] self-start lg:top-28">
+      <div className="bg-azul-claro/30 relative aspect-[16/9] overflow-hidden rounded-xl md:aspect-[4/3] max-md:aspect-[3/4] sticky top-[calc(13.5rem+var(--visor-arriba,0px))] self-start lg:top-28">
         <PortadaDeMaterial material={m} variante="miniatura" sizes="(min-width: 768px) 218px, 34vw" />
       </div>
 

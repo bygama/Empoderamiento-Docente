@@ -72,7 +72,7 @@ export function EscenarioFichas({
     >
       {/* Transparente y sin grilla: el gris lo pone el body, la grilla y la
           víbora la capa fija de la página, por debajo. */}
-      <div ref={stageRef} className="isolate sticky top-0 h-[100svh] overflow-clip">
+      <div ref={stageRef} className="isolate sticky top-[var(--visor-arriba,0px)] h-[100svh] overflow-clip">
         {/* La cámara: todo lo que se ve cuelga de acá, y la coreografía le
             hace el zoom de los dos solos. */}
         <div data-camara className="absolute inset-0">

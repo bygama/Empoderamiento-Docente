@@ -74,7 +74,7 @@ export function IndiceAreas({
     // la columna del costado como siempre.
     <div
       data-areas-banda
-      className="max-lg:sticky max-lg:top-0 max-lg:z-20 max-lg:-mx-5 max-lg:border-b max-lg:border-azul-principal/10 max-lg:bg-white/95 max-lg:px-5 max-lg:pt-[4.75rem] max-lg:pb-2 max-lg:backdrop-blur-md md:max-lg:-mx-10 md:max-lg:px-10 lg:contents"
+      className="max-lg:sticky max-lg:top-[var(--visor-arriba,0px)] max-lg:z-20 max-lg:-mx-5 max-lg:border-b max-lg:border-azul-principal/10 max-lg:bg-white/95 max-lg:px-5 max-lg:pt-[4.75rem] max-lg:pb-2 max-lg:backdrop-blur-md md:max-lg:-mx-10 md:max-lg:px-10 lg:contents"
     >
       {/* El titular volvió el 2026-09-11 (el usuario: «falta el título a
           la izquierda antes de las áreas»). El owner lo había sacado con

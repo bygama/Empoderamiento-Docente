@@ -166,7 +166,7 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
         <div
           className={
             "w-full motion-reduce:static motion-reduce:h-auto " +
-            (live ? "sticky top-0 h-[100svh] overflow-hidden" : modoMovil ? "sticky top-0 h-lvh overflow-hidden" : "")
+            (live ? "sticky top-[var(--visor-arriba,0px)] h-[100svh] overflow-hidden" : modoMovil ? "sticky top-[var(--visor-arriba,0px)] h-lvh overflow-hidden" : "")
           }
         >
           <MapaConstelacion live={live} perspectivas={perspectivas} />
