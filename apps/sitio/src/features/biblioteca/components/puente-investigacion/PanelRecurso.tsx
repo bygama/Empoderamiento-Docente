@@ -11,6 +11,11 @@ import type { Tema } from "./temas";
  * en estático se apila vertical; en celular y tablet (`movil`) es una carta
  * de la pila con lomo arriba (puente/pila-movil.ts). El texto y la foto llegan por props; el
  * tema (navy o gris) lo pone la pila, por el lugar del panel.
+ *
+ * En celular la carta no repite lo que ya dice su lomo: el «Recurso 01 / 04»
+ * no se muestra y el nombre queda solo para lectores de pantalla (el lomo es
+ * decorativo). Con todo adentro, la carta no entraba en lo que queda de
+ * pantalla y la pila la achicaba hasta que no se leía.
  */
 export function PanelRecurso({
   recurso: c,
@@ -120,6 +125,7 @@ export function PanelRecurso({
           <p
             className={
               "font-mono text-[0.7rem] tracking-[0.14em] uppercase " +
+              (movil ? "max-md:hidden " : "") +
               tema.eyebrow
             }
           >
@@ -128,6 +134,7 @@ export function PanelRecurso({
           <h3
             className={
               "font-display mt-3 font-extrabold tracking-[-0.02em] " +
+              (movil ? "max-md:sr-only " : "") +
               tema.titulo
             }
             style={{
@@ -139,7 +146,8 @@ export function PanelRecurso({
           </h3>
           <p
             className={
-              "mt-4 max-w-[46ch] font-sans text-[1rem] leading-relaxed md:text-[1.08rem] max-md:text-[0.92rem] " +
+              "mt-4 max-w-[46ch] font-sans text-[1rem] leading-relaxed md:text-[1.08rem] max-md:text-[0.95rem] " +
+              (movil ? "max-md:mt-0 " : "") +
               tema.desc
             }
           >
