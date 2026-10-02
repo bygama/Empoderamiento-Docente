@@ -10,6 +10,7 @@ import { crearEspiral } from "./coreografia-espiral";
 import { crearEspiralMovil } from "./coreografia-espiral-movil";
 import { EspiralEstatica } from "./EspiralEstatica";
 import { EspiralLamina } from "./EspiralLamina";
+import { EspiralMovil } from "./EspiralMovil";
 
 /**
  * Secciones 4 y 5 — Ciclo de investigación aplicada (`#ciclo`) y Volvemos
@@ -35,13 +36,15 @@ import { EspiralLamina } from "./EspiralLamina";
  * `features/investigacion/contenido/ciclo.ts` o de la base).
  *
  * `#evidencia` es un ancla interna que salta a la bisagra.
- * Touch / reduced-motion: EspiralEstatica (que es también lo que dibuja el SSR).
+ * Bajo `lg`, una estación por vez en una escena pegajosa (EspiralMovil.tsx).
+ * Reduced-motion y pantallas bajas: EspiralEstatica (que es también lo que
+ * dibuja el SSR).
  */
 export function EspiralInvestigacion({ contenido }: { contenido: Ciclo }) {
   const zonaRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
   // quieto = EspiralEstatica sola (lo que dibuja el SSR); vivo = la lámina de
-  // escritorio; movil = la espiral pegada que acompaña la lectura bajo lg.
+  // escritorio; movil = una estación por vez, en una escena pegajosa bajo lg.
   // Se decide entero en cada corrida y se vuelve a decidir al cambiar cualquier
   // media query (rotar el dispositivo), no solo al montar.
   const [modo, setModo] = useState<"quieto" | "vivo" | "movil">("quieto");
@@ -92,8 +95,7 @@ export function EspiralInvestigacion({ contenido }: { contenido: Ciclo }) {
     };
   }, [live]);
 
-  // Bajo `lg`: la espiral queda sticky arriba y acompaña los ocho pasos
-  // que se leen debajo (EspiralEstatica).
+  // Bajo `lg`: la escena de una estación por vez (EspiralMovil).
   useIsomorphicLayoutEffect(() => {
     if (modo !== "movil") return;
     const zona = zonaRef.current;
@@ -125,7 +127,13 @@ export function EspiralInvestigacion({ contenido }: { contenido: Ciclo }) {
             Archivo ED · Hoja 03 · Ciclo de investigación aplicada
           </span>
 
-          {live ? <EspiralLamina contenido={contenido} /> : <EspiralEstatica contenido={contenido} />}
+          {live ? (
+            <EspiralLamina contenido={contenido} />
+          ) : modo === "movil" ? (
+            <EspiralMovil contenido={contenido} />
+          ) : (
+            <EspiralEstatica contenido={contenido} />
+          )}
         </div>
       </div>
     </section>
