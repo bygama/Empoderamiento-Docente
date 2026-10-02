@@ -1,18 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import {
-  ArrowRight,
-  BookOpen,
-  Compass,
-  LampManual,
-  Lightbulb,
-  School,
-  Target,
-  TrendingUp,
-  Users,
-  type IconProps,
-} from "@/components/ui/icons";
+import { ArrowRight, Compass, type IconProps } from "@/components/ui/icons";
+import { TIPOS } from "@/features/biblioteca/contenido/modelo";
+import { ESTILO_DE_TIPO } from "./portada/estilo-de-tipo";
 import { alCambiarTipo, bajarAlCatalogo, escribirTipoEnUrl, tipoDeUrl } from "./materiales-listado/filtros";
 
 /**
@@ -22,15 +13,9 @@ import { alCambiarTipo, bajarAlCatalogo, escribirTipoEnUrl, tipoDeUrl } from "./
  */
 const CATEGORIAS: { label: string; Icon: (p: IconProps) => React.JSX.Element }[] = [
   // Los rótulos son los TIPOS de contenido/modelo.ts, tal cual: el riel
-  // filtra por ese texto.
+  // filtra por ese texto. El ícono de cada uno, el de su portada.
   { label: "Todo el catálogo", Icon: Compass },
-  { label: "Artículos", Icon: BookOpen },
-  { label: "Capítulos de libro", Icon: Lightbulb },
-  { label: "Libros", Icon: School },
-  { label: "Tesis", Icon: Target },
-  { label: "Actas de congreso", Icon: Users },
-  { label: "Divulgación", Icon: TrendingUp },
-  { label: "Materiales", Icon: LampManual },
+  ...TIPOS.map((tipo) => ({ label: tipo, Icon: ESTILO_DE_TIPO[tipo].Icon })),
 ];
 
 const PASO_SCROLL = 280;
@@ -90,65 +75,65 @@ export function CategoriasRail() {
 
   return (
     <>
-    <p id="categorias-rotulo" className="mb-3 font-mono text-[0.72rem] tracking-[0.14em] text-white/70 uppercase md:hidden">
-      Explorá por tipo
-    </p>
-    <div role="group" aria-labelledby="categorias-rotulo" className="flex items-center gap-2 md:gap-3">
-      <button
-        type="button"
-        aria-label="Ver categorías anteriores"
-        aria-hidden={!hayIzq}
-        tabIndex={hayIzq ? 0 : -1}
-        onClick={() => desplazar(-1)}
-        className={flechaClase(hayIzq)}
-      >
-        <ArrowRight size={18} className="rotate-180" />
-      </button>
+      <p id="categorias-rotulo" className="mb-3 font-mono text-[0.72rem] tracking-[0.14em] text-white/70 uppercase md:hidden">
+        Explorá por tipo
+      </p>
+      <div role="group" aria-labelledby="categorias-rotulo" className="flex items-center gap-2 md:gap-3">
+        <button
+          type="button"
+          aria-label="Ver categorías anteriores"
+          aria-hidden={!hayIzq}
+          tabIndex={hayIzq ? 0 : -1}
+          onClick={() => desplazar(-1)}
+          className={flechaClase(hayIzq)}
+        >
+          <ArrowRight size={18} className="rotate-180" />
+        </button>
 
-      {/* La banda blanca ES el contenedor de scroll: las píldoras se cortan
-          contra su borde redondeado real (como la referencia), no contra una
-          línea interna de padding. */}
-      <div
-        ref={railRef}
-        onScroll={actualizar}
-        className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-full bg-white p-2 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.4)] max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-2 max-md:-mx-5 max-md:scroll-px-5 max-md:rounded-none max-md:bg-transparent max-md:px-5 max-md:py-0 max-md:shadow-none"
-      >
-        {CATEGORIAS.map(({ label, Icon }, i) => {
-          const suTipo = i === 0 ? null : label;
-          const activa = tipo === suTipo;
-          return (
-            <button
-              key={label}
-              type="button"
-              data-bh-pill
-              aria-pressed={activa}
-              onClick={() => elegir(suTipo)}
-              className={`flex shrink-0 items-center gap-2.5 rounded-full px-4 py-2.5 font-sans text-[0.9rem] font-medium whitespace-nowrap transition-colors max-lg:min-h-11 max-lg:snap-start ${
-                activa
-                  ? "bg-azul-principal text-white max-md:bg-white max-md:text-azul-principal"
-                  : "bg-gris-fondo text-azul-principal hover:bg-azul-claro/40 max-md:bg-white/10 max-md:text-white max-md:ring-1 max-md:ring-white/20 max-md:ring-inset"
-              }`}
-            >
-              <span className="text-verde-concepto">
-                <Icon size={18} />
-              </span>
-              {label}
-            </button>
-          );
-        })}
+        {/* La banda blanca ES el contenedor de scroll: las píldoras se cortan
+            contra su borde redondeado real (como la referencia), no contra una
+            línea interna de padding. */}
+        <div
+          ref={railRef}
+          onScroll={actualizar}
+          className="scrollbar-none flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-full bg-white p-2 shadow-[0_24px_60px_-24px_rgb(0_0_0_/_0.4)] max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-2 max-md:-mx-5 max-md:scroll-px-5 max-md:rounded-none max-md:bg-transparent max-md:px-5 max-md:py-0 max-md:shadow-none"
+        >
+          {CATEGORIAS.map(({ label, Icon }, i) => {
+            const suTipo = i === 0 ? null : label;
+            const activa = tipo === suTipo;
+            return (
+              <button
+                key={label}
+                type="button"
+                data-bh-pill
+                aria-pressed={activa}
+                onClick={() => elegir(suTipo)}
+                className={`flex shrink-0 items-center gap-2.5 rounded-full px-4 py-2.5 font-sans text-[0.9rem] font-medium whitespace-nowrap transition-colors max-lg:min-h-11 max-lg:snap-start ${
+                  activa
+                    ? "bg-azul-principal text-white max-md:bg-white max-md:text-azul-principal"
+                    : "bg-gris-fondo text-azul-principal hover:bg-azul-claro/40 max-md:bg-white/10 max-md:text-white max-md:ring-1 max-md:ring-white/20 max-md:ring-inset"
+                }`}
+              >
+                <span className="text-verde-concepto">
+                  <Icon size={18} />
+                </span>
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          type="button"
+          aria-label="Ver más categorías"
+          aria-hidden={!hayDer}
+          tabIndex={hayDer ? 0 : -1}
+          onClick={() => desplazar(1)}
+          className={flechaClase(hayDer)}
+        >
+          <ArrowRight size={18} />
+        </button>
       </div>
-
-      <button
-        type="button"
-        aria-label="Ver más categorías"
-        aria-hidden={!hayDer}
-        tabIndex={hayDer ? 0 : -1}
-        onClick={() => desplazar(1)}
-        className={flechaClase(hayDer)}
-      >
-        <ArrowRight size={18} />
-      </button>
-    </div>
     </>
   );
 }

@@ -1,10 +1,9 @@
-import Image from "next/image";
 import type { RefObject } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material";
 import { accionDe } from "@/features/biblioteca/contenido/modelo";
 import { contar } from "@/lib/contadores/contar";
-import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { PortadaDeMaterial } from "@/features/biblioteca/components/portada/PortadaDeMaterial";
 import { TextoPlegable } from "./TextoPlegable";
 
 type ArticuloDestacadoProps = {
@@ -52,14 +51,7 @@ export function ArticuloDestacado({ item, i, activo, reduced, refItem, refSlot }
         <div
           className={`${claseImagenInline} bg-azul-medio/25 relative mb-6 aspect-[16/9] overflow-hidden rounded-xl`}
         >
-          <Image
-            src={material.portada.src}
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover"
-            style={estiloDeFoco(material.portada.foco)}
-          />
+          <PortadaDeMaterial material={material} variante="miniatura" sizes="100vw" />
         </div>
 
         {/* hyphens + break-words: títulos con palabras largas
