@@ -10,6 +10,7 @@ import type { EquipoDeQuienesSomos } from "@/features/quienes-somos/contenido/eq
 import type { PersonaDelSitio as Persona, Tier } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { PersonCard } from "@/features/quienes-somos/components/PersonCard";
 import { TeamProfileOverlay } from "@/features/quienes-somos/components/TeamProfileOverlay";
+import { CierreDelEquipo } from "./impulsan-ed/CierreDelEquipo";
 import { crearCoreografiaEquipo } from "./impulsan-ed/coreografia-equipo";
 import { KickerRotulo } from "./impulsan-ed/KickerRotulo";
 import { Nivel } from "./impulsan-ed/Nivel";
@@ -161,11 +162,11 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
           data-reveal-y="34"
           data-reveal-dur="0.85"
           data-reveal-stagger="0.18"
-          className="relative mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_30rem_minmax(0,1fr)] lg:gap-8"
+          className="relative mt-16 grid grid-cols-1 gap-10 max-sm:grid-cols-2 max-sm:gap-x-5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_30rem_minmax(0,1fr)] lg:gap-8"
         >
           {/* N1 — Dirección General (retrato grande, al centro); una sola, y la base lo garantiza */}
           {direccionGeneral && (
-            <div className="sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[30rem] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none">
+            <div className="max-lg:order-1 max-sm:col-span-2 sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[30rem] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none">
               <KickerRotulo>{niveles.direccionGeneral}</KickerRotulo>
               <div data-reveal className="mt-4">
                 <PersonCard persona={direccionGeneral} onOpen={openProfile} />
@@ -175,15 +176,23 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
 
           {/* N2 — Dirección: una card de cada lado, más abajo, a la misma
               altura entre sí. Orden de lectura: académica a la izquierda,
-              institucional a la derecha. */}
+              institucional a la derecha. En celular y tablet van las dos en
+              la misma línea, debajo de la Dirección General, y la segunda va
+              primero (Gastón, 2026-10-02: Raquel antes que Karla); en
+              computadora nada cambia. */}
           {direccion.map((persona, i) => (
             <div
               key={persona.key}
               className={`lg:row-start-1 lg:mt-[9rem] lg:self-start ${
-                i === 0 ? "lg:col-start-1" : "lg:col-start-3"
+                i === 0 ? "max-lg:order-3 lg:col-start-1" : "max-lg:order-2 lg:col-start-3"
               }`}
             >
-              <KickerRotulo>{niveles.direccion}</KickerRotulo>
+              {/* En celular y tablet van lado a lado: el rótulo se lee una vez,
+                  sobre la primera; el de la otra conserva su lugar para que
+                  las dos cards arranquen a la misma altura. */}
+              <div className={i === 0 ? "max-lg:invisible" : undefined}>
+                <KickerRotulo>{niveles.direccion}</KickerRotulo>
+              </div>
               <div data-reveal className="mt-4">
                 <PersonCard persona={persona} onOpen={openProfile} />
               </div>
@@ -235,7 +244,8 @@ export function ImpulsanEd({ contenido, personas }: { contenido: EquipoDeQuienes
         {/* ── Cierre: respiración final + nodo (la red se resuelve en un
             punto), sin CTA inventado. Deja continuidad con la sección
             siguiente, que acopla su lámina clara por encima. ─────────────── */}
-        <div className="mt-24 flex flex-col items-center">
+        <CierreDelEquipo personas={personas} />
+        <div className="mt-24 flex flex-col items-center max-lg:hidden">
           <span
             aria-hidden="true"
             className="h-px w-full max-w-2xl bg-gradient-to-r from-transparent via-white/18 to-transparent"
