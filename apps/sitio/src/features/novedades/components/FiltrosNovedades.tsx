@@ -86,6 +86,16 @@ export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasD
     cards.forEach((c) => {
       c.style.display = visibles.has(c.dataset.id ?? "") ? "" : "none";
     });
+    // En celular la primera visible queda como card y las demás pasan a
+    // fila compacta (NovedadCard lee `data-fila`): seis cards enteras
+    // apiladas eran tres pantallas y media.
+    let primera = true;
+    cards.forEach((c) => {
+      if (c.style.display === "none") return;
+      if (primera) delete c.dataset.fila;
+      else c.dataset.fila = "si";
+      primera = false;
+    });
 
     // Al paginar, volver al tope del panel (se ven chips + primera fila).
     // Lenis ignora window.scrollTo suave → usar su scrollTo; sin Lenis
@@ -182,7 +192,8 @@ export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasD
           {/* Cabecera: chips + contador */}
           <div className="border-azul-principal/10 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-b px-5 py-5 md:px-8">
             <div
-              className="flex flex-wrap gap-2.5 max-md:-mx-5 max-md:flex-nowrap max-md:snap-x max-md:overflow-x-auto max-md:px-5 max-md:scrollbar-none max-md:[scrollbar-width:none]"
+              // En celular el riel se desvanece a la derecha: dice que sigue.
+              className="flex flex-wrap gap-2.5 max-md:-mx-5 max-md:flex-nowrap max-md:snap-x max-md:overflow-x-auto max-md:pr-12 max-md:pl-5 max-md:scroll-pl-5 max-md:scrollbar-none max-md:[scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,black_calc(100%-3rem),transparent)]"
               role="group"
               aria-label="Filtrar por categoría"
             >
@@ -201,11 +212,16 @@ export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasD
                     }`}
                   >
                     {key === "todas" ? "Todas" : etiquetaDeCategoria(key)}
+                    {/* En celular cada chip lleva su cantidad: reemplaza al
+                        contador de abajo, que ahí queda solo para lectores. */}
+                    <span className={`ml-2 md:hidden ${on ? "text-white/80" : "text-gris-texto/60"}`}>
+                      {filtrarLista(novedades, key).length}
+                    </span>
                   </button>
                 );
               })}
             </div>
-            <p className="text-gris-texto font-mono text-[0.68rem] tracking-[0.14em] uppercase" aria-live="polite">
+            <p className="text-gris-texto font-mono text-[0.68rem] tracking-[0.14em] uppercase max-md:sr-only" aria-live="polite">
               {filtradas.length} {filtradas.length === 1 ? "novedad" : "novedades"}
               {activa !== "todas" && ` · ${etiquetaDeCategoria(activa)}`}
             </p>
@@ -226,7 +242,7 @@ export function FiltrosNovedades({ contenido, novedades }: { contenido: UltimasD
                 </button>
               </div>
             )}
-            <div ref={gridRef} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div ref={gridRef} className="grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
               {novedades.map((n) => (
                 <NovedadCard key={n.slug} n={n} />
               ))}
