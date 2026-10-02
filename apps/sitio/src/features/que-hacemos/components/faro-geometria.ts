@@ -32,3 +32,23 @@ export const FOCO_Y = 388;
 export const PUNTOS_VERBO: ReadonlyArray<readonly [number, number]> = [
   [270, 700], [180, 620], [1230, 680], [720, 820],
 ] as const;
+
+/** Un tramo del dibujo como porcentaje de otro (para ubicar cajas en CSS). */
+export const pctDelDibujo = (n: number, de: number) => `${((n / de) * 100).toFixed(3)}%`;
+
+/**
+ * La caja de cada cono de luz en el dibujo (viewBox 1440×900): x, y, ancho,
+ * alto. Las dos nacen en el foco de la linterna (x 950) y van para su lado.
+ * Las dibuja hero-faro/HacesFaro.tsx.
+ */
+export const CAJA_HAZ = { izq: [-360, 280, 1310, 372], der: [950, 280, 1310, 372] } as const;
+
+/**
+ * El foco de la linterna dentro de la caja de cada cono: su pivote. Lo usan
+ * las coreografías al fijar el estado inicial (antes era un `transformOrigin`
+ * en píxeles del bbox del `<g>`, que solo vale adentro de un SVG).
+ */
+export const ORIGEN_HAZ = {
+  izq: `100% ${pctDelDibujo(FOCO_Y - CAJA_HAZ.izq[1], CAJA_HAZ.izq[3])}`,
+  der: `0% ${pctDelDibujo(FOCO_Y - CAJA_HAZ.der[1], CAJA_HAZ.der[3])}`,
+} as const;

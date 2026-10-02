@@ -2,7 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { VERBO_POS } from "../preguntas-faro";
 import { crearCamaraMovil, type Punto } from "./camara-faro-movil";
-import { ORIGEN_HAZ } from "./HacesFaro";
+import { ORIGEN_HAZ } from "../faro-geometria";
 import { crearLuzMovil } from "./luz-faro-movil";
 
 if (typeof window !== "undefined") {
