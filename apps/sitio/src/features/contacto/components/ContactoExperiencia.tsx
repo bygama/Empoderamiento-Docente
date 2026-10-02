@@ -15,8 +15,7 @@ import { finIntro, montarIntro, saltarIntro } from "./experiencia/coreografia-in
 import { cambiarTema, elegirTema } from "./experiencia/coreografia-paneles";
 import { enviar, otraConsulta } from "./experiencia/coreografia-envio";
 import { useSaltoIntro } from "./experiencia/useSaltoIntro";
-import { useTope } from "./experiencia/useTope";
-import { panelClases } from "./experiencia/movil";
+import { panelClases } from "./experiencia/estilos";
 import { PanelHero } from "./experiencia/PanelHero";
 import { ColumnaIdentidad } from "./experiencia/ColumnaIdentidad";
 import { IndiceTemas } from "./experiencia/IndiceTemas";
@@ -24,9 +23,11 @@ import { PanelFormulario } from "./experiencia/PanelFormulario";
 import { PanelCierre } from "./experiencia/PanelCierre";
 
 /**
- * Contacto como EXPERIENCIA DE UNA SOLA PANTALLA: acá no se scrollea, se
- * TRANSFORMA. Los estados viven apilados en el mismo viewport y morfean uno
- * en otro, en cadena y de ida:
+ * Contacto como EXPERIENCIA DE UNA SOLA PANTALLA: acá no se navega, se
+ * TRANSFORMA. Los estados viven apilados en el mismo lugar y morfean uno en
+ * otro, en cadena y de ida. Si un estado no entra en la pantalla (notebook
+ * baja, celular), scrollea la página — nunca un panel por dentro — y las
+ * coreografías son las mismas en todos los tamaños (`panelClases`, `pasarA`):
  *
  *  0 · HERO — "Hablemos." gigante y EDITORIAL. La palabra sola: nada de
  *      eyebrow, bajada, botón ni hint. NO es una pantalla que haya que
@@ -150,8 +151,6 @@ export function ContactoExperiencia({
 
   // Mientras la intro corre, cualquier intento de scroll la saltea.
   useSaltoIntro(reduced, introListo, estado, () => saltarIntro(contexto()));
-
-  useTope(vista);
 
   return (
     <section

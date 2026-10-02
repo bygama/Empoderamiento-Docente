@@ -1,7 +1,6 @@
 import gsap from "gsap";
 import { panelDe, type Contexto } from "./contexto";
 import { crearGhostTitulo } from "./ghost-titulo";
-import { esMovil } from "./movil";
 
 // Los ghosts viven en <body> (position:fixed), fuera del ctx de GSAP: si la
 // intro se saltea o el componente se desmonta a mitad de vuelo, nadie más
@@ -64,7 +63,7 @@ function desarmar(c: Contexto) {
   const dstTit = root.querySelector<HTMLElement>("[data-ap-titulo]");
   const h2 = root.querySelector<HTMLElement>("[data-ap-h2]");
 
-  if (srcTit && dstTit && h2 && !esMovil()) {
+  if (srcTit && dstTit && h2) {
     const s = srcTit.getBoundingClientRect();
     const d = dstTit.getBoundingClientRect();
     const cs = getComputedStyle(dstTit);
@@ -87,8 +86,7 @@ function desarmar(c: Contexto) {
       .set(h2, { autoAlpha: 1 }, 0.78)
       .to(gt, { autoAlpha: 0, duration: 0.12, onComplete: () => gt.remove() }, 0.78);
   } else {
-    // sin medida (titular no montado) o en celular (el panel destino está
-    // en display:none y mide 0): corte simple, sin viaje
+    // sin medida (titular no montado): corte simple, sin viaje
     tl.to(srcTit, { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 0);
   }
 
