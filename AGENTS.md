@@ -861,8 +861,8 @@ define al implementar cada fase.
   - [x] **El cierre:** lo del armazón que no sabe de ED pasó al kit, y los
         registros de la actividad y de los pendientes quedaron con un archivo
         por módulo. `work/cierre-del-mapa/`.
-- [ ] **Admin, fase 4 — URLs y SEO:** las 26 rutas nuevas (15 perfiles, 4 casos,
-      7 landings de tipo), canonicals y JSON-LD; el `sitemap.xml` y las
+- [ ] **Admin, fase 4 — URLs y SEO:** las 24 rutas nuevas (15 perfiles, 2 casos
+      desde que Daniela sacó el 02 y el 03, 7 landings de tipo), canonicals y JSON-LD; el `sitemap.xml` y las
       redirecciones de las rutas de hoy ya los hizo Ajustes. Reemplaza al
       «sitemap definitivo» que este §13 venía arrastrando.
 - [x] **Deploy para los dos hosts** (ADR-0018): la imagen, el compose, Umami,
