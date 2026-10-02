@@ -12,7 +12,8 @@ import { partirResaltado } from "@/lib/contenido/resaltado";
 import { armarPerspectivas } from "./mirada/constelacion-mirada";
 import { leerEscena, prepararEstados } from "./mirada/setup-estados";
 import { crearTimelineFases } from "./mirada/timeline-fases";
-import { crearMapaMovil } from "./mirada/mapa-movil";
+import { crearEscenaMovil } from "./mirada/escena-movil";
+import { ALTO_ESCENA_LVH, scrollDePrincipio } from "./mirada/geometria-movil";
 import { MapaConstelacion } from "./mirada/MapaConstelacion";
 import { MapaMovil } from "./mirada/MapaMovil";
 import { DetallePerspectiva } from "./mirada/DetallePerspectiva";
@@ -54,7 +55,10 @@ if (typeof window !== "undefined") {
  * fracciones de W) pensada para desktop — en móvil/tablet los textos se
  * pisaban y recortaban contra el borde. Bajo 1024px o sin hover se sirve el
  * MISMO layout estático del fallback de reduced-motion, ahora por clases
- * condicionales además de las variantes motion-reduce.
+ * condicionales además de las variantes motion-reduce. Bajo 1024px con alto
+ * suficiente corre la ESCENA FIJA de celular (`mirada/escena-movil.ts`): el
+ * título solo, un principio por vez bajo la barra de nodos y la constelación
+ * en el cierre, sobre este mismo markup.
  *
  * El CTA «Mirá cómo lo hacemos» sigue retirado de esta transición (ruta
  * /que-hacemos viva en el nav).
@@ -65,6 +69,9 @@ if (typeof window !== "undefined") {
  * maestro); el markup en `MapaConstelacion`, `DetallePerspectiva`,
  * `FichasPerspectiva`, `SintesisMirada` e `IndicadorFases`.
  */
+/** Bajo `lg` y con alto para la escena fija (el mismo piso que Origen). */
+const MOVIL = "(max-width: 63.999rem) and (min-height: 38.75rem)";
+
 export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
   const perspectivas = armarPerspectivas(contenido.principios);
   const titulo = partirResaltado(contenido.titulo);
@@ -75,9 +82,10 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
   const [modoMovil, setModoMovil] = useState(false);
 
   // La escena solo con puntero fino y ancho desktop real: a 768 los labels
-  // de los nodos ya se montaban sobre la zona de lectura. Bajo `lg` (o sin
-  // hover) se sirve el mapa fijo (`modoMovil`) en su lugar. Se suscribe al
-  // `change` de ambas media queries para recalcular al rotar el dispositivo.
+  // de los nodos ya se montaban sobre la zona de lectura. Bajo `lg` con alto
+  // suficiente se sirve la escena fija de celular (`modoMovil`); si la
+  // pantalla es muy baja, los bloques apilados. Se suscribe al `change` de
+  // ambas media queries para recalcular al rotar el dispositivo.
   useIsomorphicLayoutEffect(() => {
     const decidir = () => {
       if (reduced) {
@@ -87,11 +95,11 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
       }
       const vivo = window.matchMedia("(hover: hover) and (min-width: 1024px)").matches;
       setLive(vivo);
-      setModoMovil(!vivo && window.matchMedia("(max-width: 63.999rem)").matches);
+      setModoMovil(!vivo && window.matchMedia(MOVIL).matches);
     };
     decidir();
     const mqVivo = window.matchMedia("(hover: hover) and (min-width: 1024px)");
-    const mqMovil = window.matchMedia("(max-width: 63.999rem)");
+    const mqMovil = window.matchMedia(MOVIL);
     mqVivo.addEventListener("change", decidir);
     mqMovil.addEventListener("change", decidir);
     return () => {
@@ -103,8 +111,9 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
   useIsomorphicLayoutEffect(() => {
     if (!modoMovil) return;
     const root = rootRef.current;
-    if (!root) return;
-    return crearMapaMovil(root);
+    const zone = zoneRef.current;
+    if (!root || !zone) return;
+    return crearEscenaMovil(root, zone);
   }, [modoMovil]);
 
   useIsomorphicLayoutEffect(() => {
@@ -152,11 +161,12 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
       <div
         ref={zoneRef}
         className={"relative motion-reduce:h-auto " + (live ? "h-[910svh]" : "h-auto")}
+        style={modoMovil ? { height: `${ALTO_ESCENA_LVH}lvh` } : undefined}
       >
         <div
           className={
             "w-full motion-reduce:static motion-reduce:h-auto " +
-            (live ? "sticky top-0 h-[100svh] overflow-hidden" : "")
+            (live ? "sticky top-0 h-[100svh] overflow-hidden" : modoMovil ? "sticky top-0 h-lvh overflow-hidden" : "")
           }
         >
           <MapaConstelacion live={live} perspectivas={perspectivas} />
@@ -193,17 +203,14 @@ export function MiradaEd({ contenido }: { contenido: MiradaDeQuienesSomos }) {
             <MapaMovil
               perspectivas={perspectivas}
               onIr={(i) => {
-                const el = rootRef.current?.querySelector<HTMLElement>(`[data-detalle="${i}"]`);
-                // 160px ≈ header (4.75rem) + mapa fijo (~5rem) + aire: sin este
-                // offset el título queda tapado por ambos, sticky por encima.
-                if (el) irAPosicion(el.getBoundingClientRect().top + window.scrollY - 160);
+                if (zoneRef.current) irAPosicion(scrollDePrincipio(zoneRef.current, i));
               }}
             />
           )}
 
           {/* ── Zonas de lectura + fichas por principio ───────────────────── */}
           {perspectivas.map((p, i) => (
-            <div key={p.id} className="contents">
+            <div key={p.id} data-capitulo className="contents">
               <DetallePerspectiva p={p} i={i} live={live} />
               <FichasPerspectiva p={p} i={i} live={live} />
             </div>
