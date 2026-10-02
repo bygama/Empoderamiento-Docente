@@ -8,18 +8,23 @@ import { GRILLA } from "./estilos";
  * sobre el margen del sitio. Las fotos se revelan dentro de la máscara y la
  * muesca del borde izquierdo viaja con el scroll (reinterpretación sobria de
  * la referencia editorial). Solo desktop + motion. Lo anima `panel-fotos.ts`.
+ *
+ * En celular, con el pasador de capítulos (`data-modo="movil"`), el panel es
+ * un marco apaisado ARRIBA, bajo la navbar: la foto queda fija, se cruza con
+ * cada capítulo y el texto cambia debajo (`Pilar` reserva ese alto). Lo
+ * anima `capitulos-movil.ts`.
  */
 export function PanelFotos({ fotos }: { fotos: readonly ValorFoto[] }) {
   return (
     <div
       data-photo-panel
-      className="absolute inset-0 z-0 hidden md:block motion-reduce:hidden"
+      className="absolute inset-0 z-0 hidden md:block motion-reduce:hidden [[data-modo=movil]_&]:block"
     >
       <div className={`h-full ${GRILLA}`}>
-        <div className="col-start-2 mt-[13svh] h-[74svh]">
+        <div className="col-start-2 mt-[13svh] h-[74svh] max-md:mt-[5.25rem] max-md:h-[33svh]">
           <div
             data-photo-lamina
-            className="relative h-full w-full overflow-hidden rounded-[1.75rem] bg-white/[0.04] shadow-[0_60px_140px_-50px_rgb(0_0_0/0.7)]"
+            className="relative h-full w-full overflow-hidden rounded-[1.75rem] bg-white/[0.04] max-md:rounded-[1.25rem] shadow-[0_60px_140px_-50px_rgb(0_0_0/0.7)]"
           >
             {fotos.map((f, i) => (
               <div
@@ -33,7 +38,7 @@ export function PanelFotos({ fotos }: { fotos: readonly ValorFoto[] }) {
                     src={f.src}
                     alt={f.alt}
                     fill
-                    sizes="(max-width: 767px) 1px, (min-width: 1280px) 560px, 44vw"
+                    sizes="(max-width: 767px) 92vw, (min-width: 1280px) 560px, 44vw"
                     className="object-cover"
                     style={estiloDeFoco(f.foco)}
                   />
@@ -67,7 +72,7 @@ export function PanelFotos({ fotos }: { fotos: readonly ValorFoto[] }) {
               <svg
                 viewBox="0 0 18 144"
                 preserveAspectRatio="none"
-                className="text-azul-principal absolute top-0 left-0 h-36 w-[22px]"
+                className="text-azul-principal absolute top-0 left-0 h-36 w-[22px] max-md:h-14"
               >
                 <path
                   d="M0 0 C 0 14, 13 18, 13 34 L 13 110 C 13 126, 0 130, 0 144 Z"
