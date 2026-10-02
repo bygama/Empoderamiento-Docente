@@ -2,7 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { crearCamara } from "./camara-faro";
 import { crearHaces } from "./haz-faro";
-import { ORIGEN_HAZ } from "./HacesFaro";
+import { ORIGEN_HAZ } from "../faro-geometria";
 import { armarEscenas } from "./escenas-faro";
 import { armarFaroMovil } from "./coreografia-faro-movil";
 

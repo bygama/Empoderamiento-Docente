@@ -1,26 +1,11 @@
-import { FOCO_Y } from "../faro-geometria";
+import { CAJA_HAZ, FOCO_Y, ORIGEN_HAZ, pctDelDibujo as pct } from "../faro-geometria";
 
 const AZUL_CLARO = "var(--color-azul-claro)";
-
-/** La caja de cada cono en el dibujo (viewBox 1440×900): x, y, ancho, alto.
- *  Las dos nacen en el foco de la linterna (x 950) y van para su lado. */
-const CAJA = { izq: [-360, 280, 1310, 372], der: [950, 280, 1310, 372] } as const;
-const pct = (n: number, de: number) => `${((n / de) * 100).toFixed(3)}%`;
-
-/**
- * El foco de la linterna dentro de la caja de cada cono: su pivote. Lo usan
- * las coreografías al fijar el estado inicial (antes era un `transformOrigin`
- * en píxeles del bbox del `<g>`, que solo vale adentro de un SVG).
- */
-export const ORIGEN_HAZ = {
-  izq: `100% ${pct(FOCO_Y - CAJA.izq[1], CAJA.izq[3])}`,
-  der: `0% ${pct(FOCO_Y - CAJA.der[1], CAJA.der[3])}`,
-} as const;
 
 /** Un cono: dos envolventes con gradiente lateral y una máscara que lo apaga
  *  con la distancia (ver el porqué en `HacesFaro`). */
 function Haz({ lado }: { lado: "izq" | "der" }) {
-  const [x, y, ancho, alto] = CAJA[lado];
+  const [x, y, ancho, alto] = CAJA_HAZ[lado];
   // El extremo lejano: a la izquierda del foco en un cono, a la derecha en el otro.
   const lejos = lado === "izq" ? -360 : 2260;
   const cerca = lado === "izq" ? 946 : 954;
