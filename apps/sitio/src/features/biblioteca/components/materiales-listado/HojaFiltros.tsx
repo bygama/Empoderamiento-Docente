@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import gsap from "gsap";
 import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -28,15 +28,17 @@ const GRUPOS = ["Tipo de material", "Público", "Año"] as const;
  * Entra deslizando desde abajo (transform), no anima altura, y con
  * movimiento reducido aparece de una.
  *
- * A diferencia de la sidebar de escritorio (un grupo abierto a la vez, para
- * entrar en un viewport bajo), acá los tres grupos van siempre expandidos:
- * es un modal que el usuario abrió a propósito para filtrar, con scroll
- * propio, no hay motivo para esconder categorías detrás de un acordeón.
+ * Como en la sidebar de escritorio, los grupos son desplegables y hay uno
+ * abierto a la vez (pedido de Gastón): expandidos los tres, la hoja era más
+ * alta que la pantalla y «Año» quedaba abajo del pliegue. Cerrado, cada grupo
+ * muestra lo elegido. Arranca abierto el de tipo.
  */
 export function HojaFiltros({ abierta, onCerrar, anios, filtros, onCambiar, onLimpiar, total }: Props) {
   const ref = useRef<HTMLDialogElement | null>(null);
   const reduced = useReducedMotion();
   const tituloId = useId();
+  const [grupoAbierto, setGrupoAbierto] = useState<string | null>(GRUPOS[0]);
+  const alternar = (grupo: string) => () => setGrupoAbierto((abierto) => (abierto === grupo ? null : grupo));
   useLockScroll(abierta);
 
   useEffect(() => {
@@ -85,9 +87,9 @@ export function HojaFiltros({ abierta, onCerrar, anios, filtros, onCambiar, onLi
           </button>
         </div>
         <div className="border-azul-principal/10 mt-2 border-t [&_button[aria-pressed]]:min-h-11 [&_button[aria-pressed]]:px-4">
-          <FiltroGrupo label={GRUPOS[0]} opciones={TIPOS} valor={filtros.tipo} onChange={(tipo) => onCambiar({ tipo })} fijo />
-          <FiltroGrupo label={GRUPOS[1]} opciones={PUBLICOS} valor={filtros.publico} onChange={(publico) => onCambiar({ publico })} fijo />
-          <FiltroGrupo label={GRUPOS[2]} opciones={anios.map(String)} valor={filtros.anio === null ? null : String(filtros.anio)} onChange={(anio) => onCambiar({ anio: anio === null ? null : Number(anio) })} fijo />
+          <FiltroGrupo label={GRUPOS[0]} opciones={TIPOS} valor={filtros.tipo} onChange={(tipo) => onCambiar({ tipo })} abierto={grupoAbierto === GRUPOS[0]} onAlternar={alternar(GRUPOS[0])} />
+          <FiltroGrupo label={GRUPOS[1]} opciones={PUBLICOS} valor={filtros.publico} onChange={(publico) => onCambiar({ publico })} abierto={grupoAbierto === GRUPOS[1]} onAlternar={alternar(GRUPOS[1])} />
+          <FiltroGrupo label={GRUPOS[2]} opciones={anios.map(String)} valor={filtros.anio === null ? null : String(filtros.anio)} onChange={(anio) => onCambiar({ anio: anio === null ? null : Number(anio) })} abierto={grupoAbierto === GRUPOS[2]} onAlternar={alternar(GRUPOS[2])} />
         </div>
         <button
           type="button"
