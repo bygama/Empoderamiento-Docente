@@ -1,46 +1,69 @@
 import type { Perspectiva } from "./constelacion-mirada";
+import { RAMAS_MOVIL } from "./geometria-movil";
 
 /**
- * «Nuestra mirada» bajo `lg`: la cámara de escritorio no entra en una
- * pantalla vertical, así que el mapa se vuelve una constelación mínima y
- * fija bajo el header —tres nodos unidos por un trazo— que acompaña la
- * lectura: el trazo se dibuja al avanzar y el nodo del principio que se está
- * leyendo se enciende. Tocar un nodo lleva a su principio. Decorativa para
- * lectores de pantalla salvo los botones.
+ * «Nuestra mirada» bajo `lg`: el mapa de la escena fija. Tres nodos que la
+ * coreografía (`escena-movil.ts`) mueve en tres tiempos: nacen del título,
+ * forman la BARRA de arriba —el principio que se lee va adelante con su
+ * nombre, y el trazo hacia el siguiente se llena mientras se lee— y en el
+ * cierre bajan a formar la constelación alrededor de la síntesis, con sus
+ * radios y sus ramas. Todo se ubica por transform desde la esquina de la
+ * escena: acá solo está el markup. Decorativo para lectores de pantalla salvo
+ * los botones: tocar un nodo lleva a su principio.
  */
-const X = [16, 50, 84];
 export function MapaMovil({ perspectivas, onIr }: { perspectivas: readonly Perspectiva[]; onIr: (i: number) => void }) {
   return (
-    <div data-mapa-movil className="sticky top-[4.75rem] z-20 -mx-6 bg-white/85 px-6 py-2 backdrop-blur lg:hidden">
-      <div className="relative mx-auto h-16 max-w-md">
-        <svg aria-hidden="true" viewBox="0 0 100 24" preserveAspectRatio="none" className="text-azul-principal absolute inset-x-0 top-0 h-full w-full overflow-visible">
-          <path d={`M${X[0]},12 L${X[1]},12 L${X[2]},12`} fill="none" stroke="currentColor" strokeOpacity="0.18" strokeWidth="0.6" vectorEffect="non-scaling-stroke" />
-          <path data-mapa-trazo d={`M${X[0]},12 L${X[1]},12 L${X[2]},12`} fill="none" stroke="currentColor" strokeWidth="0.6" vectorEffect="non-scaling-stroke" />
-        </svg>
-        {perspectivas.map((p, i) => (
+    <div data-mapa-movil className="pointer-events-none absolute inset-x-0 top-0 z-20 h-svh">
+      {/* La barra: el riel tenue y el trazo que se llena con la lectura. */}
+      <span data-mapa-riel aria-hidden="true" className="bg-azul-principal/15 absolute top-0 left-0 block h-px origin-left" />
+      <span data-mapa-trazo aria-hidden="true" className="bg-azul-principal/70 absolute top-0 left-0 block h-[1.5px] origin-left rounded-full" />
+
+      {/* El cierre: un radio de cada nodo hacia la síntesis y sus ramas. */}
+      {perspectivas.map((p) => (
+        <span
+          key={p.id}
+          data-mapa-radio
+          aria-hidden="true"
+          className="absolute top-0 left-0 block h-px origin-left"
+          style={{ backgroundColor: p.accent }}
+        />
+      ))}
+      {RAMAS_MOVIL.map((r) => (
+        <span
+          key={`${r.nodo}-${r.angulo}`}
+          data-mapa-rama={r.nodo}
+          aria-hidden="true"
+          className="bg-azul-principal/30 absolute top-0 left-0 block h-px origin-left"
+          style={{ width: r.largo }}
+        >
+          <span
+            data-mapa-brote
+            className="absolute top-1/2 right-0 block h-1.5 w-1.5 translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ backgroundColor: perspectivas[r.nodo]?.accent }}
+          />
+        </span>
+      ))}
+
+      {perspectivas.map((p, i) => (
+        <div key={p.id} data-mapa-nodo={i} className="absolute top-0 left-0">
           <button
-            key={p.id}
             type="button"
-            data-mapa-nodo={i}
             onClick={() => onIr(i)}
             aria-label={`Ir a ${p.nombre}`}
-            className="absolute top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-            style={{ left: `${X[i]}%` }}
+            className="pointer-events-auto absolute -top-[22px] -left-[22px] flex h-11 w-11 items-center justify-center"
           >
-            <span
-              data-mapa-halo
-              className="absolute h-7 w-7 rounded-full opacity-0 transition-opacity duration-300 [[data-activo]_&]:opacity-100"
-              style={{ backgroundColor: `${p.accent}33` }}
-            />
-            <span
-              data-mapa-punto
-              className="relative block h-3 w-3 rounded-full transition-transform duration-300 [[data-activo]_&]:scale-125"
-              style={{ backgroundColor: p.accent }}
-            />
-            <span className="text-azul-principal/70 absolute top-full mt-0.5 font-mono text-[0.62rem] tracking-[0.14em]">{p.id}</span>
+            <span data-mapa-halo className="absolute h-7 w-7 rounded-full" style={{ backgroundColor: `${p.accent}33` }} />
+            <span data-mapa-punto className="relative block h-3 w-3 rounded-full" style={{ backgroundColor: p.accent }} />
           </button>
-        ))}
-      </div>
+          {/* El nombre del principio (en escritorio lo dice el nodo del mapa).
+              Va DEBAJO de la barra: a su altura el trazo lo cruzaba como un
+              tachado. */}
+          <span data-mapa-rotulo aria-hidden="true" className="absolute top-4 -left-1.5 block w-[11rem]">
+            <span className="text-azul-principal/60 block font-mono text-[0.62rem] tracking-[0.18em]">{p.id}</span>
+            <span className="font-display text-azul-principal block text-[0.92rem] leading-[1.15] font-bold">{p.nombre}</span>
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
