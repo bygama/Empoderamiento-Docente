@@ -32,11 +32,10 @@ export function PanelFormulario({ activo, temaActivo, temaIdx, envio, cvAbierto,
       data-panel="formulario"
       aria-hidden={!activo}
       inert={!activo}
-      className={`absolute inset-x-5 top-0 bottom-0 flex overflow-y-auto pt-24 pb-24 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-10 [@media(max-height:760px)]:md:pb-6 ${panelClases(activo)} max-lg:pb-12`}
+      className={`flex pt-24 pb-24 opacity-0 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-10 [@media(max-height:760px)]:md:pb-6 ${panelClases(activo)} max-lg:pb-12`}
     >
-      {/* my-auto (y no justify-center en el padre): si el contenido no
-          entra, se scrollea desde arriba sin que el tope quede recortado
-          bajo el navbar */}
+      {/* my-auto: se centra en la pantalla si entra; si no entra, el panel
+          crece desde arriba y scrollea la página (ver `panelClases`). */}
       <div className="mx-auto my-auto w-full max-w-5xl">
         {/* Breadcrumb de vuelta, FUERA del contenedor (sobre el borde
             superior): navegación clara para volver a elegir el tema, más
