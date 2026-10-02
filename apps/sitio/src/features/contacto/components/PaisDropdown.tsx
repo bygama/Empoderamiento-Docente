@@ -12,9 +12,7 @@ type Props = {
   placeholder?: string;
   /** Cómo se anuncia la lista abierta. El formulario de CV lo usa también para el nivel. */
   etiqueta?: string;
-  /** Valor controlado desde afuera (p. ej. PaisCampo, para que sobreviva el
-   * cruce de breakpoint entre este dropdown y el `<select>` nativo). Si no
-   * viene, el componente sigue manejando su propio estado como siempre. */
+  /** Valor controlado desde afuera. Si no viene, el componente maneja el suyo. */
   value?: string;
   onChange?: (v: string) => void;
 };
@@ -24,6 +22,10 @@ type Props = {
  * del sistema desentonan con los campos editoriales del formulario. El valor
  * elegido se escribe en un <input hidden> para que el FormData del form lo lea
  * igual que un campo normal (name="pais").
+ *
+ * Va en todos los tamaños: bajo `lg` las opciones miden 44px de alto, para
+ * el dedo. La lista cae sobre el resto del formulario, que scrollea con la
+ * página, así que no se corta contra el borde de la pantalla.
  *
  * Accesible: trigger con aria-haspopup/aria-expanded, lista role="listbox" con
  * opciones role="option", teclado completo (↑ ↓ Enter Espacio Escape, Home/End)
@@ -187,7 +189,7 @@ export function PaisDropdown({
                 aria-selected={elegido}
                 onClick={() => elegir(opt)}
                 onMouseEnter={() => setActive(i)}
-                className={`flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-left font-sans text-[0.95rem] transition-colors ${
+                className={`flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-left font-sans text-[0.95rem] transition-colors max-lg:min-h-11 max-lg:text-[1rem] ${
                   resaltado ? "bg-azul-claro/20" : ""
                 } ${elegido ? "text-verde-concepto font-medium" : "text-azul-principal"}`}
               >

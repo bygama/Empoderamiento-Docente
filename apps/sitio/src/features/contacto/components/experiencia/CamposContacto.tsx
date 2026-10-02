@@ -1,7 +1,7 @@
 import { ArrowUpRight } from "@/components/ui/icons";
 import { aLos } from "@/config/privacidad";
 import type { Envio } from "./contexto";
-import { PaisCampo } from "./PaisCampo";
+import { PaisDropdown } from "../PaisDropdown";
 import { INPUT_BASE, LABEL_BASE } from "./estilos";
 
 /**
@@ -35,12 +35,15 @@ export function CamposContacto({ envio, correo, paises, mesesDeGuarda }: { envio
         </label>
         <input id="ct-institucion" name="institucion" autoComplete="organization" className={INPUT_BASE} />
       </div>
-      <div data-campo>
+      {/* La cascada deja un transform en cada campo, y con él un contexto de
+          apilamiento: sin subir este, la lista abierta queda pintada debajo
+          de los campos que siguen. */}
+      <div data-campo className="relative has-[[aria-expanded=true]]:z-30">
         <label htmlFor="ct-pais" className={LABEL_BASE}>
           País
         </label>
-        {/* Dropdown propio en computadora, <select> nativo bajo lg (PaisCampo). */}
-        <PaisCampo id="ct-pais" name="pais" options={[...paises, "Otro"]} />
+        {/* El dropdown propio en todos los tamaños: el menú del sistema desentona con el formulario. */}
+        <PaisDropdown id="ct-pais" name="pais" options={[...paises, "Otro"]} />
       </div>
       <div data-campo className="md:col-span-2">
         <label htmlFor="ct-mensaje" className={LABEL_BASE}>
