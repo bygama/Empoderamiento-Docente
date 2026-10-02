@@ -20,7 +20,9 @@ type Props = {
 /**
  * Filtros del catálogo bajo `lg`: la sidebar de escritorio no cabe arriba de
  * los resultados (era una pantalla entera antes del primer material). Acá
- * queda una BARRA pegajosa bajo el header —buscador, botón «Filtros» con la
+ * queda una BARRA pegajosa que llega hasta el borde de arriba de la pantalla
+ * (su blanco tapa lo que pasa por detrás del logo y del menú, que flotan; el
+ * margen negativo compensa ese relleno mientras todavía no se pegó) —buscador, botón «Filtros» con la
  * cuenta de filtros puestos y los chips activos, cada uno con su ×— y una
  * HOJA inferior con los tres grupos (HojaFiltros). Mismo estado y mismos
  * callbacks que la sidebar: `?tipo=` sigue viajando en la URL.
@@ -46,7 +48,7 @@ export function FiltrosMovil({ busqueda, onBuscar, anios, filtros, onCambiar, on
   if (filtros.anio !== null) activos.push({ etiqueta: String(filtros.anio), quitar: () => onCambiar({ anio: null }) });
 
   return (
-    <div data-filtros-movil className="sticky top-[4.75rem] z-20 -mx-5 border-b border-azul-principal/10 bg-white px-5 pt-3 pb-3 lg:hidden">
+    <div data-filtros-movil className="sticky top-0 z-20 -mx-5 -mt-16 border-b border-azul-principal/10 bg-white px-5 pt-[5.5rem] pb-3 md:-mx-10 md:-mt-24 md:px-10 lg:hidden">
       <div className="border-azul-principal/15 focus-within:border-azul-medio focus-within:ring-azul-claro/60 flex items-center gap-2.5 rounded-lg border bg-white px-3.5 transition-colors focus-within:ring-2">
         <span className="text-gris-texto shrink-0">
           <Search size={18} />
