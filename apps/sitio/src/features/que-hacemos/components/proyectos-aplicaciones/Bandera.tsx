@@ -3,7 +3,7 @@ import { PAISES, type PaisKey } from "./fichas";
 
 /**
  * Banderas propias, flat y ondeadas, en un cuadro de 40 x 34 recortado
- * por una onda: las cuatro con la misma forma, para que un juego de dos o
+ * por una onda: todas con la misma forma, para que un juego de dos o
  * tres se lea como un solo objeto. Dibujadas acá y no bajadas de un banco
  * de íconos: sin atribución que arrastrar y con un solo estilo. Los
  * colores son los de cada bandera —como los logos de los aliados, no son
@@ -74,6 +74,20 @@ const DIBUJOS: Record<PaisKey, React.ReactNode> = {
         fill="#FFFFFF"
         transform="translate(0.4 2.7)"
       />
+    </>
+  ),
+  co: (
+    <>
+      <rect width="40" height="34" fill="#CE1126" />
+      <path d={banda(0, ALTO / 2)} fill="#FCD116" />
+      <path d={banda(ALTO / 2, (ALTO * 3) / 4)} fill="#003893" />
+    </>
+  ),
+  cr: (
+    <>
+      <rect width="40" height="34" fill="#002B7F" />
+      <path d={banda(ALTO / 6, (ALTO * 5) / 6)} fill="#FFFFFF" />
+      <path d={banda(ALTO / 3, (ALTO * 2) / 3)} fill="#CE1126" />
     </>
   ),
 };
