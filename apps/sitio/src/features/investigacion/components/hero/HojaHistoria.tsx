@@ -16,6 +16,11 @@ import { FIGURAS } from "../constelacion";
  * como una hoja sobre un escritorio a oscuras). Invisible hasta que la
  * coreografía la muestra, y siempre si no corre: touch y reduced-motion ven
  * el hero de noche y nada más (coreografia-historia.ts).
+ *
+ * Bajo `lg` es la misma hoja, en una columna: el folio baja de la esquina
+ * (ahí están el logo y el botón del menú) a un renglón propio, la lámina se
+ * achica y todo se centra en el alto VISIBLE, sin contar la barra del
+ * navegador (movil/escena.ts).
  */
 export function HojaHistoria({ pasos }: { pasos: HeroInvestigacion["pasos"] }) {
   return (
@@ -27,18 +32,18 @@ export function HojaHistoria({ pasos }: { pasos: HeroInvestigacion["pasos"] }) {
       {/* Folio de archivo: número de hoja + nombre de la sección en el
           sitemap. El folio es el índice literal del archivo: cada hoja dice
           qué sección del sitemap es (decisión 2026-09-14). */}
-      <span className="text-gris-texto/70 absolute top-7 right-8 font-mono text-[0.68rem] tracking-[0.2em] uppercase">
+      <span className="text-gris-texto/70 absolute top-7 right-8 font-mono text-[0.68rem] tracking-[0.2em] uppercase max-lg:top-[5.25rem] max-lg:right-auto max-lg:left-6 md:max-lg:left-12">
         Archivo ED · Hoja 01 · Por qué investigamos
       </span>
 
-      <div className="mx-auto grid h-full w-full max-w-screen-xl items-center gap-x-16 px-6 md:px-12 lg:grid-cols-[0.95fr_1.05fr]">
+      <div className="mx-auto grid h-full w-full max-w-screen-xl items-center gap-x-16 px-6 max-lg:content-center max-lg:gap-y-6 max-lg:pt-28 max-lg:pb-[calc(100lvh-100svh+1.25rem)] md:px-12 lg:grid-cols-[0.95fr_1.05fr]">
         {/* El hueco de la lámina: mismo aspecto que el viewBox de las
             figuras (400x480). La coreografía lo mide para saber dónde
             aterriza la bandada. */}
         <div>
           <div
             data-historia-destino
-            className="mx-auto aspect-[400/480] w-full max-w-[min(460px,54svh)]"
+            className="mx-auto aspect-[400/480] w-full max-w-[min(460px,54svh)] max-lg:max-w-[min(300px,33svh)]"
           />
         </div>
 

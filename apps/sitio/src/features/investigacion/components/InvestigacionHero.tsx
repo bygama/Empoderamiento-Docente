@@ -12,12 +12,13 @@ import { ConResaltado } from "./ConResaltado";
 import { LinternaFaro } from "./LinternaFaro";
 import { Bandada } from "./hero/Bandada";
 import { CieloNocturno } from "./hero/CieloNocturno";
-import { HistoriaMovil } from "./hero/HistoriaMovil";
+import { EtapasEnFlujo } from "./hero/EtapasEnFlujo";
 import { HojaHistoria } from "./hero/HojaHistoria";
 import { crearEncendido } from "./hero/coreografia-encendido";
-import { HAZ_POSE_MOVIL, posarQuieto } from "./hero/coreografia-encendido-movil";
-import { crearEntregaMovil } from "./hero/coreografia-entrega-movil";
 import { crearHistoria } from "./hero/coreografia-historia";
+import { ALTO_PISTA_LVH, crearEscenaMovil } from "./hero/movil/escena";
+import { HAZ_POSE_MOVIL } from "./hero/movil/partes";
+import { posarQuieto } from "./hero/movil/quieto";
 
 /** Ángulo del haz en el frame estático: posado hacia el titular. */
 const HAZ_REPOSO = -168;
@@ -54,9 +55,12 @@ const HAZ_REPOSO = -168;
  * la noche. La historia solo existe con la coreografía (desktop con
  * puntero).
  *
- * Bajo `lg` (con alto para la escena) el faro chico también se enciende al
- * cargar, y al scrollear su haz baja hacia la historia móvil y se la entrega
- * (hero/coreografia-entrega-movil.ts).
+ * Bajo `lg` (con alto para la escena) corre la misma historia en una escena
+ * pegajosa propia (hero/movil/escena.ts): el titular arriba, los botones
+ * abajo a la izquierda y el faro plantado en el borde de la pantalla; el haz
+ * lee el titular al pasar y se posa en las estrellas, y al scrollear el faro
+ * se hunde, la hoja sube y esas estrellas bajan a armar la pregunta. La pista
+ * (`[data-hero-pista]`) le da el recorrido; en escritorio no hace nada.
  */
 /** La escena de escritorio (encendido + historia): la arma y devuelve su limpieza. */
 function armarVivo(zona: HTMLElement) {
@@ -86,16 +90,18 @@ function armarVivo(zona: HTMLElement) {
 
 export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion }) {
   const zonaRef = useRef<HTMLElement | null>(null);
+  const pistaRef = useRef<HTMLDivElement | null>(null);
   const reduced = useReducedMotion();
 
   // El modo de la escena: vivo = la historia de escritorio (armarVivo, la de
-  // main); movil = el faro chico encendido + la entrega; quieto = sin
-  // movimiento, con el haz posado hacia el titular (medido). Se decide
+  // main); movil = la escena pegajosa de celular; quieto = sin movimiento,
+  // con el haz posado sobre las estrellas (medido). Se decide
   // entero en cada corrida y se vuelve a decidir al cambiar cualquier media
   // query (rotar el dispositivo o cruzar 1024px), desarmando el modo anterior.
   useIsomorphicLayoutEffect(() => {
     const zona = zonaRef.current;
-    if (!zona) return;
+    const pista = pistaRef.current;
+    if (!zona || !pista) return;
     const mqVivo = window.matchMedia("(hover: hover) and (min-width: 64rem)");
     const mqMovil = window.matchMedia("(max-width: 63.999rem) and (min-height: 38.75rem)");
     let limpiar = () => {};
@@ -103,9 +109,12 @@ export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion 
       limpiar();
       limpiar = () => {};
       const modo = reduced ? "quieto" : mqVivo.matches ? "vivo" : mqMovil.matches ? "movil" : "quieto";
+      // La pista lleva el modo antes de armar nada: es lo que vuelve pegajosa
+      // a la sección y le da su alto, y la escena se mide con eso puesto.
       zona.dataset.modo = modo;
+      pista.dataset.modo = modo;
       if (modo === "vivo") limpiar = armarVivo(zona);
-      else if (modo === "movil") limpiar = crearEntregaMovil(zona);
+      else if (modo === "movil") limpiar = crearEscenaMovil(zona, pista);
       else if (modo === "quieto") limpiar = posarQuieto(zona);
     };
     decidir();
@@ -116,11 +125,17 @@ export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion 
       mqMovil.removeEventListener("change", decidir);
       limpiar();
       delete zona.dataset.modo;
+      delete pista.dataset.modo;
     };
   }, [reduced]);
 
   return (
-    <>
+    <div
+      ref={pistaRef}
+      data-hero-pista
+      className="data-[modo=movil]:h-[var(--alto)]"
+      style={{ "--alto": `${ALTO_PISTA_LVH}lvh` } as React.CSSProperties}
+    >
       {/* `#sentido` es el ancla de «Por qué investigamos» (nav y doc): la
           hoja 01 vive adentro de este pin, así que la sección entera es el
           destino y la historia arranca al scrollear. Fuera del índice
@@ -129,7 +144,7 @@ export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion 
         ref={zonaRef}
         id="sentido"
         aria-label="Investigar para transformar"
-        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] max-lg:min-h-[92lvh] overflow-hidden text-white"
+        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden text-white max-lg:min-h-lvh [[data-modo=movil]_&]:sticky [[data-modo=movil]_&]:top-0"
       >
         <CieloNocturno />
 
@@ -146,26 +161,31 @@ export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion 
           <LinternaFaro prefijo="hero" largoHaz={1500} hazPose={HAZ_REPOSO} className="block h-auto w-full" />
         </div>
 
-        {/* ── El faro chico bajo `lg`: el mismo lenguaje del faro grande, a
-            un tamaño que no compite con el titular ni con los CTA. Se
-            enciende y entrega la historia (efecto de arriba); el SSR lo
-            dibuja con el haz posado, que es lo que queda sin coreografía. El
-            haz es largo porque nace en la esquina y tiene que llegar al
-            titular; nunca menor que el foco (950): el cono se dibujaría hacia
-            la izquierda y todos los ángulos se invertirían. */}
+        {/* ── El faro bajo `lg`: objeto, no ícono. Plantado en el borde de la
+            escena (que mide un alto GRANDE de pantalla: con la barra del
+            navegador a la vista su pie queda detrás de ella, nunca flotando
+            sobre un hueco) y pegado al borde derecho. El SSR lo dibuja con el
+            haz posado, que es lo que queda sin coreografía. El haz es corto a
+            propósito: un cono abierto que se disuelve antes de cruzar la
+            pantalla, no una franja que tacha el titular. Nunca menor que el
+            foco (950): el cono se dibujaría hacia la izquierda. */}
         <div
           data-hero-linterna-movil
-          className="pointer-events-none absolute right-2 bottom-0 z-20 w-[clamp(64px,16svh,88px)] lg:hidden"
+          className="pointer-events-none absolute -right-1 bottom-0 z-20 w-[clamp(96px,19svh,132px)] md:right-8 md:w-[clamp(140px,20svh,190px)] lg:hidden"
         >
-          <LinternaFaro prefijo="hero-movil" largoHaz={3200} hazPose={HAZ_POSE_MOVIL} className="block h-auto w-full" />
+          <LinternaFaro prefijo="hero-movil" largoHaz={1400} hazPose={HAZ_POSE_MOVIL} className="block h-auto w-full" />
         </div>
 
         {/* ── El titular y los dos caminos. `data-hero-acto` es lo que la
             historia hace subir y salir; adentro, `data-hero-rise` es lo que
             el encendido hace aparecer: dos capas, así ninguna coreografía
             pisa los valores de la otra. */}
-        <div className="relative z-30 mx-auto grid w-full max-w-screen-xl items-center gap-x-16 px-6 pt-28 pb-24 max-lg:pt-24 max-lg:pb-44 md:px-12 lg:grid-cols-[1.05fr_0.95fr]">
-          <div data-hero-acto>
+        <div className="relative z-30 mx-auto grid w-full max-w-screen-xl items-center gap-x-16 px-6 pt-28 pb-24 max-lg:items-stretch max-lg:pt-24 max-lg:pb-[calc(100lvh-100svh+1.75rem)] md:px-12 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Bajo `lg` el bloque se estira: titular arriba y botones abajo a
+              la izquierda, sobre el borde VISIBLE (el padding del contenedor
+              descuenta la barra del navegador); el cielo del medio es de las
+              estrellas y del haz. */}
+          <div data-hero-acto className="max-lg:flex max-lg:flex-col">
             <h1
               data-hero-titulo
               className="font-display max-w-[16ch] font-extrabold tracking-[-0.025em] text-white"
@@ -179,7 +199,11 @@ export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion 
             {/* Los dos CTA cortan directo a su sección (sin recorrer las
                 escenas del medio), igual que el navbar. El destino queda en
                 código: es el trabajo de cada botón (SPEC §4). */}
-            <div data-hero-rise className="mt-9 flex flex-wrap gap-4">
+            <div
+              data-hero-rise
+              data-hero-botones
+              className="mt-9 flex flex-wrap gap-4 max-lg:mt-auto max-lg:pt-9 max-md:flex-col max-md:items-start max-md:gap-3"
+            >
               <ButtonPrimary href="#lineas" onClick={alClicIrA("lineas")}>
                 {contenido.botonPrincipal}
               </ButtonPrimary>
@@ -215,7 +239,7 @@ export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion 
         <HojaHistoria pasos={contenido.pasos} />
         <Bandada />
       </section>
-      <HistoriaMovil pasos={contenido.pasos} />
-    </>
+      <EtapasEnFlujo pasos={contenido.pasos} />
+    </div>
   );
 }
