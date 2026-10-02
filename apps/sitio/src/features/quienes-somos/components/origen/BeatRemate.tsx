@@ -1,19 +1,34 @@
 import { Fragment } from "react";
 import { fragmentos } from "@/lib/contenido/resaltado";
+import { Palabras } from "./Palabras";
 
-/** La frase, palabra por palabra; cada una en verde si cae en una parte resaltada. */
-function palabras(frase: string): Array<{ palabra: string; verde: boolean }> {
-  return fragmentos(frase).flatMap((f) =>
-    f.texto
-      .split(/\s+/)
-      .filter((palabra) => palabra !== "")
-      .map((palabra) => ({ palabra, verde: f.resaltado })),
-  );
+/**
+ * La frase en TRAMOS (cada parte resaltada o sin resaltar), y cada tramo
+ * palabra por palabra. `desde` es el lugar del tramo en la frase: su clave.
+ */
+function tramos(frase: string): Array<{ desde: number; verde: boolean; palabras: string[] }> {
+  let desde = 0;
+  return fragmentos(frase)
+    .map((f) => {
+      const tramo = { desde, verde: f.resaltado, palabras: f.texto.split(/\s+/).filter((p) => p !== "") };
+      desde += f.texto.length;
+      return tramo;
+    })
+    .filter((t) => t.palabras.length > 0);
 }
 
-/** BEAT 4: «Vivir para hacer vivir» — las palabras convergen desde el blur. */
+/**
+ * BEAT 4: «Vivir para hacer vivir». En escritorio las palabras convergen
+ * desde el blur, centradas, en la línea que les toque. Bajo `lg`, con el
+ * pasador de capítulos, cada tramo va en su renglón: la frase empieza y
+ * termina con la misma palabra, y apilada ese espejo se ve —los tramos verdes
+ * grandes, lo del medio más chico—, siempre centrada (Gastón, 2026-10-02: a la
+ * izquierda no).
+ * Los renglones salen de lo que el contenido marca en verde: si la frase
+ * cambia en el admin, la composición la sigue.
+ */
 export function BeatRemate({ frase, texto }: { frase: string; texto: string }) {
-  const lista = palabras(frase);
+  const lista = tramos(frase);
   return (
     <div
       data-beat="4"
@@ -23,15 +38,26 @@ export function BeatRemate({ frase, texto }: { frase: string; texto: string }) {
         className="font-display font-bold tracking-[-0.02em]"
         style={{ fontSize: "clamp(2.6rem, 1rem + 5.6vw, 5.4rem)", lineHeight: 1.05 }}
       >
-        {lista.map(({ palabra, verde }, i) => (
-          <Fragment key={palabra}>
+        {lista.map((tramo, i) => (
+          <Fragment key={tramo.desde}>
+            {i > 0 ? " " : null}
             <span
-              data-fin-word
-              className={`inline-block ${verde ? "text-verde-concepto" : "text-white"}`}
+              data-fin-tramo
+              className={
+                tramo.verde
+                  ? "text-verde-concepto max-lg:[[data-modo=movil]_&]:block max-lg:[[data-modo=movil]_&]:text-[1.3em]"
+                  : "text-white max-lg:[[data-modo=movil]_&]:block max-lg:[[data-modo=movil]_&]:py-[0.18em] max-lg:[[data-modo=movil]_&]:text-[0.62em] max-lg:[[data-modo=movil]_&]:font-medium max-lg:[[data-modo=movil]_&]:tracking-normal"
+              }
             >
-              {palabra}
+              {tramo.palabras.map((palabra, k) => (
+                <Fragment key={`${tramo.desde}-${palabra}`}>
+                  {k > 0 ? " " : null}
+                  <span data-fin-word className="inline-block">
+                    {palabra}
+                  </span>
+                </Fragment>
+              ))}
             </span>
-            {i < lista.length - 1 ? " " : null}
           </Fragment>
         ))}
       </h3>
@@ -44,7 +70,7 @@ export function BeatRemate({ frase, texto }: { frase: string; texto: string }) {
         data-fin-sub
         className="text-azul-claro/85 mt-7 max-w-[50ch] font-sans text-[1.02rem] leading-relaxed md:text-[1.15rem]"
       >
-        {texto}
+        <Palabras texto={texto} />
       </p>
     </div>
   );

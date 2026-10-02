@@ -21,8 +21,10 @@ export const ALTO_CAPITULOS_LVH = 100 + CAPITULOS * LVH_POR_CAPITULO + LVH_RESPI
  * reemplaza. Gestos propios, cortos, solo transform y opacity: las letras del
  * primer título suben, las líneas de la cita se descubren, la pregunta se
  * tipea con el scroll del capítulo, la trayectoria vertical se dibuja y el
- * remate aparece palabra por palabra. En tablet las fotos del panel se cruzan
- * con los tres primeros capítulos.
+ * remate aparece palabra por palabra. Las fotos del panel se cruzan con los
+ * tres primeros capítulos: en tablet a la derecha y en celular en un marco
+ * arriba, con el texto debajo, que se enciende palabra por palabra mientras
+ * la muesca baja por el borde de la foto.
  */
 export function crearCapitulosMovil(root: HTMLElement, zone: HTMLElement) {
   const ctx = gsap.context(() => {
@@ -46,9 +48,30 @@ export function crearCapitulosMovil(root: HTMLElement, zone: HTMLElement) {
     gsap.set(p.finWords, { autoAlpha: 0, y: 18 });
     if (p.finRule) gsap.set(p.finRule, { scaleX: 0 });
     if (p.finSub) gsap.set(p.finSub, { autoAlpha: 0, y: 12 });
-    // El panel de fotos (solo md+): una foto por capítulo 0–2, después se apaga.
+    const finPalabras = p.qa("[data-fin-sub] [data-palabra]");
+    gsap.set(finPalabras, { opacity: 0.28 });
+    // El cuerpo de cada pilar espera tenue y se enciende palabra por palabra.
+    const cuerpos = [0, 1, 2].map((k) => p.qa(`[data-beat='${k}'] [data-palabra]`));
+    cuerpos.forEach((palabras) => gsap.set(palabras, { opacity: 0.28 }));
+    // El panel de fotos: una foto por capítulo 0–2, después se apaga.
     if (p.panel) gsap.set(p.panel, { autoAlpha: 1 });
     p.photoFrames.forEach((f, i) => gsap.set(f, { autoAlpha: i === 0 ? 1 : 0 }));
+    // La lámina asoma sobre el hero desde scroll 0 y la foto no: entra con los
+    // primeros pasos del scroll, antes de que la escena quede fija. Anima la
+    // lámina interna; el panel de afuera es del timeline (su salida).
+    if (p.lamina) {
+      gsap.fromTo(
+        p.lamina,
+        { autoAlpha: 0, y: 56, scale: 0.96 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          ease: "power2.out",
+          scrollTrigger: { trigger: root, start: "top 68%", end: "top 12%", scrub: 0.5 },
+        },
+      );
+    }
 
     const setDot = crearIndicador(dots);
     const tl = gsap.timeline({
@@ -96,11 +119,28 @@ export function crearCapitulosMovil(root: HTMLElement, zone: HTMLElement) {
       tl.to(n, { scale: 1, autoAlpha: 1, duration: 0.1, ease: "back.out(3)" }, at);
       if (p.constvCopies[i]) tl.to(p.constvCopies[i], { autoAlpha: 1, x: 0, duration: 0.12 }, at + 0.02);
     });
-    // 4 · el remate, palabra por palabra
-    tl.to(p.finWords, { autoAlpha: 1, y: 0, duration: 0.25, stagger: 0.07 }, entra(4) + 0.08);
+    // 4 · el remate: cada palabra cae en su renglón, y después se enciende
+    // el párrafo.
+    tl.to(p.finWords, { autoAlpha: 1, y: 0, duration: 0.25, stagger: 0.1 }, entra(4) + 0.08);
     if (p.finRule) tl.to(p.finRule, { scaleX: 1, duration: 0.2 }, entra(4) + 0.4);
     if (p.finSub) tl.to(p.finSub, { autoAlpha: 1, y: 0, duration: 0.2 }, entra(4) + 0.5);
-    // Fotos (tablet): cruce con cada capítulo 0–2 y salida antes del 3.
+    tl.to(finPalabras, { opacity: 1, duration: 0.06, stagger: { amount: 0.28 }, ease: "none" }, entra(4) + 0.58);
+    cuerpos.forEach((palabras, k) => {
+      const desde = entra(k) + (k === 0 ? 0.2 : 0.32);
+      tl.to(palabras, { opacity: 1, duration: 0.06, stagger: { amount: 0.3 }, ease: "none" }, desde);
+    });
+    // Fotos: cruce con cada capítulo 0–2 y salida antes del 3. La muesca baja
+    // por el borde de la foto: deriva apenas mientras se lee y cae un tercio
+    // con cada cambio de capítulo (repartida pareja en toda la zona no se
+    // notaba que se movía).
+    if (p.notchRail) {
+      tl.fromTo(p.notchRail, { yPercent: 4 }, { yPercent: 12, ease: "none", duration: sale(0) }, 0);
+      [1, 2].forEach((k) => {
+        const llega = 4 + k * 32;
+        tl.to(p.notchRail, { yPercent: llega, duration: 0.5, ease: "power2.inOut" }, sale(k - 1));
+        tl.to(p.notchRail, { yPercent: llega + 6, duration: 0.5, ease: "none" }, sale(k - 1) + 0.5);
+      });
+    }
     p.photoFrames.forEach((f, i) => {
       if (i > 0) tl.to(f, { autoAlpha: 1, duration: 0.2 }, entra(i));
       if (i > 0 && p.photoFrames[i - 1]) tl.to(p.photoFrames[i - 1], { autoAlpha: 0, duration: 0.2 }, entra(i));

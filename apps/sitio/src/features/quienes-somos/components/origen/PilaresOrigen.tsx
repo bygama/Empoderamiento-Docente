@@ -1,6 +1,7 @@
 import { SplitChars } from "@/components/ui/SplitChars";
 import type { OrigenDeQuienesSomos } from "@/features/quienes-somos/contenido/origen";
 import { PILAR_CUERPO, PILAR_TITULO } from "./estilos";
+import { Palabras } from "./Palabras";
 import { Pilar } from "./Pilar";
 
 /**
@@ -25,7 +26,7 @@ export function PilaresOrigen({ contenido }: { contenido: OrigenDeQuienesSomos }
         }
         cuerpo={
           <p className={PILAR_CUERPO}>
-            {origen.texto}
+            <Palabras texto={origen.texto} />
           </p>
         }
       />
@@ -65,7 +66,7 @@ export function PilaresOrigen({ contenido }: { contenido: OrigenDeQuienesSomos }
         }
         cuerpo={
           <p data-quote-sub className={PILAR_CUERPO}>
-            {sentido.quien}
+            <Palabras texto={sentido.quien} />
           </p>
         }
       />
@@ -88,7 +89,7 @@ export function PilaresOrigen({ contenido }: { contenido: OrigenDeQuienesSomos }
         }
         cuerpo={
           <p data-sub className={PILAR_CUERPO}>
-            {evolucion.respuesta}
+            <Palabras texto={evolucion.respuesta} />
           </p>
         }
       />
