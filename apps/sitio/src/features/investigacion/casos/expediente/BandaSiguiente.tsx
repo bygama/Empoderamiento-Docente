@@ -42,11 +42,15 @@ export function BandaSiguiente({ siguiente, indice, total, interactiva, onIr, on
             className={`${TINTES[siguiente.tinte].carpeta} ${TINTES[siguiente.tinte].grano} ${TINTES[siguiente.tinte].texto} relative block rounded-2xl px-8 py-9 shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55)] transition-[background-color] duration-500 lg:px-14 lg:py-12`}
           >
             <span aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-white/25" />
-            <span className={ROTULO_MICRO}>SIGUIENTE EXPEDIENTE</span>
-            <span className="font-display mt-4 block max-w-[26ch] text-[1.5rem] leading-[1.15] font-extrabold tracking-[-0.015em] lg:text-[1.9rem]">
+            {/* data-banda-*: en celular la banda sube entera al abrir el
+                siguiente, y de ella queda la pregunta, que viaja hasta el
+                título (coreografia-compacta.ts). */}
+            <span data-banda-resto className={ROTULO_MICRO}>SIGUIENTE EXPEDIENTE</span>
+            <span data-banda-pregunta className="font-display mt-4 block max-w-[26ch] text-[1.5rem] leading-[1.15] font-extrabold tracking-[-0.015em] lg:text-[1.9rem]">
               {siguiente.pregunta}
             </span>
             <span
+              data-banda-resto
               className={`mt-6 inline-flex items-center gap-2.5 ${ROTULO_TAB} underline-offset-4 group-hover:underline`}
             >
               ABRIR CASO {siguiente.numero}
