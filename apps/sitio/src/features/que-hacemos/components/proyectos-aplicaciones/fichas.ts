@@ -11,14 +11,20 @@ import type { ProyectosDeQueHacemos } from "@/features/que-hacemos/contenido/pro
 
 export type PictoKey = "cuadernillos" | "cursos" | "comunidad" | "lideres" | "examen" | "materiales" | "curricula" | "paises";
 
-export type PaisKey = "ar" | "mx" | "br" | "cl";
+export type PaisKey = "ar" | "mx" | "br" | "cl" | "co" | "cr";
 
-/** Los países donde ED trabajó, con su bandera (`Bandera.tsx`). */
+/**
+ * Los países que tienen bandera dibujada (`Bandera.tsx`): donde ED trabajó
+ * y, además, de donde es su equipo (Colombia y Costa Rica las usan las
+ * tarjetas de Quiénes somos en celular).
+ */
 export const PAISES: Record<PaisKey, string> = {
   ar: "Argentina",
   mx: "México",
   br: "Brasil",
   cl: "Chile",
+  co: "Colombia",
+  cr: "Costa Rica",
 };
 
 /** «México», «Argentina y México», «Argentina, México y Brasil». */
