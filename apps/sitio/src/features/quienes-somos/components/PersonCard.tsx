@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { PersonaDelSitio as Persona, Tier } from "@/features/quienes-somos/contenido/perfil-del-sitio";
+import { PaisDeLaCard } from "./impulsan-ed/PaisDeLaCard";
 
 /**
  * PersonCard — tarjeta base ÚNICA del equipo, a cuatro escalas jerárquicas.
@@ -50,7 +51,9 @@ type Cfg = {
   /**
    * En táctil no hay hover: el label entra en reposo, pero solo donde cabe
    * junto al país. En N3 y N4 (dos columnas en celular) lo aplastaba a 0 px;
-   * ahí la flecha sigue siendo la señal de acceso, como en escritorio.
+   * ahí la flecha sigue siendo la señal de acceso, como en escritorio. La
+   * Dirección (N2) también va de a dos en celular: su label se esconde
+   * bajo `sm`.
    */
   labelTactil: boolean;
   /** Cuerpo de las iniciales en la card sin foto (ver `SinFoto`). */
@@ -83,10 +86,10 @@ type Cfg = {
 const VIDRIO = "bg-white/80 backdrop-blur-[10px]";
 
 const CFG: Record<Tier, Cfg> = {
-  1: { aspect: "aspect-[4/5]", radius: "rounded-[1.5rem]", radiusB: "rounded-b-[1.5rem]", plate: VIDRIO, pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, labelTactil: true, iniciales: "text-[7rem]" },
-  2: { aspect: "aspect-[4/5]", radius: "rounded-[1.4rem]", radiusB: "rounded-b-[1.4rem]", plate: VIDRIO, pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, labelTactil: true, iniciales: "text-[5.5rem]" },
-  3: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.35rem]", radiusB: "rounded-b-[1.35rem]", plate: VIDRIO, pad: "p-[1.15rem]", nombre: "text-[1.18rem] max-md:text-[1.06rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem] max-md:text-[0.64rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, labelTactil: false, iniciales: "text-[4.4rem]" },
-  4: { aspect: "aspect-[3/5] sm:aspect-[4/5]", radius: "rounded-[1.15rem]", radiusB: "rounded-b-[1.15rem]", plate: VIDRIO, pad: "p-[0.95rem]", nombre: "text-[1.02rem] max-md:text-[1rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem] max-md:text-[0.64rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, labelTactil: false, iniciales: "text-[3.1rem]" },
+  1: { aspect: "lg:aspect-[4/5]", radius: "rounded-[1.5rem]", radiusB: "rounded-b-[1.5rem]", plate: VIDRIO, pad: "p-5 lg:p-6", nombre: "text-[1.55rem] lg:text-[1.85rem]", rol: "text-[0.9rem]", pais: "text-[0.66rem]", label: "text-[0.82rem]", arrow: "h-11 w-11", glyph: 18, labelAtRest: true, labelOnHover: true, labelTactil: true, iniciales: "text-[7rem]" },
+  2: { aspect: "lg:aspect-[4/5]", radius: "rounded-[1.4rem]", radiusB: "rounded-b-[1.4rem]", plate: VIDRIO, pad: "p-5", nombre: "text-[1.3rem]", rol: "text-[0.82rem]", pais: "text-[0.64rem]", label: "text-[0.78rem] max-sm:hidden!", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, labelTactil: true, iniciales: "text-[5.5rem]" },
+  3: { aspect: "lg:aspect-[4/5]", radius: "rounded-[1.35rem]", radiusB: "rounded-b-[1.35rem]", plate: VIDRIO, pad: "p-[1.15rem]", nombre: "text-[1.18rem] max-md:text-[1.06rem]", rol: "text-[0.79rem]", pais: "text-[0.63rem] max-md:text-[0.64rem]", label: "text-[0.76rem]", arrow: "h-10 w-10", glyph: 16, labelAtRest: false, labelOnHover: true, labelTactil: false, iniciales: "text-[4.4rem]" },
+  4: { aspect: "lg:aspect-[4/5]", radius: "rounded-[1.15rem]", radiusB: "rounded-b-[1.15rem]", plate: VIDRIO, pad: "p-[0.95rem]", nombre: "text-[1.02rem] max-md:text-[1rem]", rol: "text-[0.72rem]", pais: "text-[0.59rem] max-md:text-[0.64rem]", label: "text-[0.7rem]", arrow: "h-9 w-9", glyph: 15, labelAtRest: false, labelOnHover: true, labelTactil: false, iniciales: "text-[3.1rem]" },
 };
 
 /**
@@ -142,10 +145,14 @@ function Caption({
       data-caption={variant}
       className={cx(
         "pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end transition-opacity duration-500 ease-out",
+        // Bajo lg no hay hover y la foto va limpia: el caption de reposo baja al
+        // flujo, sobre blanco, y el de hover no se dibuja.
+        // Compacto: la tarjeta la manda la foto, y el pie mide lo que su texto.
+        hover ? "max-lg:hidden" : "max-lg:static max-lg:flex-1 max-lg:justify-start max-lg:bg-white max-lg:p-3.5 max-lg:backdrop-blur-none",
         cfg.pad,
         hover
           ? "from-azul-principal/95 via-azul-principal/55 to-transparent bg-gradient-to-t pt-20 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
-          : cx(cfg.plate, cfg.radiusB, "opacity-100 group-hover:opacity-0 group-focus-visible:opacity-0"),
+          : cx(cfg.plate, cfg.radiusB, "opacity-100 lg:group-hover:opacity-0 lg:group-focus-visible:opacity-0"),
       )}
     >
       <span
@@ -157,13 +164,14 @@ function Caption({
       <span className={cx("mt-0.5 line-clamp-3 font-sans leading-snug sm:line-clamp-2", cfg.rol, hover ? "text-white/85" : "text-azul-principal/75")}>
         {persona.rol}
       </span>
-      <span className="mt-2 flex items-center justify-between gap-2">
+      <span className="mt-2 flex items-center justify-between gap-2 max-lg:mt-auto max-lg:pt-2.5">
         {/* El país cede antes que el CTA: en las compactas "Colombia" + "Ver
             trayectoria" van al límite del ancho útil y el acceso no puede ser
             lo que se recorte. */}
-        <span className={cx("min-w-0 truncate font-mono tracking-[0.16em] uppercase", cfg.pais, hover ? "text-azul-claro" : "text-azul-medio")}>
-          {persona.pais}
-        </span>
+        <PaisDeLaCard
+          pais={persona.pais}
+          className={cx("min-w-0 truncate font-mono tracking-[0.16em] uppercase", cfg.pais, hover ? "text-azul-claro" : "text-azul-medio")}
+        />
         <span className="flex shrink-0 items-center gap-1.5">
           {showLabel && (
             <span
@@ -180,6 +188,8 @@ function Caption({
           <span
             className={cx(
               "inline-flex items-center justify-center rounded-full border transition-colors",
+              // Bajo lg la flecha es solo la señal: toda la tarjeta es el botón.
+              "max-lg:h-[1.875rem] max-lg:w-[1.875rem] max-lg:[&>svg]:h-3.5 max-lg:[&>svg]:w-3.5",
               cfg.arrow,
               hover ? "border-verde-concepto bg-verde-concepto text-white" : "border-azul-principal/30 text-azul-principal",
             )}
@@ -225,7 +235,7 @@ export function PersonCard({
       onFocus={() => precargarPerfil(persona)}
       aria-label={`Ver la trayectoria de ${persona.nombre}, ${persona.rol}`}
       className={cx(
-        "group relative block w-full cursor-pointer overflow-hidden text-left ring-1 ring-white/10 transition-shadow duration-500",
+        "group relative block w-full cursor-pointer overflow-hidden text-left ring-1 ring-white/10 transition-shadow duration-500 max-lg:flex max-lg:h-full max-lg:flex-col",
         "hover:shadow-[0_28px_70px_-26px_rgb(31_154_120/0.45)] focus-visible:shadow-[0_28px_70px_-26px_rgb(31_154_120/0.45)]",
         "focus-visible:outline-verde-concepto focus-visible:outline-2 focus-visible:outline-offset-2",
         "max-lg:active:scale-[0.985] max-lg:transition-[box-shadow,transform]",
@@ -234,26 +244,30 @@ export function PersonCard({
       )}
     >
       {/* Foto — cubre toda la card, color pleno, encuadre por persona. Quien
-          pidió no publicar retrato lleva la superficie tipográfica. */}
-      {persona.foto === null ? (
-        <SinFoto persona={persona} cfg={cfg} />
-      ) : (
-        <Image
-          src={persona.foto.src}
-          alt={persona.foto.alt}
-          fill
-          sizes={persona.tier <= 2 ? "(max-width: 1024px) 90vw, 640px" : persona.tier === 3 ? "(max-width: 1024px) 45vw, 320px" : "(max-width: 1024px) 30vw, 240px"}
-          style={
-            {
-              objectPosition: persona.foto.posicion,
-              "--foto-zoom": persona.imageZoom,
-            } as React.CSSProperties
-          }
-          /* El acercamiento de hover se multiplica por el zoom propio de la foto,
-             así el gesto es el mismo para todos sin importar de qué encuadre parta. */
-          className="scale-[var(--foto-zoom)] object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[calc(var(--foto-zoom)*1.045)] group-focus-visible:scale-[calc(var(--foto-zoom)*1.045)]"
-        />
-      )}
+          pidió no publicar retrato lleva la superficie tipográfica. Bajo lg el
+          marco es un retrato 4/5 propio y los datos van debajo: con el caption
+          encima, en dos columnas de celular quedaba media cara tapada. */}
+      <span className="absolute inset-0 block max-lg:relative max-lg:inset-auto max-lg:aspect-[4/5] max-lg:w-full max-lg:shrink-0 max-lg:overflow-hidden">
+        {persona.foto === null ? (
+          <SinFoto persona={persona} cfg={cfg} />
+        ) : (
+          <Image
+            src={persona.foto.src}
+            alt={persona.foto.alt}
+            fill
+            sizes={persona.tier <= 2 ? "(max-width: 1024px) 90vw, 640px" : persona.tier === 3 ? "(max-width: 1024px) 45vw, 320px" : "(max-width: 1024px) 30vw, 240px"}
+            style={
+              {
+                objectPosition: persona.foto.posicion,
+                "--foto-zoom": persona.imageZoom,
+              } as React.CSSProperties
+            }
+            /* El acercamiento de hover se multiplica por el zoom propio de la foto,
+               así el gesto es el mismo para todos sin importar de qué encuadre parta. */
+            className="scale-[var(--foto-zoom)] object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[calc(var(--foto-zoom)*1.045)] group-focus-visible:scale-[calc(var(--foto-zoom)*1.045)]"
+          />
+        )}
+      </span>
       {/* Captions pre-apilados: reposo (plate claro) ↔ hover (scrim navy) */}
       <Caption persona={persona} cfg={cfg} variant="rest" />
       <Caption persona={persona} cfg={cfg} variant="hover" />
