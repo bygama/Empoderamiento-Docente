@@ -97,50 +97,68 @@ export function FichaNovedad({ n, material }: { n: NovedadDelSitio; material: Ma
   }, [secciones]);
 
   return (
-    <article className="bg-white">
-      <div className="mx-auto w-full max-w-screen-xl px-5 pt-32 pb-20 md:px-10 md:pt-36 md:pb-28">
+    <article className="relative bg-white">
+      {/* El glow de faro de los heroes, sobre la cabecera azul (bajo lg). */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-80 lg:hidden"
+        style={{
+          background:
+            "radial-gradient(70% 55% at 50% 0%, color-mix(in srgb, var(--color-azul-claro) 22%, transparent), transparent 70%)",
+        }}
+      />
+      <div className="mx-auto w-full max-w-screen-xl px-5 pt-20 pb-20 md:px-10 md:pb-28 lg:pt-36">
         <Link
           href="/novedades"
           onClick={volver}
-          className="group text-gris-texto hover:text-azul-principal inline-flex max-lg:min-h-11 items-center gap-2 font-mono text-[0.72rem] tracking-[0.14em] uppercase transition-colors"
+          className="group text-gris-texto hover:text-azul-principal max-lg:text-azul-claro/85 relative z-10 inline-flex items-center gap-2 font-mono text-[0.72rem] tracking-[0.14em] uppercase transition-colors max-lg:min-h-11 max-lg:hover:text-white"
         >
           <ArrowRight size={14} className="rotate-180 transition-transform group-hover:-translate-x-0.5" />
           Todas las novedades
         </Link>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16">
+        <div className="mt-2 grid gap-10 lg:mt-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16">
           {/* Columna de lectura */}
           <div className="min-w-0">
-            <div className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.16em] uppercase">
-              <span className="text-verde-concepto-texto">
-                {etiquetaDeCategoria(n.categoria)}
-              </span>
-              <span className="bg-gris-texto/40 h-1 w-1 rounded-full" />
-              <span className="text-gris-texto">{fechaCorta(n.fecha)}</span>
+            {/* Bajo lg la cabecera es una pieza azul, como los heroes del
+                sitio: el fondo sube hasta el borde de la pantalla (toma el
+                link de volver y el nav) y baja hasta montar la foto. */}
+            <div className="relative isolate">
+              <span
+                aria-hidden="true"
+                className="bg-azul-principal absolute -inset-x-5 -top-[60rem] -bottom-24 -z-10 rounded-b-[2rem] md:-inset-x-10 md:rounded-b-[2.75rem] lg:hidden"
+              />
+
+              <div className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.16em] uppercase">
+                <span className="text-verde-concepto-texto max-lg:text-[color-mix(in_srgb,var(--color-verde-concepto)_62%,white)]">
+                  {etiquetaDeCategoria(n.categoria)}
+                </span>
+                <span className="bg-gris-texto/40 max-lg:bg-azul-claro/40 h-1 w-1 rounded-full" />
+                <span className="text-gris-texto max-lg:text-azul-claro/80">{fechaCorta(n.fecha)}</span>
+              </div>
+
+              <RevealLines
+                as="h1"
+                delay={espera}
+                className="font-display text-azul-principal mt-4 font-bold tracking-[-0.02em] max-lg:mt-3 max-lg:text-white"
+                style={{ fontSize: "clamp(1.9rem, 1.1rem + 2.4vw, 3.1rem)", lineHeight: 1.08 }}
+              >
+                {n.titulo}
+              </RevealLines>
             </div>
 
-            <RevealLines
-              as="h1"
-              delay={espera}
-              className="font-display text-azul-principal mt-4 font-bold tracking-[-0.02em]"
-              style={{ fontSize: "clamp(1.9rem, 1.1rem + 2.4vw, 3.1rem)", lineHeight: 1.08 }}
-            >
-              {n.titulo}
-            </RevealLines>
-
-            {/* Foto en mobile: bajo el titular (en lg vive en la columna derecha). */}
+            {/* Foto en mobile: bajo el titular, montada sobre el borde de la
+                cabecera (en lg vive en la columna derecha). */}
             <RevealFoco
               delay={espera}
-              className="mt-8 aspect-[16/10] w-full overflow-hidden rounded-2xl lg:hidden"
+              className="relative z-10 mt-6 aspect-[16/10] w-full overflow-hidden rounded-2xl shadow-[0_30px_60px_-30px_rgb(15_21_40/0.55)] lg:hidden"
             >
               <div className="relative h-full w-full">
                 <Image src={n.imagen.src} alt="" fill sizes="100vw" className="object-cover" style={estiloDeFoco(n.imagen.foco)} priority />
               </div>
             </RevealFoco>
 
-            {secciones.length > 1 && (
-              <GuiaNotaRiel secciones={secciones} activa={activa} onIr={irASeccion} />
-            )}
+            <GuiaNotaRiel titulo={n.titulo} secciones={secciones} activa={activa} onIr={irASeccion} />
 
             <p className="text-azul-principal mt-8 font-sans text-[1.15rem] leading-relaxed font-medium">
               {n.bajada}
