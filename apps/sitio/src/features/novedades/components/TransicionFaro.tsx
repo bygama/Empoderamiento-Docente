@@ -11,6 +11,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { getLenis } from "@/lib/lenis";
+import { conservarScrollAlLlegar } from "@/lib/navegar";
 
 /**
  * Transición de ruta "el faro te abre el documento", en tres tiempos:
@@ -136,7 +137,10 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
         vuelta.current = null;
       }
       // Con un scroll por restaurar, Next no sube al tope.
-      const ir = () => router.push(destino, { scroll: restaurar.current === null });
+      const ir = () => {
+        if (restaurar.current !== null) conservarScrollAlLlegar();
+        router.push(destino, { scroll: restaurar.current === null });
+      };
       if (reduced || !velo || !marca) {
         ir();
         return;

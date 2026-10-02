@@ -1,5 +1,6 @@
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { irArriba, irASeccion } from "@/lib/indice";
+import { getLenis } from "@/lib/lenis";
 
 /**
  * Ir a un DESTINO del sitio (`/pagina#seccion`, `/pagina?filtro=x#seccion`)
@@ -111,6 +112,40 @@ export function aterrizarEn(id: string): () => void {
       ScrollTrigger.refresh();
       irASeccion(id, { corte: true, alFinal: true });
     });
+  });
+  return () => cancelAnimationFrame(raf);
+}
+
+/**
+ * Página nueva por un link, sin sección pedida: abre ARRIBA, siempre. Next
+ * ya sube al tope al navegar, pero no alcanza: si la rueda todavía venía
+ * deslizando, Lenis sigue su viaje, no escucha ese salto y lleva la página
+ * nueva a la altura de la anterior (Qué hacemos al 60% → Investigación al
+ * 60%). Acá se le corta el viaje a Lenis y se sube; se repite dos cuadros,
+ * por si el alto de la página nueva todavía se estaba acomodando.
+ *
+ * La excepción es una navegación que trae su propio scroll (volver al listado
+ * de Novedades donde se lo dejó): avisa antes con `conservarScrollAlLlegar`.
+ */
+let conservaScroll = false;
+
+export function conservarScrollAlLlegar() {
+  conservaScroll = true;
+}
+
+export function abrirArriba(): () => void {
+  if (conservaScroll) {
+    conservaScroll = false;
+    return () => {};
+  }
+  const subir = () => {
+    getLenis()?.scrollTo(0, { immediate: true, force: true });
+    if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: "instant" });
+  };
+  subir();
+  let raf = requestAnimationFrame(() => {
+    subir();
+    raf = requestAnimationFrame(subir);
   });
   return () => cancelAnimationFrame(raf);
 }
