@@ -73,6 +73,21 @@ export function crearCoreografiaEquipo(root: HTMLElement): () => void {
       // Apenas detrás del título: el trazo baja mientras entra la primera fila.
       if (spine) tl.to(spine, { scaleY: 1, duration: 0.85, ease: "power2.out" }, 0.16);
     });
+
+    // El cierre de celular y tablet: el punto baja por su trazo hacia el faro
+    // del footer. Desde `lg` ese bloque no se dibuja (no tiene caja) y esto
+    // no corre.
+    const rastro = root.querySelector<HTMLElement>("[data-cierre-rastro]");
+    if (rastro && rastro.offsetParent !== null) {
+      const linea = rastro.querySelector("[data-cierre-linea]");
+      const punto = rastro.querySelector("[data-cierre-punto]");
+      gsap.set(linea, { scaleY: 0 });
+      gsap
+        .timeline({ scrollTrigger: { trigger: rastro, start: "top 90%", end: "bottom 58%", scrub: 0.5 } })
+        .to(linea, { scaleY: 1, duration: 1, ease: "none" }, 0)
+        .to(punto, { y: () => rastro.offsetHeight, duration: 1, ease: "none" }, 0)
+        .to(punto, { autoAlpha: 0, scale: 0.4, duration: 0.2, ease: "power2.in" }, 0.8);
+    }
   }, root);
 
   // Revela lo que ya esté en viewport al montar (p. ej. recarga con la página
