@@ -18,8 +18,10 @@ import { ESTRELLA, ESTRELLAS } from "./estrellas";
  * un núcleo, nada de conos: no es un segundo faro. Va debajo de los puntos,
  * para que el hallazgo se vea en el centro de la luz.
  *
- * Presentacional. El SSR dibuja el cielo estrellado: es lo que ven touch,
- * reduced-motion y las pantallas sin `lg`.
+ * Presentacional. El SSR dibuja el cielo estrellado de escritorio. Bajo
+ * `lg` ese cielo no sirve (la mitad cae fuera del cuadro y el resto, sobre
+ * el titular): la capa espera invisible a que la escena de celular ubique
+ * las estrellas y declare su modo (movil/escena.ts).
  */
 export function Bandada() {
   return (
@@ -28,7 +30,7 @@ export function Bandada() {
       viewBox="0 0 1440 900"
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-50 h-full w-full"
+      className="pointer-events-none absolute inset-0 z-50 h-full w-full max-lg:invisible max-lg:[[data-modo]_&]:visible"
     >
       <defs>
         <radialGradient id="hero-chispa-halo">
