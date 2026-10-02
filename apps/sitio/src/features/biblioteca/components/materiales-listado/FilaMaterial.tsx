@@ -4,6 +4,7 @@ import { accionDe } from "@/features/biblioteca/contenido/modelo";
 import { contar } from "@/lib/contadores/contar";
 import { estiloDe } from "@/features/biblioteca/components/portada/estilo-de-tipo";
 import { PortadaDeMaterial } from "@/features/biblioteca/components/portada/PortadaDeMaterial";
+import { TextoPlegable } from "@/features/biblioteca/components/destacados/TextoPlegable";
 import { CopiarCita } from "./CopiarCita";
 
 /** Una fila del catálogo: portada, chips de tipo y tema, título, autores, descripción, metadata con «Copiar cita APA» y el link de acción. */
@@ -35,11 +36,16 @@ export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
         <p className="text-azul-principal/70 mt-1.5 font-sans text-[0.9rem] leading-snug">
           {m.autores}
         </p>
-        <p className="text-gris-texto mt-2 max-w-[68ch] font-sans text-[0.97rem] leading-relaxed max-md:text-[0.9rem]">
-          {m.descripcion}
-        </p>
+        <div className="mt-2 flex flex-col">
+          <TextoPlegable
+            descripcion={m.descripcion}
+            renglones={2}
+            sobreClaro
+            claseParrafo="text-gris-texto max-w-[68ch] font-sans text-[0.97rem] leading-relaxed max-md:text-[0.9rem]"
+          />
+        </div>
 
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-5">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-3">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <p className="text-gris-texto font-mono text-[0.72rem] tracking-[0.08em] uppercase">
               {m.fecha} · {m.paginas ? `${m.paginas} páginas` : m.formato}
