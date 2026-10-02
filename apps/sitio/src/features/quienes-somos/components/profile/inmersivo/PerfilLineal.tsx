@@ -13,13 +13,23 @@ type Props = {
   refWrap: Ref<HTMLDivElement>;
 };
 
-/** REDUCED MOTION: el perfil completo, lineal, sin coreografía. */
+/**
+ * El perfil completo, lineal: bajo `lg` y con movimiento reducido.
+ *
+ * Va en su propia capa y por encima del lienzo blanco (`z-[1]` +
+ * `translateZ(0)`). El lienzo es un `sticky` que queda debajo del contenido
+ * solo por orden de pintado, y en iPhone eso no alcanzó: al terminar la
+ * apertura, o al empezar a scrollear, el contenido quedaba tapado por el
+ * blanco y solo se veían los dos botones fijos (Gastón, 2026-10-02, video).
+ * No hay `fixed` acá adentro, así que el transform no le cambia el bloque
+ * contenedor a nada.
+ */
 export function PerfilLineal({ profile, figura, onClose, refWrap }: Props) {
   return (
     <div
       ref={refWrap}
       data-perfil-lineal
-      className="relative mx-auto max-w-screen-lg px-6 py-20 md:px-10 max-lg:pb-[calc(5rem+env(safe-area-inset-bottom))]"
+      className="relative z-[1] mx-auto max-w-screen-lg [transform:translateZ(0)] px-6 py-20 md:px-10 max-lg:pb-[calc(5rem+env(safe-area-inset-bottom))]"
     >
       <header className="grid items-center gap-8 md:grid-cols-[1.2fr_1fr]">
         <div data-lineal-texto>
