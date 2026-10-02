@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { Search } from "@/components/ui/icons";
 import type { HeroBiblioteca } from "@/features/biblioteca/contenido/hero";
 import { CategoriasRail } from "./CategoriasRail";
+import { bajarAlCatalogo, pedirBusqueda } from "./materiales-listado/filtros";
 import { PuntosFaro } from "@/components/ui/PuntosFaro";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
@@ -38,12 +39,16 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * El titular y la bajada llegan por props (de
  * `features/biblioteca/contenido/hero.ts` o de la base).
  */
-// Enter en el campo y clic en la lupa hacen lo MISMO (hoy, bajar al listado):
-// un solo lugar donde cambiarlo cuando el buscador filtre de verdad. Vive en
-// el módulo porque no lee props ni estado: adentro se rearmaría por render.
-function irAMateriales() {
-  document.getElementById("materiales")?.scrollIntoView({ behavior: "smooth" });
+// Enter en el campo y clic en la lupa hacen lo MISMO: le pasan lo escrito al
+// catálogo (el estado de la búsqueda es del listado) y bajan hasta él. Con el
+// campo vacío solo se baja: no se pisa una búsqueda que ya esté puesta. Vive
+// en el módulo porque no lee props ni estado: adentro se rearmaría por render.
+function buscarEnCatalogo() {
+  const texto = (document.getElementById("biblioteca-buscar") as HTMLInputElement | null)?.value.trim();
+  if (texto) pedirBusqueda(texto);
+  bajarAlCatalogo();
 }
+
 
 export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
   const { titulo } = contenido;
@@ -129,8 +134,7 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
           {contenido.bajada}
         </p>
 
-        {/* Buscador — por ahora ancla al futuro listado (#materiales);
-            cuando exista el catálogo, pasa a filtrarlo de verdad. */}
+        {/* Buscador — lleva lo escrito al catálogo (#materiales) y baja hasta él. */}
         {/* No es un <form>: no hay nada que enviar ni endpoint que responda, y
             un submit cancelado con preventDefault promete un envío que sin JS
             no pasa nunca. <search> es el landmark nativo (mejor que un
@@ -158,14 +162,14 @@ export function BibliotecaHero({ contenido }: { contenido: HeroBiblioteca }) {
             onKeyDown={(e) => {
               if (e.key !== "Enter") return;
               e.currentTarget.blur();
-              irAMateriales();
+              buscarEnCatalogo();
             }}
             className="text-azul-principal placeholder:text-gris-texto min-w-0 flex-1 bg-transparent px-3.5 font-sans text-[0.98rem] max-lg:text-[1rem] outline-none"
           />
           <button
             type="button"
             aria-label="Buscar"
-            onClick={irAMateriales}
+            onClick={buscarEnCatalogo}
             className="bg-naranja-accion flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white transition-opacity hover:opacity-90"
           >
             <Search size={20} />
