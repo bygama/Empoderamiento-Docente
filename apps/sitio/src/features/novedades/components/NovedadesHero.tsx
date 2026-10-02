@@ -66,7 +66,7 @@ export function NovedadesHero({ contenido, fechaDeLaUltima }: { contenido: HeroD
   return (
     <section
       ref={rootRef}
-      className="bg-azul-principal relative isolate flex min-h-[88svh] flex-col justify-between overflow-hidden rounded-b-[2rem] pt-28 pb-10 text-white max-md:min-h-[78lvh] md:rounded-b-[2.75rem] md:pt-32"
+      className="bg-azul-principal relative isolate flex min-h-[88svh] flex-col justify-between overflow-hidden rounded-b-[2rem] pt-28 pb-10 text-white max-lg:min-h-[calc(100svh-2.75rem)] md:rounded-b-[2.75rem] md:pt-32"
       aria-label="Novedades"
     >
       {/* Fondo: glow de faro contenido + forma plana (manual §6) */}
@@ -144,7 +144,9 @@ export function NovedadesHero({ contenido, fechaDeLaUltima }: { contenido: HeroD
         className="mx-auto w-full max-w-screen-xl px-5 text-center md:px-10"
       >
         <span className="font-mono text-[0.72rem] tracking-[0.2em] text-white/45 uppercase">
-          Scrolleá para ver lo último ↓
+          {/* Bajo lg se desliza con el dedo; con mouse se scrollea. */}
+          <span className="lg:hidden">Deslizá</span>
+          <span className="max-lg:hidden">Scrolleá</span> para ver lo último ↓
         </span>
       </div>
     </section>
