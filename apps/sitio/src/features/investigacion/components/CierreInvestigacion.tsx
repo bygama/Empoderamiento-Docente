@@ -40,8 +40,9 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
   const hojaRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
   // Tres modos, decididos enteros en cada corrida y de nuevo en cada cambio
-  // de pantalla: el ascenso de escritorio, la escena de celular (el faro chico
-  // sube y su haz gira hacia cada mensaje) y la hoja quieta.
+  // de pantalla: el ascenso de escritorio, la misma escena en vertical para
+  // celular y tablet (nubes, faro que sube girando, el haz que lee) y la hoja
+  // quieta.
   const [modo, setModo] = useState<"quieto" | "vivo" | "movil">("quieto");
   const live = modo === "vivo";
 
@@ -113,7 +114,7 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
         id="conversemos"
         data-indice="Cierre"
         aria-label="Cierre e invitación a conversar"
-        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden [--faro-movil:clamp(96px,18svh,140px)] pb-[var(--footer-radio)] text-white data-[modo=movil]:sticky data-[modo=movil]:top-0 data-[modo=movil]:h-lvh"
+        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden [--faro-movil:clamp(112px,21svh,156px)] pb-[var(--footer-radio)] text-white data-[modo=movil]:sticky data-[modo=movil]:top-0 data-[modo=movil]:h-lvh"
       >
         {/* ── El cielo: cae la noche sobre el archivo. */}
         <CieloCierre />
@@ -150,13 +151,13 @@ export function CierreInvestigacion({ contenido }: { contenido: CierreDeInvestig
           </div>
         </div>
 
-        {/* ── Bajo `lg`: el faro chico (llega ya encendido) sube desde el
-            piso entre dos nubes; el haz gira de costado hacia cada mensaje
+        {/* ── Bajo `lg`: las nubes en vertical y el faro, que sube girando
+            adentro de la última y se enciende
             (cierre-investigacion/coreografia-cierre-movil.ts). */}
         <CierreLinternaMovil />
 
         {/* ── Los dos mensajes que la luz lee de costado: invitaciones. */}
-        <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(200px,17vw)_1fr] lg:gap-x-6 [[data-modo=movil]_&]:min-h-0 [[data-modo=movil]_&]:h-full [[data-modo=movil]_&]:content-between [[data-modo=movil]_&]:pb-[calc(var(--footer-radio)+var(--faro-movil))]">
+        <div className="relative z-30 mx-auto grid min-h-[100svh] w-full max-w-screen-xl items-center gap-x-8 gap-y-14 px-6 py-24 md:px-12 lg:grid-cols-[1fr_minmax(200px,17vw)_1fr] lg:gap-x-6 [[data-modo=movil]_&]:min-h-0 [[data-modo=movil]_&]:h-full [[data-modo=movil]_&]:content-between [[data-modo=movil]_&]:pt-[7.5rem] [[data-modo=movil]_&]:pb-[calc(var(--footer-radio)+var(--faro-movil))]">
           {/* Primera parada del haz: dónde vive lo que investigamos. */}
           <div id="biblioteca" data-cierre-bloque className="max-w-[30rem] lg:max-w-none lg:justify-self-end">
             <h2

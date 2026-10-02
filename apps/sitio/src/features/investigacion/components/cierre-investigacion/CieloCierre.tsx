@@ -53,9 +53,12 @@ export function CieloCierre() {
             "linear-gradient(180deg, color-mix(in srgb, var(--color-azul-principal) 58%, black) 0%, var(--color-azul-principal) 46%, color-mix(in srgb, var(--color-azul-principal) 76%, black) 100%)",
         }}
       />
-      {/* Resplandor de la linterna sobre el cielo (la luz vive ahí). */}
+      {/* Resplandor de la linterna sobre el cielo (la luz vive ahí). Solo
+          desde `lg`: está puesto donde va el faro de escritorio, al centro; en
+          celular el faro va abajo a la derecha y esto quedaba como una columna
+          de luz suelta en medio del cielo. */}
       <span
-        className="absolute inset-0"
+        className="absolute inset-0 max-lg:hidden"
         style={{
           background:
             "radial-gradient(38% 34% at 50% 44%, color-mix(in srgb, var(--color-azul-claro) 22%, transparent), transparent 70%)",
