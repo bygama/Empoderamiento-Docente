@@ -2,6 +2,16 @@ import gsap from "gsap";
 import { panelDe, pasarA, type Contexto } from "./contexto";
 import type { TemaKey } from "./data";
 
+// Al llegar al formulario el foco va al primer campo, listo para escribir.
+// Salvo con el dedo: ahí enfocar un campo levanta el teclado encima de un
+// formulario que todavía nadie vio (Android; iOS lo ignora). El foco va
+// entonces a lo primero del panel, «Volver a los temas», que no pide teclado.
+function enfocarFormulario(root: HTMLElement) {
+  const conElDedo = window.matchMedia("(pointer: coarse)").matches;
+  const destino = conElDedo ? '[data-panel="formulario"] button' : "#ct-nombre";
+  root.querySelector<HTMLElement>(destino)?.focus({ preventScroll: true });
+}
+
 // ── APERTURA → FORMULARIO: crossfade limpio (sin vuelo) ───────────────────
 // El índice se disuelve y el formulario entra en cascada. El rail — con su
 // ícono y su título del tema — aparece de una, sin que nada vuele: un ícono
@@ -36,7 +46,7 @@ export function elegirTema(c: Contexto, key: TemaKey, cardEl: HTMLElement) {
       defaults: { ease: "power3.inOut" },
       onComplete: () => {
         c.estado.animando = false;
-        root.querySelector<HTMLInputElement>("#ct-nombre")?.focus({ preventScroll: true });
+        enfocarFormulario(root);
       },
     });
 
