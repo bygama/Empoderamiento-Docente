@@ -21,7 +21,7 @@ export function PanelCierre({ activo, titulo, contenido, contacto, onOtra }: Pro
       data-panel="cierre"
       aria-hidden={!activo}
       inert={!activo}
-      className={`absolute inset-x-5 top-0 bottom-0 flex flex-col items-center justify-center text-center opacity-0 md:inset-x-10 ${panelClases(activo)} max-lg:px-2 max-lg:py-24`}
+      className={`flex flex-col items-center justify-center py-24 text-center opacity-0 ${panelClases(activo)} max-lg:px-2`}
     >
       <span
         data-fin-rule

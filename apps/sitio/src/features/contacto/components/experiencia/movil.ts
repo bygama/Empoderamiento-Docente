@@ -1,21 +1,25 @@
 /**
- * Contacto bajo `lg` (< 64rem): la experiencia deja de ser UNA pantalla fija.
- * En computadora los cuatro estados viven apilados en absoluto dentro de una
- * raíz de 100svh y morfean entre sí; en celular y tablet eso no sobrevive al
- * teclado virtual (svh no se recalcula y el panel de campos queda recortado).
- * Acá cada panel va en el flujo: el activo ocupa la página, los otros no se
- * renderizan (`display: none`), y el scroll es el de la página. Las clases
- * llevan `max-lg:` para que computadora quede exactamente igual.
+ * Los cuatro estados de Contacto, en TODOS los tamaños: el panel activo va en
+ * el flujo y los inactivos quedan superpuestos en absoluto, arriba. Cada uno
+ * mide al menos una pantalla: si el contenido entra, se ve como una sola
+ * pantalla centrada; si no entra (notebook baja, zoom, celular, teclado
+ * virtual), la sección crece y scrollea LA PÁGINA. Ningún panel scrollea por
+ * dentro: antes la raíz medía 100svh fijos y cada panel tenía su
+ * `overflow-y-auto`, y en una ventana de menos de ~720px de alto aparecía una
+ * segunda barra adentro de la de la página.
+ *
+ * El inactivo no lleva `bottom`: mide lo mismo que cuando estaba en el flujo,
+ * así que al cambiar de vista el que sale no se mueve mientras se apaga.
  */
-export const PANEL_MOVIL =
-  "max-lg:relative max-lg:inset-auto max-lg:min-h-[100lvh] max-lg:overflow-visible";
+const PANEL_ACTIVO = "relative min-h-[100svh]";
+const PANEL_INACTIVO = "absolute inset-x-5 top-0 min-h-[100svh] md:inset-x-10";
 
 /** Media query bajo `lg` (< 64rem), compartida entre `esMovil()` y los hooks del cliente. */
 export const MQ_MOVIL = "(max-width: 63.999rem)";
 
-/** Clases del panel según esté activo: en celular el inactivo no ocupa lugar. */
+/** Clases del panel según esté activo (en el flujo) o no (superpuesto). */
 export function panelClases(activo: boolean) {
-  return activo ? PANEL_MOVIL : `${PANEL_MOVIL} max-lg:hidden`;
+  return activo ? PANEL_ACTIVO : PANEL_INACTIVO;
 }
 
 /** ¿Estamos bajo `lg`? Solo en el cliente; en SSR devuelve false. */

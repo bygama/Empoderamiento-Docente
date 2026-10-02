@@ -15,7 +15,7 @@ import { finIntro, montarIntro, saltarIntro } from "./experiencia/coreografia-in
 import { cambiarTema, elegirTema } from "./experiencia/coreografia-paneles";
 import { enviar, otraConsulta } from "./experiencia/coreografia-envio";
 import { useSaltoIntro } from "./experiencia/useSaltoIntro";
-import { useTopeMovil } from "./experiencia/useTopeMovil";
+import { useTope } from "./experiencia/useTope";
 import { panelClases } from "./experiencia/movil";
 import { PanelHero } from "./experiencia/PanelHero";
 import { ColumnaIdentidad } from "./experiencia/ColumnaIdentidad";
@@ -151,12 +151,12 @@ export function ContactoExperiencia({
   // Mientras la intro corre, cualquier intento de scroll la saltea.
   useSaltoIntro(reduced, introListo, estado, () => saltarIntro(contexto()));
 
-  useTopeMovil(vista);
+  useTope(vista);
 
   return (
     <section
       ref={rootRef}
-      className="bg-grain-light relative isolate h-[100svh] overflow-hidden bg-gradient-to-b from-white via-white to-gris-fondo/50 max-lg:h-auto max-lg:min-h-[100lvh] max-lg:overflow-x-clip max-lg:overflow-y-visible"
+      className="bg-grain-light relative isolate min-h-[100lvh] overflow-clip bg-gradient-to-b from-white via-white to-gris-fondo/50"
       aria-label="Contacto"
     >
       {/* Fondo de nodos vivo durante toda la experiencia */}
@@ -164,7 +164,7 @@ export function ContactoExperiencia({
         <MathField className="h-full w-full" />
       </div>
       {/* ── Escenario: los cuatro estados apilados ────────────────────────── */}
-      <div className="relative z-10 mx-auto h-full w-full max-w-screen-xl px-5 md:px-10 max-lg:h-auto">
+      <div className="relative z-10 mx-auto w-full max-w-screen-xl px-5 md:px-10">
         {/* 0 · HERO */}
         <PanelHero activo={vista === "hero"} titulo={titular.titulo} />
 
@@ -173,21 +173,17 @@ export function ContactoExperiencia({
             el contenido no entra en mobile, y justify-center lo recorta de los
             DOS lados — el titular se iba arriba del navbar y las tarjetas se
             metían abajo de la barra. Así se centra si entra, y si no entra
-            arranca del tope y se scrollea. Mismo patrón que el formulario.
-            overflow-x-hidden porque overflow-y solo ya hace que overflow-x
-            compute a `auto`: en reposo no desborda nada, pero el back.out con
-            que entran las tarjetas pasa apenas de scale 1 y eso alcanza para
-            que parpadee un scrollbar horizontal en pleno desarme.
+            arranca del tope y scrollea la página (ver `panelClases`). Mismo
+            patrón que el formulario.
             PANTALLAS BAJAS (laptop a 125%, 1366×768): con 112px de padding
-            abajo los cinco temas no entraban y el panel scrolleaba por dentro
-            —doble barra, y un índice que hay que descubrir scrolleando—. En
-            alto ≤ 860px el padding de abajo baja a 32px y las filas se
-            compactan (IndiceTemas), así entra todo en la pantalla. */}
+            abajo los cinco temas no entraban en la pantalla. En alto ≤ 860px
+            el padding de abajo baja a 32px y las filas se compactan
+            (IndiceTemas), así el índice se ve entero sin scrollear. */}
         <div
           data-panel="apertura"
           aria-hidden={vista !== "apertura"}
           inert={vista !== "apertura"}
-          className={`absolute inset-x-5 top-0 bottom-0 flex overflow-x-hidden overflow-y-auto pt-24 pb-8 opacity-0 md:inset-x-10 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pt-24 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-8 [@media(max-height:760px)]:md:pt-[5.5rem] [@media(max-height:760px)]:md:pb-6 ${panelClases(vista === "apertura")} max-lg:pb-12`}
+          className={`flex pt-24 pb-8 opacity-0 md:pt-28 md:pb-28 [@media(max-height:860px)_and_(min-height:761px)]:md:pt-24 [@media(max-height:860px)_and_(min-height:761px)]:md:pb-8 [@media(max-height:760px)]:md:pt-[5.5rem] [@media(max-height:760px)]:md:pb-6 ${panelClases(vista === "apertura")} max-lg:pb-12`}
         >
           {/* Composición editorial asimétrica (idioma de la home): columna de
               identidad a la izquierda (titular + equipo real) y el ÍNDICE de
