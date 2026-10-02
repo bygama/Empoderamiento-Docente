@@ -39,7 +39,7 @@ export function CanalDirecto({ correo, whatsapp, className }: { correo: string; 
     >
       <a
         href={`mailto:${correo}`}
-        className="text-azul-principal hover:text-verde-concepto font-sans text-[0.95rem] font-medium break-all transition-colors"
+        className="text-azul-principal hover:text-verde-concepto font-sans text-[0.95rem] font-medium break-all transition-colors max-lg:inline-flex max-lg:min-h-11 max-lg:items-center"
       >
         {correo}
       </a>
