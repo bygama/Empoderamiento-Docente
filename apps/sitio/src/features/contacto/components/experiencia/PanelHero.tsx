@@ -1,5 +1,4 @@
-import { TITULO_TIPO } from "./estilos";
-import { panelClases } from "./movil";
+import { TITULO_TIPO, panelClases } from "./estilos";
 
 /**
  * 0 · HERO — "Hablemos." gigante y EDITORIAL: izquierda y a ancho total, en

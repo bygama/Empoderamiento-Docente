@@ -1,7 +1,7 @@
 import type { ContactoDelSitio } from "@/config/datos-del-sitio";
 import type { CierreDeContacto } from "@/features/contacto/contenido/cierre";
 import { CanalDirecto } from "../CanalDirecto";
-import { panelClases } from "./movil";
+import { panelClases } from "./estilos";
 
 type Props = {
   activo: boolean;

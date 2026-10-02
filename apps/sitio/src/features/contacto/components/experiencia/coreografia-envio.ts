@@ -2,8 +2,7 @@ import gsap from "gsap";
 import type { FormEvent } from "react";
 import { contar } from "@/lib/contadores/contar";
 import { enviarFormulario } from "@/lib/formularios/enviar";
-import { panelDe, type Contexto } from "./contexto";
-import { esMovil } from "./movil";
+import { panelDe, pasarA, type Contexto } from "./contexto";
 
 const sinRespuesta = (correo: string) => `No pudimos enviar tu mensaje. Revisá tu conexión y probá de nuevo, o escribinos a ${correo}.`;
 
@@ -37,28 +36,10 @@ export async function enviar(c: Contexto, e: FormEvent<HTMLFormElement>, correo:
   // (work/metricas-completas/SPEC.md §5.3).
   contar("contacto-envio");
 
-  c.setVista("cierre");
+  pasarA(c, "formulario", "cierre");
   if (c.reduced) {
     gsap.set(panelDe(c, "formulario"), { autoAlpha: 0 });
     gsap.set(panelDe(c, "cierre"), { autoAlpha: 1 });
-    return;
-  }
-
-  // Bajo `lg` el formulario ya pasó a display:none (setVista): su salida
-  // animaría sobre nada mientras el cierre espera en blanco. Se lo pone
-  // visible ya y corren solo los tweens de entrada del cierre, en 0.
-  if (esMovil()) {
-    gsap.set(panelDe(c, "formulario"), { autoAlpha: 0 });
-    gsap.set(panelDe(c, "cierre"), { autoAlpha: 1 });
-    gsap
-      .timeline({ defaults: { ease: "power3.out" } })
-      .fromTo("[data-fin-rule]", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, 0)
-      .fromTo(
-        "[data-fin-bit]",
-        { autoAlpha: 0, y: 22 },
-        { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 },
-        0.35,
-      );
     return;
   }
 
@@ -77,7 +58,7 @@ export async function enviar(c: Contexto, e: FormEvent<HTMLFormElement>, correo:
 
 // ── CIERRE → APERTURA (otra consulta) ─────────────────────────────────────
 export function otraConsulta(c: Contexto) {
-  c.setVista("apertura");
+  pasarA(c, "cierre", "apertura");
   // Sin esto el foco cae al <body> cuando termina la transición: quien
   // navega por teclado (o lector de pantalla) queda en la nada.
   const enfocarPrimerTema = () =>
@@ -87,29 +68,6 @@ export function otraConsulta(c: Contexto) {
     gsap.set(panelDe(c, "cierre"), { autoAlpha: 0 });
     gsap.set(panelDe(c, "apertura"), { autoAlpha: 1 });
     enfocarPrimerTema();
-    return;
-  }
-
-  // Bajo `lg` el cierre ya pasó a display:none (setVista): su salida
-  // animaría sobre nada mientras la apertura espera en blanco. Se la
-  // enciende ya y corre solo la cascada de entrada, en 0.
-  if (esMovil()) {
-    gsap.set(panelDe(c, "cierre"), { autoAlpha: 0 });
-    gsap.set(panelDe(c, "apertura"), { autoAlpha: 1 });
-    gsap
-      .timeline({ defaults: { ease: "power3.out" }, onComplete: enfocarPrimerTema })
-      .fromTo(
-        "[data-ap-head], [data-ap-h2]",
-        { autoAlpha: 0, y: -16 },
-        { autoAlpha: 1, y: 0, duration: 0.43 },
-        0,
-      )
-      .fromTo(
-        "[data-tema-card]",
-        { autoAlpha: 0, y: 12 },
-        { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.02 },
-        0,
-      );
     return;
   }
 

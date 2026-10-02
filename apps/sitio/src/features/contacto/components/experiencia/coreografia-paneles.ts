@@ -1,8 +1,6 @@
 import gsap from "gsap";
-import { panelDe, type Contexto } from "./contexto";
+import { panelDe, pasarA, type Contexto } from "./contexto";
 import type { TemaKey } from "./data";
-import { esMovil } from "./movil";
-import { cambiarTemaMovil, elegirTemaMovil } from "./coreografia-paneles-movil";
 
 // ── APERTURA → FORMULARIO: crossfade limpio (sin vuelo) ───────────────────
 // El índice se disuelve y el formulario entra en cascada. El rail — con su
@@ -11,7 +9,7 @@ import { cambiarTemaMovil, elegirTemaMovil } from "./coreografia-paneles-movil";
 export function elegirTema(c: Contexto, key: TemaKey, cardEl: HTMLElement) {
   if (c.estado.animando) return;
   c.setTema(key);
-  c.setVista("formulario");
+  pasarA(c, "apertura", "formulario");
 
   if (c.reduced) {
     gsap.set(panelDe(c, "apertura"), { autoAlpha: 0 });
@@ -32,11 +30,6 @@ export function elegirTema(c: Contexto, key: TemaKey, cardEl: HTMLElement) {
     }
 
     const campos = gsap.utils.toArray<HTMLElement>("[data-campo]");
-
-    // Rama móvil aparte (coreografia-paneles-movil.ts) para que este archivo
-    // quede bajo el tope de 200 líneas del proyecto.
-    if (esMovil()) return elegirTemaMovil(c, root, campos);
-
     const otras = gsap.utils.toArray<HTMLElement>("[data-tema-card]").filter((el) => el !== cardEl);
 
     const tl = gsap.timeline({
@@ -103,7 +96,7 @@ export function elegirTema(c: Contexto, key: TemaKey, cardEl: HTMLElement) {
 export function cambiarTema(c: Contexto) {
   if (c.estado.animando) return;
   const root = c.root;
-  c.setVista("apertura");
+  pasarA(c, "formulario", "apertura");
 
   // El foco vuelve a la tarjeta del tema que estaba elegido: el botón que se
   // apretó ("Volver a los temas") desaparece con el formulario, y sin esto el
@@ -121,10 +114,6 @@ export function cambiarTema(c: Contexto) {
     volverElFoco();
     return;
   }
-
-  // Rama móvil aparte (coreografia-paneles-movil.ts) para que este archivo
-  // quede bajo el tope de 200 líneas del proyecto.
-  if (esMovil()) return cambiarTemaMovil(c, volverElFoco);
 
   c.estado.animando = true;
 

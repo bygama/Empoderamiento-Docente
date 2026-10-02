@@ -5,7 +5,7 @@ import type { Envio } from "./contexto";
 import { mailtoDelCV, type Tema } from "./data";
 import { RailTema } from "./RailTema";
 import { CamposContacto } from "./CamposContacto";
-import { panelClases } from "./movil";
+import { panelClases } from "./estilos";
 
 type Props = {
   activo: boolean;
