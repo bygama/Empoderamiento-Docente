@@ -9,8 +9,8 @@ import { useCopiar } from "@/lib/hooks/useCopiar";
 import type { PersonaDelSitio as Persona } from "@/features/quienes-somos/contenido/perfil-del-sitio";
 import { ImmersiveProfile } from "@/features/quienes-somos/components/profile/ImmersiveProfile";
 import { usePortalModal } from "./overlay/usePortalModal";
-import { abrirOverlay } from "./overlay/apertura-overlay";
-import { cerrarOverlay, type RefsOverlay } from "./overlay/coreografia-overlay";
+import { entrarAlPerfil, salirDelPerfil } from "./overlay/entrada-y-salida";
+import type { RefsOverlay } from "./overlay/coreografia-overlay";
 import { PerfilShell } from "./overlay/PerfilShell";
 
 /**
@@ -37,7 +37,8 @@ import { PerfilShell } from "./overlay/PerfilShell";
  *
  * Piezas (`overlay/`): `usePortalModal` (portal, lock, showModal, foco,
  * scroll), `apertura-overlay.ts` (la entrada), `coreografia-overlay.ts`
- * (tiempos, pares, clip-path y el cierre), `viaje-foto.ts` (la foto viajera).
+ * (tiempos, pares, clip-path y el cierre), `viaje-foto.ts` (la foto viajera)
+ * y `apertura-lineal.ts` (entrada y salida del perfil lineal, bajo `lg`).
  */
 export function TeamProfileOverlay({
   persona,
@@ -73,7 +74,11 @@ export function TeamProfileOverlay({
   // En el inmersivo de escritorio, la FOTO de la card viaja (la lleva este
   // overlay) y la figura recortada la releva al llegar. Se decide en render
   // porque ImmersiveProfile lo necesita como prop.
-  const fotoViaja = immersive && !staticProfile && !!originEl?.querySelector("img");
+  // Bajo `lg` (el perfil lineal, con motion) la foto también viaja, con su
+  // propia entrada y salida (`apertura-lineal.ts`).
+  const conViaje = immersive && !reduced;
+  const lineal = conViaje && !desktopChoreo;
+  const fotoViaja = conViaje && !!originEl?.querySelector("img");
   // Las piezas que animan apertura y cierre, en un solo bundle estable.
   const refs = useMemo<RefsOverlay>(
     () => ({
@@ -97,15 +102,15 @@ export function TeamProfileOverlay({
     originEl,
     reduced,
     immersive,
-    entrar: (root) => abrirOverlay({ root, originEl, reduced, immersive, fotoViaja, refs }),
+    entrar: (root) => entrarAlPerfil({ lineal, root, originEl, reduced, immersive, fotoViaja, refs }),
   });
 
   // ── Cierre ───────────────────────────────────────────────────────────────
   const requestClose = useCallback(() => {
     if (closingRef.current) return;
     closingRef.current = true;
-    cerrarOverlay({ root: rootRef.current, originEl, reduced, immersive, refs, alTerminar: onClose });
-  }, [originEl, onClose, reduced, immersive, refs]);
+    salirDelPerfil({ lineal, root: rootRef.current, originEl, reduced, immersive, refs, alTerminar: onClose });
+  }, [originEl, onClose, reduced, immersive, lineal, refs]);
 
   if (!container) return null;
 
