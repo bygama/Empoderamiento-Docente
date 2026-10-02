@@ -71,6 +71,12 @@ export function QuienesSomosHero({ contenido }: { contenido: HeroDeQuienesSomos 
 
       // ── El titular se RELLENA en dos tiempos (el giro) ───────────────────
       const tl = gsap.timeline({ delay: 0.3 });
+      // En celular el bloque está centrado y el titular llega desde un poco
+      // más abajo: sube y se asienta mientras se rellena.
+      const titular = line1.closest("h1");
+      if (titular && window.matchMedia("(max-width: 47.999rem)").matches) {
+        tl.from(titular, { y: 56, duration: 1.5, ease: "power3.out" }, 0);
+      }
       // 1 — "No capacitamos." (planteo, resuelve navy)
       tl.fromTo(
         line1,
@@ -113,7 +119,10 @@ export function QuienesSomosHero({ contenido }: { contenido: HeroDeQuienesSomos 
   return (
     <section
       ref={rootRef}
-      className="relative isolate flex min-h-[87svh] flex-col justify-between overflow-hidden bg-gradient-to-b from-white via-white to-gris-fondo/40 px-6 pt-40 pb-12 md:px-12 md:pt-48 md:pb-16"
+      // Bajo md el titular y su pie son UN bloque centrado entre la navbar y
+      // la lámina que asoma: repartidos arriba y abajo, en un celular quedaban
+      // dos piezas sueltas con un hueco en el medio.
+      className="relative isolate flex min-h-[87svh] flex-col justify-between overflow-hidden bg-gradient-to-b from-white via-white to-gris-fondo/40 px-6 pt-40 pb-12 max-md:justify-center max-md:gap-7 max-md:pt-24 max-md:pb-[calc(4svh+2.5rem)] md:px-12 md:pt-48 md:pb-16"
       aria-labelledby="quienes-somos-titulo"
     >
       {/* Fondo de nodos de marca (el mismo del Inicio), detrás de todo */}
@@ -140,9 +149,11 @@ export function QuienesSomosHero({ contenido }: { contenido: HeroDeQuienesSomos 
 
       {/* ── Pie: bajada de identidad (abajo, a la derecha) ───────────────── */}
       <div className="relative z-10 flex flex-col items-start gap-6 md:items-end">
+        {/* En celular la bajada usa todo el ancho, con un filete que la cose al
+            titular: balanceada a 42ch dejaba un tercio de la pantalla vacío. */}
         <p
           data-hero-foot
-          className="text-azul-principal max-w-[42ch] font-sans text-[1.05rem] leading-relaxed font-medium [text-wrap:balance] md:max-w-[62ch] md:text-right md:text-[1.2rem]"
+          className="text-azul-principal max-md:border-azul-principal/20 max-w-[42ch] font-sans text-[1.05rem] leading-relaxed font-medium [text-wrap:balance] max-md:max-w-none max-md:border-l-2 max-md:pl-4 max-md:[text-wrap:pretty] md:max-w-[62ch] md:text-right md:text-[1.2rem]"
         >
           {contenido.bajada}
         </p>
