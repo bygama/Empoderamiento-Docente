@@ -144,7 +144,7 @@ export function InvestigacionHero({ contenido }: { contenido: HeroInvestigacion 
         ref={zonaRef}
         id="sentido"
         aria-label="Investigar para transformar"
-        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden text-white max-lg:min-h-lvh [[data-modo=movil]_&]:sticky [[data-modo=movil]_&]:top-0"
+        className="bg-azul-principal bg-grain-dark relative isolate flex min-h-[100svh] overflow-hidden text-white max-lg:min-h-lvh [[data-modo=movil]_&]:sticky [[data-modo=movil]_&]:top-[var(--visor-arriba,0px)]"
       >
         <CieloNocturno />
 

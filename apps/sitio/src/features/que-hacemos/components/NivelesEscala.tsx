@@ -126,7 +126,7 @@ export function NivelesEscala({ contenido }: { contenido: NivelesDeQueHacemos })
         ref={stageRef}
         className={
           "overflow-clip " +
-          (live ? "sticky top-0 h-[100svh]" : "relative flex min-h-[70svh] flex-col py-24")
+          (live ? "sticky top-[var(--visor-arriba,0px)] h-[100svh]" : "relative flex min-h-[70svh] flex-col py-24")
         }
       >
         {/* Grilla de puntos §6 (en vivo la pone la capa fija). */}

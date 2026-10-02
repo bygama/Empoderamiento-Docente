@@ -161,7 +161,7 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
               hueco del alto del header adentro. */}
           <div
             data-lineas-escena
-            className={modo === "pila" ? "sticky top-[4.75rem] flex h-[calc(100lvh-4.75rem)] flex-col pb-[calc(100lvh-100svh+1rem)]" : "contents"}
+            className={modo === "pila" ? "sticky top-[calc(4.75rem+var(--visor-arriba,0px))] flex h-[calc(100lvh-4.75rem)] flex-col pb-[calc(100lvh-100svh+1rem)]" : "contents"}
           >
           {/* Número fantasma: rotulación de archivo. */}
           <span

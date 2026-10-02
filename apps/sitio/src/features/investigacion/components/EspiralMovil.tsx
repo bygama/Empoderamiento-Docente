@@ -52,7 +52,7 @@ export function EspiralMovil({ contenido }: { contenido: Ciclo }) {
       <span id="evidencia" aria-hidden="true" className="absolute" style={{ top: `${LVH_HASTA_LA_BISAGRA}lvh` }} />
       <div
         data-espiral-escena
-        className="sticky top-0 flex h-lvh flex-col px-6 pt-[5.25rem] pb-[calc(100lvh-100svh+1.25rem)] md:px-12"
+        className="sticky top-[var(--visor-arriba,0px)] flex h-lvh flex-col px-6 pt-[5.25rem] pb-[calc(100lvh-100svh+1.25rem)] md:px-12"
       >
         <p className="text-gris-texto/80 flex items-baseline justify-between gap-3 font-mono text-[0.62rem] tracking-[0.12em] uppercase">
           <span>Hoja 03 · Ciclo de investigación</span>

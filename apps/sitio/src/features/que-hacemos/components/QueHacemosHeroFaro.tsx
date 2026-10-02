@@ -104,7 +104,7 @@ export function QueHacemosHeroFaro({ contenido }: { contenido: FaroDeQueHacemos 
           // liso de la página (Gastón, 2026-09-24). Con la barra visible, ese
           // pedazo queda detrás de ella. dvh no: cambia con la barra y
           // obligaría a recalcular la coreografía en pleno scroll.
-          className="sticky top-0 isolate h-svh overflow-hidden max-lg:h-lvh"
+          className="sticky top-[var(--visor-arriba,0px)] isolate h-svh overflow-hidden max-lg:h-lvh"
         >
           <FaroEscena />
 

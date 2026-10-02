@@ -372,7 +372,8 @@ body {
 .deck.is-pila .deck-mazo {
   display: block;
   position: sticky;
-  top: 0;
+  /* El tope cuenta lo que el navegador tape por arriba (VisorVisual). */
+  top: var(--visor-arriba, 0px);
   height: 100svh;
   overflow: hidden;
   margin: 0 -1.25rem;
@@ -821,7 +822,7 @@ body:has([data-footer-dock-tint="propio"]) [data-footer-dock] {
   display: flex;
   flex-direction: column;
   position: sticky;
-  top: 0;
+  top: var(--visor-arriba, 0px);
   height: 100lvh;
   overflow: hidden;
   margin: 0 -1.25rem;

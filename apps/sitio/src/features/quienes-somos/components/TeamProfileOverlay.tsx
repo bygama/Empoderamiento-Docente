@@ -132,8 +132,9 @@ export function TeamProfileOverlay({
       // w-full` tampoco sobra: su `width: fit-content` le gana al ancho
       // implícito del inset y dejaba el panel angosto (el retrato del shell
       // medía 254px en vez de 416). El `backdrop` propio lo pinta el lienzo.
+      // El tope y el alto son los de la pantalla que se ve (VisorVisual).
       className={
-        "invisible fixed inset-0 z-[100] m-0 h-full w-full max-h-none max-w-none border-0 bg-transparent p-0 backdrop:bg-transparent" +
+        "invisible fixed inset-x-0 top-[var(--visor-arriba,0px)] z-[100] m-0 h-[var(--visor-alto,100%)] w-full max-h-none max-w-none border-0 bg-transparent p-0 backdrop:bg-transparent" +
         (immersive ? " overflow-x-hidden overflow-y-auto overscroll-contain" : "")
       }
     >

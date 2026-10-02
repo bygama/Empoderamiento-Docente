@@ -45,7 +45,7 @@ export function EscaleraMovil({ contenido, frase }: { contenido: NivelesDeQueHac
       className="bg-gris-fondo relative"
       style={{ height: `${ALTO_ESCALERA_LVH}lvh` }}
     >
-      <div className="sticky top-0 flex h-lvh flex-col overflow-clip bg-[radial-gradient(color-mix(in_srgb,var(--color-azul-claro)_55%,transparent)_1.2px,transparent_1.2px)] bg-[length:22px_22px] px-5 pt-[5.25rem] pb-5 md:px-10">
+      <div className="sticky top-[var(--visor-arriba,0px)] flex h-lvh flex-col overflow-clip bg-[radial-gradient(color-mix(in_srgb,var(--color-azul-claro)_55%,transparent)_1.2px,transparent_1.2px)] bg-[length:22px_22px] px-5 pt-[5.25rem] pb-5 md:px-10">
         {/* La frase grande de la apertura; decorativa, el h2 va abajo. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center px-5 md:px-10">
           <p

@@ -51,7 +51,7 @@ export function FiltrosMovil({ busqueda, onBuscar, anios, filtros, onCambiar, on
   if (filtros.anio !== null) activos.push({ etiqueta: String(filtros.anio), quitar: () => onCambiar({ anio: null }) });
 
   return (
-    <div data-filtros-movil className="sticky top-0 z-20 -mx-5 -mt-16 border-b border-azul-principal/10 bg-white px-5 pt-[5.5rem] pb-3 md:-mx-10 md:-mt-24 md:px-10 lg:hidden">
+    <div data-filtros-movil className="sticky top-[var(--visor-arriba,0px)] z-20 -mx-5 -mt-16 border-b border-azul-principal/10 bg-white px-5 pt-[5.5rem] pb-3 md:-mx-10 md:-mt-24 md:px-10 lg:hidden">
       <div className="border-azul-principal/15 focus-within:border-azul-medio focus-within:ring-azul-claro/60 flex items-center gap-2.5 rounded-lg border bg-white px-3.5 transition-colors focus-within:ring-2">
         <span className="text-gris-texto shrink-0">
           <Search size={18} />
