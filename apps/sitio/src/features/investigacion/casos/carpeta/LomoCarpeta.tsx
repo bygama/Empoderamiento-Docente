@@ -42,7 +42,7 @@ export function LomoCarpeta({ tinte, esUltima, baseRedondeada }: Props) {
       {!esUltima && (
         <span
           data-carpeta-faldon
-          className={`absolute inset-x-0 top-full hidden h-5 md:block ${tinte.carpeta}`}
+          className={`absolute inset-x-0 top-full block h-5 ${tinte.carpeta}`}
         >
           <span className="absolute inset-0 bg-[rgb(10_16_30/0.12)]" />
         </span>

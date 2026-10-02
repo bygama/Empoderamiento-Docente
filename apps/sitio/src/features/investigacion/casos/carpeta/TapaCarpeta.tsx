@@ -50,7 +50,7 @@ export function TapaCarpeta({
     <span
       data-carpeta-front
       className={`${tinte.carpeta} ${tinte.carpetaHover} ${tinte.grano} ${tinte.texto} pointer-events-none relative z-20 mt-1 block overflow-hidden rounded-t-lg px-8 py-6 shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-14px_30px_-20px_rgb(31_45_77/0.35)] transition-[background-color,box-shadow,translate] duration-[380ms] ease-out group-hover:shadow-[0_30px_70px_-32px_rgb(31_45_77/0.55),0_-17px_26px_-13px_rgb(31_45_77/0.6)] [backface-visibility:hidden] motion-safe:group-hover:translate-y-3 md:px-10 lg:px-12 ${peso.pt} ${
-        esUltima ? "pb-20 md:pb-24" : peso.pb
+        esUltima ? "pb-20 md:pb-24" : `max-md:pb-14 ${peso.pb}`
       } ${baseRedondeada}`}
     >
       {/* Anatomía de la tapa: luz del canto y pliegue inferior. El
@@ -118,7 +118,9 @@ export function TapaCarpeta({
               // Solo con mouse: en touch no hay hover y el toggle manda.
               onPointerEnter={(e) => e.pointerType === "mouse" && interactiva && onHoverRotulo()}
               onPointerLeave={(e) => e.pointerType === "mouse" && onSalirRotulo()}
-              className={`-mx-2 -my-1 inline-block cursor-pointer rounded-sm px-2 py-1 text-right focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${ROTULO_MICRO} ${
+              // Sin hover el rótulo no recibe toques: pasan a la capa de
+              // abrir, que es la carpeta entera (CarpetaCaso).
+              className={`-mx-2 -my-1 inline-block cursor-pointer rounded-sm px-2 py-1 text-right focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current max-lg:pointer-events-none! [@media(hover:none)]:pointer-events-none! ${ROTULO_MICRO} ${
                 interactiva ? "pointer-events-auto" : "pointer-events-none"
               }`}
             >
@@ -129,16 +131,31 @@ export function TapaCarpeta({
               {caso.eje.toUpperCase()}
               <span
                 aria-hidden="true"
-                className={`ml-3 inline-block transition-transform duration-300 ${
+                className={`ml-3 inline-block transition-transform duration-300 max-lg:hidden [@media(hover:none)]:hidden ${
                   desplegada ? "-rotate-90" : ""
                 }`}
               >
                 ‹
               </span>
             </button>
+            {/* «Sin hover» es táctil O más angosto que `lg`: debajo de 1024 el
+                sitio entero se comporta como celular aunque haya mouse (una
+                ventana angosta, un simulador), igual que el resto de la
+                página. */}
+            {/* El indicio es del hover: en pantallas táctiles quedaba siempre
+                a la vista, sumando un renglón a cada carpeta, y Gastón
+                (2026-10-02) pidió sacarlo. Ahí la carpeta dice su eje y que
+                se abre: es una señal, no un segundo control (el toque lo
+                recibe la capa de abrir). */}
+            <span
+              aria-hidden="true"
+              className={`mt-2.5 hidden underline underline-offset-4 max-lg:block [@media(hover:none)]:block ${ROTULO_MICRO}`}
+            >
+              LEER INVESTIGACIÓN ↗
+            </span>
             <span
               aria-hidden={!desplegada}
-              className={`mt-2 block h-5 font-sans text-[0.88rem] transition-[opacity,translate] duration-300 [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0 ${
+              className={`mt-2 block h-5 font-sans text-[0.88rem] transition-[opacity,translate] duration-300 max-lg:hidden [@media(hover:none)]:hidden ${
                 desplegada
                   ? "opacity-100 motion-safe:translate-y-0"
                   : "opacity-0 motion-safe:translate-y-1"

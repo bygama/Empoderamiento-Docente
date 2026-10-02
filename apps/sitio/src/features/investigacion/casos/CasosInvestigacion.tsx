@@ -123,7 +123,7 @@ export function CasosInvestigacion({ titulo, casos }: { titulo: string; casos: r
                       cuando el título ya está en su esquina. */}
                   <div data-casos-pila className="relative">
                     <ol
-                      className={`mt-20 flex flex-col gap-5 md:block ${
+                      className={`mt-20 block max-md:mt-12 ${
                         estado === "index" ? "" : "pointer-events-none"
                       }`}
                       // Al salir de la pila con el mouse se cierra la

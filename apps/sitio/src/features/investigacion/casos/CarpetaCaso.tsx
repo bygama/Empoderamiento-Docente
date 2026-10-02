@@ -69,6 +69,12 @@ type Props = {
  *   desplegaba la 03). Cambiar de una a otra no mueve la que se está
  *   mirando: la de arriba se cierra y la nueva crece hacia abajo.
  *
+ * SIN HOVER (celular, tablet) HAY UN SOLO GESTO (Gastón, 2026-10-02): la
+ * anticipación era el hover traducido a toque, y como el rótulo es lo
+ * primero que se toca, abrir un caso costaba dos toques. Ahí el rótulo no
+ * recibe eventos: cualquier toque cae en la capa de abrir, y en lugar de la
+ * flechita dice «ABRIR ↗».
+ *
  * Para que el rótulo gane el clic estando la capa de abrir por encima en
  * el orden del DOM, toda la anatomía va en pointer-events-none y solo el
  * rótulo repone pointer-events-auto: los clics atraviesan la tapa hasta
@@ -110,11 +116,10 @@ export function CarpetaCaso({
   };
   const alSalirRotulo = () => window.clearTimeout(demora.current);
 
-  // Redondeo de la base. Abajo de md la pila no existe —las carpetas van
-  // sueltas, separadas— así que TODAS cierran redondeadas; con la base
-  // recta se veían dos puntas contra el fondo. De md para arriba las
-  // cubiertas la pierden: ahí sí las tapa la carpeta siguiente.
-  const baseRedondeada = esUltima ? "rounded-b-2xl" : "rounded-b-2xl md:rounded-b-none";
+  // Redondeo de la base: solo la última cierra redondeada; a las demás las
+  // tapa la carpeta siguiente. También en celular, donde antes iban sueltas
+  // y separadas: Gastón (2026-10-02) pidió la pila pegada de escritorio.
+  const baseRedondeada = esUltima ? "rounded-b-2xl" : "rounded-b-none";
 
   // pt − mt = −4px en todos los breakpoints: la carpeta siguiente apoya 4px
   // por encima del fin de la anterior (pila sin aire).
@@ -122,7 +127,7 @@ export function CarpetaCaso({
     <li
       ref={refItem}
       data-carpeta-item
-      className="pointer-events-none relative list-none pt-11 md:-mt-12 md:first:mt-0 lg:-mt-13 lg:pt-12 lg:first:mt-0"
+      className="pointer-events-none relative -mt-12 list-none pt-11 first:mt-0 lg:-mt-13 lg:pt-12 lg:first:mt-0"
       style={{ zIndex: 10 + indice }}
     >
       {/* pointer-events: el padding del solape (li) no captura taps de la
@@ -173,7 +178,12 @@ export function CarpetaCaso({
           esUltima={esUltima}
           interactiva={interactiva}
           desplegada={desplegada}
-          onToggle={() => onDesplegar(desplegada ? null : indice)}
+          // Sin hover o bajo `lg` (celular, tablet) no hay anticipación: el rótulo deja
+          // pasar el toque a la capa de abrir (TapaCarpeta), y si llega
+          // activado por teclado también abre.
+          onToggle={() =>
+            window.matchMedia("(hover: none), (max-width: 63.999rem)").matches ? onAbrir(indice) : onDesplegar(desplegada ? null : indice)
+          }
           onHoverRotulo={alEntrarRotulo}
           onSalirRotulo={alSalirRotulo}
           idPanel={idPanel}
