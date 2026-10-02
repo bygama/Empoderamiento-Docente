@@ -75,7 +75,9 @@ export function TapaCarpeta({
 
       {/* Marca seca ED en la base del archivo (solo carpeta completa).
           Logo ACTUAL de la marca (logotipo-principal-ed), versión
-          negativa — el mismo que usan navbar y footer. */}
+          negativa — el mismo que usan navbar y footer. Bajo `lg` va a la
+          izquierda: a la derecha quedaba debajo de «Leer investigación» y
+          de la flecha de volver arriba. */}
       {esUltima && (
         <Image
           src="/brand/logotipo-principal-ed-negativo.png"
@@ -84,7 +86,7 @@ export function TapaCarpeta({
           data-carpeta-rotulos
           width={395}
           height={433}
-          className="pointer-events-none absolute right-8 bottom-6 h-16 w-auto opacity-[0.14] select-none lg:right-12 lg:bottom-7 lg:h-20"
+          className="pointer-events-none absolute right-8 bottom-6 h-16 w-auto opacity-[0.14] select-none max-lg:right-auto max-lg:left-8 lg:right-12 lg:bottom-7 lg:h-20"
         />
       )}
 

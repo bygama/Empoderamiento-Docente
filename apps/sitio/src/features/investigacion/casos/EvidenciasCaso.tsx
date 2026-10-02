@@ -63,6 +63,10 @@ const CINTA_NOTA: Record<string, string> = {
  * Draggable: z-index arriba al agarrar, límites en el contenedor). El
  * texto esencial del caso nunca vive acá. Al cambiar de caso el componente
  * se remonta (key) y las posiciones se reinician solas.
+ *
+ * Bajo `lg` no hay collage: las piezas van en columna, COMPACTAS (menos
+ * aire, la bajada a dos renglones como mucho): cinco tarjetas a tamaño
+ * completo eran más de una pantalla de scroll.
  */
 export function EvidenciasCaso({ evidencias, tinte }: Props) {
   const areaRef = useRef<HTMLDivElement | null>(null);
@@ -105,7 +109,7 @@ export function EvidenciasCaso({ evidencias, tinte }: Props) {
 
   return (
     <div ref={areaRef} className="relative">
-      <ul className="flex flex-col gap-5 lg:flex-row lg:flex-wrap lg:items-start lg:gap-x-[4%] lg:gap-y-0 lg:pb-6">
+      <ul className="flex flex-col gap-5 max-lg:gap-2.5 lg:flex-row lg:flex-wrap lg:items-start lg:gap-x-[4%] lg:gap-y-0 lg:pb-6">
         {evidencias.map((evidencia, i) => {
           const capa = DISPOSICION[i % DISPOSICION.length];
           return (
@@ -116,8 +120,8 @@ export function EvidenciasCaso({ evidencias, tinte }: Props) {
               {...(evidencia.movible ? { "data-evidencia-movible": "" } : {})}
               className={`relative w-full rounded-xl shadow-[0_16px_40px_-22px_rgb(31_45_77/0.4)] max-lg:[rotate:0deg]! ${capa.ancho} ${capa.extra} ${
                 capa.estilo === "nota"
-                  ? `${FONDO_NOTA[capa.tono] ?? clases.suave} p-6`
-                  : `border bg-white ${clases.borde} ${capa.estilo === "ficha" ? "overflow-hidden" : "p-6"}`
+                  ? `${FONDO_NOTA[capa.tono] ?? clases.suave} p-6 max-lg:px-4 max-lg:py-3.5`
+                  : `border bg-white ${clases.borde} ${capa.estilo === "ficha" ? "overflow-hidden" : "p-6 max-lg:px-4 max-lg:py-3.5"}`
               } ${
                 evidencia.movible
                   ? "touch-manipulation select-none active:z-30 active:scale-[1.02]"
@@ -130,14 +134,14 @@ export function EvidenciasCaso({ evidencias, tinte }: Props) {
                   {/* azul-principal/70: gris-texto sobre fondos suave/gris
                       queda bajo 4.5:1 (AA texto chico) */}
                   <p
-                    className={`${clases.suave} text-azul-principal/70 flex items-center justify-between px-6 py-2.5 ${ROTULO_MICRO}`}
+                    className={`${clases.suave} text-azul-principal/70 flex items-center justify-between px-6 py-2.5 max-lg:px-4 max-lg:py-2 ${ROTULO_MICRO}`}
                   >
                     {evidencia.rotulo}
                     {evidencia.movible && arrastreActivo && (
                       <span aria-hidden="true" className="opacity-60">⠿</span>
                     )}
                   </p>
-                  <div className="p-6 pt-4">
+                  <div className="p-6 pt-4 max-lg:px-4 max-lg:py-3">
                     <p className={`font-display text-[1rem] font-bold ${clases.acentoTexto}`}>
                       {evidencia.titulo}
                     </p>
@@ -159,10 +163,10 @@ export function EvidenciasCaso({ evidencias, tinte }: Props) {
                       <span className="ml-2 opacity-60" aria-hidden="true">⠿</span>
                     )}
                   </p>
-                  <p className="font-hand text-azul-principal mt-2 text-[1.45rem] leading-[1.2] font-medium">
+                  <p className="font-hand text-azul-principal mt-2 text-[1.45rem] leading-[1.2] font-medium max-lg:mt-1 max-lg:text-[1.3rem]">
                     {evidencia.titulo.charAt(0) + evidencia.titulo.slice(1).toLowerCase()}
                   </p>
-                  <p className="text-azul-principal/70 mt-1 font-sans text-[0.82rem] leading-relaxed">
+                  <p className="text-azul-principal/70 mt-1 font-sans text-[0.82rem] leading-relaxed max-lg:line-clamp-2 max-lg:leading-snug">
                     {evidencia.descripcion}
                   </p>
                 </>
@@ -179,10 +183,10 @@ export function EvidenciasCaso({ evidencias, tinte }: Props) {
                       <span className="ml-2 opacity-60" aria-hidden="true">⠿</span>
                     )}
                   </p>
-                  <p className={`font-display mt-2.5 text-[1.1rem] font-bold ${clases.acentoTexto}`}>
+                  <p className={`font-display mt-2.5 text-[1.1rem] font-bold max-lg:mt-1.5 max-lg:text-[1rem] ${clases.acentoTexto}`}>
                     {evidencia.titulo}
                   </p>
-                  <p className="text-azul-principal/70 mt-1.5 font-sans text-[0.85rem] leading-relaxed">
+                  <p className="text-azul-principal/70 mt-1.5 font-sans text-[0.85rem] leading-relaxed max-lg:mt-1 max-lg:line-clamp-2 max-lg:text-[0.82rem] max-lg:leading-snug">
                     {evidencia.descripcion}
                   </p>
                 </>
