@@ -22,7 +22,7 @@ export function PerfilLineal({ profile, figura, onClose, refWrap }: Props) {
       className="relative mx-auto max-w-screen-lg px-6 py-20 md:px-10 max-lg:pb-[calc(5rem+env(safe-area-inset-bottom))]"
     >
       <header className="grid items-center gap-8 md:grid-cols-[1.2fr_1fr]">
-        <div>
+        <div data-lineal-texto>
           <span className="text-verde-concepto-texto font-mono text-[0.72rem] font-semibold tracking-[0.22em] uppercase">
             {profile.role}
           </span>
