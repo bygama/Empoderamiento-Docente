@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { getLenis } from "@/lib/lenis";
 
 /**
  * Transición de ruta "el faro te abre el documento", en tres tiempos:
@@ -33,6 +34,7 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * llega. Con prefers-reduced-motion: push directo, sin telón.
  */
 export const FLAG_ENTRADA_FARO = "ed-entrada-faro";
+const LISTADO = "/novedades";
 /** Milisegundos de telón pleno antes de destapar (el respiro del faro). */
 const BEAT_MINIMO_MS = 500;
 const CUBRIR_MS = 500;
@@ -59,6 +61,11 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
   const cubiertoEn = useRef(Infinity); // performance.now() al completar cobertura
   const timers = useRef<number[]>([]);
   const alCubrir = useRef<((e: TransitionEvent) => void) | null>(null);
+  // De dónde se abrió la ficha (el listado con su filtro y su scroll), para
+  // que «volver» deje a la persona donde estaba y no en el hero; y el scroll
+  // que queda por restaurar cuando el listado vuelva a montar.
+  const vuelta = useRef<{ url: string; y: number } | null>(null);
+  const restaurar = useRef<number | null>(null);
 
   const programar = (fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms));
@@ -120,8 +127,18 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
       const velo = veloRef.current;
       const marca = marcaRef.current;
       if (cubriendo.current) return; // gesto en curso: ignorar repetidos
+      let destino = href;
+      if (href.startsWith("/novedades/") && pathname === LISTADO) {
+        vuelta.current = { url: LISTADO + window.location.search, y: window.scrollY };
+      } else if (href === LISTADO && vuelta.current) {
+        destino = vuelta.current.url;
+        restaurar.current = vuelta.current.y;
+        vuelta.current = null;
+      }
+      // Con un scroll por restaurar, Next no sube al tope.
+      const ir = () => router.push(destino, { scroll: restaurar.current === null });
       if (reduced || !velo || !marca) {
-        router.push(href);
+        ir();
         return;
       }
       cubriendo.current = true;
@@ -154,7 +171,7 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
         if (pushHecho || !cubriendo.current) return;
         pushHecho = true;
         cubiertoEn.current = performance.now();
-        router.push(href); // pantalla 100% cubierta: recién ahora
+        ir(); // pantalla 100% cubierta: recién ahora
       };
       const onEnd = (e: TransitionEvent) => {
         if (e.target === velo && e.propertyName === "transform") push();
@@ -177,13 +194,28 @@ export function TransicionFaro({ children }: { children: React.ReactNode }) {
       // Escape: si la ruta nunca llega, no dejar la pantalla presa del telón.
       programar(destapar, ESCAPE_MS);
     },
-    [reduced, router, destapar],
+    [reduced, router, destapar, pathname],
   );
 
   // Cualquier cambio de ruta con el telón puesto destapa: la ficha que llegó,
-  // o un back del navegador en pleno viaje.
+  // o un back del navegador en pleno viaje. Si se vuelve al listado, antes se
+  // lo deja donde estaba (todavía tapado): ahora y un instante después, por
+  // si el listado termina de acomodarse.
   useEffect(() => {
+    const y = restaurar.current;
+    restaurar.current = null;
+    let cola = 0;
+    if (y !== null && pathname === LISTADO) {
+      const bajar = () => {
+        const lenis = getLenis();
+        if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+        else window.scrollTo(0, y);
+      };
+      bajar();
+      cola = window.setTimeout(bajar, 80);
+    }
     if (cubriendo.current) destapar();
+    return () => window.clearTimeout(cola);
   }, [pathname, destapar]);
 
   return (
