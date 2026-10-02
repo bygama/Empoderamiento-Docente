@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { switchSalida } from "../coreografia";
+import { esCompacto, salidaCompacta } from "../coreografia-compacta";
 import type { CasoInvestigacion } from "../tipos";
 import type { Maquina } from "./useLugarExpediente";
 
@@ -109,13 +110,12 @@ export function useAccionesLugar(m: Maquina, casos: readonly CasoInvestigacion[]
     // Desde la banda «siguiente», la banda misma sube como ghost y se
     // convierte en la carcasa nueva (aterriza en switchEntrada).
     ghostRef.current?.remove();
-    ghostRef.current = switchSalida({
-      registrar,
-      lugar,
-      shell,
-      desdeBanda,
-      onListo: () => setActivo(j),
-    });
+    // En celular y tablet la banda sube entera, con su pregunta
+    // (coreografia-compacta.ts); si no hay banda, la salida de siempre.
+    const alListo = () => setActivo(j);
+    ghostRef.current =
+      (desdeBanda && esCompacto() ? salidaCompacta({ registrar, lugar, shell, onListo: alListo }) : null) ??
+      switchSalida({ registrar, lugar, shell, desdeBanda, onListo: alListo });
   };
 
   return { abrir, cerrar, solicitarCierre, irA };

@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import { useIsomorphicLayoutEffect } from "@/lib/hooks/useIsomorphicLayoutEffect";
 import { aperturaLugar, switchEntrada, transicionCierre } from "../coreografia";
+import { aperturaCompacta, entradaCompactaDesdeBanda, esCompacto } from "../coreografia-compacta";
 import type { Maquina } from "./useLugarExpediente";
 
 /**
@@ -55,6 +56,14 @@ export function useTransicionesExpediente(m: Maquina, cerrar: () => void) {
         finalizar();
         return;
       }
+      const otrasArriba = itemsRef.current.filter((el, j): el is HTMLLIElement => j < i && el !== null);
+      const otrasAbajo = itemsRef.current.filter((el, j): el is HTMLLIElement => j > i && el !== null);
+      const introEls = introRef.current ? [introRef.current] : [];
+      // En celular y tablet, la apertura corta (coreografia-compacta.ts).
+      if (esCompacto()) {
+        aperturaCompacta({ registrar, li, otrasArriba, otrasAbajo, introEls, shell, lugar, onFin: finalizar });
+        return;
+      }
       // UNA sola timeline: pre-paint por piezas + física de la carpeta +
       // nacimiento del lugar en paralelo + morph medido. (Sin desplazar:
       // la hoja destino vive en la capa fija; mover la página correría a
@@ -62,13 +71,9 @@ export function useTransicionesExpediente(m: Maquina, cerrar: () => void) {
       aperturaLugar({
         registrar,
         li,
-        otrasArriba: itemsRef.current.filter(
-          (el, j): el is HTMLLIElement => j < i && el !== null,
-        ),
-        otrasAbajo: itemsRef.current.filter(
-          (el, j): el is HTMLLIElement => j > i && el !== null,
-        ),
-        introEls: introRef.current ? [introRef.current] : [],
+        otrasArriba,
+        otrasAbajo,
+        introEls,
         shell,
         hoja,
         lugar,
@@ -84,7 +89,13 @@ export function useTransicionesExpediente(m: Maquina, cerrar: () => void) {
       );
       const ghost = ghostRef.current;
       ghostRef.current = null;
-      switchEntrada({ registrar, lugar, shell, ghost, onFin: finalizar });
+      // El fantasma compacto es la banda entera, con su pregunta: la
+      // entrada que lo aterriza es la de coreografia-compacta.ts.
+      if (ghost?.dataset.expGhost === "compacto") {
+        entradaCompactaDesdeBanda({ registrar, lugar, shell, ghost, onFin: finalizar });
+      } else {
+        switchEntrada({ registrar, lugar, shell, ghost, onFin: finalizar });
+      }
     }
 
   }, [activo]);

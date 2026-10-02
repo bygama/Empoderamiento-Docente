@@ -111,7 +111,7 @@ export function ExpedienteCaso({
     >
       {/* lg:pt-28: la píldora del navbar queda a la vista encima del lugar y
           termina a 86 px del borde; la cabecera arranca debajo, con aire. */}
-      <div className="relative mx-auto w-[min(96vw,94rem)] px-4 pt-14 pb-24 lg:px-8 lg:pt-28 lg:pb-28">
+      <div className="relative mx-auto w-[min(96vw,94rem)] px-4 pt-14 pb-24 max-lg:pt-[1.1rem] lg:px-8 lg:pt-28 lg:pb-28">
         <CabeceraExpediente caso={caso} refTitulo={refTitulo} />
 
         {/* ── La carpeta: carcasa tintada = INTERIOR de cartón. La hoja
@@ -142,10 +142,12 @@ export function ExpedienteCaso({
       </div>
 
       {/* ── Indicio de scroll: la primera pantalla muestra solo el borde de
-          la carpeta; esto avisa que hay recorrido. Se apaga al scrollear. */}
+          la carpeta; esto avisa que hay recorrido. Se apaga al scrollear.
+          Solo en escritorio: en celular scrollear es lo natural y el
+          indicio quedaba pisando el contenido sobre la barra de abajo. */}
       <p
         aria-hidden="true"
-        className={`${ROTULO_MICRO} text-azul-principal/70 fixed bottom-8 left-8 z-[55] hidden items-center gap-2.5 transition-opacity duration-500 max-lg:flex max-lg:bottom-[calc(5.25rem+env(safe-area-inset-bottom))] max-lg:left-5 lg:flex ${
+        className={`${ROTULO_MICRO} text-azul-principal/70 fixed bottom-8 left-8 z-[55] hidden items-center gap-2.5 transition-opacity duration-500 lg:flex ${
           telonOpaco && !recorrido ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
