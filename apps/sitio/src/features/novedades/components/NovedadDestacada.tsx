@@ -87,8 +87,9 @@ export function NovedadDestacada({ contenido, novedades }: { contenido: Destacad
 
   return (
     <section ref={rootRef} id="destacado" data-indice="Destacado" className="bg-gris-fondo" aria-label="Novedades destacadas">
-      <div className="mx-auto w-full max-w-screen-xl px-5 py-20 md:px-10 md:py-28">
-        <div className="bg-azul-principal relative isolate overflow-hidden rounded-[2rem] px-5 py-10 md:rounded-[2.75rem] md:px-12 md:py-14">
+      {/* En celular los márgenes se achican: el ancho es para las cards. */}
+      <div className="mx-auto w-full max-w-screen-xl px-3 py-12 md:px-10 md:py-28">
+        <div className="bg-azul-principal relative isolate overflow-hidden rounded-[2rem] px-3 pt-7 pb-4 md:rounded-[2.75rem] md:px-12 md:py-14">
           {/* Atmósfera: glow de faro arriba-derecha (eco del hero) + puntos
               vivos del manual §6 que el cursor enciende a su paso. */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
@@ -109,7 +110,7 @@ export function NovedadDestacada({ contenido, novedades }: { contenido: Destacad
           {/* Label de sección: eyebrow chico, no H2 — el titular de la nota es
               el protagonista acá. Punto verde latiendo + decodificado, como la
               señal del faro del hero. */}
-          <div className="text-azul-claro/90 mb-8 flex items-center gap-3 font-mono text-[0.74rem] tracking-[0.2em] uppercase md:mb-10">
+          <div className="text-azul-claro/90 mb-5 flex items-center gap-3 font-mono max-md:px-2 md:mb-8 text-[0.74rem] tracking-[0.2em] uppercase md:mb-10">
             <span className="bg-verde-concepto h-2 w-2 animate-pulse rounded-full" />
             <ScrambleText text={contenido.titulo} duration={1000} />
           </div>
