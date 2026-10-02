@@ -6,6 +6,7 @@ import { useLockScroll } from "@/lib/hooks/useLockScroll";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import { PUBLICOS, TIPOS } from "@/features/biblioteca/contenido/modelo";
 import type { Filtros } from "./filtros";
+import { ESTILO_DE_TIPO } from "@/features/biblioteca/components/portada/estilo-de-tipo";
 import { FiltroGrupo } from "./FiltroGrupo";
 
 type Props = {
@@ -87,7 +88,7 @@ export function HojaFiltros({ abierta, onCerrar, anios, filtros, onCambiar, onLi
           </button>
         </div>
         <div className="border-azul-principal/10 mt-2 border-t [&_button[aria-pressed]]:min-h-11 [&_button[aria-pressed]]:px-4">
-          <FiltroGrupo label={GRUPOS[0]} opciones={TIPOS} valor={filtros.tipo} onChange={(tipo) => onCambiar({ tipo })} abierto={grupoAbierto === GRUPOS[0]} onAlternar={alternar(GRUPOS[0])} />
+          <FiltroGrupo label={GRUPOS[0]} opciones={TIPOS} valor={filtros.tipo} onChange={(tipo) => onCambiar({ tipo })} estilos={ESTILO_DE_TIPO} abierto={grupoAbierto === GRUPOS[0]} onAlternar={alternar(GRUPOS[0])} />
           <FiltroGrupo label={GRUPOS[1]} opciones={PUBLICOS} valor={filtros.publico} onChange={(publico) => onCambiar({ publico })} abierto={grupoAbierto === GRUPOS[1]} onAlternar={alternar(GRUPOS[1])} />
           <FiltroGrupo label={GRUPOS[2]} opciones={anios.map(String)} valor={filtros.anio === null ? null : String(filtros.anio)} onChange={(anio) => onCambiar({ anio: anio === null ? null : Number(anio) })} abierto={grupoAbierto === GRUPOS[2]} onAlternar={alternar(GRUPOS[2])} />
         </div>
