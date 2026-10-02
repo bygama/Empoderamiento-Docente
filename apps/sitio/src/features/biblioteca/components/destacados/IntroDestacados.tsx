@@ -1,8 +1,7 @@
-import Image from "next/image";
 import type { RefObject } from "react";
 import type { Destacados } from "@/features/biblioteca/contenido/destacados";
 import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material";
-import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { PortadaDeMaterial } from "@/features/biblioteca/components/portada/PortadaDeMaterial";
 import { fragmentos } from "@/lib/contenido/resaltado";
 
 /**
@@ -80,14 +79,7 @@ export function IntroDestacados({
               data-viajera
               className="bg-azul-claro/30 relative aspect-[3/4] overflow-hidden rounded-xl"
             >
-              <Image
-                src={material.portada.src}
-                alt=""
-                fill
-                sizes="(min-width: 768px) 25vw, 50vw"
-                className="object-cover"
-                style={estiloDeFoco(material.portada.foco)}
-              />
+              <PortadaDeMaterial material={material} variante="tarjeta" sizes="(min-width: 768px) 25vw, 50vw" />
             </div>
           ))}
         </div>

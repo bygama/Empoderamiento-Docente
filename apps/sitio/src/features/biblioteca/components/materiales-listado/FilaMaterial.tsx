@@ -1,31 +1,28 @@
-import Image from "next/image";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { MaterialDelSitio } from "@/features/biblioteca/contenido/material";
 import { accionDe } from "@/features/biblioteca/contenido/modelo";
 import { contar } from "@/lib/contadores/contar";
-import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { estiloDe } from "@/features/biblioteca/components/portada/estilo-de-tipo";
+import { PortadaDeMaterial } from "@/features/biblioteca/components/portada/PortadaDeMaterial";
 import { CopiarCita } from "./CopiarCita";
 
 /** Una fila del catálogo: portada, chips de tipo y tema, título, autores, descripción, metadata con «Copiar cita APA» y el link de acción. */
 export function FilaMaterial({ material: m }: { material: MaterialDelSitio }) {
+  const { Icon, fondo, velo, acento, borde } = estiloDe(m.tipo);
   return (
     <article className="grid gap-5 py-7 md:grid-cols-[218px_minmax(0,1fr)] md:gap-8 md:py-8 max-md:grid-cols-[34%_minmax(0,1fr)] max-md:gap-4 max-md:py-5">
-      {/* Portada: cualquier foto que el equipo cargue (mock: fotos del hero) */}
+      {/* Portada: el tipo y el año con el color del tipo, o la foto que cargue el equipo. */}
       <div className="bg-azul-claro/30 relative aspect-[16/9] overflow-hidden rounded-xl md:aspect-[4/3] max-md:aspect-[3/4] max-md:self-start">
-        <Image
-          src={m.portada.src}
-          alt=""
-          fill
-          sizes="(min-width: 768px) 218px, 34vw"
-          className="object-cover"
-          style={estiloDeFoco(m.portada.foco)}
-        />
+        <PortadaDeMaterial material={m} variante="miniatura" sizes="(min-width: 768px) 218px, 34vw" />
       </div>
 
       <div className="flex min-w-0 flex-col">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="bg-azul-principal rounded-md px-2.5 py-1 font-sans text-[0.72rem] font-medium text-white">
-            {m.tipo}
+          {/* El chip del tipo lleva su mismo color e ícono que la portada. */}
+          <span className={`relative inline-flex items-center gap-1.5 overflow-hidden rounded-md px-2.5 py-1 font-sans text-[0.72rem] font-medium ${fondo} ${borde ? "ring-azul-principal/15 ring-1 ring-inset" : ""}`}>
+            {velo ? <span aria-hidden="true" className={`absolute inset-0 ${velo}`} /> : null}
+            <Icon size={13} className={`relative shrink-0 ${acento}`} />
+            <span className="relative">{m.tipo}</span>
           </span>
           <span className="bg-gris-fondo text-azul-principal rounded-md px-2.5 py-1 font-sans text-[0.72rem] font-medium">
             {m.tema}

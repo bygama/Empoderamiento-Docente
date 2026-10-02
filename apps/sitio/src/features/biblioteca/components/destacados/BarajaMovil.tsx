@@ -1,12 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "@/components/ui/icons";
 import type { DestacadoDelSitio } from "@/features/biblioteca/contenido/material";
 import { accionDe } from "@/features/biblioteca/contenido/modelo";
 import { contar } from "@/lib/contadores/contar";
-import { estiloDeFoco } from "@/lib/contenido/fotos";
+import { PortadaDeMaterial } from "@/features/biblioteca/components/portada/PortadaDeMaterial";
 import { TextoPlegable } from "./TextoPlegable";
 
 /**
@@ -88,7 +87,7 @@ export function BarajaMovil({ items }: { items: readonly DestacadoDelSitio[] }) 
               onClick={() => ir(i)}
               className="bg-azul-claro/30 relative aspect-[3/4] w-[72vw] shrink-0 snap-center overflow-hidden rounded-xl md:w-[38vw]"
             >
-              <Image src={material.portada.src} alt="" fill sizes="(min-width: 768px) 38vw, 72vw" className="object-cover" style={estiloDeFoco(material.portada.foco)} />
+              <PortadaDeMaterial material={material} variante="tarjeta" sizes="(min-width: 768px) 38vw, 72vw" />
             </button>
           ))}
         </div>
