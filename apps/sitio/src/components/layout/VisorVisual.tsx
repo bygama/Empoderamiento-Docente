@@ -31,12 +31,20 @@ export function VisorVisual() {
     sonda.style.cssText = "position:fixed;inset:0;visibility:hidden;pointer-events:none;z-index:-1";
     document.body.appendChild(sonda);
 
+    // Chrome de iPhone dispara estos eventos en cada cuadro del scroll, no
+    // solo cuando se mueven sus barras. Por eso se escribe únicamente si algo
+    // cambió —tocar una variable de `<html>` recalcula los estilos de toda la
+    // página— y la sonda, que obliga a un layout, se lee solo en ese caso.
     let raf = 0;
+    let ultimo = "";
     const medir = () => {
       raf = 0;
       const conZoom = vv.scale > 1.01;
       const arriba = conZoom ? 0 : Math.max(0, Math.round(vv.offsetTop));
       const alto = Math.round(vv.height);
+      const firma = `${conZoom}/${arriba}/${alto}`;
+      if (firma === ultimo) return;
+      ultimo = firma;
       const abajo = conZoom ? 0 : Math.round(sonda.offsetHeight - (arriba + alto));
       raiz.style.setProperty("--visor-arriba", `${arriba}px`);
       raiz.style.setProperty("--visor-alto", conZoom ? "100%" : `${alto}px`);
