@@ -142,7 +142,7 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
       <div
         ref={carpetaRef}
         data-lineas-carpeta
-        className="bg-azul-claro bg-grain-light relative z-10 w-full shadow-[0_-28px_70px_-30px_rgb(0_0_0/0.65)] lg:-ml-[10vw] lg:w-[120vw]"
+        className="bg-azul-claro bg-grain-light relative z-10 w-full shadow-[0_-28px_70px_-30px_rgb(0_0_0/0.65)] lg:-ml-[10vw] lg:w-[120vw] [[data-modo=pila]_&]:mx-2.5 [[data-modo=pila]_&]:w-auto [[data-modo=pila]_&]:rounded-tr-[14px]"
       >
         <BocaCarpeta />
 
@@ -151,14 +151,17 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
             los demás modos su alto lo da el contenido, sin pin. */}
         <div
           data-lineas-pista
-          className="relative px-6 pt-28 pb-24 md:px-10 lg:mx-[10vw] lg:pt-32 lg:pb-28"
+          className="relative px-6 pt-28 pb-24 md:px-10 lg:mx-[10vw] lg:pt-32 lg:pb-28 [[data-modo=pila]_&]:px-4 [[data-modo=pila]_&]:pt-5 [[data-modo=pila]_&]:pb-10"
           style={modo === "pila" ? { height: `${ALTO_PILA_LINEAS_LVH}lvh` } : undefined}
         >
           {/* La escena de la pila: la caja pegada mientras la pista
-              scrollea; en los demás modos `contents` no toca el layout. */}
+              scrollea; en los demás modos `contents` no toca el layout. Se
+              pega DEBAJO del header (top, no padding): así el folio queda
+              pegado a la boca de la carpeta cuando la sección llega, sin un
+              hueco del alto del header adentro. */}
           <div
             data-lineas-escena
-            className={modo === "pila" ? "sticky top-0 flex h-lvh flex-col" : "contents"}
+            className={modo === "pila" ? "sticky top-[4.75rem] flex h-[calc(100lvh-4.75rem)] flex-col pb-[calc(100lvh-100svh+1rem)]" : "contents"}
           >
           {/* Número fantasma: rotulación de archivo. */}
           <span
@@ -177,9 +180,27 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
             ARCHIVO ED · HOJA 02 · LÍNEAS DE INVESTIGACIÓN
           </span>
 
-          <div className="text-azul-principal relative mx-auto max-w-screen-xl">
-            {/* Encabezado adentro de la carpeta, centrado. */}
-            <div className="flex flex-col items-center text-center">
+          {/* En la pila este bloque es el que reparte el alto de la escena:
+              sin estirarse, la lista no tiene alto propio y cada papel se
+              achicaba al mínimo para «entrar» en nada. */}
+          <div className="text-azul-principal relative mx-auto max-w-screen-xl [[data-modo=pila]_&]:flex [[data-modo=pila]_&]:min-h-0 [[data-modo=pila]_&]:w-full [[data-modo=pila]_&]:flex-1 [[data-modo=pila]_&]:flex-col">
+            {/* Solo en la pila: por cuál pregunta se va y el nombre de la
+                sección. El nombre RELEVA a la solapa de la carpeta: aparece
+                recién cuando ella se va por arriba, así se lee una sola vez
+                en todo el recorrido (pila-movil.ts). */}
+            <p
+              data-lineas-folio
+              className="text-azul-principal/70 hidden items-baseline justify-between gap-3 font-mono text-[0.62rem] tracking-[0.12em] uppercase [[data-modo=pila]_&]:flex"
+            >
+              <span data-lineas-rotulo>Hoja 02 · Líneas de investigación</span>
+              <span aria-hidden="true" className="tabular-nums">
+                <span data-lineas-contador className="text-azul-principal font-bold">01</span> / 06
+              </span>
+            </p>
+
+            {/* Encabezado adentro de la carpeta, centrado. En la pila flota
+                sobre el tope de la lista y cede cuando arrancan los papeles. */}
+            <div data-lineas-titulo className="flex flex-col items-center text-center [[data-modo=pila]_&]:absolute [[data-modo=pila]_&]:inset-x-0 [[data-modo=pila]_&]:top-10">
               <span className="text-azul-principal/75 inline-flex items-end gap-3">
                 <span className="border-azul-principal/60 font-display border-b-2 pb-0.5 text-[0.95rem] font-medium tracking-wide uppercase">
                   {contenido.antetitulo}
@@ -207,7 +228,7 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
               data-lineas-pila
               className={
                 modo === "pila"
-                  ? "relative mt-6 min-h-0 flex-1"
+                  ? "relative mt-4 min-h-0 flex-1 [clip-path:inset(-1rem_-1rem_0_-1rem)]"
                   : "mt-14 grid items-start gap-x-8 gap-y-10 lg:mt-16 lg:grid-cols-2 lg:gap-y-12 md:max-lg:grid-cols-2"
               }
             >
@@ -218,7 +239,7 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
 
             {/* Un solo CTA: mirar de cerca una línea es ir a ver dónde se
                 investiga. */}
-            <div className="mt-12 flex justify-center lg:mt-14">
+            <div className="mt-12 flex justify-center lg:mt-14 [[data-modo=pila]_&]:mt-4 [[data-modo=pila]_&]:justify-start">
               <ButtonSecondary href="#en-accion" withArrow onClick={alClicIrA("en-accion")}>
                 {contenido.boton}
               </ButtonSecondary>
@@ -232,7 +253,7 @@ export function LineasInvestigacion({ contenido, casos }: { contenido: Lineas; c
             aria-hidden="true"
             width={395}
             height={433}
-            className="pointer-events-none absolute right-6 bottom-8 h-12 w-auto opacity-[0.16] select-none md:right-10 lg:bottom-10 lg:h-14"
+            className="pointer-events-none absolute right-6 bottom-8 h-12 w-auto opacity-[0.16] select-none md:right-10 lg:bottom-10 lg:h-14 [[data-modo=pila]_&]:hidden"
           />
           </div>
         </div>

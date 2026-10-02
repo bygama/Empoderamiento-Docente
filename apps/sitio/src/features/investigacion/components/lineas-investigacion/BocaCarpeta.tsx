@@ -20,21 +20,22 @@ export function BocaCarpeta() {
       {/* Pestaña troquelada, grande como en la referencia. */}
       <span
         aria-hidden="true"
-        className="text-azul-claro absolute -top-12 left-[4vw] z-0 block h-12 w-[22rem] lg:-top-14 lg:left-[13vw] lg:h-14 lg:w-[26rem]"
+        className="text-azul-claro absolute -top-12 left-[4vw] z-0 block h-12 w-[22rem] max-md:left-0 max-md:w-[min(21.5rem,100%)] lg:-top-14 lg:left-[13vw] lg:h-14 lg:w-[26rem]"
       >
         <Pestana className="h-full w-full">
-          <span className={`${ROTULO_TAB} text-azul-principal whitespace-nowrap`}>
+          <span className={`${ROTULO_TAB} text-azul-principal whitespace-nowrap max-md:text-[0.66rem] max-md:tracking-[0.1em]`}>
             02 · Líneas de investigación
           </span>
         </Pestana>
       </span>
 
-      {/* Papeles mal guardados asomando por la boca. */}
+      {/* Papeles mal guardados asomando por la boca. En celular no van: la
+          carpeta es angosta y las puntas se salían por el costado. */}
       {PAPELES.map((clases) => (
         <span
           key={clases}
           aria-hidden="true"
-          className={`pointer-events-none absolute z-0 block rounded-t-[3px] shadow-[0_-2px_5px_-2px_rgb(31_45_77/0.4)] ${clases}`}
+          className={`pointer-events-none absolute z-0 block rounded-t-[3px] shadow-[0_-2px_5px_-2px_rgb(31_45_77/0.4)] max-md:hidden ${clases}`}
         />
       ))}
 

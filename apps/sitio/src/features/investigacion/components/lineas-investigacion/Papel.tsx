@@ -69,7 +69,7 @@ export function Papel({ linea, caso, indice }: { linea: Linea; caso?: string; in
   return (
     <li
       data-linea
-      className={`text-azul-principal relative px-7 pb-7 shadow-[0_22px_50px_-26px_rgb(31_45_77/0.55),0_2px_6px_-2px_rgb(31_45_77/0.2)] lg:px-8 [[data-modo=pila]_&]:absolute [[data-modo=pila]_&]:inset-x-0 [[data-modo=pila]_&]:top-0 ${superficie} ${GIROS[indice] ?? ""}`}
+      className={`text-azul-principal relative px-7 pb-7 shadow-[0_22px_50px_-26px_rgb(31_45_77/0.55),0_2px_6px_-2px_rgb(31_45_77/0.2)] lg:px-8 [[data-modo=pila]_&]:absolute [[data-modo=pila]_&]:inset-x-0 [[data-modo=pila]_&]:top-0 [[data-modo=pila]_&]:px-5 [[data-modo=pila]_&]:pt-0 ${superficie} ${GIROS[indice] ?? ""}`}
     >
       {material === "hoja" && (
         <ClipPapel className="text-azul-principal/45 absolute -top-3 right-7 h-11 w-6" />
@@ -79,22 +79,24 @@ export function Papel({ linea, caso, indice }: { linea: Linea; caso?: string; in
       {/* Número: mono en la hoja y la nota; a mano en la ficha (la única
           anotación manuscrita de ese papel). */}
       {material === "ficha" ? (
-        <span aria-hidden="true" className="font-hand text-azul-medio absolute top-3 right-6 text-[2rem] leading-none">
+        <span aria-hidden="true" className="font-hand text-azul-medio absolute top-3 right-6 text-[2rem] leading-none [[data-modo=pila]_&]:top-2.5 [[data-modo=pila]_&]:right-5">
           {numero}
         </span>
       ) : null}
-      <div data-linea-lomo className="flex items-center gap-3">
+      {/* En la pila el lomo es la PESTAÑA: alto fijo, pegada al borde de
+          arriba, con el nombre entero en dos renglones como mucho. */}
+      <div data-linea-lomo className="flex items-center gap-3 [[data-modo=pila]_&]:h-[3.25rem]">
         <span
           className={`font-display text-verde-concepto-texto text-[1.05rem] font-bold tabular-nums ${material === "ficha" ? "sr-only" : ""}`}
         >
           {numero}
         </span>
-        <span className={`${ROTULO_MICRO} text-gris-texto/80`}>{linea.nombre}</span>
+        <span className={`${ROTULO_MICRO} text-gris-texto/80 [[data-modo=pila]_&]:line-clamp-2 [[data-modo=pila]_&]:pr-8 [[data-modo=pila]_&]:text-[0.62rem] [[data-modo=pila]_&]:leading-[1.45] [[data-modo=pila]_&]:tracking-[0.06em]`}>{linea.nombre}</span>
       </div>
       {/* En la pila de celular el lomo (número y nombre) queda a la vista al
           taparse; el cuerpo es lo que se esconde (lineas-investigacion/pila-movil.ts). */}
       <div data-linea-cuerpo>
-        <h3 className="font-display mt-4 text-[1.32rem] leading-[1.24] font-bold tracking-[-0.015em] text-balance lg:text-[1.42rem]">
+        <h3 className="font-display mt-4 text-[1.32rem] [[data-modo=pila]_&]:mt-3 leading-[1.24] font-bold tracking-[-0.015em] text-balance lg:text-[1.42rem]">
           {material === "nota" && (
             <FlechaManuscrita className="text-verde-concepto float-left mt-1 mr-2 h-5 w-8 rotate-[12deg]" />
           )}
