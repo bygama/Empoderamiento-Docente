@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { VERBO_POS } from "../preguntas-faro";
 import { crearCamaraMovil, type Punto } from "./camara-faro-movil";
+import { ORIGEN_HAZ } from "./HacesFaro";
 import { crearLuzMovil } from "./luz-faro-movil";
 
 if (typeof window !== "undefined") {
@@ -147,7 +148,7 @@ export function armarFaroMovil(root: HTMLElement, alto: HTMLElement) {
   });
 
   /* ── Estados iniciales: faro apagado, textos fuera ────────────────── */
-  gsap.set("[data-haz='izq']", { autoAlpha: 0, scaleX: 0.06, transformOrigin: "1310px 100px", willChange: "transform, opacity" });
+  gsap.set("[data-haz='izq']", { autoAlpha: 0, scaleX: 0.06, transformOrigin: ORIGEN_HAZ.izq, willChange: "transform, opacity" });
   gsap.set("[data-haz='der']", { autoAlpha: 0 });
   gsap.set("[data-halo]", { autoAlpha: 0, scale: 0.3, transformOrigin: "50% 50%" });
   gsap.set("[data-nucleo]", { autoAlpha: 0.16, scale: 0.5, transformOrigin: "50% 50%" });
