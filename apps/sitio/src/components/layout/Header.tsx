@@ -109,9 +109,11 @@ export function Header({ sitio }: { sitio: Pick<DatosDelSitio, "correo" | "redes
     <nav
       ref={ref}
       data-bp-nav
+      // El tope suma lo que el navegador tape por arriba (VisorVisual): así el
+      // logo y el menú quedan siempre a la vista.
       // La píldora es de escritorio (todo lo `lg:`). Por debajo de lg el nav es
       // solo el renglón: el logo va suelto y el botón es una isla (MobileNav).
-      className="group/nav lg:border-azul-principal/10 fixed top-4 right-4 left-4 z-50 flex items-center justify-between gap-3 lg:right-auto lg:left-1/2 lg:w-max lg:max-w-[calc(100vw-2rem)] lg:-translate-x-1/2 lg:justify-start lg:rounded-[1.25rem] lg:border lg:bg-white/70 lg:px-4 lg:py-3 lg:backdrop-blur-xl"
+      className="group/nav lg:border-azul-principal/10 fixed top-[calc(1rem+var(--visor-arriba,0px))] right-4 left-4 z-50 flex items-center justify-between gap-3 lg:right-auto lg:left-1/2 lg:w-max lg:max-w-[calc(100vw-2rem)] lg:-translate-x-1/2 lg:justify-start lg:rounded-[1.25rem] lg:border lg:bg-white/70 lg:px-4 lg:py-3 lg:backdrop-blur-xl"
     >
       {/* Grupo logo + wordmark. El wordmark colapsa (width + marginLeft → 0) sin
           dejar gap residual: la separación con los links la da el gap-3 del nav. */}

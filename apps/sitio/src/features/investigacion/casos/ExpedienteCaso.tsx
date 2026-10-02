@@ -105,7 +105,9 @@ export function ExpedienteCaso({
       data-lenis-prevent
       id="expediente-caso"
       aria-label={`Expediente del caso ${caso.numero}`}
-      className={`fixed inset-0 z-50 overflow-x-hidden overflow-y-auto overscroll-contain ${
+      // El tope y el alto son los de la pantalla que se ve (VisorVisual), no
+      // los del layout: en iPhone la cabecera quedaba tapada arriba.
+      className={`fixed inset-x-0 top-[var(--visor-arriba,0px)] z-50 h-[var(--visor-alto,100%)] overflow-x-hidden overflow-y-auto overscroll-contain ${
         telonOpaco ? "bg-gris-fondo" : "bg-transparent"
       }`}
     >

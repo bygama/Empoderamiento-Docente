@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { IndicePagina } from "@/components/layout/IndicePagina";
 import { Analitica } from "@/components/layout/Analitica";
 import { AterrizajePorLink } from "@/components/layout/AterrizajePorLink";
+import { VisorVisual } from "@/components/layout/VisorVisual";
 import { FranjaDeBorrador } from "@/components/layout/FranjaDeBorrador";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { inter, manrope } from "@/config/fuentes/compartidas";
@@ -78,6 +79,7 @@ export default async function RootLayout({
           <Header sitio={{ correo, redes }} />
           <IndicePagina />
           <AterrizajePorLink />
+          <VisorVisual />
           {children}
           {/* Fondo detrás del footer: la muesca de sus esquinas superiores
               redondeadas toma ESTE color. Blanco por defecto (matchea las
